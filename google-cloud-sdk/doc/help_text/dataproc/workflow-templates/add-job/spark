@@ -47,15 +47,17 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --archives=[ARCHIVE,...]
-        Comma separated list of archives to be provided to the job. must be one
-        of the following file formats: .zip, .tar, .tar.gz, or .tgz.
+        Comma separated list of archives to be extracted into the working
+        directory of each executor. Must be one of the following file formats:
+        .zip, .tar, .tar.gz, or .tgz.
 
      --driver-log-levels=[PACKAGE=LEVEL,...]
         List of package to log4j log level pairs to configure driver logging.
         For example: root=FATAL,com.example=INFO
 
      --files=[FILE,...]
-        Comma separated list of files to be provided to the job.
+        Comma separated list of files to be placed in the working directory of
+        each executor.
 
      --jars=[JAR,...]
         Comma separated list of jar files to be provided to the executor and

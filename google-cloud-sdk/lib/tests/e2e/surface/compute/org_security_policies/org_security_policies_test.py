@@ -34,13 +34,16 @@ class OrgSecurityPoliciesTestAlpha(e2e_test_base.BaseTest):
         e2e_utils.GetResourceNameGenerator(
             prefix='compute-security-policy-test')
     )
+    self.description_generator = e2e_utils.GetResourceNameGenerator(
+        prefix='compute-org-security-policy')
 
   def testSecurityPolicy(self):
     try:
       # Create a security policy.
+      description = next(self.description_generator)
       self.Run('compute org-security-policies create --organization={0} '
                '--description={1} --display-name={2}'.format(
-                   ORGANIZATION_ID, 'test-e2e-sp', self.display_name))
+                   ORGANIZATION_ID, description, self.display_name))
       self.AssertErrContains('SUCCESS')
       self.ClearErr()
 
@@ -48,19 +51,21 @@ class OrgSecurityPoliciesTestAlpha(e2e_test_base.BaseTest):
       security_policy_describe = self.Run(
           'compute org-security-policies describe {0} --organization={1}'
           .format(self.display_name, ORGANIZATION_ID))[0]
-      self.assertEqual(security_policy_describe.description, 'test-e2e-sp')
+      self.assertEqual(security_policy_describe.description, description)
       self.ClearErr()
 
       # Patch
+      updated_description = next(self.description_generator)
       self.Run(
           'compute org-security-policies update {0} --description={1} --organization={2}'
-          .format(self.display_name, 'test-e2e-sp-1', ORGANIZATION_ID))
+          .format(self.display_name, updated_description, ORGANIZATION_ID))
       self.AssertErrContains('SUCCESS')
       self.ClearErr()
       security_policy_describe = self.Run(
           'compute org-security-policies describe {0} --organization={1}'
           .format(self.display_name, ORGANIZATION_ID))[0]
-      self.assertEqual(security_policy_describe.description, 'test-e2e-sp-1')
+      self.assertEqual(security_policy_describe.description,
+                       updated_description)
       self.ClearErr()
 
       # Add Rule

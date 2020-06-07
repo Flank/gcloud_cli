@@ -1,5 +1,5 @@
 title: gcloud workflows describe test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -22,7 +22,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://workflows.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow?alt=json
+          uri: https://workflows.googleapis.com/v1beta/projects/fake-project/locations/us-central1/workflows/test-workflow?alt=json
           method: GET
           headers: {}
           body: null
@@ -38,16 +38,16 @@ actions:
                       Return: "1"
             state: ACTIVE
             updateTime: '2019-05-30T08:58:28.271930330Z'
-            versionId: '7'
+            revisionId: '000007-a3f'
     - expect_stdout: |
         createTime: '2019-05-17T13:13:08.760823862Z'
         description: This is a description
         name: projects/fake-project/locations/us-central1/workflows/test-workflow
+        revisionId: 000007-a3f
         sourceContents: |
           - return:
                   Return: "1"
         state: ACTIVE
         updateTime: '2019-05-30T08:58:28.271930330Z'
-        versionId: '7'
     - expect_exit:
         code: 0

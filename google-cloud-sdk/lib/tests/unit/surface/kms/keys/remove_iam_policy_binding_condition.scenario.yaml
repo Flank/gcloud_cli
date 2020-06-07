@@ -1,5 +1,5 @@
 title: kms keys remove-iam-policy-binding scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # remove binding with condition from a policy with condition

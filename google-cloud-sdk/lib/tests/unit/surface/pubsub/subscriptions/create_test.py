@@ -375,6 +375,44 @@ Created subscription [{}].
       self.Run('pubsub subscriptions create subs1 --topic topic1' +
                dead_letter_flags)
 
+  @parameterized.parameters(
+      (' --min-retry-delay 20s --max-retry-delay 50s', '20s', '50s'),
+      (' --min-retry-delay 20s', '20s', None),
+      (' --max-retry-delay 50s', None, '50s'))
+  def testRetryPolicyPullSubscriptionsCreate(self, retry_policy_flags,
+                                             min_retry_delay, max_retry_delay):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    retry_policy = self.msgs.RetryPolicy(
+        minimumBackoff=min_retry_delay, maximumBackoff=max_retry_delay)
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        retryPolicy=retry_policy)
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1' +
+         retry_policy_flags), [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].retryPolicy, retry_policy)
+
+  @parameterized.parameters(
+      (' --min-retry-delay 0s --max-retry-delay 700s',
+       cli_test_base.MockArgumentError,
+       'argument --max-retry-delay: value must be less than or equal '
+       'to 600s; received: 700s'),
+      (' --min-retry-delay 800s --max-retry-delay 500s',
+       cli_test_base.MockArgumentError,
+       'argument --min-retry-delay: value must be less than or equal '
+       'to 600s; received: 800s'))
+  def testRetryPolicyExceptionPullSubscriptionsCreate(self, retry_flags,
+                                                      exception,
+                                                      exception_message):
+    with self.AssertRaisesExceptionMatches(exception, exception_message):
+      self.Run('pubsub subscriptions create subs1 --topic topic1' + retry_flags)
+
 
 class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
 
@@ -576,44 +614,6 @@ class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest,
     self.assertEqual(result[0].name, sub_ref.RelativeName())
     self.assertEqual(result[0].topic, topic_ref.RelativeName())
     self.assertEqual(result[0].enableMessageOrdering, ordering_property)
-
-  @parameterized.parameters(
-      (' --min-retry-delay 20s --max-retry-delay 50s', '20s', '50s'),
-      (' --min-retry-delay 20s', '20s', None),
-      (' --max-retry-delay 50s', None, '50s'))
-  def testRetryPolicyPullSubscriptionsCreate(self, retry_policy_flags,
-                                             min_retry_delay, max_retry_delay):
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    retry_policy = self.msgs.RetryPolicy(
-        minimumBackoff=min_retry_delay, maximumBackoff=max_retry_delay)
-    req_subscription = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        topic=topic_ref.RelativeName(),
-        retryPolicy=retry_policy)
-
-    result = self.ExpectCreatedSubscriptions(
-        ('pubsub subscriptions create subs1 --topic topic1' +
-         retry_policy_flags), [req_subscription])
-
-    self.assertEqual(result[0].name, sub_ref.RelativeName())
-    self.assertEqual(result[0].topic, topic_ref.RelativeName())
-    self.assertEqual(result[0].retryPolicy, retry_policy)
-
-  @parameterized.parameters(
-      (' --min-retry-delay 0s --max-retry-delay 700s',
-       cli_test_base.MockArgumentError,
-       'argument --max-retry-delay: value must be less than or equal '
-       'to 600s; received: 700s'),
-      (' --min-retry-delay 800s --max-retry-delay 500s',
-       cli_test_base.MockArgumentError,
-       'argument --min-retry-delay: value must be less than or equal '
-       'to 600s; received: 800s'))
-  def testRetryPolicyExceptionPullSubscriptionsCreate(self, retry_flags,
-                                                      exception,
-                                                      exception_message):
-    with self.AssertRaisesExceptionMatches(exception, exception_message):
-      self.Run('pubsub subscriptions create subs1 --topic topic1' + retry_flags)
 
 
 if __name__ == '__main__':

@@ -34,7 +34,7 @@ actions:
                   labels:
                     family: highmem
                     stack: dev
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   networkAccess: public
                   reserved: false
                 workerCount: '2'
@@ -65,7 +65,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/labelled_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "networkAccess": "public",
@@ -99,7 +99,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/labelled_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "networkAccess": "public",

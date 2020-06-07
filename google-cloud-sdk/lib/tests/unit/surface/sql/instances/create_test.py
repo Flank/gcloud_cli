@@ -152,6 +152,26 @@ instance1 POSTGRES_11      us-central db-n1-standard-1 0.0.0.0         -        
 """,
         normalize_space=True)
 
+  def testCreatePostgres12(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_12,
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 --database-version=POSTGRES_12')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 POSTGRES_12      us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
   def testCreateSqlServer2017Express(self):
     diff = {
         'name':
@@ -1112,12 +1132,12 @@ class InstancesCreateGATest(_BaseInstancesCreateTest, base.SqlMockTestGA):
   def testCreateUnknownVersion(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('sql instances create instance1 --database-version=UNKNOWN')
-      self.AssertErrContains(
-          "argument --database-version: Invalid choice: 'UNKNOWN'.")
-      self.AssertErrContains(
-          'Valid choices are [MYSQL_5_5, MYSQL_5_6, MYSQL_5_7, POSTGRES_11, '
-          'POSTGRES_9_6, SQLSERVER_2017_ENTERPRISE, SQLSERVER_2017_EXPRESS, '
-          'SQLSERVER_2017_STANDARD, SQLSERVER_2017_WEB].')
+    self.AssertErrContains(
+        "argument --database-version: Invalid choice: 'UNKNOWN'.")
+    self.AssertErrContains(
+        'Valid choices are [MYSQL_5_5, MYSQL_5_6, MYSQL_5_7, POSTGRES_10, '
+        'POSTGRES_11, POSTGRES_12, POSTGRES_9_6, SQLSERVER_2017_ENTERPRISE, '
+        'SQLSERVER_2017_EXPRESS, SQLSERVER_2017_STANDARD, SQLSERVER_2017_WEB].')
   # LINT.ThenChange(:version_tests)
 
 

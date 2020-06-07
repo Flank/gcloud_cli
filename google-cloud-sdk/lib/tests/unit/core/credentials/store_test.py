@@ -31,6 +31,7 @@ from googlecloudsdk.core.credentials import devshell as c_devshell
 from googlecloudsdk.core.credentials import gce as c_gce
 from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth
 from googlecloudsdk.core.credentials import store
+from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -49,6 +50,7 @@ from google.auth import _helpers
 from google.auth import compute_engine as google_auth_gce
 from google.auth import crypt as google_auth_crypt
 from google.auth import exceptions as google_auth_exceptions
+from google.auth import impersonated_credentials as google_auth_impersonated_creds
 from google.auth import jwt
 from google.oauth2 import _client
 from google.oauth2 import credentials
@@ -76,6 +78,18 @@ def _FakeRefreshGoogleAuthUserCredentials(self, http):
   self.token = 'REFRESHED-ACCESS-TOKEN'
   self.expiry = _MakeFakeCredentialsRefreshExpiry()
   self._id_token = 'REFRESHED-ID-TOKEN'
+
+
+def _MockImpersonatedGoogleAuthAccessTokenRefresh(
+    self, requests):  # pylint=invalid-name
+  del requests
+  self.token = 'test-access-token'
+
+
+def _MockImpersonatedGoogleAuthIdTokenRefresh(self,
+                                              requests):  # pylint=invalid-name
+  del requests
+  self.token = 'test-id-token'
 
 
 # pylint: enable=unused-argument
@@ -764,6 +778,19 @@ gs_oauth2_refresh_token = fake-token
           r'\[asdf@google.com\] but impersonation support is not available.'):
         store.Load()
 
+  def testServiceAccountImpersonationGoogleAuthNotConfiguredError(self):
+    fake_cred = self.MakeServiceAccountCredentialsGoogleAuth()
+    store.Store(fake_cred)
+    properties.VALUES.auth.impersonate_service_account.Set('asdf@google.com')
+    with mock.patch(
+        'googlecloudsdk.core.credentials.store.IMPERSONATION_TOKEN_PROVIDER',
+        None):
+      with self.assertRaisesRegex(
+          store.AccountImpersonationError,
+          r'gcloud is configured to impersonate service account '
+          r'\[asdf@google.com\] but impersonation support is not available.'):
+        store.Load(use_google_auth=True)
+
   def testNoAccountError(self):
     store.Store(self.fake_cred)
     properties.VALUES.core.account.Set(None)
@@ -901,6 +928,32 @@ gs_oauth2_refresh_token = fake-token
     self.assertEqual(test_cred.id_tokenb64, 'test-id-token')
     mock_GetElevationIdToken.assert_called_once_with(
         'service-account-id', mock.ANY, True)
+
+  def testRefreshImpersonateServiceAccountIdTokenGoogleAuth(self):
+    store.IMPERSONATION_TOKEN_PROVIDER = (
+        iamcredentials_util.ImpersonationAccessTokenProvider())
+    source_cred = mock.Mock()
+
+    self.StartObjectPatch(
+        google_auth_impersonated_creds.Credentials,
+        'refresh',
+        new=_MockImpersonatedGoogleAuthAccessTokenRefresh)
+    self.StartObjectPatch(
+        google_auth_impersonated_creds.IDTokenCredentials,
+        'refresh',
+        new=_MockImpersonatedGoogleAuthIdTokenRefresh)
+
+    access_token_cred = store.IMPERSONATION_TOKEN_PROVIDER.GetElevationAccessTokenGoogleAuth(
+        source_cred, 'service_account_id', config.CLOUDSDK_SCOPES)
+
+    store.Refresh(
+        access_token_cred,
+        http_client=mock.Mock(),
+        is_impersonated_credential=True,
+        include_email=True)
+
+    self.assertEqual(access_token_cred.token, 'test-access-token')
+    self.assertEqual(access_token_cred.id_tokenb64, 'test-id-token')
 
   def testRefreshError(self):
     self.refresh_mock.side_effect = client.AccessTokenRefreshError
@@ -1344,6 +1397,12 @@ class RevokeTest(cli_test_base.CliTestBase,
     self.AssertCredsNotExistInLocal(sv.service_account_email)
     revoke_credentials_mock.assert_not_called()
     self.assertFalse(result)
+
+  def testRevoke_MissingLegacyCredentials(self):
+    store.Store(self.oauth2client_creds, self.fake_account)
+    files.RmTree(config.Paths().LegacyCredentialsDir(self.fake_account))
+    store.Revoke(account=self.fake_account, use_google_auth=True)
+    self.AssertCredsNotExistInLocal(self.fake_account)
 
 
 if __name__ == '__main__':

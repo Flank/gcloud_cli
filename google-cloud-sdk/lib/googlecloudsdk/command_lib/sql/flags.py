@@ -186,9 +186,10 @@ def AddActivationPolicy(parser):
 def AddAssignIp(parser):
   parser.add_argument(
       '--assign-ip',
-      help='Assign an IPv4 external address to this instance. This setting is '
-      'enabled by default when creating a new instance, but can be '
-      'disabled to use private IP connectivity.',
+      help='Assign a public IP address to the instance. This is a public, '
+      'externally available IPv4 address that you can use to connect to your '
+      'instance when properly authorized. Use --assign-ip to enable a public '
+      'IP and --no-assign-ip to disable it.',
       action=arg_parsers.StoreTrueFalseAction)
 
 
@@ -274,6 +275,7 @@ def AddDatabaseVersion(parser, restrict_choices=True):
       'POSTGRES_9_6',
       'POSTGRES_10',
       'POSTGRES_11',
+      'POSTGRES_12',
       'SQLSERVER_2017_EXPRESS',
       'SQLSERVER_2017_WEB',
       'SQLSERVER_2017_STANDARD',

@@ -24,6 +24,7 @@ import contextlib
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.util.platforms import OperatingSystem
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
@@ -36,8 +37,45 @@ def _GetResourceName(prefix):
 
 class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
                                    cli_test_base.CliTestBase):
+  # A mapping of which billing project to use for this instance of e2e test
+  # based on the operating system and release track.
+  SHARDING_QUOTA_PROJECT = {
+      OperatingSystem.LINUX: {
+          calliope_base.ReleaseTrack.GA: '888422664032',
+          calliope_base.ReleaseTrack.BETA: '334969862',
+          calliope_base.ReleaseTrack.ALPHA: '227997894940',
+      },
+      OperatingSystem.WINDOWS: {
+          calliope_base.ReleaseTrack.GA: '502734576903',
+          calliope_base.ReleaseTrack.BETA: '937099147667',
+          calliope_base.ReleaseTrack.ALPHA: '686404499936',
+      },
+      OperatingSystem.MACOSX: {
+          calliope_base.ReleaseTrack.GA: '618624148297',
+          calliope_base.ReleaseTrack.BETA: '974650614028',
+          calliope_base.ReleaseTrack.ALPHA: '86178890000',
+      }
+  }
+  # A mapping of which organization to use for this instance of e2e test based
+  # on the operating system and release track.
+  SHARDING_ORG = {
+      OperatingSystem.LINUX: {
+          calliope_base.ReleaseTrack.GA: '76738297746',
+          calliope_base.ReleaseTrack.BETA: '340595059913',
+          calliope_base.ReleaseTrack.ALPHA: '191131751739',
+      },
+      OperatingSystem.WINDOWS: {
+          calliope_base.ReleaseTrack.GA: '995906764022',
+          calliope_base.ReleaseTrack.BETA: '45731270610',
+          calliope_base.ReleaseTrack.ALPHA: '221222174612',
+      },
+      OperatingSystem.MACOSX: {
+          calliope_base.ReleaseTrack.GA: '507192639236',
+          calliope_base.ReleaseTrack.BETA: '880393349060',
+          calliope_base.ReleaseTrack.ALPHA: '62963706250',
+      }
+  }
 
-  ORG_ID = '1054311078602'
   BASIC_LEVEL_SPEC = ('[{"ipSubnetworks": ["8.8.8.8/32"]}, '
                       '{"regions": ["CA", "US"]}, '
                       '{"members": ["user:example@example.com"]}, '
@@ -71,7 +109,8 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
     ]
   """
 
-  PROJECT_NUMBER = '175742511250'
+  DEFAULT_ORG_ID = '1054311078602'
+  DEFAULT_PROJECT_NUMBER = '175742511250'
 
   # Requires an already-set-up regular perimeter, in case it runs multiple times
   # simultaneously (a single project can only belong to one regular perimeter,
@@ -81,6 +120,20 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
     self._policy_id = None
+    self._current_org = self.SHARDING_ORG.get(OperatingSystem.Current(),
+                                              {}).get(self.track,
+                                                      self.DEFAULT_ORG_ID)
+    self._current_billing_project = self.SHARDING_QUOTA_PROJECT.get(
+        OperatingSystem.Current(), {}).get(self.track,
+                                           self.DEFAULT_PROJECT_NUMBER)
+
+  @contextlib.contextmanager
+  def _SetBillingProject(self):
+    properties.VALUES.billing.quota_project.Set(self._current_billing_project)
+    try:
+      yield
+    finally:
+      properties.VALUES.billing.quota_project.Set(None)
 
   @contextlib.contextmanager
   def _SetPolicyProperty(self, policy):
@@ -175,11 +228,9 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
     perimeter_id = _GetResourceName('PERIMETER')
     try:
       self.Run('access-context-manager perimeters create'
-               '    --perimeter-type bridge '
                '    --title "My Perimeter {perimeter}" '
-               '    --resources projects/{project} '
                '   {perimeter}'.format(
-                   project=self.PROJECT_NUMBER, perimeter=perimeter_id))
+                   perimeter=perimeter_id))
       yield perimeter_id
     finally:
       self.Run('access-context-manager perimeters delete '
@@ -245,7 +296,7 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
       policies = list(
           self.Run('access-context-manager policies list '
                    '    --format disable '
-                   '    --organization ' + self.ORG_ID))
+                   '    --organization ' + self._current_org))
       self.assertEqual(len(policies), 1)
       policy_ref = resources.REGISTRY.Parse(
           policies[0].name, collection='accesscontextmanager.accessPolicies')
@@ -256,8 +307,9 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
     policy_id = self._GetTestPolicyId()
     with self._SetPolicyProperty(policy_id):
       if self.track == calliope_base.ReleaseTrack.ALPHA or self.track == calliope_base.ReleaseTrack.BETA:
+        # TODO(b/150383794): Re-enable tests for ReplaceAccessLevels.
         # pylint: disable=using-constant-test
-        if False:  # TODO(b/150383794): Re-enable tests for ReplaceAccessLevels.
+        if False:
           # NOTE: Currently the replace levels includes a custom level.
           # If replace levels goes to GA before custom levels, we will need to
           # modify the replaceAll GA test to only reference basic levels.
@@ -487,16 +539,14 @@ vpcAccessibleServices:
       self._DestroyPerimeter(perimeter_id)
 
 
-@test_case.Filters.skipAlways('Generates too much traffic to ACM',
-                              'b/152875046')
+@test_case.Filters.skipAlways('Write quota exhaustion', 'b/152382402')
 class AccessContextManagerE2eTestsBeta(AccessContextManagerE2eTests):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
 
-@test_case.Filters.skipAlways('Generates too much traffic to ACM',
-                              'b/152875046')
+@test_case.Filters.skipAlways('Write quota exhaustion', 'b/152382402')
 class AccessContextManagerE2eTestsAlpha(AccessContextManagerE2eTests):
 
   def SetUp(self):

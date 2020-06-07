@@ -1,0 +1,56 @@
+NAME
+    gcloud alpha apigee - manage Apigee resources
+
+SYNOPSIS
+    gcloud alpha apigee GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Apigee resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     apis
+        (ALPHA) Manage Apigee API proxies.
+
+     deployments
+        (ALPHA) Manage deployments of Apigee proxies in runtime environments.
+
+     environments
+        (ALPHA) Manage Apigee environments.
+
+     organizations
+        (ALPHA) Manage Apigee organizations.
+
+EXAMPLES
+    To list API proxies in the active Cloud Platform project, run:
+
+        $ gcloud alpha apis list
+
+    To deploy an API proxy named hello-world to the test environment, run:
+
+        $ gcloud alpha apis deploy --environment=test --api=hello-world
+
+    To get the status of that deployment, run:
+
+        $ gcloud alpha deployments describe --environment=test \
+            --api=hello-world
+
+    To undeploy that API proxy, run:
+
+        $ gcloud alpha apis undeploy --environment=test --api=hello-world
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

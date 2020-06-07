@@ -185,13 +185,6 @@ class NodeGroupsUpdateTest(sdk_test_base.WithFakeAuth,
       self.Run('compute sole-tenancy node-groups update my-node-group '
                '--add-nodes 2 --delete-nodes node-2,node-5 --zone ' + self.zone)
 
-
-class NodeGroupsUpdateTestBeta(NodeGroupsUpdateTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
-
   def testUpdate_SetAutoscalingPolicy(self):
     mode = self.messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum('ON')
     self._ExpectSetAutoscalingPolicy({'mode': mode,
@@ -266,6 +259,13 @@ class NodeGroupsUpdateTestBeta(NodeGroupsUpdateTest):
              '--zone ' + self.zone)
     self.AssertErrContains(
         'Updating autoscaling policy on [my-node-group] to [min-nodes=0].')
+
+
+class NodeGroupsUpdateTestBeta(NodeGroupsUpdateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
 
 class NodeGroupsUpdateTestAlpha(NodeGroupsUpdateTestBeta):

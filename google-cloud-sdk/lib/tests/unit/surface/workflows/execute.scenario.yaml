@@ -1,5 +1,5 @@
 title: gcloud workflows execute test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -17,7 +17,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://workflowexecutions.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow/executions?alt=json
+          uri: https://workflowexecutions.googleapis.com/v1beta/projects/fake-project/locations/us-central1/workflows/test-workflow/executions?alt=json
           method: POST
           headers: {}
           body:
@@ -32,12 +32,12 @@ actions:
               "startTime": "2020-02-12T08:21:10.294056012Z",
               "state": "ACTIVE",
               "argument": "{\"test\":5}",
-              "workflowVersionId": "1"
+              "workflowRevisionId": "000001-2f4"
             }
     - expect_stderr: |
         Created [foo].
 
         To view the workflow status, you can use following command:
-        gcloud alpha workflows executions describe foo --workflow test-workflow
+        gcloud beta workflows executions describe foo --workflow test-workflow
     - expect_exit:
         code: 0

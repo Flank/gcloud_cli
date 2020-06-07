@@ -319,6 +319,7 @@ class ParseCreateOrUpdateBetaPushQueueArgsTest(ParseArgsTestBase):
     expected_config = _BETA_MESSAGES_MODULE.Queue()
     expected_config.appEngineHttpQueue = (
         _BETA_MESSAGES_MODULE.AppEngineHttpQueue())
+    expected_config.type = _BETA_MESSAGES_MODULE.Queue.TypeValueValuesEnum.PUSH
     args = self.parser.parse_args([])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
         args, constants.PUSH_QUEUE, _BETA_MESSAGES_MODULE,
@@ -336,6 +337,7 @@ class ParseCreateOrUpdateBetaPushQueueArgsTest(ParseArgsTestBase):
         _BETA_MESSAGES_MODULE.StackdriverLoggingConfig(samplingRatio=0.5))
     expected_config.appEngineHttpQueue = _BETA_MESSAGES_MODULE.AppEngineHttpQueue(
         appEngineRoutingOverride={'service': 'abc'})
+    expected_config.type = _BETA_MESSAGES_MODULE.Queue.TypeValueValuesEnum.PUSH
     args = self.parser.parse_args(['--log-sampling-ratio=0.5',
                                    '--max-attempts=10',
                                    '--max-retry-duration=5s',
@@ -361,6 +363,7 @@ class ParseCreateOrUpdateBetaPushQueueArgsTest(ParseArgsTestBase):
         _BETA_MESSAGES_MODULE.StackdriverLoggingConfig(samplingRatio=0.5))
     expected_config.appEngineHttpQueue = _BETA_MESSAGES_MODULE.AppEngineHttpQueue(
         appEngineRoutingOverride={'service': 'abc'})
+    expected_config.type = _BETA_MESSAGES_MODULE.Queue.TypeValueValuesEnum.PUSH
     args = self.parser.parse_args(['--log-sampling-ratio=0.5',
                                    '--max-attempts=unlimited',
                                    '--max-retry-duration=5s',
@@ -401,7 +404,8 @@ class ParseClearQueueFieldsTest(ParseArgsTestBase):
         stackdriverLoggingConfig=(
             _BETA_MESSAGES_MODULE.StackdriverLoggingConfig()),
         appEngineHttpQueue=_BETA_MESSAGES_MODULE.AppEngineHttpQueue(
-            appEngineRoutingOverride=_BETA_MESSAGES_MODULE.AppEngineRouting()))
+            appEngineRoutingOverride=_BETA_MESSAGES_MODULE.AppEngineRouting()),
+        type=_BETA_MESSAGES_MODULE.Queue.TypeValueValuesEnum.PUSH)
     args = self.parser.parse_args(['--clear-log-sampling-ratio',
                                    '--clear-max-attempts',
                                    '--clear-max-retry-duration',

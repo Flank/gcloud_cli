@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha remote-build-execution worker-pools update
-        (WORKERPOOL : --instance=INSTANCE) [--async] [--disk-size=DISK_SIZE]
+        (WORKERPOOL : --instance=INSTANCE) [--async]
+        [--channel=CHANNEL; default="current"] [--disk-size=DISK_SIZE]
         [--disk-type=DISK_TYPE] [--machine-type=MACHINE_TYPE]
         [--max-concurrent-actions=MAX_CONCURRENT_ACTIONS]
         [--min-cpu-platform=MIN_CPU_PLATFORM] [--network-access=NETWORK_ACCESS]
@@ -42,6 +43,9 @@ FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --channel=CHANNEL; default="current"
+        The release channel of the worker pool.
 
      --disk-size=DISK_SIZE
         Size of the disk, in Gb, for each worker. Defaults to 200Gb.

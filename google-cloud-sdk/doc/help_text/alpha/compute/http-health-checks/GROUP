@@ -28,8 +28,7 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create an HTTP legacy health check to monitor load balanced
-        instances.
+        (ALPHA) Create a legacy HTTP health check.
 
      delete
         (ALPHA) Delete HTTP health checks.
@@ -41,7 +40,7 @@ COMMANDS
         (ALPHA) List Google Compute Engine health checks.
 
      update
-        (ALPHA) Update an HTTP health check.
+        (ALPHA) Update a legacy HTTP health check.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

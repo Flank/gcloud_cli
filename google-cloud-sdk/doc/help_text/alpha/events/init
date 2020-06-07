@@ -2,8 +2,8 @@ NAME
     gcloud alpha events init - initialize a cluster for eventing
 
 SYNOPSIS
-    gcloud alpha events init --service-account=SERVICE_ACCOUNT
-        [--platform=PLATFORM]
+    gcloud alpha events init [--platform=PLATFORM]
+        [--service-account=SERVICE_ACCOUNT]
         [--region=REGION
           | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
           | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
@@ -14,12 +14,7 @@ DESCRIPTION
     account, and creates a new key for the provided service account. This
     command is only available with Cloud Run for Anthos.
 
-REQUIRED FLAGS
-     --service-account=SERVICE_ACCOUNT
-        Email address of an IAM service account which represents the identity
-        of the internal events operator.
-
-OPTIONAL FLAGS
+FLAGS
      --platform=PLATFORM
         Target platform for running commands. Alternatively, set the property
         [run/platform]. If not specified, the user will be prompted to choose a
@@ -37,6 +32,11 @@ OPTIONAL FLAGS
             Use a Knative-compatible kubernetes cluster. Use with the
             --kubeconfig and --context flags to specify a kubeconfig file and
             the context for connecting.
+
+     --service-account=SERVICE_ACCOUNT
+        Email address of an existing IAM service account which represents the
+        identity of the internal events operator. If no service account is
+        provided, a default service account (cloud-run-events) will be created.
 
      Arguments to locate resources, depending on the platform used. At most one
      of these may be specified:

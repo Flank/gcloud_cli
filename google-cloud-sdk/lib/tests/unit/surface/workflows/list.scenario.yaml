@@ -1,14 +1,14 @@
 title: gcloud workflows list test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       workflows list --location us-central1
   - stdout: |
-      NAME                                                                         STATE   VERSION_ID  UPDATE_TIME
-      projects/fake-project/locations/us-central1/workflows/test-workflow          ACTIVE  7           2019-05-30T08:58:28.271930330Z
-      projects/fake-project/locations/us-central1/workflows/another-test-workflow  ACTIVE  14          2019-04-11T23:03:44.183427632Z
+      NAME                                                                         STATE   REVISION_ID  UPDATE_TIME
+      projects/fake-project/locations/us-central1/workflows/test-workflow          ACTIVE  000007-bec   2019-05-30T08:58:28.271930330Z
+      projects/fake-project/locations/us-central1/workflows/another-test-workflow  ACTIVE  000014-123   2019-04-11T23:03:44.183427632Z
 actions:
 - execute_command:
     command: |
@@ -16,7 +16,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://workflows.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows?alt=json
+          uri: https://workflows.googleapis.com/v1beta/projects/fake-project/locations/us-central1/workflows?alt=json
           method: GET
           headers: {}
           body: null
@@ -33,7 +33,7 @@ actions:
                         Return: "1"
               state: ACTIVE
               updateTime: '2019-05-30T08:58:28.271930330Z'
-              versionId: '7'
+              revisionId: 000007-bec
             - createTime: '2019-03-22T17:42:55.928517456Z'
               description: This is a different description
               name: projects/fake-project/locations/us-central1/workflows/another-test-workflow
@@ -42,10 +42,10 @@ actions:
                         Return: "test"
               state: ACTIVE
               updateTime: '2019-04-11T23:03:44.183427632Z'
-              versionId: '14'
+              revisionId: 000014-123
     - expect_stdout: |
-        NAME                                                                         STATE   VERSION_ID  UPDATE_TIME
-        projects/fake-project/locations/us-central1/workflows/test-workflow          ACTIVE  7           2019-05-30T08:58:28.271930330Z
-        projects/fake-project/locations/us-central1/workflows/another-test-workflow  ACTIVE  14          2019-04-11T23:03:44.183427632Z
+        NAME                                                                         STATE   REVISION_ID  UPDATE_TIME
+        projects/fake-project/locations/us-central1/workflows/test-workflow          ACTIVE  000007-bec   2019-05-30T08:58:28.271930330Z
+        projects/fake-project/locations/us-central1/workflows/another-test-workflow  ACTIVE  000014-123   2019-04-11T23:03:44.183427632Z
     - expect_exit:
         code: 0

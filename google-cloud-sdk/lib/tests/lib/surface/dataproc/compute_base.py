@@ -151,6 +151,7 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
           http=mock.ANY,
           progress_tracker=None,
           followup_overrides=None,
+          no_followup=False,
           log_result=True,
           timeout=None)
 

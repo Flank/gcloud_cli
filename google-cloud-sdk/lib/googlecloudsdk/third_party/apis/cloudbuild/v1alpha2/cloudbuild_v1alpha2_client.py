@@ -8,17 +8,17 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
   """Generated client library for service cloudbuild version v1alpha2."""
 
   MESSAGES_MODULE = messages
-  BASE_URL = u'https://cloudbuild.googleapis.com/'
-  MTLS_BASE_URL = u'https://cloudbuild.mtls.googleapis.com/'
+  BASE_URL = 'https://cloudbuild.googleapis.com/'
+  MTLS_BASE_URL = 'https://cloudbuild.mtls.googleapis.com/'
 
-  _PACKAGE = u'cloudbuild'
-  _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
-  _VERSION = u'v1alpha2'
+  _PACKAGE = 'cloudbuild'
+  _SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
+  _VERSION = 'v1alpha2'
   _CLIENT_ID = '1042881264118.apps.googleusercontent.com'
   _CLIENT_SECRET = 'x_Tw5K8nnjoRAqULM9PFAC2b'
-  _USER_AGENT = u'google-cloud-sdk'
-  _CLIENT_CLASS_NAME = u'CloudbuildV1alpha2'
-  _URL_VERSION = u'v1alpha2'
+  _USER_AGENT = 'google-cloud-sdk'
+  _CLIENT_CLASS_NAME = 'CloudbuildV1alpha2'
+  _URL_VERSION = 'v1alpha2'
   _API_KEY = None
 
   def __init__(self, url='', credentials=None,
@@ -36,13 +36,136 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
+    self.projects_locations_operations = self.ProjectsLocationsOperationsService(self)
+    self.projects_locations = self.ProjectsLocationsService(self)
     self.projects_workerPools = self.ProjectsWorkerPoolsService(self)
     self.projects = self.ProjectsService(self)
+
+  class ProjectsLocationsOperationsService(base_api.BaseApiService):
+    """Service class for the projects_locations_operations resource."""
+
+    _NAME = 'projects_locations_operations'
+
+    def __init__(self, client):
+      super(CloudbuildV1alpha2.ProjectsLocationsOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Cancel(self, request, global_params=None):
+      r"""Starts asynchronous cancellation on a long-running operation.  The server.
+makes a best effort to cancel the operation, but success is not
+guaranteed.  If the server doesn't support this method, it returns
+`google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+Operations.GetOperation or
+other methods to check whether the cancellation succeeded or whether the
+operation completed despite cancellation. On successful cancellation,
+the operation is not deleted; instead, it becomes an operation with
+an Operation.error value with a google.rpc.Status.code of 1,
+corresponding to `Code.CANCELLED`.
+
+      Args:
+        request: (CloudbuildProjectsLocationsOperationsCancelRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Empty) The response message.
+      """
+      config = self.GetMethodConfig('Cancel')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Cancel.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel',
+        http_method='POST',
+        method_id='cloudbuild.projects.locations.operations.cancel',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1alpha2/{+name}:cancel',
+        request_field='cancelOperationRequest',
+        request_type_name='CloudbuildProjectsLocationsOperationsCancelRequest',
+        response_type_name='Empty',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
+method to poll the operation result at intervals as recommended by the API
+service.
+
+      Args:
+        request: (CloudbuildProjectsLocationsOperationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='cloudbuild.projects.locations.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1alpha2/{+name}',
+        request_field='',
+        request_type_name='CloudbuildProjectsLocationsOperationsGetRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists operations that match the specified filter in the request. If the.
+server doesn't support this method, it returns `UNIMPLEMENTED`.
+
+NOTE: the `name` binding allows API services to override the binding
+to use different resource name schemes, such as `users/*/operations`. To
+override the binding, API services can add a binding such as
+`"/v1/{name=users/*}/operations"` to their service configuration.
+For backwards compatibility, the default name includes the operations
+collection id, however overriding users must ensure the name binding
+is the parent resource, without the operations collection id.
+
+      Args:
+        request: (CloudbuildProjectsLocationsOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListOperationsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/operations',
+        http_method='GET',
+        method_id='cloudbuild.projects.locations.operations.list',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['filter', 'pageSize', 'pageToken'],
+        relative_path='v1alpha2/{+name}/operations',
+        request_field='',
+        request_type_name='CloudbuildProjectsLocationsOperationsListRequest',
+        response_type_name='ListOperationsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsService(base_api.BaseApiService):
+    """Service class for the projects_locations resource."""
+
+    _NAME = 'projects_locations'
+
+    def __init__(self, client):
+      super(CloudbuildV1alpha2.ProjectsLocationsService, self).__init__(client)
+      self._upload_configs = {
+          }
 
   class ProjectsWorkerPoolsService(base_api.BaseApiService):
     """Service class for the projects_workerPools resource."""
 
-    _NAME = u'projects_workerPools'
+    _NAME = 'projects_workerPools'
 
     def __init__(self, client):
       super(CloudbuildV1alpha2.ProjectsWorkerPoolsService, self).__init__(client)
@@ -63,16 +186,16 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
           config, request, global_params=global_params)
 
     Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha2/projects/{projectsId}/workerPools',
-        http_method=u'POST',
-        method_id=u'cloudbuild.projects.workerPools.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'workerPoolId'],
-        relative_path=u'v1alpha2/{+parent}/workerPools',
-        request_field=u'workerPool',
-        request_type_name=u'CloudbuildProjectsWorkerPoolsCreateRequest',
-        response_type_name=u'WorkerPool',
+        flat_path='v1alpha2/projects/{projectsId}/workerPools',
+        http_method='POST',
+        method_id='cloudbuild.projects.workerPools.create',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['workerPoolId'],
+        relative_path='v1alpha2/{+parent}/workerPools',
+        request_field='workerPool',
+        request_type_name='CloudbuildProjectsWorkerPoolsCreateRequest',
+        response_type_name='WorkerPool',
         supports_download=False,
     )
 
@@ -90,16 +213,16 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
           config, request, global_params=global_params)
 
     Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha2/projects/{projectsId}/workerPools/{workerPoolsId}',
-        http_method=u'DELETE',
-        method_id=u'cloudbuild.projects.workerPools.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
+        flat_path='v1alpha2/projects/{projectsId}/workerPools/{workerPoolsId}',
+        http_method='DELETE',
+        method_id='cloudbuild.projects.workerPools.delete',
+        ordered_params=['name'],
+        path_params=['name'],
         query_params=[],
-        relative_path=u'v1alpha2/{+name}',
+        relative_path='v1alpha2/{+name}',
         request_field='',
-        request_type_name=u'CloudbuildProjectsWorkerPoolsDeleteRequest',
-        response_type_name=u'Empty',
+        request_type_name='CloudbuildProjectsWorkerPoolsDeleteRequest',
+        response_type_name='Empty',
         supports_download=False,
     )
 
@@ -117,16 +240,16 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
           config, request, global_params=global_params)
 
     Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha2/projects/{projectsId}/workerPools/{workerPoolsId}',
-        http_method=u'GET',
-        method_id=u'cloudbuild.projects.workerPools.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
+        flat_path='v1alpha2/projects/{projectsId}/workerPools/{workerPoolsId}',
+        http_method='GET',
+        method_id='cloudbuild.projects.workerPools.get',
+        ordered_params=['name'],
+        path_params=['name'],
         query_params=[],
-        relative_path=u'v1alpha2/{+name}',
+        relative_path='v1alpha2/{+name}',
         request_field='',
-        request_type_name=u'CloudbuildProjectsWorkerPoolsGetRequest',
-        response_type_name=u'WorkerPool',
+        request_type_name='CloudbuildProjectsWorkerPoolsGetRequest',
+        response_type_name='WorkerPool',
         supports_download=False,
     )
 
@@ -144,16 +267,16 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
           config, request, global_params=global_params)
 
     List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha2/projects/{projectsId}/workerPools',
-        http_method=u'GET',
-        method_id=u'cloudbuild.projects.workerPools.list',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
+        flat_path='v1alpha2/projects/{projectsId}/workerPools',
+        http_method='GET',
+        method_id='cloudbuild.projects.workerPools.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
         query_params=[],
-        relative_path=u'v1alpha2/{+parent}/workerPools',
+        relative_path='v1alpha2/{+parent}/workerPools',
         request_field='',
-        request_type_name=u'CloudbuildProjectsWorkerPoolsListRequest',
-        response_type_name=u'ListWorkerPoolsResponse',
+        request_type_name='CloudbuildProjectsWorkerPoolsListRequest',
+        response_type_name='ListWorkerPoolsResponse',
         supports_download=False,
     )
 
@@ -171,23 +294,23 @@ class CloudbuildV1alpha2(base_api.BaseApiClient):
           config, request, global_params=global_params)
 
     Patch.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha2/projects/{projectsId}/workerPools/{workerPoolsId}',
-        http_method=u'PATCH',
-        method_id=u'cloudbuild.projects.workerPools.patch',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'updateMask'],
-        relative_path=u'v1alpha2/{+name}',
-        request_field=u'workerPool',
-        request_type_name=u'CloudbuildProjectsWorkerPoolsPatchRequest',
-        response_type_name=u'WorkerPool',
+        flat_path='v1alpha2/projects/{projectsId}/workerPools/{workerPoolsId}',
+        http_method='PATCH',
+        method_id='cloudbuild.projects.workerPools.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['updateMask'],
+        relative_path='v1alpha2/{+name}',
+        request_field='workerPool',
+        request_type_name='CloudbuildProjectsWorkerPoolsPatchRequest',
+        response_type_name='WorkerPool',
         supports_download=False,
     )
 
   class ProjectsService(base_api.BaseApiService):
     """Service class for the projects resource."""
 
-    _NAME = u'projects'
+    _NAME = 'projects'
 
     def __init__(self, client):
       super(CloudbuildV1alpha2.ProjectsService, self).__init__(client)

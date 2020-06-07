@@ -36,9 +36,7 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
             'my-test-cluster',
             '--login-config',
             'my-login-config.yaml',])
-    self.AssertErrContains('{"ux": "PROGRESS_TRACKER", '
-                           '"message": "Configuring Anthos authentication.", '
-                           '"status": "SUCCESS"}')
+    self.AssertErrContains('Configuring Anthos authentication')
 
   def testLoginDryRun(self):
     self.Run('anthos auth login  --cluster my-test-cluster '
@@ -53,9 +51,7 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
             '--login-config',
             'my-login-config.yaml',
             '--dry-run',])
-    self.AssertErrContains('{"ux": "PROGRESS_TRACKER", '
-                           '"message": "Configuring Anthos authentication.", '
-                           '"status": "SUCCESS"}')
+    self.AssertErrContains('Configuring Anthos authentication')
 
   def testLoginExplicit(self):
     self.Run('anthos auth login  --cluster my-test-cluster '
@@ -76,9 +72,7 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
             'mycert',
             '--user',
             'testuser',])
-    self.AssertErrContains('{"ux": "PROGRESS_TRACKER", '
-                           '"message": "Configuring Anthos authentication.", '
-                           '"status": "SUCCESS"}')
+    self.AssertErrContains('Configuring Anthos authentication')
 
 
 if __name__ == '__main__':

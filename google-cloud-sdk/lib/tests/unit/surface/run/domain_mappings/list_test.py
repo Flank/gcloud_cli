@@ -39,7 +39,7 @@ class DomainMappingListTestBeta(base.ServerlessSurfaceBase):
     for i, d in enumerate(self.domain_mappings):
       d.name = 'www.example{}.com'.format(i)
       d.status.conditions = [
-          self.serverless_messages.DomainMappingCondition(
+          self.serverless_messages.GoogleCloudRunV1Condition(
               type='Ready',
               status=six.text_type(bool(i % 2)))
       ]

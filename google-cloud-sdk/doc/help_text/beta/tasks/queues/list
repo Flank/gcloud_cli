@@ -1,5 +1,5 @@
 NAME
-    gcloud beta tasks queues list - list all queues
+    gcloud beta tasks queues list - list all queues including their type
 
 SYNOPSIS
     gcloud beta tasks queues list [--filter=EXPRESSION] [--limit=LIMIT]
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List all queues.
+    (BETA) List all queues including their type.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

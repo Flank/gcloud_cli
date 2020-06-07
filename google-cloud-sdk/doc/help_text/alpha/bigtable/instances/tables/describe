@@ -32,6 +32,9 @@ FLAGS
         The view to be applied to the returned table's fields. VIEW must be one
         of:
 
+         encryption
+            Only populates name and fields related to the table's encryption
+            status.
          full
             Populates all fields.
          name

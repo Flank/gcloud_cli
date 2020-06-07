@@ -37,6 +37,12 @@ COMMANDS
      describe
         Display detailed information about a target HTTP proxy.
 
+     export
+        Export a target HTTP proxy.
+
+     import
+        Import a target HTTP proxy.
+
      list
         List Google Compute Engine target HTTP proxies.
 

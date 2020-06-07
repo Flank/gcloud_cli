@@ -141,11 +141,13 @@ class FailureCollector(object):
   raised with all the failure messages.
   """
 
-  def __init__(self, update_modes, spec_name=None, action_location=None):
+  def __init__(self, update_modes,
+               spec_name=None, action_location=None, execution_mode=None):
     self._failures = []
     self._update_modes = update_modes
     self._spec_name = spec_name
     self._action_location = action_location
+    self._execution_mode = execution_mode
 
   def ShouldUpdateResponsePayloads(self):
     return updates.Mode.API_RESPONSE_PAYLOADS in self._update_modes
@@ -166,9 +168,9 @@ class FailureCollector(object):
     # Try to do updates instead of failing.
     if self._spec_name or self._action_location:
       self._Write(
-          '\n\n▶▶ Processing updates for spec: {}\n'
+          '\n\n▶▶ Processing updates for spec: {} ({})\n'
           '  ▶▶ For action: {}\n\n'.format(
-              self._spec_name,
+              self._spec_name, self._execution_mode,
               FormatLocation(self._action_location)))
     unhandled = []
     for f in self._failures:

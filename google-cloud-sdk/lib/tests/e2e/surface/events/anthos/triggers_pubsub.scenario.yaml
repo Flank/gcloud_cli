@@ -1,0 +1,1487 @@
+filters:
+  skipAlways:
+    reason: timing out
+    bug: b/156889942
+title: Create and delete a Cloud Pub/Sub trigger in GKE
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: run/platform gke
+- set_property: run/region us-central1
+- set_property: run/cluster do-not-delete-knative-test-eventing
+- set_property: run/cluster_location us-central1-a
+- execute:
+  - command: pubsub topics create $$my-topic$$
+  - stderr: 'Is None: False'
+- execute:
+  - command: run deploy $$my-service$$ --image gcr.io/knative-samples/helloworld-nodejs
+  - stderr: |
+      Deploying container to Cloud Run for Anthos service [$$my-service$$] in namespace [default] of cluster [do-not-delete-knative-test-eventing]
+  - staged_progress_tracker:
+    - message: Deploying new service...
+    - status: SUCCESS
+  - stderr: |-
+      Service \[$$my-service$$\] revision \[$$my-service$$.*\] has been deployed and is serving 100 percent of traffic at http://$$my-service$$.default.example.com
+      $
+- execute:
+  - command: events triggers create $$my-trigger$$ --type com.google.cloud.pubsub.topic.publish
+      --parameters "topic=$$my-topic$$" --target-service $$my-service$$
+  - staged_progress_tracker:
+    - message: Initializing trigger...
+    - status: SUCCESS
+- execute:
+  - command: events triggers list
+  - stdout: .*$$my-trigger$$.*$$my-service$$.*$
+- execute:
+  - command: events triggers describe $$my-trigger$$
+  - stdout: .*$$my-trigger$$.*$$my-topic$$.*$
+- execute:
+  - command: events triggers delete $$my-trigger$$
+  - prompt:
+    - input: y
+  - stderr: |
+      Deleted trigger [$$my-trigger$$].
+- execute:
+  - command: run services delete $$my-service$$
+  - prompt:
+    - input: y
+  - stderr: |
+      Deleted service [$$my-service$$].
+- execute:
+  - command: pubsub topics delete $$my-topic$$
+  - stderr: 'Is None: False'
+actions:
+
+- set_property:
+    run/platform: gke
+
+- set_property:
+    run/region: us-central1
+
+- set_property:
+    run/cluster: do-not-delete-knative-test-eventing
+
+- set_property:
+    run/cluster_location: us-central1-a
+
+- generate_resource_id:
+    reference: my-topic
+    prefix: topic
+
+- execute_command:
+    command: pubsub topics create $$my-topic$$
+    validation_only: true
+    events:
+    - expect_stderr:
+        is_none: false
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-service
+    prefix: service
+
+- execute_command:
+    command: run deploy $$my-service$$ --image gcr.io/knative-samples/helloworld-nodejs
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deploying container to Cloud Run for Anthos service [$$my-service$$] in namespace [default] of cluster [do-not-delete-knative-test-eventing]
+    - expect_staged_progress_tracker:
+        message: Deploying new service...
+        status: SUCCESS
+    - expect_stderr:
+        matches: |
+          Service \[$$my-service$$\] revision \[$$my-service$$.*\] has been deployed and is serving 100 percent of traffic at http://$$my-service$$.default.example.com
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: my-trigger
+    prefix: trigger
+
+- execute_command:
+    command: events triggers create $$my-trigger$$ --type com.google.cloud.pubsub.topic.publish
+      --parameters "topic=$$my-topic$$" --target-service $$my-service$$
+    validation_only: true
+    events:
+    - expect_staged_progress_tracker:
+        message: Initializing trigger...
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: events triggers list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-eventing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5242'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-eventing
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig:
+                enableIntegrityMonitoring: true
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.36.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling: {}
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+              cloudRunConfig: {}
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig:
+                  enableIntegrityMonitoring: true
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 3
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              locations:
+              - us-central1-a
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-eventing/nodePools/default-pool
+              version: 1.15.9-gke.24
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-83e55cc1-grp
+              status: RUNNING
+              upgradeSettings:
+                maxSurge: 1
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy:
+              resourceVersion: e3b0c442
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            shieldedNodes: {}
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-eventing
+            zone: us-central1-a
+            endpoint: 34.66.86.171
+            initialClusterVersion: 1.15.9-gke.22
+            currentMasterVersion: 1.15.9-gke.24
+            currentNodeVersion: 1.15.9-gke.24
+            createTime: '2020-03-20T18:48:33+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.39.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-83e55cc1-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: 75c00a5c-b28e-416a-93e7-b83009c3b55e
+            content-length: '1928'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            items:
+            - apiVersion: eventing.knative.dev/v1alpha1
+              kind: Trigger
+              metadata:
+                annotations:
+                  eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  knative-eventing-injection: enabled
+                  knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                    "kind": "CloudPubSubSource", "name": "source-for-$$my-trigger$$",
+                    "namespace": "default"}'
+                creationTimestamp: '2020-05-08T08:52:43Z'
+                generation: 1
+                labels:
+                  eventing.knative.dev/broker: default
+                name: $$my-trigger$$
+                namespace: default
+                resourceVersion: '19149707'
+                selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$
+                uid: feefb786-e768-41a6-8355-9f40f50f08ac
+              spec:
+                broker: default
+                filter:
+                  attributes:
+                    knsourcetrigger: link0.06050594244793428
+                    type: com.google.cloud.pubsub.topic.publish
+                subscriber:
+                  ref:
+                    apiVersion: serving.knative.dev/v1alpha1
+                    kind: Service
+                    name: $$my-service$$
+              status:
+                conditions:
+                - lastTransitionTime: '2020-05-08T08:52:43Z'
+                  status: 'True'
+                  type: BrokerReady
+                - lastTransitionTime: '2020-05-08T08:52:45Z'
+                  status: 'True'
+                  type: DependencyReady
+                - lastTransitionTime: '2020-05-08T08:52:45Z'
+                  status: 'True'
+                  type: Ready
+                - lastTransitionTime: '2020-05-08T08:52:45Z'
+                  status: 'True'
+                  type: Subscribed
+                - lastTransitionTime: '2020-05-08T08:52:43Z'
+                  status: 'True'
+                  type: SubscriberResolved
+                observedGeneration: 1
+                subscriberURI: http://$$my-service$$.default.svc.cluster.local
+            kind: TriggerList
+            metadata:
+              continue: ''
+              resourceVersion: '19149714'
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers
+    - expect_stdout:
+        matches: .*$$my-trigger$$.*$$my-service$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: events triggers describe $$my-trigger$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-eventing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5242'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-eventing
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig:
+                enableIntegrityMonitoring: true
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.36.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling: {}
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+              cloudRunConfig: {}
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig:
+                  enableIntegrityMonitoring: true
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 3
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              locations:
+              - us-central1-a
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-eventing/nodePools/default-pool
+              version: 1.15.9-gke.24
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-83e55cc1-grp
+              status: RUNNING
+              upgradeSettings:
+                maxSurge: 1
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy:
+              resourceVersion: e3b0c442
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            shieldedNodes: {}
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-eventing
+            zone: us-central1-a
+            endpoint: 34.66.86.171
+            initialClusterVersion: 1.15.9-gke.22
+            currentMasterVersion: 1.15.9-gke.24
+            currentNodeVersion: 1.15.9-gke.24
+            createTime: '2020-03-20T18:48:33+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.39.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-83e55cc1-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: 613d8246-7953-4632-9297-c2507b7e1562
+            content-length: '1717'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            kind: Trigger
+            metadata:
+              annotations:
+                eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                knative-eventing-injection: enabled
+                knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                  "kind": "CloudPubSubSource", "name": "source-for-$$my-trigger$$",
+                  "namespace": "default"}'
+              creationTimestamp: '2020-05-08T08:52:43Z'
+              generation: 1
+              labels:
+                eventing.knative.dev/broker: default
+              name: $$my-trigger$$
+              namespace: default
+              resourceVersion: '19149707'
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$
+              uid: feefb786-e768-41a6-8355-9f40f50f08ac
+            spec:
+              broker: default
+              filter:
+                attributes:
+                  knsourcetrigger: link0.06050594244793428
+                  type: com.google.cloud.pubsub.topic.publish
+              subscriber:
+                ref:
+                  apiVersion: serving.knative.dev/v1alpha1
+                  kind: Service
+                  name: $$my-service$$
+            status:
+              conditions:
+              - lastTransitionTime: '2020-05-08T08:52:43Z'
+                status: 'True'
+                type: BrokerReady
+              - lastTransitionTime: '2020-05-08T08:52:45Z'
+                status: 'True'
+                type: DependencyReady
+              - lastTransitionTime: '2020-05-08T08:52:45Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2020-05-08T08:52:45Z'
+                status: 'True'
+                type: Subscribed
+              - lastTransitionTime: '2020-05-08T08:52:43Z'
+                status: 'True'
+                type: SubscriberResolved
+              observedGeneration: 1
+              subscriberURI: http://$$my-service$$.default.svc.cluster.local
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions\?alt=json&labelSelector=duck.knative.dev%2Fsource%3Dtrue&parent=namespaces%2Fcloud-sdk-integration-testing
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: ec2904cd-8379-4fa7-a0f8-d0527ce10a78
+            content-type: application/json
+            status: '200'
+          body:
+            kind: CustomResourceDefinitionList
+            apiVersion: apiextensions.k8s.io/v1beta1
+            metadata:
+              selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions
+              resourceVersion: '19149724'
+            items:
+            - metadata:
+                name: cloudauditlogssources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudauditlogssources.events.cloud.google.com
+                uid: fda2b4a1-8c83-4de9-a5fe-92b3ec709538
+                resourceVersion: '6264'
+                generation: 1
+                creationTimestamp: '2020-03-20T19:07:21Z'
+                labels:
+                  duck.knative.dev/source: 'true'
+                  events.cloud.google.com/crd-install: 'true'
+                  events.cloud.google.com/release: v0.12.2-gke.0
+                annotations:
+                  kubectl.kubernetes.io/last-applied-configuration: |
+                    {"apiVersion":"apiextensions.k8s.io/v1beta1","kind":"CustomResourceDefinition","metadata":{"annotations":{"registry.knative.dev/eventTypes":"[\n  {\"type\": \"com.google.cloud.auditlog.event\", \"schema\": \"type.googleapis.com/google.logging.v2.LogEntry\", \"description\": \"Common audit log event type for all Google Cloud Platform API operations.\" }\n]\n"},"labels":{"duck.knative.dev/source":"true","events.cloud.google.com/crd-install":"true","events.cloud.google.com/release":"v0.12.2-gke.0"},"name":"cloudauditlogssources.events.cloud.google.com"},"spec":{"additionalPrinterColumns":[{"JSONPath":".status.conditions[?(@.type==\"Ready\")].status","name":"Ready","type":"string"},{"JSONPath":".status.conditions[?(@.type==\"Ready\")].reason","name":"Reason","type":"string"},{"JSONPath":".metadata.creationTimestamp","name":"Age","type":"date"}],"group":"events.cloud.google.com","names":{"categories":["all","knative","cloudauditlogssource","sources"],"kind":"CloudAuditLogsSource","plural":"cloudauditlogssources"},"scope":"Namespaced","subresources":{"status":{}},"validation":{"openAPIV3Schema":{"properties":{"spec":{"properties":{"methodName":{"description":"The name of the service method or operation. For API calls, this should be the name of the API method.","type":"string"},"project":{"description":"Google Cloud Project ID of the project into which the topic should be created. If omitted uses the Project ID from the GKE cluster metadata service.","type":"string"},"pubSubSecret":{"description":"Optional credential to use for creating a Topic and subscribing to the Topic. If omitted, uses secret. Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).","type":"object"},"resourceName":{"description":"The resource or collection that is the target of the operation. The name is a scheme-less URI, not including the API service name. If omitted, audit log events matching service and method will be pulled for all resources.","type":"string"},"secret":{"description":"Credential used to pull Stackdriver audit log pubsub messages. Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys). If omitted, defaults to 'google-cloud-key'","type":"object"},"serviceAccountName":{"description":"Service Account to run Receive Adapter as. If omitted, uses 'default'.","type":"string"},"serviceName":{"description":"The GCP service providing audit logs.","type":"string"},"sink":{"description":"Sink which receives the notifications.","type":"object"}},"required":["sink","serviceName","methodName"]},"status":{"properties":{"conditions":{"items":{"properties":{"lastTransitionTime":{"type":"string"},"message":{"type":"string"},"reason":{"type":"string"},"severity":{"type":"string"},"status":{"type":"string"},"type":{"type":"string"}},"required":["type","status"],"type":"object"},"type":"array"},"observedGeneration":{"format":"int64","type":"integer"},"projectId":{"type":"string"},"sinkUri":{"type":"string"},"stackdriverSink":{"type":"string"},"subscriptionId":{"type":"string"},"topicId":{"type":"string"}},"type":"object"}}}},"version":"v1alpha1"}}
+                  registry.knative.dev/eventTypes: |
+                    [
+                      {"type": "com.google.cloud.auditlog.event", "schema": "type.googleapis.com/google.logging.v2.LogEntry", "description": "Common audit log event type for all Google Cloud Platform API operations." }
+                    ]
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudauditlogssources
+                  singular: cloudauditlogssource
+                  kind: CloudAuditLogsSource
+                  listKind: CloudAuditLogsSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudauditlogssource
+                  - sources
+                scope: Namespaced
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - sink
+                        - serviceName
+                        - methodName
+                        properties:
+                          methodName:
+                            description: The name of the service method or operation.
+                              For API calls, this should be the name of the API method.
+                            type: string
+                          project:
+                            description: Google Cloud Project ID of the project into
+                              which the topic should be created. If omitted uses the
+                              Project ID from the GKE cluster metadata service.
+                            type: string
+                          pubSubSecret:
+                            description: Optional credential to use for creating a
+                              Topic and subscribing to the Topic. If omitted, uses
+                              secret. Must be a service account key in JSON format
+                              (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                            type: object
+                          resourceName:
+                            description: The resource or collection that is the target
+                              of the operation. The name is a scheme-less URI, not
+                              including the API service name. If omitted, audit log
+                              events matching service and method will be pulled for
+                              all resources.
+                            type: string
+                          secret:
+                            description: Credential used to pull Stackdriver audit
+                              log pubsub messages. Must be a service account key in
+                              JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                              If omitted, defaults to 'google-cloud-key'
+                            type: object
+                          serviceAccountName:
+                            description: Service Account to run Receive Adapter as.
+                              If omitted, uses 'default'.
+                            type: string
+                          serviceName:
+                            description: The GCP service providing audit logs.
+                            type: string
+                          sink:
+                            description: Sink which receives the notifications.
+                            type: object
+                      status:
+                        type: object
+                        properties:
+                          conditions:
+                            type: array
+                            items:
+                              type: object
+                              required:
+                              - type
+                              - status
+                              properties:
+                                lastTransitionTime:
+                                  type: string
+                                message:
+                                  type: string
+                                reason:
+                                  type: string
+                                severity:
+                                  type: string
+                                status:
+                                  type: string
+                                type:
+                                  type: string
+                          observedGeneration:
+                            type: integer
+                            format: int64
+                          projectId:
+                            type: string
+                          sinkUri:
+                            type: string
+                          stackdriverSink:
+                            type: string
+                          subscriptionId:
+                            type: string
+                          topicId:
+                            type: string
+                subresources:
+                  status: {}
+                versions:
+                - name: v1alpha1
+                  served: true
+                  storage: true
+                additionalPrinterColumns:
+                - name: Ready
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].status
+                - name: Reason
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].reason
+                - name: Age
+                  type: date
+                  JSONPath: .metadata.creationTimestamp
+                conversion:
+                  strategy: None
+                preserveUnknownFields: true
+              status:
+                conditions:
+                - type: NonStructuralSchema
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:21Z'
+                  reason: Violations
+                  message: '[spec.validation.openAPIV3Schema.properties[spec].type:
+                    Required value: must not be empty for specified object fields,
+                    spec.validation.openAPIV3Schema.type: Required value: must not
+                    be empty at the root]'
+                - type: NamesAccepted
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:21Z'
+                  reason: NoConflicts
+                  message: no conflicts found
+                - type: Established
+                  status: 'True'
+                  lastTransitionTime: null
+                  reason: InitialNamesAccepted
+                  message: the initial names have been accepted
+                acceptedNames:
+                  plural: cloudauditlogssources
+                  singular: cloudauditlogssource
+                  kind: CloudAuditLogsSource
+                  listKind: CloudAuditLogsSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudauditlogssource
+                  - sources
+                storedVersions:
+                - v1alpha1
+            - metadata:
+                name: cloudpubsubsources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudpubsubsources.events.cloud.google.com
+                uid: d5b8c120-a962-4979-95aa-3260252d97dd
+                resourceVersion: '6273'
+                generation: 1
+                creationTimestamp: '2020-03-20T19:07:21Z'
+                labels:
+                  duck.knative.dev/source: 'true'
+                  events.cloud.google.com/crd-install: 'true'
+                  events.cloud.google.com/release: v0.12.2-gke.0
+                annotations:
+                  kubectl.kubernetes.io/last-applied-configuration: |
+                    {"apiVersion":"apiextensions.k8s.io/v1beta1","kind":"CustomResourceDefinition","metadata":{"annotations":{"registry.knative.dev/eventTypes":"[\n  { \"type\": \"com.google.cloud.pubsub.topic.publish\", \"description\": \"This event is sent when a message is published to a Cloud Pub/Sub topic.\"}\n]\n"},"labels":{"duck.knative.dev/source":"true","events.cloud.google.com/crd-install":"true","events.cloud.google.com/release":"v0.12.2-gke.0"},"name":"cloudpubsubsources.events.cloud.google.com"},"spec":{"additionalPrinterColumns":[{"JSONPath":".status.conditions[?(@.type==\"Ready\")].status","name":"Ready","type":"string"},{"JSONPath":".status.conditions[?(@.type==\"Ready\")].reason","name":"Reason","type":"string"},{"JSONPath":".metadata.creationTimestamp","name":"Age","type":"date"}],"group":"events.cloud.google.com","names":{"categories":["all","knative","cloudpubsubsource","sources"],"kind":"CloudPubSubSource","plural":"cloudpubsubsources"},"scope":"Namespaced","subresources":{"status":{}},"validation":{"openAPIV3Schema":{"properties":{"spec":{"properties":{"ackDeadline":{"description":"The default maximum time after a subscriber receives a message before the subscriber should acknowledge the message. Defaults to `30s`. Valid time units are `s`, `m`, `h`. The minimum deadline you can specify is 0 seconds. The maximum deadline you can specify is 600 seconds (10 minutes).","type":"string"},"ceOverrides":{"description":"Defines overrides to control modifications of the event sent to the sink.","properties":{"extensions":{"description":"Extensions specify what attribute are added or overridden on the outbound event. Each `Extensions` key-value pair are set on the event as an attribute extension independently.","type":"object"}},"type":"object"},"project":{"description":"ID of the Google Cloud Project that the Pub/Sub Topic exists in. E.g. 'my-project-1234' rather than its display name, 'My Project' or its number '1234567890'. If omitted uses the Project ID from the GKE cluster metadata service.","type":"string"},"retainAckedMessages":{"description":"Whether to retain acknowledged messages. If true, acknowledged messages will not be expunged until they fall out of the RetentionDuration window.","type":"boolean"},"retentionDuration":{"description":"How long to retain messages in backlog, from the time of publish. If retainAckedMessages is true, this duration affects the retention of acknowledged messages, otherwise only unacknowledged messages are retained. Defaults to 7 days (`168h`). Cannot be longer than 7 days or shorter than 10 minutes. Valid time units are `s`, `m`, `h`.","type":"string"},"secret":{"description":"Credential to use to poll the Cloud Pub/Sub Subscription. It is not used to create or delete the Subscription, only to poll it. The value of the secret entry must be a service account key in the JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys). Defaults to secret.name of 'google-cloud-key' and secret.key of 'key.json'.","type":"object"},"sink":{"anyOf":[{"properties":{"uri":{"minLength":1,"type":"string"}},"type":"object"},{"properties":{"ref":{"properties":{"apiVersion":{"minLength":1,"type":"string"},"kind":{"minLength":1,"type":"string"},"name":{"minLength":1,"type":"string"}},"required":["apiVersion","kind","name"],"type":"object"}},"type":"object"}],"description":"Reference to an object that will resolve to a domain name to use as the sink.","type":"object"},"topic":{"description":"ID of the Cloud Pub/Sub Topic to Subscribe to. It must be in the form of the unique identifier within the project, not the entire name. E.g. it must be 'laconia', not 'projects/my-gcp-project/topics/laconia'.","type":"string"}},"required":["sink","topic"],"type":"object"},"status":{"properties":{"conditions":{"items":{"properties":{"lastTransitionTime":{"type":"string"},"message":{"type":"string"},"reason":{"type":"string"},"severity":{"type":"string"},"status":{"type":"string"},"type":{"type":"string"}},"required":["type","status"],"type":"object"},"type":"array"},"observedGeneration":{"format":"int64","type":"integer"},"sinkUri":{"type":"string"}},"type":"object"}}}},"version":"v1alpha1"}}
+                  registry.knative.dev/eventTypes: |
+                    [
+                      { "type": "com.google.cloud.pubsub.topic.publish", "description": "This event is sent when a message is published to a Cloud Pub/Sub topic."}
+                    ]
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudpubsubsources
+                  singular: cloudpubsubsource
+                  kind: CloudPubSubSource
+                  listKind: CloudPubSubSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudpubsubsource
+                  - sources
+                scope: Namespaced
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        type: object
+                        required:
+                        - sink
+                        - topic
+                        properties:
+                          ackDeadline:
+                            description: The default maximum time after a subscriber
+                              receives a message before the subscriber should acknowledge
+                              the message. Defaults to `30s`. Valid time units are
+                              `s`, `m`, `h`. The minimum deadline you can specify
+                              is 0 seconds. The maximum deadline you can specify is
+                              600 seconds (10 minutes).
+                            type: string
+                          ceOverrides:
+                            description: Defines overrides to control modifications
+                              of the event sent to the sink.
+                            type: object
+                            properties:
+                              extensions:
+                                description: Extensions specify what attribute are
+                                  added or overridden on the outbound event. Each
+                                  `Extensions` key-value pair are set on the event
+                                  as an attribute extension independently.
+                                type: object
+                          project:
+                            description: ID of the Google Cloud Project that the Pub/Sub
+                              Topic exists in. E.g. 'my-project-1234' rather than
+                              its display name, 'My Project' or its number '1234567890'.
+                              If omitted uses the Project ID from the GKE cluster
+                              metadata service.
+                            type: string
+                          retainAckedMessages:
+                            description: Whether to retain acknowledged messages.
+                              If true, acknowledged messages will not be expunged
+                              until they fall out of the RetentionDuration window.
+                            type: boolean
+                          retentionDuration:
+                            description: How long to retain messages in backlog, from
+                              the time of publish. If retainAckedMessages is true,
+                              this duration affects the retention of acknowledged
+                              messages, otherwise only unacknowledged messages are
+                              retained. Defaults to 7 days (`168h`). Cannot be longer
+                              than 7 days or shorter than 10 minutes. Valid time units
+                              are `s`, `m`, `h`.
+                            type: string
+                          secret:
+                            description: Credential to use to poll the Cloud Pub/Sub
+                              Subscription. It is not used to create or delete the
+                              Subscription, only to poll it. The value of the secret
+                              entry must be a service account key in the JSON format
+                              (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                              Defaults to secret.name of 'google-cloud-key' and secret.key
+                              of 'key.json'.
+                            type: object
+                          sink:
+                            description: Reference to an object that will resolve
+                              to a domain name to use as the sink.
+                            type: object
+                            anyOf:
+                            - type: object
+                              properties:
+                                uri:
+                                  type: string
+                                  minLength: 1
+                            - type: object
+                              properties:
+                                ref:
+                                  type: object
+                                  required:
+                                  - apiVersion
+                                  - kind
+                                  - name
+                                  properties:
+                                    apiVersion:
+                                      type: string
+                                      minLength: 1
+                                    kind:
+                                      type: string
+                                      minLength: 1
+                                    name:
+                                      type: string
+                                      minLength: 1
+                          topic:
+                            description: ID of the Cloud Pub/Sub Topic to Subscribe
+                              to. It must be in the form of the unique identifier
+                              within the project, not the entire name. E.g. it must
+                              be 'laconia', not 'projects/my-gcp-project/topics/laconia'.
+                            type: string
+                      status:
+                        type: object
+                        properties:
+                          conditions:
+                            type: array
+                            items:
+                              type: object
+                              required:
+                              - type
+                              - status
+                              properties:
+                                lastTransitionTime:
+                                  type: string
+                                message:
+                                  type: string
+                                reason:
+                                  type: string
+                                severity:
+                                  type: string
+                                status:
+                                  type: string
+                                type:
+                                  type: string
+                          observedGeneration:
+                            type: integer
+                            format: int64
+                          sinkUri:
+                            type: string
+                subresources:
+                  status: {}
+                versions:
+                - name: v1alpha1
+                  served: true
+                  storage: true
+                additionalPrinterColumns:
+                - name: Ready
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].status
+                - name: Reason
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].reason
+                - name: Age
+                  type: date
+                  JSONPath: .metadata.creationTimestamp
+                conversion:
+                  strategy: None
+                preserveUnknownFields: true
+              status:
+                conditions:
+                - type: NamesAccepted
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:22Z'
+                  reason: NoConflicts
+                  message: no conflicts found
+                - type: Established
+                  status: 'True'
+                  lastTransitionTime: null
+                  reason: InitialNamesAccepted
+                  message: the initial names have been accepted
+                - type: NonStructuralSchema
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:22Z'
+                  reason: Violations
+                  message: '[spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[0].properties[uri].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[0].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[apiVersion].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[kind].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[name].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.type:
+                    Required value: must not be empty at the root]'
+                acceptedNames:
+                  plural: cloudpubsubsources
+                  singular: cloudpubsubsource
+                  kind: CloudPubSubSource
+                  listKind: CloudPubSubSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudpubsubsource
+                  - sources
+                storedVersions:
+                - v1alpha1
+            - metadata:
+                name: cloudschedulersources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudschedulersources.events.cloud.google.com
+                uid: 5a5aca10-dafb-467b-83d0-5e0a449c78f9
+                resourceVersion: '6279'
+                generation: 1
+                creationTimestamp: '2020-03-20T19:07:22Z'
+                labels:
+                  duck.knative.dev/source: 'true'
+                  events.cloud.google.com/crd-install: 'true'
+                  events.cloud.google.com/release: v0.12.2-gke.0
+                annotations:
+                  kubectl.kubernetes.io/last-applied-configuration: |
+                    {"apiVersion":"apiextensions.k8s.io/v1beta1","kind":"CustomResourceDefinition","metadata":{"annotations":{"registry.knative.dev/eventTypes":"[\n  { \"type\": \"com.google.cloud.scheduler.job.execute\", \"description\": \"This event is sent when a job is executed in Cloud Scheduler.\"}\n]\n"},"labels":{"duck.knative.dev/source":"true","events.cloud.google.com/crd-install":"true","events.cloud.google.com/release":"v0.12.2-gke.0"},"name":"cloudschedulersources.events.cloud.google.com"},"spec":{"additionalPrinterColumns":[{"JSONPath":".status.conditions[?(@.type==\"Ready\")].status","name":"Ready","type":"string"},{"JSONPath":".status.conditions[?(@.type==\"Ready\")].reason","name":"Reason","type":"string"},{"JSONPath":".metadata.creationTimestamp","name":"Age","type":"date"}],"group":"events.cloud.google.com","names":{"categories":["all","knative","cloudschedulersource","sources"],"kind":"CloudSchedulerSource","plural":"cloudschedulersources"},"scope":"Namespaced","subresources":{"status":{}},"validation":{"openAPIV3Schema":{"properties":{"spec":{"properties":{"ceOverrides":{"description":"Defines overrides to control modifications of the event sent to the sink.","properties":{"extensions":{"description":"Extensions specify what attribute are added or overridden on the outbound event. Each `Extensions` key-value pair are set on the event as an attribute extension independently.","type":"object"}},"type":"object"},"data":{"description":"Data to send in the payload of the Event.","type":"string"},"location":{"description":"Location to create the Scheduler job in.","type":"string"},"project":{"description":"Google Cloud Project ID of the project into which the Scheduler job should be created. If omitted uses the Project ID from the GKE cluster metadata service.","type":"string"},"pubSubSecret":{"description":"Optional credential to use for creating a Topic and subscribing to the Topic. If omitted, uses secret. Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).","type":"object"},"schedule":{"description":"Frequency using the unix-cron format. Or App Engine Cron format.","type":"string"},"secret":{"description":"Credential to use for managing Scheduler Jobs. Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys). If omitted, defaults to 'google-cloud-key'.","type":"object"},"sink":{"anyOf":[{"properties":{"uri":{"minLength":1,"type":"string"}},"type":"object"},{"properties":{"ref":{"properties":{"apiVersion":{"minLength":1,"type":"string"},"kind":{"minLength":1,"type":"string"},"name":{"minLength":1,"type":"string"}},"required":["apiVersion","kind","name"],"type":"object"}},"type":"object"}],"description":"Sink which receives the notifications.","type":"object"}},"required":["location","schedule","sink","data"]},"status":{"properties":{"conditions":{"items":{"properties":{"lastTransitionTime":{"type":"string"},"message":{"type":"string"},"reason":{"type":"string"},"severity":{"type":"string"},"status":{"type":"string"},"type":{"type":"string"}},"required":["type","status"],"type":"object"},"type":"array"},"notificationId":{"type":"string"},"projectId":{"type":"string"},"sinkUri":{"type":"string"},"subscriptionId":{"type":"string"},"topicId":{"type":"string"}},"type":"object"}}}},"version":"v1alpha1"}}
+                  registry.knative.dev/eventTypes: |
+                    [
+                      { "type": "com.google.cloud.scheduler.job.execute", "description": "This event is sent when a job is executed in Cloud Scheduler."}
+                    ]
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudschedulersources
+                  singular: cloudschedulersource
+                  kind: CloudSchedulerSource
+                  listKind: CloudSchedulerSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudschedulersource
+                  - sources
+                scope: Namespaced
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - location
+                        - schedule
+                        - sink
+                        - data
+                        properties:
+                          ceOverrides:
+                            description: Defines overrides to control modifications
+                              of the event sent to the sink.
+                            type: object
+                            properties:
+                              extensions:
+                                description: Extensions specify what attribute are
+                                  added or overridden on the outbound event. Each
+                                  `Extensions` key-value pair are set on the event
+                                  as an attribute extension independently.
+                                type: object
+                          data:
+                            description: Data to send in the payload of the Event.
+                            type: string
+                          location:
+                            description: Location to create the Scheduler job in.
+                            type: string
+                          project:
+                            description: Google Cloud Project ID of the project into
+                              which the Scheduler job should be created. If omitted
+                              uses the Project ID from the GKE cluster metadata service.
+                            type: string
+                          pubSubSecret:
+                            description: Optional credential to use for creating a
+                              Topic and subscribing to the Topic. If omitted, uses
+                              secret. Must be a service account key in JSON format
+                              (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                            type: object
+                          schedule:
+                            description: Frequency using the unix-cron format. Or
+                              App Engine Cron format.
+                            type: string
+                          secret:
+                            description: Credential to use for managing Scheduler
+                              Jobs. Must be a service account key in JSON format (see
+                              https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                              If omitted, defaults to 'google-cloud-key'.
+                            type: object
+                          sink:
+                            description: Sink which receives the notifications.
+                            type: object
+                            anyOf:
+                            - type: object
+                              properties:
+                                uri:
+                                  type: string
+                                  minLength: 1
+                            - type: object
+                              properties:
+                                ref:
+                                  type: object
+                                  required:
+                                  - apiVersion
+                                  - kind
+                                  - name
+                                  properties:
+                                    apiVersion:
+                                      type: string
+                                      minLength: 1
+                                    kind:
+                                      type: string
+                                      minLength: 1
+                                    name:
+                                      type: string
+                                      minLength: 1
+                      status:
+                        type: object
+                        properties:
+                          conditions:
+                            type: array
+                            items:
+                              type: object
+                              required:
+                              - type
+                              - status
+                              properties:
+                                lastTransitionTime:
+                                  type: string
+                                message:
+                                  type: string
+                                reason:
+                                  type: string
+                                severity:
+                                  type: string
+                                status:
+                                  type: string
+                                type:
+                                  type: string
+                          notificationId:
+                            type: string
+                          projectId:
+                            type: string
+                          sinkUri:
+                            type: string
+                          subscriptionId:
+                            type: string
+                          topicId:
+                            type: string
+                subresources:
+                  status: {}
+                versions:
+                - name: v1alpha1
+                  served: true
+                  storage: true
+                additionalPrinterColumns:
+                - name: Ready
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].status
+                - name: Reason
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].reason
+                - name: Age
+                  type: date
+                  JSONPath: .metadata.creationTimestamp
+                conversion:
+                  strategy: None
+                preserveUnknownFields: true
+              status:
+                conditions:
+                - type: NamesAccepted
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:22Z'
+                  reason: NoConflicts
+                  message: no conflicts found
+                - type: Established
+                  status: 'True'
+                  lastTransitionTime: null
+                  reason: InitialNamesAccepted
+                  message: the initial names have been accepted
+                - type: NonStructuralSchema
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:23Z'
+                  reason: Violations
+                  message: '[spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[0].properties[uri].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[0].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[apiVersion].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[kind].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[name].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].type:
+                    Required value: must not be empty for specified object fields,
+                    spec.validation.openAPIV3Schema.type: Required value: must not
+                    be empty at the root]'
+                acceptedNames:
+                  plural: cloudschedulersources
+                  singular: cloudschedulersource
+                  kind: CloudSchedulerSource
+                  listKind: CloudSchedulerSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudschedulersource
+                  - sources
+                storedVersions:
+                - v1alpha1
+            - metadata:
+                name: cloudstoragesources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudstoragesources.events.cloud.google.com
+                uid: 146b4e7b-18c7-48ea-aaaf-3163c9050bd0
+                resourceVersion: '6288'
+                generation: 1
+                creationTimestamp: '2020-03-20T19:07:23Z'
+                labels:
+                  duck.knative.dev/source: 'true'
+                  events.cloud.google.com/crd-install: 'true'
+                  events.cloud.google.com/release: v0.12.2-gke.0
+                annotations:
+                  kubectl.kubernetes.io/last-applied-configuration: |
+                    {"apiVersion":"apiextensions.k8s.io/v1beta1","kind":"CustomResourceDefinition","metadata":{"annotations":{"registry.knative.dev/eventTypes":"[\n  { \"type\": \"com.google.cloud.storage.object.finalize\", \"schema\": \"https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json\", \"description\": \"Sent when a new object (or a new generation of an existing object) is successfully created in the bucket. This includes copying or rewriting an existing object. A failed upload does not trigger this event.\" },\n  { \"type\": \"com.google.cloud.storage.object.delete\", \"schema\": \"https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json\", \"description\": \"Sent when an object has been permanently deleted. This includes objects that are overwritten or are deleted as part of the bucket's lifecycle configuration. For buckets with object versioning enabled, this is not sent when an object is archived.\"},\n  { \"type\": \"com.google.cloud.storage.object.archive\", \"schema\": \"https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json\", \"description\": \"Only sent when a bucket has enabled object versioning. This event indicates that the live version of an object has become an archived version, either because it was archived or because it was overwritten by the upload of an object of the same name.\"},\n  { \"type\": \"com.google.cloud.storage.object.metadataUpdate\", \"schema\": \"https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json\", \"description\": \"Sent when the metadata of an existing object changes.\" }\n]\n"},"labels":{"duck.knative.dev/source":"true","events.cloud.google.com/crd-install":"true","events.cloud.google.com/release":"v0.12.2-gke.0"},"name":"cloudstoragesources.events.cloud.google.com"},"spec":{"additionalPrinterColumns":[{"JSONPath":".status.conditions[?(@.type==\"Ready\")].status","name":"Ready","type":"string"},{"JSONPath":".status.conditions[?(@.type==\"Ready\")].reason","name":"Reason","type":"string"},{"JSONPath":".metadata.creationTimestamp","name":"Age","type":"date"}],"group":"events.cloud.google.com","names":{"categories":["all","knative","cloudstoragesource","sources"],"kind":"CloudStorageSource","plural":"cloudstoragesources"},"scope":"Namespaced","subresources":{"status":{}},"validation":{"openAPIV3Schema":{"properties":{"spec":{"properties":{"bucket":{"description":"GCS bucket to subscribe to. For example my-test-bucket","type":"string"},"ceOverrides":{"description":"Defines overrides to control modifications of the event sent to the sink.","properties":{"extensions":{"description":"Extensions specify what attribute are added or overridden on the outbound event. Each `Extensions` key-value pair are set on the event as an attribute extension independently.","type":"object"}},"type":"object"},"eventTypes":{"items":{"enum":["com.google.cloud.storage.object.finalize","com.google.cloud.storage.object.delete","com.google.cloud.storage.object.archive","com.google.cloud.storage.object.metadataUpdate"],"type":"string"},"type":"array"},"objectNamePrefix":{"description":"Optional prefix to only notify when objects match this prefix.","type":"string"},"payloadFormat":{"description":"Optional payload format. Either NONE or JSON_API_V1. If omitted, uses JSON_API_V1.","type":"string"},"project":{"description":"Google Cloud Project ID of the project into which the topic should be created. If omitted uses the Project ID from the GKE cluster metadata service.","type":"string"},"pubSubSecret":{"description":"Optional credential to use for creating a Topic and subscribing to the Topic. If omitted, uses secret. Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).","type":"object"},"secret":{"description":"Credential to use for managing GCS notifications. Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys). If omitted, defaults to 'google-cloud-key'.","type":"object"},"serviceAccountName":{"description":"Service Account to run Receive Adapter as. If omitted, uses 'default'.","type":"string"},"sink":{"anyOf":[{"properties":{"uri":{"minLength":1,"type":"string"}},"type":"object"},{"properties":{"ref":{"properties":{"apiVersion":{"minLength":1,"type":"string"},"kind":{"minLength":1,"type":"string"},"name":{"minLength":1,"type":"string"}},"required":["apiVersion","kind","name"],"type":"object"}},"type":"object"}],"description":"Sink which receives the notifications.","type":"object"}},"required":["bucket","sink"]},"status":{"properties":{"conditions":{"items":{"properties":{"lastTransitionTime":{"type":"string"},"message":{"type":"string"},"reason":{"type":"string"},"severity":{"type":"string"},"status":{"type":"string"},"type":{"type":"string"}},"required":["type","status"],"type":"object"},"type":"array"},"notificationId":{"type":"string"},"observedGeneration":{"format":"int64","type":"integer"},"projectId":{"type":"string"},"sinkUri":{"type":"string"},"subscriptionId":{"type":"string"},"topicId":{"type":"string"}},"type":"object"}}}},"version":"v1alpha1"}}
+                  registry.knative.dev/eventTypes: |
+                    [
+                      { "type": "com.google.cloud.storage.object.finalize", "schema": "https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json", "description": "Sent when a new object (or a new generation of an existing object) is successfully created in the bucket. This includes copying or rewriting an existing object. A failed upload does not trigger this event." },
+                      { "type": "com.google.cloud.storage.object.delete", "schema": "https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json", "description": "Sent when an object has been permanently deleted. This includes objects that are overwritten or are deleted as part of the bucket's lifecycle configuration. For buckets with object versioning enabled, this is not sent when an object is archived."},
+                      { "type": "com.google.cloud.storage.object.archive", "schema": "https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json", "description": "Only sent when a bucket has enabled object versioning. This event indicates that the live version of an object has become an archived version, either because it was archived or because it was overwritten by the upload of an object of the same name."},
+                      { "type": "com.google.cloud.storage.object.metadataUpdate", "schema": "https://raw.githubusercontent.com/google/knative-gcp/master/schemas/storage/schema.json", "description": "Sent when the metadata of an existing object changes." }
+                    ]
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudstoragesources
+                  singular: cloudstoragesource
+                  kind: CloudStorageSource
+                  listKind: CloudStorageSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudstoragesource
+                  - sources
+                scope: Namespaced
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - bucket
+                        - sink
+                        properties:
+                          bucket:
+                            description: GCS bucket to subscribe to. For example my-test-bucket
+                            type: string
+                          ceOverrides:
+                            description: Defines overrides to control modifications
+                              of the event sent to the sink.
+                            type: object
+                            properties:
+                              extensions:
+                                description: Extensions specify what attribute are
+                                  added or overridden on the outbound event. Each
+                                  `Extensions` key-value pair are set on the event
+                                  as an attribute extension independently.
+                                type: object
+                          eventTypes:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                              - com.google.cloud.storage.object.finalize
+                              - com.google.cloud.storage.object.delete
+                              - com.google.cloud.storage.object.archive
+                              - com.google.cloud.storage.object.metadataUpdate
+                          objectNamePrefix:
+                            description: Optional prefix to only notify when objects
+                              match this prefix.
+                            type: string
+                          payloadFormat:
+                            description: Optional payload format. Either NONE or JSON_API_V1.
+                              If omitted, uses JSON_API_V1.
+                            type: string
+                          project:
+                            description: Google Cloud Project ID of the project into
+                              which the topic should be created. If omitted uses the
+                              Project ID from the GKE cluster metadata service.
+                            type: string
+                          pubSubSecret:
+                            description: Optional credential to use for creating a
+                              Topic and subscribing to the Topic. If omitted, uses
+                              secret. Must be a service account key in JSON format
+                              (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                            type: object
+                          secret:
+                            description: Credential to use for managing GCS notifications.
+                              Must be a service account key in JSON format (see https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+                              If omitted, defaults to 'google-cloud-key'.
+                            type: object
+                          serviceAccountName:
+                            description: Service Account to run Receive Adapter as.
+                              If omitted, uses 'default'.
+                            type: string
+                          sink:
+                            description: Sink which receives the notifications.
+                            type: object
+                            anyOf:
+                            - type: object
+                              properties:
+                                uri:
+                                  type: string
+                                  minLength: 1
+                            - type: object
+                              properties:
+                                ref:
+                                  type: object
+                                  required:
+                                  - apiVersion
+                                  - kind
+                                  - name
+                                  properties:
+                                    apiVersion:
+                                      type: string
+                                      minLength: 1
+                                    kind:
+                                      type: string
+                                      minLength: 1
+                                    name:
+                                      type: string
+                                      minLength: 1
+                      status:
+                        type: object
+                        properties:
+                          conditions:
+                            type: array
+                            items:
+                              type: object
+                              required:
+                              - type
+                              - status
+                              properties:
+                                lastTransitionTime:
+                                  type: string
+                                message:
+                                  type: string
+                                reason:
+                                  type: string
+                                severity:
+                                  type: string
+                                status:
+                                  type: string
+                                type:
+                                  type: string
+                          notificationId:
+                            type: string
+                          observedGeneration:
+                            type: integer
+                            format: int64
+                          projectId:
+                            type: string
+                          sinkUri:
+                            type: string
+                          subscriptionId:
+                            type: string
+                          topicId:
+                            type: string
+                subresources:
+                  status: {}
+                versions:
+                - name: v1alpha1
+                  served: true
+                  storage: true
+                additionalPrinterColumns:
+                - name: Ready
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].status
+                - name: Reason
+                  type: string
+                  JSONPath: .status.conditions[?(@.type=="Ready")].reason
+                - name: Age
+                  type: date
+                  JSONPath: .metadata.creationTimestamp
+                conversion:
+                  strategy: None
+                preserveUnknownFields: true
+              status:
+                conditions:
+                - type: NamesAccepted
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:23Z'
+                  reason: NoConflicts
+                  message: no conflicts found
+                - type: Established
+                  status: 'True'
+                  lastTransitionTime: null
+                  reason: InitialNamesAccepted
+                  message: the initial names have been accepted
+                - type: NonStructuralSchema
+                  status: 'True'
+                  lastTransitionTime: '2020-03-20T19:07:24Z'
+                  reason: Violations
+                  message: '[spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[0].properties[uri].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[0].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[apiVersion].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[kind].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].properties[name].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].properties[ref].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].properties[sink].anyOf[1].type:
+                    Forbidden: must be empty to be structural, spec.validation.openAPIV3Schema.properties[spec].type:
+                    Required value: must not be empty for specified object fields,
+                    spec.validation.openAPIV3Schema.type: Required value: must not
+                    be empty at the root]'
+                acceptedNames:
+                  plural: cloudstoragesources
+                  singular: cloudstoragesource
+                  kind: CloudStorageSource
+                  listKind: CloudStorageSourceList
+                  categories:
+                  - all
+                  - knative
+                  - cloudstoragesource
+                  - sources
+                storedVersions:
+                - v1alpha1
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/events.cloud.google.com/v1alpha1/namespaces/default/cloudpubsubsources/source-for-$$my-trigger$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: c8b9a57f-6593-47ee-a546-ec2d8fba9b5a
+            content-length: '1208'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: events.cloud.google.com/v1alpha1
+            kind: CloudPubSubSource
+            metadata:
+              creationTimestamp: '2020-05-08T08:52:43Z'
+              generation: 1
+              name: source-for-$$my-trigger$$
+              namespace: default
+              ownerReferences:
+              - apiVersion: eventing.knative.dev/v1alpha1
+                controller: true
+                kind: Trigger
+                name: $$my-trigger$$
+                uid: feefb786-e768-41a6-8355-9f40f50f08ac
+              resourceVersion: '19149702'
+              selfLink: /apis/events.cloud.google.com/v1alpha1/namespaces/default/cloudpubsubsources/source-for-$$my-trigger$$
+              uid: 72fb3286-59b4-4d91-bd56-d5d3a3ee43b8
+            spec:
+              ackDeadline: 30s
+              ceOverrides:
+                extensions:
+                  knsourcetrigger: link0.06050594244793428
+              retentionDuration: 168h0m0s
+              secret:
+                key: key.json
+                name: google-cloud-key
+              sink:
+                ref:
+                  apiVersion: eventing.knative.dev/v1alpha1
+                  kind: Broker
+                  name: default
+              topic: $$my-topic$$
+            status:
+              conditions:
+              - lastTransitionTime: '2020-05-08T08:52:45Z'
+                status: 'True'
+                type: PullSubscriptionReady
+              - lastTransitionTime: '2020-05-08T08:52:45Z'
+                status: 'True'
+                type: Ready
+              observedGeneration: 1
+              sinkUri: http://default-broker.default.svc.cluster.local
+    - expect_stdout:
+        matches: .*$$my-trigger$$.*$$my-topic$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: events triggers delete $$my-trigger$$
+    cleanup_for: my-trigger
+    events:
+    - expect_prompt_continue:
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-eventing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5242'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-eventing
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig:
+                enableIntegrityMonitoring: true
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.36.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling: {}
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+              cloudRunConfig: {}
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig:
+                  enableIntegrityMonitoring: true
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 3
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              locations:
+              - us-central1-a
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-eventing/nodePools/default-pool
+              version: 1.15.9-gke.24
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-83e55cc1-grp
+              status: RUNNING
+              upgradeSettings:
+                maxSurge: 1
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy:
+              resourceVersion: e3b0c442
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            shieldedNodes: {}
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-eventing
+            zone: us-central1-a
+            endpoint: 34.66.86.171
+            initialClusterVersion: 1.15.9-gke.22
+            currentMasterVersion: 1.15.9-gke.24
+            currentNodeVersion: 1.15.9-gke.24
+            createTime: '2020-03-20T18:48:33+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.39.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-83e55cc1-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$\?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: 58a52562-e5a8-46c7-80b9-b570174414af
+            content-length: '213'
+            content-type: application/json
+            status: '200'
+          body:
+            kind: Status
+            apiVersion: v1
+            metadata: {}
+            status: Success
+            details:
+              name: $$my-trigger$$
+              group: eventing.knative.dev
+              kind: triggers
+              uid: feefb786-e768-41a6-8355-9f40f50f08ac
+    - expect_stderr: |
+        Deleted trigger [$$my-trigger$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: run services delete $$my-service$$
+    validation_only: true
+    cleanup_for: my-service
+    events:
+    - expect_prompt_continue:
+        user_input: y
+    - expect_stderr:
+        matches: Deleted.*$$my-service$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: pubsub topics delete $$my-topic$$
+    validation_only: true
+    cleanup_for: my-topic
+    events:
+    - expect_stderr:
+        is_none: false
+    - expect_exit:
+        code: 0

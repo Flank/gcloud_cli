@@ -33,8 +33,9 @@ class Binding(_messages.Message):
       not apply to the current request. However, a different role binding
       might grant the same role to one or more of the members in this binding.
       To learn which resources support conditions in their IAM policies, see
-      the [IAM documentation](https://cloud.google.com/iam/help/conditions
-      /resource-policies).
+      the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -348,11 +349,13 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       refer to go/cloud-saas-mw-ug.
     maintenanceSchedules: The MaintenanceSchedule contains the scheduling
       information of published maintenance schedule.
+    maintenanceSettings: Optional. The MaintenanceSettings associated with
+      instance.
     name: Unique name of the resource. It uses the form:
       `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     producerMetadata: Output only. Custom string attributes used primarily to
-      expose producer-specific information in monitoring dashboards. See go
-      /get-instance-metadata.
+      expose producer-specific information in monitoring dashboards. See
+      go/get-instance-metadata.
     provisionedResources: Output only. The list of data plane resources
       provisioned for this instance, e.g. compute VMs. See go/get-instance-
       metadata.
@@ -538,15 +541,16 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
   labels = _messages.MessageField('LabelsValue', 3)
   maintenancePolicyNames = _messages.MessageField('MaintenancePolicyNamesValue', 4)
   maintenanceSchedules = _messages.MessageField('MaintenanceSchedulesValue', 5)
-  name = _messages.StringField(6)
-  producerMetadata = _messages.MessageField('ProducerMetadataValue', 7)
-  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 8, repeated=True)
-  slmInstanceTemplate = _messages.StringField(9)
-  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 10)
-  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 11)
-  state = _messages.EnumField('StateValueValuesEnum', 12)
-  tenantProjectId = _messages.StringField(13)
-  updateTime = _messages.StringField(14)
+  maintenanceSettings = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings', 6)
+  name = _messages.StringField(7)
+  producerMetadata = _messages.MessageField('ProducerMetadataValue', 8)
+  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 9, repeated=True)
+  slmInstanceTemplate = _messages.StringField(10)
+  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 11)
+  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 12)
+  state = _messages.EnumField('StateValueValuesEnum', 13)
+  tenantProjectId = _messages.StringField(14)
+  updateTime = _messages.StringField(15)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messages.Message):
@@ -568,6 +572,19 @@ class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messag
   endTime = _messages.StringField(2)
   rolloutManagementPolicy = _messages.StringField(3)
   startTime = _messages.StringField(4)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings(_messages.Message):
+  r"""Maintenance settings associated with instance. Allows service producers
+  and end users to assign settings that controls maintenance on this instance.
+
+  Fields:
+    exclude: Optional. Exclude instance from maintenance. When true, rollout
+      service will not attempt maintenance on the instance. Rollout service
+      will include the instance in reported rollout progress as not attempted.
+  """
+
+  exclude = _messages.BooleanField(1)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata(_messages.Message):
@@ -1267,8 +1284,8 @@ class Policy(_messages.Message):
   timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
   "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
   bindings:     - members:       - user:mike@example.com       -
-  group:admins@example.com       - domain:google.com       - serviceAccount
-  :my-project-id@appspot.gserviceaccount.com       role:
+  group:admins@example.com       - domain:google.com       -
+  serviceAccount:my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
@@ -1409,7 +1426,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

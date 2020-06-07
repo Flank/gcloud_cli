@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.auth import util as auth_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as c_exc
+from googlecloudsdk.core import http
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth
@@ -31,7 +32,6 @@ from googlecloudsdk.core.credentials import store as c_store
 import six
 from google.auth import _default as google_auth_default
 from google.auth import exceptions as google_auth_exceptions
-from google.auth.transport import requests
 
 from google.oauth2 import credentials as google_auth_creds
 
@@ -51,8 +51,9 @@ class PrintAccessToken(base.Command):
   In order to print details of the access token, such as the associated account
   and the token's expiration time in seconds, run:
 
-    $ curl https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=\
-    $(gcloud auth application-default print-access-token)
+    $ curl -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "access_token=$(gcloud auth application-default print-access-token)" \
+    https://www.googleapis.com/oauth2/v1/tokeninfo
   """
 
   @staticmethod
@@ -82,5 +83,5 @@ class PrintAccessToken(base.Command):
       creds = c_google_auth.UserCredWithReauth.FromGoogleAuthUserCredentials(
           creds)
     with c_store.HandleGoogleAuthCredentialsRefreshError():
-      creds.refresh(requests.Request())
+      creds.refresh(http.GoogleAuthRequest())
     return creds

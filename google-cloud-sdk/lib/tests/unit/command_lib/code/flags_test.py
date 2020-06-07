@@ -53,3 +53,14 @@ class FlagsValidateTest(test_case.TestCase):
     namespace = self.parser.parse_args(['--application-default-credential'])
     # No exception means everything is OK
     flags.Validate(namespace)
+
+
+class NoSqlFlagsTestCase(test_case.TestCase):
+
+  def SetUp(self):
+    self.parser = util.ArgumentParser()
+
+  def testNoFlags(self):
+    namespace = self.parser.parse_args([])
+    # No exception means everything is OK
+    flags.Validate(namespace)

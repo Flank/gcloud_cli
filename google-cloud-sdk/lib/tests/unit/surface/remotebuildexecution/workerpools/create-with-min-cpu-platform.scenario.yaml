@@ -31,7 +31,7 @@ actions:
                 workerConfig:
                   diskSizeGb: '200'
                   diskType: pd-standard
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   minCpuPlatform: Intel Haswell
                   reserved: false
                 workerCount: '2'
@@ -61,7 +61,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/min_cpu_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "minCpuPlatform": "Intel Haswell",
@@ -92,7 +92,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/min_cpu_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "minCpuPlatform": "Intel Haswell",

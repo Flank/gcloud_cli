@@ -25,8 +25,8 @@ from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-class DescribeCommandTest(base.BigtableV2TestBase,
-                          sdk_test_base.WithOutputCapture):
+class DescribeCommandTestAlpha(base.BigtableV2TestBase,
+                               sdk_test_base.WithOutputCapture):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -40,21 +40,28 @@ class DescribeCommandTest(base.BigtableV2TestBase,
     self.table_ref = util.GetTableRef('theinstance', 'thetable')
 
   def _RunSuccessTest(self, cmd):
+    kms_key = 'projects/p/locations/l/keyRings/r/cryptoKeys/k'
     self.svc.Expect(
         request=self.msg,
         response=self.msgs.Backup(
-            name=('{}/backups/{}'.format(
-                self.cluster_ref.RelativeName(), 'thebackup')),
+            name=('{}/backups/{}'.format(self.cluster_ref.RelativeName(),
+                                         'thebackup')),
             sourceTable=self.table_ref.RelativeName(),
             expireTime='2019-06-01T00:00:00Z',
             startTime='2019-05-28T18:19:16.792310Z',
             endTime='2019-05-28T18:20:19.470575Z',
             sizeBytes=3187,
-            state=self.msgs.Backup.StateValueValuesEnum.READY))
+            state=self.msgs.Backup.StateValueValuesEnum.READY,
+            encryptionInfo=self.msgs.EncryptionInfo(
+                kmsKeyVersion=kms_key,
+                encryptionType=self.msgs.EncryptionInfo
+                .EncryptionTypeValueValuesEnum.CUSTOMER_MANAGED_ENCRYPTION,
+            )))
     self.Run(cmd)
     self.AssertOutputContains('thebackup')
     self.AssertOutputContains('2019-06-01T00:00:00Z')
     self.AssertOutputContains('READY')
+    self.AssertOutputContains(kms_key)
 
   def testDescribe(self):
     self._RunSuccessTest(

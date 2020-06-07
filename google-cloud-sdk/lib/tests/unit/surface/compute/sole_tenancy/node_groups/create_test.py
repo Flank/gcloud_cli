@@ -26,10 +26,12 @@ from tests.lib.surface.compute import test_base
 
 class NodeGroupsCreateTest(test_base.BaseTest):
 
-  def SetUp(self):
-    self.api_version = 'v1'
-    self.SelectApi(self.api_version)
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
     self.region = 'us-central1'
     self.zone = 'us-central1-a'
 
@@ -97,13 +99,22 @@ class NodeGroupsCreateTest(test_base.BaseTest):
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
     self.assertEqual(result, node_group)
 
+  def testCreate_MaintenancePolicy(self):
+    node_group = self._CreateNodeGroup(
+        name='my-node-group',
+        description='Frontend Group',
+        node_template='my-template',
+        maintenance_policy='RESTART_IN_PLACE')
+    request = self._ExpectCreate(node_group, 3)
 
-class NodeGroupsCreateTestBeta(NodeGroupsCreateTest):
+    result = self.Run(
+        'compute sole-tenancy node-groups create my-node-group '
+        '--node-template my-template --target-size 3 '
+        '--maintenance-policy restart-in-place '
+        '--description "Frontend Group" --zone ' + self.zone)
 
-  def SetUp(self):
-    self.api_version = 'beta'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
+    self.assertEqual(result, node_group)
 
   def testCreate_AutoscalingPolicy(self):
     node_group = self._CreateNodeGroup(
@@ -191,30 +202,19 @@ class NodeGroupsCreateTestBeta(NodeGroupsCreateTest):
           '--autoscaler-mode=only-scale-out '
           '--zone ' + self.zone)
 
-  def testCreate_MaintenancePolicy(self):
-    node_group = self._CreateNodeGroup(
-        name='my-node-group',
-        description='Frontend Group',
-        node_template='my-template',
-        maintenance_policy='RESTART_IN_PLACE')
-    request = self._ExpectCreate(node_group, 3)
 
-    result = self.Run(
-        'compute sole-tenancy node-groups create my-node-group '
-        '--node-template my-template --target-size 3 '
-        '--maintenance-policy restart-in-place '
-        '--description "Frontend Group" --zone ' + self.zone)
+class NodeGroupsCreateTestBeta(NodeGroupsCreateTest):
 
-    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
-    self.assertEqual(result, node_group)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
 
 class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
 
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
   def testCreateMaintenanceStartTime(self):
     node_group = self._CreateNodeGroup(

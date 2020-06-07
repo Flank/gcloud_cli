@@ -21,6 +21,12 @@ GROUPS
      auth
         (ALPHA) Authenticate clusters using the Anthos client.
 
+COMMANDS
+    COMMAND is one of the following:
+
+     apply
+        (ALPHA) Apply configuration changes for Anthos infrastructure.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

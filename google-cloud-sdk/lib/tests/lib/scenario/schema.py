@@ -436,7 +436,8 @@ class ExecuteBinaryAction(Action):
     try:
       with assertions.FailureCollector(
           scenario_context.update_modes, spec_name=scenario_context.spec_name,
-          action_location=action_location) as failures:
+          action_location=action_location,
+          execution_mode=scenario_context.execution_mode.name) as failures:
         failures.AddAll(exit_event.HandleReturnCode(return_code))
         failures.AddAll(stdout_event.Handle(stdout.getvalue()))
         failures.AddAll(stderr_event.Handle(stderr.getvalue()))
@@ -551,7 +552,8 @@ class CommandExecutionAction(Action):
     try:
       with assertions.FailureCollector(
           update_modes, spec_name=scenario_context.spec_name,
-          action_location=action_location) as failures:
+          action_location=action_location,
+          execution_mode=scenario_context.execution_mode.name) as failures:
         with session.Session(
             self._LoadEvents(scenario_context.resource_ref_resolver),
             failures, stream_mocker, scenario_context.execution_mode,

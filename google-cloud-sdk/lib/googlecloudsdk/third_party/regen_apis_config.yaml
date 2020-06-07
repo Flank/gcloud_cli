@@ -18,8 +18,8 @@
 # everytime some input discovery doc is added/updated or apitools generation
 # code has been changed.
 
-# To add new api simply add an entry with its api name and version
-# pointing to its discovery doc file which should be checked into root_dir.
+# To add a new API, simply add an entry with its api name and version
+# pointing to its discovery doc file, which should be checked into root_dir.
 
 # api version can have the following fields:
 # api_name:
@@ -64,6 +64,9 @@ apis:
     v1alpha1:
       discovery_doc: apigateway_v1alpha1.json
       default: true
+  apigee:
+    v1:
+      discovery_doc: apigee_v1.json
   appengine:
     v1alpha:
       discovery_doc: appengine_v1alpha.json
@@ -112,6 +115,10 @@ apis:
     v1beta1:
       discovery_doc: billingbudgets_v1beta1.json
       default: true
+  certificatemanager:
+    v1alpha1:
+      discovery_doc: certificatemanager_v1alpha1.json
+      default: true
   cloudasset:
     v1beta1:
       default: true
@@ -150,6 +157,9 @@ apis:
     v1:
       discovery_doc: cloudbuild_v1.json
       default: true
+      resources:
+        projects:
+          path: projects/{projectId}
       # The following stanza is a workaround for b/24867445. It prevents elision
       # of a request containing (project_id + xyz) into just an Xyz object.
       unelidable_request_methods:
@@ -275,6 +285,10 @@ apis:
       enable_mtls: true
       mtls_endpoint_override: https://compute.mtls.googleapis.com/compute/alpha/
       resources:
+        regionAcceleratorTypes:
+          path: projects/{project}/regions/{region}/acceleratorTypes/{acceleratorType}
+        regionMachineTypes:
+          path: projects/{project}/regions/{region}/machineTypes/{machineType}
         nextHopGateways:
           path: projects/{project}/global/gateways/{nextHopGateway}
         securityPolicyRules:
@@ -667,14 +681,21 @@ apis:
   resourcesettings:
     v1alpha1:
       discovery_doc: resourcesettings_v1alpha1.json
+      unelidable_request_methods:
+      - resourcesettings.folders.settings.value.create
+      - resourcesettings.folders.settings.updateValue
+      - resourcesettings.organizations.settings.value.create
+      - resourcesettings.organizations.settings.updateValue
+      - resourcesettings.projects.settings.value.create
+      - resourcesettings.projects.settings.updateValue
   run:
     v1alpha1:
       discovery_doc: run_v1alpha1.json
-      default: true
     v1beta1:
       discovery_doc: run_v1beta1.json
     v1:
       discovery_doc: run_v1.json
+      default: true
   runtimeconfig:
     v1beta1:
       discovery_doc: runtimeconfig_v1beta1.json

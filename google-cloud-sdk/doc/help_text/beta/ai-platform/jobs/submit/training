@@ -17,6 +17,8 @@ SYNOPSIS
         [--use-chief-in-tf-config=USE_CHIEF_IN_TF_CONFIG]
         [--worker-accelerator=[count=COUNT],[type=TYPE]]
         [--worker-image-uri=WORKER_IMAGE_URI] [--async | --stream-logs]
+        [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--parameter-server-count=PARAMETER_SERVER_COUNT
           --parameter-server-machine-type=PARAMETER_SERVER_MACHINE_TYPE]
         [--worker-count=WORKER_COUNT --worker-machine-type=WORKER_MACHINE_TYPE]
@@ -113,9 +115,11 @@ FLAGS
         Google Cloud Storage path in which to store training outputs and other
         data needed for training.
 
-        This path will be passed to your TensorFlow program as the --job_dir
+        This path will be passed to your TensorFlow program as the --job-dir
         command-line arg. The benefit of specifying this field is that AI
-        Platform will validate the path for use in training.
+        Platform will validate the path for use in training. However, note that
+        your training program will need to parse the provided --job-dir
+        argument.
 
         If packages must be uploaded and --staging-bucket is not provided, this
         path will be used instead.
@@ -156,10 +160,10 @@ FLAGS
         Name of the module to run.
 
      --package-path=PACKAGE_PATH
-        Path to a Python package to build. This should point to a directory
-        containing the Python source for the job. It will be built using
-        setuptools (which must be installed) using its parent directory as
-        context. If the parent directory contains a setup.py file, the build
+        Path to a Python package to build. This should point to a local
+        directory containing the Python source for the job. It will be built
+        using setuptools (which must be installed) using its parent directory
+        as context. If the parent directory contains a setup.py file, the build
         will use that; otherwise, it will use a simple built-in one.
 
      --packages=[PACKAGE,...]
@@ -304,6 +308,26 @@ FLAGS
           until cancelled with
 
               $ gcloud ai-platform jobs cancel JOB_ID
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the job. The 'AI Platform Service Agent' service
+     account must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'.
+     The arguments in this group can be used to specify the attributes of this
+     resource.
+
+       --kms-key=KMS_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --kms-keyring=KMS_KEYRING
+          The KMS keyring of the key.
+
+       --kms-location=KMS_LOCATION
+          The Cloud location for the key.
+
+       --kms-project=KMS_PROJECT
+          The Cloud project for the key.
 
      Configure parameter server machine type settings.
 

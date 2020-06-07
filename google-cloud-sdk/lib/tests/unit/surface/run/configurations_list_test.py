@@ -45,7 +45,7 @@ class ConfigurationsListTestBeta(base.ServerlessSurfaceBase):
           self.namespace.Name(), r.name)
       r.status.latestCreatedRevisionName = '{}.3'.format(r.name)
       r.status.latestReadyRevisionName = '{}.1'.format(r.name)
-      r.status.conditions = [self.serverless_messages.ConfigurationCondition(
+      r.status.conditions = [self.serverless_messages.GoogleCloudRunV1Condition(
           type='Ready',
           status=six.text_type(bool(i%2)))]
     self.operations.ListConfigurations.return_value = self.configurations

@@ -74,6 +74,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -122,6 +125,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -185,6 +191,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -252,6 +261,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -310,6 +322,9 @@ class HTMLMarkdownTests(test_base.Markdown):
         li {
           margin-top: 1ex; margin-bottom: 1ex;
         }
+        .flag {
+          white-space: nowrap;
+        }
         .hangingindent {
           padding-left: 1.5em;
           text-indent: -1.5em;
@@ -331,7 +346,7 @@ class HTMLMarkdownTests(test_base.Markdown):
       <dt><h4>SYNOPSIS</h4></dt>
       <dd class="sectionbody">
       <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-      gcloud component <nobr>[ <code><var>flags</var></code> ]</nobr> <nobr>[ <code><var>positionals</var></code> ]</nobr>
+      gcloud component <span>[ <code><var>flags</var></code> ]</span> <span>[ <code><var>positionals</var></code> ]</span>
       </span></dt></dl>
       </dd>
 
@@ -376,6 +391,9 @@ class HTMLMarkdownTests(test_base.Markdown):
         }
         li {
           margin-top: 1ex; margin-bottom: 1ex;
+        }
+        .flag {
+          white-space: nowrap;
         }
         .hangingindent {
           padding-left: 1.5em;
@@ -504,6 +522,9 @@ class HTMLMarkdownTests(test_base.Markdown):
         }
         li {
           margin-top: 1ex; margin-bottom: 1ex;
+        }
+        .flag {
+          white-space: nowrap;
         }
         .hangingindent {
           padding-left: 1.5em;
@@ -641,6 +662,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -702,6 +726,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -839,6 +866,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -926,6 +956,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -1034,6 +1067,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -1062,7 +1098,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         <dt><h4>SYNOPSIS</h4></dt>
         <dd class="sectionbody">
         <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-        <code>gcloud compute backend-services update-backend</code> <code><var><a href="#NAME">NAME</a></var></code> <code><a href="#--instance-group">--instance-group</a></code>=<code><var>INSTANCE_GROUP</var></code> <nobr>[<code><a href="#--balancing-mode">--balancing-mode</a></code>=<code><var>BALANCING_MODE</var></code>]</nobr> <nobr>[<code><a href="#--capacity-scaler">--capacity-scaler</a></code>=<code><var>CAPACITY_SCALER</var></code>]</nobr> <nobr>[<code><a href="#--description">--description</a></code>=<code><var>DESCRIPTION</var></code>]</nobr> <nobr>[<code><a href="#--max-utilization">--max-utilization</a></code>=<code><var>MAX_UTILIZATION</var></code>]</nobr> <nobr>[<code><a href="#--instance-group-zone">--instance-group-zone</a></code>=<code><var>INSTANCE_GROUP_ZONE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--zone">--zone</a></code>=<code><var>ZONE</var></code>]</nobr> <nobr>[<code><a href="#--max-connections">--max-connections</a></code>=<code><var>MAX_CONNECTIONS</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--max-connections-per-instance">--max-connections-per-instance</a></code>=<code><var>MAX_CONNECTIONS_PER_INSTANCE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--max-rate">--max-rate</a></code>=<code><var>MAX_RATE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--max-rate-per-instance">--max-rate-per-instance</a></code>=<code><var>MAX_RATE_PER_INSTANCE</var></code>]</nobr> <nobr>[<code><var><a href="#GCLOUD-WIDE-FLAGS">GCLOUD_WIDE_FLAG</a> &hellip;</var></code>]</nobr>
+        <code>gcloud compute backend-services update-backend</code> <code><var><a href="#NAME">NAME</a></var></code> <span class="flag"><code><a href="#--instance-group">--instance-group</a></code>=<code><var>INSTANCE_GROUP</var></code></span> <span>[<span class="flag"><code><a href="#--balancing-mode">--balancing-mode</a></code>=<code><var>BALANCING_MODE</var></code>]</span></span> <span>[<span class="flag"><code><a href="#--capacity-scaler">--capacity-scaler</a></code>=<code><var>CAPACITY_SCALER</var></code>]</span></span> <span>[<span class="flag"><code><a href="#--description">--description</a></code>=<code><var>DESCRIPTION</var></code>]</span></span> <span>[<span class="flag"><code><a href="#--max-utilization">--max-utilization</a></code>=<code><var>MAX_UTILIZATION</var></code>]</span></span> <span>[<span class="flag"><code><a href="#--instance-group-zone">--instance-group-zone</a></code>=<code><var>INSTANCE_GROUP_ZONE</var></code></span></span> <span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="flag"><code><a href="#--zone">--zone</a></code>=<code><var>ZONE</var></code>]</span></span> <span>[<span class="flag"><code><a href="#--max-connections">--max-connections</a></code>=<code><var>MAX_CONNECTIONS</var></code></span></span> <span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="flag"><code><a href="#--max-connections-per-instance">--max-connections-per-instance</a></code>=<code><var>MAX_CONNECTIONS_PER_INSTANCE</var></code></span></span> <span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="flag"><code><a href="#--max-rate">--max-rate</a></code>=<code><var>MAX_RATE</var></code></span></span> <span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="flag"><code><a href="#--max-rate-per-instance">--max-rate-per-instance</a></code>=<code><var>MAX_RATE_PER_INSTANCE</var></code>]</span></span> <span>[<code><var><a href="#GCLOUD-WIDE-FLAGS">GCLOUD_WIDE_FLAG</a> &hellip;</var></code>]</span>
         </span></dt></dl>
         </dd>
 
@@ -1107,6 +1143,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -1207,6 +1246,9 @@ class HTMLMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;

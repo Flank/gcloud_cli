@@ -3,22 +3,22 @@ release_tracks: [ALPHA]
 summary:
 - execute:
   - command: |
-      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB"
+      scc assets update-marks 11773236938904334887 --organization 702114178617 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB"
   - stdout: |
       marks:
         probermark: proberTestValue
         testA: valueA
         testB: valueB
-      name: organizations/345840165995/assets/595423472147994486/securityMarks
+      name: organizations/702114178617/assets/11773236938904334887/securityMarks
 actions:
 - execute_command:
     # Update all marks (skip update-mask)
     command: |
-      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB"
+      scc assets update-marks 11773236938904334887 --organization 702114178617 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB"
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets/595423472147994486/securityMarks?alt=json
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets/11773236938904334887/securityMarks?alt=json
           method: PATCH
           headers: {}
           body:
@@ -32,7 +32,7 @@ actions:
             status: '200'
           body: |
             {
-              "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+              "name": "organizations/702114178617/assets/11773236938904334887/securityMarks",
               "marks": {
                 "probermark": "proberTestValue",
                 "testA": "valueA",
@@ -44,17 +44,17 @@ actions:
           probermark: proberTestValue
           testA: valueA
           testB: valueB
-        name: organizations/345840165995/assets/595423472147994486/securityMarks
+        name: organizations/702114178617/assets/11773236938904334887/securityMarks
     - expect_exit:
         code: 0
 - execute_command:
     # Update all marks (empty update-mask)
     command: |
-      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB" --update-mask ""
+      scc assets update-marks 11773236938904334887 --organization 702114178617 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB" --update-mask ""
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets/595423472147994486/securityMarks?alt=json
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets/11773236938904334887/securityMarks?alt=json
           method: PATCH
           headers: {}
           body:
@@ -68,29 +68,28 @@ actions:
             status: '200'
           body: |
             {
-              "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+              "name": "organizations/702114178617/assets/11773236938904334887/securityMarks",
               "marks": {
                 "probermark": "proberTestValue",
                 "testA": "valueA",
                 "testB": "valueB"
               }
             }
-    - expect_stdout: |
-        marks:
-          probermark: proberTestValue
-          testA: valueA
-          testB: valueB
-        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_stdout:
+        matches: |
+            .*probermark: proberTestValue.*
+            .*testA: valueA.*
+            .*testB: valueB.*
     - expect_exit:
         code: 0
 - execute_command:
     # Update single mark using update-mask
     command: |
-      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "testA=valueA" --update-mask "marks.testA"
+      scc assets update-marks 11773236938904334887 --organization 702114178617 --security-marks "testA=valueA" --update-mask "marks.testA"
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets/595423472147994486/securityMarks?alt=json&updateMask=marks.testA
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets/11773236938904334887/securityMarks?alt=json&updateMask=marks.testA
           method: PATCH
           headers: {}
           body:
@@ -102,18 +101,17 @@ actions:
             status: '200'
           body: |
             {
-              "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+              "name": "organizations/702114178617/assets/11773236938904334887/securityMarks",
               "marks": {
                 "probermark": "proberTestValue",
                 "testA": "valueA",
                 "testB": "valueB"
               }
             }
-    - expect_stdout: |
-        marks:
-          probermark: proberTestValue
-          testA: valueA
-          testB: valueB
-        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_stdout:
+        matches: |
+            .*probermark: proberTestValue.*
+            .*testA: valueA.*
+            .*testB: valueB.*
     - expect_exit:
         code: 0

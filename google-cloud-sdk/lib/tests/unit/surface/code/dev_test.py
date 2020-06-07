@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.code import kubernetes
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import platforms
 from surface import code
 from surface.code import dev
@@ -44,6 +45,9 @@ class DevTest(test_case.TestCase):
     self.parser = util.ArgumentParser()
     code.Code.Args(self.parser)
     dev.Dev.Args(self.parser)
+
+    self.find_executable_on_path = self.StartObjectPatch(
+        file_utils, 'FindExecutableOnPath', return_value=True)
 
   def testSelectMinikube(self):
     args = self.parser.parse_args(['--minikube-profile=fake-profile'] +
@@ -110,6 +114,15 @@ class DevTest(test_case.TestCase):
       cmd.Run(args)
 
     mock_cluster.assert_called()
+
+  def testNoDocker(self):
+    self.find_executable_on_path.return_value = False
+
+    args = self.parser.parse_args(self.COMMON_ARGS)
+    cmd = dev.Dev(None, None)
+
+    with self.assertRaises(dev.RuntimeMissingDependencyError):
+      cmd.Run(args)
 
 
 class SkaffoldTest(test_case.TestCase):

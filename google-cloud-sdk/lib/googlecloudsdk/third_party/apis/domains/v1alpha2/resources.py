@@ -18,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://domains.googleapis.com/v1alpha2/'
-DOCS_URL = 'https://cloud.google.com/domains/'
+DOCS_URL = 'https://cloud.google.com/cloud-domains/'
 
 
 class Collections(enum.Enum):
@@ -28,7 +28,7 @@ class Collections(enum.Enum):
       'projects',
       'projects/{projectsId}',
       {},
-      [u'projectsId'],
+      ['projectsId'],
       True
   )
   PROJECTS_LOCATIONS = (
@@ -38,7 +38,7 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}',
       },
-      [u'name'],
+      ['name'],
       True
   )
   PROJECTS_LOCATIONS_OPERATIONS = (
@@ -49,7 +49,7 @@ class Collections(enum.Enum):
               'projects/{projectsId}/locations/{locationsId}/operations/'
               '{operationsId}',
       },
-      [u'name'],
+      ['name'],
       True
   )
   PROJECTS_LOCATIONS_REGISTRATIONS = (
@@ -60,7 +60,7 @@ class Collections(enum.Enum):
               'projects/{projectsId}/locations/{locationsId}/registrations/'
               '{registrationsId}',
       },
-      [u'name'],
+      ['name'],
       True
   )
 

@@ -108,7 +108,7 @@ be in the local filesystem or in Google Cloud Storage using a URL beginning with
 \fB\-\-timeout\fR=\fITIMEOUT\fR
 The max time this test execution can run before it is cancelled (default: 15m).
 It does not include any time necessary to prepare and clean up the target
-device. The maximum possible testing time is 30m on physical devices and 60m on
+device. The maximum possible testing time is 45m on physical devices and 60m on
 virtual devices. The \fITIMEOUT\fR units can be h, m, or s. If no unit is given,
 seconds are assumed. Examples:
 .RS 2m
@@ -214,9 +214,9 @@ Note: If you need to embed a comma into a \f5VALUE\fR string, please refer to
 \fB\-\-network\-profile\fR=\fIPROFILE_ID\fR
 The name of the network traffic profile, for example \-\-network\-profile=LTE,
 which consists of a set of parameters to emulate network conditions when running
-the test (default: no network shaping; see available profiles listed by the \f5$
-gcloud firebase test network\-profiles list\fR command). This feature only works
-on physical devices.
+the test (default: no network shaping; see available profiles listed by the $
+gcloud beta firebase test network\-profiles list\f5 command). This feature only
+works on physical devices.
 
 .TP 2m
 \fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR
@@ -335,6 +335,7 @@ with semi\-colons:
 .RE
 
 
+\fR
 .RE
 .RE
 .sp

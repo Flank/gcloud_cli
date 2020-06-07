@@ -233,8 +233,12 @@ class TestBaseFilterTests(test_base.ScenarioTestBase, parameterized.TestCase):
        {'skip': {'reason': 'Failing', 'bug': 'b/12345'}}),
       ('SkippedLocal', True, session.ExecutionMode.LOCAL,
        {'skip': {'reason': 'Failing', 'bug': 'b/12345', 'locally': True}}),
+      ('SkippedBoth', True, session.ExecutionMode.BOTH,
+       {'skip': {'reason': 'Failing', 'bug': 'b/12345', 'locally': True}}),
       ('NotSkippedRemote', False, session.ExecutionMode.REMOTE, None),
       ('NotSkippedLocal', False, session.ExecutionMode.LOCAL,
+       {'skip': {'reason': 'Failing', 'bug': 'b/12345'}}),
+      ('NotSkippedBoth', False, session.ExecutionMode.BOTH,
        {'skip': {'reason': 'Failing', 'bug': 'b/12345'}})
   )
   def testSkips(self, expected_is_filtered, execution_mode, filter_data):
@@ -246,8 +250,12 @@ class TestBaseFilterTests(test_base.ScenarioTestBase, parameterized.TestCase):
        {'DoNotRunOnLinux': {'reason': 'Because'}}),
       ('RestrictedLocal', True, session.ExecutionMode.LOCAL,
        {'DoNotRunOnLinux': {'reason': 'Because'}}),
+      ('RestrictedBoth', True, session.ExecutionMode.BOTH,
+       {'DoNotRunOnLinux': {'reason': 'Because'}}),
       ('NotRestrictedRemote', False, session.ExecutionMode.REMOTE,
-       {'RunOnlyOnLinux': {'reason': 'Because'}})
+       {'RunOnlyOnLinux': {'reason': 'Because'}}),
+      ('NotRestrictedBoth', False, session.ExecutionMode.BOTH,
+       {'RunOnlyOnLinux': {'reason': 'Because'}}),
   )
   def testRestrictions(self, expected_is_filtered, execution_mode, filter_data):
     # Pretend we're running on Linux so that the restriction is relevant.

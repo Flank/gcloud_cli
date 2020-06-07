@@ -37,23 +37,22 @@ ANDROID_CATALOG_GET = TESTING_V1_MSGS.TestingTestEnvironmentCatalogGetRequest(
     projectId=unit_base.TestUnitTestBase.PROJECT_ID)
 
 ALL_GA_TEST_RUN_ARGS = [
-    'app', 'app_package', 'async_', 'auto_google_login', 'device', 'device_ids',
-    'directories_to_pull', 'environment_variables', 'locales',
-    'network_profile', 'num_flaky_test_attempts', 'obb_files', 'orientations',
-    'os_version_ids', 'performance_metrics', 'record_video', 'results_bucket',
-    'results_dir', 'results_history_name', 'robo_directives',
-    'scenario_numbers', 'scenario_labels', 'test', 'test_package',
-    'test_runner_class', 'test_targets', 'timeout', 'type', 'use_orchestrator'
+    'additional_apks', 'app', 'app_package', 'async_', 'auto_google_login',
+    'device', 'device_ids', 'directories_to_pull', 'environment_variables',
+    'locales', 'network_profile', 'num_flaky_test_attempts', 'obb_files',
+    'orientations', 'os_version_ids', 'other_files', 'performance_metrics',
+    'record_video', 'results_bucket', 'results_dir', 'results_history_name',
+    'robo_directives', 'robo_script', 'scenario_numbers', 'scenario_labels',
+    'test', 'test_package', 'test_runner_class', 'test_targets', 'timeout',
+    'type', 'use_orchestrator'
 ]
 
 ALL_TEST_RUN_ARGS = {
     calliope_base.ReleaseTrack.GA:
         ALL_GA_TEST_RUN_ARGS,
     calliope_base.ReleaseTrack.BETA:
-        ALL_GA_TEST_RUN_ARGS + [
-            'additional_apks', 'client_details', 'num_uniform_shards',
-            'other_files', 'robo_script', 'test_targets_for_shard'
-        ]
+        ALL_GA_TEST_RUN_ARGS +
+        ['client_details', 'num_uniform_shards', 'test_targets_for_shard']
 }
 
 

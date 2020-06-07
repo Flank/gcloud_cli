@@ -11,7 +11,7 @@ gcloud dns policies create \- creates a new Cloud DNS policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fINETWORKS\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fINETWORKS\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-private\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,6 +74,11 @@ sent by VMs or applications over VPN connections. Defaults to False.
 .TP 2m
 \fB\-\-enable\-logging\fR
 Specifies whether to enable query logging. Defaults to False.
+
+.TP 2m
+\fB\-\-private\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]
+List of alternative name servers to forward to. All addresses specified for this
+parameter will be reached through the VPC.
 
 
 .RE

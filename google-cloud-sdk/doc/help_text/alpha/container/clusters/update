@@ -9,7 +9,7 @@ SYNOPSIS
           | --database-encryption-key=DATABASE_ENCRYPTION_KEY
           | --disable-database-encryption | --disable-default-snat
           | --disable-workload-identity | --enable-autoscaling
-          | --enable-binauthz | --enable-cost-management
+          | --enable-binauthz | --enable-cost-management | --enable-gvnic
           | --enable-intra-node-visibility | --enable-legacy-authorization
           | --enable-logging-monitoring-system-only
           | --enable-master-authorized-networks | --enable-master-global-access
@@ -139,6 +139,10 @@ REQUIRED FLAGS
           (https://cloud.google.com/billing/docs/how-to/export-data-bigquery).
 
           Use --no-enable-cost-management to disable this feature.
+
+       --enable-gvnic
+          Enable the use of GVNIC for this cluster. Requires re-creation of
+          nodes using either a node-pool upgrade or node-pool creation.
 
        --enable-intra-node-visibility
           Enable Intra-node visibility for this cluster.

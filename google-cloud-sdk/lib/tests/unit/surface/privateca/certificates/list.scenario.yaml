@@ -69,6 +69,15 @@ summary:
       my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
 - execute:
   - command: |
+      privateca certificates list --issuer projects/foo/locations/europe-west1/certificateAuthorities/my-ca
+  - stderr: |
+      WARNING: The following locations were fully or partially unreachable : us-west1. If you continue encountering this error, contact certificate-authority-service-alpha-external@google.com for help resolving the issue.
+  - stdout: |
+      NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
+      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
+- execute:
+  - command: |
       privateca certificates list --issuer my-ca
   - error: '1: Invalid value for [--issuer-location]: location must be specified.'
 actions:
@@ -124,7 +133,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -150,7 +159,7 @@ actions:
             {
               "certificates": [],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stderr: |
         Listed 0 items.
@@ -194,7 +203,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -240,7 +249,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -285,7 +294,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -333,7 +342,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -391,7 +400,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -438,7 +447,7 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
@@ -488,12 +497,60 @@ actions:
                 }
               ],
               "next_page_token": "",
-              "unreachable_locations": []
+              "unreachable": []
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
         my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
         my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      privateca certificates list --issuer projects/foo/locations/europe-west1/certificateAuthorities/my-ca
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates?alt=json&pageSize=100
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+                "certificates": [
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
+                  "certificate_description" : {
+                    "subject_description": {
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
+                    }
+                  },
+                  "revocation_details": {
+                    "revocation_state": "SUPERSEDED",
+                    "revocation_time": "2020-04-17T15:14:00.105-07:00"
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert2",
+                  "certificate_description" : {
+                    "subject_description": {
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable": ["us-west1"]
+            }
+    - expect_stderr: |
+        WARNING: The following locations were fully or partially unreachable : us-west1. If you continue encountering this error, contact certificate-authority-service-alpha-external@google.com for help resolving the issue.
+    - expect_stdout: |
+        NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
+        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:

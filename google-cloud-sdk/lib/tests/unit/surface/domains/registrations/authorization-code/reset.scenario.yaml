@@ -1,0 +1,113 @@
+title: cloud domains authorization-code reset test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations authorization-code reset valid-authcode.com
+  - stdout: |
+      code: 80G*Aop{3g5u_39/
+- execute:
+  - command: |
+      domains registrations authorization-code reset no-authcode.ÜniCode.com
+  - error: |
+      1: HTTPError 400: {
+         "message": "authorization code is not available because it has been less than 60 days since you purchased the domain"
+      }
+- execute:
+  - command: |
+      domains registrations authorization-code get exported.com
+  - error: "1: The registration resource must be in state ACTIVE or SUSPENDED, not\
+      \ 'EXPORTED'."
+actions:
+- execute_command:
+    command: |
+      domains registrations authorization-code reset valid-authcode.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/valid-authcode.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "state": "ACTIVE"
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/valid-authcode.com:resetAuthorizationCode?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "code": "80G*Aop{3g5u_39/"
+            }
+    - expect_stdout: |
+        code: 80G*Aop{3g5u_39/
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations authorization-code reset no-authcode.ÜniCode.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/no-authcode.xn--nicode-2ya.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "state": "ACTIVE"
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/no-authcode.xn--nicode-2ya.com:resetAuthorizationCode?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '400'
+          body: |
+            {
+               "message": "authorization code is not available because it has been less than 60 days since you purchased the domain"
+            }
+    - expect_exit:
+        code: 1
+        message: |
+          HTTPError 400: {
+             "message": "authorization code is not available because it has been less than 60 days since you purchased the domain"
+          }
+- execute_command:
+    command: |
+      domains registrations authorization-code get exported.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/exported.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "state": "EXPORTED"
+            }
+    - expect_exit:
+        code: 1
+        message: The registration resource must be in state ACTIVE or SUSPENDED, not
+          'EXPORTED'.

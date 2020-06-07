@@ -24,6 +24,17 @@ DOCS_URL = ''
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
+  NAMESPACES_CUSTOMRESOURCEDEFINITIONS = (
+      'namespaces.customresourcedefinitions',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/customresourcedefinitions/'
+              '{customresourcedefinitionsId}',
+      },
+      ['name'],
+      True
+  )
   NAMESPACES_TRIGGERS = (
       'namespaces.triggers',
       '{+name}',
@@ -31,28 +42,39 @@ class Collections(enum.Enum):
           '':
               'namespaces/{namespacesId}/triggers/{triggersId}',
       },
-      [u'name'],
+      ['name'],
       True
   )
   NAMESPACES = (
       'namespaces',
       'namespaces/{namespacesId}',
       {},
-      [u'namespacesId'],
+      ['namespacesId'],
       True
   )
   PROJECTS = (
       'projects',
       'projects/{projectsId}',
       {},
-      [u'projectsId'],
+      ['projectsId'],
       True
   )
   PROJECTS_LOCATIONS = (
       'projects.locations',
       'projects/{projectsId}/locations/{locationsId}',
       {},
-      [u'projectsId', u'locationsId'],
+      ['projectsId', 'locationsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_CUSTOMRESOURCEDEFINITIONS = (
+      'projects.locations.customresourcedefinitions',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'customresourcedefinitions/{customresourcedefinitionsId}',
+      },
+      ['name'],
       True
   )
   PROJECTS_LOCATIONS_TRIGGERS = (
@@ -63,7 +85,7 @@ class Collections(enum.Enum):
               'projects/{projectsId}/locations/{locationsId}/triggers/'
               '{triggersId}',
       },
-      [u'name'],
+      ['name'],
       True
   )
 

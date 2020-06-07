@@ -22,6 +22,7 @@ import os
 import textwrap
 
 from googlecloudsdk.api_lib.auth import util as auth_util
+from googlecloudsdk.command_lib.auth import auth_util as command_auth_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -100,9 +101,13 @@ class LoginTestOauth2client(cli_test_base.CliTestBase, test_case.WithInput):
         user_agent=''
     )
 
-  def Login(self, more_args=''):
-    return self.Run('beta auth application-default login --use-oauth2client '
-                    '{more_args}'.format(more_args=more_args))
+  def Login(self, disable_quota_project=True, more_args=''):
+    if disable_quota_project:
+      return self.Run('auth application-default login --disable-quota-project '
+                      '{more_args}'.format(more_args=more_args))
+    else:
+      return self.Run('auth application-default login '
+                      '{more_args}'.format(more_args=more_args))
 
   def testBasicLogin(self):
     """Basic login with default client id and default scopes."""
@@ -326,11 +331,13 @@ class LoginTestOauth2client(cli_test_base.CliTestBase, test_case.WithInput):
     self.AssertFileExists(self.temp_path, 'junk', 'ADC')
 
   def testLoginWithQuotaProject(self):
+    self.StartObjectPatch(
+        command_auth_util, 'AdcHasGivenPermissionOnProject', return_value=True)
     self.mock_webflow.return_value = creds.FromJson(_GetJsonUserADC())
-    self.Login('--add-quota-project')
+    self.Login(disable_quota_project=False)
     self.AssertFileEquals(_GetJsonUserExtendedADC(),
                           os.path.join(self.temp_path, 'ADC'))
-    self.AssertErrContains("Quota project 'fake-project' was added to ADC")
+    self.AssertErrContains('Quota project "fake-project" was added to ADC')
 
   def testLoginWithoutQuotaProject(self):
     self.mock_webflow.return_value = creds.FromJson(_GetJsonUserADC())
@@ -394,9 +401,15 @@ class LoginTestGoogleAuth(cli_test_base.CliTestBase, test_case.WithInput):
     self.StartDictPatch('os.environ', {'DISPLAY': ':1'})
     self.scopes = auth_util.DEFAULT_SCOPES + [config.REAUTH_SCOPE]
 
-  def Login(self, more_args=''):
-    return self.Run('beta auth application-default login {more_args}'.format(
-        more_args=more_args))
+  def Login(self, disable_quota_project=True, more_args=''):
+    if disable_quota_project:
+      return self.Run(
+          'auth application-default login --no-use-oauth2client '
+          '--disable-quota-project {more_args}'.format(more_args=more_args))
+    else:
+      return self.Run(
+          'auth application-default login --no-use-oauth2client {more_args}'
+          .format(more_args=more_args))
 
   def testBasicLogin(self):
     """Basic login with default client id and default scopes."""
@@ -562,11 +575,21 @@ class LoginTestGoogleAuth(cli_test_base.CliTestBase, test_case.WithInput):
     self.AssertErrContains('Credentials saved to file')
     self.AssertFileExists(self.temp_path, 'junk', 'ADC')
 
-  def testLoginWithQuotaProject(self):
-    self.Login('--add-quota-project')
+  def testLoginWithQuotaProject_WithPermission(self):
+    self.StartObjectPatch(
+        command_auth_util, 'AdcHasGivenPermissionOnProject', return_value=True)
+    self.Login(disable_quota_project=False)
     self.AssertFileEquals(_GetJsonUserExtendedADC(),
                           os.path.join(self.temp_path, 'ADC'))
-    self.AssertErrContains("Quota project 'fake-project' was added to ADC")
+    self.AssertErrContains('Quota project "fake-project" was added to ADC')
+
+  def testLoginWithQuotaProject_WithoutPermission(self):
+    self.StartObjectPatch(
+        command_auth_util, 'AdcHasGivenPermissionOnProject', return_value=False)
+    self.Login(disable_quota_project=False)
+    self.AssertFileEquals(_GetJsonUserADC(),
+                          os.path.join(self.temp_path, 'ADC'))
+    self.AssertErrContains('Cannot add the project "fake-project" to ADC')
 
   def testLoginWithoutQuotaProject(self):
     self.Login()

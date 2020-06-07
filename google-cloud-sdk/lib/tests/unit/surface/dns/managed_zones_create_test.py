@@ -289,6 +289,40 @@ Created [{0}projects/{1}/managedZones/mz].
 Created [{0}projects/{1}/managedZones/mz].
 """.format(self.client.BASE_URL, self.Project()))
 
+  def testCreateWithBothKindsOfForwardingTargetsAndPrivateVisibility(self):
+    forwarding_servers = ['1.0.1.1', '1.2.1.1']
+    private_forwarding_targets = ['1.1.1.1', '8.8.8.8']
+    forwarding_config = util.ParseManagedZoneForwardingConfig(
+        target_servers=forwarding_servers,
+        private_target_servers=private_forwarding_targets)
+
+    visibility_settings = util.GetDnsVisibilityDict(
+        self.api_version,
+        visibility='private',
+        network_urls=['1.0.2.1', '1.2.2.1'])
+    test_zone = util.GetManagedZoneBeforeCreation(
+        self.messages,
+        dns_sec_config=False,
+        visibility_dict=visibility_settings,
+        forwarding_config=forwarding_config)
+
+    zone_create_request = self.messages.DnsManagedZonesCreateRequest(
+        managedZone=test_zone, project=self.Project())
+    self.client.managedZones.Create.Expect(zone_create_request, test_zone)
+    result = self.Run(
+        'dns managed-zones create {0} --dns-name {1} --description {2} '
+        '--format=disable --visibility private --forwarding-targets {3} '
+        '--private-forwarding-targets {4} --networks {5}'.format(
+            test_zone.name, test_zone.dnsName, test_zone.description,
+            ','.join(forwarding_servers), ','.join(private_forwarding_targets),
+            ','.join(['1.0.2.1', '1.2.2.1'])))
+
+    self.assertEqual([test_zone], list(result))
+    self.AssertOutputEquals('')
+    self.AssertErrContains("""\
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
+
   def testCreateWithForwardingTargetsandPublicVisibility(self):
     visibility_settings = util.GetDnsVisibilityDict(
         self.api_version, visibility='private', network_urls=[])

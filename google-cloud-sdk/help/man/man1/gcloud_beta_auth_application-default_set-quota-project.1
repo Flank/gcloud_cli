@@ -18,8 +18,9 @@ gcloud beta auth application\-default set\-quota\-project \- update or add a quo
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR Before running this command, an ADC must already be generated using
-$gcloud auth application\-default login. The quota project can be used by Google
-client libraries for billing purpose.
+$gcloud auth application\-default login. The quota project can be used by client
+libraries for the billing purpose. The existing application default credentials
+must have the "serviceusage.services.use" permission on the given project.
 
 
 

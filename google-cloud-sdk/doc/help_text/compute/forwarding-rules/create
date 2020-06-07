@@ -189,14 +189,15 @@ OPTIONAL FLAGS
         to use as the prefix of the fully qualified domain name for this
         forwarding rule. The full name will be internally generated and output
         as dnsName. If this field is not specified, no DNS record will be
-        generated and no DNS name will be output.
+        generated and no DNS name will be output. You cannot use the
+        --service-label flag if the forwarding rule references an internal IP
+        address that has the --purpose=SHARED_LOADBALANCER_VIP flag set.
 
      --subnet=SUBNET
-        (Only for --load-balancing-scheme=INTERNAL) Subnetwork that this
-        forwarding rule applies to. If the network configured for this
-        forwarding rule is in auto subnet mode, this flag is optional and the
-        subnet in the same region of the forwarding rule is used. However, if
-        the network is in custom subnet mode, a subnetwork must be specified.
+        (Only for --load-balancing-scheme=INTERNAL and
+        --load-balancing-scheme=INTERNAL_MANAGED) Subnetwork that this
+        forwarding rule applies to. If the network is auto mode, this flag is
+        optional. If the network is custom mode, this flag is required.
 
      --subnet-region=SUBNET_REGION
         Region of the subnetwork to operate on. If not specified, the region is

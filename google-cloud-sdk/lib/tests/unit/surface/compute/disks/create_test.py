@@ -740,7 +740,7 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
   def testCreateDiskSourceDisk(self):
     self.Run("""
         compute disks create testdisk --zone central2-a
-         --source-disk source --source-disk-zone central2-b
+         --source-disk source
     """)
 
     self.CheckRequests(
@@ -752,10 +752,48 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
                   name='testdisk',
                   sourceDisk=self.compute_uri +
                   '/projects/my-project/zones/'
-                  'central2-b/disks/source'
+                  'central2-a/disks/source'
               ),
               project='my-project',
               zone='central2-a'))])
+
+  def testCreateDiskSourceDiskRegion(self):
+    self.make_requests.side_effect = iter([
+        [],
+        [
+            self.messages.Region(
+                name='central2',
+            ),
+        ],
+        [],
+    ])
+    self.Run("""
+        compute disks create disk-1 --region central2 --replica-zones
+        central2-b,central2-c --source-disk source
+        """)
+
+    self.CheckRequests(
+        [],
+        [(self.compute.regions,
+          'Get',
+          self.messages.ComputeRegionsGetRequest(
+              project='my-project',
+              region='central2'
+          ))],
+        [(self.compute.regionDisks,
+          'Insert',
+          self.messages.ComputeRegionDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-1',
+                  sourceDisk=(self.compute_uri + '/projects/my-project/regions/'
+                              'central2/disks/source'),
+                  replicaZones=[
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c']
+              ),
+              project='my-project',
+              region='central2'))],
+    )
 
   def testTypePdBalancedOption(self):
     self.Run("""
@@ -787,7 +825,6 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
                          self.messages.ComputeDisksInsertRequest(
                              disk=self.messages.Disk(
                                  name='testdisk',
-                                 sizeGb=500,
                                  sourceInPlaceSnapshot=self.compute_uri +
                                  '/projects/my-project/zones/'
                                  'central2-a/inPlaceSnapshots/sourceIPS'),
@@ -805,7 +842,6 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
                          self.messages.ComputeDisksInsertRequest(
                              disk=self.messages.Disk(
                                  name='testdisk',
-                                 sizeGb=500,
                                  sourceInPlaceSnapshot=self.compute_uri +
                                  '/projects/my-project/zones/'
                                  'central2-a/inPlaceSnapshots/sourceIPS'),
@@ -1515,7 +1551,6 @@ class RegionalDisksCreateTestAlpha(RegionalDisksCreateTestBeta):
          self.messages.ComputeRegionDisksInsertRequest(
              disk=self.messages.Disk(
                  name='testdisk',
-                 sizeGb=500,
                  sourceInPlaceSnapshot=self.compute_uri +
                  '/projects/my-project/regions/'
                  'central2/inPlaceSnapshots/sourceIPS',
@@ -1540,7 +1575,6 @@ class RegionalDisksCreateTestAlpha(RegionalDisksCreateTestBeta):
          self.messages.ComputeRegionDisksInsertRequest(
              disk=self.messages.Disk(
                  name='testdisk',
-                 sizeGb=500,
                  sourceInPlaceSnapshot=self.compute_uri +
                  '/projects/my-project/regions/'
                  'central2/inPlaceSnapshots/sourceIPS',

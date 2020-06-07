@@ -7,10 +7,11 @@ SYNOPSIS
         (WORKERPOOL : --instance=INSTANCE)
         (--worker-count=WORKER_COUNT | --autoscale-max-size=AUTOSCALE_MAX_SIZE
           --autoscale-min-size=AUTOSCALE_MIN_SIZE) [--async]
+        [--channel=CHANNEL; default="current"]
         [--disk-size=DISK_SIZE; default=200]
         [--disk-type=DISK_TYPE; default="pd-standard"]
         [--labels=[KEY=VALUE,...]]
-        [--machine-type=MACHINE_TYPE; default="n1-standard-2"]
+        [--machine-type=MACHINE_TYPE; default="e2-standard-2"]
         [--max-concurrent-actions=MAX_CONCURRENT_ACTIONS; default=1]
         [--min-cpu-platform=MIN_CPU_PLATFORM]
         [--network-access=NETWORK_ACCESS; default="public"] [--reserved]
@@ -61,6 +62,9 @@ OPTIONAL FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
+     --channel=CHANNEL; default="current"
+        The release channel of the worker pool.
+
      --disk-size=DISK_SIZE; default=200
         Size of the disk, in Gb, for each worker. Defaults to 200Gb.
 
@@ -82,7 +86,7 @@ OPTIONAL FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
-     --machine-type=MACHINE_TYPE; default="n1-standard-2"
+     --machine-type=MACHINE_TYPE; default="e2-standard-2"
         Type of VM to use for each worker. To get a list of valid machine
         types, use the following command:
 
@@ -137,7 +141,7 @@ API REFERENCE
 EXAMPLES
     The following command creates a worker pool called 'pool1' in the instance
     called 'default_instance' with 25 workers configured with default machine
-    type (n1-standard-2) and disk size (200Gb):
+    type (e2-standard-2) and disk size (200Gb):
 
         $ gcloud alpha remote-build-execution worker-pools create pool1 \
             --instance=default_instance --worker-count=25

@@ -235,7 +235,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. The unique name of this domain resource in the format:\n`projects\/[project_id]\/locations\/global\/memberships\/[membership_id]`.\n`membership_id` can only be set at creation time using the `membership_id`\nfield in the creation request. `membership_id` must be a valid RFC 1123\ncompliant DNS label. In particular, it must be:\n  1. At most 63 characters in length\n  2. It must consist of lower case alphanumeric characters or `-`\n  3. It must start and end with an alphanumeric character\nI.e. `membership_id` must match the regex: `[a-z0-9]([-a-z0-9]*[a-z0-9])?`\nwith at most 63 characters.",
+          "description": "Output only. The unique name of this domain resource in the format:\n`projects\/[project_number]\/locations\/global\/memberships\/[membership_id]`.\n`membership_id` can only be set at creation time using the `membership_id`\nfield in the creation request. `membership_id` must be a valid RFC 1123\ncompliant DNS label. In particular, it must be:\n  1. At most 63 characters in length\n  2. It must consist of lower case alphanumeric characters or `-`\n  3. It must start and end with an alphanumeric character\nI.e. `membership_id` must match the regex: `[a-z0-9]([-a-z0-9]*[a-z0-9])?`\nwith at most 63 characters.",
           "type": "string"
         },
         "labels": {
@@ -303,6 +303,10 @@
         "kubernetesMetadata": {
           "description": "Output only. For Memberships that point to Kubernetes Endpoints, this field provides\nuseful metadata.",
           "$ref": "KubernetesMetadata"
+        },
+        "kubernetesResource": {
+          "description": "Optional. A correctly registered cluster should have the Kubernetes resources\napplied to the clusters and settle at steady states. These resources are\nneeded in order to:\n* Ensure that the cluster is exclusively registered to one and only one Hub\n  Membership.\n* Propagate Workload Pool Information available in the Membership Authority\n  field.\n* Ensure proper initial configuration of default Hub Features.\nThis field is only filled out upon a Membership Get request if\n`WITH_KUBERNETES_RESOURCES` or `FULL` view is specified.",
+          "$ref": "KubernetesResource"
         }
       }
     },
@@ -312,7 +316,7 @@
       "type": "object",
       "properties": {
         "resourceLink": {
-          "description": "Self-link of the GCP resource for the GKE cluster.\nFor example:\n\/\/container.googleapis.com\/v1\/projects\/my-project\/zones\/us-west1-a\/clusters\/my-cluster\nIt can be at the most 1000 characters in length.",
+          "description": "Immutable. Self-link of the GCP resource for the GKE cluster.\nFor example:\n\/\/container.googleapis.com\/v1\/projects\/12345\/zones\/us-west1-a\/clusters\/my-cluster\nIt can be at the most 1000 characters in length.",
           "type": "string"
         }
       }
@@ -344,6 +348,50 @@
           "description": "The time at which these details were last updated. This update_time is\ndifferent from the Membership-level update_time since EndpointDetails are\nupdated internally for API consumers.",
           "type": "string",
           "format": "google-datetime"
+        }
+      }
+    },
+    "KubernetesResource": {
+      "id": "KubernetesResource",
+      "description": "KubernetesResource contains the YAML manifests for Kubernetes resources\nof the Membership in the cluster.\nUpon CreateMembership:\n  - The caller should provide membership_cr_manifest if a Membership CR\n    exists in the cluster.\n  - The caller should then apply resources from the successful\n    GetMembership request.\nUpon UpdateMembership:\n  - The caller should re-apply the resources from the returned Membership.",
+      "type": "object",
+      "properties": {
+        "membershipCrManifest": {
+          "description": "Input only. The YAML representation of the Membership CR if already exists in the\ncluster. Leave empty if no Membership CR exists.\nThe CR manifest will be used to validate that the cluster has not been\nregistered with another Membership.",
+          "type": "string"
+        },
+        "connectVersion": {
+          "description": "Optional. The connect version to generate for connect_resources, default to the\nlatest.",
+          "type": "string"
+        },
+        "membershipResources": {
+          "description": "Output only. The additional Kubernetes resources that need to be applied to the cluster\nafter the membership creation and every update.\nThis field is only populated upon GetRequest if\nMembershipView = `WITH_MEMBERSHIP_RESOURCES` or `FULL`.",
+          "type": "array",
+          "items": {
+            "$ref": "ResourceManifest"
+          }
+        },
+        "connectResources": {
+          "description": "Output only. The Kubernetes resources for installing GKE Connect agent.\nThie field is only populated upon GetRequest if\nMembershipView = `FULL`,",
+          "type": "array",
+          "items": {
+            "$ref": "ResourceManifest"
+          }
+        }
+      }
+    },
+    "ResourceManifest": {
+      "id": "ResourceManifest",
+      "description": "ResourceManifest represents a Kubernetes resource to be applied to\nthe cluster.",
+      "type": "object",
+      "properties": {
+        "manifest": {
+          "description": "YAML manifest of the resource.",
+          "type": "string"
+        },
+        "clusterScoped": {
+          "description": "Specifies whether the resource provided in the manifest is cluster_scoped.\nIf set to false, the assumption is that it is namespace scoped.\nThis field is used for default REST mapper when applying the resource\nto a cluster.",
+          "type": "boolean"
         }
       }
     },
@@ -380,15 +428,19 @@
       "type": "object",
       "properties": {
         "issuer": {
-          "description": "A JWT issuer URI.\nIf set, then Google will attempt OIDC discovery on this URI, and allow\nvalid OIDC tokens from this issuer to authenticate within the below\nidentity namespace.\n\nThis can be updated from a non-empty to empty value and vice-versa.\nBut cannot be changed from one non-empty value to another.\nSetting to empty will disable Workload Identity.",
+          "description": "A JWT issuer URI.\nIf set, then Google will attempt OIDC discovery on this URI, and allow\nvalid OIDC tokens from this issuer to authenticate within the below\nidentity namespace.\n\nThis can be updated from a non-empty to empty value and vice-versa.\nBut cannot be changed from one non-empty value to another.\nSetting to empty will disable Workload Identity. issuer should be a valid\nURL of length < 2000 that can be parsed, and must start with https:\/\/.",
           "type": "string"
         },
         "identityNamespace": {
-          "description": "Output only. The identity namespace in which the above issuer will be recognized.",
+          "description": "Output only. The identity namespace in which the above issuer will be recognized. This\nfield is now deprecated, and will be removed eventually. Callers should now\nuse workload_identity_pool instead of identity_namespace, once we start\nsetting it.",
           "type": "string"
         },
         "identityProvider": {
           "description": "Output only. An identity provider that reflects this issuer in the identity namespace.",
+          "type": "string"
+        },
+        "workloadIdentityPool": {
+          "description": "Output only. The name of the workload identity pool in which the above issuer will be\nrecognized. There is a single Workload Identity Pool per Hub that is shared\nbetween all Memberships that belong to this Hub. For a Hub hosted in\n{PROJECT_ID}, the workload pool format is {PROJECT_ID}.hub.id.goog,\nalthough this is subject to change in newer versions of this API.",
           "type": "string"
         }
       }
@@ -1156,7 +1208,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The parent in whose context the memberships are listed. The parent value\nis in the format: `projects\/[project_id]\/locations\/global`.",
+                      "description": "Required. The parent in whose context the memberships are listed. The parent value\nis in the format: `projects\/[project_number]\/locations\/global`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1174,7 +1226,7 @@
                       "type": "string"
                     },
                     "filter": {
-                      "description": "Optional. Lists the Memberships that match the filter expression. A filter expression\nfilters the resources listed in the response. The expression must be of\nthe form `{field} {operator} {value}` where operators:\n`<`, `>`, `<=`,`>=`, `!=`, `=`, `:`\nare supported (colon `:` represents a HAS operator which is roughly\nsynonymous with equality). `{field}` can refer to a proto or JSON field,\nor a synthetic field. Field names can be camelCase or snake_case.\n\nExamples:\n- Filter by name:\n  name = \"projects\/foo-proj\/locations\/global\/membership\/bar\n\n- Filter by labels:\n  - Resources that have a key called `foo`\n    labels.foo:*\n  - Resources that have a key called `foo` whose value is `bar`\n    labels.foo = bar\n\n - Filter by state:\n   - Members in CREATING state.\n     state = CREATING",
+                      "description": "Optional. Lists the Memberships that match the filter expression. A filter expression\nfilters the resources listed in the response. The expression must be of\nthe form `{field} {operator} {value}` where operators:\n`<`, `>`, `<=`,`>=`, `!=`, `=`, `:`\nare supported (colon `:` represents a HAS operator which is roughly\nsynonymous with equality). `{field}` can refer to a proto or JSON field,\nor a synthetic field. Field names can be camelCase or snake_case.\n\nExamples:\n- Filter by name:\n  name = \"projects\/12345\/locations\/global\/membership\/bar\n\n- Filter by labels:\n  - Resources that have a key called `foo`\n    labels.foo:*\n  - Resources that have a key called `foo` whose value is `bar`\n    labels.foo = bar\n\n - Filter by state:\n   - Members in CREATING state.\n     state = CREATING",
                       "location": "query",
                       "type": "string"
                     },
@@ -1202,11 +1254,22 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The Membership resource name in the format:\n`projects\/[project_id]\/locations\/global\/memberships\/[membership_id]`",
+                      "description": "Required. The Membership resource name in the format:\n`projects\/[project_number]\/locations\/global\/memberships\/[membership_id]`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/memberships\/[^\/]+$",
                       "type": "string"
+                    },
+                    "view": {
+                      "description": "Optional. View for partial response.",
+                      "location": "query",
+                      "type": "string",
+                      "enum": [
+                        "MEMBERSHIP_VIEW_UNSPECIFIED",
+                        "BASIC",
+                        "FULL",
+                        "WITH_MEMBERSHIP_RESOURCES"
+                      ]
                     }
                   },
                   "parameterOrder": [
@@ -1227,7 +1290,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The parent in whose context the membership is created. The parent value is\nin the format: `projects\/[project_id]\/locations\/global`.",
+                      "description": "Required. The parent in whose context the membership is created. The parent value is\nin the format: `projects\/[project_number]\/locations\/global`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1260,7 +1323,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The membership resource name in the format:\n`projects\/[project_id]\/locations\/global\/memberships\/[membership_id]`",
+                      "description": "Required. The membership resource name in the format:\n`projects\/[project_number]\/locations\/global\/memberships\/[membership_id]`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/memberships\/[^\/]+$",
@@ -1285,7 +1348,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Required. The membership resource name in the format:\n`projects\/[project_id]\/locations\/global\/memberships\/[membership_id]`",
+                      "description": "Required. The membership resource name in the format:\n`projects\/[project_number]\/locations\/global\/memberships\/[membership_id]`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/memberships\/[^\/]+$",
@@ -1319,7 +1382,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The membership resource the connect agent is associated with.\n`projects\/[project_id]\/locations\/global\/memberships\/[membership_id]`.",
+                      "description": "Required. The membership resource the connect agent is associated with.\n`projects\/[project_number]\/locations\/global\/memberships\/[membership_id]`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/memberships\/[^\/]+$",

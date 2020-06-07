@@ -204,11 +204,13 @@ class Environment(_messages.Message):
       RUNNING: The environment is running and ready to accept connections. It
         will automatically transition back to DISABLED after a period of
         inactivity or if another environment is started.
+      DELETING: The environment is being deleted and can't be connected to.
     """
     STATE_UNSPECIFIED = 0
     DISABLED = 1
     STARTING = 2
     RUNNING = 3
+    DELETING = 4
 
   dockerImage = _messages.StringField(1)
   id = _messages.StringField(2)
@@ -424,7 +426,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)
@@ -490,9 +492,12 @@ class StartEnvironmentRequest(_messages.Message):
       gcloud so that the user can run gcloud commands in Cloud Shell without
       having to log in. This code can be updated later by calling
       AuthorizeEnvironment.
+    publicKeys: Public keys that should be added to the environment before it
+      is started.
   """
 
   accessToken = _messages.StringField(1)
+  publicKeys = _messages.MessageField('PublicKey', 2, repeated=True)
 
 
 class StartEnvironmentResponse(_messages.Message):

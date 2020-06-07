@@ -63,7 +63,7 @@ class ServicesListTestBeta(base.ServerlessSurfaceBase):
     for i, s in enumerate(self.services):
       s.name = 's{}'.format(i)
       s.status.conditions = [
-          self.serverless_messages.ServiceCondition(
+          self.serverless_messages.GoogleCloudRunV1Condition(
               type='Ready',
               status=six.text_type(bool(i % 2)),
               lastTransitionTime=datetime.datetime.utcfromtimestamp(

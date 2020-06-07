@@ -26,9 +26,6 @@ LOCATION\-docker.pkg.dev/PROJECT\-ID/REPOSITORY\-ID
 A valid image has the format of
 LOCATION\-docker.pkg.dev/PROJECT\-ID/REPOSITORY\-ID/IMAGE_PATH
 
-Without location in input path, all images across all locations under all
-matched projects and repositories are listed.
-
 To specify the maximum number of images to list, use the \-\-limit flag.
 
 
@@ -129,22 +126,6 @@ To list images under repository \f5my\-repo\fR, project \f5my\-project\fR, in
 .RS 2m
 $ gcloud alpha artifacts docker images list \e
   us\-central1\-docker.pkg.dev/my\-project/my\-repo
-.RE
-
-To list images under repository \f5my\-repo\fR, project \f5my\-project\fR across
-all locations:
-
-.RS 2m
-$ gcloud alpha artifacts docker images list \e
-  docker.pkg.dev/my\-project/my\-repo
-.RE
-
-To list all image digests under image \f5busy\-box\fR, in repository
-\f5my\-repo\fR, project \f5my\-project\fR across all locations:
-
-.RS 2m
-$ gcloud alpha artifacts docker images list \e
-  docker.pkg.dev/my\-project/my\-repo/busy\-box
 .RE
 
 The following command lists a maximum of five images:

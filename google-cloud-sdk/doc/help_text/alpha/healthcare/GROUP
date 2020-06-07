@@ -21,6 +21,9 @@ GROUPS
      annotation-stores
         (ALPHA) Manage Cloud Healthcare API annotation stores.
 
+     consent-stores
+        (ALPHA) Manage Cloud Healthcare API consent stores.
+
      datasets
         (ALPHA) Manage Cloud Healthcare API datasets.
 

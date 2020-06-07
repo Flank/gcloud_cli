@@ -39,8 +39,7 @@ import six
 _CONSOLE_URL = ('https://console.cloud.google.com/mlengine/jobs/{job_id}?'
                 'project={project}')
 _LOGS_URL = ('https://console.cloud.google.com/logs?'
-             'resource=ml.googleapis.com%2Fjob_id%2F{job_id}'
-             '&project={project}')
+             'resource=ml_job%2Fjob_id%2F{job_id}&project={project}')
 JOB_FORMAT = 'yaml(jobId,state,startTime.date(tz=LOCAL),endTime.date(tz=LOCAL))'
 # Check every 10 seconds if the job is complete (if we didn't fetch any logs the
 # last time)
@@ -350,11 +349,22 @@ def ParseCreateLabels(jobs_client, args):
   return labels_util.ParseCreateArgs(args, jobs_client.job_class.LabelsValue)
 
 
-def SubmitTraining(jobs_client, job, job_dir=None, staging_bucket=None,
-                   packages=None, package_path=None, scale_tier=None,
-                   config=None, module_name=None, runtime_version=None,
-                   python_version=None, stream_logs=None, user_args=None,
-                   labels=None, custom_train_server_config=None):
+def SubmitTraining(jobs_client,
+                   job,
+                   job_dir=None,
+                   staging_bucket=None,
+                   packages=None,
+                   package_path=None,
+                   scale_tier=None,
+                   config=None,
+                   module_name=None,
+                   runtime_version=None,
+                   python_version=None,
+                   stream_logs=None,
+                   user_args=None,
+                   labels=None,
+                   kms_key=None,
+                   custom_train_server_config=None):
   """Submit a training job."""
   region = properties.VALUES.compute.region.Get(required=True)
   staging_location = jobs_prep.GetStagingLocation(
@@ -387,6 +397,7 @@ def SubmitTraining(jobs_client, job, job_dir=None, staging_bucket=None,
         runtime_version=runtime_version,
         python_version=python_version,
         labels=labels,
+        kms_key=kms_key,
         custom_train_server_config=custom_train_server_config)
   except jobs_prep.NoStagingLocationError:
     raise flags.ArgumentError(

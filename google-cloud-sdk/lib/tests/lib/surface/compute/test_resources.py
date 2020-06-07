@@ -1889,7 +1889,8 @@ def MakeNodesInNodeGroup(msgs, api):
               'instances/instance-2'
           ],
           nodeType=prefix +
-          '/projects/my-project/zones/zone-1/nodeTypes/iAPX-286'),
+          '/projects/my-project/zones/zone-1/nodeTypes/iAPX-286',
+          serverId='server-1'),
       msgs.NodeGroupNode(
           name='node-2',
           status=msgs.NodeGroupNode.StatusValueValuesEnum.READY,
@@ -1898,7 +1899,8 @@ def MakeNodesInNodeGroup(msgs, api):
               'instances/instance-3'
           ],
           nodeType=prefix +
-          '/projects/my-project/zones/zone-1/nodeTypes/iAPX-286')
+          '/projects/my-project/zones/zone-1/nodeTypes/iAPX-286',
+          serverId='server-2')
   ]
 
 

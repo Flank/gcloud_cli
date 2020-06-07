@@ -35,7 +35,7 @@ actions:
                 workerConfig:
                   diskSizeGb: '200'
                   diskType: pd-standard
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   reserved: false
         return_response:
           headers:
@@ -64,7 +64,7 @@ actions:
                 "name": "projects/fake-project/instances/default_instance/workerpools/autoscale_pool",
                 "autoscale": {"minSize": "1","maxSize": "10"},
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "reserved": "false",
@@ -96,7 +96,7 @@ actions:
                 "name": "projects/fake-project/instances/default_instance/workerpools/autoscale_pool",
                 "autoscale": {"minSize": "1","maxSize": "10"},
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "reserved": "false",

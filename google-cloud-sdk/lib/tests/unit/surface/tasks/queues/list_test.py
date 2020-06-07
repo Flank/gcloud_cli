@@ -115,6 +115,44 @@ class QueuesListTestBeta(QueuesListTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
+  def _MakeQueues(self, n=3):
+    queues = []
+    for i in range(n):
+      queue_name = '{}/queues/q{}'.format(self.location_name, i)
+      # Make every other queue a pull queue.
+      if i % 2 == 1:
+        queue_type = self.messages.Queue.TypeValueValuesEnum.PULL
+      else:
+        queue_type = self.messages.Queue.TypeValueValuesEnum.PUSH
+
+      q = self.messages.Queue(
+          name=queue_name,
+          state=self.messages.Queue.StateValueValuesEnum.RUNNING,
+          rateLimits=self.messages.RateLimits(
+              maxConcurrentDispatches=10, maxDispatchesPerSecond=500),
+          type=queue_type)
+      queues.append(q)
+    return queues
+
+  def testList_CheckFormat(self):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    queues = self._MakeQueues(n=3)
+    self.queues_service.List.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesListRequest(
+            parent=self.location_name),
+        response=self.messages.ListQueuesResponse(queues=queues))
+
+    self.Run('tasks queues list')
+
+    self.AssertOutputEquals(
+        """\
+        QUEUE_NAME  TYPE  STATE    MAX_NUM_OF_TASKS  MAX_RATE (/sec)  MAX_ATTEMPTS
+        q0          push  RUNNING  10                500.0            unlimited
+        q1          pull  RUNNING  10                500.0            unlimited
+        q2          push  RUNNING  10                500.0            unlimited
+        """,
+        normalize_space=True)
+
 
 class QueuesAlphaListTest(test_base.CloudTasksAlphaTestBase):
 

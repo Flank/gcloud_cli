@@ -1,0 +1,546 @@
+title: cloud domains configure dns test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations configure dns example.com --cloud-dns-zone=example-com --disable-dnssec
+  - progress_tracker:
+    - message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated registration [example.com].
+- execute:
+  - command: |
+      domains registrations configure dns example.com --cloud-dns-zone=example-com --validate-only
+  - stderr: |
+      The command will not have any effect because validate-only flag is present.
+- execute:
+  - command: |
+      domains registrations configure dns example.com --cloud-dns-zone=different-domain-com
+  - error: "1: The dnsName 'different-domain.com.' of specified Cloud DNS zone 'different-domain-com'\
+      \ does not match the registration domain 'example.com.'"
+- execute:
+  - command: |
+      domains registrations configure dns example.com --cloud-dns-zone=not-found-com
+  - error: '1: HTTPError 404'
+- execute:
+  - command: |
+      domains registrations configure dns example-interactive-cloud-dns-zone.com --async
+  - stderr: |
+      Your current DNS settings are:
+      googleDomainsDns:
+        dsState: DS_RECORDS_UNPUBLISHED
+        nameServers:
+        - ns1.com
+        - ns2.com
+  - prompt:
+    - message: You can provide your DNS settings by specifying name servers, Cloud
+        DNS Managed Zone name or by choosing free name servers provided by Google
+        Domains
+    - choices: &id001
+      - Provide name servers list
+      - Provide Cloud DNS Managed Zone name
+      - Use free name servers provided by Google Domains
+      - cancel
+    - input: '2'
+  - prompt:
+    - message: 'Cloud DNS Managed Zone name:  '
+    - input: not-found-com
+  - stderr: |
+      HTTPError 404
+  - prompt:
+    - message: 'Cloud DNS Managed Zone name:  '
+    - input: projects/different-project/managedZones/example-zone
+  - stderr: |
+      Cloud DNS Zone 'projects/different-project/managedZones/example-zone' is not signed. DNSSEC won't be enabled.
+  - stderr: |
+      Update in progress for registration [example-interactive-cloud-dns-zone.com].
+actions:
+- execute_command:
+    command: |
+      domains registrations configure dns example.com --cloud-dns-zone=example-com --disable-dnssec
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "dnsSettings": {
+                "googleDomainsDns": {
+                  "nameServers": ["ns1.com", "ns2.com"],
+                  "dsState": "DS_RECORDS_UNPUBLISHED"
+                }
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "example-com",
+              "dnsName": "example.com.",
+              "description": "",
+              "id": "7109061377772250347",
+              "nameServers": [
+                "ns-cloud-a1.googledomains.com.",
+                "ns-cloud-a2.googledomains.com."
+              ],
+              "creationTime": "2019-01-09T14:14:57.933Z",
+              "kind": "dns#managedZone",
+              "visibility": "public"
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com:configureDnsSettings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              dnsSettings:
+                customDns:
+                  nameServers:
+                  - ns-cloud-a1.googledomains.com.
+                  - ns-cloud-a2.googledomains.com.
+              updateMask: dns_provider
+              validateOnly: false
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/example.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "endTime": "2019-01-14T14:41:31.657446027Z",
+                "target": "projects/fake-project/locations/global/registrations/example.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.Registration",
+                "name": "projects/fake-project/locations/global/registrations/example.com",
+                "domainName": "example.com",
+                "createTime": "2019-02-20T16:47:22.739565061Z",
+                "expireTime": "2020-02-20T16:47:26Z",
+                "state": "ACTIVE",
+                "dnsSettings": {
+                  "customDns": {
+                    "nameServers": ["ns-cloud-a1.googledomains.com.", "ns-cloud-a2.googledomains.com."]
+                  }
+                }
+              }
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated registration [example.com].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations configure dns example.com --cloud-dns-zone=example-com --validate-only
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "dnsSettings": {
+                "googleDomainsDns": {
+                  "nameServers": ["ns1.com", "ns2.com"],
+                  "dsState": "DS_RECORDS_UNPUBLISHED"
+                }
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "example-com",
+              "dnsName": "example.com.",
+              "description": "",
+              "id": "7109061377772250347",
+              "nameServers": [
+                "ns-cloud-a1.googledomains.com.",
+                "ns-cloud-a2.googledomains.com."
+              ],
+              "dnssecConfig": {
+                "defaultKeySpecs": [
+                  {
+                    "algorithm": "rsasha256",
+                    "keyLength": 2048,
+                    "keyType": "keySigning",
+                    "kind": "dns#dnsKeySpec"
+                  },
+                  {
+                    "algorithm": "rsasha256",
+                    "keyLength": 1024,
+                    "keyType": "zoneSigning",
+                    "kind": "dns#dnsKeySpec"
+                  }
+                ],
+                "kind": "dns#managedZoneDnsSecConfig",
+                "nonExistence": "nsec3",
+                "state": "on"
+              },
+              "creationTime": "2019-01-09T14:14:57.933Z",
+              "kind": "dns#managedZone",
+              "visibility": "public"
+            }
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com/dnsKeys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "dnsKeys": [
+                {
+                  "algorithm": "rsasha256",
+                  "creationTime": "2020-04-06T15:32:56.112Z",
+                  "digests": [
+                    {
+                      "digest": "2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d",
+                      "type": "sha256"
+                    }
+                  ],
+                  "id": "0",
+                  "isActive": true,
+                  "keyLength": 2048,
+                  "keyTag": 54547,
+                  "kind": "dns#dnsKey",
+                  "publicKey": "pk",
+                  "type": "keySigning"
+                },
+                {
+                  "algorithm": "rsasha256",
+                  "creationTime": "2020-04-06T15:32:56.278Z",
+                  "id": "1",
+                  "isActive": true,
+                  "keyLength": 1024,
+                  "keyTag": 44553,
+                  "kind": "dns#dnsKey",
+                  "publicKey": "pk",
+                  "type": "zoneSigning"
+                },
+                {
+                  "algorithm": "rsasha256",
+                  "creationTime": "2020-04-06T15:32:56.112Z",
+                  "digests": [
+                    {
+                      "digest": "1234",
+                      "type": "sha256"
+                    }
+                  ],
+                  "id": "2",
+                  "isActive": false,
+                  "keyLength": 2048,
+                  "keyTag": 54547,
+                  "kind": "dns#dnsKey",
+                  "publicKey": "pk",
+                  "type": "keySigning"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com:configureDnsSettings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              dnsSettings:
+                customDns:
+                  nameServers:
+                  - ns-cloud-a1.googledomains.com.
+                  - ns-cloud-a2.googledomains.com.
+                  dsRecords:
+                  - keyTag: 54547
+                    algorithm: RSASHA256
+                    digestType: SHA256
+                    digest: 2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d
+              updateMask: dns_provider
+              validateOnly: true
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        The command will not have any effect because validate-only flag is present.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations configure dns example.com --cloud-dns-zone=different-domain-com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "dnsSettings": {
+                "googleDomainsDns": {
+                  "nameServers": ["ns1.com", "ns2.com"],
+                  "dsState": "DS_RECORDS_UNPUBLISHED"
+                }
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/different-domain-com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "example-com",
+              "dnsName": "different-domain.com.",
+              "description": "",
+              "id": "7109061377772250347",
+              "nameServers": [
+                "ns-cloud-a1.googledomains.com.",
+                "ns-cloud-a2.googledomains.com."
+              ],
+              "creationTime": "2019-01-09T14:14:57.933Z",
+              "kind": "dns#managedZone",
+              "visibility": "public"
+            }
+    - expect_exit:
+        code: 1
+        message: The dnsName 'different-domain.com.' of specified Cloud DNS zone 'different-domain-com'
+          does not match the registration domain 'example.com.'
+- execute_command:
+    command: |
+      domains registrations configure dns example.com --cloud-dns-zone=not-found-com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "dnsSettings": {
+                "googleDomainsDns": {
+                  "nameServers": ["ns1.com", "ns2.com"],
+                  "dsState": "DS_RECORDS_UNPUBLISHED"
+                }
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/not-found-com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+    - expect_exit:
+        code: 1
+        message: HTTPError 404
+- execute_command:
+    command: |
+      domains registrations configure dns example-interactive-cloud-dns-zone.com --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-interactive-cloud-dns-zone.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example-interactive-cloud-dns-zone.com",
+              "domainName": "example-interactive-cloud-dns-zone.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "dnsSettings": {
+                "googleDomainsDns": {
+                  "nameServers": ["ns1.com", "ns2.com"],
+                  "dsState": "DS_RECORDS_UNPUBLISHED"
+                }
+              }
+            }
+    - expect_stderr: |
+        Your current DNS settings are:
+        googleDomainsDns:
+          dsState: DS_RECORDS_UNPUBLISHED
+          nameServers:
+          - ns1.com
+          - ns2.com
+    - expect_prompt_choice:
+        message: You can provide your DNS settings by specifying name servers, Cloud
+          DNS Managed Zone name or by choosing free name servers provided by Google
+          Domains
+        choices: *id001
+        user_input: '2'
+    - expect_prompt_response:
+        message: 'Cloud DNS Managed Zone name:  '
+        user_input: not-found-com
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/not-found-com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+    - expect_stderr: |
+        HTTPError 404
+    - expect_prompt_response:
+        message: 'Cloud DNS Managed Zone name:  '
+        user_input: projects/different-project/managedZones/example-zone
+    - api_call:
+        expect_request:
+          uri: https://dns.googleapis.com/dns/v1/projects/different-project/managedZones/example-zone?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "example-zone",
+              "dnsName": "example-interactive-cloud-dns-zone.com.",
+              "description": "",
+              "id": "7109061377772250347",
+              "nameServers": [
+                "ns-cloud-a1.googledomains.com.",
+                "ns-cloud-a2.googledomains.com."
+              ],
+              "creationTime": "2019-01-09T14:14:57.933Z",
+              "kind": "dns#managedZone",
+              "visibility": "public"
+            }
+    - expect_stderr: |
+        Cloud DNS Zone 'projects/different-project/managedZones/example-zone' is not signed. DNSSEC won't be enabled.
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-interactive-cloud-dns-zone.com:configureDnsSettings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              dnsSettings:
+                customDns:
+                  nameServers:
+                  - ns-cloud-a1.googledomains.com.
+                  - ns-cloud-a2.googledomains.com.
+              updateMask: dns_provider
+              validateOnly: false
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/example-interactive-cloud-dns-zone.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Update in progress for registration [example-interactive-cloud-dns-zone.com].
+    - expect_exit:
+        code: 0

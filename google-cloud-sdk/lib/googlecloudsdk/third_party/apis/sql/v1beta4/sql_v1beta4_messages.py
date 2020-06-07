@@ -399,6 +399,7 @@ class DatabaseInstance(_messages.Message):
       the instance. This property is applicable only to Second Generation
       instances.
     settings: The user settings.
+    sqlserverInstanceConfiguration: SQL Server specific configuration
     state: The current serving state of the Cloud SQL instance. This can be
       one of the following. <br><b>RUNNABLE</b>: The instance is running, or
       is ready to run when accessed. <br><b>SUSPENDED</b>: The instance is not
@@ -580,8 +581,9 @@ class DatabaseInstance(_messages.Message):
   serverCaCert = _messages.MessageField('SslCert', 25)
   serviceAccountEmailAddress = _messages.StringField(26)
   settings = _messages.MessageField('Settings', 27)
-  state = _messages.EnumField('StateValueValuesEnum', 28)
-  suspensionReason = _messages.EnumField('SuspensionReasonValueListEntryValuesEnum', 29, repeated=True)
+  sqlserverInstanceConfiguration = _messages.MessageField('SqlServerInstanceConfiguration', 28)
+  state = _messages.EnumField('StateValueValuesEnum', 29)
+  suspensionReason = _messages.EnumField('SuspensionReasonValueListEntryValuesEnum', 30, repeated=True)
 
 
 class DatabasesListResponse(_messages.Message):
@@ -1223,8 +1225,9 @@ class MaintenanceWindow(_messages.Message):
 
   Enums:
     UpdateTrackValueValuesEnum: Maintenance timing setting: <b>canary</b>
-      (Earlier) or <b>stable</b> (Later). <br /><a href="/sql/docs/db_path
-      /instance-settings#maintenance-timing-2ndgen"> Learn more</a>.
+      (Earlier) or <b>stable</b> (Later). <br /><a
+      href="/sql/docs/db_path/instance-settings#maintenance-timing-2ndgen">
+      Learn more</a>.
 
   Fields:
     day: day of week (1-7), starting on Monday.
@@ -2524,6 +2527,16 @@ class SqlServerDatabaseDetails(_messages.Message):
   recoveryModel = _messages.StringField(2)
 
 
+class SqlServerInstanceConfiguration(_messages.Message):
+  r"""SQL Server specific configuration.
+
+  Fields:
+    collation: The name of Sqlserver Instance collation.
+  """
+
+  collation = _messages.StringField(1)
+
+
 class SqlServerUserDetails(_messages.Message):
   r"""Represents a Sql Server user on the Cloud SQL instance.
 
@@ -2809,7 +2822,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

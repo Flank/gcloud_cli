@@ -517,7 +517,6 @@ class InstanceGroupManagersUpdateZonalTestBeta(
           """.format(*self.scope_params))
 
   def testUpdateNoStatefulPolicy_createsUpdateRequest(self):
-    # TODO(b/70314588): Fix this test to expect Patch instead of Update.
     self._setInitialIgm()
 
     self.Run("""

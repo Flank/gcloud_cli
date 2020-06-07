@@ -39,16 +39,18 @@ third_party_dir = os.path.join(lib_dir, 'third_party')
 
 sys.path = [lib_dir, third_party_dir] + sys.path
 
+# When python is not invoked with the -S option, it can preload google module
+# via .pth file setting its __path__. After this happens, our vendored google
+# package may not in the __path__. After our vendored dependency directory is
+# put at the first place in the sys.path, google module should be reloaded,
+# so that our vendored copy can be preferred.
 if 'google' in sys.modules:
-  # By this time 'google' should NOT be in sys.modules, but some releases of
-  # protobuf preload google package via .pth file setting its __path__. This
-  # prevents loading of other packages in the same namespace.
-  # Below add our vendored 'google' packages to its path if this is the case,
-  # but if __path__ was not set it is okay to leave it unchanged.
-  google_paths = getattr(sys.modules['google'], '__path__', [])
-  vendored_google_path = os.path.join(third_party_dir, 'google')
-  if vendored_google_path not in google_paths:
-    google_paths.append(vendored_google_path)
+  import google  # pylint: disable=g-import-not-at-top
+  try:
+    reload(google)
+  except NameError:
+    import importlib  # pylint: disable=g-import-not-at-top
+    importlib.reload(google)
 
 
 # pylint: disable=g-import-not-at-top

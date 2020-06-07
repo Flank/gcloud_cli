@@ -11,7 +11,7 @@ gcloud alpha container node\-pools create \- create a node pool in a running clu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autoprovisioning\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-linux\-sysctls\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-config\fR=\fINODE_CONFIG\fR] [\fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autoprovisioning\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-linux\-sysctls\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-system\-config\-from\-file\fR=\fISYSTEM_CONFIG_FROM_FILE\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -280,74 +280,6 @@ $ gcloud beta compute zones describe ZONE \e
 CPU platform selection is available only in selected zones.
 
 .TP 2m
-\fB\-\-node\-config\fR=\fINODE_CONFIG\fR
-Path of the YAML/JSON file that contains the node configuration, including Linux
-kernel parameters (sysctls) and kubelet configs.
-
-Example:
-
-.RS 2m
-kubeletConfig:
-  cpuManagerPolicy: static
-linuxConfig:
-  sysctl:
-    net.core.somaxconn: '2048'
-    net.ipv4.tcp_rmem: '4096 87380 6291456'
-.RE
-
-List of supported kubelet configs in 'kubeletConfig'.
-
-
-.TS
-tab(	);
-l(17)B l(34)B
-l(17) l(34).
-KEY	VALUE
-cpuManagerPolicy	either 'static' or 'default'
-cpuCFSQuota	true or false (enabled by default)
-cpuCFSQuotaPeriod	interval (e.g., '100ms')
-.TE
-
-List of supported sysctls in 'linuxConfig'.
-
-
-.TS
-tab(	);
-l(42)B l(34)B
-l(42) l(34).
-KEY	VALUE
-kernel.pid_max	Must be [32768, 4194304]
-fs.inotify.max_queued_events	Must be [16384, 4194304]
-fs.inotify.max_user_instances	Must be [128, 4194304]
-fs.inotify.max_user_watches	Must be [12288, 4194304]
-net.core.netdev_budget	Any positive integer
-net.core.netdev_budget_usecs	Any positive integer
-net.core.netdev_max_backlog	Any positive integer
-net.core.rmem_default	Any positive integer
-net.core.rmem_max	Any positive integer
-net.core.wmem_default	Any positive integer
-net.core.wmem_max	Any positive integer
-net.core.optmem_max	Any positive integer
-net.core.somaxconn	Must be [128, 4194304]
-net.ipv4.tcp_rmem	Any positive integer
-net.ipv4.tcp_wmem	Any positive integer tuple
-net.ipv4.tcp_mem	Any positive integer
-net.ipv4.tcp_fin_timeout	Any positive integer
-net.ipv4.tcp_keepalive_intvl	Any positive integer
-net.ipv4.tcp_keepalive_probes	Any positive integer
-net.ipv4.tcp_keepalive_time	Any positive integer
-net.ipv4.tcp_max_orphans	Any positive integer
-net.ipv4.tcp_max_syn_backlog	Any positive integer
-net.ipv4.tcp_max_tw_buckets	Any positive integer
-net.ipv4.tcp_syn_retries	Any positive integer
-net.ipv4.tcp_tw_reuse	Must be {0, 1}
-net.ipv4.udp_mem	Any positive integer tuple
-net.ipv4.udp_rmem_min	Any positive integer
-net.ipv4.udp_wmem_min	Any positive integer
-net.netfilter.nf_conntrack_generic_timeout	Any positive integer
-.TE
-
-.TP 2m
 \fB\-\-node\-group\fR=\fINODE_GROUP\fR
 Assign instances of this pool to run on the specified Google Compute Engine node
 group. This is useful for running workloads on sole tenant nodes.
@@ -464,6 +396,74 @@ created.
 .TP 2m
 \fB\-\-shielded\-secure\-boot\fR
 The instance will boot with secure boot enabled.
+
+.TP 2m
+\fB\-\-system\-config\-from\-file\fR=\fISYSTEM_CONFIG_FROM_FILE\fR
+Path of the YAML/JSON file that contains the node configuration, including Linux
+kernel parameters (sysctls) and kubelet configs.
+
+Example:
+
+.RS 2m
+kubeletConfig:
+  cpuManagerPolicy: static
+linuxConfig:
+  sysctl:
+    net.core.somaxconn: '2048'
+    net.ipv4.tcp_rmem: '4096 87380 6291456'
+.RE
+
+List of supported kubelet configs in 'kubeletConfig'.
+
+
+.TS
+tab(	);
+l(17)B l(34)B
+l(17) l(34).
+KEY	VALUE
+cpuManagerPolicy	either 'static' or 'default'
+cpuCFSQuota	true or false (enabled by default)
+cpuCFSQuotaPeriod	interval (e.g., '100ms')
+.TE
+
+List of supported sysctls in 'linuxConfig'.
+
+
+.TS
+tab(	);
+l(42)B l(34)B
+l(42) l(34).
+KEY	VALUE
+kernel.pid_max	Must be [32768, 4194304]
+fs.inotify.max_queued_events	Must be [16384, 4194304]
+fs.inotify.max_user_instances	Must be [128, 4194304]
+fs.inotify.max_user_watches	Must be [12288, 4194304]
+net.core.netdev_budget	Any positive integer
+net.core.netdev_budget_usecs	Any positive integer
+net.core.netdev_max_backlog	Any positive integer
+net.core.rmem_default	Any positive integer
+net.core.rmem_max	Any positive integer
+net.core.wmem_default	Any positive integer
+net.core.wmem_max	Any positive integer
+net.core.optmem_max	Any positive integer
+net.core.somaxconn	Must be [128, 4194304]
+net.ipv4.tcp_rmem	Any positive integer
+net.ipv4.tcp_wmem	Any positive integer tuple
+net.ipv4.tcp_mem	Any positive integer
+net.ipv4.tcp_fin_timeout	Any positive integer
+net.ipv4.tcp_keepalive_intvl	Any positive integer
+net.ipv4.tcp_keepalive_probes	Any positive integer
+net.ipv4.tcp_keepalive_time	Any positive integer
+net.ipv4.tcp_max_orphans	Any positive integer
+net.ipv4.tcp_max_syn_backlog	Any positive integer
+net.ipv4.tcp_max_tw_buckets	Any positive integer
+net.ipv4.tcp_syn_retries	Any positive integer
+net.ipv4.tcp_tw_reuse	Must be {0, 1}
+net.ipv4.udp_mem	Any positive integer tuple
+net.ipv4.udp_rmem_min	Any positive integer
+net.ipv4.udp_wmem_min	Any positive integer
+net.netfilter.nf_conntrack_generic_timeout	Any positive integer
+.TE
 
 .TP 2m
 \fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]

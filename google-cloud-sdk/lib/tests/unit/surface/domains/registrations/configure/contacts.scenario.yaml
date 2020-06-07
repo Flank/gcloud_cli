@@ -1,0 +1,713 @@
+title: cloud domains configure contacts test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations configure contacts example.com --quiet
+- execute:
+  - command: |
+      domains registrations configure contacts example.com --contact-privacy=private-contact-data
+  - prompt:
+    - message: Contact data not provided using the --contact-data-from-file flag.
+    - prompt_string: Do you want to enter it interactively
+    - input: n
+  - progress_tracker:
+    - message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated registration [example.com] Note:
+      The contact settings are currently pending.
+      In order to finalize the update you need to confirm the change using an email sent to the registrant.
+- execute:
+  - command: |
+      domains registrations configure contacts example-same-contacts.com --contact-privacy=public-contact-data --validate-only
+  - prompt:
+    - message: Contact data not provided using the --contact-data-from-file flag.
+    - prompt_string: Do you want to enter it interactively
+    - input: n
+  - stderr: |
+      You choose to make contact data of domain example-same-contacts.com public.
+      Anyone who looks it up in the WHOIS directory will be able to see info
+      for the domain owner and administrative and technical contacts.
+      Make sure it's ok with them that their contact data is public.
+      This info will be publicly available:
+      email: testuser@google.com
+      phoneNumber: '+1.1234567890'
+      postalAddress:
+        addressLines:
+        - 1600 Amphitheatre Pkwy
+        administrativeArea: CA
+        locality: Mountain View
+        postalCode: '94043'
+        recipients:
+        - Test User
+        regionCode: US
+  - prompt:
+    - input: y
+  - stderr: |
+      The command will not have any effect because validate-only flag is present.
+- execute:
+  - command: |
+      domains registrations configure contacts example-same-contacts.com --contact-privacy=public-contact-data --notices=public-contact-data-acknowledgement --async
+  - prompt:
+    - message: Contact data not provided using the --contact-data-from-file flag.
+    - prompt_string: Do you want to enter it interactively
+    - input: n
+  - stderr: |
+      Update in progress for registration [example-same-contacts.com].
+- execute:
+  - command: |
+      domains registrations configure contacts example-different-contacts.com
+  - prompt:
+    - message: Contact data not provided using the --contact-data-from-file flag.
+    - prompt_string: Do you want to enter it interactively
+    - input: n
+  - prompt:
+    - message: |-
+        Your current contact privacy is PRIVATE_CONTACT_DATA.
+    - prompt_string: Do you want to change it
+    - input: y
+  - prompt:
+    - message: Specify contact privacy
+    - choices: &id001
+      - private-contact-data
+      - public-contact-data
+    - input: '2'
+  - stderr: |
+      You choose to make contact data of domain example-different-contacts.com public.
+      Anyone who looks it up in the WHOIS directory will be able to see info
+      for the domain owner and administrative and technical contacts.
+      Make sure it's ok with them that their contact data is public.
+      This info will be publicly available:
+      adminContact:
+        email: admin@google.com
+      registrantContact:
+        email: registrant@google.com
+      technicalContact:
+        email: technical@google.com
+  - prompt:
+    - input: n
+  - error: '1: Aborted by user.'
+- execute:
+  - command: |
+      domains registrations configure contacts example.com --contact-privacy=public-contact-data --quiet
+  - stderr: |
+      You choose to make contact data of domain example.com public.
+      Anyone who looks it up in the WHOIS directory will be able to see info
+      for the domain owner and administrative and technical contacts.
+      Make sure it's ok with them that their contact data is public.
+      This info will be publicly available:
+      adminContact:
+        email: admin@google.com
+      registrantContact:
+        email: registrant@google.com
+      technicalContact:
+        email: technical@google.com
+  - error: '1: Aborted by user.'
+- execute:
+  - command: |
+      domains registrations configure contacts exported.com
+  - error: "1: The registration resource must be in state ACTIVE or SUSPENDED, not\
+      \ 'EXPORTED'."
+actions:
+- execute_command:
+    command: |
+      domains registrations configure contacts example.com --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "REDACTED_CONTACT_DATA", "PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "PRIVATE_CONTACT_DATA",
+                "registrantContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "registrant@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "adminContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "admin@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "technicalContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "technical@google.com",
+                  "phoneNumber": "+1.1234567890"
+                }
+              }
+            }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations configure contacts example.com --contact-privacy=private-contact-data
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "REDACTED_CONTACT_DATA", "PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "REDACTED_CONTACT_DATA",
+                "registrantContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "registrant@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "adminContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "admin@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "technicalContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "technical@google.com",
+                  "phoneNumber": "+1.1234567890"
+                }
+              }
+            }
+    - expect_prompt_continue:
+        message: Contact data not provided using the --contact-data-from-file flag.
+        prompt_string: Do you want to enter it interactively
+        user_input: n
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com:configureContactSettings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contactSettings:
+                privacy: PRIVATE_CONTACT_DATA
+              updateMask: privacy
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/example-glue-records-ds-records.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "endTime": "2019-01-14T14:41:31.657446027Z",
+                "target": "projects/fake-project/locations/global/registrations/example.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.Registration",
+                "name": "projects/fake-project/locations/global/registrations/example.com",
+                "domainName": "example.com",
+                "createTime": "2019-02-20T16:47:22.739565061Z",
+                "expireTime": "2020-02-20T16:47:26Z",
+                "state": "ACTIVE",
+                "contactSettings": {
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "pendingContactSettings": {
+                "privacy": "PRIVATE_CONTACT_DATA"
+              }
+            }
+    - expect_stderr: |
+        Updated registration [example.com] Note:
+        The contact settings are currently pending.
+        In order to finalize the update you need to confirm the change using an email sent to the registrant.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations configure contacts example-same-contacts.com --contact-privacy=public-contact-data --validate-only
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-same-contacts.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example-same-contacts.com",
+              "domainName": "example-same-contacts.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "PRIVATE_CONTACT_DATA",
+                "registrantContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "adminContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "technicalContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                }
+              }
+            }
+    - expect_prompt_continue:
+        message: Contact data not provided using the --contact-data-from-file flag.
+        prompt_string: Do you want to enter it interactively
+        user_input: n
+    - expect_stderr: |
+        You choose to make contact data of domain example-same-contacts.com public.
+        Anyone who looks it up in the WHOIS directory will be able to see info
+        for the domain owner and administrative and technical contacts.
+        Make sure it's ok with them that their contact data is public.
+        This info will be publicly available:
+        email: testuser@google.com
+        phoneNumber: '+1.1234567890'
+        postalAddress:
+          addressLines:
+          - 1600 Amphitheatre Pkwy
+          administrativeArea: CA
+          locality: Mountain View
+          postalCode: '94043'
+          recipients:
+          - Test User
+          regionCode: US
+    - expect_prompt_continue:
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-same-contacts.com:configureContactSettings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contactNotices:
+              - PUBLIC_CONTACT_DATA_ACKNOWLEDGEMENT
+              contactSettings:
+                privacy: PUBLIC_CONTACT_DATA
+              updateMask: privacy
+              validateOnly: true
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+            }
+    - expect_stderr: |
+        The command will not have any effect because validate-only flag is present.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations configure contacts example-same-contacts.com --contact-privacy=public-contact-data --notices=public-contact-data-acknowledgement --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-same-contacts.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example-same-contacts.com",
+              "domainName": "example-same-contacts.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "PRIVATE_CONTACT_DATA",
+                "registrantContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "adminContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "technicalContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                }
+              }
+            }
+    - expect_prompt_continue:
+        message: Contact data not provided using the --contact-data-from-file flag.
+        prompt_string: Do you want to enter it interactively
+        user_input: n
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-same-contacts.com:configureContactSettings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contactNotices:
+              - PUBLIC_CONTACT_DATA_ACKNOWLEDGEMENT
+              contactSettings:
+                privacy: PUBLIC_CONTACT_DATA
+              updateMask: privacy
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/example-glue-records-ds-records.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Update in progress for registration [example-same-contacts.com].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations configure contacts example-different-contacts.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-different-contacts.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example-different-contacts.com",
+              "domainName": "example-different-contacts.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "PRIVATE_CONTACT_DATA",
+                "registrantContact": {
+                  "email": "registrant@google.com"
+                },
+                "adminContact": {
+                  "email": "admin@google.com"
+                },
+                "technicalContact": {
+                  "email": "technical@google.com"
+                }
+              }
+            }
+    - expect_prompt_continue:
+        message: Contact data not provided using the --contact-data-from-file flag.
+        prompt_string: Do you want to enter it interactively
+        user_input: n
+    - expect_prompt_continue:
+        message: |-
+          Your current contact privacy is PRIVATE_CONTACT_DATA.
+        prompt_string: Do you want to change it
+        user_input: y
+    - expect_prompt_choice:
+        message: Specify contact privacy
+        choices: *id001
+        user_input: '2'
+    - expect_stderr: |
+        You choose to make contact data of domain example-different-contacts.com public.
+        Anyone who looks it up in the WHOIS directory will be able to see info
+        for the domain owner and administrative and technical contacts.
+        Make sure it's ok with them that their contact data is public.
+        This info will be publicly available:
+        adminContact:
+          email: admin@google.com
+        registrantContact:
+          email: registrant@google.com
+        technicalContact:
+          email: technical@google.com
+    - expect_prompt_continue:
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.
+- execute_command:
+    command: |
+      domains registrations configure contacts example.com --contact-privacy=public-contact-data --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "PRIVATE_CONTACT_DATA",
+                "registrantContact": {
+                  "email": "registrant@google.com"
+                },
+                "adminContact": {
+                  "email": "admin@google.com"
+                },
+                "technicalContact": {
+                  "email": "technical@google.com"
+                }
+              }
+            }
+    - expect_stderr: |
+        You choose to make contact data of domain example.com public.
+        Anyone who looks it up in the WHOIS directory will be able to see info
+        for the domain owner and administrative and technical contacts.
+        Make sure it's ok with them that their contact data is public.
+        This info will be publicly available:
+        adminContact:
+          email: admin@google.com
+        registrantContact:
+          email: registrant@google.com
+        technicalContact:
+          email: technical@google.com
+    - expect_exit:
+        code: 1
+        message: Aborted by user.
+- execute_command:
+    command: |
+      domains registrations configure contacts exported.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/exported.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/exported.com",
+              "domainName": "exported.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "EXPORTED"
+            }
+    - expect_exit:
+        code: 1
+        message: |-
+          The registration resource must be in state ACTIVE or SUSPENDED, not 'EXPORTED'.

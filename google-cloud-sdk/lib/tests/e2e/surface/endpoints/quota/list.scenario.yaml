@@ -5,17 +5,8 @@ summary:
 - execute:
   - command: |
       endpoints quota list --service=donotdelete-service.cloud-sdk-integration-testing.appspot.com
-      --consumer=projects/cloud-sdk-integration-testing
+      --consumer=projects/cloud-sdk-integration-testing --sort-by displayName
   - stdout: |
-      ---
-      consumerQuotaLimits:
-      - metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
-        quotaBuckets:
-        - defaultLimit: '30'
-          effectiveLimit: '30'
-        unit: 1/min/{project}
-      displayName: Mutate requests
-      metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
       ---
       consumerQuotaLimits:
       - metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/default_requests
@@ -25,11 +16,20 @@ summary:
         unit: 1/min/{project}
       displayName: Default requests
       metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/default_requests
+      ---
+      consumerQuotaLimits:
+      - metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
+        quotaBuckets:
+        - defaultLimit: '30'
+          effectiveLimit: '30'
+        unit: 1/min/{project}
+      displayName: Mutate requests
+      metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
 actions:
 - execute_command:
     command: |
       endpoints quota list --service=donotdelete-service.cloud-sdk-integration-testing.appspot.com
-      --consumer=projects/cloud-sdk-integration-testing
+      --consumer=projects/cloud-sdk-integration-testing --sort-by displayName
     events:
     - api_call:
         expect_request:
@@ -84,15 +84,6 @@ actions:
     - expect_stdout: |
         ---
         consumerQuotaLimits:
-        - metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
-          quotaBuckets:
-          - defaultLimit: '30'
-            effectiveLimit: '30'
-          unit: 1/min/{project}
-        displayName: Mutate requests
-        metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
-        ---
-        consumerQuotaLimits:
         - metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/default_requests
           quotaBuckets:
           - defaultLimit: '120'
@@ -100,5 +91,14 @@ actions:
           unit: 1/min/{project}
         displayName: Default requests
         metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/default_requests
+        ---
+        consumerQuotaLimits:
+        - metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
+          quotaBuckets:
+          - defaultLimit: '30'
+            effectiveLimit: '30'
+          unit: 1/min/{project}
+        displayName: Mutate requests
+        metric: donotdelete-service.cloud-sdk-integration-testing.appspot.com/mutate_requests
     - expect_exit:
         code: 0

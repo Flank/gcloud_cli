@@ -11,7 +11,7 @@ gcloud beta pubsub subscriptions update \- updates an existing Cloud Pub/Sub sub
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta pubsub subscriptions update\fR \fISUBSCRIPTION\fR [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-dead\-letter\-policy\fR\ |\ \fB\-\-max\-delivery\-attempts\fR=\fIMAX_DELIVERY_ATTEMPTS\fR\ [\fB\-\-dead\-letter\-topic\fR=\fIDEAD_LETTER_TOPIC\fR\ :\ \fB\-\-dead\-letter\-topic\-project\fR=\fIDEAD_LETTER_TOPIC_PROJECT\fR]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta pubsub subscriptions update\fR \fISUBSCRIPTION\fR [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-dead\-letter\-policy\fR\ |\ \fB\-\-max\-delivery\-attempts\fR=\fIMAX_DELIVERY_ATTEMPTS\fR\ [\fB\-\-dead\-letter\-topic\fR=\fIDEAD_LETTER_TOPIC\fR\ :\ \fB\-\-dead\-letter\-topic\-project\fR=\fIDEAD_LETTER_TOPIC_PROJECT\fR]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-clear\-retry\-policy\fR\ |\ \fB\-\-max\-retry\-delay\fR=\fIMAX_RETRY_DELAY\fR\ \fB\-\-min\-retry\-delay\fR=\fIMIN_RETRY_DELAY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -173,7 +173,41 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
 applied first.
 
+.RE
+.sp
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-retry\-policy\fR
+If set, clear the retry policy from the subscription.
+
+.TP 2m
+
+Retry Policy Options. Retry policy specifies how Cloud Pub/Sub retries message
+delivery for this subscription.
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-retry\-delay\fR=\fIMAX_RETRY_DELAY\fR
+The maximum delay between consecutive deliveries of a given message. Value
+should be between 0 and 600 seconds. Defaults to 10 seconds. Valid values are
+strings of the form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d"
+for seconds, minutes, hours, and days, respectively. If the unit is omitted,
+seconds is assumed.
+
+.TP 2m
+\fB\-\-min\-retry\-delay\fR=\fIMIN_RETRY_DELAY\fR
+The minimum delay between consecutive deliveries of a given message. Value
+should be between 0 and 600 seconds. Defaults to 10 seconds. Valid values are
+strings of the form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d"
+for seconds, minutes, hours, and days, respectively. If the unit is omitted,
+seconds is assumed.
+
+
+.RE
 .RE
 .RE
 .sp

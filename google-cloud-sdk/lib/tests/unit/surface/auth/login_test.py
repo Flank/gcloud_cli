@@ -413,7 +413,7 @@ class LoginTestOauth2client(LoginTestMixin, cli_test_base.CliTestBase,
         store, 'AcquireFromWebFlow', autospec=True)
 
   def Login(self, account='', more_args=''):
-    return self.Run('auth login {account}{more_args} --use-oauth2client'.format(
+    return self.Run('auth login {account}{more_args}'.format(
         account=account, more_args=more_args))
 
   def assert_mock_flow_called_with(self, launch_browser, scopes):
@@ -455,8 +455,9 @@ class LoginTestGoogleAuth(LoginTestMixin, cli_test_base.CliTestBase,
     self.mock_jwt_decode = self.StartObjectPatch(jwt, 'decode', autospec=True)
 
   def Login(self, account='', more_args=''):
-    return self.Run('auth login {account}{more_args}'.format(
-        account=account, more_args=more_args))
+    return self.Run(
+        'auth login {account}{more_args} --no-use-oauth2client'.format(
+            account=account, more_args=more_args))
 
   def assert_mock_flow_called_with(self, launch_browser, scopes):
     self.mock_flow.assert_called_once_with(launch_browser, scopes)

@@ -86,17 +86,18 @@ specified. Default: 0
 Google Cloud Storage path or local_directory in which to store training outputs
 and other data needed for training.
 
-This path will be passed to your TensorFlow program as the \f5\-\-job_dir\fR
+This path will be passed to your TensorFlow program as the \f5\-\-job\-dir\fR
 command\-line arg. The benefit of specifying this field is that AI Platform will
-validate the path for use in training.
+validate the path for use in training. However, note that your training program
+will need to parse the provided \f5\-\-job\-dir\fR argument.
 
 .TP 2m
 \fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR
-Path to a Python package to build. This should point to a directory containing
-the Python source for the job. It will be built using \fBsetuptools\fR (which
-must be installed) using its \fBparent\fR directory as context. If the parent
-directory contains a \f5setup.py\fR file, the build will use that; otherwise, it
-will use a simple built\-in one.
+Path to a Python package to build. This should point to a \fBlocal\fR directory
+containing the Python source for the job. It will be built using
+\fBsetuptools\fR (which must be installed) using its \fBparent\fR directory as
+context. If the parent directory contains a \f5setup.py\fR file, the build will
+use that; otherwise, it will use a simple built\-in one.
 
 .TP 2m
 \fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR

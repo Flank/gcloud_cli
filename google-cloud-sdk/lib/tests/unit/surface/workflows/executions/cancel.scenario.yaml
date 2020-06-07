@@ -1,5 +1,5 @@
 title: gcloud workflows executions cancel test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -24,7 +24,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://workflowexecutions.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow/executions/foo:cancel?alt=json
+          uri: https://workflowexecutions.googleapis.com/v1beta/projects/fake-project/locations/us-central1/workflows/test-workflow/executions/foo:cancel?alt=json
           method: POST
           headers: {}
           body: null

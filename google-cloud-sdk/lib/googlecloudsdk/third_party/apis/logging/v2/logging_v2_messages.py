@@ -23,9 +23,10 @@ class BigQueryOptions(_messages.Message):
       (https://cloud.google.com/bigquery/docs/partitioned-tables). By default,
       Logging creates dated tables based on the log entries' timestamps, e.g.
       syslog_20170523. With partitioned tables the date suffix is no longer
-      present and special query syntax (https://cloud.google.com/bigquery/docs
-      /querying-partitioned-tables) has to be used instead. In both cases,
-      tables are sharded based on UTC timezone.
+      present and special query syntax
+      (https://cloud.google.com/bigquery/docs/querying-partitioned-tables) has
+      to be used instead. In both cases, tables are sharded based on UTC
+      timezone.
     usesTimestampColumnPartitioning: Output only. True if new timestamp column
       based partitioning is in use, false if legacy ingestion-time
       partitioning is in use. All new sinks will have this field set true and
@@ -317,17 +318,31 @@ class ListExclusionsResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
+class ListLocationsResponse(_messages.Message):
+  r"""The response message for Locations.ListLocations.
+
+  Fields:
+    locations: A list of locations that matches the specified filter in the
+      request.
+    nextPageToken: The standard List next-page token.
+  """
+
+  locations = _messages.MessageField('Location', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class ListLogEntriesRequest(_messages.Message):
   r"""The parameters to ListLogEntries.
 
   Fields:
     filter: Optional. A filter that chooses which log entries to return. See
-      Advanced Logs Queries (https://cloud.google.com/logging/docs/view
-      /advanced-queries). Only log entries that match the filter are returned.
-      An empty filter matches all log entries in the resources listed in
-      resource_names. Referencing a parent resource that is not listed in
-      resource_names will cause the filter to return no results. The maximum
-      length of the filter is 20000 characters.
+      Advanced Logs Queries
+      (https://cloud.google.com/logging/docs/view/advanced-queries). Only log
+      entries that match the filter are returned. An empty filter matches all
+      log entries in the resources listed in resource_names. Referencing a
+      parent resource that is not listed in resource_names will cause the
+      filter to return no results. The maximum length of the filter is 20000
+      characters.
     orderBy: Optional. How the results should be sorted. Presently, the only
       permitted values are "timestamp asc" (default) and "timestamp desc". The
       first option returns entries in order of increasing values of
@@ -461,6 +476,86 @@ class ListViewsResponse(_messages.Message):
 
   nextPageToken = _messages.StringField(1)
   views = _messages.MessageField('LogView', 2, repeated=True)
+
+
+class Location(_messages.Message):
+  r"""A resource that represents Google Cloud Platform location.
+
+  Messages:
+    LabelsValue: Cross-service attributes for the location. For example
+      {"cloud.googleapis.com/region": "us-east1"}
+    MetadataValue: Service-specific metadata. For example the available
+      capacity at the given location.
+
+  Fields:
+    displayName: The friendly name for this location, typically a nearby city
+      name. For example, "Tokyo".
+    labels: Cross-service attributes for the location. For example
+      {"cloud.googleapis.com/region": "us-east1"}
+    locationId: The canonical id for this location. For example: "us-east1".
+    metadata: Service-specific metadata. For example the available capacity at
+      the given location.
+    name: Resource name for the location, which may vary between
+      implementations. For example: "projects/example-project/locations/us-
+      east1"
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Cross-service attributes for the location. For example
+    {"cloud.googleapis.com/region": "us-east1"}
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class MetadataValue(_messages.Message):
+    r"""Service-specific metadata. For example the available capacity at the
+    given location.
+
+    Messages:
+      AdditionalProperty: An additional property for a MetadataValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a MetadataValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  displayName = _messages.StringField(1)
+  labels = _messages.MessageField('LabelsValue', 2)
+  locationId = _messages.StringField(3)
+  metadata = _messages.MessageField('MetadataValue', 4)
+  name = _messages.StringField(5)
 
 
 class LogBucket(_messages.Message):
@@ -1186,8 +1281,8 @@ class LoggingBillingAccountsBucketsViewsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the policy: "projects/[PROJECT_ID]/lo
       cations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]" Example:
-      "projects/my-project-id/locations/my-location/buckets/my-bucket-id/views
-      /my-view-id".
+      "projects/my-project-id/locations/my-location/buckets/my-bucket-
+      id/views/my-view-id".
   """
 
   name = _messages.StringField(1, required=True)
@@ -1363,8 +1458,8 @@ class LoggingBillingAccountsLocationsBucketsPatchRequest(_messages.Message):
     updateMask: Required. Field mask that specifies the fields in bucket that
       need an update. A bucket field will be overwritten if, and only if, it
       is in the update mask. name and output only fields cannot be updated.For
-      a detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      a detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=retention_days.
   """
@@ -1456,8 +1551,8 @@ class LoggingBillingAccountsLocationsBucketsViewsPatchRequest(_messages.Message)
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
       the update mask. name and output only fields cannot be updated.For a
-      detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
@@ -1465,6 +1560,32 @@ class LoggingBillingAccountsLocationsBucketsViewsPatchRequest(_messages.Message)
   logView = _messages.MessageField('LogView', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class LoggingBillingAccountsLocationsGetRequest(_messages.Message):
+  r"""A LoggingBillingAccountsLocationsGetRequest object.
+
+  Fields:
+    name: Resource name for the location.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class LoggingBillingAccountsLocationsListRequest(_messages.Message):
+  r"""A LoggingBillingAccountsLocationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class LoggingBillingAccountsLogsDeleteRequest(_messages.Message):
@@ -1498,13 +1619,13 @@ class LoggingBillingAccountsLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Required. Required for Logging Data Model V2. The resource
-      name that owns the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buck
-      ets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCA
-      TION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT
-      _ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDE
-      R_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support
-      legacy queries, it could also be:  "projects/PROJECT_ID"
+    resourceNames: NOT IMPLEMENTED YET. Required for Logging Data Model V2.
+      The resource name that owns the logs:  projects/PROJECT_ID/locations/LOC
+      ATION_ID/buckets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/l
+      ocations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BI
+      LLING_ACCOUNT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID
+      folders/FOLDER_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDT
+      o support legacy queries, it could also be:  "projects/PROJECT_ID"
       "organizations/ORGANIZATION_ID"  "billingAccounts/BILLING_ACCOUNT_ID"
       "folders/FOLDER_ID"Note: It is not supported for query across multiple
       projects/orgs/folders/billingAccounts
@@ -1949,8 +2070,8 @@ class LoggingFoldersLocationsBucketsPatchRequest(_messages.Message):
     updateMask: Required. Field mask that specifies the fields in bucket that
       need an update. A bucket field will be overwritten if, and only if, it
       is in the update mask. name and output only fields cannot be updated.For
-      a detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      a detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=retention_days.
   """
@@ -2016,8 +2137,8 @@ class LoggingFoldersLocationsBucketsViewsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the policy: "projects/[PROJECT_ID]/lo
       cations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]" Example:
-      "projects/my-project-id/locations/my-location/buckets/my-bucket-id/views
-      /my-view-id".
+      "projects/my-project-id/locations/my-location/buckets/my-bucket-
+      id/views/my-view-id".
   """
 
   name = _messages.StringField(1, required=True)
@@ -2055,8 +2176,8 @@ class LoggingFoldersLocationsBucketsViewsPatchRequest(_messages.Message):
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
       the update mask. name and output only fields cannot be updated.For a
-      detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
@@ -2064,6 +2185,32 @@ class LoggingFoldersLocationsBucketsViewsPatchRequest(_messages.Message):
   logView = _messages.MessageField('LogView', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class LoggingFoldersLocationsGetRequest(_messages.Message):
+  r"""A LoggingFoldersLocationsGetRequest object.
+
+  Fields:
+    name: Resource name for the location.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class LoggingFoldersLocationsListRequest(_messages.Message):
+  r"""A LoggingFoldersLocationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class LoggingFoldersLogsDeleteRequest(_messages.Message):
@@ -2097,13 +2244,13 @@ class LoggingFoldersLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Required. Required for Logging Data Model V2. The resource
-      name that owns the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buck
-      ets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCA
-      TION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT
-      _ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDE
-      R_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support
-      legacy queries, it could also be:  "projects/PROJECT_ID"
+    resourceNames: NOT IMPLEMENTED YET. Required for Logging Data Model V2.
+      The resource name that owns the logs:  projects/PROJECT_ID/locations/LOC
+      ATION_ID/buckets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/l
+      ocations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BI
+      LLING_ACCOUNT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID
+      folders/FOLDER_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDT
+      o support legacy queries, it could also be:  "projects/PROJECT_ID"
       "organizations/ORGANIZATION_ID"  "billingAccounts/BILLING_ACCOUNT_ID"
       "folders/FOLDER_ID"Note: It is not supported for query across multiple
       projects/orgs/folders/billingAccounts
@@ -2385,8 +2532,8 @@ class LoggingLocationsBucketsPatchRequest(_messages.Message):
     updateMask: Required. Field mask that specifies the fields in bucket that
       need an update. A bucket field will be overwritten if, and only if, it
       is in the update mask. name and output only fields cannot be updated.For
-      a detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      a detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=retention_days.
   """
@@ -2452,8 +2599,8 @@ class LoggingLocationsBucketsViewsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the policy: "projects/[PROJECT_ID]/lo
       cations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]" Example:
-      "projects/my-project-id/locations/my-location/buckets/my-bucket-id/views
-      /my-view-id".
+      "projects/my-project-id/locations/my-location/buckets/my-bucket-
+      id/views/my-view-id".
   """
 
   name = _messages.StringField(1, required=True)
@@ -2491,8 +2638,8 @@ class LoggingLocationsBucketsViewsPatchRequest(_messages.Message):
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
       the update mask. name and output only fields cannot be updated.For a
-      detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
@@ -2500,6 +2647,32 @@ class LoggingLocationsBucketsViewsPatchRequest(_messages.Message):
   logView = _messages.MessageField('LogView', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class LoggingLocationsGetRequest(_messages.Message):
+  r"""A LoggingLocationsGetRequest object.
+
+  Fields:
+    name: Resource name for the location.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class LoggingLocationsListRequest(_messages.Message):
+  r"""A LoggingLocationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class LoggingLogsDeleteRequest(_messages.Message):
@@ -2533,13 +2706,13 @@ class LoggingLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Required. Required for Logging Data Model V2. The resource
-      name that owns the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buck
-      ets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCA
-      TION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT
-      _ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDE
-      R_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support
-      legacy queries, it could also be:  "projects/PROJECT_ID"
+    resourceNames: NOT IMPLEMENTED YET. Required for Logging Data Model V2.
+      The resource name that owns the logs:  projects/PROJECT_ID/locations/LOC
+      ATION_ID/buckets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/l
+      ocations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BI
+      LLING_ACCOUNT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID
+      folders/FOLDER_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDT
+      o support legacy queries, it could also be:  "projects/PROJECT_ID"
       "organizations/ORGANIZATION_ID"  "billingAccounts/BILLING_ACCOUNT_ID"
       "folders/FOLDER_ID"Note: It is not supported for query across multiple
       projects/orgs/folders/billingAccounts
@@ -2772,8 +2945,8 @@ class LoggingOrganizationsLocationsBucketsPatchRequest(_messages.Message):
     updateMask: Required. Field mask that specifies the fields in bucket that
       need an update. A bucket field will be overwritten if, and only if, it
       is in the update mask. name and output only fields cannot be updated.For
-      a detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      a detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=retention_days.
   """
@@ -2839,8 +3012,8 @@ class LoggingOrganizationsLocationsBucketsViewsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the policy: "projects/[PROJECT_ID]/lo
       cations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]" Example:
-      "projects/my-project-id/locations/my-location/buckets/my-bucket-id/views
-      /my-view-id".
+      "projects/my-project-id/locations/my-location/buckets/my-bucket-
+      id/views/my-view-id".
   """
 
   name = _messages.StringField(1, required=True)
@@ -2878,8 +3051,8 @@ class LoggingOrganizationsLocationsBucketsViewsPatchRequest(_messages.Message):
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
       the update mask. name and output only fields cannot be updated.For a
-      detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
@@ -2887,6 +3060,32 @@ class LoggingOrganizationsLocationsBucketsViewsPatchRequest(_messages.Message):
   logView = _messages.MessageField('LogView', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class LoggingOrganizationsLocationsGetRequest(_messages.Message):
+  r"""A LoggingOrganizationsLocationsGetRequest object.
+
+  Fields:
+    name: Resource name for the location.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class LoggingOrganizationsLocationsListRequest(_messages.Message):
+  r"""A LoggingOrganizationsLocationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class LoggingOrganizationsLogsDeleteRequest(_messages.Message):
@@ -2920,13 +3119,13 @@ class LoggingOrganizationsLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Required. Required for Logging Data Model V2. The resource
-      name that owns the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buck
-      ets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCA
-      TION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT
-      _ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDE
-      R_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support
-      legacy queries, it could also be:  "projects/PROJECT_ID"
+    resourceNames: NOT IMPLEMENTED YET. Required for Logging Data Model V2.
+      The resource name that owns the logs:  projects/PROJECT_ID/locations/LOC
+      ATION_ID/buckets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/l
+      ocations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BI
+      LLING_ACCOUNT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID
+      folders/FOLDER_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDT
+      o support legacy queries, it could also be:  "projects/PROJECT_ID"
       "organizations/ORGANIZATION_ID"  "billingAccounts/BILLING_ACCOUNT_ID"
       "folders/FOLDER_ID"Note: It is not supported for query across multiple
       projects/orgs/folders/billingAccounts
@@ -3305,8 +3504,8 @@ class LoggingProjectsLocationsBucketsPatchRequest(_messages.Message):
     updateMask: Required. Field mask that specifies the fields in bucket that
       need an update. A bucket field will be overwritten if, and only if, it
       is in the update mask. name and output only fields cannot be updated.For
-      a detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      a detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=retention_days.
   """
@@ -3372,8 +3571,8 @@ class LoggingProjectsLocationsBucketsViewsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the policy: "projects/[PROJECT_ID]/lo
       cations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]" Example:
-      "projects/my-project-id/locations/my-location/buckets/my-bucket-id/views
-      /my-view-id".
+      "projects/my-project-id/locations/my-location/buckets/my-bucket-
+      id/views/my-view-id".
   """
 
   name = _messages.StringField(1, required=True)
@@ -3411,8 +3610,8 @@ class LoggingProjectsLocationsBucketsViewsPatchRequest(_messages.Message):
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
       the update mask. name and output only fields cannot be updated.For a
-      detailed FieldMask definition, see https://developers.google.com
-      /protocol-
+      detailed FieldMask definition, see
+      https://developers.google.com/protocol-
       buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
@@ -3420,6 +3619,32 @@ class LoggingProjectsLocationsBucketsViewsPatchRequest(_messages.Message):
   logView = _messages.MessageField('LogView', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class LoggingProjectsLocationsGetRequest(_messages.Message):
+  r"""A LoggingProjectsLocationsGetRequest object.
+
+  Fields:
+    name: Resource name for the location.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class LoggingProjectsLocationsListRequest(_messages.Message):
+  r"""A LoggingProjectsLocationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class LoggingProjectsLogsDeleteRequest(_messages.Message):
@@ -3453,13 +3678,13 @@ class LoggingProjectsLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Required. Required for Logging Data Model V2. The resource
-      name that owns the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buck
-      ets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCA
-      TION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT
-      _ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDE
-      R_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support
-      legacy queries, it could also be:  "projects/PROJECT_ID"
+    resourceNames: NOT IMPLEMENTED YET. Required for Logging Data Model V2.
+      The resource name that owns the logs:  projects/PROJECT_ID/locations/LOC
+      ATION_ID/buckets/BUCKET_ID/views/VIEW_ID  organization/ORGANIZATION_ID/l
+      ocations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  billingAccounts/BI
+      LLING_ACCOUNT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_ID
+      folders/FOLDER_ID/locations/LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDT
+      o support legacy queries, it could also be:  "projects/PROJECT_ID"
       "organizations/ORGANIZATION_ID"  "billingAccounts/BILLING_ACCOUNT_ID"
       "folders/FOLDER_ID"Note: It is not supported for query across multiple
       projects/orgs/folders/billingAccounts
@@ -4516,7 +4741,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

@@ -1,3 +1,7 @@
+filters:
+  skipAlways:
+    reason: Timing out heavily
+    bug: b/148134431
 title: Create, update, then delete a workerpool with labels
 release_tracks: [ALPHA]
 summary:
@@ -59,7 +63,7 @@ actions:
                 workerConfig:
                   diskSizeGb: '200'
                   diskType: pd-standard
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   reserved: false
                   networkAccess: public
                   labels:
@@ -96,7 +100,7 @@ actions:
             workerConfig:
               diskSizeGb: '200'
               diskType: pd-standard
-              machineType: n1-standard-2
+              machineType: e2-standard-2
               reserved: false
               networkAccess: public
               labels:
@@ -161,7 +165,7 @@ actions:
               labels:
                 a: '1'
                 c: '3'
-              machineType: n1-standard-2
+              machineType: e2-standard-2
               networkAccess: public
         repeatable: true
     - expect_stderr: |

@@ -291,11 +291,13 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     if endpoint_config is not None:
       cluster.config.endpointConfig = endpoint_config
     if 'gkeClusterPath' in kwargs:
-      cluster.config.gkeClusterConfig = self.messages.GkeClusterConfig(
-          namespacedGkeDeploymentTarget=self.messages
-          .NamespacedGkeDeploymentTarget(
-              targetGkeCluster=kwargs.get('gkeClusterPath', None),
-              clusterNamespace=kwargs.get('gkeClusterNamespace', None)))
+      # This configuration only exists for beta clusters for now...
+      if self.api_version == _BETA_API_VERSION:
+        cluster.config.gkeClusterConfig = self.messages.GkeClusterConfig(
+            namespacedGkeDeploymentTarget=self.messages
+            .NamespacedGkeDeploymentTarget(
+                targetGkeCluster=kwargs.get('gkeClusterPath', None),
+                clusterNamespace=kwargs.get('gkeClusterNamespace', None)))
       # zero out the gce configs that wont exist.
       cluster.config.gceClusterConfig = None
       cluster.config.masterConfig = None

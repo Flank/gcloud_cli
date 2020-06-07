@@ -687,7 +687,7 @@
           "$ref": "Device"
         },
         "customer": {
-          "description": "Required. [Resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names) of\nthe customer. To find the customer ID for your organization, use the\ncommand:\n```\ngcloud alpha organizations list\n```\nThe customer ID you need to use appears under the heading\n`DIRECTORY_CUSTOMER_ID`. The value is the letter \"C\" followed by\nletters and numbers. Use the value after the letter \"C\". So if\nthe Directory Customer ID displayed is, say `C00zqsgyx`, then the\ncustomer ID value to use in the API is: `customers\/00zqsgyx`.\nIf you're using this API to manage another\norganization, use `customers\/{customer_id}`, where `customer_id` is the\ncustomer to whom the device belongs.",
+          "description": "Required. [Resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names) of\nthe customer. You can use the 'customers\/my_customer' alias to represent\nyour account's customerId. To find the customer ID for your organization,\nuse the command:\n```\ngcloud alpha organizations list\n```\nThe customer ID you need to use appears under the heading\n`DIRECTORY_CUSTOMER_ID`. The value is the letter \"C\" followed by\nletters and numbers. Use the value after the letter \"C\". So if\nthe Directory Customer ID displayed is, say `C00zqsgyx`, then the\ncustomer ID value to use in the API is: `customers\/00zqsgyx`.\nIf you're using this API to manage another\norganization, use `customers\/{customer_id}`, where `customer_id` is the\ncustomer to whom the device belongs.",
           "type": "string"
         }
       }
@@ -1064,6 +1064,11 @@
             "PASSWORD_SET",
             "PASSWORD_NOT_SET"
           ]
+        },
+        "createTime": {
+          "description": "When the user first signed in to the device",
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -1567,6 +1572,24 @@
         "customer": {
           "description": "The obfuscated customer Id that may be passed back to other\nDevices API methods such as List, Get, etc.",
           "type": "string"
+        },
+        "nextPageToken": {
+          "description": "Token to retrieve the next page of results. Empty if there are no more\nresults.",
+          "type": "string"
+        }
+      }
+    },
+    "ListClientStatesResponse": {
+      "id": "ListClientStatesResponse",
+      "description": "Response message that is returned in LRO result of ListClientStates\nOperation.",
+      "type": "object",
+      "properties": {
+        "clientStates": {
+          "description": "Client states meeting the list restrictions.",
+          "type": "array",
+          "items": {
+            "$ref": "ClientState"
+          }
         },
         "nextPageToken": {
           "description": "Token to retrieve the next page of results. Empty if there are no more\nresults.",
@@ -2978,7 +3001,7 @@
                     "name"
                   ],
                   "response": {
-                    "$ref": "Operation"
+                    "$ref": "ClientState"
                   },
                   "description": "Get client state for a device user"
                 },
@@ -3004,12 +3027,6 @@
                       "description": "Optional. Additional restrictions when fetching list of client states.",
                       "location": "query",
                       "type": "string"
-                    },
-                    "pageSize": {
-                      "description": "Optional. The maximum number of ClientStates to return.\nIf unspecified, at most 5 ClientStates will be returned.\nThe maximum value is 20; values above 20 will be coerced to 20.",
-                      "location": "query",
-                      "type": "integer",
-                      "format": "int32"
                     },
                     "pageToken": {
                       "description": "Optional. A page token, received from a previous `ListClientStates` call.\nProvide this to retrieve the subsequent page.\n\nWhen paginating, all other parameters provided to `ListClientStates` must\nmatch the call that provided the page token.",

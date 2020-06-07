@@ -120,10 +120,9 @@ class AutoprovisioningNodePoolDefaults(_messages.Message):
       platform](https://cloud.google.com/compute/docs/instances/specify-min-
       cpu-platform) To unset the min cpu platform field pass "automatic" as
       field value.
-    oauthScopes: Scopes that are used by NAP when creating node pools. If
-      oauth_scopes are specified, service_account should be empty.
+    oauthScopes: Scopes that are used by NAP when creating node pools.
     serviceAccount: The Google Cloud Platform Service Account to be used by
-      the node VMs. If service_account is specified, scopes should be empty.
+      the node VMs.
     upgradeSettings: Specifies the upgrade settings for NAP created node pools
   """
 
@@ -283,8 +282,6 @@ class Cluster(_messages.Message):
       this resource for username and password information.
     expireTime: [Output only] The time the cluster will be automatically
       deleted in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
-    exposeMasterSignalsConfig: Configuration used to enable sending selected
-      master logs and metrics to customer project.
     initialClusterVersion: The initial Kubernetes version for this cluster.
       Valid versions are those found in validMasterVersions returned by
       getServerConfig.  The version can be upgraded over time; such upgrades
@@ -310,8 +307,9 @@ class Cluster(_messages.Message):
     legacyAbac: Configuration for the legacy ABAC authorization mode.
     location: [Output only] The name of the Google Compute Engine
       [zone](https://cloud.google.com/compute/docs/regions-zones/regions-
-      zones#available) or [region](https://cloud.google.com/compute/docs
-      /regions-zones/regions-zones#available) in which the cluster resides.
+      zones#available) or
+      [region](https://cloud.google.com/compute/docs/regions-zones/regions-
+      zones#available) in which the cluster resides.
     locations: The list of Google Compute Engine
       [zones](https://cloud.google.com/compute/docs/zones#available) in which
       the cluster's nodes should be located.
@@ -324,6 +322,7 @@ class Cluster(_messages.Message):
       will be used for GKE 1.14+ or `logging.googleapis.com` for earlier
       versions.
     maintenancePolicy: Configure the maintenance policy for this cluster.
+    master: Configuration for master components.
     masterAuth: The authentication information for accessing the master
       endpoint. If unspecified, the defaults are used: For clusters before
       v1.12, if master_auth is unspecified, `username` will be set to "admin",
@@ -385,9 +384,10 @@ class Cluster(_messages.Message):
       Resource usage export is disabled when this config unspecified.
     selfLink: [Output only] Server-defined URL for the resource.
     servicesIpv4Cidr: [Output only] The IP address range of the Kubernetes
-      services in this cluster, in [CIDR](http://en.wikipedia.org/wiki
-      /Classless_Inter-Domain_Routing) notation (e.g. `1.2.3.4/29`). Service
-      addresses are typically put in the last `/16` from the container CIDR.
+      services in this cluster, in
+      [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+      notation (e.g. `1.2.3.4/29`). Service addresses are typically put in the
+      last `/16` from the container CIDR.
     shieldedNodes: Shielded Nodes configuration.
     status: [Output only] The current status of this cluster.
     statusMessage: [Output only] Additional information about the current
@@ -481,17 +481,17 @@ class Cluster(_messages.Message):
   enableTpu = _messages.BooleanField(17)
   endpoint = _messages.StringField(18)
   expireTime = _messages.StringField(19)
-  exposeMasterSignalsConfig = _messages.MessageField('ExposeMasterSignalsConfig', 20)
-  initialClusterVersion = _messages.StringField(21)
-  initialNodeCount = _messages.IntegerField(22, variant=_messages.Variant.INT32)
-  instanceGroupUrls = _messages.StringField(23, repeated=True)
-  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 24)
-  labelFingerprint = _messages.StringField(25)
-  legacyAbac = _messages.MessageField('LegacyAbac', 26)
-  location = _messages.StringField(27)
-  locations = _messages.StringField(28, repeated=True)
-  loggingService = _messages.StringField(29)
-  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 30)
+  initialClusterVersion = _messages.StringField(20)
+  initialNodeCount = _messages.IntegerField(21, variant=_messages.Variant.INT32)
+  instanceGroupUrls = _messages.StringField(22, repeated=True)
+  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 23)
+  labelFingerprint = _messages.StringField(24)
+  legacyAbac = _messages.MessageField('LegacyAbac', 25)
+  location = _messages.StringField(26)
+  locations = _messages.StringField(27, repeated=True)
+  loggingService = _messages.StringField(28)
+  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 29)
+  master = _messages.MessageField('Master', 30)
   masterAuth = _messages.MessageField('MasterAuth', 31)
   masterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 32)
   masterIpv4CidrBlock = _messages.StringField(33)
@@ -595,6 +595,8 @@ class ClusterUpdate(_messages.Message):
   provided.
 
   Enums:
+    DesiredDatapathProviderValueValuesEnum: The desired datapath provider for
+      the cluster.
     DesiredPrivateIpv6GoogleAccessValueValuesEnum: The desired state of IPv6
       connectivity to Google Services.
 
@@ -607,6 +609,7 @@ class ClusterUpdate(_messages.Message):
     desiredClusterTelemetry: The desired telemetry integration for the
       cluster.
     desiredDatabaseEncryption: Configuration of etcd encryption.
+    desiredDatapathProvider: The desired datapath provider for the cluster.
     desiredDefaultSnatStatus: The desired status of whether to disable default
       sNAT for this cluster.
     desiredEnableGvnic: Enable or disable gvnic on this cluster. This field is
@@ -633,6 +636,7 @@ class ClusterUpdate(_messages.Message):
       no logs will be exported from the cluster.  If left as an empty
       string,`logging.googleapis.com/kubernetes` will be used for GKE 1.14+ or
       `logging.googleapis.com` for earlier versions.
+    desiredMaster: Configuration for master components.
     desiredMasterAuthorizedNetworksConfig: The desired configuration options
       for master authorized networks feature.
     desiredMasterVersion: The Kubernetes version to change the master to. The
@@ -682,6 +686,19 @@ class ClusterUpdate(_messages.Message):
     desiredWorkloadIdentityConfig: Configuration for Workload Identity.
   """
 
+  class DesiredDatapathProviderValueValuesEnum(_messages.Enum):
+    r"""The desired datapath provider for the cluster.
+
+    Values:
+      DATAPATH_PROVIDER_UNSPECIFIED: Default value.
+      LEGACY_DATAPATH: Use the IPTables implementation based on kube-proxy.
+      ADVANCED_DATAPATH: Use the eBPF based data plane with additional
+        visibility features.
+    """
+    DATAPATH_PROVIDER_UNSPECIFIED = 0
+    LEGACY_DATAPATH = 1
+    ADVANCED_DATAPATH = 2
+
   class DesiredPrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
     r"""The desired state of IPv6 connectivity to Google Services.
 
@@ -704,29 +721,31 @@ class ClusterUpdate(_messages.Message):
   desiredClusterAutoscaling = _messages.MessageField('ClusterAutoscaling', 3)
   desiredClusterTelemetry = _messages.MessageField('ClusterTelemetry', 4)
   desiredDatabaseEncryption = _messages.MessageField('DatabaseEncryption', 5)
-  desiredDefaultSnatStatus = _messages.MessageField('DefaultSnatStatus', 6)
-  desiredEnableGvnic = _messages.BooleanField(7)
-  desiredImage = _messages.StringField(8)
-  desiredImageProject = _messages.StringField(9)
-  desiredImageType = _messages.StringField(10)
-  desiredIntraNodeVisibilityConfig = _messages.MessageField('IntraNodeVisibilityConfig', 11)
-  desiredLocations = _messages.StringField(12, repeated=True)
-  desiredLoggingService = _messages.StringField(13)
-  desiredMasterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 14)
-  desiredMasterVersion = _messages.StringField(15)
-  desiredMonitoringService = _messages.StringField(16)
-  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 17)
-  desiredNodePoolId = _messages.StringField(18)
-  desiredNodeVersion = _messages.StringField(19)
-  desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 20)
-  desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 21)
-  desiredPrivateIpv6GoogleAccess = _messages.EnumField('DesiredPrivateIpv6GoogleAccessValueValuesEnum', 22)
-  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 23)
-  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 24)
-  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 25)
-  desiredTpuConfig = _messages.MessageField('TpuConfig', 26)
-  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 27)
-  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 28)
+  desiredDatapathProvider = _messages.EnumField('DesiredDatapathProviderValueValuesEnum', 6)
+  desiredDefaultSnatStatus = _messages.MessageField('DefaultSnatStatus', 7)
+  desiredEnableGvnic = _messages.BooleanField(8)
+  desiredImage = _messages.StringField(9)
+  desiredImageProject = _messages.StringField(10)
+  desiredImageType = _messages.StringField(11)
+  desiredIntraNodeVisibilityConfig = _messages.MessageField('IntraNodeVisibilityConfig', 12)
+  desiredLocations = _messages.StringField(13, repeated=True)
+  desiredLoggingService = _messages.StringField(14)
+  desiredMaster = _messages.MessageField('Master', 15)
+  desiredMasterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 16)
+  desiredMasterVersion = _messages.StringField(17)
+  desiredMonitoringService = _messages.StringField(18)
+  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 19)
+  desiredNodePoolId = _messages.StringField(20)
+  desiredNodeVersion = _messages.StringField(21)
+  desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 22)
+  desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 23)
+  desiredPrivateIpv6GoogleAccess = _messages.EnumField('DesiredPrivateIpv6GoogleAccessValueValuesEnum', 24)
+  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 25)
+  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 26)
+  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 27)
+  desiredTpuConfig = _messages.MessageField('TpuConfig', 28)
+  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 29)
+  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 30)
 
 
 class CompleteIPRotationRequest(_messages.Message):
@@ -1268,8 +1287,9 @@ class CreateClusterRequest(_messages.Message):
   r"""CreateClusterRequest creates a cluster.
 
   Fields:
-    cluster: Required. A [cluster resource](https://cloud.google.com
-      /container-engine/reference/rest/v1beta1/projects.zones.clusters)
+    cluster: Required. A [cluster
+      resource](https://cloud.google.com/container-
+      engine/reference/rest/v1beta1/projects.zones.clusters)
     parent: The parent (project and location) where the cluster will be
       created. Specified in the format `projects/*/locations/*`.
     projectId: Required. Deprecated. The Google Developers Console [project ID
@@ -1402,38 +1422,6 @@ class Empty(_messages.Message):
   JSON representation for `Empty` is empty JSON object `{}`.
   """
 
-
-
-class ExposeMasterSignalsConfig(_messages.Message):
-  r"""ExposeMasterSignalsConfig is the configuration for exposing selected
-  master logs and metrics to customer
-
-  Enums:
-    EnableComponentLogsValueListEntryValuesEnum:
-
-  Fields:
-    enableComponentLogs: Select components to expose logs
-    enableMetrics: Enable sendings metrics to customer
-  """
-
-  class EnableComponentLogsValueListEntryValuesEnum(_messages.Enum):
-    r"""EnableComponentLogsValueListEntryValuesEnum enum type.
-
-    Values:
-      COMPONENT_UNSPECIFIED: <no description>
-      APISERVER: <no description>
-      SCHEDULER: <no description>
-      CONTROLLER_MANAGER: <no description>
-      ADDON_MANAGER: <no description>
-    """
-    COMPONENT_UNSPECIFIED = 0
-    APISERVER = 1
-    SCHEDULER = 2
-    CONTROLLER_MANAGER = 3
-    ADDON_MANAGER = 4
-
-  enableComponentLogs = _messages.EnumField('EnableComponentLogsValueListEntryValuesEnum', 1, repeated=True)
-  enableMetrics = _messages.BooleanField(2)
 
 
 class GcePersistentDiskCsiDriverConfig(_messages.Message):
@@ -1939,6 +1927,17 @@ class MaintenanceWindow(_messages.Message):
   recurringWindow = _messages.MessageField('RecurringTimeWindow', 3)
 
 
+class Master(_messages.Message):
+  r"""Master is the configuration for components on master.
+
+  Fields:
+    signalsConfig: Configuration used to enable sending selected master logs
+      and metrics to customer project.
+  """
+
+  signalsConfig = _messages.MessageField('MasterSignalsConfig', 1)
+
+
 class MasterAuth(_messages.Message):
   r"""The authentication information for accessing the master endpoint.
   Authentication can be done using HTTP basic auth or using client
@@ -1987,6 +1986,38 @@ class MasterAuthorizedNetworksConfig(_messages.Message):
   enabled = _messages.BooleanField(2)
 
 
+class MasterSignalsConfig(_messages.Message):
+  r"""MasterSignalsConfig is the configuration for exposing selected master
+  logs and metrics to customer
+
+  Enums:
+    LogEnabledComponentsValueListEntryValuesEnum:
+
+  Fields:
+    enableMetrics: Enable sendings metrics to customer
+    logEnabledComponents: Select components to expose logs
+  """
+
+  class LogEnabledComponentsValueListEntryValuesEnum(_messages.Enum):
+    r"""LogEnabledComponentsValueListEntryValuesEnum enum type.
+
+    Values:
+      COMPONENT_UNSPECIFIED: <no description>
+      APISERVER: <no description>
+      SCHEDULER: <no description>
+      CONTROLLER_MANAGER: <no description>
+      ADDON_MANAGER: <no description>
+    """
+    COMPONENT_UNSPECIFIED = 0
+    APISERVER = 1
+    SCHEDULER = 2
+    CONTROLLER_MANAGER = 3
+    ADDON_MANAGER = 4
+
+  enableMetrics = _messages.BooleanField(1)
+  logEnabledComponents = _messages.EnumField('LogEnabledComponentsValueListEntryValuesEnum', 2, repeated=True)
+
+
 class MaxPodsConstraint(_messages.Message):
   r"""Constraints applied to pods.
 
@@ -2018,18 +2049,27 @@ class NetworkConfig(_messages.Message):
   r"""NetworkConfig reports the relative names of network & subnetwork.
 
   Enums:
+    DatapathProviderValueValuesEnum: The desired datapath provider for this
+      cluster. By default, uses the IPTables-based kube-proxy implementation.
     PrivateIpv6GoogleAccessValueValuesEnum: The desired state of IPv6
       connectivity to Google Services. By default, no private IPv6 access to
       or from Google Services (all access will be via IPv4)
 
   Fields:
+    datapathProvider: The desired datapath provider for this cluster. By
+      default, uses the IPTables-based kube-proxy implementation.
+    defaultSnatStatus: Whether the cluster disables default in-node sNAT
+      rules. In-node sNAT rules will be disabled when default_snat_status is
+      disabled. When disabled is set to false, default IP masquerade rules
+      will be applied to the nodes to prevent sNAT on cluster internal
+      traffic.
     enableIntraNodeVisibility: Whether Intra-node visibility is enabled for
       this cluster. This makes same node pod to pod traffic visible for VPC
       network.
     network: Output only. The relative name of the Google Compute Engine
       network(https://cloud.google.com/compute/docs/networks-and-
-      firewalls#networks) to which the cluster is connected. Example: projects
-      /my-project/global/networks/my-network
+      firewalls#networks) to which the cluster is connected. Example:
+      projects/my-project/global/networks/my-network
     privateIpv6GoogleAccess: The desired state of IPv6 connectivity to Google
       Services. By default, no private IPv6 access to or from Google Services
       (all access will be via IPv4)
@@ -2038,6 +2078,20 @@ class NetworkConfig(_messages.Message):
       cluster is connected. Example: projects/my-project/regions/us-
       central1/subnetworks/my-subnet
   """
+
+  class DatapathProviderValueValuesEnum(_messages.Enum):
+    r"""The desired datapath provider for this cluster. By default, uses the
+    IPTables-based kube-proxy implementation.
+
+    Values:
+      DATAPATH_PROVIDER_UNSPECIFIED: Default value.
+      LEGACY_DATAPATH: Use the IPTables implementation based on kube-proxy.
+      ADVANCED_DATAPATH: Use the eBPF based data plane with additional
+        visibility features.
+    """
+    DATAPATH_PROVIDER_UNSPECIFIED = 0
+    LEGACY_DATAPATH = 1
+    ADVANCED_DATAPATH = 2
 
   class PrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
     r"""The desired state of IPv6 connectivity to Google Services. By default,
@@ -2058,10 +2112,12 @@ class NetworkConfig(_messages.Message):
     PRIVATE_IPV6_GOOGLE_ACCESS_TO_GOOGLE = 2
     PRIVATE_IPV6_GOOGLE_ACCESS_BIDIRECTIONAL = 3
 
-  enableIntraNodeVisibility = _messages.BooleanField(1)
-  network = _messages.StringField(2)
-  privateIpv6GoogleAccess = _messages.EnumField('PrivateIpv6GoogleAccessValueValuesEnum', 3)
-  subnetwork = _messages.StringField(4)
+  datapathProvider = _messages.EnumField('DatapathProviderValueValuesEnum', 1)
+  defaultSnatStatus = _messages.MessageField('DefaultSnatStatus', 2)
+  enableIntraNodeVisibility = _messages.BooleanField(3)
+  network = _messages.StringField(4)
+  privateIpv6GoogleAccess = _messages.EnumField('PrivateIpv6GoogleAccessValueValuesEnum', 5)
+  subnetwork = _messages.StringField(6)
 
 
 class NetworkPolicy(_messages.Message):
@@ -2386,8 +2442,9 @@ class NodePool(_messages.Message):
       quotas">resource quota</a> is sufficient for this number of instances.
       You must also have available firewall and routes quota.
     instanceGroupUrls: [Output only] The resource URLs of the [managed
-      instance groups](https://cloud.google.com/compute/docs/instance-groups
-      /creating-groups-of-managed-instances) associated with this node pool.
+      instance groups](https://cloud.google.com/compute/docs/instance-
+      groups/creating-groups-of-managed-instances) associated with this node
+      pool.
     locations: The list of Google Compute Engine
       [zones](https://cloud.google.com/compute/docs/zones#available) in which
       the NodePool's nodes should be located.
@@ -2473,9 +2530,9 @@ class NodePoolAutoscaling(_messages.Message):
 class NodeTaint(_messages.Message):
   r"""Kubernetes taint is comprised of three fields: key, value, and effect.
   Effect can only be one of three types:  NoSchedule, PreferNoSchedule or
-  NoExecute.  See [here](https://kubernetes.io/docs/concepts/configuration
-  /taint-and-toleration) for more information, including usage and the valid
-  values.
+  NoExecute.  See
+  [here](https://kubernetes.io/docs/concepts/configuration/taint-and-
+  toleration) for more information, including usage and the valid values.
 
   Enums:
     EffectValueValuesEnum: Effect for taint.
@@ -2520,8 +2577,9 @@ class Operation(_messages.Message):
       [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     location: [Output only] The name of the Google Compute Engine
       [zone](https://cloud.google.com/compute/docs/regions-zones/regions-
-      zones#available) or [region](https://cloud.google.com/compute/docs
-      /regions-zones/regions-zones#available) in which the cluster resides.
+      zones#available) or
+      [region](https://cloud.google.com/compute/docs/regions-zones/regions-
+      zones#available) in which the cluster resides.
     name: The server-assigned ID for the operation.
     nodepoolConditions: Which conditions caused the current node pool state.
     operationType: The operation type.
@@ -2825,9 +2883,9 @@ class ReleaseChannelConfig(_messages.Message):
 
 
 class ReservationAffinity(_messages.Message):
-  r"""[ReservationAffinity](https://cloud.google.com/compute/docs/instances
-  /reserving-zonal-resources) is the configuration of desired reservation
-  which instances could take capacity from.
+  r"""[ReservationAffinity](https://cloud.google.com/compute/docs/instances/re
+  serving-zonal-resources) is the configuration of desired reservation which
+  instances could take capacity from.
 
   Enums:
     ConsumeReservationTypeValueValuesEnum: Corresponds to the type of
@@ -3453,7 +3511,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

@@ -3846,8 +3846,10 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     config = self._MakePrivateClusterConfig(
         enablePrivateNodes=True, masterIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
+    default_snat_status = self.msgs.DefaultSnatStatus(
+        disabled=True)
     expected_cluster.networkConfig = self.msgs.NetworkConfig(
-        disableDefaultSnat=True)
+        defaultSnatStatus=default_snat_status)
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     # Get operation returns done
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -3931,7 +3933,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
-  def testNodeConfigFromFile(self):
+  def testSystemConfigFromFile(self):
     cluster_kwargs = {
         'linuxNodeConfig':
             self.msgs.LinuxNodeConfig(
@@ -3955,7 +3957,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     self.updateResponse(return_args)
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
-    node_config = self.Touch(
+    system_config_file = self.Touch(
         self.temp_path,
         contents="""
 kubeletConfig:
@@ -3969,8 +3971,9 @@ linuxConfig:
         """)
     self.Run(
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--node-config {node_config} '
-        '--quiet'.format(name=self.CLUSTER_NAME, node_config=node_config))
+        '--system-config-from-file {system_config_file} '
+        '--quiet'.format(
+            name=self.CLUSTER_NAME, system_config_file=system_config_file))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
@@ -3992,14 +3995,16 @@ linuxConfig:
     net.core.somaxconn: 1024
 """, 'Invalid node config: value of "net.core.somaxconn" must be str'),
   )
-  def testNodeConfigFromFileBadConfig(self, node_config_content, expected_msg):
+  def testSystemConfigFromFileBadConfig(self, system_config_content,
+                                        expected_msg):
     with self.AssertRaisesExceptionMatches(c_util.Error, expected_msg):
-      node_config = self.Touch(self.temp_path, contents=node_config_content)
+      system_config_file = self.Touch(
+          self.temp_path, contents=system_config_content)
       self.Run('{base} create {name} --quiet '
-               '--node-config {node_config}'.format(
+               '--system-config-from-file {system_config_file}'.format(
                    base=self.clusters_command_base.format(self.ZONE),
                    name=self.CLUSTER_NAME,
-                   node_config=node_config))
+                   system_config_file=system_config_file))
 
   @parameterized.parameters(
       ('--enable-cost-management', True),

@@ -41,6 +41,7 @@ FUNCTION_JS_FILE = """exports.function = function(context, data) {
         """
 
 
+@test_case.Filters.skip('internal error', 'b/157216406')
 class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
 
   def _PrepareFunctionFiles(self):

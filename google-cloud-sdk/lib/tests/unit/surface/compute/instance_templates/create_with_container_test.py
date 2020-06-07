@@ -1224,5 +1224,93 @@ class InstanceTemplatesCreateFromContainerWithLocalSsdBetaTest(
           ))],
     )
 
+
+class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessBeta(
+    InstanceTemplatesCreateWithContainerTestBase):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self._SetUp()
+
+  def CreateRequestWithPrivateIpv6GoogleAccess(self,
+                                               private_ipv6_google_access):
+    m = self.messages
+    if private_ipv6_google_access:
+      private_ipv6_google_access_enum = (
+          m.InstanceProperties.PrivateIpv6GoogleAccessValueValuesEnum(
+              private_ipv6_google_access))
+    else:
+      private_ipv6_google_access_enum = None
+    prop = m.InstanceProperties(
+        canIpForward=False,
+        disks=[self.default_attached_disk],
+        labels=self.default_labels,
+        machineType=self.default_machine_type,
+        metadata=self.default_metadata,
+        networkInterfaces=[self.default_network_interface],
+        privateIpv6GoogleAccess=private_ipv6_google_access_enum,
+        scheduling=m.Scheduling(automaticRestart=True),
+        serviceAccounts=[self.default_service_account],
+        tags=self.default_tags)
+    template = m.InstanceTemplate(name='it-1', properties=prop)
+
+    return m.ComputeInstanceTemplatesInsertRequest(
+        instanceTemplate=template,
+        project='my-project',
+    )
+
+  def testWithInheritSubnetPrivateIpv6GoogleAccess(self):
+    self.Run("""
+        compute instance-templates create-with-container it-1
+            --private-ipv6-google-access-type inherit-subnetwork
+            --container-image=gcr.io/my-docker/test-image
+        """)
+
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          self.CreateRequestWithPrivateIpv6GoogleAccess(
+              'INHERIT_FROM_SUBNETWORK'))],
+    )
+
+  def testWithOutboundPrivateIpv6GoogleAccess(self):
+    self.Run("""
+        compute instance-templates create-with-container it-1
+            --private-ipv6-google-access-type enable-outbound-vm-access
+            --container-image=gcr.io/my-docker/test-image
+          """)
+
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          self.CreateRequestWithPrivateIpv6GoogleAccess(
+              'ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE'))],
+    )
+
+  def testWithBidireactionalPrivateIpv6GoogleAccess(self):
+    self.Run("""
+        compute instance-templates create-with-container it-1
+            --private-ipv6-google-access-type enable-bidirectional-access
+            --container-image=gcr.io/my-docker/test-image
+          """)
+
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          self.CreateRequestWithPrivateIpv6GoogleAccess(
+              'ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE'))],
+    )
+
+
+class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessAlpha(
+    InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self._SetUp()
+
+
 if __name__ == '__main__':
   test_case.main()

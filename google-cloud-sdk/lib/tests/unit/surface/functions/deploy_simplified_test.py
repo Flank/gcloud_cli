@@ -63,8 +63,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     if expected_src_dir is None:
       expected_src_dir = '.'
 
-    def FakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None):
-      del dest_zip_file, predicate
+    def FakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None,
+                           update_date=False):
+      del dest_zip_file, predicate, update_date
       self.assertEqual(src_dir, expected_src_dir)
 
     return FakeMakeZipFromDir

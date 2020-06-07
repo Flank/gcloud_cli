@@ -5,18 +5,22 @@ NAME
 SYNOPSIS
     gcloud firebase test android run [ARGSPEC] [--app=APP]
         [--device=DIMENSION=VALUE,[...]] [--test=TEST] [--timeout=TIMEOUT]
-        [--type=TYPE] [--app-package=APP_PACKAGE] [--async]
-        [--auto-google-login] [--directories-to-pull=[DIR_TO_PULL,...]]
+        [--type=TYPE] [--additional-apks=APK,[APK,...]]
+        [--app-package=APP_PACKAGE] [--async] [--auto-google-login]
+        [--directories-to-pull=[DIR_TO_PULL,...]]
         [--environment-variables=[KEY=VALUE,...]]
-        [--num-flaky-test-attempts=int] [--obb-files=OBB_FILE,[OBB_FILE]]
-        [--performance-metrics] [--record-video]
-        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
+        [--network-profile=PROFILE_ID] [--num-flaky-test-attempts=int]
+        [--obb-files=OBB_FILE,[OBB_FILE]]
+        [--other-files=DEVICE_PATH=FILE_PATH,[...]] [--performance-metrics]
+        [--record-video] [--results-bucket=RESULTS_BUCKET]
+        [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
         [--scenario-labels=LABEL,[LABEL,...]]
         [--scenario-numbers=int,[int,...]] [--test-package=TEST_PACKAGE]
         [--test-runner-class=TEST_RUNNER_CLASS]
         [--test-targets=TEST_TARGET,[TEST_TARGET,...]] [--use-orchestrator]
         [--robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]]
+        [--robo-script=ROBO_SCRIPT]
         [--device-ids=MODEL_ID,[MODEL_ID,...], -d MODEL_ID,[MODEL_ID,...]]
         [--locales=LOCALE,[LOCALE,...], -l LOCALE,[LOCALE,...]]
         [--orientations=ORIENTATION,[ORIENTATION],
@@ -93,7 +97,7 @@ COMMONLY USED FLAGS
      --timeout=TIMEOUT
         The max time this test execution can run before it is cancelled
         (default: 15m). It does not include any time necessary to prepare and
-        clean up the target device. The maximum possible testing time is 30m on
+        clean up the target device. The maximum possible testing time is 45m on
         physical devices and 60m on virtual devices. The TIMEOUT units can be
         h, m, or s. If no unit is given, seconds are assumed. Examples:
         * --timeout 1h is 1 hour
@@ -106,6 +110,11 @@ COMMONLY USED FLAGS
         game-loop.
 
 FLAGS
+     --additional-apks=APK,[APK,...]
+        A list of up to 100 additional APKs to install, in addition to those
+        being directly tested. The path may be in the local filesystem or in
+        Google Cloud Storage using gs:// notation.
+
      --app-package=APP_PACKAGE
         (REMOVED) The Java package of the application under test. By default,
         the application package name is parsed from the APK manifest.
@@ -151,6 +160,14 @@ FLAGS
         Note: If you need to embed a comma into a VALUE string, please refer to
         gcloud topic escaping for ways to change the default list delimiter.
 
+     --network-profile=PROFILE_ID
+        The name of the network traffic profile, for example
+        --network-profile=LTE, which consists of a set of parameters to emulate
+        network conditions when running the test (default: no network shaping;
+        see available profiles listed by the $ gcloud firebase test
+        network-profiles list command). This feature only works on physical
+        devices.
+
      --num-flaky-test-attempts=int
         Specifies the number of times a test execution should be reattempted if
         one or more of its test cases fail for any reason. An execution that
@@ -165,6 +182,22 @@ FLAGS
         file name must conform to the format as specified by Android (e.g.
         [main|patch].0300110.com.example.android.obb) and will be installed
         into <shared-storage>/Android/obb/<package-name>/ on the test device.
+
+     --other-files=DEVICE_PATH=FILE_PATH,[...]
+        A list of device-path=file-path pairs that indicate the device paths to
+        push files to the device before starting tests, and the paths of files
+        to push.
+
+        Device paths must be under absolute, whitelisted paths
+        (${EXTERNAL_STORAGE}, or ${ANDROID_DATA}/local/tmp). Source file paths
+        may be in the local filesystem or in Google Cloud Storage (gs://...).
+
+        Examples:
+
+            --other-files /sdcard/dir1/file1.txt=local/file.txt,/sdcard/dir2/file2.jpg=gs://bucket/file.jpg
+
+        This flag only copies files to the device. To install files, like OBB
+        or APK files, see --obb-files and --additional-apks.
 
      --performance-metrics
         Monitor and record performance metrics: CPU, memory, network usage, and
@@ -274,6 +307,13 @@ ANDROID ROBO TEST FLAGS
 
         Caution: You should only use credentials for test accounts that are not
         associated with real users.
+
+     --robo-script=ROBO_SCRIPT
+        The path to a Robo Script JSON file. The path may be in the local
+        filesystem or in Google Cloud Storage using gs:// notation. You can
+        guide the Robo test to perform specific actions by recording a Robo
+        Script in Android Studio and then specifying this argument. Learn more
+        at https://firebase.google.com/docs/test-lab/robo-ux-test#scripting.
 
 DEPRECATED DEVICE DIMENSIONS FLAGS
      --device-ids=MODEL_ID,[MODEL_ID,...], -d MODEL_ID,[MODEL_ID,...]

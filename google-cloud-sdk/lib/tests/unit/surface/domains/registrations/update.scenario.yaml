@@ -4,130 +4,32 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      domains registrations update example.com --registrant-contact-from-file=contact.yaml --async
-- execute:
-  - command: |
-      domains registrations update example.com --whois-privacy=use-whois-privacy-proxy
+      domains registrations update example.com --update-labels="foo=bar"
   - progress_tracker:
-    - message: Waiting for [operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86]
+    - message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         to complete
     - status: SUCCESS
   - stderr: |
       Updated registration [example.com].
 - execute:
   - command: |
-      domains registrations update example.com --cloud-dns-zone=example-com
-  - progress_tracker:
-    - message: Waiting for [operation-1547475255493-57f6ba8e701a1-fb76a369-357a5cc9]
-        to complete
-    - status: SUCCESS
+      domains registrations update ÜniCode.com. --update-labels="foo=bar" --remove-labels=old --async
   - stderr: |
-      Updated registration [example.com].
+      Update in progress for registration [xn--nicode-2ya.com].
 - execute:
   - command: |
-      domains registrations update example.app --name-servers=ns-cloud-a1.googledomains.com.,ns-cloud-a2.googledomains.com.,ns-cloud-a3.googledomains.com. --validate-only
-- execute:
-  - command: |
-      domains registrations update example.app --cloud-dns-zone=example-com
-  - error: '1: The dnsName [example.com.] of specified Cloud DNS zone [example-com]
-      does not match the registration domain [example.app.]'
-- execute:
-  - command: |
-      domains registrations update example.com --update-labels=test=foo
-  - progress_tracker:
-    - message: Waiting for [operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86]
-        to complete
-    - status: SUCCESS
-  - stderr: |
-      Updated registration [example.com].
-- execute:
-  - command: |
-      domains registrations update example.app
-  - error: '1: Must specify at least one field to update.'
+      domains registrations update example.com
+  - error: |-
+      1: Specify labels to update.
+      Run `gcloud help alpha domains registrations configure` to see how to change management, DNS or contact settings.
 actions:
-- write_file:
-    path: contact.yaml
-    contents: |
-      email: 'test@example.com'
-      phoneNumber: '+48.123456789'
-      postalAddress:
-              regionCode: 'PL'
-              postalCode: '00-113'
-              locality: 'Warszawa'
-              addressLines: ['Emilii Plater 53']
-              recipients: ['Test User']
 - execute_command:
     command: |
-      domains registrations update example.com --registrant-contact-from-file=contact.yaml --async
+      domains registrations update example.com --update-labels="foo=bar"
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com?alt=json&updateMask=whois_config.registrant_contact&validateOnly=False
-          method: PATCH
-          headers: {}
-          body:
-            json:
-              whoisConfig:
-                registrantContact:
-                  email: test@example.com
-                  phoneNumber: '+48.123456789'
-                  postalAddress:
-                    addressLines:
-                    - Emilii Plater 53
-                    locality: Warszawa
-                    postalCode: 00-113
-                    recipients:
-                    - Test User
-                    regionCode: PL
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
-                "createTime": "2019-01-14T13:20:39.218508799Z",
-                "target": "projects/fake-project/locations/global/registrations/example.com",
-                "verb": "update",
-                "apiVersion": "v1alpha1"
-              },
-              "done": false
-            }
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      domains registrations update example.com --whois-privacy=use-whois-privacy-proxy
-    events:
-    - api_call:
-        expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com?alt=json&updateMask=whois_config.privacy&validateOnly=False
-          method: PATCH
-          headers: {}
-          body:
-            json:
-              whoisConfig:
-                privacy: USE_WHOIS_PRIVACY_PROXY
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
-                "createTime": "2019-01-14T13:20:39.218508799Z",
-                "target": "projects/fake-project/locations/global/registrations/example.com",
-                "verb": "update",
-                "apiVersion": "v1alpha1"
-              },
-              "done": false
-            }
-
-    - api_call:
-        expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -136,284 +38,24 @@ actions:
             status: '200'
           body: |
             {
-              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
-                "createTime": "2019-01-14T13:20:39.218508799Z",
-                "endTime": "2019-01-14T13:20:52.606261846Z",
-                "target": "projects/fake-project/locations/global/registrations/example.com",
-                "verb": "update",
-                "apiVersion": "v1alpha1"
-              },
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.Registration",
-                "name": "projects/fake-project/locations/global/registrations/example.com",
-                "domainName": "example.com",
-                "createTime": "2019-01-11T14:09:08.068037639Z",
-                "updateTime": "2019-01-11T14:09:16.933570624Z",
-                "expireTime": "2020-01-11T14:09:12Z",
-                "state": "ACTIVE",
-                "dnsConfig": {},
-                "whoisConfig": {
-                  "privacy": "USE_WHOIS_PRIVACY_PROXY",
-                  "registrantContact": {
-                    "postalAddress": {
-                      "regionCode": "US",
-                      "postalCode": "94043",
-                      "administrativeArea": "CA",
-                      "locality": "Mountain View",
-                      "addressLines": [
-                        "1600 Amphitheatre Pkwy"
-                      ],
-                      "recipients": [
-                        "Test User"
-                      ]
-                    },
-                    "email": "testuser@google.com",
-                    "phoneNumber": "+1.1234567890"
-                  }
-                }
-              }
-            }
-        repeatable: true
-    - expect_progress_tracker:
-        message: Waiting for [operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86]
-          to complete
-        status: SUCCESS
-    - expect_stderr: |
-        Updated registration [example.com].
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      domains registrations update example.com --cloud-dns-zone=example-com
-    events:
-    - api_call:
-        expect_request:
-          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "example-com",
-              "dnsName": "example.com.",
-              "description": "",
-              "id": "7109061377772250347",
-              "nameServers": [
-                "ns-cloud-d1.googledomains.com.",
-                "ns-cloud-d2.googledomains.com.",
-                "ns-cloud-d3.googledomains.com.",
-                "ns-cloud-d4.googledomains.com."
-              ],
-              "creationTime": "2019-01-09T14:14:57.933Z",
-              "kind": "dns#managedZone"
-            }
-
-    - api_call:
-        expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com?alt=json&updateMask=dns_config&validateOnly=False
-          method: PATCH
-          headers: {}
-          body:
-            json:
-              dnsConfig:
-                nameServers:
-                - ns-cloud-d1.googledomains.com.
-                - ns-cloud-d2.googledomains.com.
-                - ns-cloud-d3.googledomains.com.
-                - ns-cloud-d4.googledomains.com.
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1547475255493-57f6ba8e701a1-fb76a369-357a5cc9",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
-                "createTime": "2019-01-14T14:14:17.022253283Z",
-                "target": "projects/fake-project/locations/global/registrations/example.com",
-                "verb": "update",
-                "apiVersion": "v1alpha1"
-              },
-              "done": false
-            }
-
-    - api_call:
-        expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1547475255493-57f6ba8e701a1-fb76a369-357a5cc9?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1547475255493-57f6ba8e701a1-fb76a369-357a5cc9",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
-                "createTime": "2019-01-14T14:14:17.022253283Z",
-                "target": "projects/fake-project/locations/global/registrations/example.com",
-                "verb": "update",
-                "apiVersion": "v1alpha1"
-              },
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.Registration",
-                "name": "projects/fake-project/locations/global/registrations/example.com",
-                "domainName": "example.com",
-                "createTime": "2019-01-11T14:09:08.068037639Z",
-                "updateTime": "2019-01-11T14:09:16.933570624Z",
-                "expireTime": "2020-01-11T14:09:12Z",
-                "state": "ACTIVE",
-                "dnsConfig": {
-                  "nameServers": [
-                    "ns-cloud-d1.googledomains.com.",
-                    "ns-cloud-d2.googledomains.com.",
-                    "ns-cloud-d3.googledomains.com.",
-                    "ns-cloud-d4.googledomains.com."
-                  ]
-                },
-                "whoisConfig": {
-                  "privacy": "USE_WHOIS_PRIVACY_PROXY",
-                  "registrantContact": {
-                    "postalAddress": {
-                      "regionCode": "US",
-                      "postalCode": "94043",
-                      "administrativeArea": "CA",
-                      "locality": "Mountain View",
-                      "addressLines": [
-                        "1600 Amphitheatre Pkwy"
-                      ],
-                      "recipients": [
-                        "Test User"
-                      ]
-                    },
-                    "email": "testuser@google.com",
-                    "phoneNumber": "+1.1234567890"
-                  }
-                }
-              }
-            }
-
-    - expect_progress_tracker:
-        message: Waiting for [operation-1547475255493-57f6ba8e701a1-fb76a369-357a5cc9]
-          to complete
-        status: SUCCESS
-    - expect_stderr: |
-        Updated registration [example.com].
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      domains registrations update example.app --name-servers=ns-cloud-a1.googledomains.com.,ns-cloud-a2.googledomains.com.,ns-cloud-a3.googledomains.com. --validate-only
-    events:
-    - api_call:
-        expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.app?alt=json&updateMask=dns_config&validateOnly=True
-          method: PATCH
-          headers: {}
-          body:
-            json:
-              dnsConfig:
-                nameServers:
-                - ns-cloud-a1.googledomains.com.
-                - ns-cloud-a2.googledomains.com.
-                - ns-cloud-a3.googledomains.com.
-        return_response:
-          headers:
-            status: '200'
-          body: '{}'
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      domains registrations update example.app --cloud-dns-zone=example-com
-    events:
-    - api_call:
-        expect_request:
-          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "example-com",
-              "dnsName": "example.com.",
-              "description": "",
-              "id": "7109061377772250347",
-              "nameServers": [
-                "ns-cloud-d1.googledomains.com.",
-                "ns-cloud-d2.googledomains.com.",
-                "ns-cloud-d3.googledomains.com.",
-                "ns-cloud-d4.googledomains.com."
-              ],
-              "creationTime": "2019-01-09T14:14:57.933Z",
-              "kind": "dns#managedZone"
-            }
-    - expect_exit:
-        code: 1
-        message: The dnsName [example.com.] of specified Cloud DNS zone [example-com]
-          does not match the registration domain [example.app.]
-- execute_command:
-    command: |
-      domains registrations update example.com --update-labels=test=foo
-    events:
-    - api_call:
-        expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/registrations/example.com",
-              "domainName": "example.com",
+              "name": "projects/fake-project/locations/global/registrations/exported.com",
+              "domainName": "exported.com",
               "createTime": "2019-01-11T14:09:08.068037639Z",
-              "updateTime": "2019-01-11T14:09:16.933570624Z",
               "expireTime": "2020-01-11T14:09:12Z",
-              "state": "ACTIVE",
-              "dnsConfig": {},
-              "whoisConfig": {
-                "privacy": "USE_WHOIS_PRIVACY_PROXY",
-                "registrantContact": {
-                  "postalAddress": {
-                    "regionCode": "US",
-                    "postalCode": "94043",
-                    "administrativeArea": "CA",
-                    "locality": "Mountain View",
-                    "addressLines": [
-                      "1600 Amphitheatre Pkwy"
-                    ],
-                    "recipients": [
-                      "Test User"
-                    ]
-                  },
-                  "email": "testuser@google.com",
-                  "phoneNumber": "+1.1234567890"
-                }
+              "state": "EXPORTED",
+              "labels": {
+                "foo": "test"
               }
             }
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com?alt=json&updateMask=labels&validateOnly=False
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:
             json:
               labels:
-                test: foo
+                foo: bar
         return_response:
           headers:
             status: '200'
@@ -421,18 +63,17 @@ actions:
             {
               "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
                 "createTime": "2019-01-14T13:20:39.218508799Z",
                 "target": "projects/fake-project/locations/global/registrations/example.com",
                 "verb": "update",
-                "apiVersion": "v1alpha1"
+                "apiVersion": "v1alpha2"
               },
               "done": false
             }
-
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
           method: GET
           headers: {}
           body: null
@@ -443,47 +84,29 @@ actions:
             {
               "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
                 "createTime": "2019-01-14T13:20:39.218508799Z",
-                "endTime": "2019-01-14T13:20:52.606261846Z",
+                "endTime": "2019-01-14T14:41:31.657446027Z",
                 "target": "projects/fake-project/locations/global/registrations/example.com",
                 "verb": "update",
-                "apiVersion": "v1alpha1"
+                "apiVersion": "v1alpha2"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.Registration",
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.Registration",
                 "name": "projects/fake-project/locations/global/registrations/example.com",
                 "domainName": "example.com",
-                "createTime": "2019-01-11T14:09:08.068037639Z",
-                "updateTime": "2019-01-11T14:09:16.933570624Z",
-                "expireTime": "2020-01-11T14:09:12Z",
-                "state": "ACTIVE",
-                "dnsConfig": {},
-                "whoisConfig": {
-                  "privacy": "USE_WHOIS_PRIVACY_PROXY",
-                  "registrantContact": {
-                    "postalAddress": {
-                      "regionCode": "US",
-                      "postalCode": "94043",
-                      "administrativeArea": "CA",
-                      "locality": "Mountain View",
-                      "addressLines": [
-                        "1600 Amphitheatre Pkwy"
-                      ],
-                      "recipients": [
-                        "Test User"
-                      ]
-                    },
-                    "email": "testuser@google.com",
-                    "phoneNumber": "+1.1234567890"
-                  }
+                "createTime": "2019-02-20T16:47:22.739565061Z",
+                "expireTime": "2020-02-20T16:47:26Z",
+                "state": "EXPORTED",
+                "labels": {
+                  "foo": "bar"
                 }
               }
             }
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for [operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86]
+        message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
           to complete
         status: SUCCESS
     - expect_stderr: |
@@ -492,8 +115,64 @@ actions:
         code: 0
 - execute_command:
     command: |
-      domains registrations update example.app
+      domains registrations update ÜniCode.com. --update-labels="foo=bar" --remove-labels=old --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/xn--nicode-2ya.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/exported.com",
+              "domainName": "exported.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "EXPORTED",
+              "labels": {
+                "env": "test",
+                "old": "very"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/xn--nicode-2ya.com?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              labels:
+                env: test
+                foo: bar
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/xn--nicode-2ya.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Update in progress for registration [xn--nicode-2ya.com].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations update example.com
     events:
     - expect_exit:
         code: 1
-        message: Must specify at least one field to update.
+        message: |-
+          Specify labels to update.
+          Run `gcloud help alpha domains registrations configure` to see how to change management, DNS or contact settings.

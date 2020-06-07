@@ -14,6 +14,7 @@ SYNOPSIS
         [--max-delivery-attempts=MAX_DELIVERY_ATTEMPTS
           [--dead-letter-topic=DEAD_LETTER_TOPIC
           : --dead-letter-topic-project=DEAD_LETTER_TOPIC_PROJECT]]
+        [--max-retry-delay=MAX_RETRY_DELAY --min-retry-delay=MIN_RETRY_DELAY]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -119,6 +120,23 @@ OPTIONAL FLAGS
          --dead-letter-topic-project=DEAD_LETTER_TOPIC_PROJECT
             Project ID of the Google Cloud Platform project for the
             dead-letter-topic.
+
+     Retry Policy Options. Retry policy specifies how Cloud Pub/Sub retries
+     message delivery for this subscription.
+
+       --max-retry-delay=MAX_RETRY_DELAY
+          The maximum delay between consecutive deliveries of a given message.
+          Value should be between 0 and 600 seconds. Defaults to 10 seconds.
+          Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+          of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+          respectively. If the unit is omitted, seconds is assumed.
+
+       --min-retry-delay=MIN_RETRY_DELAY
+          The minimum delay between consecutive deliveries of a given message.
+          Value should be between 0 and 600 seconds. Defaults to 10 seconds.
+          Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+          of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+          respectively. If the unit is omitted, seconds is assumed.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -64,15 +64,23 @@ class PauseError(Error):
 class ExecutionMode(enum.Enum):
   """Represents what mode the tests are being run in.
 
-  Tests can declare that they work in LOCAL mode or REMOTE mode (which implies
-  they can run in LOCAL mode as well). When running in LOCAL mode, all tests are
+  Tests can declare that they work in LOCAL, REMOTE (which implies they can run
+  in LOCAL mode as well) or BOTH mode.
+
+  When running in LOCAL mode, all tests are
   run in LOCAL mode (even those that can be run in REMOTE mode) and no real API
-  calls are made. In REMOTE mode, those tests that can be run as REMOTE tests
+  calls are made.
+
+  In REMOTE mode, those tests that can be run as REMOTE tests
   will be (making real requests), while those that only work in LOCAL mode will
   continue to run as LOCAL tests.
+
+  The BOTH mode will attempt a test in both REMOTE and LOCAL modes. If a test
+  can only be run in LOCAL mode, it will still only be run in LOCAL mode.
   """
   LOCAL = 0
   REMOTE = 1
+  BOTH = 2
 
 
 class StreamMocker(object):

@@ -1,0 +1,74 @@
+title: |
+  compute target-http-proxies export tests.
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+- set_property:
+    core/project: test-project
+
+- execute_command:
+    command: compute target-http-proxies export test-target-http-proxy --destination='test-target-http-proxy.yaml' --global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/targetHttpProxies/test-target-http-proxy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "test-target-http-proxy",
+              "description": "This is a test Target Http Proxy",
+              "kind": "compute#targetHttpProxy",
+              "urlMap": "https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/urlMaps/test-url-map"
+            }
+    - expect_file_written:
+        path: test-target-http-proxy.yaml
+        contents: |
+          description: This is a test Target Http Proxy
+          kind: compute#targetHttpProxy
+          name: test-target-http-proxy
+          urlMap: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/urlMaps/test-url-map
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute target-http-proxies export regional-test-target-http-proxy --destination='regional-test-target-http-proxy.yaml' --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/regions/us-central1/targetHttpProxies/regional-test-target-http-proxy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "regional-test-target-http-proxy",
+              "description": "This is a test regional Target Http Proxy",
+              "kind": "compute#targetHttpProxy",
+              "urlMap": "https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/regions/us-central1/urlMaps/test-url-map"
+            }
+    - expect_file_written:
+        path: regional-test-target-http-proxy.yaml
+        contents: |
+          description: This is a test regional Target Http Proxy
+          kind: compute#targetHttpProxy
+          name: regional-test-target-http-proxy
+          urlMap: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/regions/us-central1/urlMaps/test-url-map
+    - expect_exit:
+        code: 0

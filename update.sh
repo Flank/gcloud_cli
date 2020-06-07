@@ -5,7 +5,7 @@
 #
 # gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
 
-VERSION=291.0.0
+VERSION=294.0.0
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk_$VERSION.orig.tar.gz
 
@@ -26,3 +26,10 @@ rm -rf google-cloud-sdk
 
 tar -xzf google-cloud-sdk_$VERSION.orig.tar.gz
 tar -xzf google-cloud-sdk-tests_$VERSION.orig.tar.gz
+
+# Over GitHub 100MB file limit
+rm google-cloud-sdk/bin/anthoscli
+
+gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
+
+git commit -am "Update to $VERSION"

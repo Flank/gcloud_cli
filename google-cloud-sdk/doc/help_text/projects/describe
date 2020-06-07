@@ -2,7 +2,7 @@ NAME
     gcloud projects describe - show metadata for a project
 
 SYNOPSIS
-    gcloud projects describe PROJECT_ID [GCLOUD_WIDE_FLAG ...]
+    gcloud projects describe PROJECT_ID_OR_NUMBER [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Shows metadata for a project given a valid project ID.
@@ -13,8 +13,8 @@ DESCRIPTION
         project.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to describe.
+     PROJECT_ID_OR_NUMBER
+        ID or number for the project you want to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -33,6 +33,7 @@ from googlecloudsdk.command_lib.code import local
 from googlecloudsdk.command_lib.code import local_files
 from googlecloudsdk.command_lib.code import yaml_helper
 from googlecloudsdk.core import config
+from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files as file_utils
@@ -74,6 +75,10 @@ def _FindSkaffold():
   if not skaffold:
     raise EnvironmentError('Unable to locate skaffold.')
   return skaffold
+
+
+class RuntimeMissingDependencyError(exceptions.Error):
+  """A runtime dependency is missing."""
 
 
 class WindowsNamedTempFile(object):
@@ -195,10 +200,10 @@ def _SetImagePush(skaffold_file, shared_docker):
     # to rewrite the skaffold file.
     yield skaffold_file
   else:
-    sakffold_yaml = yaml.load_path(skaffold_file.name)
-    local_block = yaml_helper.GetOrCreate(sakffold_yaml, ('build', 'local'))
+    skaffold_yaml = yaml.load_path(skaffold_file.name)
+    local_block = yaml_helper.GetOrCreate(skaffold_yaml, ('build', 'local'))
     local_block['push'] = False
-    with _NamedTempFile(yaml.dump(sakffold_yaml)) as patched_skaffold_file:
+    with _NamedTempFile(yaml.dump(skaffold_yaml)) as patched_skaffold_file:
       yield patched_skaffold_file
 
 
@@ -254,6 +259,8 @@ class Dev(base.Command):
     local_file_generator = local_files.LocalRuntimeFiles(settings)
 
     kubernetes_config = six.ensure_text(local_file_generator.KubernetesConfig())
+
+    self._EnsureDockerInstalled()
 
     with _NamedTempFile(kubernetes_config) as kubernetes_file:
       skaffold_config = six.ensure_text(
@@ -321,3 +328,9 @@ class Dev(base.Command):
         yield
     else:
       yield
+
+  @staticmethod
+  def _EnsureDockerInstalled():
+    """Make sure docker is installed."""
+    if not file_utils.FindExecutableOnPath('docker'):
+      raise RuntimeMissingDependencyError('Cannot locate docker on $PATH.')

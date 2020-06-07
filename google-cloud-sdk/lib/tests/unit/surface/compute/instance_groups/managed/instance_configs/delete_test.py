@@ -137,7 +137,7 @@ class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
           .MinimalActionValueValuesEnum.NONE,
           mostDisruptiveAllowedAction=self.messages
           .InstanceGroupManagersApplyUpdatesRequest
-          .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
+          .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -309,7 +309,7 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
                     .MinimalActionValueValuesEnum.NONE,
                     mostDisruptiveAllowedAction=self.messages
                     .RegionInstanceGroupManagersApplyUpdatesRequest
-                    .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
+                    .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
             project='fake-project',
             region='us-central2',
         )

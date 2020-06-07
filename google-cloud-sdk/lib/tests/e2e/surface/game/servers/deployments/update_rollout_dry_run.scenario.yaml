@@ -1,5 +1,5 @@
 title: Cloud Game Servers deployments rollout dry-run test
-release_tracks: [ALPHA, BETA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -28,7 +28,7 @@ summary:
               name: autoscaler-$$deployment-id-1$$-config-.+
               specSource:
                 gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
-                name: sc2
+                name: sc\d+
             fleet:
               name: fleet-$$deployment-id-1$$-config-.+
               specSource:
@@ -49,7 +49,7 @@ summary:
               name: autoscaler-$$deployment-id-1$$-config-.+
               specSource:
                 gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
-                name: sc2
+                name: sc\d+
             fleet:
               name: fleet-$$deployment-id-1$$-config-.+
               specSource:
@@ -260,7 +260,7 @@ actions:
                   name: autoscaler-$$deployment-id-1$$-config-.+
                   specSource:
                     gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
-                    name: sc2
+                    name: sc\d+
                 fleet:
                   name: fleet-$$deployment-id-1$$-config-.+
                   specSource:
@@ -316,7 +316,7 @@ actions:
                   name: autoscaler-$$deployment-id-1$$-config-.+
                   specSource:
                     gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
-                    name: sc2
+                    name: sc\d+
                 fleet:
                   name: fleet-$$deployment-id-1$$-config-.+
                   specSource:

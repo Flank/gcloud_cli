@@ -18,11 +18,10 @@ gcloud alpha compute health\-checks create http \- create a HTTP health check to
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute health\-checks create http\fR is used to
-create an HTTP non\-legacy health check. HTTP health checks monitor instances in
-a load balancer controlled by a target pool. All arguments to the command are
-optional except for the name of the health check. For more information on load
-balancing, see
-https://cloud.google.com/compute/docs/load\-balancing\-and\-autoscaling/
+create a non\-legacy health check using the HTTP protocol. You can use this
+health check for Google Cloud Platform load balancers or for managed instance
+group autohealing. For more information, see the health checks overview at:
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts
 
 
 
@@ -67,10 +66,9 @@ is marked as healthy. The default is 2.
 
 .TP 2m
 \fB\-\-host\fR=\fIHOST\fR
-The value of the host header used in this HTTP health check request. By default,
-this is empty and Google Compute Engine automatically sets the host header in
-health requests to the same external IP address as the forwarding rule
-associated with the target pool.
+The value of the host header used in this HTTP health check request. The host
+header is empty by default. When empty, the health check sets the host header to
+the IP address of the backend VM or endpoint.
 
 .TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR; default="NONE"

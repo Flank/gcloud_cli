@@ -1,0 +1,62 @@
+NAME
+    gcloud alpha resource-settings set-value - set an resource setting from a
+        JSON or YAML file
+
+SYNOPSIS
+    gcloud alpha resource-settings set-value SETTING_NAME
+        --value-file=value-file
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [--etag=etag] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This first converts the contents of the specified file into a
+    setting object. It then fetches the current setting using GetSetting. If it
+    does not exist, the setting is created using CreateSetting.
+
+POSITIONAL ARGUMENTS
+     SETTING_NAME
+        Name of the resource settings. The list of available settings can be
+        found here:
+
+REQUIRED FLAGS
+     --value-file=value-file
+        Path to JSON or YAML file that contains the resource setting.
+
+     Resource that is associated with the resource settings. Exactly one of
+     these must be specified:
+
+       --folder=FOLDER_ID
+          Folder ID.
+
+       --organization=ORGANIZATION_ID
+          Organization ID.
+
+       --project=PROJECT_ID
+          Project ID. Overrides the default core/project property value for
+          this command invocation.
+
+OPTIONAL FLAGS
+     --etag=etag
+        Etag of the resource setting.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To set the setting from the file on the path ./sample_path, run:
+
+        $ gcloud alpha resource-settings set-value SETTING_NAME \
+            --value-file="./test_input.json"
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

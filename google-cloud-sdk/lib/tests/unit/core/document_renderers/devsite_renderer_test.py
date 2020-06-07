@@ -68,6 +68,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -109,6 +112,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -171,6 +177,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -237,6 +246,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -292,6 +304,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -314,7 +329,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <dt>SYNOPSIS</dt>
         <dd class="sectionbody">
         <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-        gcloud component <nobr>[ <code><var>flags</var></code> ]</nobr> <nobr>[ <code><var>positionals</var></code> ]</nobr>
+        gcloud component <span>[ <code><var>flags</var></code> ]</span> <span>[ <code><var>positionals</var></code> ]</span>
         </span></dt></dl>
         </dd>
         </section>
@@ -359,6 +374,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -415,6 +433,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -498,6 +519,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -545,6 +569,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -673,6 +700,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           li {
             margin-top: 1ex; margin-bottom: 1ex;
           }
+          .flag {
+            white-space: nowrap;
+          }
           .hangingindent {
             padding-left: 1.5em;
             text-indent: -1.5em;
@@ -756,6 +786,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;
@@ -853,6 +886,9 @@ class DevSiteMarkdownTests(test_base.Markdown):
           }
           li {
             margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .flag {
+            white-space: nowrap;
           }
           .hangingindent {
             padding-left: 1.5em;

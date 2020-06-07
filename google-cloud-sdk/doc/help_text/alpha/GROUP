@@ -137,6 +137,9 @@ GROUPS
      anthos
         (ALPHA) Anthos command Group.
 
+     apigee
+        (ALPHA) Manage Apigee resources.
+
      app
         (ALPHA) Manage your App Engine deployments.
 

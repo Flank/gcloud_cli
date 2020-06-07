@@ -576,7 +576,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     config_changes.TrafficChanges({
         'r1': 90,
         'LATEST': 10
-    }, {
+    }, False, {
         'staging': 'LATEST'
     }, ['prod'], False).Adjust(self.resource)
     self.traffic_mock.return_value.UpdateTags.assert_called_once_with(
@@ -585,6 +585,30 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         'r1': 90,
         'LATEST': 10
     })
+
+  def testTrafficChangesByTag(self):
+    self.traffic_mock.return_value.TagToKey.return_value = {
+        'preprod': 'r1',
+        'staging': 'LATEST',
+    }
+    config_changes.TrafficChanges({
+        'preprod': 90,
+        'staging': 10
+    }, by_tag=True).Adjust(self.resource)
+    self.traffic_mock.return_value.UpdateTraffic.assert_called_once_with({
+        'r1': 90,
+        'LATEST': 10
+    })
+
+  def testTrafficChangesByTagNotPresent(self):
+    self.traffic_mock.return_value.TagToKey.return_value = {
+        'staging': 'LATEST',
+    }
+    with self.assertRaises(exceptions.ConfigurationError):
+      config_changes.TrafficChanges({
+          'preprod': 90,
+          'staging': 10
+      }, by_tag=True).Adjust(self.resource)
 
   def testContainerPortChangeNumberNewPort(self):
     self.resource = config_changes.ContainerPortChange(port='123').Adjust(

@@ -370,7 +370,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
         config_changes, 'TrafficChanges', autoSpec=True)
     self.args.set_tags = {'latest': 'LATEST', 'prod': 'r1'}
     self._GetAndApplyChanges()
-    change_mock.assert_called_once_with({}, {
+    change_mock.assert_called_once_with({}, False, {
         'latest': 'LATEST',
         'prod': 'r1'
     }, None, True)
@@ -381,7 +381,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
         config_changes, 'TrafficChanges', autoSpec=True)
     self.args.update_tags = {'latest': 'LATEST', 'prod': 'r1'}
     self._GetAndApplyChanges()
-    change_mock.assert_called_once_with({}, {
+    change_mock.assert_called_once_with({}, False, {
         'latest': 'LATEST',
         'prod': 'r1'
     }, None, None)
@@ -392,7 +392,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
         config_changes, 'TrafficChanges', autoSpec=True)
     self.args.remove_tags = ['prod']
     self._GetAndApplyChanges()
-    change_mock.assert_called_once_with({}, None, ['prod'], None)
+    change_mock.assert_called_once_with({}, False, None, ['prod'], None)
 
   def testTrafficTagsClear(self):
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
@@ -400,7 +400,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
         config_changes, 'TrafficChanges', autoSpec=True)
     self.args.clear_tags = True
     self._GetAndApplyChanges()
-    change_mock.assert_called_once_with({}, None, None, True)
+    change_mock.assert_called_once_with({}, False, None, None, True)
 
   def testTrafficSetTagsAndToRevision(self):
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
@@ -410,7 +410,20 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.args.to_latest = False
     self.args.to_revisions = {'r1': 60}
     self._GetAndApplyChanges()
-    change_mock.assert_called_once_with({'r1': 60}, {
+    change_mock.assert_called_once_with({'r1': 60}, False, {
+        'latest': 'LATEST',
+        'prod': 'r1'
+    }, None, True)
+
+  def testTrafficSetTagsAndToTags(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.set_tags = {'latest': 'LATEST', 'prod': 'r1'}
+    self.args.to_latest = False
+    self.args.to_tags = {'latest': 60}
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({'latest': 60}, True, {
         'latest': 'LATEST',
         'prod': 'r1'
     }, None, True)
@@ -422,7 +435,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.args.update_tags = {'latest': 'LATEST', 'prod': 'r1'}
     self.args.to_latest = True
     self._GetAndApplyChanges()
-    change_mock.assert_called_once_with({'LATEST': 100}, {
+    change_mock.assert_called_once_with({'LATEST': 100}, False, {
         'latest': 'LATEST',
         'prod': 'r1'
     }, None, None)

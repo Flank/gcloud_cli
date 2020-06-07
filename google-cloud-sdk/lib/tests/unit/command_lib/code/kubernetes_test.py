@@ -153,9 +153,7 @@ class StartKindTest(SdkPathTestCase):
         with kubernetes.KindClusterContext("cluster-name"):
           check_call.assert_called_once_with([
               self.PATH_TO_KIND, "create", "cluster", "--name", "cluster-name"
-          ],
-                                             stdout=mock.ANY,
-                                             stderr=mock.ANY)
+          ])
 
     self.assertIn("delete", check_call.call_args[0][0])
 

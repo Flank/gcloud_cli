@@ -113,3 +113,46 @@ class HookTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         request=request, response=response)
 
     hooks.CheckRequestRootTypeHook(ca_ref, None, request)
+
+
+class ConvertCertificateLifetimeToIso8601Test(cli_test_base.CliTestBase):
+  """Tests for ConvertCertificateLifetimeToIso8601."""
+
+  def SetUp(self):
+    self.messages = base.GetMessagesModule()
+
+  def _GenerateCertificate(self, lifetime):
+    return self.messages.Certificate(
+        lifetime=lifetime,
+        certificateDescription=self.messages.CertificateDescription(
+            subjectDescription=self.messages.SubjectDescription(
+                lifetime=lifetime)))
+
+  def testHandleMissingLifetimesWithoutErrors(self):
+    cert_without_lifetimes = self.messages.Certificate(name='foo')
+    hooks.ConvertCertificateLifetimeToIso8601(cert_without_lifetimes, None)
+
+  def testConvertAmountLessThanDays(self):
+    two_hours = str(2*60*60) + 's'
+    modified = hooks.ConvertCertificateLifetimeToIso8601(
+        self._GenerateCertificate(two_hours), None)
+    self.assertEqual(modified.lifetime, 'PT2H')
+    self.assertEqual(
+        modified.certificateDescription.subjectDescription.lifetime, 'PT2H')
+
+  def testConvertAmountInDays(self):
+    thirty_days = str(30*24*60*60) + 's'
+    modified = hooks.ConvertCertificateLifetimeToIso8601(
+        self._GenerateCertificate(thirty_days), None)
+    self.assertEqual(modified.lifetime, 'P30D')
+    self.assertEqual(
+        modified.certificateDescription.subjectDescription.lifetime, 'P30D')
+
+  def testConvertAmountInTwoUnits(self):
+    thirty_days_and_two_hours = str(30*24*60*60 + 2*60*60) + 's'
+    modified = hooks.ConvertCertificateLifetimeToIso8601(
+        self._GenerateCertificate(thirty_days_and_two_hours), None)
+    self.assertEqual(modified.lifetime, 'P30DT2H')
+    self.assertEqual(
+        modified.certificateDescription.subjectDescription.lifetime, 'P30DT2H')
+

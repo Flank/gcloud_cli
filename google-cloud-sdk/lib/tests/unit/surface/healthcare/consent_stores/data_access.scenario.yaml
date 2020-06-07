@@ -1,0 +1,113 @@
+title: healthcare consent-stores data access scenario tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: check-data-access
+  - command: |
+      healthcare consent-stores check-data-access my-store --location=us-central1
+      --dataset=my-dataset --data-id=my-data-id
+  - stdout: |
+      consented: true
+- execute:
+  - label: query-accessible-data
+  - command: |
+      healthcare consent-stores query-accessible-data my-store --location=us-central1
+      --dataset=my-dataset --gcs-uri=gs://bucket-id/path/to/fake/dir
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+- execute_command:
+    label: check-data-access
+    command: |
+      healthcare consent-stores check-data-access my-store --location=us-central1
+      --dataset=my-dataset --data-id=my-data-id
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:checkDataAccess?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              dataId: my-data-id
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "consented": true
+            }
+    - expect_stdout: |
+        consented: true
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: query-accessible-data
+    command: |
+      healthcare consent-stores query-accessible-data my-store --location=us-central1
+      --dataset=my-dataset --gcs-uri=gs://bucket-id/path/to/fake/dir
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:queryAccessibleData?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              gcsDestination:
+                uriPrefix: gs://bucket-id/path/to/fake/dir
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0

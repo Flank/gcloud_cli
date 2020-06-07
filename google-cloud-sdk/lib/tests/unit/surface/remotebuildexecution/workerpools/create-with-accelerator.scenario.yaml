@@ -35,7 +35,7 @@ actions:
                     acceleratorType: nvidia-tesla-k80
                   diskSizeGb: '200'
                   diskType: pd-standard
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   reserved: false
                 workerCount: '1'
         return_response:
@@ -65,7 +65,7 @@ actions:
                 "name": "projects/fake-project/instances/default_instance/workerpools/accelerator_pool",
                 "workerConfig": {
                   "accelerator": {"acceleratorCount": "1","acceleratorType": "nvidia-tesla-k80"},
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "reserved": "false",
@@ -98,7 +98,7 @@ actions:
                 "name": "projects/fake-project/instances/default_instance/workerpools/accelerator_pool",
                 "workerConfig": {
                   "accelerator": {"acceleratorCount": "1","acceleratorType": "nvidia-tesla-k80"},
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "reserved": "false",

@@ -1,0 +1,58 @@
+NAME
+    gcloud alpha apigee apis undeploy - undeploy an Apigee API proxy from an
+        environment
+
+SYNOPSIS
+    gcloud alpha apigee apis undeploy
+        [[REVISION]
+          --api=API --environment=ENVIRONMENT --organization=ORGANIZATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Undeploy an Apigee API proxy from an environment.
+
+POSITIONAL ARGUMENTS
+     Revision resource - The API proxy revision to be undeployed, and the
+     environment from which it should be removed. The revision defaults to
+     auto, which will undeploy whichever revision is currently deployed, unless
+     there is more than one such revision. The arguments in this group can be
+     used to specify the attributes of this resource.
+
+       [REVISION]
+          ID of the revision or fully qualified identifier for the revision.
+
+       --api=API
+          The API proxy to be undeployed.
+
+       --environment=ENVIRONMENT
+          The environment from which to undeploy the API proxy.
+
+       --organization=ORGANIZATION
+          The organization of the proxy and environment.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To undeploy an API proxy called my-api from the test environment of the
+    active Cloud Platform project, run:
+
+        $ gcloud alpha apigee apis undeploy --environment=test --api=my-api
+
+    To undeploy revision 3 of an my-api from the test environment of Apigee
+    organization test-org, run:
+
+        $ gcloud alpha apigee apis undeploy --organization=test-org \
+            --environment=test --api=my-api 3
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

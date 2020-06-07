@@ -66,8 +66,9 @@ The HCFS URI of jar file containing the driver jar.
 .RS 2m
 .TP 2m
 \fB\-\-archives\fR=[\fIARCHIVE\fR,...]
-Comma separated list of archives to be provided to the job. must be one of the
-following file formats: .zip, .tar, .tar.gz, or .tgz.
+Comma separated list of archives to be extracted into the working directory of
+each executor. Must be one of the following file formats: .zip, .tar, .tar.gz,
+or .tgz.
 
 .TP 2m
 \fB\-\-async\fR
@@ -85,7 +86,8 @@ example: root=FATAL,com.example=INFO
 
 .TP 2m
 \fB\-\-files\fR=[\fIFILE\fR,...]
-Comma separated list of files to be provided to the job.
+Comma separated list of files to be placed in the working directory of each
+executor.
 
 .TP 2m
 \fB\-\-jars\fR=[\fIJAR\fR,...]

@@ -39,7 +39,7 @@ class ViewsUpdateTest(base.LoggingTestBase):
         expected_view)
     self.RunLogging(
         'views update my-view --bucket=my-bucket --location=global '
-        '--filter=my-filter',
+        '--log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testUpdateSuccessAllProperties(self):
@@ -53,7 +53,7 @@ class ViewsUpdateTest(base.LoggingTestBase):
         expected_view)
     self.RunLogging(
         'views update my-view --bucket=my-bucket --location=global '
-        '--filter=my-filter --description=description',
+        '--log-filter=my-filter --description=description',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testUpdateSuccessAllDefaultProperties(self):
@@ -66,7 +66,7 @@ class ViewsUpdateTest(base.LoggingTestBase):
         expected_view)
     self.RunLogging(
         'views update my-view --bucket=my-bucket --location=global '
-        '--filter= --description=',
+        '--log-filter= --description=',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testUpdateMissingRequiredFlag(self):
@@ -87,19 +87,19 @@ class ViewsUpdateTest(base.LoggingTestBase):
         exception=http_error.MakeHttpError(403))
     self.RunWithoutPerms(
         'views update my-view --bucket=my-bucket --location=global '
-        '--filter=my-filter',
+        '--log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testUpdateNoProject(self):
     self.RunWithoutProject(
         'views update my-view --bucket=my-bucket --location=global '
-        '--filter=my-filter',
+        '--log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testUpdateNoAuth(self):
     self.RunWithoutAuth(
         'views update my-view --bucket=my-bucket --location=global '
-        '--filter=my-filter',
+        '--log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
 if __name__ == '__main__':

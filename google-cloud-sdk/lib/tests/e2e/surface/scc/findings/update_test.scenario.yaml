@@ -4,19 +4,19 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      scc findings update "gcloudcsccfinding2" --organization 345840165995 --source 2948230327750090626 --event-time "2019-06-12T07:03:00Z" --state=ACTIVE --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt"
+      scc findings update "gcloudcsccfinding2" --organization 702114178617 --source 662187876638200613 --event-time "2019-06-13T07:03:00Z" --state=ACTIVE --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt"
   - stderr: |
       Updated finding [gcloudcsccfinding2].
   - stdout: |
       category: CAT3
-      createTime: '2019-03-12T23:45:08.062Z'
-      eventTime: '2019-06-12T07:03:00Z'
+      createTime: '2020-04-29T22:47:39.372Z'
+      eventTime: '2019-06-13T07:03:00Z'
       externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
-      name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-      parent: organizations/345840165995/sources/2948230327750090626
+      name: organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2
+      parent: organizations/702114178617/sources/662187876638200613
       resourceName: http://somedistinctresource1
       securityMarks:
-        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        name: organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2/securityMarks
       sourceProperties:
         pKey1: pVal1
         pKey2: pVal2
@@ -25,16 +25,16 @@ actions:
 - execute_command:
     # Selectively update some attributes/properties.
     command: |
-      scc findings update "gcloudcsccfinding2" --organization 345840165995 --source 2948230327750090626 --event-time "2019-06-12T07:03:00Z" --state=ACTIVE --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt"
+      scc findings update "gcloudcsccfinding2" --organization 702114178617 --source 662187876638200613 --event-time "2019-06-13T07:03:00Z" --state=ACTIVE --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt"
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2?alt=json&updateMask=eventTime%2CexternalUri%2Cstate
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2?alt=json&updateMask=eventTime%2CexternalUri%2Cstate
           method: PATCH
           headers: {}
           body:
             json:
-              eventTime: '2019-06-12T07:03:00Z'
+              eventTime: '2019-06-13T07:03:00Z'
               externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
               state: ACTIVE
         return_response:
@@ -44,8 +44,8 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-            parent: organizations/345840165995/sources/2948230327750090626
+            name: organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2
+            parent: organizations/702114178617/sources/662187876638200613
             resourceName: http://somedistinctresource1
             state: ACTIVE
             category: CAT3
@@ -54,24 +54,20 @@ actions:
               pKey1: pVal1
               pKey2: pVal2
             securityMarks:
-              name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
-            eventTime: '2019-06-12T07:03:00Z'
-            createTime: '2019-03-12T23:45:08.062Z'
+              name: organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2/securityMarks
+            eventTime: '2019-06-13T07:03:00Z'
+            createTime: '2020-04-29T22:47:39.372Z'
     - expect_stderr: |
         Updated finding [gcloudcsccfinding2].
-    - expect_stdout: |
-        category: CAT3
-        createTime: '2019-03-12T23:45:08.062Z'
-        eventTime: '2019-06-12T07:03:00Z'
-        externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
-        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-        parent: organizations/345840165995/sources/2948230327750090626
-        resourceName: http://somedistinctresource1
-        securityMarks:
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
-        sourceProperties:
-          pKey1: pVal1
-          pKey2: pVal2
-        state: ACTIVE
+    - expect_stdout:
+        matches: |
+          .*CAT3.*
+          .*ftp://ftp.is.co.za/rfc/rfc1808.txt.*
+          .*organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2.*
+          .*http://somedistinctresource1.*
+          .*organizations/702114178617/sources/662187876638200613/findings/gcloudcsccfinding2/securityMarks.*
+          .*pKey1: pVal1.*
+          .*pKey2: pVal2.*
+          .*ACTIVE.*
     - expect_exit:
         code: 0

@@ -27,7 +27,7 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create an HTTPS legacy health check to monitor load balanced instances.
+        Create a legacy HTTPS health check.
 
      delete
         Delete HTTPS health checks.
@@ -39,7 +39,7 @@ COMMANDS
         List Google Compute Engine HTTPS health checks.
 
      update
-        Update an HTTPS health check.
+        Update a legacy HTTPS health check.
 
 NOTES
     These variants are also available:

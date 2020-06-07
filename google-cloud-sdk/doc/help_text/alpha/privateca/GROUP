@@ -25,6 +25,9 @@ GROUPS
      locations
         (ALPHA) Manage locations.
 
+     reusable-configs
+        (ALPHA) Manage reusable configs.
+
      roots
         (ALPHA) Manage root certificate authorities.
 

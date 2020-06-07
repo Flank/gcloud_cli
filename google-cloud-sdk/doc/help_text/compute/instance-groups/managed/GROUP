@@ -52,6 +52,9 @@ COMMANDS
      list
         List Google Compute Engine managed instance groups.
 
+     list-errors
+        List errors produced by managed instances in a managed instance group.
+
      list-instances
         List instances present in the managed instance group.
 

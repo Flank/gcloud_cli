@@ -3,24 +3,24 @@ release_tracks: [ALPHA]
 summary:
 - execute:
   - command: |
-      scc assets describe 345840165995 --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
+      scc assets describe 702114178617 --resource-name=//cloudresourcemanager.googleapis.com/projects/1096071605089
   - stdout: |
-        asset: 595423472147994486
-        resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+        asset: 11773236938904334887
+        resourceName: //cloudresourcemanager.googleapis.com/projects/1096071605089
 - execute:
   - command: |
-      scc assets describe 345840165995 --asset=595423472147994486
+      scc assets describe 702114178617 --asset=11773236938904334887
   - stdout: |
-        asset: 595423472147994486
-        resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+        asset: 11773236938904334887
+        resourceName: //cloudresourcemanager.googleapis.com/projects/1096071605089
 actions:
 - execute_command:
     command: |
-      scc assets describe 345840165995 --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
+      scc assets describe 702114178617 --resource-name=//cloudresourcemanager.googleapis.com/projects/1096071605089
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F428809690096%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F1096071605089%22
           method: GET
           headers: {}
           body: null
@@ -32,12 +32,12 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "name": "organizations/702114178617/assets/11773236938904334887",
                     "securityCenterProperties": {
-                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096"
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/1096071605089"
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks"
+                      "name": "organizations/702114178617/assets/11773236938904334887/securityMarks"
                     },
                     "iamPolicy": {}
                   }
@@ -46,18 +46,19 @@ actions:
               "readTime": "2019-03-20T22:14:11.630Z",
               "totalSize": 1
             }
-    - expect_stdout: |
-        asset: 595423472147994486
-        resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+    - expect_stdout:
+        matches: |
+          .*11773236938904334887.*
+          .*//cloudresourcemanager.googleapis.com/projects/1096071605089.*
     - expect_exit:
         code: 0
 - execute_command:
     command: |
-      scc assets describe 345840165995 --asset=595423472147994486
+      scc assets describe 702114178617 --asset=11773236938904334887
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F595423472147994486%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=name%3D%22organizations%2F702114178617%2Fassets%2F11773236938904334887%22
           method: GET
           headers: {}
           body: null
@@ -69,12 +70,12 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "name": "organizations/702114178617/assets/11773236938904334887",
                     "securityCenterProperties": {
-                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096"
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/1096071605089"
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks"
+                      "name": "organizations/702114178617/assets/11773236938904334887/securityMarks"
                     },
                     "iamPolicy": {}
                   }
@@ -83,8 +84,9 @@ actions:
               "readTime": "2019-03-20T22:14:11.630Z",
               "totalSize": 1
             }
-    - expect_stdout: |
-        asset: 595423472147994486
-        resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+    - expect_stdout:
+        matches: |
+          .*11773236938904334887
+          .*//cloudresourcemanager.googleapis.com/projects/1096071605089
     - expect_exit:
         code: 0

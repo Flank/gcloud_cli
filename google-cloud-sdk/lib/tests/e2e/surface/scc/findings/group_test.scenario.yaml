@@ -1,41 +1,90 @@
-filters:
-  skip:
-    reason: stdout change
-    bug: b/155053287
 title: scc findings list scenario test
 release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      scc findings group 345840165995 --source 2948230327750090626 --group-by 'category,parent' --read-time '2019-03-13T21:34:39.405Z'
+      scc findings group 702114178617 --source 662187876638200613 --group-by 'category,parent' --read-time '2020-04-29T07:00:00.000Z' --page-size 20
   - stdout: |
+      ---
       groupByResults:
       - count: '1'
         properties:
-          category: null
-          parent: organizations/345840165995/sources/2948230327750090626
+          category: 2SV_NOT_ENFORCED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '1'
+        properties:
+          category: ADMIN_SERVICE_ACCOUNT
+          parent: organizations/702114178617/sources/662187876638200613
       - count: '2'
         properties:
+          category: AUDIT_CONFIG_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '3'
+        properties:
+          category: AUDIT_LOGGING_DISABLED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: BUCKET_IAM_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '1'
+        properties:
           category: CAT3
-          parent: organizations/345840165995/sources/2948230327750090626
-      readTime: '2019-03-13T21:34:39.405Z'
-      totalSize: 2
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: CUSTOM_ROLE_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: EGRESS_DENY_RULE_NOT_SET
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: FIREWALL_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: LOG_NOT_EXPORTED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: NETWORK_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: OWNER_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '3'
+        properties:
+          category: PRIMITIVE_ROLES_USED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: ROUTE_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      - count: '2'
+        properties:
+          category: SQL_INSTANCE_NOT_MONITORED
+          parent: organizations/702114178617/sources/662187876638200613
+      readTime: '2020-04-29T07:00:00Z'
+      totalSize: 15
 actions:
 - execute_command:
     # Group by multiple fields (comma-separated).
     command: |
-      scc findings group 345840165995 --source 2948230327750090626 --group-by 'category,parent' --read-time '2019-03-13T21:34:39.405Z'
+      scc findings group 702114178617 --source 662187876638200613 --group-by 'category,parent' --read-time '2020-04-29T07:00:00.000Z' --page-size 20
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings:group?alt=json
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/sources/662187876638200613/findings:group?alt=json
           method: POST
           headers: {}
           body:
             json:
               groupBy: category,parent
-              readTime: '2019-03-13T21:34:39.405Z'
+              readTime: '2020-04-29T07:00:00.000Z'
         return_response:
           headers:
             cache-control: private
@@ -44,27 +93,84 @@ actions:
             status: '200'
           body:
             groupByResults:
-            - properties:
-                category: null
-                parent: organizations/345840165995/sources/2948230327750090626
-              count: '1'
-            - properties:
+            - count: '1'
+              properties:
+                category: 2SV_NOT_ENFORCED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '1'
+              properties:
+                category: ADMIN_SERVICE_ACCOUNT
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: AUDIT_CONFIG_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '3'
+              properties:
+                category: AUDIT_LOGGING_DISABLED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: BUCKET_IAM_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '1'
+              properties:
                 category: CAT3
-                parent: organizations/345840165995/sources/2948230327750090626
-              count: '2'
-            readTime: '2019-03-13T21:34:39.405Z'
-            totalSize: 2
-    - expect_stdout: |
-        groupByResults:
-        - count: '1'
-          properties:
-            category: null
-            parent: organizations/345840165995/sources/2948230327750090626
-        - count: '2'
-          properties:
-            category: CAT3
-            parent: organizations/345840165995/sources/2948230327750090626
-        readTime: '2019-03-13T21:34:39.405Z'
-        totalSize: 2
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: CUSTOM_ROLE_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: EGRESS_DENY_RULE_NOT_SET
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: FIREWALL_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: LOG_NOT_EXPORTED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: NETWORK_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: OWNER_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '3'
+              properties:
+                category: PRIMITIVE_ROLES_USED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: ROUTE_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            - count: '2'
+              properties:
+                category: SQL_INSTANCE_NOT_MONITORED
+                parent: organizations/702114178617/sources/662187876638200613
+            readTime: '2020-04-29T07:00:00Z'
+            totalSize: 15
+    - expect_stdout:
+        matches: |
+            .*category: 2SV_NOT_ENFORCED.*
+            .*category: ADMIN_SERVICE_ACCOUNT.*
+            .*category: AUDIT_CONFIG_NOT_MONITORED.*
+            .*category: AUDIT_LOGGING_DISABLED.*
+            .*category: BUCKET_IAM_NOT_MONITORED.*
+            .*category: CAT3.*
+            .*category: CUSTOM_ROLE_NOT_MONITORED.*
+            .*category: EGRESS_DENY_RULE_NOT_SET.*
+            .*category: FIREWALL_NOT_MONITORED.*
+            .*category: LOG_NOT_EXPORTED.*
+            .*category: NETWORK_NOT_MONITORED.*
+            .*category: OWNER_NOT_MONITORED.*
+            .*category: PRIMITIVE_ROLES_USED.*
+            .*category: ROUTE_NOT_MONITORED.*
+            .*category: SQL_INSTANCE_NOT_MONITORED.*
     - expect_exit:
         code: 0

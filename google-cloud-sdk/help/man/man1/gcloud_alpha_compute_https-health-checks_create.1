@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute https\-health\-checks create \- create an HTTPS legacy health check to monitor load balanced instances
+gcloud alpha compute https\-health\-checks create \- create a legacy HTTPS health check
 
 
 
@@ -17,13 +17,18 @@ gcloud alpha compute https\-health\-checks create \- create an HTTPS legacy heal
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute https\-health\-checks create\fR is used to
-create a legacy health check with a health check type of HTTPS. HTTPS health
-checks monitor instances in a load balancer controlled by a target pool. All
-arguments to the command are optional except for the name of the health check.
-For more information on load balancing, see
-https://cloud.google.com/compute/docs/load\-balancing\-and\-autoscaling/. Note,
-creating a legacy health check is recommended only for a network load balancer.
+\fB(ALPHA)\fR Though you can use legacy HTTPS health checks in certain Google
+Cloud Platform load balancing configurations and for managed instance group
+autohealing, you should consider a non\-legacy HTTPS health check created with
+\f5health\-checks create https\fR instead.
+
+For more information about the differences between legacy and non\-legacy health
+checks see:
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#category_and_protocol
+
+For information about what type of health check to use for a particular load
+balancer, see:
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
 
 
 

@@ -56,15 +56,17 @@ OPTIONAL FLAGS
         Google Cloud Storage path or local_directory in which to store training
         outputs and other data needed for training.
 
-        This path will be passed to your TensorFlow program as the --job_dir
+        This path will be passed to your TensorFlow program as the --job-dir
         command-line arg. The benefit of specifying this field is that AI
-        Platform will validate the path for use in training.
+        Platform will validate the path for use in training. However, note that
+        your training program will need to parse the provided --job-dir
+        argument.
 
      --package-path=PACKAGE_PATH
-        Path to a Python package to build. This should point to a directory
-        containing the Python source for the job. It will be built using
-        setuptools (which must be installed) using its parent directory as
-        context. If the parent directory contains a setup.py file, the build
+        Path to a Python package to build. This should point to a local
+        directory containing the Python source for the job. It will be built
+        using setuptools (which must be installed) using its parent directory
+        as context. If the parent directory contains a setup.py file, the build
         will use that; otherwise, it will use a simple built-in one.
 
      --parameter-server-count=PARAMETER_SERVER_COUNT

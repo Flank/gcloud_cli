@@ -1,0 +1,697 @@
+title: cloud domains register test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations register unavailable.com
+  - error: "1: Domain 'unavailable.com' is not available for registration: 'UNAVAILABLE'"
+- execute:
+  - command: |
+      domains registrations register UpperCase.app. --contact-data-from-file=allContacts.yaml --contact-privacy=public-contact-data --use-google-domains-dns --yearly-price=12.00USD --notices=hsts-preloaded,public-contact-data-acknowledgement --validate-only
+  - prompt:
+    - message: Domain name 'UpperCase.app.' has been normalized to equivalent 'uppercase.app'.
+    - input: y
+  - stderr: |
+      The command will not have any effect because validate-only flag is present.
+- execute:
+  - command: |
+      domains registrations register example-no-dnssec.com --contact-data-from-file=allContacts.yaml --contact-privacy=private-contact-data --use-google-domains-dns --disable-dnssec --yearly-price=12.00USD --validate-only --quiet
+  - stderr: |
+      The command will not have any effect because validate-only flag is present.
+- execute:
+  - command: |
+      domains registrations register example.com --contact-data-from-file=registrantAdminTechnical.yaml --name-servers=ns1.com,ns2.com --contact-privacy=redacted-contact-data --yearly-price=12USD --labels=foo=bar --async --disable-dnssec
+  - stderr: |
+      Create in progress for registration [example.com] Note:
+      The domain is not yet registered.
+      Wait until the registration resource changes state to ACTIVE.
+- execute:
+  - command: |
+      domains registrations register example.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --yearly-price=12.00USD
+  - prompt:
+    - message: The only supported contant privacy is private-contact-data.
+    - input: n
+  - error: '1: Providing Contact Privacy is required.'
+- execute:
+  - command: |
+      domains registrations register example.com --yearly-price=48PLN
+  - error: "1: Incorrect yearly_price: '48.00 PLN', expected: 12.00 USD."
+- execute:
+  - command: |
+      domains registrations register example.com --yearly-price=48
+  - error: "1: Yearly price '48' is not valid."
+- execute:
+  - command: |
+      domains registrations register example.com --contact-data-from-file=admin.yaml
+  - error: '1: Providing registrantContact is required.'
+- execute:
+  - command: |
+      domains registrations register example-price-not-accepted.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --contact-privacy=redacted-contact-data --quiet
+  - error: '1: Aborted by user.'
+- execute:
+  - command: |
+      domains registrations register example-hsts-not-accepted.app --contact-data-from-file=allContacts.yaml --use-google-domains-dns --contact-privacy=private-contact-data --yearly-price=12USD --quiet
+  - error: '1: Aborted by user.'
+- execute:
+  - command: |
+      domains registrations register example-public-privacy-accepted.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --contact-privacy=public-contact-data --yearly-price=12USD --quiet
+  - stderr: |
+      You choose to make contact data of domain example-public-privacy-accepted.com public.
+      Anyone who looks it up in the WHOIS directory will be able to see info
+      for the domain owner and administrative and technical contacts.
+      Make sure it's ok with them that their contact data is public.
+      This info will be publicly available:
+      email: test@example.com
+      phoneNumber: '+1.1234567890'
+      postalAddress:
+        addressLines:
+        - 1600 Amphitheatre Pkwy
+        administrativeArea: CA
+        locality: Mountain View
+        postalCode: '94043'
+        recipients:
+        - Test User
+        regionCode: US
+  - error: '1: Aborted by user.'
+actions:
+- write_file:
+    path: allContacts.yaml
+    contents: |
+      allContacts:
+        email: 'test@example.com'
+        phoneNumber: '+1.1234567890'
+        postalAddress:
+                regionCode: 'US'
+                postalCode: '94043'
+                administrativeArea: 'CA'
+                locality: 'Mountain View'
+                addressLines: ['1600 Amphitheatre Pkwy']
+                recipients: ['Test User']
+- write_file:
+    path: registrantAdminTechnical.yaml
+    contents: |
+      registrantContact:
+        email: 'registrant@example.com'
+        phoneNumber: '+48.123456789'
+        postalAddress:
+          regionCode: 'PL'
+          postalCode: '00-113'
+          locality: 'Warszawa'
+          addressLines: ['Emilii Plater 53']
+          recipients: ['Test User']
+      adminContact:
+        email: 'admin@example.com'
+        phoneNumber: '+48.123456789'
+        postalAddress:
+          regionCode: 'PL'
+          postalCode: '00-113'
+          locality: 'Warszawa'
+          addressLines: ['Emilii Plater 53']
+          recipients: ['Test User']
+      technicalContact:
+        email: 'technical@example.com'
+        phoneNumber: '+48.123456789'
+        postalAddress:
+          regionCode: 'PL'
+          postalCode: '00-113'
+          locality: 'Warszawa'
+          addressLines: ['Emilii Plater 53']
+          recipients: ['Test User']
+- write_file:
+    path: admin.yaml
+    contents: |
+      adminContact:
+        email: 'admin@example.com'
+        phoneNumber: '+48.123456789'
+        postalAddress:
+          regionCode: 'PL'
+          postalCode: '00-113'
+          locality: 'Warszawa'
+          addressLines: ['Emilii Plater 53']
+          recipients: ['Test User']
+- execute_command:
+    command: |
+      domains registrations register unavailable.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=unavailable.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "unavailable.com",
+                "availability": "UNAVAILABLE"
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: "Domain 'unavailable.com' is not available for registration: 'UNAVAILABLE'"
+- execute_command:
+    command: |
+      domains registrations register UpperCase.app. --contact-data-from-file=allContacts.yaml --contact-privacy=public-contact-data --use-google-domains-dns --yearly-price=12.00USD --notices=hsts-preloaded,public-contact-data-acknowledgement --validate-only
+    events:
+    - expect_prompt_continue:
+        message: Domain name 'UpperCase.app.' has been normalized to equivalent 'uppercase.app'.
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=uppercase.app
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "uppercase.app",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "domainNotices": ["HSTS_PRELOADED"],
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA"
+                ]
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:register?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contactNotices:
+              - PUBLIC_CONTACT_DATA_ACKNOWLEDGEMENT
+              domainNotices:
+              - HSTS_PRELOADED
+              registration:
+                contactSettings:
+                  adminContact:
+                    email: test@example.com
+                    phoneNumber: '+1.1234567890'
+                    postalAddress:
+                      addressLines:
+                      - 1600 Amphitheatre Pkwy
+                      administrativeArea: CA
+                      locality: Mountain View
+                      postalCode: '94043'
+                      recipients:
+                      - Test User
+                      regionCode: US
+                  registrantContact:
+                    email: test@example.com
+                    phoneNumber: '+1.1234567890'
+                    postalAddress:
+                      addressLines:
+                      - 1600 Amphitheatre Pkwy
+                      administrativeArea: CA
+                      locality: Mountain View
+                      postalCode: '94043'
+                      recipients:
+                      - Test User
+                      regionCode: US
+                  technicalContact:
+                    email: test@example.com
+                    phoneNumber: '+1.1234567890'
+                    postalAddress:
+                      addressLines:
+                      - 1600 Amphitheatre Pkwy
+                      administrativeArea: CA
+                      locality: Mountain View
+                      postalCode: '94043'
+                      recipients:
+                      - Test User
+                      regionCode: US
+                  privacy: PUBLIC_CONTACT_DATA
+                dnsSettings:
+                  googleDomainsDns:
+                    dsState: DS_RECORDS_PUBLISHED
+                domainName: uppercase.app
+              validateOnly: true
+              yearlyPrice:
+                currencyCode: USD
+                nanos: 0
+                units: '12'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+            }
+    - expect_stderr: |
+        The command will not have any effect because validate-only flag is present.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations register example-no-dnssec.com --contact-data-from-file=allContacts.yaml --contact-privacy=private-contact-data --use-google-domains-dns --disable-dnssec --yearly-price=12.00USD --validate-only --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example-no-dnssec.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example-no-dnssec.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA"
+                ]
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:register?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              registration:
+                contactSettings:
+                  adminContact:
+                    email: test@example.com
+                    phoneNumber: '+1.1234567890'
+                    postalAddress:
+                      addressLines:
+                      - 1600 Amphitheatre Pkwy
+                      administrativeArea: CA
+                      locality: Mountain View
+                      postalCode: '94043'
+                      recipients:
+                      - Test User
+                      regionCode: US
+                  registrantContact:
+                    email: test@example.com
+                    phoneNumber: '+1.1234567890'
+                    postalAddress:
+                      addressLines:
+                      - 1600 Amphitheatre Pkwy
+                      administrativeArea: CA
+                      locality: Mountain View
+                      postalCode: '94043'
+                      recipients:
+                      - Test User
+                      regionCode: US
+                  technicalContact:
+                    email: test@example.com
+                    phoneNumber: '+1.1234567890'
+                    postalAddress:
+                      addressLines:
+                      - 1600 Amphitheatre Pkwy
+                      administrativeArea: CA
+                      locality: Mountain View
+                      postalCode: '94043'
+                      recipients:
+                      - Test User
+                      regionCode: US
+                  privacy: PRIVATE_CONTACT_DATA
+                dnsSettings:
+                  googleDomainsDns:
+                    dsState: DS_RECORDS_UNPUBLISHED
+                domainName: example-no-dnssec.com
+              validateOnly: true
+              yearlyPrice:
+                currencyCode: USD
+                nanos: 0
+                units: '12'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+            }
+    - expect_stderr: |
+        The command will not have any effect because validate-only flag is present.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations register example.com --contact-data-from-file=registrantAdminTechnical.yaml --name-servers=ns1.com,ns2.com --contact-privacy=redacted-contact-data --yearly-price=12USD --labels=foo=bar --async --disable-dnssec
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA"
+                ]
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:register?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              registration:
+                contactSettings:
+                  adminContact:
+                    email: admin@example.com
+                    phoneNumber: '+48.123456789'
+                    postalAddress:
+                      addressLines:
+                      - Emilii Plater 53
+                      locality: Warszawa
+                      postalCode: 00-113
+                      recipients:
+                      - Test User
+                      regionCode: PL
+                  registrantContact:
+                    email: registrant@example.com
+                    phoneNumber: '+48.123456789'
+                    postalAddress:
+                      addressLines:
+                      - Emilii Plater 53
+                      locality: Warszawa
+                      postalCode: 00-113
+                      recipients:
+                      - Test User
+                      regionCode: PL
+                  technicalContact:
+                    email: technical@example.com
+                    phoneNumber: '+48.123456789'
+                    postalAddress:
+                      addressLines:
+                      - Emilii Plater 53
+                      locality: Warszawa
+                      postalCode: 00-113
+                      recipients:
+                      - Test User
+                      regionCode: PL
+                  privacy: REDACTED_CONTACT_DATA
+                dnsSettings:
+                  customDns:
+                    nameServers:
+                    - ns1.com
+                    - ns2.com
+                domainName: example.com
+                labels:
+                  foo: bar
+              yearlyPrice:
+                currencyCode: USD
+                units: '12'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/example.com",
+                "verb": "register",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Create in progress for registration [example.com] Note:
+        The domain is not yet registered.
+        Wait until the registration resource changes state to ACTIVE.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations register example.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --yearly-price=12.00USD
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "PRIVATE_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_prompt_continue:
+        message: The only supported contant privacy is private-contact-data.
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Providing Contact Privacy is required.
+- execute_command:
+    command: |
+      domains registrations register example.com --yearly-price=48PLN
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA",
+                  "PUBLIC_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: "Incorrect yearly_price: '48.00 PLN', expected: 12.00 USD."
+- execute_command:
+    command: |
+      domains registrations register example.com --yearly-price=48
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA",
+                  "PUBLIC_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: Yearly price '48' is not valid.
+- execute_command:
+    command: |
+      domains registrations register example.com --contact-data-from-file=admin.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "domainNotices": ["HSTS_PRELOADED"],
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA",
+                  "PUBLIC_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: Providing registrantContact is required.
+
+- execute_command:
+    command: |
+      domains registrations register example-price-not-accepted.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --contact-privacy=redacted-contact-data --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example-price-not-accepted.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example-price-not-accepted.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA",
+                  "PUBLIC_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: Aborted by user.
+- execute_command:
+    command: |
+      domains registrations register example-hsts-not-accepted.app --contact-data-from-file=allContacts.yaml --use-google-domains-dns --contact-privacy=private-contact-data --yearly-price=12USD --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example-hsts-not-accepted.app
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example-hsts-not-accepted.app",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "domainNotices": ["HSTS_PRELOADED"],
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA",
+                  "PUBLIC_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: Aborted by user.
+- execute_command:
+    command: |
+      domains registrations register example-public-privacy-accepted.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --contact-privacy=public-contact-data --yearly-price=12USD --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=example-public-privacy-accepted.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "example-public-privacy-accepted.com",
+                "availability": "AVAILABLE",
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedPrivacy": [
+                  "REDACTED_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA",
+                  "PUBLIC_CONTACT_DATA"
+                ]
+              }
+            }
+    - expect_stderr: |
+        You choose to make contact data of domain example-public-privacy-accepted.com public.
+        Anyone who looks it up in the WHOIS directory will be able to see info
+        for the domain owner and administrative and technical contacts.
+        Make sure it's ok with them that their contact data is public.
+        This info will be publicly available:
+        email: test@example.com
+        phoneNumber: '+1.1234567890'
+        postalAddress:
+          addressLines:
+          - 1600 Amphitheatre Pkwy
+          administrativeArea: CA
+          locality: Mountain View
+          postalCode: '94043'
+          recipients:
+          - Test User
+          regionCode: US
+    - expect_exit:
+        code: 1
+        message: Aborted by user.

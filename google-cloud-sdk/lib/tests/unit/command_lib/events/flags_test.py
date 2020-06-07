@@ -19,20 +19,25 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.events import custom_resource_definition
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import flags
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
+from googlecloudsdk.command_lib.run import flags as run_flags
 from tests.lib import cli_test_base
 from tests.lib.calliope import util as calliope_test_util
-from tests.lib.surface.run import base
+from tests.lib.surface.events import base
 
 
-class FlagsTest(base.ServerlessBase):
+class FlagsTest(base.EventsBase):
 
   def SetUp(self):
     self.parser = calliope_test_util.ArgumentParser()
     flags.AddParametersFlags(self.parser)
     flags.AddSecretsFlag(self.parser)
+    flags.AddFiltersFlags(self.parser)
+    run_flags.AddPlatformArg(self.parser)
 
   def _MakeEventType(self, include_props=False, include_secret_props=False):
     """Creates a source CRD with parameters and an event type."""
@@ -270,3 +275,22 @@ class FlagsTest(base.ServerlessBase):
     }
     self.assertDictEqual(
         expected, flags.GetAndValidateParameters(args, self.event_type))
+
+  def testParseTriggerFilterGKESucceeds(self):
+    args = self.parser.parse_args(
+        ['--trigger-filters=key1=value1', '--platform=gke'])
+    expected_platform = 'gke'
+
+    run_flags.GetAndValidatePlatform(args, calliope_base.ReleaseTrack.ALPHA,
+                                     run_flags.Product.EVENTS)
+    self.assertEqual(expected_platform, args.platform)
+
+  def testParseTriggerFilterManagedFails(self):
+    args = self.parser.parse_args(
+        ['--trigger-filters=key1=value1', '--platform=managed'])
+
+    with self.assertRaises(serverless_exceptions.ConfigurationError) as ctx:
+      run_flags.GetAndValidatePlatform(args, calliope_base.ReleaseTrack.ALPHA,
+                                       run_flags.Product.EVENTS)
+
+    self.assertIn('--trigger-filters', str(ctx.exception))

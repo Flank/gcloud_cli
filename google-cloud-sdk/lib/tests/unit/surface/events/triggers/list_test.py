@@ -20,12 +20,12 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib.surface.run import base
+from tests.lib.surface.events import base
 
 import six
 
 
-class TriggersListTestAlpha(base.ServerlessSurfaceBase):
+class TriggersListTestAlpha(base.EventsBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -33,13 +33,13 @@ class TriggersListTestAlpha(base.ServerlessSurfaceBase):
   def _MakeTriggers(self, num_triggers, use_uri=False):
     """Creates triggers and assigns them as output to ListTriggers."""
     self.triggers = [
-        trigger.Trigger.New(self.mock_serverless_client, 'fake-project')
+        trigger.Trigger.New(self.mock_client, 'fake-project')
         for _ in range(num_triggers)
     ]
     for i, t in enumerate(self.triggers):
       t.name = 't{}'.format(i)
       t.status.conditions = [
-          self.serverless_messages.TriggerCondition(
+          self.messages.TriggerCondition(
               type='Ready', status=six.text_type(bool(i % 2)))
       ]
       t.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/triggers/{}'.format(

@@ -102,31 +102,42 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
   def DescribeInstance(self, name):
     self.Run('compute instances describe {name}'.format(name=name))
 
-  def CreateDisk(self, zone=None):
-    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
-    # Update seek position
-    self.GetNewErr()
-    self.Run("""
-      compute disks create {disk_name} \
-        --zone {zone} \
-        --size 10GB""".format(disk_name=name, zone=zone or self.zone))
-    stderr = self.GetNewErr()
-    # Return URI to the disk
-    return re.search(r'Created \[(.*)\]', stderr).group(1)
-
-  def CreateDiskForStateful(self, zone=None):
-    """Create a disk for use in the stateful API.
-
-    Use this method if you're creating a disk to specify in a per-instance
-    config. This is required to cleanup the disk properly at the end.
+  def CreateDisk(self,
+                 size=10,
+                 zone=None,
+                 image_family=None,
+                 image_project=None):
+    """Create a disk for use in the IGM.
 
     Args:
-      zone: Zone to create the disk in. None for default.
+      size: Size (in GB) of the new disk.
+      zone: Zone of the new disk.
+      image_family: Image family to initialize the new disk from.
+      image_project: Project ID of the image family specified.
 
     Returns:
       URI of the created disk.
     """
-    disk_uri = self.CreateDisk(zone=zone)
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
+    # Update seek position
+    self.GetNewErr()
+    command = ("""
+        compute disks create {disk_name} \
+          --zone {zone} \
+          --size {size}GB""".format(
+              size=size, disk_name=name, zone=zone or self.zone))
+    if image_family:
+      command += ' --image-family={0}'.format(image_family)
+    if image_project:
+      command += ' --image-project={0}'.format(image_project)
+    self.Run(command)
+    stderr = self.GetNewErr()
+    # Return URI to the disk
+    return re.search(r'Created \[(.*)\]', stderr).group(1)
+
+  def CreateDiskForStateful(self, *args, **kwargs):
+    """Create a disk for use as a stateful disk (with proper cleanup)."""
+    disk_uri = self.CreateDisk(*args, **kwargs)
     self.potential_stateful_disk_urls.add(disk_uri)
     return disk_uri
 

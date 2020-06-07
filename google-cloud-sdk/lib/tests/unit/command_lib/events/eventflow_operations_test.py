@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import random
 
 from apitools.base.protorpclite import protojson
@@ -35,13 +36,13 @@ from googlecloudsdk.command_lib.events import stages
 from googlecloudsdk.command_lib.events import util
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core.console import progress_tracker
-from tests.lib import test_case
-from tests.lib.surface.run import base
+from tests.lib import cli_test_base
+from tests.lib.surface.events import base
 
 import mock
 
 
-class EventflowConnectTest(test_case.TestCase):
+class EventflowConnectTest(cli_test_base.CliTestBase):
   """Tests eventflow_operations.Connect()."""
 
   def SetUp(self):
@@ -64,23 +65,28 @@ class EventflowConnectTest(test_case.TestCase):
       self.assertIsNone(eventflow_client._region)
 
   def testConnectManaged(self):
+    region = 'us-central1'
+
     mock_context = mock.Mock()
     mock_context.__enter__ = mock.Mock(return_value=mock_context)
     mock_context.__exit__ = mock.Mock(return_value=False)
     mock_context.supports_one_platform = True
-    mock_context.region = base.DEFAULT_REGION
+    mock_context.region = region
 
     with eventflow_operations.Connect(mock_context) as eventflow_client:
       self.assertEqual(eventflow_client._client, self.mock_client)
       self.assertIsNone(eventflow_client._core_client)
       self.assertEqual(eventflow_client._crd_client, self.mock_client)
       self.assertEqual(eventflow_client._op_client, self.mock_client)
-      self.assertEqual(eventflow_client._region, base.DEFAULT_REGION)
+      self.assertEqual(eventflow_client._region, region)
 
 
-class EventflowOperationsTest(base.ServerlessBase):
+class EventflowOperationsTest(base.EventsBase):
 
   def SetUp(self):
+    self.eventflow_client = eventflow_operations.EventflowOperations(
+        self.mock_client, self.region, self.mock_core_client,
+        self.mock_crd_client, self.mock_client)
     self.StartObjectPatch(random, 'random', return_value=0)
     self.StartObjectPatch(util, 'WaitForCondition')
     gsa_key = apis.GetMessagesModule('iam', 'v1').ServiceAccountKey(
@@ -115,25 +121,25 @@ class EventflowOperationsTest(base.ServerlessBase):
     """Test the get trigger api call."""
     trigger_ref = self._TriggerRef('my-trigger')
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersGetRequest(
+        self.messages.RunNamespacesTriggersGetRequest(
             name=trigger_ref.RelativeName()))
 
-    expected_response = self.serverless_messages.Trigger(apiVersion='1')
-    self.mock_serverless_client.namespaces_triggers.Get.Expect(
-        expected_request, expected_response)
+    expected_response = self.messages.Trigger(apiVersion='1')
+    self.mock_client.namespaces_triggers.Get.Expect(expected_request,
+                                                    expected_response)
 
     trigger_obj = self.eventflow_client.GetTrigger(trigger_ref)
     self.assertEqual(trigger_obj.Message(),
-                     self.serverless_messages.Trigger(apiVersion='1'))
+                     self.messages.Trigger(apiVersion='1'))
 
   def testGetTriggerReturnsNoneIfNotFound(self):
     """Test the get trigger api call returns None if no trigger found."""
     trigger_ref = self._TriggerRef('my-trigger')
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersGetRequest(
+        self.messages.RunNamespacesTriggersGetRequest(
             name=trigger_ref.RelativeName()))
 
-    self.mock_serverless_client.namespaces_triggers.Get.Expect(
+    self.mock_client.namespaces_triggers.Get.Expect(
         expected_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
 
@@ -144,11 +150,11 @@ class EventflowOperationsTest(base.ServerlessBase):
     """Test the delete trigger api call."""
     trigger_ref = self._TriggerRef('my-trigger')
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersDeleteRequest(
+        self.messages.RunNamespacesTriggersDeleteRequest(
             name=trigger_ref.RelativeName()))
 
-    self.mock_serverless_client.namespaces_triggers.Delete.Expect(
-        expected_request, self.serverless_messages.Empty())
+    self.mock_client.namespaces_triggers.Delete.Expect(expected_request,
+                                                       self.messages.Empty())
 
     self.eventflow_client.DeleteTrigger(trigger_ref)
 
@@ -156,10 +162,10 @@ class EventflowOperationsTest(base.ServerlessBase):
     """Test the delete trigger api call raises an error if no trigger found."""
     trigger_ref = self._TriggerRef('my-trigger')
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersDeleteRequest(
+        self.messages.RunNamespacesTriggersDeleteRequest(
             name=trigger_ref.RelativeName()))
 
-    self.mock_serverless_client.namespaces_triggers.Delete.Expect(
+    self.mock_client.namespaces_triggers.Delete.Expect(
         expected_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
 
@@ -194,18 +200,19 @@ class EventflowOperationsTest(base.ServerlessBase):
         })
 
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersCreateRequest(
+        self.messages.RunNamespacesTriggersCreateRequest(
             trigger=trigger_obj.Message(),
             parent=self._NamespaceRef(project='default').RelativeName()))
 
-    self.mock_serverless_client.namespaces_triggers.Create.Expect(
-        expected_request, trigger_obj.Message())
+    self.mock_client.namespaces_triggers.Create.Expect(expected_request,
+                                                       trigger_obj.Message())
 
     self._MakeEventType('CloudPubSubSource', 'cloudpubsubsources')
     created_trigger = self.eventflow_client.CreateTrigger(
         self._TriggerRef('my-trigger', 'default'),
         source_obj,
         self.event_type.type,
+        collections.OrderedDict(),
         'my-service',
         'my-broker',
     )
@@ -242,22 +249,23 @@ class EventflowOperationsTest(base.ServerlessBase):
         })
 
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersCreateRequest(
+        self.messages.RunNamespacesTriggersCreateRequest(
             trigger=trigger_obj.Message(),
             parent=self._NamespaceRef(project='default').RelativeName()))
 
-    self.mock_serverless_client.namespaces_triggers.Create.Expect(
-        expected_request, trigger_obj.Message())
+    self.mock_client.namespaces_triggers.Create.Expect(expected_request,
+                                                       trigger_obj.Message())
 
     self._MakeEventType('CloudPubSubSource', 'cloudpubsubsources')
     created_trigger = self.eventflow_client.CreateTrigger(
         self._TriggerRef('my-trigger', 'default'),
         source_obj,
         self.event_type.type,
+        collections.OrderedDict(),
         'my-service',
         'default',
     )
-    self.assertEqual(trigger_obj, created_trigger)
+    self.assertEqual(created_trigger, trigger_obj)
 
   def testCreateTriggerFailsIfAlreadyExists(self):
     """Test the create trigger api call."""
@@ -287,11 +295,11 @@ class EventflowOperationsTest(base.ServerlessBase):
         })
 
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersCreateRequest(
+        self.messages.RunNamespacesTriggersCreateRequest(
             trigger=trigger_obj.Message(),
             parent=self._NamespaceRef(project='default').RelativeName()))
 
-    self.mock_serverless_client.namespaces_triggers.Create.Expect(
+    self.mock_client.namespaces_triggers.Create.Expect(
         expected_request,
         exception=api_exceptions.HttpConflictError(None, None, None))
 
@@ -301,6 +309,7 @@ class EventflowOperationsTest(base.ServerlessBase):
           self._TriggerRef('my-trigger', 'default'),
           source_obj,
           self.event_type.type,
+          collections.OrderedDict(),
           'my-service',
           'my-broker',
       )
@@ -308,29 +317,28 @@ class EventflowOperationsTest(base.ServerlessBase):
   def testListTriggers(self):
     """Test the list triggers api call."""
     expected_request = (
-        self.serverless_messages.RunNamespacesTriggersListRequest(
+        self.messages.RunNamespacesTriggersListRequest(
             parent='namespaces/{}'.format(self.namespace.namespacesId)))
 
-    expected_response = self.serverless_messages.ListTriggersResponse(
-        items=[self.serverless_messages.Trigger(apiVersion='1')])
-    self.mock_serverless_client.namespaces_triggers.List.Expect(
-        expected_request, expected_response)
+    expected_response = self.messages.ListTriggersResponse(
+        items=[self.messages.Trigger(apiVersion='1')])
+    self.mock_client.namespaces_triggers.List.Expect(expected_request,
+                                                     expected_response)
 
     triggers = self.eventflow_client.ListTriggers(self.namespace)
 
     self.assertListEqual([t.Message() for t in triggers],
-                         [self.serverless_messages.Trigger(apiVersion='1')])
+                         [self.messages.Trigger(apiVersion='1')])
 
   def testGetSource(self):
     """Test the get source api call."""
     source_ref = self._SourceRef('my-source', 'cloudpubsubsources')
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesGetRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesGetRequest(
             name=source_ref.RelativeName()))
 
-    expected_response = self.serverless_messages.CloudPubSubSource(
-        apiVersion='1')
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Get.Expect(
+    expected_response = self.messages.CloudPubSubSource(apiVersion='1')
+    self.mock_client.namespaces_cloudpubsubsources.Get.Expect(
         expected_request, expected_response)
 
     source_crd = (
@@ -341,16 +349,16 @@ class EventflowOperationsTest(base.ServerlessBase):
             kind='CloudPubSubSource', plural='cloudpubsubsources'))
     source_obj = self.eventflow_client.GetSource(source_ref, source_crd)
     self.assertEqual(source_obj.Message(),
-                     self.serverless_messages.CloudPubSubSource(apiVersion='1'))
+                     self.messages.CloudPubSubSource(apiVersion='1'))
 
   def testGetSourceReturnsNoneIfNotFound(self):
     """Test the get source api call returns None if no source found."""
     source_ref = self._SourceRef('my-source', 'cloudpubsubsources')
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesGetRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesGetRequest(
             name=source_ref.RelativeName()))
 
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Get.Expect(
+    self.mock_client.namespaces_cloudpubsubsources.Get.Expect(
         expected_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
 
@@ -397,11 +405,11 @@ class EventflowOperationsTest(base.ServerlessBase):
         })
 
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesCreateRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesCreateRequest(
             cloudPubSubSource=source_obj.Message(),
             parent=self._NamespaceRef(project='default').RelativeName()))
 
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Create.Expect(
+    self.mock_client.namespaces_cloudpubsubsources.Create.Expect(
         expected_request, source_obj.Message())
 
     self._MakeEventType('CloudPubSubSource', 'cloudpubsubsources')
@@ -449,11 +457,11 @@ class EventflowOperationsTest(base.ServerlessBase):
         })
 
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesCreateRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesCreateRequest(
             cloudPubSubSource=source_obj.Message(),
             parent=self._NamespaceRef(project='default').RelativeName()))
 
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Create.Expect(
+    self.mock_client.namespaces_cloudpubsubsources.Create.Expect(
         expected_request,
         exception=api_exceptions.HttpConflictError(None, None, None))
 
@@ -508,11 +516,11 @@ class EventflowOperationsTest(base.ServerlessBase):
         })
 
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesCreateRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesCreateRequest(
             cloudPubSubSource=source_obj.Message(),
             parent=self._NamespaceRef(project='default').RelativeName()))
 
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Create.Expect(
+    self.mock_client.namespaces_cloudpubsubsources.Create.Expect(
         expected_request, source_obj.Message())
 
     self._MakeEventType('CloudPubSubSource', 'cloudpubsubsources')
@@ -537,11 +545,11 @@ class EventflowOperationsTest(base.ServerlessBase):
     """Test the delete source api call."""
     source_ref = self._SourceRef('my-source', 'cloudpubsubsources')
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesDeleteRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesDeleteRequest(
             name=source_ref.RelativeName()))
 
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Delete.Expect(
-        expected_request, self.serverless_messages.Empty())
+    self.mock_client.namespaces_cloudpubsubsources.Delete.Expect(
+        expected_request, self.messages.Empty())
 
     source_crd = (
         custom_resource_definition.SourceCustomResourceDefinition.New(
@@ -556,10 +564,10 @@ class EventflowOperationsTest(base.ServerlessBase):
     """Test the delete source api call raises an error if no source found."""
     source_ref = self._SourceRef('my-source', 'cloudpubsubsources')
     expected_request = (
-        self.serverless_messages.RunNamespacesCloudpubsubsourcesDeleteRequest(
+        self.messages.RunNamespacesCloudpubsubsourcesDeleteRequest(
             name=source_ref.RelativeName()))
 
-    self.mock_serverless_client.namespaces_cloudpubsubsources.Delete.Expect(
+    self.mock_client.namespaces_cloudpubsubsources.Delete.Expect(
         expected_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
 
@@ -697,7 +705,7 @@ class EventflowOperationsTest(base.ServerlessBase):
       trigger.Trigger whose underlying message has been modified with the given
         values.
     """
-    trigger_obj = trigger.Trigger.New(self.mock_serverless_client, 'default')
+    trigger_obj = trigger.Trigger.New(self.mock_client, 'default')
     arg_utils.ParseStaticFieldsIntoMessage(trigger_obj.Message(), kwargs)
     return trigger_obj
 
@@ -718,7 +726,7 @@ class EventflowOperationsTest(base.ServerlessBase):
       source.Source whose underlying message has been modified with the given
         values.
     """
-    source_obj = source.Source.New(self.mock_serverless_client, 'default', kind,
+    source_obj = source.Source.New(self.mock_client, 'default', kind,
                                    api_category)
     arg_utils.ParseStaticFieldsIntoMessage(source_obj.Message(), kwargs)
     return source_obj

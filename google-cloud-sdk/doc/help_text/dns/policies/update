@@ -5,7 +5,9 @@ SYNOPSIS
     gcloud dns policies update POLICY
         [--alternative-name-servers=[NAME_SERVERS,...]]
         [--description=DESCRIPTION] [--enable-inbound-forwarding]
-        [--enable-logging] [--networks=[NETWORKS,...]] [GCLOUD_WIDE_FLAG ...]
+        [--enable-logging] [--networks=[NETWORKS,...]]
+        [--private-alternative-name-servers=[NAME_SERVERS,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update an existing Cloud DNS policy.
@@ -39,6 +41,10 @@ FLAGS
 
      --networks=[NETWORKS,...]
         The comma separated list of network names to associate with the policy.
+
+     --private-alternative-name-servers=[NAME_SERVERS,...]
+        List of alternative name servers to forward to. All addresses specified
+        for this parameter will be reached through the VPC.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha apigee deployments - manage deployments of Apigee proxies in
+        runtime environments
+
+SYNOPSIS
+    gcloud alpha apigee deployments COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage deployments of Apigee proxies in runtime environments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe an Apigee API proxy deployment.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

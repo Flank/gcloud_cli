@@ -53,9 +53,9 @@ class NodeGroupsListNodesTest(test_base.BaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME                      STATUS  NODE_TYPE       INSTANCES
-            node-1                    READY   iAPX-286        instance-1,instance-2
-            node-2                    READY   iAPX-286        instance-3
+            NAME                      STATUS  NODE_TYPE       INSTANCES              SERVER_ID
+            node-1                    READY   iAPX-286        instance-1,instance-2  server-1
+            node-2                    READY   iAPX-286        instance-3             server-2
             """),
         normalize_space=True)
 
@@ -67,8 +67,8 @@ class NodeGroupsListNodesTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME                      STATUS  NODE_TYPE       INSTANCES
-            node-1                    READY   iAPX-286        instance-1,instance-2
+            NAME                      STATUS  NODE_TYPE       INSTANCES              SERVER_ID
+            node-1                    READY   iAPX-286        instance-1,instance-2  server-1
             """),
         normalize_space=True)
 
@@ -80,9 +80,9 @@ class NodeGroupsListNodesTest(test_base.BaseTest):
         """.format(self.compute_uri))
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME                      STATUS  NODE_TYPE       INSTANCES
-            node-1                    READY   iAPX-286        instance-1,instance-2
-            node-2                    READY   iAPX-286        instance-3
+            NAME                      STATUS  NODE_TYPE       INSTANCES              SERVER_ID
+            node-1                    READY   iAPX-286        instance-1,instance-2  server-1
+            node-2                    READY   iAPX-286        instance-3             server-2
             """),
         normalize_space=True)
 
@@ -94,9 +94,9 @@ class NodeGroupsListNodesTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME                      STATUS  NODE_TYPE       INSTANCES
-            node-2                    READY   iAPX-286        instance-3
-            node-1                    READY   iAPX-286        instance-1,instance-2
+            NAME                      STATUS  NODE_TYPE       INSTANCES              SERVER_ID
+            node-2                    READY   iAPX-286        instance-3             server-2
+            node-1                    READY   iAPX-286        instance-1,instance-2  server-1
             """),
         normalize_space=True)
 
@@ -123,9 +123,9 @@ class NodeGroupsListNodesTest(test_base.BaseTest):
     )
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME                      STATUS  NODE_TYPE       INSTANCES
-            node-1                    READY   iAPX-286        instance-1,instance-2
-            node-2                    READY   iAPX-286        instance-3
+            NAME                      STATUS  NODE_TYPE       INSTANCES              SERVER_ID
+            node-1                    READY   iAPX-286        instance-1,instance-2  server-1
+            node-2                    READY   iAPX-286        instance-3             server-2
             """), normalize_space=True)
 
 if __name__ == '__main__':

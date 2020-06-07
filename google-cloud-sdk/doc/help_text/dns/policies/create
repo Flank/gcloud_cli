@@ -5,7 +5,9 @@ SYNOPSIS
     gcloud dns policies create POLICY --description=DESCRIPTION
         --networks=[NETWORKS,...]
         [--alternative-name-servers=[NAME_SERVERS,...]]
-        [--enable-inbound-forwarding] [--enable-logging] [GCLOUD_WIDE_FLAG ...]
+        [--enable-inbound-forwarding] [--enable-logging]
+        [--private-alternative-name-servers=[NAME_SERVERS,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command creates a new Cloud DNS policy.
@@ -40,6 +42,10 @@ OPTIONAL FLAGS
 
      --enable-logging
         Specifies whether to enable query logging. Defaults to False.
+
+     --private-alternative-name-servers=[NAME_SERVERS,...]
+        List of alternative name servers to forward to. All addresses specified
+        for this parameter will be reached through the VPC.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

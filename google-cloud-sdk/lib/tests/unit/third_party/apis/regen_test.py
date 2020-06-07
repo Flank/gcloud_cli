@@ -30,7 +30,7 @@ _CONFIG = os.path.join(
     _BASE_DIR, 'googlecloudsdk', 'third_party', 'regen_apis_config.yaml')
 
 
-@test_case.Filters.DoNotRunOnPy3('b/138241113')
+@test_case.Filters.DoNotRunOnPy2('b/138241113')
 class ClientGenCliTest(test_case.TestCase):
   pass
 

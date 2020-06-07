@@ -100,7 +100,7 @@ COMMONLY USED FLAGS
      --timeout=TIMEOUT
         The max time this test execution can run before it is cancelled
         (default: 15m). It does not include any time necessary to prepare and
-        clean up the target device. The maximum possible testing time is 30m on
+        clean up the target device. The maximum possible testing time is 45m on
         physical devices and 60m on virtual devices. The TIMEOUT units can be
         h, m, or s. If no unit is given, seconds are assumed. Examples:
         * --timeout 1h is 1 hour
@@ -179,7 +179,7 @@ FLAGS
         The name of the network traffic profile, for example
         --network-profile=LTE, which consists of a set of parameters to emulate
         network conditions when running the test (default: no network shaping;
-        see available profiles listed by the $ gcloud firebase test
+        see available profiles listed by the $ gcloud alpha firebase test
         network-profiles list command). This feature only works on physical
         devices.
 

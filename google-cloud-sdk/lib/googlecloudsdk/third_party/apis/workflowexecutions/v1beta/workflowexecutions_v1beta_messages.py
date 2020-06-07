@@ -143,7 +143,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)
@@ -228,8 +228,11 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsListRequest(_message
       view.
 
   Fields:
-    filter: Filter to restrict results to specific executions.
-    pageSize: Maximum number of executions to return per call.
+    pageSize: Maximum number of executions to return per call. Max supported
+      value depends on the selected Execution view: it's 10000 for BASIC and
+      100 for FULL. The default value used if the field is not specified is
+      100, regardless of the selected view. Values greater than the max value
+      will be coerced down to it.
     pageToken: A page token, received from a previous `ListExecutions` call.
       Provide this to retrieve the subsequent page.  When paginating, all
       other parameters provided to `ListExecutions` must match the call that
@@ -254,11 +257,10 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsListRequest(_message
     BASIC = 1
     FULL = 2
 
-  filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
-  view = _messages.EnumField('ViewValueValuesEnum', 5)
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+  view = _messages.EnumField('ViewValueValuesEnum', 4)
 
 
 encoding.AddCustomJsonFieldMapping(

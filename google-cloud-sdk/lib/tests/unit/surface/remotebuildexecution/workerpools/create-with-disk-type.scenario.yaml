@@ -31,7 +31,7 @@ actions:
                 workerConfig:
                   diskSizeGb: '200'
                   diskType: pd-ssd
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   reserved: false
                 workerCount: '1'
         return_response:
@@ -60,7 +60,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/ssd_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-ssd",
                   "diskSizeGb": "200",
                   "reserved": "false",
@@ -92,7 +92,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/ssd_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-ssd",
                   "diskSizeGb": "200",
                   "reserved": "false",

@@ -1115,7 +1115,7 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
          '{name} {version}\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
 
-  def testNodeConfigFromFile(self):
+  def testSystemConfigFromFile(self):
     self.assertIsNone(
         c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                   self.PROJECT_ID))
@@ -1148,7 +1148,7 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
     pool = self._MakeNodePool(**pool_version_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool)
 
-    node_config = self.Touch(
+    system_config_file = self.Touch(
         self.temp_path,
         contents="""
 kubeletConfig:
@@ -1163,10 +1163,10 @@ linuxConfig:
     self.Run(
         self.node_pools_command_base.format(self.ZONE) + ' create {name}'
         ' --cluster={cluster_id}'
-        ' --node-config={node_config}'.format(
+        ' --system-config-from-file={system_config_file}'.format(
             name='my-pool',
             cluster_id=self.CLUSTER_NAME,
-            node_config=node_config))
+            system_config_file=system_config_file))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),

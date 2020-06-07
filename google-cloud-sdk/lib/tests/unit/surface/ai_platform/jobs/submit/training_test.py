@@ -1216,6 +1216,61 @@ class TrainTestBeta(TrainTestBase, base.MlBetaPlatformTestBase):
              '    --worker-image-uri gcr.io/project/containerimage3'
              '    -- --model-dir=gs://my-bucket '.format(module_name))
 
+  def testTrain_AsyncKmsKeyName(self, module_name):
+    self._BaseSetUp()
+
+    key = 'projects/proj/locations/loc/keyRings/ring/cryptoKeys/key'
+    training_input = self.short_msgs.TrainingInput(
+        pythonModule='my_module',
+        packageUris=['gs://bucket/stuff.tar.gz'],
+        region='us-central1',
+        jobDir='gs://job-bucket/job-prefix',
+        encryptionConfig=self.short_msgs.EncryptionConfig(kmsKeyName=key))
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --kms-key {}'.format(module_name, key))
+
+  def testTrain_AsyncKmsKeyNameResourceArgs(self, module_name):
+    self._BaseSetUp()
+
+    key = 'projects/proj/locations/loc/keyRings/ring/cryptoKeys/key'
+    training_input = self.short_msgs.TrainingInput(
+        pythonModule='my_module',
+        packageUris=['gs://bucket/stuff.tar.gz'],
+        region='us-central1',
+        jobDir='gs://job-bucket/job-prefix',
+        encryptionConfig=self.short_msgs.EncryptionConfig(kmsKeyName=key))
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --kms-project proj '
+             '    --kms-location loc'
+             '    --kms-keyring ring'
+             '    --kms-key key'.format(module_name))
+
 
 class TrainTestAlpha(base.MlAlphaPlatformTestBase, TrainTestBeta):
   pass

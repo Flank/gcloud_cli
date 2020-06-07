@@ -1,0 +1,117 @@
+
+.TH "GCLOUD_BETA_COMPUTE_TARGET\-HTTP\-PROXIES_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute target\-http\-proxies import \- import a target HTTP proxy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute target\-http\-proxies import\fR \fINAME\fR [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Imports a target HTTP proxy's configuration from a file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the target HTTP proxy to import.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a YAML file containing configuration export data. The YAML file must not
+contain any output\-only fields. Alternatively, you may omit this flag to read
+from standard input. A schema describing the export/import format can be found
+in: $CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/beta/TargetHttpProxy.yaml.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the target HTTP proxy is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the target HTTP proxy to import. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+A target HTTP proxy can be imported by running:
+
+.RS 2m
+$ gcloud beta compute target\-http\-proxies import NAME \e
+    \-\-source=<path\-to\-file>
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute target\-http\-proxies import
+$ gcloud alpha compute target\-http\-proxies import
+.RE
+

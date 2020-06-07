@@ -443,10 +443,10 @@ class _BaseConnectTest(object):
           ))
 
   def MockProxyStartAndInstanceGet(self):
-    # Mock checking that the Cloud SQL Proxy component is installed.
+    # Mock checking that the Cloud SQL Proxy binary is installed.
     self.StartPatch(
-        'googlecloudsdk.command_lib.emulators.util.EnsureComponentIsInstalled',
-        return_value=None)
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value='cloud_sql_proxy')
     # Mock starting the proxy.
     self.StartPatch(
         'googlecloudsdk.api_lib.sql.instances.StartCloudSqlProxy',
@@ -585,6 +585,16 @@ class MysqlV2ConnectBetaTest(_BaseMysqlConnectTest, base.SqlMockTestBeta):
     self.assertEqual('-u', actual_user_flag)
     self.assertEqual(mysql_user, actual_username)
     self.assertEqual('-p', actual_pass_flag)
+
+  def testProxyNotAvailable(self):
+    self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value=None)
+
+    self.ExpectInstanceGet()
+
+    with self.assertRaises(exceptions.CloudSqlProxyError):
+      self.Run('sql connect {0} --database somedb'.format(self.instance['id']))
 
   def testDatabaseFlagError(self):
     self.MockConnectionSetup()

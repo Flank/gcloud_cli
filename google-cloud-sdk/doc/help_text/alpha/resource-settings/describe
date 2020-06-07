@@ -1,0 +1,52 @@
+NAME
+    gcloud alpha resource-settings describe - get a resource setting
+
+SYNOPSIS
+    gcloud alpha resource-settings describe SETTING_NAME
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Get a resource setting
+
+POSITIONAL ARGUMENTS
+     SETTING_NAME
+        Name of the resource settings. The list of available settings can be
+        found here:
+
+REQUIRED FLAGS
+     Resource that is associated with the resource settings. Exactly one of
+     these must be specified:
+
+       --folder=FOLDER_ID
+          Folder ID.
+
+       --organization=ORGANIZATION_ID
+          Organization ID.
+
+       --project=PROJECT_ID
+          Project ID. Overrides the default core/project property value for
+          this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To describe the resource settings iam-projectCreatorRoles with the Project
+    foo-project, run:
+
+        $ gcloud alpha resource-settings describe iam-projectCreatorRoles \
+            --project=foo-project
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

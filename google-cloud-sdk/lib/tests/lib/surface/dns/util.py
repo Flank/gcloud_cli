@@ -63,22 +63,58 @@ def GetDnsVisibilityDict(version,
   return result
 
 
-def ParseManagedZoneForwardingConfig(target_servers=None, version="v1"):
-  """Parses list of forwarding nameservers into ManagedZoneForwardingConfig."""
-  if not target_servers:
-    return None
+def ParseManagedZoneForwardingConfig(target_servers=None,
+                                     private_target_servers=None):
+  """Parses list of forwarding nameservers into ManagedZoneForwardingConfig.
 
-  messages = GetMessages(version)
-  target_servers = [
-      messages.ManagedZoneForwardingConfigNameServerTarget(ipv4Address=name)
-      for name in target_servers
-  ]
+  Args:
+    target_servers: (Sequence) IP addresses to use as forwarding targets for the
+      DNS Managed Zone that uses default forwarding logic.
+    private_target_servers: (Sequence) IP addresses to use as forwarding targets
+      for the DNS Managed Zone that always use the private VPC path.
 
-  return messages.ManagedZoneForwardingConfig(targetNameServers=target_servers)
+  Returns:
+    A messages.ManagedZoneForwardingConfig instance populated from the given
+    command line arguments. Only the not none server list will be parsed and
+    an empty list will be returned if both are none.
+  """
+  messages = GetMessages()
+  if target_servers == [""] and private_target_servers == [""]:
+    # Handle explicit unset case for update
+    return messages.ManagedZoneForwardingConfig(targetNameServers=[])
+
+  server_list = []
+  default_enum = messages.ManagedZoneForwardingConfigNameServerTarget.ForwardingPathValueValuesEnum(
+      0)
+  private_enum = messages.ManagedZoneForwardingConfigNameServerTarget.ForwardingPathValueValuesEnum(
+      1)
+  if target_servers:
+    server_list += [
+        messages.ManagedZoneForwardingConfigNameServerTarget(
+            ipv4Address=name, forwardingPath=default_enum)
+        for name in target_servers
+    ]
+  if private_target_servers:
+    server_list += [
+        messages.ManagedZoneForwardingConfigNameServerTarget(
+            ipv4Address=name, forwardingPath=private_enum)
+        for name in private_target_servers
+    ]
+
+  return messages.ManagedZoneForwardingConfig(targetNameServers=server_list)
 
 
 def PeeringConfig(target_project, target_network):
-  """Returns ManagedZonePeeringConfig."""
+  """Make a PeeringConfig that targets 'target_network' in 'target_project'.
+
+  Args:
+    target_project: (str) Project name of the project
+    target_network: (str) Network name of the network
+
+  Returns:
+    A messages.ManagedZonePeeringConfig instance generated from the given
+    project and network.
+  """
   messages = GetMessages()
 
   peering_network = ("https://www.googleapis.com/compute/v1/projects/{}/global"
@@ -107,21 +143,44 @@ def GetPolicies(num=3, name_server_config=None, forwarding=False,
   return r
 
 
-def GetAltNameServerConfig(target_servers=None):
-  """Get ForwardingConfig Message."""
-  if not target_servers:
+def GetAltNameServerConfig(target_servers=None, private_target_servers=None):
+  """Parses list of alternative nameservers into AlternativeNameServerConfig.
+
+  Args:
+    target_servers: (Sequence) IP addresses to use as forwarding targets for the
+      DNS Managed Zone that uses default forwarding logic.
+    private_target_servers: (Sequence) IP addresses to use as forwarding targets
+      for the DNS Managed Zone that always uses the private VPC path.
+
+  Returns:
+    A messages.PolicyAlternativeNameServerConfig instance populated from the
+    given command line arguments.Only the not none server list will be parsed
+    and an empty list will be returned if both are none.
+  """
+  if not target_servers and not private_target_servers:
     return None
 
   m = GetMessages()
-  if target_servers == [""]:
-    return None
+  service_list = []
+  default_enum = m.PolicyAlternativeNameServerConfigTargetNameServer.ForwardingPathValueValuesEnum(
+      0)
+  private_enum = m.PolicyAlternativeNameServerConfigTargetNameServer.ForwardingPathValueValuesEnum(
+      1)
+  if target_servers:
+    service_list += [
+        m.PolicyAlternativeNameServerConfigTargetNameServer(
+            ipv4Address=name, forwardingPath=default_enum)
+        for name in target_servers
+    ]
 
-  target_servers = [
-      m.PolicyAlternativeNameServerConfigTargetNameServer(ipv4Address=name)
-      for name in target_servers
-  ]
+  if private_target_servers:
+    service_list += [
+        m.PolicyAlternativeNameServerConfigTargetNameServer(
+            ipv4Address=name, forwardingPath=private_enum)
+        for name in private_target_servers
+    ]
 
-  return m.PolicyAlternativeNameServerConfig(targetNameServers=target_servers)
+  return m.PolicyAlternativeNameServerConfig(targetNameServers=service_list)
 
 
 def GetNetworkURI(network, project):

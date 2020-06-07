@@ -29,10 +29,10 @@ from tests.lib import test_case
 
 class ArchiveTest(test_case.TestCase):
 
-  def _MakeZip(self, src_dir):
+  def _MakeZip(self, src_dir, update_date=False):
     with files.TemporaryDirectory() as dst_dir:
       zip_file = os.path.join(dst_dir, 'arch.zip')
-      archive.MakeZipFromDir(zip_file, src_dir)
+      archive.MakeZipFromDir(zip_file, src_dir, update_date=update_date)
       zf = zipfile.ZipFile(zip_file)
       try:
         self.assertIsNone(zf.testzip())
@@ -111,6 +111,30 @@ class ArchiveTest(test_case.TestCase):
                       ('full_directory/', b''),
                       ('full_directory/sample1.txt', b''),
                       ('full_directory/sample2.txt', b'Hello'),
+                      ('sample.txt', b'')], sorted(name_list))
+
+  def testZipOlder1980(self):
+    with files.TemporaryDirectory() as src_dir:
+      os.makedirs(os.path.join(src_dir, 'empty_dir'))
+      os.utime(os.path.join(src_dir, 'empty_dir'),
+               (289955080, 289955080))  #  1979-03-10
+      with open(os.path.join(src_dir, 'sample.txt'), 'a'):
+        pass
+      os.utime(os.path.join(src_dir, 'sample.txt'), (289955080, 289955080))
+      full_dir = os.path.join(src_dir, 'full_dir')
+      os.makedirs(full_dir)
+      with open(os.path.join(full_dir, 'sample1.txt'), 'a'):
+        pass
+      with open(os.path.join(full_dir, 'sample2.txt'), 'a') as f:
+        f.write('Hello')
+      name_list = self._MakeZip(src_dir, update_date=True)
+      self.assertEqual(os.path.getmtime(os.path.join(src_dir, 'sample.txt')),
+                       289955080)
+      self.assertEqual(os.path.getmtime(os.path.join(src_dir, 'empty_dir')),
+                       289955080)
+    self.assertEqual([('empty_dir/', b''), ('full_dir/', b''),
+                      ('full_dir/sample1.txt', b''),
+                      ('full_dir/sample2.txt', b'Hello'),
                       ('sample.txt', b'')], sorted(name_list))
 
 

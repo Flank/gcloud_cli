@@ -6,7 +6,9 @@ SYNOPSIS
         --dns-name=DNS_NAME [--denial-of-existence=DENIAL_OF_EXISTENCE]
         [--dnssec-state=DNSSEC_STATE] [--forwarding-targets=[IP_ADDRESSES,...]]
         [--ksk-algorithm=KSK_ALGORITHM] [--ksk-key-length=KSK_KEY_LENGTH]
-        [--labels=[KEY=VALUE,...]] [--networks=[NETWORK,...]]
+        [--labels=[KEY=VALUE,...]] [--managed-reverse-lookup]
+        [--networks=[NETWORK,...]]
+        [--private-forwarding-targets=[IP_ADDRESSES,...]]
         [--visibility=VISIBILITY; default="public"]
         [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
         [--target-network=TARGET_NETWORK --target-project=TARGET_PROJECT]
@@ -63,9 +65,18 @@ OPTIONAL FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     --managed-reverse-lookup
+        Whether this zone is a managed reverse lookup zone, required for Cloud
+        DNS to correctly resolve Non-RFC1918 PTR records.
+
      --networks=[NETWORK,...]
         List of networks that the zone should be visible in if the zone
         visibility is [private].
+
+     --private-forwarding-targets=[IP_ADDRESSES,...]
+        List of IPv4 addresses of target name servers that the zone will
+        forward queries to. Ignored for public visibility. All addresses
+        specified for this parameter will be reached through the VPC.
 
      --visibility=VISIBILITY; default="public"
         Visibility of the zone. Public zones are visible to the public

@@ -1,0 +1,127 @@
+
+.TH "GCLOUD_BETA_PUBSUB_LITE\-TOPICS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub lite\-topics update \- update a Pub/Sub Lite topic
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub lite\-topics update\fR (\fITOPIC\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) (\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR\ \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR\ \fB\-\-scale\fR=\fISCALE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Update a Pub/Sub Lite topic.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Topic resource \- Topic to update. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [topic] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fITOPIC\fR
+ID of the topic or fully qualified identifier for the topic. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+ID of the location of the Pub/Sub Lite resource.
+
+If not specified, will use \f5default\fR pubsub/lite_zone property.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+At least one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR
+How long a published message is retained. If unset, messages will only be
+dropped to make space for new ones once the \f5per\-partition\-bytes\fR limit is
+reached. A valid example value of this flag would be
+\f5message\-retention\-period="2w"\fR.
+
+.TP 2m
+\fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR
+Provisioned storage, in bytes, per partition. If the number of bytes stored in
+any of the topic's partitions exceeds this value, older messages will be dropped
+to make room for newer ones, regardless of the value of
+\f5message\-retention\-period\fR. A valid example value of this flag would be
+\f5per\-partition\-bytes=30GiB\fR.
+
+.TP 2m
+\fB\-\-scale\fR=\fISCALE\fR
+Topic partition scale value. Every partition in the topic is allocated
+throughput equivalent to \f5scale\fR times the standard partition throughput (4
+MiB/s of publishing throughput and 8 MiB/s of subscribing throughput). This is
+also reflected in the cost of this topic; a topic with \f5scale\fR of 2 and
+count of 10 is charged for 20 partitions.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBpubsublite/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/pubsub/docs
+
+
+
+.SH "EXAMPLES"
+
+To update a Pub/Sub Lite topic, run:
+
+.RS 2m
+$ gcloud beta pubsub lite\-topics update mytopic \e
+    \-\-zone=us\-central1\-a \e
+    \-\-scale=2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha pubsub lite\-topics update
+.RE
+

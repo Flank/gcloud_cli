@@ -2,7 +2,7 @@ NAME
     gcloud beta projects delete - delete a project
 
 SYNOPSIS
-    gcloud beta projects delete PROJECT_ID [GCLOUD_WIDE_FLAG ...]
+    gcloud beta projects delete PROJECT_ID_OR_NUMBER [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Deletes the project with the given project ID.
@@ -13,8 +13,8 @@ DESCRIPTION
         project.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to delete.
+     PROJECT_ID_OR_NUMBER
+        ID or number for the project you want to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

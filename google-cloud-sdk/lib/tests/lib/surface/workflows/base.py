@@ -22,6 +22,7 @@ from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.api_lib.workflows import workflows
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -30,17 +31,19 @@ class WorkflowsTestBase(cli_test_base.CliTestBase):
   """Base class for all Workflows tests."""
 
   def SetUp(self):
-    self.messages = core_apis.GetMessagesModule('workflows', 'v1alpha1')
+    self.api_version = workflows.ReleaseTrackToApiVersion(self.track)
+    self.messages = core_apis.GetMessagesModule('workflows', self.api_version)
 
 
 class WorkflowsUnitTestBase(WorkflowsTestBase, sdk_test_base.WithFakeAuth):
   """Base class for all Workflows unit tests that use fake auth and mocks."""
 
   def SetUp(self):
+    super(WorkflowsUnitTestBase, self).SetUp()
     self.mock_client = mock.Client(
-        core_apis.GetClientClass('workflows', 'v1alpha1'),
+        core_apis.GetClientClass('workflows', self.api_version),
         real_client=core_apis.GetClientInstance(
-            'workflows', 'v1alpha1', no_http=True))
+            'workflows', self.api_version, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
     self.StartPatch('time.sleep')

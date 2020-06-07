@@ -6,7 +6,7 @@ summary:
 - execute:
   - command: network-management connectivity-tests create $$my-test$$ --protocol=UDP
       --source-instance=projects/fake-project/zones/fake-zone/instances/fake-source-instance
-      --destination-instance=projects/fake-project/zones/fake-zone/instances/fake-destination-instance
+      --destination-instance=projects/google.com:fake-project2/zones/fake-zone/instances/fake-destination-instance
   - stderr: |
       Create request issued for: [$$my-test$$]
   - progress_tracker:
@@ -34,7 +34,7 @@ actions:
 - execute_command:
     command: network-management connectivity-tests create $$my-test$$ --protocol=UDP
       --source-instance=projects/fake-project/zones/fake-zone/instances/fake-source-instance
-      --destination-instance=projects/fake-project/zones/fake-zone/instances/fake-destination-instance
+      --destination-instance=projects/google.com:fake-project2/zones/fake-zone/instances/fake-destination-instance
     events:
     - api_call:
         poll_operation: false
@@ -46,7 +46,7 @@ actions:
               source:
                 instance: projects/fake-project/zones/fake-zone/instances/fake-source-instance
               destination:
-                instance: projects/fake-project/zones/fake-zone/instances/fake-destination-instance
+                instance: projects/google.com:fake-project2/zones/fake-zone/instances/fake-destination-instance
         return_response:
           headers:
             cache-control: private

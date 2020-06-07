@@ -1,0 +1,69 @@
+title: |
+  compute target-https-proxies import tests.
+  proxyBind is not promoted to GA.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+- write_file:
+    path: test-target-https-proxy.yaml
+    contents: |
+      name: test-target-https-proxy
+      description: This is a test Target Https Proxy
+      kind: compute#targetHttpsProxy
+      urlMap: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/urlMaps/test-url-map
+      proxyBind: true
+
+- set_property:
+    core/project: test-project
+
+- execute_command:
+    command: compute target-https-proxies import test-target-https-proxy --source='test-target-https-proxy.yaml' --global
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/targetHttpsProxies/test-target-https-proxy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+            body: |
+              {
+                "error": {
+                  "code": "404",
+                  "message": "Resource 'projects/test-project/global/targetHttpsProxies/test-target-https-proxy' was not found",
+                  "status": "NOT_FOUND",
+                }
+              }
+    - expect_exit:
+        code: 1
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/targetHttpsProxies/test-target-https-proxy?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              name: test-target-https-proxy
+              description: This is a test Target Https Proxy
+              kind: compute#targetHttpsProxy
+              urlMap: https://compute.googleapis.com/compute/$$api-version$$/projects/test-project/global/urlMaps/test-url-map
+              proxyBind: true
+            }
+        return_response:
+          headers:
+            status: '200'
+    - expect_exit:
+        code: 0

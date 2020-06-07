@@ -7,6 +7,7 @@ budget plan and the rules to execute as spend is tracked against that plan.
 
 from apitools.base.protorpclite import messages as _messages
 from apitools.base.py import encoding
+from apitools.base.py import extra_types
 
 
 package = 'billingbudgets'
@@ -93,12 +94,12 @@ class GoogleCloudBillingBudgetsV1beta1AllUpdatesRule(_messages.Message):
       related messages will be published, in the form
       `projects/{project_id}/topics/{topic_id}`. Updates are sent at regular
       intervals to the topic. The topic needs to be created before the budget
-      is created; see https://cloud.google.com/billing/docs/how-to/budgets
-      #manage-notifications for more details. Caller is expected to have
-      `pubsub.topics.setIamPolicy` permission on the topic when it's set for a
-      budget, otherwise, the API call will fail with PERMISSION_DENIED. See
-      https://cloud.google.com/pubsub/docs/access-control for more details on
-      Pub/Sub roles and permissions.
+      is created; see https://cloud.google.com/billing/docs/how-
+      to/budgets#manage-notifications for more details. Caller is expected to
+      have `pubsub.topics.setIamPolicy` permission on the topic when it's set
+      for a budget, otherwise, the API call will fail with PERMISSION_DENIED.
+      See https://cloud.google.com/pubsub/docs/access-control for more details
+      on Pub/Sub roles and permissions.
     schemaVersion: Required. The schema version of the notification. Only
       "1.0" is accepted. It represents the JSON schema as defined in
       https://cloud.google.com/billing/docs/how-to/budgets#notification_format
@@ -174,9 +175,19 @@ class GoogleCloudBillingBudgetsV1beta1Filter(_messages.Message):
     CreditTypesTreatmentValueValuesEnum: Optional. If not set, default
       behavior is `INCLUDE_ALL_CREDITS`.
 
+  Messages:
+    LabelsValue: Optional. A single label and value pair specifying that usage
+      from only this set of labeled resources should be included in the
+      budget. Multiple entries or multiple values per entry are not allowed.
+      If omitted, the report will include all labeled and unlabeled usage.
+
   Fields:
     creditTypesTreatment: Optional. If not set, default behavior is
       `INCLUDE_ALL_CREDITS`.
+    labels: Optional. A single label and value pair specifying that usage from
+      only this set of labeled resources should be included in the budget.
+      Multiple entries or multiple values per entry are not allowed. If
+      omitted, the report will include all labeled and unlabeled usage.
     projects: Optional. A set of projects of the form `projects/{project}`,
       specifying that usage from only this set of projects should be included
       in the budget. If omitted, the report will include all usage for the
@@ -187,6 +198,12 @@ class GoogleCloudBillingBudgetsV1beta1Filter(_messages.Message):
       in the budget. If omitted, the report will include usage for all the
       services. The service names are available through the Catalog API:
       https://cloud.google.com/billing/v1/how-tos/catalog-api.
+    subaccounts: Optional. A set of subaccounts of the form
+      `billingAccounts/{account_id}`, specifying that usage from only this set
+      of subaccounts should be included in the budget. If a subaccount is set
+      to the name of the master account, usage from the master account will be
+      included. If omitted, the report will include usage from the master
+      account and all subaccounts, if they exist.
   """
 
   class CreditTypesTreatmentValueValuesEnum(_messages.Enum):
@@ -203,9 +220,38 @@ class GoogleCloudBillingBudgetsV1beta1Filter(_messages.Message):
     INCLUDE_ALL_CREDITS = 1
     EXCLUDE_ALL_CREDITS = 2
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Optional. A single label and value pair specifying that usage from
+    only this set of labeled resources should be included in the budget.
+    Multiple entries or multiple values per entry are not allowed. If omitted,
+    the report will include all labeled and unlabeled usage.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2, repeated=True)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   creditTypesTreatment = _messages.EnumField('CreditTypesTreatmentValueValuesEnum', 1)
-  projects = _messages.StringField(2, repeated=True)
-  services = _messages.StringField(3, repeated=True)
+  labels = _messages.MessageField('LabelsValue', 2)
+  projects = _messages.StringField(3, repeated=True)
+  services = _messages.StringField(4, repeated=True)
+  subaccounts = _messages.StringField(5, repeated=True)
 
 
 class GoogleCloudBillingBudgetsV1beta1LastPeriodAmount(_messages.Message):
@@ -369,7 +415,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

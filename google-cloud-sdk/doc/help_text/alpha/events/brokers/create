@@ -3,8 +3,8 @@ NAME
         namespace for eventing
 
 SYNOPSIS
-    gcloud alpha events brokers create BROKER --service-account=SERVICE_ACCOUNT
-        [--namespace=NAMESPACE] [--platform=PLATFORM]
+    gcloud alpha events brokers create BROKER [--namespace=NAMESPACE]
+        [--platform=PLATFORM] [--service-account=SERVICE_ACCOUNT]
         [--region=REGION
           | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
           | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
@@ -18,12 +18,7 @@ POSITIONAL ARGUMENTS
      BROKER
         Name of the Broker to create.
 
-REQUIRED FLAGS
-     --service-account=SERVICE_ACCOUNT
-        Email address of an IAM service account which represents the identity
-        of the internal events operator.
-
-OPTIONAL FLAGS
+FLAGS
      Namespace resource - Namespace to create the Broker in. This represents a
      Cloud resource.
 
@@ -47,6 +42,11 @@ OPTIONAL FLAGS
             Use a Knative-compatible kubernetes cluster. Use with the
             --kubeconfig and --context flags to specify a kubeconfig file and
             the context for connecting.
+
+     --service-account=SERVICE_ACCOUNT
+        Email address of an existing IAM service account which represents the
+        identity of the internal events operator. If no service account is
+        provided, a default service account (cloud-run-events) will be created.
 
      Arguments to locate resources, depending on the platform used. At most one
      of these may be specified:

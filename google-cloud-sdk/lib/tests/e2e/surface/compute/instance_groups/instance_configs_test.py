@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
+from tests.lib.surface.compute.e2e_test_base import test_case
 
 
 class ManagedInstanceGroupsInstanceConfigsZonalTest(
@@ -63,32 +64,38 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
         instance_template_name, size=1)
     self.WaitUntilStable(igm_name)
     instance_uri = self.GetInstanceUris(igm_name)[0]
-    instance_zone = self.ExtractZoneFromUri(instance_uri)
-    new_disk_uri = self.CreateDiskForStateful(zone=instance_zone)
+    new_disk_uri = self.CreateDiskForStateful(
+        size=20,
+        zone=self.ExtractZoneFromUri(instance_uri),
+        image_family=self.DEFAULT_DISK_IMAGE_FAMILY,
+        image_project=self.DEFAULT_DISK_IMAGE_PROJECT)
     # --update-instance is True by default
     self.Run("""\
         compute instance-groups managed instance-configs create {group_name} \
           {scope_flag} \
           --instance {instance} \
-          --stateful-disk device-name=disk1 \
-          --stateful-disk device-name=disk3,source={source} \
+          --stateful-disk device-name=disk1,auto-delete=on-permanent-instance-deletion \
+          --stateful-disk device-name={boot_disk_name},source={source}
     """.format(
         group_name=igm_name,
         scope_flag=self.GetScopeFlag(),
         instance=instance_uri,
+        boot_disk_name='persistent-disk-0',
         source=new_disk_uri))
     self.ClearOutput()
     self._ListInstanceConfigs(igm_name)
     self.AssertNewOutputContainsAll([
-        'name: {0}'.format(self.ExtractInstanceNameFromUri(instance_uri)),
-        """
-        disk3:
-          autoDelete: NEVER
-        """,
-        """
-        disk1:
-          autoDelete: NEVER
-        """
+        'name: {0}'.format(self.ExtractInstanceNameFromUri(instance_uri)), """
+            {boot_disk_name}:
+              autoDelete: NEVER
+              mode: READ_WRITE
+              source: {boot_disk_source}
+            """.format(
+                boot_disk_name='persistent-disk-0',
+                boot_disk_source=new_disk_uri), """
+            disk1:
+              autoDelete: ON_PERMANENT_INSTANCE_DELETION
+            """
     ],
                                     normalize_space=True)
     self.AssertOutputNotContains('disk2')
@@ -96,8 +103,13 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
     self.ClearOutput()
     self.DescribeInstance(instance_uri)
     self.AssertNewOutputContainsAll([
-        'deviceName: disk3', 'source: {0}'.format(new_disk_uri), 'boot: false'
-    ])
+        """
+        boot: true
+        deviceName: {boot_disk_name}
+        """.format(boot_disk_name='persistent-disk-0'),
+        'source: {0}'.format(new_disk_uri),
+    ],
+                                    normalize_space=True)
 
   def testUpdateInstanceConfigEditStatefulDisksWithoutInstanceUpdate(self):
     instance_template_name = self.CreateInstanceTemplate(
@@ -155,6 +167,7 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
     self.AssertOutputNotContains('disk1')
     self.AssertOutputNotContains('disk2')
 
+  @test_case.Filters.skip('stderr assertion wrong', 'b/157133801')
   def testDeleteInstanceConfigs(self):
     instance_template_name = self.CreateInstanceTemplate(
         additional_disks=['disk1', 'disk2'])

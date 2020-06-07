@@ -9,8 +9,8 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Removes a policy binding from the IAM policy of a kms keyring. One
-    binding consists of a member, a role, and an optional condition.
+    (ALPHA) Removes a policy binding from the IAM policy of a kms keyring. A
+    binding consists of at least one member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
      Keyring resource - The keyring to remove the IAM policy binding. The

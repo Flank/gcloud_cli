@@ -1,5 +1,5 @@
 title: gcloud workflows delete test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -29,7 +29,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://workflows.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow?alt=json
+          uri: https://workflows.googleapis.com/v1beta/projects/fake-project/locations/us-central1/workflows/test-workflow?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -40,12 +40,12 @@ actions:
             {
               "name": "projects/fake-project/locations/us-central1/operations/operation-42",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.workflows.v1alpha1.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.workflows.v1beta.OperationMetadata",
                 "createTime": "2019-06-19T16:58:10.998276253Z",
                 "target": "projects/fake-project/locations/us-central1/workflows/test-workflow",
                 "verb": "delete",
                 "cancelRequested": false,
-                "apiVersion": "v1alpha1"
+                "apiVersion": "v1beta"
               },
               "done": false
             }

@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: one more parent
+    bug: b/156887911
 title: project get-ancestors test
 release_tracks: [GA]
 summary:
@@ -7,6 +11,7 @@ summary:
   - stdout: |
       ID                             TYPE
       cloud-sdk-integration-testing  project
+      143644243706                   folder
       396521612403                   folder
       433637338589                   organization
 actions:
@@ -22,7 +27,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '341'
+            content-length: '439'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -32,6 +37,9 @@ actions:
                 id: cloud-sdk-integration-testing
             - resourceId:
                 type: folder
+                id: '143644243706'
+            - resourceId:
+                type: folder
                 id: '396521612403'
             - resourceId:
                 type: organization
@@ -39,6 +47,7 @@ actions:
     - expect_stdout: |
         ID                             TYPE
         cloud-sdk-integration-testing  project
+        143644243706                   folder
         396521612403                   folder
         433637338589                   organization
     - expect_exit:

@@ -1,0 +1,46 @@
+NAME
+    gcloud beta workflows - manage your Cloud Workflows resources
+
+SYNOPSIS
+    gcloud beta workflows GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Manage your Cloud Workflows resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     executions
+        (BETA) Manage your Cloud Workflow execution resources.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (BETA) Delete a workflow.
+
+     deploy
+        (BETA) Create or update a workflow.
+
+     describe
+        (BETA) Show metadata for a workflow.
+
+     execute
+        (BETA) Execute a workflow.
+
+     list
+        (BETA) List workflows.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

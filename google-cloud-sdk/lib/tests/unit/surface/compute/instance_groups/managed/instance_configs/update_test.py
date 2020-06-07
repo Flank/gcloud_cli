@@ -243,7 +243,7 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
           .MinimalActionValueValuesEnum.NONE,
           mostDisruptiveAllowedAction=self.messages
           .InstanceGroupManagersApplyUpdatesRequest
-          .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
+          .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -610,7 +610,7 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
                     .MinimalActionValueValuesEnum.NONE,
                     mostDisruptiveAllowedAction=self.messages
                     .RegionInstanceGroupManagersApplyUpdatesRequest
-                    .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
+                    .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
             project='fake-project',
             region='us-central2',
         )

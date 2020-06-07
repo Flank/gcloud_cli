@@ -103,6 +103,31 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
                    '--service myapp --domain www.example.com')
         self.AssertErrContains('www.not-example.com')
 
+  def testDomainMappingCreateAlreadyExistsPrompts(self):
+    """Create a domain mapping and prompt and try again if its already in use."""
+
+    self.operations.CreateDomainMapping.side_effect = [
+        exceptions.DomainMappingAlreadyExistsError(), self.domain_mapping
+    ]
+
+    with mock.patch(
+        'googlecloudsdk.api_lib.run.global_methods.GetServerlessClientInstance',
+        return_value=self.mock_serverless_client):
+      verified_domains = [
+          self.mock_serverless_client.MESSAGES_MODULE.AuthorizedDomain(
+              id='www.example.com')
+      ]
+      with mock.patch(
+          'googlecloudsdk.api_lib.run.global_methods.ListVerifiedDomains',
+          return_value=verified_domains):
+        self.WriteInput('y\n')
+        self.Run('run domain-mappings create '
+                 '--service myapp --domain www.example.com')
+        self.AssertOutputContains(
+            """NAME RECORD TYPE CONTENTS
+            myapp A 216.239.32.21""",
+            normalize_space=True)
+
   def testDomainMappingCreateUnverifiedDomainGKE(self):
     """Create a domain mapping."""
 

@@ -27,6 +27,9 @@ COMMANDS
      create-app-engine-queue
         (BETA) (DEPRECATED) Create a Cloud Tasks queue.
 
+     create-pull-queue
+        (BETA) Create a pull queue.
+
      delete
         (BETA) Delete a queue.
 
@@ -37,7 +40,7 @@ COMMANDS
         (BETA) Get the IAM policy for a queue.
 
      list
-        (BETA) List all queues.
+        (BETA) List all queues including their type.
 
      pause
         (BETA) Pause a queue.

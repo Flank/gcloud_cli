@@ -27,8 +27,7 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create an HTTP legacy health check to monitor load balanced
-        instances.
+        (BETA) Create a legacy HTTP health check.
 
      delete
         (BETA) Delete HTTP health checks.
@@ -40,7 +39,7 @@ COMMANDS
         (BETA) List Google Compute Engine health checks.
 
      update
-        (BETA) Update an HTTP health check.
+        (BETA) Update a legacy HTTP health check.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -4,32 +4,32 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      scc assets get-project 345840165995 --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
+      scc assets get-project 702114178617 --resource-name=//cloudresourcemanager.googleapis.com/projects/1096071605089
   - stdout: |
-        projectId: prober-project-1
+        projectId: gcloudtestproject1
 - execute:
   - command: |
-      scc assets get-project 345840165995 --asset=4285038039734670702
+      scc assets get-project 702114178617 --asset=11773236938904334887
   - stdout: |
-        projectId: prober-project-1
+        projectId: gcloudtestproject1
 - execute:
   - command: |
-      scc assets get-project 345840165995 --asset=10851265360336357506
+      scc assets get-project 702114178617 --asset=9160976373479434521
   - error: '1: Organization assets do not belong to a Project.'
 - execute:
   - command: |
-      scc assets get-project 345840165995 --asset=1
+      scc assets get-project 702114178617 --asset=1
   - error: '1: Asset or resource does not exist for the provided Organization. Please verify that both the OrganizationId and AssetId/ResourceName are correct.'
 actions:
 # Get project using resource name.
 - execute_command:
     command: |
-      scc assets get-project 345840165995 --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
+      scc assets get-project 702114178617 --resource-name=//cloudresourcemanager.googleapis.com/projects/1096071605089
     events:
     - api_call:
         repeatable: true
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F428809690096%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F1096071605089%22
           method: GET
           headers: {}
           body: null
@@ -41,12 +41,12 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "name": "organizations/702114178617/assets/595423472147994486",
                     "securityCenterProperties": {
-                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/1096071605089",
                       "resourceType": "google.cloud.resourcemanager.Project",
-                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
-                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/702114178617",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/1096071605089",
                       "resourceOwners": [
                         "user:riskdashboard.prober@cscc-prober-org.joonix.net"
                       ]
@@ -54,13 +54,13 @@ actions:
                     "resourceProperties": {
                       "name": "prober project 1",
                       "lifecycleState": "active",
-                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
-                      "projectId": "prober-project-1",
+                      "parent": "{\"id\":\"702114178617\",\"type\":\"organization\"}",
+                      "projectId": "gcloudtestproject1",
                       "createTime": "2018-09-12t17:39:00.974z",
-                      "projectNumber": 428809690096
+                      "projectNumber": 1096071605089
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "name": "organizations/702114178617/assets/595423472147994486/securityMarks",
                       "marks": {
                         "probermark": "proberTestValue",
                         "testB": "valueB",
@@ -76,19 +76,20 @@ actions:
               "readTime": "2019-03-21T22:11:36.105Z",
               "totalSize": 1
             }
-    - expect_stdout: |
-        projectId: prober-project-1
+    - expect_stdout:
+        matches: |
+          .*gcloudtestproject1
     - expect_exit:
         code: 0
 # Get project using asset id.
 - execute_command:
     command: |
-      scc assets get-project 345840165995 --asset=4285038039734670702
+      scc assets get-project 702114178617 --asset=11773236938904334887
     events:
     - api_call:
         repeatable: true
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F4285038039734670702%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=name%3D%22organizations%2F702114178617%2Fassets%2F11773236938904334887%22
           method: GET
           headers: {}
           body: null
@@ -100,12 +101,12 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "name": "organizations/702114178617/assets/595423472147994486",
                     "securityCenterProperties": {
-                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/1096071605089",
                       "resourceType": "google.cloud.resourcemanager.Project",
-                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
-                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/702114178617",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/1096071605089",
                       "resourceOwners": [
                         "user:riskdashboard.prober@cscc-prober-org.joonix.net"
                       ]
@@ -113,13 +114,13 @@ actions:
                     "resourceProperties": {
                       "name": "prober project 1",
                       "lifecycleState": "active",
-                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
-                      "projectId": "prober-project-1",
+                      "parent": "{\"id\":\"702114178617\",\"type\":\"organization\"}",
+                      "projectId": "gcloudtestproject1",
                       "createTime": "2018-09-12t17:39:00.974z",
-                      "projectNumber": 428809690096
+                      "projectNumber": 1096071605089
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "name": "organizations/702114178617/assets/595423472147994486/securityMarks",
                       "marks": {
                         "probermark": "proberTestValue",
                         "testB": "valueB",
@@ -138,7 +139,7 @@ actions:
     - api_call:
         repeatable: true
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F428809690096%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F1096071605089%22
           method: GET
           headers: {}
           body: null
@@ -150,12 +151,12 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "name": "organizations/702114178617/assets/595423472147994486",
                     "securityCenterProperties": {
-                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/1096071605089",
                       "resourceType": "google.cloud.resourcemanager.Project",
-                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
-                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/702114178617",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/1096071605089",
                       "resourceOwners": [
                         "user:riskdashboard.prober@cscc-prober-org.joonix.net"
                       ]
@@ -163,13 +164,13 @@ actions:
                     "resourceProperties": {
                       "name": "prober project 1",
                       "lifecycleState": "active",
-                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
-                      "projectId": "prober-project-1",
+                      "parent": "{\"id\":\"702114178617\",\"type\":\"organization\"}",
+                      "projectId": "gcloudtestproject1",
                       "createTime": "2018-09-12t17:39:00.974z",
-                      "projectNumber": 428809690096
+                      "projectNumber": 1096071605089
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "name": "organizations/702114178617/assets/595423472147994486/securityMarks",
                       "marks": {
                         "probermark": "proberTestValue",
                         "testB": "valueB",
@@ -185,19 +186,20 @@ actions:
               "readTime": "2019-03-21T22:11:36.105Z",
               "totalSize": 1
             }
-    - expect_stdout: |
-        projectId: prober-project-1
+    - expect_stdout:
+        matches: |
+          .*gcloudtestproject1
     - expect_exit:
         code: 0
 # Try to get project of an Organization. This will fail.
 - execute_command:
     command: |
-      scc assets get-project 345840165995 --asset=10851265360336357506
+      scc assets get-project 702114178617 --asset=9160976373479434521
     events:
     - api_call:
         repeatable: true
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F10851265360336357506%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=name%3D%22organizations%2F702114178617%2Fassets%2F9160976373479434521%22
           method: GET
           headers: {}
           body: null
@@ -209,14 +211,14 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/10851265360336357506",
+                    "name": "organizations/702114178617/assets/9160976373479434521",
                     "securityCenterProperties": {
-                      "resourceName": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceName": "//cloudresourcemanager.googleapis.com/organizations/702114178617",
                       "resourceType": "google.cloud.resourcemanager.Organization"
                     },
                     "resourceProperties": {
-                      "organizationId": "345840165995",
-                      "name": "organizations/345840165995",
+                      "organizationId": "702114178617",
+                      "name": "organizations/702114178617",
                       "owner": "{\"directoryCustomerId\":\"C011uk192\"}",
                       "lifecycleState": "active",
                       "displayName": "cscc-prober-org.joonix.net",
@@ -224,7 +226,7 @@ actions:
                       "lastModifiedTime": "2018-09-12t17:22:25.87z"
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/10851265360336357506/securityMarks"
+                      "name": "organizations/702114178617/assets/9160976373479434521/securityMarks"
                     },
                     "createTime": "2018-09-12T18:12:04.214Z",
                     "updateTime": "2018-10-17T22:00:25.516Z",
@@ -242,12 +244,12 @@ actions:
 # Try to get project of an invalid asset. This will fail.
 - execute_command:
     command: |
-      scc assets get-project 345840165995 --asset=1
+      scc assets get-project 702114178617 --asset=1
     events:
     - api_call:
         repeatable: true
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F1%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=name%3D%22organizations%2F702114178617%2Fassets%2F1%22
           method: GET
           headers: {}
           body: null

@@ -1,5 +1,6 @@
 NAME
-    gcloud compute http-health-checks update - update an HTTP health check
+    gcloud compute http-health-checks update - update a legacy HTTP health
+        check
 
 SYNOPSIS
     gcloud compute http-health-checks update NAME
@@ -9,9 +10,9 @@ SYNOPSIS
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute http-health-checks update is used to update an existing HTTP
-    health check. Only arguments passed in will be updated on the health check.
-    Other attributes will remain unaffected.
+    gcloud compute http-health-checks update is used to update an existing
+    legacy HTTP health check. Only arguments passed in will be updated on the
+    health check. Other attributes will remain unaffected.
 
 POSITIONAL ARGUMENTS
      NAME

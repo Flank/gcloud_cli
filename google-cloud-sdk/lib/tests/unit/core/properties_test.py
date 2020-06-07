@@ -486,6 +486,7 @@ class PropertyValidatorTests(sdk_test_base.SdkBase, parameterized.TestCase):
       properties.VALUES.app.cloud_build_timeout.Set('x1123')
 
   def testGoodTimeouts(self):
+    properties.VALUES.app.cloud_build_timeout.Set('12m')
     properties.VALUES.app.cloud_build_timeout.Set('123')
     properties.VALUES.app.cloud_build_timeout.Set('1m23s')
 

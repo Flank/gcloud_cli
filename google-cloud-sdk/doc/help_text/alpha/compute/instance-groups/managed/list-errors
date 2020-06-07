@@ -28,7 +28,7 @@ DESCRIPTION
       o Viewer
 
     For more information regarding permissions required by managed instance
-    groups, refer to Compute Engine's access control guide :
+    groups, refer to Compute Engine's access control guide:
     https://cloud.google.com/compute/docs/access/iam-permissions#instancegroupmanagers_collection.
 
 POSITIONAL ARGUMENTS
@@ -107,7 +107,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud compute instance-groups managed list-errors
         $ gcloud beta compute instance-groups managed list-errors
 

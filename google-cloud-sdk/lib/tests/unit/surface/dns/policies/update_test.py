@@ -28,6 +28,7 @@ class UpdateTest(base.DnsMockTest):
   def _ExpectUpdate(self,
                     description=None,
                     name_servers=None,
+                    private_name_servers=None,
                     networks=None,
                     forwarding=None,
                     logging=None):
@@ -42,9 +43,11 @@ class UpdateTest(base.DnsMockTest):
     if networks:
       expected_output.networks = util.GetPolicyNetworks(networks)
 
-    if name_servers:
+    if name_servers or private_name_servers:
       expected_output.alternativeNameServerConfig = (
-          util.GetAltNameServerConfig(name_servers))
+          util.GetAltNameServerConfig(
+              target_servers=name_servers,
+              private_target_servers=private_name_servers))
 
     if forwarding is not None:
       expected_output.enableInboundForwarding = forwarding
@@ -83,9 +86,10 @@ class UpdateTest(base.DnsMockTest):
     self.assertEqual(expected_response.policy, actual_output)
 
   def testUpdateRemoveNameServers(self):
-    expected_response = self._ExpectUpdate(name_servers=[''])
+    expected_response = self._ExpectUpdate(name_servers=[])
     actual_output = self.Run('dns policies update mypolicy0 '
-                             '--alternative-name-servers ""')
+                             '--alternative-name-servers "" '
+                             '--private-alternative-name-servers ""')
     self.assertEqual(expected_response.policy, actual_output)
     self.assertIsNone(expected_response.policy.alternativeNameServerConfig)
 
@@ -105,6 +109,14 @@ class UpdateTest(base.DnsMockTest):
     expected_response = self._ExpectUpdate(logging=True)
     actual_output = self.Run('dns policies update mypolicy0 '
                              '--enable-logging')
+    self.assertEqual(expected_response.policy, actual_output)
+
+  def testUpdatePrivateServer(self):
+    expected_response = self._ExpectUpdate(
+        forwarding=True, private_name_servers=['8.8.8.8'])
+    actual_output = self.Run('dns policies update mypolicy0 '
+                             '--enable-inbound-forwarding '
+                             '--private-alternative-name-servers 8.8.8.8')
     self.assertEqual(expected_response.policy, actual_output)
 
   def testUpdateAll(self):

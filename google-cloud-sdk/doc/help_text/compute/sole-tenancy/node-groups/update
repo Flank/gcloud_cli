@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud compute sole-tenancy node-groups update NAME
         [--node-template=NODE_TEMPLATE] [--zone=ZONE]
         [--add-nodes=ADD_NODES | --delete-nodes=[NODE,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--autoscaler-mode=AUTOSCALER_MODE
+          --max-nodes=MAX_NODES --min-nodes=MIN_NODES] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update a Compute Engine node group.
@@ -46,6 +47,28 @@ FLAGS
 
        --delete-nodes=[NODE,...]
           The names of the nodes to remove from the group.
+
+     Autoscaling policy for node groups.
+
+       --autoscaler-mode=AUTOSCALER_MODE
+          Set the mode of an autoscaler for a node group. AUTOSCALER_MODE must
+          be one of:
+
+           off
+              to turn off autoscaling.
+           on
+              to permit autoscaling to scale in and out.
+           only-scale-out
+              to permit autoscaling to scale only out and not in.
+
+       --max-nodes=MAX_NODES
+          The maximum size of the node group. Must be smaller or equal to 100
+          and larger than or equal to --min-nodes. Must be specified if
+          --autoscaler-mode is not off.
+
+       --min-nodes=MIN_NODES
+          The minimum size of the node group. Default is 0 and must be an
+          integer value smaller than or equal to --max-nodes.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

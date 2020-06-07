@@ -30,6 +30,7 @@ from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.app import deploy_util
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.app import api_test_util
@@ -80,7 +81,7 @@ class GetRuntimeBuilderStrategyTest(sdk_test_base.SdkBase):
           runtime_builders.RuntimeBuilderStrategy.NEVER)
 
 
-class ServiceDeployerTest(api_test_util.ApiTestBase):
+class ServiceDeployerTest(parameterized.TestCase, api_test_util.ApiTestBase):
 
   def SetUp(self):
     self.service_mock = mock.MagicMock()
@@ -159,17 +160,19 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertEqual(result.identifier, {'appYamlPath': 'zap.yaml'})
 
-  def testBuildOnServer_CloudBuildTimeout(self):
-    """If build image on server, don't build the image in client."""
+  @parameterized.parameters(('333', '333s'), ('333s', '333s'), ('6m', '360s'))
+  def testBuildOnServer_CloudBuildTimeoutWithoutSuffix(self, timeout_property,
+                                                       expected):
     self.service_mock.GetAppYamlBasename.return_value = 'zap.yaml'
-    properties.VALUES.app.cloud_build_timeout.Set('333')
+    properties.VALUES.app.cloud_build_timeout.Set(timeout_property)
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
         self.fake_version, self.service_mock, None, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
-    self.assertEqual(result.identifier,
-                     {'appYamlPath': 'zap.yaml',
-                      'cloudBuildTimeout': '333'})
+    self.assertEqual(result.identifier, {
+        'appYamlPath': 'zap.yaml',
+        'cloudBuildTimeout': expected
+    })
 
   def testPossiblyUploadFiles_imageUrl(self):
     """If image-url on client, and hermetic service, don't upload files."""

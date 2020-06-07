@@ -45,33 +45,35 @@ class ClustersClientTest(base.BigtableV2TestBase):
     self.zone_ref = 'projects/{0}/locations/my-zone'.format(self.Project())
 
   def testCreate(self):
+    cluster = self.msgs.Cluster(
+        location=self.zone_ref,
+        defaultStorageType=self.msgs.Cluster.DefaultStorageTypeValueValuesEnum
+        .STORAGE_TYPE_UNSPECIFIED,
+        serveNodes=3)
     response = self.msgs.Operation()
     self.client.projects_instances_clusters.Create.Expect(
         request=self.msgs.BigtableadminProjectsInstancesClustersCreateRequest(
-            cluster=self.msgs.Cluster(
-                location=self.zone_ref,
-                defaultStorageType=self.msgs.Cluster.
-                DefaultStorageTypeValueValuesEnum.STORAGE_TYPE_UNSPECIFIED,
-                serveNodes=3),
+            cluster=cluster,
             clusterId=self.cluster_ref.Name(),
             parent=self.instance_ref.RelativeName()),
         response=response)
-    self.assertEquals(clusters.Create(self.cluster_ref, 'my-zone'), response)
+    self.assertEqual(clusters.Create(self.cluster_ref, cluster), response)
 
   def testCreateWithParams(self):
+    cluster = self.msgs.Cluster(
+        location=self.zone_ref,
+        defaultStorageType=self.msgs.Cluster.DefaultStorageTypeValueValuesEnum
+        .STORAGE_TYPE_UNSPECIFIED,
+        serveNodes=4)
     response = self.msgs.Operation()
     self.client.projects_instances_clusters.Create.Expect(
         request=self.msgs.BigtableadminProjectsInstancesClustersCreateRequest(
-            cluster=self.msgs.Cluster(
-                location=self.zone_ref,
-                defaultStorageType=self.msgs.Cluster.
-                DefaultStorageTypeValueValuesEnum.STORAGE_TYPE_UNSPECIFIED,
-                serveNodes=4),
+            cluster=cluster,
             clusterId=self.cluster_ref.Name(),
             parent=self.instance_ref.RelativeName()),
         response=response)
-    self.assertEquals(
-        clusters.Create(self.cluster_ref, 'my-zone', serve_nodes=4), response)
+    self.assertEqual(
+        clusters.Create(self.cluster_ref, cluster), response)
 
   def testDelete(self):
     response = self.msgs.Empty()
@@ -79,4 +81,4 @@ class ClustersClientTest(base.BigtableV2TestBase):
         request=self.msgs.BigtableadminProjectsInstancesClustersDeleteRequest(
             name=self.cluster_ref.RelativeName()),
         response=response)
-    self.assertEquals(clusters.Delete(self.cluster_ref), None)
+    self.assertEqual(clusters.Delete(self.cluster_ref), None)

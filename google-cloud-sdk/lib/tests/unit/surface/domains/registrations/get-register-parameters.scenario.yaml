@@ -1,0 +1,167 @@
+title: cloud domains get-register-parameters test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations get-register-parameters ""
+  - error: '1: Empty domain name'
+- execute:
+  - command: |
+      domains registrations get-register-parameters unavailable.com
+  - stdout: |
+      availability: UNAVAILABLE
+      domainName: unavailable.com
+- execute:
+  - command: |
+      domains registrations get-register-parameters available.app
+  - stdout: |
+      availability: AVAILABLE
+      domainName: available.app
+      domainNotices:
+      - HSTS_PRELOADED
+      supportedPrivacy:
+      - PUBLIC_CONTACT_DATA
+      - PRIVATE_CONTACT_DATA
+      yearlyPrice:
+        currencyCode: USD
+        units: '14'
+- execute:
+  - command: |
+      domains registrations get-register-parameters registry-down.com
+  - stdout: |
+      availability: UNKNOWN
+      domainName: registry-down.com
+- execute:
+  - command: |
+      domains registrations get-register-parameters ÜniCode.com.
+  - stdout: |
+      availability: UNAVAILABLE
+      domainName: xn--nicode-2ya.com
+actions:
+- execute_command:
+    command: |
+      domains registrations get-register-parameters ""
+    events:
+    - expect_exit:
+        code: 1
+        message: Empty domain name
+- execute_command:
+    command: |
+      domains registrations get-register-parameters unavailable.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=unavailable.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "unavailable.com",
+                "availability": "UNAVAILABLE"
+              }
+            }
+    - expect_stdout: |
+        availability: UNAVAILABLE
+        domainName: unavailable.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations get-register-parameters available.app
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=available.app
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "available.app",
+                "availability": "AVAILABLE",
+                "supportedPrivacy": [
+                  "PUBLIC_CONTACT_DATA",
+                  "PRIVATE_CONTACT_DATA"
+                ],
+                "domainNotices": [
+                  "HSTS_PRELOADED"
+                ],
+                "yearlyPrice": {
+                  "currencyCode": "USD",
+                  "units": "14"
+                }
+              }
+            }
+    - expect_stdout: |
+        availability: AVAILABLE
+        domainName: available.app
+        domainNotices:
+        - HSTS_PRELOADED
+        supportedPrivacy:
+        - PUBLIC_CONTACT_DATA
+        - PRIVATE_CONTACT_DATA
+        yearlyPrice:
+          currencyCode: USD
+          units: '14'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations get-register-parameters registry-down.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=registry-down.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "registry-down.com",
+                "availability": "UNKNOWN"
+              }
+            }
+    - expect_stdout: |
+        availability: UNKNOWN
+        domainName: registry-down.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations get-register-parameters ÜniCode.com.
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=xn--nicode-2ya.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": {
+                "domainName": "xn--nicode-2ya.com",
+                "availability": "UNAVAILABLE"
+              }
+            }
+    - expect_stdout: |
+        availability: UNAVAILABLE
+        domainName: xn--nicode-2ya.com
+    - expect_exit:
+        code: 0

@@ -88,12 +88,14 @@ class Authority(_messages.Message):
   Membership. A workload with a token from this issuer can call the IAM
   credentials API for the provided identity_namespace; the workload will
   receive a Google OAuth token that it can use for further API calls. See the
-  workload identity documentation for more details: https://cloud.google.com
-  /kubernetes-engine/docs/how-to/workload-identity
+  workload identity documentation for more details:
+  https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 
   Fields:
     identityNamespace: Output only. The identity namespace in which the above
-      issuer will be recognized.
+      issuer will be recognized. This field is now deprecated, and will be
+      removed eventually. Callers should now use workload_identity_pool
+      instead of identity_namespace, once we start setting it.
     identityProvider: Output only. An identity provider that reflects this
       issuer in the identity namespace.
     issuer: A JWT issuer URI. If set, then Google will attempt OIDC discovery
@@ -101,12 +103,20 @@ class Authority(_messages.Message):
       authenticate within the below identity namespace.  This can be updated
       from a non-empty to empty value and vice-versa. But cannot be changed
       from one non-empty value to another. Setting to empty will disable
-      Workload Identity.
+      Workload Identity. issuer should be a valid URL of length < 2000 that
+      can be parsed, and must start with https://.
+    workloadIdentityPool: Output only. The name of the workload identity pool
+      in which the above issuer will be recognized. There is a single Workload
+      Identity Pool per Hub that is shared between all Memberships that belong
+      to this Hub. For a Hub hosted in {PROJECT_ID}, the workload pool format
+      is {PROJECT_ID}.hub.id.goog, although this is subject to change in newer
+      versions of this API.
   """
 
   identityNamespace = _messages.StringField(1)
   identityProvider = _messages.StringField(2)
   issuer = _messages.StringField(3)
+  workloadIdentityPool = _messages.StringField(4)
 
 
 class AuthorizationLoggingOptions(_messages.Message):
@@ -149,8 +159,9 @@ class Binding(_messages.Message):
       not apply to the current request. However, a different role binding
       might grant the same role to one or more of the members in this binding.
       To learn which resources support conditions in their IAM policies, see
-      the [IAM documentation](https://cloud.google.com/iam/help/conditions
-      /resource-policies).
+      the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -249,21 +260,21 @@ class Condition(_messages.Message):
       AUTHORITY: Either principal or (if present) authority selector.
       ATTRIBUTION: The principal (even if an authority selector is present),
         which must only be used for attribution, not authorization.
-      SECURITY_REALM: Any of the security realms in the IAMContext (go
-        /security-realms). When used with IN, the condition indicates "any of
-        the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". Note that a value can
-        be:  - 'self' (i.e., allow connections from clients that are in the
-        same  security realm)  - 'self:cloud-region' (i.e., allow connections
-        from clients that are in  the same cloud region)  - 'guardians' (i.e.,
-        allow connections from its guardian realms. See  go/security-realms-
-        glossary#guardian for more information.)  - a realm (e.g., 'campus-
-        abc')  - a realm group (e.g., 'realms-for-borg-cell-xx', see: go
-        /realm-groups) A match is determined by a realm group membership check
-        performed by a RealmAclRep object (go/realm-acl-howto). It is not
-        permitted to grant access based on the *absence* of a realm, so realm
-        conditions can only be used in a "positive" context (e.g., ALLOW/IN or
-        DENY/NOT_IN).
+      SECURITY_REALM: Any of the security realms in the IAMContext
+        (go/security-realms). When used with IN, the condition indicates "any
+        of the request's realms match one of the given values; with NOT_IN,
+        "none of the realms match any of the given values". Note that a value
+        can be:  - 'self' (i.e., allow connections from clients that are in
+        the same  security realm)  - 'self:cloud-region' (i.e., allow
+        connections from clients that are in  the same cloud region)  -
+        'guardians' (i.e., allow connections from its guardian realms. See
+        go/security-realms-glossary#guardian for more information.)  - a realm
+        (e.g., 'campus-abc')  - a realm group (e.g., 'realms-for-borg-cell-
+        xx', see: go/realm-groups) A match is determined by a realm group
+        membership check performed by a RealmAclRep object (go/realm-acl-
+        howto). It is not permitted to grant access based on the *absence* of
+        a realm, so realm conditions can only be used in a "positive" context
+        (e.g., ALLOW/IN or DENY/NOT_IN).
       APPROVER: An approver (distinct from the requester) that has authorized
         this request. When used with IN, the condition indicates that one of
         the approvers associated with the request matches the specified
@@ -487,8 +498,9 @@ class GkeCluster(_messages.Message):
   r"""GkeCluster represents a k8s cluster on GKE.
 
   Fields:
-    resourceLink: Self-link of the GCP resource for the GKE cluster. For
-      example: //container.googleapis.com/v1/projects/my-project/zones/us-
+    resourceLink: Immutable. Self-link of the GCP resource for the GKE
+      cluster. For example:
+      //container.googleapis.com/v1/projects/12345/zones/us-
       west1-a/clusters/my-cluster It can be at the most 1000 characters in
       length.
   """
@@ -538,7 +550,7 @@ class GkehubProjectsLocationsMembershipsCreateRequest(_messages.Message):
       `[a-z0-9]([-a-z0-9]*[a-z0-9])?` with at most 63 characters.
     parent: Required. The parent in whose context the membership is created.
       The parent value is in the format:
-      `projects/[project_id]/locations/global`.
+      `projects/[project_number]/locations/global`.
   """
 
   membership = _messages.MessageField('Membership', 1)
@@ -551,7 +563,7 @@ class GkehubProjectsLocationsMembershipsDeleteRequest(_messages.Message):
 
   Fields:
     name: Required. The membership resource name in the format:
-      `projects/[project_id]/locations/global/memberships/[membership_id]`
+      `projects/[project_number]/locations/global/memberships/[membership_id]`
   """
 
   name = _messages.StringField(1, required=True)
@@ -568,8 +580,8 @@ class GkehubProjectsLocationsMembershipsGenerateConnectManifestRequest(_messages
       Some resources (e.g. secrets) generated for installation will be
       excluded.
     name: Required. The membership resource the connect agent is associated
-      with.
-      `projects/[project_id]/locations/global/memberships/[membership_id]`.
+      with. `projects/[project_number]/locations/global/memberships/[membershi
+      p_id]`.
     namespace: Optional. Namespace for GKE Connect agent resources. If empty,
       uses 'gke-connect'.
     proxy: Optional. URI of a proxy if connectivity from the agent to
@@ -616,12 +628,31 @@ class GkehubProjectsLocationsMembershipsGetIamPolicyRequest(_messages.Message):
 class GkehubProjectsLocationsMembershipsGetRequest(_messages.Message):
   r"""A GkehubProjectsLocationsMembershipsGetRequest object.
 
+  Enums:
+    ViewValueValuesEnum: Optional. View for partial response.
+
   Fields:
     name: Required. The Membership resource name in the format:
-      `projects/[project_id]/locations/global/memberships/[membership_id]`
+      `projects/[project_number]/locations/global/memberships/[membership_id]`
+    view: Optional. View for partial response.
   """
 
+  class ViewValueValuesEnum(_messages.Enum):
+    r"""Optional. View for partial response.
+
+    Values:
+      MEMBERSHIP_VIEW_UNSPECIFIED: <no description>
+      BASIC: <no description>
+      FULL: <no description>
+      WITH_MEMBERSHIP_RESOURCES: <no description>
+    """
+    MEMBERSHIP_VIEW_UNSPECIFIED = 0
+    BASIC = 1
+    FULL = 2
+    WITH_MEMBERSHIP_RESOURCES = 3
+
   name = _messages.StringField(1, required=True)
+  view = _messages.EnumField('ViewValueValuesEnum', 2)
 
 
 class GkehubProjectsLocationsMembershipsListRequest(_messages.Message):
@@ -635,7 +666,7 @@ class GkehubProjectsLocationsMembershipsListRequest(_messages.Message):
       represents a HAS operator which is roughly synonymous with equality).
       `{field}` can refer to a proto or JSON field, or a synthetic field.
       Field names can be camelCase or snake_case.  Examples: - Filter by name:
-      name = "projects/foo-proj/locations/global/membership/bar  - Filter by
+      name = "projects/12345/locations/global/membership/bar  - Filter by
       labels:   - Resources that have a key called `foo`     labels.foo:*   -
       Resources that have a key called `foo` whose value is `bar`
       labels.foo = bar   - Filter by state:    - Members in CREATING state.
@@ -649,7 +680,7 @@ class GkehubProjectsLocationsMembershipsListRequest(_messages.Message):
       the resources.
     parent: Required. The parent in whose context the memberships are listed.
       The parent value is in the format:
-      `projects/[project_id]/locations/global`.
+      `projects/[project_number]/locations/global`.
   """
 
   filter = _messages.StringField(1)
@@ -665,7 +696,7 @@ class GkehubProjectsLocationsMembershipsPatchRequest(_messages.Message):
   Fields:
     membership: A Membership resource to be passed as the request body.
     name: Required. The membership resource name in the format:
-      `projects/[project_id]/locations/global/memberships/[membership_id]`
+      `projects/[project_number]/locations/global/memberships/[membership_id]`
     updateMask: Required. Mask of fields to update. At least one field path
       must be specified in this mask.
   """
@@ -830,6 +861,36 @@ class KubernetesMetadata(_messages.Message):
   nodeProviderId = _messages.StringField(3)
   updateTime = _messages.StringField(4)
   vcpuCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+
+
+class KubernetesResource(_messages.Message):
+  r"""KubernetesResource contains the YAML manifests for Kubernetes resources
+  of the Membership in the cluster. Upon CreateMembership:   - The caller
+  should provide membership_cr_manifest if a Membership CR     exists in the
+  cluster.   - The caller should then apply resources from the successful
+  GetMembership request. Upon UpdateMembership:   - The caller should re-apply
+  the resources from the returned Membership.
+
+  Fields:
+    connectResources: Output only. The Kubernetes resources for installing GKE
+      Connect agent. Thie field is only populated upon GetRequest if
+      MembershipView = `FULL`,
+    connectVersion: Optional. The connect version to generate for
+      connect_resources, default to the latest.
+    membershipCrManifest: Input only. The YAML representation of the
+      Membership CR if already exists in the cluster. Leave empty if no
+      Membership CR exists. The CR manifest will be used to validate that the
+      cluster has not been registered with another Membership.
+    membershipResources: Output only. The additional Kubernetes resources that
+      need to be applied to the cluster after the membership creation and
+      every update. This field is only populated upon GetRequest if
+      MembershipView = `WITH_MEMBERSHIP_RESOURCES` or `FULL`.
+  """
+
+  connectResources = _messages.MessageField('ResourceManifest', 1, repeated=True)
+  connectVersion = _messages.StringField(2)
+  membershipCrManifest = _messages.StringField(3)
+  membershipResources = _messages.MessageField('ResourceManifest', 4, repeated=True)
 
 
 class ListLocationsResponse(_messages.Message):
@@ -997,8 +1058,8 @@ class Membership(_messages.Message):
       not use GKE Connect, or that have never connected successfully, this
       field will be unset.
     name: Output only. The unique name of this domain resource in the format:
-      `projects/[project_id]/locations/global/memberships/[membership_id]`.
-      `membership_id` can only be set at creation time using the
+      `projects/[project_number]/locations/global/memberships/[membership_id]`
+      . `membership_id` can only be set at creation time using the
       `membership_id` field in the creation request. `membership_id` must be a
       valid RFC 1123 compliant DNS label. In particular, it must be:   1. At
       most 63 characters in length   2. It must consist of lower case
@@ -1060,10 +1121,19 @@ class MembershipEndpoint(_messages.Message):
       this is a self link to its GCP resource.
     kubernetesMetadata: Output only. For Memberships that point to Kubernetes
       Endpoints, this field provides useful metadata.
+    kubernetesResource: Optional. A correctly registered cluster should have
+      the Kubernetes resources applied to the clusters and settle at steady
+      states. These resources are needed in order to: * Ensure that the
+      cluster is exclusively registered to one and only one Hub   Membership.
+      * Propagate Workload Pool Information available in the Membership
+      Authority   field. * Ensure proper initial configuration of default Hub
+      Features. This field is only filled out upon a Membership Get request if
+      `WITH_KUBERNETES_RESOURCES` or `FULL` view is specified.
   """
 
   gkeCluster = _messages.MessageField('GkeCluster', 1)
   kubernetesMetadata = _messages.MessageField('KubernetesMetadata', 2)
+  kubernetesResource = _messages.MessageField('KubernetesResource', 3)
 
 
 class MembershipState(_messages.Message):
@@ -1231,8 +1301,8 @@ class Policy(_messages.Message):
   timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
   "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
   bindings:     - members:       - user:mike@example.com       -
-  group:admins@example.com       - domain:google.com       - serviceAccount
-  :my-project-id@appspot.gserviceaccount.com       role:
+  group:admins@example.com       - domain:google.com       -
+  serviceAccount:my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
@@ -1290,6 +1360,22 @@ class Policy(_messages.Message):
   iamOwned = _messages.BooleanField(4)
   rules = _messages.MessageField('Rule', 5, repeated=True)
   version = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+
+
+class ResourceManifest(_messages.Message):
+  r"""ResourceManifest represents a Kubernetes resource to be applied to the
+  cluster.
+
+  Fields:
+    clusterScoped: Specifies whether the resource provided in the manifest is
+      cluster_scoped. If set to false, the assumption is that it is namespace
+      scoped. This field is used for default REST mapper when applying the
+      resource to a cluster.
+    manifest: YAML manifest of the resource.
+  """
+
+  clusterScoped = _messages.BooleanField(1)
+  manifest = _messages.StringField(2)
 
 
 class Rule(_messages.Message):
@@ -1414,7 +1500,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

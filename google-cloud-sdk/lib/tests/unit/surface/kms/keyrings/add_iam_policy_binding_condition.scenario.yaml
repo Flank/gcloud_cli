@@ -1,5 +1,5 @@
 title: kms keyrings add-iam-policy-binding scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # add binding with condition to a policy with condition

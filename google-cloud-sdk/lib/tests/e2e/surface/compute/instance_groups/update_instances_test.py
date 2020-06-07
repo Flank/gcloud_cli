@@ -24,6 +24,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
+from tests.lib.surface.compute.e2e_test_base import test_case
 
 
 class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
@@ -97,6 +98,7 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
     self.AssertNewOutputContains('n1-standard-4')
     self.AssertNewOutputNotContains('n1-standard-1')
 
+  @test_case.Filters.skip('Invalid error match', 'b/157057030')
   def testUpdateInstancesMostDisruptiveAllowedAction(self):
     template1_name = self.CreateInstanceTemplate()
     template2_name = self.CreateInstanceTemplate(machine_type='n1-standard-4')

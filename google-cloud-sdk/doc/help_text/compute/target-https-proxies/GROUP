@@ -37,6 +37,12 @@ COMMANDS
      describe
         Display detailed information about a target HTTPS proxy.
 
+     export
+        Export a target HTTPS proxy.
+
+     import
+        Import a target HTTPS proxy.
+
      list
         List Google Compute Engine target HTTPS proxies.
 

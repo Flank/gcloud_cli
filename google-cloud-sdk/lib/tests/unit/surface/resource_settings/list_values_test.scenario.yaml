@@ -1,0 +1,95 @@
+title: ResourceSettings - List-values test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: resource-settings list --organization=123
+  - stdout: |
+      settingValues:
+      - etag: O2VWGxZU01VnAfRU4Mu97w==
+        name: organization/123/settings/gcp-basicBooleanSetting/value
+        value:
+          booleanValue: true
+      - etag: O2VWGxZU01VnAfRU4Mu97w==
+        name: organization/123/settings/iam-projectCreatorRoles/value
+        value:
+          stringSetValue:
+            values:
+            - roles/storage.owner
+            - roles/compute.admin
+- execute:
+  - command: resource-settings list-values
+  - stderr: |
+      ERROR: (gcloud.alpha.resource-settings.list-values) Exactly one of (--folder | --organization | --project) must be specified.
+      Usage: gcloud alpha resource-settings list-values (--folder=FOLDER_ID | --organization=ORGANIZATION_ID | --project=PROJECT_ID) [optional flags]
+        optional flags may be  --filter | --folder | --help | --limit |
+                               --organization | --page-size | --project | --sort-by |
+                               --uri
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha resource-settings list-values --help
+  - error: '1: Exactly one of (--folder | --organization | --project) must be specified.'
+actions:
+- execute_command:
+    command: resource-settings list --organization=123
+    events:
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "settingValues" : [
+                {
+                  "name": "organization/123/settings/gcp-basicBooleanSetting/value",
+                  "value": {
+                    "booleanValue": true
+                  },
+                  "etag": "O2VWGxZU01VnAfRU4Mu97w=="
+                },
+                {
+                  "name": "organization/123/settings/iam-projectCreatorRoles/value",
+                  "value": {
+                    "stringSetValue": {
+                      "values": [ "roles/storage.owner", "roles/compute.admin" ]
+                    }
+                  },
+                  "etag": "O2VWGxZU01VnAfRU4Mu97w=="
+                }
+              ]
+            }
+    - expect_stdout: |
+        settingValues:
+        - etag: O2VWGxZU01VnAfRU4Mu97w==
+          name: organization/123/settings/gcp-basicBooleanSetting/value
+          value:
+            booleanValue: true
+        - etag: O2VWGxZU01VnAfRU4Mu97w==
+          name: organization/123/settings/iam-projectCreatorRoles/value
+          value:
+            stringSetValue:
+              values:
+              - roles/storage.owner
+              - roles/compute.admin
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: resource-settings list-values
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.resource-settings.list-values) Exactly one of (--folder | --organization | --project) must be specified.
+        Usage: gcloud alpha resource-settings list-values (--folder=FOLDER_ID | --organization=ORGANIZATION_ID | --project=PROJECT_ID) [optional flags]
+          optional flags may be  --filter | --folder | --help | --limit |
+                                 --organization | --page-size | --project | --sort-by |
+                                 --uri
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha resource-settings list-values --help
+    - expect_exit:
+        code: 1
+        message: |-
+          Exactly one of (--folder | --organization | --project) must be specified.

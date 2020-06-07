@@ -31,7 +31,7 @@ actions:
                 workerConfig:
                   diskSizeGb: '200'
                   diskType: pd-standard
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   networkAccess: private
                 workerCount: '2'
         return_response:
@@ -61,7 +61,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/private_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "networkAccess": "private"
@@ -91,7 +91,7 @@ actions:
                 "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
                 "name": "projects/fake-project/instances/default_instance/workerpools/private_pool",
                 "workerConfig": {
-                  "machineType": "n1-standard-2",
+                  "machineType": "e2-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
                   "networkAccess": "private"

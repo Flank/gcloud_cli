@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed set\-autoscaling \- set autoscalin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-cpu\-utilization\-predictive\-method\fR=\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-cpu\-utilization\-predictive\-method\fR=\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -131,35 +131,6 @@ To permit autoscaling to scale only up and not down.
 .RE
 .sp
 
-
-.TP 2m
-\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR
-Queue\-based scaling target: autoscaler will aim to assure that average number
-of tasks in the queue is no greater than this value.
-
-.TP 2m
-\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]
-Specifies queue\-based scaling based on a Cloud Pub/Sub queuing system. Both
-topic and subscription are required.
-
-.RS 2m
-.TP 2m
-\fBtopic\fR
-Topic specification. Can be just a name or a partial URL (starting with
-"projects/..."). Topic must belong to the same project as Autoscaler.
-
-.TP 2m
-\fBsubscription\fR
-Subscription specification. Can be just a name or a partial URL (starting with
-"projects/..."). Subscription must belong to the same project as Autoscaler and
-must be connected to the specified topic.
-
-.RE
-.sp
-.TP 2m
-\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR
-Hint the autoscaler for queue\-based scaling on how much throughput a single
-worker instance is able to consume.
 
 .TP 2m
 \fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR

@@ -1,8 +1,7 @@
 filters:
-  skip:
-    reason: different order of progress tracker stages
-    bug: b/155463599
-    locally: true
+  skipAlways:
+    reason: timing out
+    bug: b/156889942
 title: Create custom event trigger
 release_tracks: [ALPHA]
 summary:
@@ -31,9 +30,7 @@ summary:
   - staged_progress_tracker:
     - message: Initializing trigger...
     - status: SUCCESS
-    - succeeded_stages: &id002
-      - Linking Trigger...
-      - Subscribing Service...
+
 - execute:
   - command: events triggers delete $$my-trigger$$
   - prompt:
@@ -341,7 +338,6 @@ actions:
     - expect_staged_progress_tracker:
         message: Initializing trigger...
         status: SUCCESS
-        succeeded_stages: *id002
     - expect_exit:
         code: 0
 - execute_command:

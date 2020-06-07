@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import random
 
 from googlecloudsdk.api_lib.events import custom_resource_definition
@@ -27,12 +28,13 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import flags
 from googlecloudsdk.command_lib.events import util
-from tests.lib.surface.run import base
+from googlecloudsdk.command_lib.run import flags as run_flags
+from tests.lib.surface.events import base
 
 import mock
 
 
-class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
+class TriggersCreateTestAlpha(base.EventsBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -69,14 +71,14 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
 
   def _MakeSource(self, source_crd, namespace='default'):
     """Creates a source object of the type specified by source_crd."""
-    self.source = source.Source.New(self.mock_serverless_client, namespace,
+    self.source = source.Source.New(self.mock_client, namespace,
                                     source_crd.source_kind,
                                     source_crd.source_api_category)
     self.source.name = 'source-for-my-trigger'
 
   def _MakeTrigger(self, source_obj, event_type):
     """Creates a trigger object with the given source dependency and event type."""
-    self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
+    self.trigger = trigger.Trigger.New(self.mock_client, 'default')
     self.trigger.name = 'my-trigger'
     if source_obj is not None:
       self.trigger.dependency = source_obj
@@ -98,7 +100,8 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
     self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
     self.source.name = 'source-for-my-trigger'
     self.operations.CreateTrigger.assert_called_once_with(
-        trigger_ref, self.source, self.event_type.type, 'my-service', 'default')
+        trigger_ref, self.source, self.event_type.type,
+        collections.OrderedDict(), 'my-service', 'default')
     self.operations.CreateSource.assert_called_once_with(
         self.source, self.event_type.crd, self.trigger,
         self._NamespaceRef(project='fake-project'), 'default', {})
@@ -123,7 +126,8 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
     self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
     self.source.name = 'source-for-my-trigger'
     self.operations.CreateTrigger.assert_called_once_with(
-        trigger_ref, self.source, self.event_type.type, 'my-service', 'default')
+        trigger_ref, self.source, self.event_type.type,
+        collections.OrderedDict(), 'my-service', 'default')
     self.operations.CreateSource.assert_called_once_with(
         self.source, self.event_type.crd, self.trigger,
         self._NamespaceRef(project='default'), 'default', {})
@@ -150,7 +154,8 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
     self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
     self.source.name = 'source-for-my-trigger'
     self.operations.CreateTrigger.assert_called_once_with(
-        trigger_ref, self.source, self.event_type.type, 'my-service', 'default')
+        trigger_ref, self.source, self.event_type.type,
+        collections.OrderedDict(), 'my-service', 'default')
     self.operations.CreateSource.assert_called_once_with(
         self.source, self.event_type.crd, self.trigger,
         self._NamespaceRef(project='default'), 'default', {
@@ -180,7 +185,8 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
 
     trigger_ref = self._TriggerRef('my-trigger', 'default')
     self.operations.CreateTrigger.assert_called_once_with(
-        trigger_ref, None, event_type, 'my-service', 'default')
+        trigger_ref, None, event_type, collections.OrderedDict(), 'my-service',
+        'default')
     self.operations.CreateSource.assert_not_called()
     self.operations.PollSource.assert_not_called()
     self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
@@ -250,3 +256,33 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
                '--cluster=cluster-1 --cluster-location=us-central1-a '
                '--target-service=my-service --type=google.source.my.type')
     self.AssertErrContains('Trigger [my-trigger] already exists')
+
+  def testCreateWithFilter(self):
+    """Tests creating trigger with filters."""
+    self._MakeEventType()
+    self._MakeSource(self.source_crd)
+    self._MakeTrigger(self.source, self.event_type.type)
+
+    self.operations.CreateTrigger.return_value = self.trigger
+    self.Run('events triggers create my-trigger --platform=gke '
+             '--cluster=cluster-1 --cluster-location=us-central1-a '
+             '--target-service=my-service --type=google.source.my.type '
+             '--trigger-filters key=value1,key2=value2')
+    trigger_ref = self._TriggerRef('my-trigger', 'default')
+    self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
+    self.source.name = 'source-for-my-trigger'
+    self.operations.CreateTrigger.assert_called_once_with(
+        trigger_ref, self.source, self.event_type.type,
+        collections.OrderedDict([('key', 'value1'), ('key2', 'value2')]),
+        'my-service', 'default')
+
+  def testCreateFailsWithFilterKey(self):
+    self._MakeEventType()
+    self._MakeSource(self.source_crd)
+    self._MakeTrigger(self.source, self.event_type.type)
+
+    with self.assertRaises(run_flags.ArgumentError):
+      self.Run('events triggers create my-trigger --platform=gke '
+               '--cluster=cluster-1 --cluster-location=us-central1-a '
+               '--target-service=my-service --type=google.source.my.type '
+               '--trigger-filters knsourcetrigger=value1,key2=value2')

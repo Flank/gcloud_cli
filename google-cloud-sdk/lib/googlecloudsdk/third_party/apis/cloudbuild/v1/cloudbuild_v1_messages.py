@@ -133,8 +133,8 @@ class Build(_messages.Message):
     tags: Tags for annotation of a `Build`. These are not docker tags.
     timeout: Amount of time that this build should be allowed to run, to
       second granularity. If this amount of time elapses, work on the build
-      will cease and the build status will be `TIMEOUT`.  Default time is ten
-      minutes.
+      will cease and the build status will be `TIMEOUT`.  `timeout` starts
+      ticking from `startTime`.  Default time is ten minutes.
     timing: Output only. Stores timing information for phases of the build.
       Valid keys are:  * BUILD: time to execute all build steps * PUSH: time
       to push all specified images. * FETCHSOURCE: time to fetch source.  If
@@ -725,6 +725,45 @@ class CloudbuildProjectsBuildsRetryRequest(_messages.Message):
   retryBuildRequest = _messages.MessageField('RetryBuildRequest', 3)
 
 
+class CloudbuildProjectsLocationsOperationsCancelRequest(_messages.Message):
+  r"""A CloudbuildProjectsLocationsOperationsCancelRequest object.
+
+  Fields:
+    cancelOperationRequest: A CancelOperationRequest resource to be passed as
+      the request body.
+    name: The name of the operation resource to be cancelled.
+  """
+
+  cancelOperationRequest = _messages.MessageField('CancelOperationRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class CloudbuildProjectsLocationsOperationsGetRequest(_messages.Message):
+  r"""A CloudbuildProjectsLocationsOperationsGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudbuildProjectsLocationsOperationsListRequest(_messages.Message):
+  r"""A CloudbuildProjectsLocationsOperationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The name of the operation's parent resource.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+
+
 class CloudbuildProjectsTriggersCreateRequest(_messages.Message):
   r"""A CloudbuildProjectsTriggersCreateRequest object.
 
@@ -1027,22 +1066,22 @@ class PullRequestFilter(_messages.Message):
   Requests.
 
   Enums:
-    CommentControlValueValuesEnum: Whether to block builds on a "/gcbrun"
-      comment from a repository admin or collaborator.
+    CommentControlValueValuesEnum: Configure builds to run only when a
+      repository owner or collaborator comments `/gcbrun`.
 
   Fields:
     branch: Regex of branches to match.  The syntax of the regular expressions
       accepted is the syntax accepted by RE2 and described at
       https://github.com/google/re2/wiki/Syntax
-    commentControl: Whether to block builds on a "/gcbrun" comment from a
-      repository admin or collaborator.
+    commentControl: Configure builds to run only when a repository owner or
+      collaborator comments `/gcbrun`.
     invertRegex: If true, branches that do NOT match the git_ref will trigger
       a build.
   """
 
   class CommentControlValueValuesEnum(_messages.Enum):
-    r"""Whether to block builds on a "/gcbrun" comment from a repository admin
-    or collaborator.
+    r"""Configure builds to run only when a repository owner or collaborator
+    comments `/gcbrun`.
 
     Values:
       COMMENTS_DISABLED: Do not require comments on Pull Requests before
@@ -1352,7 +1391,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

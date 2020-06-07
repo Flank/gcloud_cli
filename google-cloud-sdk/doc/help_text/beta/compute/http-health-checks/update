@@ -1,5 +1,6 @@
 NAME
-    gcloud beta compute http-health-checks update - update an HTTP health check
+    gcloud beta compute http-health-checks update - update a legacy HTTP health
+        check
 
 SYNOPSIS
     gcloud beta compute http-health-checks update NAME
@@ -10,8 +11,8 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute http-health-checks update is used to update an
-    existing HTTP health check. Only arguments passed in will be updated on the
-    health check. Other attributes will remain unaffected.
+    existing legacy HTTP health check. Only arguments passed in will be updated
+    on the health check. Other attributes will remain unaffected.
 
 POSITIONAL ARGUMENTS
      NAME

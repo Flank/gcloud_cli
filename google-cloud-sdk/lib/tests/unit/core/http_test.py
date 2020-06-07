@@ -28,6 +28,7 @@ from googlecloudsdk.core import http_proxy
 from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import transport
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import platforms
@@ -375,7 +376,7 @@ total round trip time (request+response): 4.000 secs
         headers=expected_headers)
 
   def testDefaultTimeout(self):
-    timeout_mock = self.StartObjectPatch(http, 'GetDefaultTimeout')
+    timeout_mock = self.StartObjectPatch(transport, 'GetDefaultTimeout')
     timeout_mock.return_value = 0.001
     self.socket_connect_mock.side_effect = socket.timeout
     http_client = http.Http()

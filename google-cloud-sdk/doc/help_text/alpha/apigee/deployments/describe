@@ -1,0 +1,62 @@
+NAME
+    gcloud alpha apigee deployments describe - describe an Apigee API proxy
+        deployment
+
+SYNOPSIS
+    gcloud alpha apigee deployments describe
+        [[REVISION]
+          --api=API --environment=ENVIRONMENT --organization=ORGANIZATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe an Apigee API proxy deployment.
+
+    gcloud alpha apigee deployments describe retrieves the status of a specific
+    Apigee API proxy's deployment to a specific environment.
+
+POSITIONAL ARGUMENTS
+     Revision resource - The API proxy revision and environment of the
+     deployment to be described. REVISION defaults to auto, which will describe
+     whichever revision is currently deployed. However, if more than one
+     revision of API is deployed in ENVIRONMENT, then an explicit REVISION is
+     required or the command will fail. The arguments in this group can be used
+     to specify the attributes of this resource.
+
+       [REVISION]
+          ID of the revision or fully qualified identifier for the revision.
+
+       --api=API
+          The deployed API proxy.
+
+       --environment=ENVIRONMENT
+          The environment in which the proxy was deployed.
+
+       --organization=ORGANIZATION
+          The organization of the proxy and environment.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To get the status of a deployment in the active Cloud Platform project,
+    which deploys my-proxy into the prod environment, run:
+
+        gcloud alpha apigee deployments describe --api=my-proxy --environment=prod
+
+    To get the status of a deployment in an Apigee organization called my-org,
+    which deploys version 3 of the proxy my-proxy into the test environment,
+    run:
+
+        gcloud alpha apigee deployments describe 3 --organization=my-org --environment=test --api=my-proxy
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

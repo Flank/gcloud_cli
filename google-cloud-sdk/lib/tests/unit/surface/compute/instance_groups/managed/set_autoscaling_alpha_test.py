@@ -157,9 +157,6 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
              'utilization-target-type=DELTA_PER_SECOND '
              '--custom-metric-utilization metric=metric3,utilization-target=3,'
              'utilization-target-type=DELTA_PER_MINUTE '
-             '--queue-scaling-cloud-pub-sub topic=topic123,subscription=sub456 '
-             '--queue-scaling-acceptable-backlog-per-instance 600 '
-             '--queue-scaling-single-worker-throughput 0.5'
             )
     request = self.messages.ComputeAutoscalersInsertRequest(
         autoscaler=self.messages.Autoscaler(
@@ -191,16 +188,6 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                     self.messages.AutoscalingPolicyLoadBalancingUtilization)(
                         utilizationTarget=0.8,
                     ),
-                queueBasedScaling=(
-                    self.messages.AutoscalingPolicyQueueBasedScaling(
-                        cloudPubSub=(
-                            self.messages
-                            .AutoscalingPolicyQueueBasedScalingCloudPubSub(
-                                topic='topic123',
-                                subscription='sub456')),
-                        acceptableBacklogPerInstance=600,
-                        singleWorkerThroughputPerSec=0.5,
-                    )),
                 maxNumReplicas=10,
                 minNumReplicas=5,
                 coolDownPeriodSec=60,
@@ -299,136 +286,6 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
       self.Run('compute instance-groups managed set-autoscaling group-1 '
                '--max-num-replicas 10 --zone zone-1 '
                '--target-load-balancing-utilization -0.11')
-
-  def testAssertsQueueSpecPresent(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Both queue specification and queue scaling target must be provided'):
-      self.Run('compute instance-groups managed set-autoscaling group-1 '
-               '--max-num-replicas 10 --zone zone-1 '
-               '--queue-scaling-acceptable-backlog-per-instance 600')
-
-  def testAssertsQueueCloudPubSubBothTopicAndSubscriptionPresent(self):
-    for param in ('topic=topic123', 'subscription=subscription123'):
-      with self.AssertRaisesToolExceptionRegexp(
-          r'Both topic and subscription are required'):
-        self.Run('compute instance-groups managed set-autoscaling group-1 '
-                 '--max-num-replicas 10 --zone zone-1 '
-                 '--queue-scaling-cloud-pub-sub %s '
-                 '--queue-scaling-acceptable-backlog-per-instance 600'
-                 % param)
-
-  def testInsertQueueCloudPubSubProperBareFormat(self):
-    self.Run('compute instance-groups managed set-autoscaling group-1 '
-             '--max-num-replicas 10 --zone zone-1 '
-             '--queue-scaling-cloud-pub-sub '
-             'topic=topic123,subscription=sub456 '
-             '--queue-scaling-acceptable-backlog-per-instance 600')
-    request = self.messages.ComputeAutoscalersInsertRequest(
-        autoscaler=self.messages.Autoscaler(
-            autoscalingPolicy=self.messages.AutoscalingPolicy(
-                queueBasedScaling=(
-                    self.messages.AutoscalingPolicyQueueBasedScaling(
-                        cloudPubSub=(
-                            self.messages
-                            .AutoscalingPolicyQueueBasedScalingCloudPubSub(
-                                topic='topic123',
-                                subscription='sub456')),
-                        acceptableBacklogPerInstance=600,
-                    )),
-                maxNumReplicas=10,
-            ),
-            name='group-1-aaaa',
-            target=self.managed_instance_group_self_link,
-        ),
-        project='my-project',
-        zone='zone-1',
-    )
-    self.CheckRequests(
-        self.managed_instance_group_get_request,
-        self.autoscalers_list_request,
-        [(self.compute.autoscalers, 'Insert', request)],
-    )
-
-  def testInsertQueueCloudPubSubProperLongFormat(self):
-    self.Run('compute instance-groups managed set-autoscaling group-1 '
-             '--max-num-replicas 10 --zone zone-1 '
-             '--queue-scaling-cloud-pub-sub '
-             'topic=projects/my-project/topics/topic123,'
-             'subscription=projects/my-project/subscriptions/sub456 '
-             '--queue-scaling-acceptable-backlog-per-instance 600')
-    request = self.messages.ComputeAutoscalersInsertRequest(
-        autoscaler=self.messages.Autoscaler(
-            autoscalingPolicy=self.messages.AutoscalingPolicy(
-                queueBasedScaling=(
-                    self.messages.AutoscalingPolicyQueueBasedScaling(
-                        cloudPubSub=(
-                            self.messages
-                            .AutoscalingPolicyQueueBasedScalingCloudPubSub(
-                                topic='projects/my-project/topics/topic123',
-                                subscription='projects/my-project/'
-                                             'subscriptions/sub456')),
-                        acceptableBacklogPerInstance=600,
-                    )),
-                maxNumReplicas=10,
-            ),
-            name='group-1-aaaa',
-            target=self.managed_instance_group_self_link,
-        ),
-        project='my-project',
-        zone='zone-1',
-    )
-    self.CheckRequests(
-        self.managed_instance_group_get_request,
-        self.autoscalers_list_request,
-        [(self.compute.autoscalers, 'Insert', request)],
-    )
-
-  def testAssertsQueueCloudPubSubProperFormat(self):
-    for good_resource, bad_resource in (
-        ('topic', 'subscription'),
-        ('subscription', 'topic')):
-      for bad_resource_value in (
-          'projects/aaaa/resource_name',
-          'projects/my-project/{0}s/what/resource_name'.format(bad_resource),
-          'projects/my-project/{0}s/invalid-chars-&*)(I('.format(bad_resource)):
-        with self.assertRaisesRegex(
-            exceptions.InvalidArgumentException, r'.*'):
-          self.Run('compute instance-groups managed set-autoscaling group-1 '
-                   '--max-num-replicas 10 --zone zone-1 '
-                   '--queue-scaling-cloud-pub-sub '
-                   '{good}=good-resource-name,{bad}={bad_value} '
-                   '--queue-scaling-acceptable-backlog-per-instance 600'.format(
-                       good=good_resource, bad=bad_resource,
-                       bad_value=bad_resource_value))
-
-  def testAssertsQueueTargetPresent(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Both queue specification and queue scaling target must be provided'):
-      self.Run('compute instance-groups managed set-autoscaling group-1 '
-               '--max-num-replicas 10 --zone zone-1 '
-               '--queue-scaling-cloud-pub-sub '
-               'topic=topic123,subscription=sub456')
-
-  def testAssertsQueueTargetAcceptableBacklogPositive(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --queue-scaling-acceptable-backlog-per-instance: '
-        r'Value must be greater than or equal to 0.0; received: -111[\d\.]*'):
-      self.Run('compute instance-groups managed set-autoscaling group-1 '
-               '--max-num-replicas 10 --zone zone-1 '
-               '--queue-scaling-cloud-pub-sub '
-               'topic=topic123,subscription=sub456 '
-               '--queue-scaling-acceptable-backlog-per-instance -111')
-
-  def testAssertsQueueSingleWorkerThroughputPositive(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --queue-scaling-single-worker-throughput: '
-        r'Value must be greater than or equal to 0.0; received: -222[\d\.]*'):
-      self.Run('compute instance-groups managed set-autoscaling group-1 '
-               '--max-num-replicas 10 --zone zone-1 '
-               '--queue-scaling-cloud-pub-sub '
-               'topic=topic123,subscription=sub456 '
-               '--queue-scaling-acceptable-backlog-per-instance 600 '
-               '--queue-scaling-single-worker-throughput -222')
 
 
 class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):

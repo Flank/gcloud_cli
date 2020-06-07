@@ -37,6 +37,12 @@ COMMANDS
      describe
         (ALPHA) Display detailed information about a target HTTP proxy.
 
+     export
+        (ALPHA) Export a target HTTP proxy.
+
+     import
+        (ALPHA) Import a target HTTP proxy.
+
      list
         (ALPHA) List Google Compute Engine target HTTP proxies.
 

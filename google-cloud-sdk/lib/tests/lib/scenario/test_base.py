@@ -99,7 +99,8 @@ def BuildFilterDecorator(filters_data, execution_mode):
     if len(decorator_args) == _RESTRICTION_ARG_COUNT:
       filters.append(decorator(filter_data['reason']))
     elif len(decorator_args) == _SKIP_ARG_COUNT:
-      if (execution_mode != session.ExecutionMode.LOCAL or
+      if (execution_mode not in [session.ExecutionMode.LOCAL,
+                                 session.ExecutionMode.BOTH] or
           filter_data.get('locally')):
         filters.append(decorator(filter_data['reason'], filter_data['bug']))
     else:

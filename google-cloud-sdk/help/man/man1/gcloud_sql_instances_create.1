@@ -46,10 +46,11 @@ found here: https://cloud.google.com/sql/faq#activation_policy.
 
 .TP 2m
 \fB\-\-[no\-]assign\-ip\fR
-Assign an IPv4 external address to this instance. This setting is enabled by
-default when creating a new instance, but can be disabled to use private IP
-connectivity. Use \fB\-\-assign\-ip\fR to enable and \fB\-\-no\-assign\-ip\fR to
-disable.
+Assign a public IP address to the instance. This is a public, externally
+available IPv4 address that you can use to connect to your instance when
+properly authorized. Use \-\-assign\-ip to enable a public IP and
+\-\-no\-assign\-ip to disable it. Use \fB\-\-assign\-ip\fR to enable and
+\fB\-\-no\-assign\-ip\fR to disable.
 
 .TP 2m
 \fB\-\-async\fR
@@ -111,8 +112,9 @@ max_allowed_packet=55555,skip_grant_tables=,log_output=1\fR)
 The database engine type and version. If left unspecified, the API defaults will
 be used. \fIDATABASE_VERSION\fR must be one of: \fBMYSQL_5_5\fR,
 \fBMYSQL_5_6\fR, \fBMYSQL_5_7\fR, \fBPOSTGRES_9_6\fR, \fBPOSTGRES_10\fR,
-\fBPOSTGRES_11\fR, \fBSQLSERVER_2017_EXPRESS\fR, \fBSQLSERVER_2017_WEB\fR,
-\fBSQLSERVER_2017_STANDARD\fR, \fBSQLSERVER_2017_ENTERPRISE\fR.
+\fBPOSTGRES_11\fR, \fBPOSTGRES_12\fR, \fBSQLSERVER_2017_EXPRESS\fR,
+\fBSQLSERVER_2017_WEB\fR, \fBSQLSERVER_2017_STANDARD\fR,
+\fBSQLSERVER_2017_ENTERPRISE\fR.
 
 .TP 2m
 \fB\-\-enable\-bin\-log\fR

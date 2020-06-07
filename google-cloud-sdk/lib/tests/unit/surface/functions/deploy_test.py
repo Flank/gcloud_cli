@@ -59,7 +59,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   # huge zip files being created (plus potential test timeouts and out of space
   # on /tmp).
 
-  def FakeMakeZipFromDir(self, dest_zip_file, src_dir, predicate=None):
+  def FakeMakeZipFromDir(self, dest_zip_file, src_dir, predicate=None,
+                         update_date=False):
     self.assertEqual(src_dir, '.')
 
   def _CreateFiles(self, directory, files):
@@ -791,8 +792,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.MockUnpackedSourcesDirSize()
     error_message_for_zip = 'Error message for ZIP'
 
-    def ThrowingFakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None):
-      del predicate, dest_zip_file, src_dir
+    def ThrowingFakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None,
+                                   update_date=False):
+      del predicate, dest_zip_file, src_dir, update_date
       raise ValueError(error_message_for_zip)
 
     mock_chooser = mock.MagicMock(gcloudignore.FileChooser)

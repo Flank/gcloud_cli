@@ -31,8 +31,9 @@ In order to print details of the access token, such as the associated account
 and the token's expiration time in seconds, run:
 
 .RS 2m
-$ curl https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=\e
-$(gcloud auth application\-default print\-access\-token)
+$ curl \-H "Content\-Type: application/x\-www\-form\-urlencoded" \e
+\-d "access_token=$(gcloud auth application\-default print\-access\-token)" \e
+https://www.googleapis.com/oauth2/v1/tokeninfo
 .RE
 
 

@@ -44,6 +44,7 @@ class GcloudIgnoreRegistryTest(parameterized.TestCase, test_case.TestCase):
       (env.STANDARD, 'php72', r'vendor'),
       (env.STANDARD, 'go111', r'dylib'),
       (env.STANDARD, 'python37', r'__pycache__'),
+      (env.STANDARD, 'java11', r'target'),
   )
   def testRegistryMatches(self, environment, runtime, ignore_regex):
     self.assertRegexpMatches(self.reg.Get(runtime, environment), ignore_regex)
@@ -52,6 +53,7 @@ class GcloudIgnoreRegistryTest(parameterized.TestCase, test_case.TestCase):
       (env.STANDARD, 'python27'),
       (env.STANDARD, 'go19'),
       (env.FLEX, 'nodejs8'),
+      (env.STANDARD, 'java8'),
   )
   def testRegistryNotMatches(self, environment, runtime):
     self.assertFalse(self.reg.Get(runtime, environment))

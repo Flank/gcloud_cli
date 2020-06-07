@@ -137,8 +137,7 @@ FLAGS
           If set, clear the retry policy from the subscription.
 
        Retry Policy Options. Retry policy specifies how Cloud Pub/Sub retries
-       message delivery for this subscription. This feature is currently
-       experimental and not recommended for production use.
+       message delivery for this subscription.
 
          --max-retry-delay=MAX_RETRY_DELAY
             The maximum delay between consecutive deliveries of a given

@@ -1,0 +1,1119 @@
+title: A test of basic filestore snapshot functionality.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: filestore instances create $$filestore-test-instance1$$ --zone us-east1-c
+      --tier STANDARD --file-share=name="my_vol",capacity=1TB --network=name=filestore-net
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore snapshots create $$filestore-test-snapshot1$$ --region us-east1
+      --instance $$filestore-test-instance1$$ --instance-zone us-east1-c --file-share="my_vol"
+  - stderr: |
+      Create request issued
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created snapshot.
+- execute:
+  - command: filestore snapshots list --region us-east1 --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+  - stdout: |
+      NAME                                          SRC_INSTANCE                                                       SRC_FILE_SHARE  STATE
+      $$filestore-test-snapshot1$$  us-east1-c/instances/$$filestore-test-instance1$$  my_vol          READY
+- execute:
+  - command: filestore snapshots list --zone us-east1-c --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+- execute:
+  - command: filestore snapshots describe '$$filestore-test-snapshot1$$' --region
+      us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
+  - stdout: |
+      NAME                                                                                                              SOURCE_INSTANCE                                                                                                     SOURCE_FILE_SHARE  STATE
+      projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$  projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$  my_vol             READY
+- execute:
+  - command: filestore instances create $$filestore-test-instance2$$ --zone us-east1-c
+      --tier STANDARD --network=name=filestore-net --file-share=name="my_vol",capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$,source-snapshot-region=us-east1
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore instances delete $$filestore-test-instance1$$ --zone us-east1-c
+      --async
+  - prompt:
+    - message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$.
+        Are you sure?
+    - input: y
+  - stderr: |
+      Check the status of the deletion by listing all instances:
+        $ gcloud alpha filestore instances list
+- execute:
+  - command: filestore snapshots delete $$filestore-test-snapshot1$$ --region us-east1
+      --async
+  - prompt:
+    - message: |
+        You are about to delete a snapshot
+    - input: y
+  - stderr: |
+      Delete request issued
+      Check operation [projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1571748015809-5957f1a28a547-801c6759-f003bee6] for status.
+- execute:
+  - command: filestore instances delete $$filestore-test-instance2$$ --zone us-east1-c
+      --async
+  - prompt:
+    - message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$.
+        Are you sure?
+    - input: y
+  - stderr: |
+      Check the status of the deletion by listing all instances:
+        $ gcloud alpha filestore instances list
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1p1alpha1
+
+- generate_resource_id:
+    reference: filestore-test-instance1
+    prefix: filestore-test-instance
+
+- execute_command:
+    command: filestore instances create $$filestore-test-instance1$$ --zone us-east1-c
+      --tier STANDARD --file-share=name="my_vol",capacity=1TB --network=name=filestore-net
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances?alt=json&instanceId=$$filestore-test-instance1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShares:
+              - capacityGb: '1024'
+                name: my_vol
+              networks:
+              - network: filestore-net
+              tier: STANDARD
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1571678227858-5956eda7902ac-075d7056-f9fbcaad
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-10-21T17:17:08.834235031Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+              verb: create
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: filestore-test-snapshot1
+    prefix: filestore-test-snapshot
+
+- execute_command:
+    command: filestore snapshots create $$filestore-test-snapshot1$$ --region us-east1
+      --instance $$filestore-test-instance1$$ --instance-zone us-east1-c --file-share="my_vol"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots?alt=json&snapshotId=$$filestore-test-snapshot1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              sourceFileShare: my_vol
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '518'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1571678436180-5956ee6e3c060-e881b035-44da03aa
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-10-21T17:20:36.265901297Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              verb: create
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create request issued
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created snapshot.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore snapshots list --region us-east1 --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '50688'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            snapshots:
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-092913-8ugz
+              state: READY
+              createTime: '2019-03-30T09:29:13.091650377Z'
+              capacityGb: '1024'
+              storageBytes: '5495936'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-092645-6ngs
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190326-142950-frdw
+              state: READY
+              createTime: '2019-03-26T14:29:51.225122216Z'
+              capacityGb: '1024'
+              storageBytes: '6052672'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190326-142718-72ym
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190326-204054-fggs
+              state: READY
+              createTime: '2019-03-26T20:40:55.285082773Z'
+              capacityGb: '1024'
+              storageBytes: '5622848'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190326-203823-89l8
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190328-042715-rvtt
+              state: READY
+              createTime: '2019-03-28T04:27:16.638955348Z'
+              capacityGb: '1024'
+              storageBytes: '6405568'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190328-042349-nqez
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190409-224731-kjzz
+              state: READY
+              createTime: '2019-04-09T22:47:32.923371497Z'
+              capacityGb: '1024'
+              storageBytes: '5646528'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190409-224500-t3eh
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190408-205234-gqli
+              state: READY
+              createTime: '2019-04-08T20:52:35.057146467Z'
+              capacityGb: '1024'
+              storageBytes: '5501248'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190408-205005-1ozv
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190409-040426-p7e3
+              state: READY
+              createTime: '2019-04-09T04:04:29.094245548Z'
+              capacityGb: '1024'
+              storageBytes: '5906112'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190409-040158-jeua
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-144732-xbqz
+              state: READY
+              createTime: '2019-10-17T14:47:32.552660868Z'
+              capacityGb: '1024'
+              storageBytes: '6137216'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-144405-eiha
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-145805-pbzj
+              state: READY
+              createTime: '2019-10-17T14:58:05.535920783Z'
+              capacityGb: '1024'
+              storageBytes: '6339520'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-145438-tqks
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-030731-muqa
+              state: READY
+              createTime: '2019-03-30T03:07:34.444281237Z'
+              capacityGb: '1024'
+              storageBytes: '5397376'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-030501-gr2z
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190407-162440-ykw5
+              state: READY
+              createTime: '2019-04-07T16:24:41.728628435Z'
+              capacityGb: '1024'
+              storageBytes: '6016064'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190407-162208-bg80
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190329-085602-i1uc
+              state: READY
+              createTime: '2019-03-29T08:56:05.658331790Z'
+              capacityGb: '1024'
+              storageBytes: '5641856'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190329-085332-r9x3
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190327-062343-90c3
+              state: READY
+              createTime: '2019-03-27T06:23:44.020976185Z'
+              capacityGb: '1024'
+              storageBytes: '5968320'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190327-062115-9wep
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190419-153604-r7eh
+              state: READY
+              createTime: '2019-04-19T15:36:05.345272328Z'
+              capacityGb: '1024'
+              storageBytes: '6147328'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190419-153336-m1bq
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-030513-zopf
+              state: READY
+              createTime: '2019-04-06T03:05:16.524599120Z'
+              capacityGb: '1024'
+              storageBytes: '6340032'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-030147-96lq
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-204738-rwmw
+              state: READY
+              createTime: '2019-04-11T20:47:39.295211516Z'
+              capacityGb: '1024'
+              storageBytes: '5897664'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-204409-0lc7
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-160401-1zct
+              state: READY
+              createTime: '2019-04-12T16:04:04.106945367Z'
+              capacityGb: '1024'
+              storageBytes: '5543680'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-160132-mptr
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190407-190045-8b28
+              state: READY
+              createTime: '2019-04-07T19:00:47.600907948Z'
+              capacityGb: '1024'
+              storageBytes: '5609152'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190407-185815-jst0
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-152604-tw5p
+              state: READY
+              createTime: '2019-10-17T15:26:04.614238935Z'
+              capacityGb: '1024'
+              storageBytes: '6575808'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-152116-1lbu
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190404-100455-g9uy
+              state: READY
+              createTime: '2019-04-04T10:04:58.132767081Z'
+              capacityGb: '1024'
+              storageBytes: '5807360'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190404-100223-mltp
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190329-123128-cyb9
+              state: READY
+              createTime: '2019-03-29T12:31:29.252535184Z'
+              capacityGb: '1024'
+              storageBytes: '5556736'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190329-122902-id2t
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190614-203645-99an
+              state: READY
+              createTime: '2019-06-14T20:36:45.904338549Z'
+              capacityGb: '1024'
+              storageBytes: '6250240'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190614-203314-pjqy
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-195705-xfr5
+              state: READY
+              createTime: '2019-04-06T19:57:07.656121551Z'
+              capacityGb: '1024'
+              storageBytes: '5699392'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-195436-7r2u
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190327-070112-d2vw
+              state: READY
+              createTime: '2019-03-27T07:01:14.686976836Z'
+              capacityGb: '1024'
+              storageBytes: '6188928'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190327-065746-gjl1
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190404-163344-khhk
+              state: READY
+              createTime: '2019-04-04T16:33:44.900233041Z'
+              capacityGb: '1024'
+              storageBytes: '5855360'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190404-163114-ckze
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-070040-idu5
+              state: READY
+              createTime: '2019-04-11T07:00:42.930638982Z'
+              capacityGb: '1024'
+              storageBytes: '6344320'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-065714-w1fj
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190409-085417-raea
+              state: READY
+              createTime: '2019-04-09T08:54:18.217633083Z'
+              capacityGb: '1024'
+              storageBytes: '6198720'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190409-085052-hlxr
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190426-183311-dvdx
+              state: READY
+              createTime: '2019-04-26T18:33:12.193446341Z'
+              capacityGb: '1024'
+              storageBytes: '6511168'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190426-182629-6vvk
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-140845-obi1
+              state: READY
+              createTime: '2019-10-17T14:08:45.898354858Z'
+              capacityGb: '1024'
+              storageBytes: '5383424'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-140519-7j64
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-083226-bc3s
+              state: READY
+              createTime: '2019-04-11T08:32:27.092875262Z'
+              capacityGb: '1024'
+              storageBytes: '5398080'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-082955-q38p
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-145956-q30k
+              state: READY
+              createTime: '2019-10-17T14:59:56.570174991Z'
+              capacityGb: '1024'
+              storageBytes: '5860288'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-145628-qfas
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-132629-m6x0
+              state: READY
+              createTime: '2019-03-30T13:26:29.462143094Z'
+              capacityGb: '1024'
+              storageBytes: '5538624'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-132401-4076
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190407-092939-2qmp
+              state: READY
+              createTime: '2019-04-07T09:29:39.584511890Z'
+              capacityGb: '1024'
+              storageBytes: '6330560'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190407-092615-45i7
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-034622-oian
+              state: READY
+              createTime: '2019-04-06T03:46:22.765943936Z'
+              capacityGb: '1024'
+              storageBytes: '5948544'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-034354-1ria
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190405-095659-isk2
+              state: READY
+              createTime: '2019-04-05T09:57:01.999736485Z'
+              capacityGb: '1024'
+              storageBytes: '5817344'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190405-095430-o1et
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190426-184232-f30j
+              state: READY
+              createTime: '2019-04-26T18:42:33.007230877Z'
+              capacityGb: '1024'
+              storageBytes: '5826368'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190426-183904-28pp
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190409-155542-33es
+              state: READY
+              createTime: '2019-04-09T15:55:44.434674937Z'
+              capacityGb: '1024'
+              storageBytes: '6236160'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190409-155215-xxv5
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-103129-t63v
+              state: READY
+              createTime: '2019-04-11T10:31:30.234308205Z'
+              capacityGb: '1024'
+              storageBytes: '5941632'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-102802-ns6l
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190407-083238-sa74
+              state: READY
+              createTime: '2019-04-07T08:32:38.745427421Z'
+              capacityGb: '1024'
+              storageBytes: '5604672'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190407-083007-flt6
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-123336-xhui
+              state: READY
+              createTime: '2019-04-12T12:33:36.991293275Z'
+              capacityGb: '1024'
+              storageBytes: '5944128'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-123103-c4tj
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191016-175538-sa15
+              state: READY
+              createTime: '2019-10-16T17:55:39.226980312Z'
+              capacityGb: '1024'
+              storageBytes: '6274816'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191016-175213-vajm
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              state: READY
+              createTime: '2019-10-21T17:20:36.262767791Z'
+              capacityGb: '1024'
+              storageBytes: '6095232'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191002-171706-gxzt
+              state: READY
+              createTime: '2019-10-02T17:17:07.279621983Z'
+              capacityGb: '1024'
+              storageBytes: '6166080'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191002-171340-0urr
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-151256-rr2q
+              state: READY
+              createTime: '2019-10-17T15:12:56.249204306Z'
+              capacityGb: '1024'
+              storageBytes: '6523712'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-150809-lekg
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190615-002328-dagw
+              state: READY
+              createTime: '2019-06-15T00:23:29.050533550Z'
+              capacityGb: '1024'
+              storageBytes: '6358336'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190615-001959-uoc1
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190422-110105-qs6i
+              state: READY
+              createTime: '2019-04-22T11:01:07.826316792Z'
+              capacityGb: '1024'
+              storageBytes: '6123520'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190422-105837-w39x
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190410-135502-3cex
+              state: READY
+              createTime: '2019-04-10T13:55:04.641600096Z'
+              capacityGb: '1024'
+              storageBytes: '6062016'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190410-135231-c7wm
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190328-012427-b7ol
+              state: READY
+              createTime: '2019-03-28T01:24:28.515532063Z'
+              capacityGb: '1024'
+              storageBytes: '5529664'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190328-012155-hxz2
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190328-021029-xj5z
+              state: READY
+              createTime: '2019-03-28T02:10:30.854285205Z'
+              capacityGb: '1024'
+              storageBytes: '5803264'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190328-020801-kaz2
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190407-002823-s2ue
+              state: READY
+              createTime: '2019-04-07T00:28:24.523634232Z'
+              capacityGb: '1024'
+              storageBytes: '6029504'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190407-002555-d807
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190410-160224-f5m8
+              state: READY
+              createTime: '2019-04-10T16:02:27.196668733Z'
+              capacityGb: '1024'
+              storageBytes: '5543040'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190410-155955-wy0w
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190405-182816-hivr
+              state: READY
+              createTime: '2019-04-05T18:28:17.462716956Z'
+              capacityGb: '1024'
+              storageBytes: '6113088'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190405-182544-770w
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190329-162458-cgci
+              state: READY
+              createTime: '2019-03-29T16:24:59.659801447Z'
+              capacityGb: '1024'
+              storageBytes: '5467648'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190329-162232-qz8h
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190614-204105-t52m
+              state: READY
+              createTime: '2019-06-14T20:41:05.949325684Z'
+              capacityGb: '1024'
+              storageBytes: '5850432'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190614-203832-ptzo
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-045232-xbw2
+              state: READY
+              createTime: '2019-04-06T04:52:34.150594813Z'
+              capacityGb: '1024'
+              storageBytes: '5571264'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-045005-2v25
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190409-082626-zsov
+              state: READY
+              createTime: '2019-04-09T08:26:26.798315139Z'
+              capacityGb: '1024'
+              storageBytes: '5495808'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190409-082359-s4mi
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190404-210133-p366
+              state: READY
+              createTime: '2019-04-04T21:01:35.483911749Z'
+              capacityGb: '1024'
+              storageBytes: '6283392'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190404-205807-tq2m
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-200216-ih16
+              state: READY
+              createTime: '2019-04-12T20:02:19.149145026Z'
+              capacityGb: '1024'
+              storageBytes: '5948608'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-195945-imsa
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190329-180719-sjyk
+              state: READY
+              createTime: '2019-03-29T18:07:20.106340567Z'
+              capacityGb: '1024'
+              storageBytes: '5806336'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190329-180451-uio4
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-115833-7w8r
+              state: READY
+              createTime: '2019-03-30T11:58:33.752489912Z'
+              capacityGb: '1024'
+              storageBytes: '6015488'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-115507-104o
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-220356-0iju
+              state: READY
+              createTime: '2019-04-12T22:03:57.751307507Z'
+              capacityGb: '1024'
+              storageBytes: '6391552'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-220025-8kxu
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-143359-qhgc
+              state: READY
+              createTime: '2019-10-17T14:34:00.040268655Z'
+              capacityGb: '1024'
+              storageBytes: '5459328'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-143033-bz5d
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190419-072011-10rv
+              state: READY
+              createTime: '2019-04-19T07:20:13.336751248Z'
+              capacityGb: '1024'
+              storageBytes: '5788672'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190419-071740-f0nq
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190328-235609-jr75
+              state: READY
+              createTime: '2019-03-28T23:56:09.522354396Z'
+              capacityGb: '1024'
+              storageBytes: '5567808'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190328-235341-7iuv
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190408-050726-gmap
+              state: READY
+              createTime: '2019-04-08T05:07:28.989839016Z'
+              capacityGb: '1024'
+              storageBytes: '6029248'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190408-050456-q8vk
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-203145-3y68
+              state: READY
+              createTime: '2019-04-06T20:31:45.677137885Z'
+              capacityGb: '1024'
+              storageBytes: '5618496'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-202914-thod
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190407-203123-229q
+              state: READY
+              createTime: '2019-04-07T20:31:24.008670342Z'
+              capacityGb: '1024'
+              storageBytes: '5551808'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190407-202855-e870
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190426-193119-uaq8
+              state: READY
+              createTime: '2019-04-26T19:31:21.615427674Z'
+              capacityGb: '1024'
+              storageBytes: '6752000'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190426-192433-66o2
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190409-022739-fwn2
+              state: READY
+              createTime: '2019-04-09T02:27:39.986819626Z'
+              capacityGb: '1024'
+              storageBytes: '6142144'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190409-022413-6ohz
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-195137-hbd4
+              state: READY
+              createTime: '2019-04-11T19:51:38.551005082Z'
+              capacityGb: '1024'
+              storageBytes: '5939008'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-194906-n4mp
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190329-232942-jult
+              state: READY
+              createTime: '2019-03-29T23:29:42.495090665Z'
+              capacityGb: '1024'
+              storageBytes: '5750784'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190329-232713-9jeu
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-002920-gn4q
+              state: READY
+              createTime: '2019-04-11T00:29:21.207404571Z'
+              capacityGb: '1024'
+              storageBytes: '5646592'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-002648-0hv3
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190419-111309-pbg3
+              state: READY
+              createTime: '2019-04-19T11:13:09.812688744Z'
+              capacityGb: '1024'
+              storageBytes: '5660736'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190419-111038-z6sn
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190326-183132-owpd
+              state: READY
+              createTime: '2019-03-26T18:31:32.928256816Z'
+              capacityGb: '1024'
+              storageBytes: '5453696'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190326-182904-b3fi
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190615-000526-fwhc
+              state: READY
+              createTime: '2019-06-15T00:05:27.106303817Z'
+              capacityGb: '1024'
+              storageBytes: '6170496'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190615-000155-4144
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-150215-hnn0
+              state: READY
+              createTime: '2019-04-11T15:02:17.866473618Z'
+              capacityGb: '1024'
+              storageBytes: '5643136'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-145943-ianb
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190418-184001-nl58
+              state: READY
+              createTime: '2019-04-18T18:40:04.410513862Z'
+              capacityGb: '1024'
+              storageBytes: '5845056'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190418-183731-iu6w
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-165819-kiu8
+              state: READY
+              createTime: '2019-04-12T16:58:21.496994586Z'
+              capacityGb: '1024'
+              storageBytes: '6976000'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-165453-9z7a
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-004015-y8tv
+              state: READY
+              createTime: '2019-04-12T00:40:16.617324469Z'
+              capacityGb: '1024'
+              storageBytes: '5575936'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-003746-1ly7
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190411-082822-6ey3
+              state: READY
+              createTime: '2019-04-11T08:28:23.606487634Z'
+              capacityGb: '1024'
+              storageBytes: '6080896'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190411-082456-9nfe
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-082524-d2y2
+              state: READY
+              createTime: '2019-03-30T08:25:24.921107374Z'
+              capacityGb: '1024'
+              storageBytes: '5435008'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-082256-0piu
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190419-050849-hdqt
+              state: READY
+              createTime: '2019-04-19T05:08:50.002058633Z'
+              capacityGb: '1024'
+              storageBytes: '5948544'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190419-050622-fmdy
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190329-162951-iak7
+              state: READY
+              createTime: '2019-03-29T16:29:50.260170833Z'
+              capacityGb: '1024'
+              storageBytes: '6433408'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190329-162625-cmfj
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190326-175901-2szl
+              state: READY
+              createTime: '2019-03-26T17:59:03.508148706Z'
+              capacityGb: '1024'
+              storageBytes: '5930368'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190326-175632-1ltx
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-142341-qtn4
+              state: READY
+              createTime: '2019-10-17T14:23:42.015464348Z'
+              capacityGb: '1024'
+              storageBytes: '6510400'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-141851-5e48
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190401-000010-8z2e
+              state: READY
+              createTime: '2019-04-01T00:00:10.990395889Z'
+              capacityGb: '1024'
+              storageBytes: '5557440'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190331-235741-dwo6
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190408-203330-anar
+              state: READY
+              createTime: '2019-04-08T20:33:30.658928189Z'
+              capacityGb: '1024'
+              storageBytes: '5472576'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190408-203103-drz7
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190614-202831-4r27
+              state: READY
+              createTime: '2019-06-14T20:28:32.429480841Z'
+              capacityGb: '1024'
+              storageBytes: '5609920'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190614-202600-n4x1
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190412-210753-ay7m
+              state: READY
+              createTime: '2019-04-12T21:07:55.755751188Z'
+              capacityGb: '1024'
+              storageBytes: '6293248'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190412-210426-zlge
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-122409-fx74
+              state: READY
+              createTime: '2019-04-06T12:24:08.558204029Z'
+              capacityGb: '1024'
+              storageBytes: '5883392'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-122141-at4j
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190328-000253-6e8d
+              state: READY
+              createTime: '2019-03-28T00:02:54.033972807Z'
+              capacityGb: '1024'
+              storageBytes: '5562112'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190328-000026-xytp
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190403-205724-zjor
+              state: READY
+              createTime: '2019-04-03T20:57:25.487374439Z'
+              capacityGb: '1024'
+              storageBytes: '6425024'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190403-205354-omv4
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190416-123749-rz9b
+              state: READY
+              createTime: '2019-04-16T12:37:50.491276128Z'
+              capacityGb: '1024'
+              storageBytes: '6061440'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190416-123422-x9b1
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190419-034838-8que
+              state: READY
+              createTime: '2019-04-19T03:48:39.142501152Z'
+              capacityGb: '1024'
+              storageBytes: '5421184'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190419-034610-ap8q
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190406-022651-yzv3
+              state: READY
+              createTime: '2019-04-06T02:26:52.719466670Z'
+              capacityGb: '1024'
+              storageBytes: '6047744'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190406-022420-be5r
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190403-221009-hd8b
+              state: READY
+              createTime: '2019-04-03T22:10:11.865844298Z'
+              capacityGb: '1024'
+              storageBytes: '5873792'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190403-220740-8e6b
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-143711-oa93
+              state: READY
+              createTime: '2019-10-17T14:37:11.988900152Z'
+              capacityGb: '1024'
+              storageBytes: '5771840'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-143345-9dwh
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191016-181749-hutl
+              state: READY
+              createTime: '2019-10-16T18:17:49.794672654Z'
+              capacityGb: '1024'
+              storageBytes: '6325440'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191016-181423-dh7e
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20191017-135303-ktqr
+              state: READY
+              createTime: '2019-10-17T13:53:03.527960758Z'
+              capacityGb: '1024'
+              storageBytes: '6368192'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20191017-134936-nks3
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-035754-771j
+              state: READY
+              createTime: '2019-03-30T03:57:56.549383293Z'
+              capacityGb: '1024'
+              storageBytes: '5495744'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-035527-8tby
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190403-235851-lmdb
+              state: READY
+              createTime: '2019-04-03T23:58:54.093814564Z'
+              capacityGb: '1024'
+              storageBytes: '6001216'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190403-235621-i5x3
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190408-055931-xwih
+              state: READY
+              createTime: '2019-04-08T05:59:33.636932706Z'
+              capacityGb: '1024'
+              storageBytes: '6405568'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190408-055604-cpyf
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190328-170343-yyys
+              state: READY
+              createTime: '2019-03-28T17:03:45.432471343Z'
+              capacityGb: '1024'
+              storageBytes: '5426176'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190328-170115-j46g
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190419-035326-wpoz
+              state: READY
+              createTime: '2019-04-19T03:53:28.322316914Z'
+              capacityGb: '1024'
+              storageBytes: '6339648'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190419-034957-ggzc
+              sourceFileShare: my_vol
+              sourceInstanceTier: STANDARD
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190331-132101-wzlt
+              state: READY
+              createTime: '2019-03-31T13:21:04.172169740Z'
+              capacityGb: '1024'
+              storageBytes: '6123200'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190331-131736-uaaa
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190404-043314-6vkm
+              state: READY
+              createTime: '2019-04-04T04:33:15.964077686Z'
+              capacityGb: '1024'
+              storageBytes: '5491264'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190404-043046-0qem
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190408-183743-u5vt
+              state: READY
+              createTime: '2019-04-08T18:37:44.683942032Z'
+              capacityGb: '1024'
+              storageBytes: '5874112'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190408-183417-j8tu
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190330-041851-m68q
+              state: READY
+              createTime: '2019-03-30T04:18:53.289502570Z'
+              capacityGb: '1024'
+              storageBytes: '5467456'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190330-041622-dmic
+              sourceFileShare: my_vol
+    - expect_stdout: |
+        NAME                                          SRC_INSTANCE                                                       SRC_FILE_SHARE  STATE
+        $$filestore-test-snapshot1$$  us-east1-c/instances/$$filestore-test-instance1$$  my_vol          READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: filestore snapshots list --zone us-east1-c --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/snapshots?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: filestore snapshots describe '$$filestore-test-snapshot1$$' --region
+      us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '457'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+            state: READY
+            createTime: '2019-10-21T17:20:36.262767791Z'
+            capacityGb: '1024'
+            storageBytes: '6095232'
+            sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+            sourceFileShare: my_vol
+            sourceInstanceTier: STANDARD
+    - expect_stdout: |
+        NAME                                                                                                              SOURCE_INSTANCE                                                                                                     SOURCE_FILE_SHARE  STATE
+        projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$  projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$  my_vol             READY
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: filestore-test-instance2
+    prefix: filestore-test-instance
+
+- execute_command:
+    command: filestore instances create $$filestore-test-instance2$$ --zone us-east1-c
+      --tier STANDARD --network=name=filestore-net --file-share=name="my_vol",capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$,source-snapshot-region=us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances?alt=json&instanceId=$$filestore-test-instance2$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShares:
+              - capacityGb: '1024'
+                name: my_vol
+                sourceSnapshot: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              networks:
+              - network: filestore-net
+              tier: STANDARD
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1571678751747-5956ef9b2ec6d-9b4182e4-4814e13b
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-10-21T17:25:52.729785082Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$
+              verb: create
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances delete $$filestore-test-instance1$$ --zone us-east1-c
+      --async
+    cleanup_for: filestore-test-instance1
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$.
+          Are you sure?
+        user_input: y
+    - expect_stderr:
+        matches: |
+          Check the status of the deletion by listing all instances:
+            \$ gcloud alpha filestore instances list *
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore snapshots delete $$filestore-test-snapshot1$$ --region us-east1
+      --async
+    cleanup_for: filestore-test-snapshot1
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to delete a snapshot
+        user_input: y
+    - expect_stderr:
+        matches: |
+          Delete request issued
+          Check operation \[.+\] for status\.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances delete $$filestore-test-instance2$$ --zone us-east1-c
+      --async
+    cleanup_for: filestore-test-instance2
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$.
+          Are you sure?
+        user_input: y
+    - expect_stderr:
+        matches: |
+          Check the status of the deletion by listing all instances:
+            \$ gcloud alpha filestore instances list *
+    - expect_exit:
+        code: 0

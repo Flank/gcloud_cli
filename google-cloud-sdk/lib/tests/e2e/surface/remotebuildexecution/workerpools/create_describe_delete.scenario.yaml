@@ -20,7 +20,7 @@ summary:
       state: RUNNING
       workerConfig:
         diskSizeGb: '200'
-        machineType: n1-standard-2
+        machineType: e2-standard-2
         networkAccess: public
 - execute:
   - label: |
@@ -54,7 +54,7 @@ actions:
                 workerConfig:
                   diskSizeGb: '200'
                   diskType: pd-standard
-                  machineType: n1-standard-2
+                  machineType: e2-standard-2
                   reserved: false
                 workerCount: '0'
         return_response:
@@ -85,7 +85,7 @@ actions:
           body:
             name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
             workerConfig:
-              machineType: n1-standard-2
+              machineType: e2-standard-2
               diskType: pd-standard
               diskSizeGb: '200'
               networkAccess: public
@@ -115,7 +115,7 @@ actions:
           body:
             name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
             workerConfig:
-              machineType: n1-standard-2
+              machineType: e2-standard-2
               diskType: pd-standard
               diskSizeGb: '200'
               networkAccess: public
@@ -125,7 +125,7 @@ actions:
         state: RUNNING
         workerConfig:
           diskSizeGb: '200'
-          machineType: n1-standard-2
+          machineType: e2-standard-2
           networkAccess: public
     - expect_exit:
         code: 0

@@ -38,7 +38,7 @@ class ViewsCreateTest(base.LoggingTestBase):
         expected_view)
     self.RunLogging(
         'views create my-view --location=global --description=description '
-        '--bucket=my-bucket --filter=my-filter',
+        '--bucket=my-bucket --log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testCreateNoPerms(self):
@@ -52,26 +52,26 @@ class ViewsCreateTest(base.LoggingTestBase):
         exception=http_error.MakeHttpError(403))
     self.RunWithoutPerms(
         'views create my-view --location=global --description=description '
-        '--bucket=my-bucket --filter=my-filter',
+        '--bucket=my-bucket --log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testCreateNoLocation(self):
     with self.AssertRaisesArgumentError():
       self.RunLogging(
           'views create my-view --description=description '
-          '--filter=my-filter',
+          '--log-filter=my-filter',
           calliope_base.ReleaseTrack.ALPHA)
 
   def testCreateNoProject(self):
     self.RunWithoutProject(
         'views create my-view --location=global --description=description '
-        '--bucket=my-bucket --filter=my-filter',
+        '--bucket=my-bucket --log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testCreateNoAuth(self):
     self.RunWithoutAuth(
         'views create my-view --location=global --description=description '
-        '--bucket=my-bucket --filter=my-filter',
+        '--bucket=my-bucket --log-filter=my-filter',
         calliope_base.ReleaseTrack.ALPHA)
 
 

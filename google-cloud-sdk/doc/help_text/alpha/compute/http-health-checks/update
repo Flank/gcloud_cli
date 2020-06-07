@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute http-health-checks update - update an HTTP health
-        check
+    gcloud alpha compute http-health-checks update - update a legacy HTTP
+        health check
 
 SYNOPSIS
     gcloud alpha compute http-health-checks update NAME
@@ -11,8 +11,8 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute http-health-checks update is used to update an
-    existing HTTP health check. Only arguments passed in will be updated on the
-    health check. Other attributes will remain unaffected.
+    existing legacy HTTP health check. Only arguments passed in will be updated
+    on the health check. Other attributes will remain unaffected.
 
 POSITIONAL ARGUMENTS
      NAME

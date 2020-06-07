@@ -1,0 +1,96 @@
+
+.TH "GCLOUD_ALPHA_APIGEE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee \- manage Apigee resources
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Manage Apigee resources.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBapis\fR
+\fB(ALPHA)\fR Manage Apigee API proxies.
+
+.TP 2m
+\fBdeployments\fR
+\fB(ALPHA)\fR Manage deployments of Apigee proxies in runtime environments.
+
+.TP 2m
+\fBenvironments\fR
+\fB(ALPHA)\fR Manage Apigee environments.
+
+.TP 2m
+\fBorganizations\fR
+\fB(ALPHA)\fR Manage Apigee organizations.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To list API proxies in the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apis list
+.RE
+
+To deploy an API proxy named \f5\fIhello\-world\fR\fR to the \f5\fItest\fR\fR
+environment, run:
+
+.RS 2m
+$ gcloud alpha apis deploy \-\-environment=test \-\-api=hello\-world
+.RE
+
+To get the status of that deployment, run:
+
+.RS 2m
+$ gcloud alpha deployments describe \-\-environment=test \e
+    \-\-api=hello\-world
+.RE
+
+To undeploy that API proxy, run:
+
+.RS 2m
+$ gcloud alpha apis undeploy \-\-environment=test \-\-api=hello\-world
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

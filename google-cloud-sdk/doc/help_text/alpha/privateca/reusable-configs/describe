@@ -1,0 +1,47 @@
+NAME
+    gcloud alpha privateca reusable-configs describe - show details about a
+        reusable config
+
+SYNOPSIS
+    gcloud alpha privateca reusable-configs describe
+        (REUSABLE_CONFIG : --location=LOCATION) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show details about a reusable config.
+
+POSITIONAL ARGUMENTS
+     Reusable config resource - The reusable config to describe. The arguments
+     in this group can be used to specify the attributes of this resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: provide the argument
+     [REUSABLE_CONFIG] on the command line with a fully specified name; project
+     will default to privateca-data. This must be specified.
+
+       REUSABLE_CONFIG
+          ID of the reusable config or fully qualified identifier for the
+          reusable config. This positional must be specified if any of the
+          other arguments in this group are specified.
+
+       --location=LOCATION
+          The location of the reusable config.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To show details about a reusable config, run:
+
+        $ gcloud alpha privateca reusable-configs describe leaf-server-tls
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

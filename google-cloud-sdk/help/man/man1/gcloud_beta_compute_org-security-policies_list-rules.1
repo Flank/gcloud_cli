@@ -121,6 +121,25 @@ $ gcloud beta compute org\-security\-policies list\-rules list\-rules \e
     123456789
 .RE
 
+To list all the fields of the rules of an organization security policy with ID
+``123456789", run:
+
+.RS 2m
+$ gcloud beta compute org\-security\-policies list\-rules list\-rules \e
+    123456789 \-\-format="table(
+  priority,
+  action,
+  direction,
+  match.config.srcIpRanges.list():label=SRC_RANGES,
+  match.config.destIpRanges.list():label=DEST_RANGES,
+  match.config.layer4Configs.map().org_firewall_rule().list():label=PORT_RANGES,
+  targetServiceAccounts.list():label=TARGET_SVC_ACCT,
+  targetResources:label=TARGET_RESOURCES,
+  ruleTupleCount,
+  enableLogging,
+  description)"
+.RE
+
 
 
 .SH "NOTES"

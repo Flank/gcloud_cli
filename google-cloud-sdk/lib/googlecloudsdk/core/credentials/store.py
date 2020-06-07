@@ -54,7 +54,7 @@ import six
 from six.moves import urllib
 from google.auth import exceptions as google_auth_exceptions
 import google.auth.compute_engine as google_auth_gce
-from google.auth.transport import requests
+import google.auth.impersonated_credentials as google_auth_impersonated_creds
 from google.oauth2 import service_account as google_auth_service_account
 
 
@@ -522,8 +522,31 @@ def Load(account=None,
     log.warning(
         'This command is using service account impersonation. All API calls will '
         'be executed as [{}].'.format(impersonate_service_account))
-    cred = IMPERSONATION_TOKEN_PROVIDER.GetElevationAccessToken(
-        impersonate_service_account, scopes or config.CLOUDSDK_SCOPES)
+
+    if use_google_auth:
+      # Check if the oauth2client version source creds is p12 service account.
+      # Since google-auth doesn't support p12 service account, we need to fall
+      # back to oauth2client behavior for account impersonation in this case.
+      oauth2client_source_creds = Load(
+          account=account,
+          allow_account_impersonation=False,
+          use_google_auth=False)
+      oauth2client_source_creds_type = c_creds.CredentialType.FromCredentials(
+          oauth2client_source_creds)
+      if oauth2client_source_creds_type == c_creds.CredentialType.P12_SERVICE_ACCOUNT:
+        use_google_auth = False
+
+    if use_google_auth:
+      google_auth_source_creds = Load(
+          account=account,
+          allow_account_impersonation=False,
+          use_google_auth=use_google_auth)
+      cred = IMPERSONATION_TOKEN_PROVIDER.GetElevationAccessTokenGoogleAuth(
+          google_auth_source_creds, impersonate_service_account, scopes or
+          config.CLOUDSDK_SCOPES)
+    else:
+      cred = IMPERSONATION_TOKEN_PROVIDER.GetElevationAccessToken(
+          impersonate_service_account, scopes or config.CLOUDSDK_SCOPES)
   else:
     cred = _Load(account, scopes, prevent_refresh, use_google_auth)
 
@@ -598,8 +621,7 @@ def Refresh(credentials,
   Args:
     credentials: oauth2client.client.Credentials or
       google.auth.credentials.Credentials, The credentials to refresh.
-    http_client: httplib2.Http or google.auth.transport.requests, The http
-      transport to refresh with.
+    http_client: httplib2.Http, The http transport to refresh with.
     is_impersonated_credential: bool, True treat provided credential as an
       impersonated service account credential. If False, treat as service
       account or user credential. Needed to avoid circular dependency on
@@ -621,22 +643,20 @@ def Refresh(credentials,
     _Refresh(credentials, http_client, is_impersonated_credential,
              include_email, gce_token_format, gce_include_license)
   else:
-    _RefreshGoogleAuth(credentials, http_client, gce_token_format,
-                       gce_include_license)
+    _RefreshGoogleAuth(credentials, http_client, is_impersonated_credential,
+                       include_email, gce_token_format, gce_include_license)
 
 
 def _Refresh(credentials,
-             http_client=None,
+             http_client,
              is_impersonated_credential=False,
              include_email=False,
              gce_token_format='standard',
              gce_include_license=False):
   """Refreshes oauth2client credentials."""
-  response_encoding = None if six.PY2 else 'utf-8'
-  request_client = http_client or http.Http(response_encoding=response_encoding)
+  http_client = http_client or http.Http(response_encoding=http.ENCODING)
   try:
-    credentials.refresh(request_client)
-
+    credentials.refresh(http_client)
     id_token = None
     # Service accounts require an additional request to receive a fresh id_token
     if is_impersonated_credential:
@@ -652,7 +672,7 @@ def _Refresh(credentials,
           credentials, include_email=include_email)
     # Service accounts require an additional request to receive a fresh id_token
     elif isinstance(credentials, service_account.ServiceAccountCredentials):
-      id_token = _RefreshServiceAccountIdToken(credentials, request_client)
+      id_token = _RefreshServiceAccountIdToken(credentials, http_client)
     elif isinstance(credentials, oauth2client_gce.AppAssertionCredentials):
       id_token = c_gce.Metadata().GetIdToken(
           config.CLOUDSDK_CLIENT_ID,
@@ -677,17 +697,19 @@ def HandleGoogleAuthCredentialsRefreshError():
   """Handles exceptions during refreshing google auth credentials."""
   try:
     yield
-  except google_auth_exceptions.RefreshError as e:
-    raise TokenRefreshError(six.text_type(e))
   except reauth_errors.ReauthSamlLoginRequiredError:
     raise WebLoginRequiredReauthError()
   except (reauth_errors.ReauthError,
           c_google_auth.ReauthRequiredError) as e:
     raise TokenRefreshReauthError(str(e))
+  except google_auth_exceptions.RefreshError as e:
+    raise TokenRefreshError(six.text_type(e))
 
 
 def _RefreshGoogleAuth(credentials,
                        http_client=None,
+                       is_impersonated_credential=False,
+                       include_email=False,
                        gce_token_format='standard',
                        gce_include_license=False):
   """Refreshes google-auth credentials.
@@ -695,20 +717,45 @@ def _RefreshGoogleAuth(credentials,
   Args:
     credentials: google.auth.credentials.Credentials, A google-auth credentials
       to refresh.
-    http_client: google.auth.transport.requests, The http transport to refresh
+    http_client: httplib2.Http, The http transport to refresh
       with.
+    is_impersonated_credential: bool, True treat provided credential as an
+      impersonated service account credential. If False, treat as service
+      account or user credential. Needed to avoid circular dependency on
+      IMPERSONATION_TOKEN_PROVIDER.
+    include_email: bool, Specifies whether or not the service account email is
+      included in the identity token. Only applicable to impersonated service
+      account.
     gce_token_format: str, Specifies whether or not the project and instance
       details are included in the identity token. Choices are "standard",
       "full".
     gce_include_license: bool, Specifies whether or not license codes for images
       associated with GCE instance are included in their identity tokens.
+
+  Raises:
+    AccountImpersonationError: if impersonation support is not available for
+      gcloud, or if the provided credentials is not google auth impersonation
+      credentials.
   """
-  request_client = http_client or requests
+  request_client = http.GoogleAuthRequest(http_client)
   with HandleGoogleAuthCredentialsRefreshError():
-    credentials.refresh(request_client.Request())
+    credentials.refresh(request_client)
 
     id_token = None
-    if isinstance(credentials, google_auth_service_account.Credentials):
+    if is_impersonated_credential:
+      if not IMPERSONATION_TOKEN_PROVIDER:
+        raise AccountImpersonationError(
+            'gcloud is configured to impersonate a service account but '
+            'impersonation support is not available.')
+      if not isinstance(credentials,
+                        google_auth_impersonated_creds.Credentials):
+        raise AccountImpersonationError(
+            'Invalid impersonation account for refresh {}'.format(credentials))
+      id_token_creds = IMPERSONATION_TOKEN_PROVIDER.GetElevationIdTokenGoogleAuth(
+          credentials, config.CLOUDSDK_CLIENT_ID, include_email)
+      id_token_creds.refresh(request_client)
+      id_token = id_token_creds.token
+    elif isinstance(credentials, google_auth_service_account.Credentials):
       id_token = _RefreshServiceAccountIdTokenGoogleAuth(
           credentials, request_client)
     elif isinstance(credentials, google_auth_gce.Credentials):
@@ -716,10 +763,6 @@ def _RefreshGoogleAuth(credentials,
           config.CLOUDSDK_CLIENT_ID,
           token_format=gce_token_format,
           include_license=gce_include_license)
-    else:
-      # TODO(b/151370064): ID token refresh should support impersonated
-      # credentials.
-      pass
 
     if id_token:
       # '_id_token' is the field supported in google-auth natively. gcloud
@@ -804,14 +847,14 @@ def _RefreshServiceAccountIdToken(cred, http_client):
     return None
 
 
-def _RefreshServiceAccountIdTokenGoogleAuth(cred, http_client):
+def _RefreshServiceAccountIdTokenGoogleAuth(cred, request_client):
   """Get a fresh id_token for the given google-auth credentials.
 
   Args:
-    cred: service_account.ServiceAccountCredentials, the credentials for which
+    cred: google.oauth2.service_account.Credentials, the credentials for which
       to refresh the id_token.
-    http_client: google.auth.transport.requests, the http transport to refresh
-      with.
+    request_client: google.auth.transport.Request, the http transport
+     to refresh with.
 
   Returns:
     str, The id_token if refresh was successful. Otherwise None.
@@ -827,7 +870,7 @@ def _RefreshServiceAccountIdTokenGoogleAuth(cred, http_client):
       google_auth_service_account.IDTokenCredentials.from_service_account_info)
   id_token_cred = id_token_credentails(
       cred_dict, target_audience=config.CLOUDSDK_CLIENT_ID)
-  id_token_cred.refresh(http_client.Request())
+  id_token_cred.refresh(request_client)
 
   return id_token_cred.token
 
@@ -891,10 +934,11 @@ def RevokeCredentials(credentials):
   if not c_creds.IsUserAccountCredentials(credentials):
     raise RevokeError('The token cannot be revoked from server because it is '
                       'not user account credentials.')
+  http_client = http.Http()
   if c_creds.IsOauth2ClientCredentials(credentials):
-    credentials.revoke(http.Http())
+    credentials.revoke(http_client)
   else:
-    credentials.revoke(requests.Request())
+    credentials.revoke(http.GoogleAuthRequest(http_client))
 
 
 def Revoke(account=None, use_google_auth=False):
@@ -957,7 +1001,9 @@ def Revoke(account=None, use_google_auth=False):
   store.Remove(account)
 
   _LegacyGenerator(account, credentials).Clean()
-  files.RmTree(config.Paths().LegacyCredentialsDir(account))
+  legacy_creds_dir = config.Paths().LegacyCredentialsDir(account)
+  if os.path.isdir(legacy_creds_dir):
+    files.RmTree(legacy_creds_dir)
   return rv
 
 

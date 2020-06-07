@@ -356,7 +356,7 @@ class ServiceConditionPollerGetIfProbablyNewerTest(base.ServerlessBase):
 
   def _NewService(self, last_transition_time):
     metadata = k8s_object.MakeMeta(self.serverless_messages)
-    conditions = [self.serverless_messages.ServiceCondition(
+    conditions = [self.serverless_messages.GoogleCloudRunV1Condition(
         lastTransitionTime=last_transition_time, status='True', type=u'Ready')]
     status = self.serverless_messages.ServiceStatus(conditions=conditions)
     serv = self.serverless_messages.Service(
@@ -402,7 +402,7 @@ class ServerlessConfigurationWaitTest(base.ServerlessBase):
   """Tests for polling and waiting for updating configuration."""
 
   def SetUp(self):
-    self.cond_class = self.serverless_messages.ConfigurationCondition
+    self.cond_class = self.serverless_messages.GoogleCloudRunV1Condition
     self.poller_class = serverless_operations.ConditionPoller
     self.readiness_type = configuration.Configuration.READY_CONDITION
     self.orig_timeout = serverless_operations.MAX_WAIT_MS
@@ -557,7 +557,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         request, response=revisions_responses)
 
   def _DeleteResponse(self):
-    return self.serverless_messages.Empty()
+    return self.serverless_messages.Status()
 
   def testListServices(self):
     """Test the list services api call."""

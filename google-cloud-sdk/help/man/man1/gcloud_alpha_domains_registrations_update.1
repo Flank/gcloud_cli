@@ -5,19 +5,26 @@
 
 .SH "NAME"
 .HP
-gcloud alpha domains registrations update \- update a domain registration
+gcloud alpha domains registrations update \- update a Cloud Domains registration
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha domains registrations update\fR \fIREGISTRATION\fR [\fB\-\-async\fR] [\fB\-\-registrant\-contact\-from\-file\fR=\fIREGISTRANT_CONTACT_FROM_FILE\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-validate\-only\fR] [\fB\-\-whois\-privacy\fR=\fIWHOIS_PRIVACY\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-cloud\-dns\-zone\fR=\fICLOUD_DNS_ZONE\fR\ |\ \fB\-\-name\-servers\fR=\fINAME_SERVER\fR,...,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha domains registrations update\fR \fIREGISTRATION\fR [\fB\-\-async\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command updates an existing registration.
+\fB(ALPHA)\fR Update an existing registration. Currently used for updating
+labels only. Run:
+
+.RS 2m
+$ gcloud help alpha domains registrations configure
+.RE
+
+to see how to change management, DNS or contact settings.
 
 
 
@@ -53,29 +60,6 @@ ID of the registration or fully qualified identifier for the registration.
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
-\fB\-\-registrant\-contact\-from\-file\fR=\fIREGISTRANT_CONTACT_FROM_FILE\fR
-A YAML file containing the required WHOIS data. If specified, this file must
-contain values for all required fields: email, phoneNumber and postalAddress in
-google.type.PostalAddress format.
-
-For more guidance on how to specify postalAddress, please see:
-https://support.google.com/business/answer/6397478
-
-Example file contents:
-
-.RS 2m
-email: 'example@example.com'
-phoneNumber: '+11234567890'
-postalAddress:
-  regionCode: 'US'
-  postalCode: '94043'
-  administrativeArea: 'CA'
-  locality: 'Mountain View'
-  addressLines: ['1600 Amphitheatre Pkwy']
-  recipients: ['Jane Doe']
-.RE
-
-.TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
@@ -84,28 +68,6 @@ Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
-
-.TP 2m
-\fB\-\-validate\-only\fR
-Don't actually update registration. Only validate arguments.
-
-.TP 2m
-\fB\-\-whois\-privacy\fR=\fIWHOIS_PRIVACY\fR
-The WHOIS privacy mode to use. \fIWHOIS_PRIVACY\fR must be one of:
-
-.RS 2m
-.TP 2m
-\fBpublish\-redacted\-contact\-data\fR
-Limited personal info will be available to the public. The actual information
-redacted depends on the domain.
-.TP 2m
-\fBuse\-whois\-privacy\-proxy\fR
-Your contact info won't be available to the public. To help protect your info
-and prevent spam, a third party provides alternate contact info for your domain
-in the WHOIS directory at no extra cost.
-.RE
-.sp
-
 
 .TP 2m
 
@@ -136,25 +98,6 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
 applied first.
 
-.RE
-.sp
-.TP 2m
-
-Set the addresses of authoritative name servers for the given domain. At most
-one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-cloud\-dns\-zone\fR=\fICLOUD_DNS_ZONE\fR
-The name of the Cloud DNS managed\-zone to set as the name server for the
-domain. If it's in the same project, you can use short name. If not, use the
-full resource name, e.g.:
-\-\-cloud\-dns\-zone=projects/example\-project/managedZones/example\-zone
-
-.TP 2m
-\fB\-\-name\-servers\fR=\fINAME_SERVER\fR,...,[...]
-List of DNS name servers for the domain.
-
 
 .RE
 .RE
@@ -173,11 +116,12 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To enable WHOIS privacy for example.com, run:
+To add a label with key \f5\fIenvironment\fR\fR and value \f5\fItest\fR\fR for
+\f5\fIexample.com\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha domains registrations update example.com \e
-    \-\-whois\-privacy=use\-whois\-privacy\-proxy
+    \-\-update\-labels="project=example,environment=test"
 .RE
 
 

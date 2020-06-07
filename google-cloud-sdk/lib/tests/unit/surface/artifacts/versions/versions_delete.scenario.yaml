@@ -106,7 +106,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             tags:
             - name: projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/tags/my-tag
               version: projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/versions/1.0.0

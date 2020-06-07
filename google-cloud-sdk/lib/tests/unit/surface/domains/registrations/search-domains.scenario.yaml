@@ -14,6 +14,19 @@ summary:
       example.app   AVAILABLE     14.00 USD     HSTS_PRELOADED
       music.info    AVAILABLE     12.00 USD
       xmpl.design   AVAILABLE     40.00 USD
+- execute:
+  - command: |
+      domains registrations search-domains ÜniCode
+  - stdout: |
+      DOMAIN              AVAILABILITY  YEARLY_PRICE  NOTICES
+      unicode.com         UNAVAILABLE
+      xn--nicode-2ya.com  AVAILABLE     12.00 USD
+- execute:
+  - command: |
+      domains registrations search-domains registry-down.com
+  - stdout: |
+      DOMAIN             AVAILABILITY  YEARLY_PRICE  NOTICES
+      registry-down.net  UNKNOWN
 actions:
 - execute_command:
     command: |
@@ -21,7 +34,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:searchAvailability?alt=json&query=example.com
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:searchDomains?alt=json&query=example.com
           method: GET
           headers: {}
           body: null
@@ -30,34 +43,27 @@ actions:
             status: '200'
           body: |
             {
-              "availability": [
+              "registerParameters": [
                 {
                   "domainName": "example.com",
-                  "available": "UNAVAILABLE"
+                  "availability": "UNAVAILABLE"
                 },
                 {
                   "domainName": "example.net",
-                  "available": "UNAVAILABLE"
+                  "availability": "UNAVAILABLE"
                 },
                 {
                   "domainName": "example.org",
-                  "available": "UNAVAILABLE"
+                  "availability": "UNAVAILABLE"
                 },
                 {
                   "domainName": "example.info",
-                  "available": "AVAILABLE",
-                  "registrationPrice": {
-                    "currencyCode": "USD",
-                    "units": "12"
-                  },
-                  "supportedWhoisPrivacy": [
-                    "PUBLISH_REDACTED_CONTACT_DATA",
-                    "USE_WHOIS_PRIVACY_PROXY"
+                  "availability": "AVAILABLE",
+                  "supportedPrivacy": [
+                    "PUBLIC_CONTACT_DATA",
+                    "REDACTED_CONTACT_DATA",
+                    "PRIVATE_CONTACT_DATA"
                   ],
-                  "renewalPrice": {
-                    "currencyCode": "USD",
-                    "units": "12"
-                  },
                   "yearlyPrice": {
                     "currencyCode": "USD",
                     "units": "12"
@@ -65,22 +71,14 @@ actions:
                 },
                 {
                   "domainName": "example.app",
-                  "available": "AVAILABLE",
-                  "registrationPrice": {
-                    "currencyCode": "USD",
-                    "units": "14"
-                  },
-                  "supportedWhoisPrivacy": [
-                    "PUBLISH_REDACTED_CONTACT_DATA",
-                    "USE_WHOIS_PRIVACY_PROXY"
+                  "availability": "AVAILABLE",
+                  "supportedPrivacy": [
+                    "REDACTED_CONTACT_DATA",
+                    "PRIVATE_CONTACT_DATA"
                   ],
-                  "notices": [
+                  "domainNotices": [
                     "HSTS_PRELOADED"
                   ],
-                  "renewalPrice": {
-                    "currencyCode": "USD",
-                    "units": "14"
-                  },
                   "yearlyPrice": {
                     "currencyCode": "USD",
                     "units": "14"
@@ -88,19 +86,11 @@ actions:
                 },
                 {
                   "domainName": "music.info",
-                  "available": "AVAILABLE",
-                  "registrationPrice": {
-                    "currencyCode": "USD",
-                    "units": "12"
-                  },
-                  "supportedWhoisPrivacy": [
-                    "PUBLISH_REDACTED_CONTACT_DATA",
-                    "USE_WHOIS_PRIVACY_PROXY"
+                  "availability": "AVAILABLE",
+                  "supportedPrivacy": [
+                    "REDACTED_CONTACT_DATA",
+                    "PRIVATE_CONTACT_DATA"
                   ],
-                  "renewalPrice": {
-                    "currencyCode": "USD",
-                    "units": "12"
-                  },
                   "yearlyPrice": {
                     "currencyCode": "USD",
                     "units": "12"
@@ -108,19 +98,11 @@ actions:
                 },
                 {
                   "domainName": "xmpl.design",
-                  "available": "AVAILABLE",
-                  "registrationPrice": {
-                    "currencyCode": "USD",
-                    "units": "40"
-                  },
-                  "supportedWhoisPrivacy": [
-                    "PUBLISH_REDACTED_CONTACT_DATA",
-                    "USE_WHOIS_PRIVACY_PROXY"
+                  "availability": "AVAILABLE",
+                  "supportedPrivacy": [
+                    "REDACTED_CONTACT_DATA",
+                    "PRIVATE_CONTACT_DATA"
                   ],
-                  "renewalPrice": {
-                    "currencyCode": "USD",
-                    "units": "40"
-                  },
                   "yearlyPrice": {
                     "currencyCode": "USD",
                     "units": "40"
@@ -138,5 +120,74 @@ actions:
         example.app   AVAILABLE     14.00 USD     HSTS_PRELOADED
         music.info    AVAILABLE     12.00 USD
         xmpl.design   AVAILABLE     40.00 USD
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations search-domains ÜniCode
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:searchDomains?alt=json&query=%C3%9CniCode
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": [
+                {
+                  "domainName": "unicode.com",
+                  "availability": "UNAVAILABLE"
+                },
+                {
+                  "domainName": "xn--nicode-2ya.com",
+                  "availability": "AVAILABLE",
+                  "supportedPrivacy": [
+                    "REDACTED_CONTACT_DATA",
+                    "PRIVATE_CONTACT_DATA"
+                  ],
+                  "yearlyPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
+                  }
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        DOMAIN              AVAILABILITY  YEARLY_PRICE  NOTICES
+        unicode.com         UNAVAILABLE
+        xn--nicode-2ya.com  AVAILABLE     12.00 USD
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations search-domains registry-down.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:searchDomains?alt=json&query=registry-down.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": [
+                {
+                  "domainName": "registry-down.net",
+                  "availability": "UNKNOWN"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        DOMAIN             AVAILABILITY  YEARLY_PRICE  NOTICES
+        registry-down.net  UNKNOWN
     - expect_exit:
         code: 0

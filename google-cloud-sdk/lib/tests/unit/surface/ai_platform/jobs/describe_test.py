@@ -165,7 +165,7 @@ https://console.cloud.google.com/mlengine/jobs/my_job?project=fake-project
 
 View logs at:
 https://console.cloud.google.com/logs?\
-resource=ml.googleapis.com%2Fjob_id%2Fmy_job&project=fake-project
+resource=ml_job%2Fjob_id%2Fmy_job&project=fake-project
 """)
 
   def testDescribeSummarizeTraining(self, module_name):

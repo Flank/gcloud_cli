@@ -183,10 +183,6 @@ COMMANDS
         (ALPHA) Updates Google Compute engine virtual machine instances running
         container images.
 
-     update-from-file
-        (ALPHA) Update a Compute Engine virtual machine instance using a
-        configuration file.
-
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

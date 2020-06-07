@@ -80,11 +80,23 @@ class ProjectIntegrationTest(base.ProjectsTestBase, e2e_base.WithServiceAuth):
     self.assertTrue(self.compareProjects(self.getIntegrationTestingProject(),
                                          result))
 
+  def testDescribeProjectWithNumber(self):
+    result = self.RunProjects('describe', '462803083913')
+    self.assertTrue(self.compareProjects(self.getIntegrationTestingProject(),
+                                         result))
+
   def testGetIamPolicy(self):
     policy = self.RunProjects(
         'get-iam-policy',
         'cloud-sdk-integration-testing')
     self.assertIsInstance(policy, self.messages.Policy)
+
+  def testGetIamPolicyWithNumber(self):
+    policy = self.RunProjects(
+        'get-iam-policy',
+        '462803083913')
+    self.assertIsInstance(policy, self.messages.Policy)
+
 
 if __name__ == '__main__':
   test_case.main()

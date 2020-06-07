@@ -50,8 +50,9 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --archives=[ARCHIVE,...]
-        Comma separated list of archives to be provided to the job. must be one
-        of the following file formats: .zip, .tar, .tar.gz, or .tgz.
+        Comma separated list of archives to be extracted into the working
+        directory of each executor. Must be one of the following file formats:
+        .zip, .tar, .tar.gz, or .tgz.
 
      --driver-log-levels=[PACKAGE=LEVEL,...]
         List of key value pairs to configure driver logging, where key is a
@@ -59,7 +60,8 @@ OPTIONAL FLAGS
         root=FATAL,com.example=INFO
 
      --files=[FILE,...]
-        Comma separated list of files to be provided to the job.
+        Comma separated list of files to be placed in the working directory of
+        each executor.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

@@ -39,7 +39,7 @@ class RoutesListTestBeta(base.ServerlessSurfaceBase):
       r.metadata.creationTimestamp = '2018/01/01 00:{}0:00Z'.format(i)
       r.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/routes/{}'.format(
           self.namespace.Name(), r.name)
-      r.status.conditions = [self.serverless_messages.RouteCondition(
+      r.status.conditions = [self.serverless_messages.GoogleCloudRunV1Condition(
           type='Ready',
           status=six.text_type(bool(i%2)))]
     self.operations.ListRoutes.return_value = self.routes

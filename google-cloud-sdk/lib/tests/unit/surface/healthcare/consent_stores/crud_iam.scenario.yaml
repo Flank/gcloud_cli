@@ -1,0 +1,433 @@
+title: healthcare consent-stores crud scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: healthcare consent-stores create my-store --location us-central1 --dataset
+      my-dataset
+  - stderr: |
+      Created consentStore [my-store].
+- execute:
+  - command: healthcare consent-stores describe my-store --location us-central1 --dataset
+      my-dataset
+  - stdout: |
+      consentStores:
+      - name: projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store
+- execute:
+  - command: healthcare consent-stores update my-store --location us-central1 --dataset
+      my-dataset
+  - stderr: |
+      Updated consentStore [my-store].
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store
+- execute:
+  - command: healthcare consent-stores get-iam-policy my-store --location us-central1
+      --dataset my-dataset
+  - stdout: |
+      etag: ACAB
+- execute:
+  - command: |
+      healthcare consent-stores set-iam-policy my-store policy.json --dataset=my-dataset
+        --location=us-central1
+  - stderr: |
+      Updated IAM policy for consentStore [my-store].
+  - stdout: |
+      bindings:
+      - members:
+        - user:testuser@google.com
+        role: roles/owner
+      etag: ACAB
+      version: 1
+- execute:
+  - command: healthcare consent-stores add-iam-policy-binding my-store --location=us-central1
+      --dataset=my-dataset --member=user:test@gmail.com --role=roles/non-primitive
+  - stderr: |
+      Updated IAM policy for consentStore [my-store].
+  - stdout: |
+      bindings:
+      - members:
+        - user:owner@gmail.com
+        role: roles/another-non-primitive
+      - members:
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+- execute:
+  - command: healthcare consent-stores remove-iam-policy-binding my-store --location=us-central1
+      --dataset=my-dataset --member=user:owner@gmail.com --role=roles/non-primitive
+      --condition='expression=expr,title=title,description=descr'
+  - stderr: |
+      Updated IAM policy for consentStore [my-store].
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:newowner@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+- execute:
+  - command: healthcare consent-stores delete my-store --location us-central1 --dataset
+      my-dataset
+  - prompt:
+    - message: You are about to delete consentStore [my-store]
+    - input: y
+  - stderr: |
+      Deleted consentStore [my-store].
+actions:
+- execute_command:
+    command: healthcare consent-stores create my-store --location us-central1 --dataset
+      my-dataset
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores?alt=json&consentStoreId=my-store
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store
+    - expect_stderr: |
+        Created consentStore [my-store].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare consent-stores describe my-store --location us-central1 --dataset
+      my-dataset
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "consentStores": [
+                {
+                  "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store"
+                }
+              ]
+            }
+    - expect_stdout: |
+        consentStores:
+        - name: projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare consent-stores update my-store --location us-central1 --dataset
+      my-dataset
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "consentStores": [
+                {
+                  "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              consentStores:
+              - name: projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store"
+            }
+    - expect_stderr: |
+        Updated consentStore [my-store].
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare consent-stores get-iam-policy my-store --location us-central1
+      --dataset my-dataset
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "etag": "ACAB"
+            }
+    - expect_stdout: |
+        etag: ACAB
+    - expect_exit:
+        code: 0
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "bindings": [
+            {
+             "role": "roles/owner",
+             "members": ["user:testuser@google.com"]
+            }],
+         "etag": "ACAB"
+      }
+- execute_command:
+    command: |
+      healthcare consent-stores set-iam-policy my-store policy.json --dataset=my-dataset
+        --location=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:testuser@google.com
+                  role: roles/owner
+                etag: ACAB
+                version: 1
+              updateMask: bindings,etag,version
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "bindings": [
+                  {
+                   "role": "roles/owner",
+                   "members": ["user:testuser@google.com"]
+                  }],
+               "etag": "ACAB"
+            }
+    - expect_stderr: |
+        Updated IAM policy for consentStore [my-store].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:testuser@google.com
+          role: roles/owner
+        etag: ACAB
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare consent-stores add-iam-policy-binding my-store --location=us-central1
+      --dataset=my-dataset --member=user:test@gmail.com --role=roles/non-primitive
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/another-non-primitive",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:owner@gmail.com
+                  role: roles/another-non-primitive
+                - members:
+                  - user:test@gmail.com
+                  role: roles/non-primitive
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/another-non-primitive",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                },
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:test@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for consentStore [my-store].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:owner@gmail.com
+          role: roles/another-non-primitive
+        - members:
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare consent-stores remove-iam-policy-binding my-store --location=us-central1
+      --dataset=my-dataset --member=user:owner@gmail.com --role=roles/non-primitive
+      --condition='expression=expr,title=title,description=descr'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:owner@gmail.com",
+                    "user:newowner@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - condition:
+                    description: descr
+                    expression: expr
+                    title: title
+                  members:
+                  - user:newowner@gmail.com
+                  role: roles/non-primitive
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:newowner@gmail.com"
+                   ],
+                   "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for consentStore [my-store].
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:newowner@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare consent-stores delete my-store --location us-central1 --dataset
+      my-dataset
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete consentStore [my-store]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted consentStore [my-store].
+    - expect_exit:
+        code: 0

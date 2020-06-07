@@ -1,40 +1,36 @@
-filters:
-  skip:
-    reason: stdout change
-    bug: b/155053287
 title: scc asset group test scenario
 release_tracks: [ALPHA]
 summary:
 - execute:
   - command: |
-      scc assets group 345840165995 --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z"
+      scc assets group 702114178617 --group-by "security_center_properties.resource_type" --read-time="2020-04-29T07:00:00Z"
   - stdout: |
       groupByResults:
       - count: '1'
         properties:
           security_center_properties.resource_type: google.cloud.resourcemanager.Organization
-      - count: '1'
+      - count: '2'
         properties:
           security_center_properties.resource_type: google.cloud.resourcemanager.Project
       - count: '1'
         properties:
-          security_center_properties.resource_type: google.cloud.storage.Bucket
-      readTime: '2019-02-28T07:00:00Z'
+          security_center_properties.resource_type: google.iam.ServiceAccount
+      readTime: '2020-04-29T07:00:00Z'
       totalSize: 3
 actions:
 - execute_command:
     command: |
-      scc assets group 345840165995 --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z"
+      scc assets group 702114178617 --group-by "security_center_properties.resource_type" --read-time="2020-04-29T07:00:00Z"
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets:group?alt=json
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets:group?alt=json
           method: POST
           headers: {}
           body:
             json:
               groupBy: security_center_properties.resource_type
-              readTime: '2019-02-28T07:00:00Z'
+              readTime: '2020-04-29T07:00:00Z'
         return_response:
           headers:
             status: '200'
@@ -51,30 +47,22 @@ actions:
                   "properties": {
                     "security_center_properties.resource_type": "google.cloud.resourcemanager.Project"
                   },
-                  "count": "1"
+                  "count": "2"
                 },
                 {
                   "properties": {
-                    "security_center_properties.resource_type": "google.cloud.storage.Bucket"
+                    "security_center_properties.resource_type": "google.iam.ServiceAccount"
                   },
                   "count": "1"
                 }
               ],
-              "readTime": "2019-02-28T07:00:00Z",
+              "readTime": "2020-04-29T07:00:00Z",
               "totalSize": 3
             }
-    - expect_stdout: |
-        groupByResults:
-        - count: '1'
-          properties:
-            security_center_properties.resource_type: google.cloud.resourcemanager.Organization
-        - count: '1'
-          properties:
-            security_center_properties.resource_type: google.cloud.resourcemanager.Project
-        - count: '1'
-          properties:
-            security_center_properties.resource_type: google.cloud.storage.Bucket
-        readTime: '2019-02-28T07:00:00Z'
-        totalSize: 3
+    - expect_stdout:
+        matches: |
+          .*Organization.*
+          .*Project.*
+          .*ServiceAccount.*
     - expect_exit:
         code: 0

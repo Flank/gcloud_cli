@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.events import custom_resource_definition
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib.surface.run import base
+from tests.lib.surface.events import base
 
 
-class TypesListTestAlpha(base.ServerlessSurfaceBase):
+class TypesListTestAlpha(base.EventsBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

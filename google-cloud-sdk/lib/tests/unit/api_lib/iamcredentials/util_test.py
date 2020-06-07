@@ -136,31 +136,6 @@ class UtilTests(sdk_test_base.SdkBase):
     self.assertEqual(credentials.token_expiry,
                      datetime.datetime(2017, 1, 8, 0, 0, 0))
 
-  def testImpersonationCredentialsGoogleAuth(self):
-    self.StartObjectPatch(
-        util,
-        'GenerateAccessToken',
-        return_value=self.messages.GenerateAccessTokenResponse(
-            accessToken='new-access-token', expireTime='2017-01-08T00:00:00Z'))
-    oauth2client_credentials = util.ImpersonationCredentials(
-        'service-account-id', 'access-token', '2016-01-08T00:00:00Z',
-        config.CLOUDSDK_SCOPES)
-
-    credentials = util.ImpersonationCredentialsGoogleAuth.from_impersonation_credentials(oauth2client_credentials)  # pylint: disable=line-too-long
-    util.GenerateAccessToken.assert_not_called()
-    self.assertEqual(credentials.token, 'access-token')
-    self.assertEqual(credentials.expiry, datetime.datetime(2016, 1, 8, 0, 0, 0))
-
-    credentials.refresh(None)
-    util.GenerateAccessToken.assert_called_once()
-    self.assertEqual(len(util.GenerateAccessToken.call_args[0]), 2)
-    service_account_arg = util.GenerateAccessToken.call_args[0][0]
-    scopes_arg = util.GenerateAccessToken.call_args[0][1]
-    self.assertEqual(service_account_arg, 'service-account-id')
-    self.assertEqual(set(scopes_arg), set(config.CLOUDSDK_SCOPES))
-    self.assertEqual(credentials.token, 'new-access-token')
-    self.assertEqual(credentials.expiry, datetime.datetime(2017, 1, 8, 0, 0, 0))
-
   def testRefreshImpersonationAccountId(self):
     # Store test credential
     store.Store(self.fake_cred)

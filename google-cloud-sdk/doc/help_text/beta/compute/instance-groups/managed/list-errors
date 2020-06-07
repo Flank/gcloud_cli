@@ -28,7 +28,7 @@ DESCRIPTION
       o Viewer
 
     For more information regarding permissions required by managed instance
-    groups, refer to Compute Engine's access control guide :
+    groups, refer to Compute Engine's access control guide:
     https://cloud.google.com/compute/docs/access/iam-permissions#instancegroupmanagers_collection.
 
 POSITIONAL ARGUMENTS
@@ -104,8 +104,9 @@ EXAMPLES
               my-group --format=yaml
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed list-errors
         $ gcloud alpha compute instance-groups managed list-errors
 

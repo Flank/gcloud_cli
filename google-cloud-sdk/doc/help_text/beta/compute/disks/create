@@ -60,7 +60,7 @@ FLAGS
         the image for their boot disks. See
         https://cloud.google.com/compute/docs/images/create-delete-deprecate-private-images#guest-os-features
         for descriptions of the supported features. GUEST_OS_FEATURE must be
-        one of: GVNIC, MULTI_IP_SUBNET, UEFI_COMPATIBLE,
+        one of: GVNIC, MULTI_IP_SUBNET, SEV_CAPABLE, UEFI_COMPATIBLE,
         VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
      --labels=[KEY=VALUE,...]

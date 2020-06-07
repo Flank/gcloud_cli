@@ -285,6 +285,34 @@ class SinksUpdateTestAlpha(SinksUpdateTest):
     self.AssertErrContains('Updated')
     self.AssertOutputContains('disabled: true')
 
+  def testUpdateOnlyPrintsReminderOnDestinationChange(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    expected_sink = self.msgs.LogSink(
+        name=test_sink.name,
+        disabled=True)
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com',
+        disabled=True)
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='disabled'),
+        updated_sink)
+    self.RunLogging('sinks update my-sink --disabled')
+    self.AssertErrNotContains('More information')
+
   def testUpdateSuccessDescription(self):
     test_sink = self.msgs.LogSink(
         name='my-sink',

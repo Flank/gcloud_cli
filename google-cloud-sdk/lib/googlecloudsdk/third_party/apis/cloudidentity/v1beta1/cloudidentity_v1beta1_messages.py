@@ -475,9 +475,6 @@ class CloudidentityDevicesDeviceUsersClientStatesListRequest(_messages.Message):
     filter: Optional. Additional restrictions when fetching list of client
       states.
     orderBy: Optional. Order specification for client states in the response.
-    pageSize: Optional. The maximum number of ClientStates to return. If
-      unspecified, at most 5 ClientStates will be returned. The maximum value
-      is 20; values above 20 will be coerced to 20.
     pageToken: Optional. A page token, received from a previous
       `ListClientStates` call. Provide this to retrieve the subsequent page.
       When paginating, all other parameters provided to `ListClientStates`
@@ -491,9 +488,8 @@ class CloudidentityDevicesDeviceUsersClientStatesListRequest(_messages.Message):
   customer = _messages.StringField(1)
   filter = _messages.StringField(2)
   orderBy = _messages.StringField(3)
-  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(5)
-  parent = _messages.StringField(6, required=True)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
 
 
 class CloudidentityDevicesDeviceUsersClientStatesPatchRequest(_messages.Message):
@@ -682,8 +678,9 @@ class CloudidentityDevicesDeviceUsersLookupSelfRequest(_messages.Message):
       the user is enrolled into Google Endpoint Verification, this id will be
       saved as the 'device_resource_id' field in the following platform
       dependent files.  Mac: ~/.secureConnect/context_aware_config.json
-      Windows: C:\Users\%USERPROFILE%\.secureConnect\context_aware_config.json
-      Linux: ~/.secureConnect/context_aware_config.json
+      Windows:
+      C:\\Users\%USERPROFILE%\.secureConnect\context_aware_config.json Linux:
+      ~/.secureConnect/context_aware_config.json
   """
 
   androidId = _messages.StringField(1)
@@ -1421,15 +1418,16 @@ class CreateDeviceRequest(_messages.Message):
   Fields:
     customer: Required. [Resource
       name](https://cloud.google.com/apis/design/resource_names) of the
-      customer. To find the customer ID for your organization, use the
-      command: ``` gcloud alpha organizations list ``` The customer ID you
-      need to use appears under the heading `DIRECTORY_CUSTOMER_ID`. The value
-      is the letter "C" followed by letters and numbers. Use the value after
-      the letter "C". So if the Directory Customer ID displayed is, say
-      `C00zqsgyx`, then the customer ID value to use in the API is:
-      `customers/00zqsgyx`. If you're using this API to manage another
-      organization, use `customers/{customer_id}`, where `customer_id` is the
-      customer to whom the device belongs.
+      customer. You can use the 'customers/my_customer' alias to represent
+      your account's customerId. To find the customer ID for your
+      organization, use the command: ``` gcloud alpha organizations list ```
+      The customer ID you need to use appears under the heading
+      `DIRECTORY_CUSTOMER_ID`. The value is the letter "C" followed by letters
+      and numbers. Use the value after the letter "C". So if the Directory
+      Customer ID displayed is, say `C00zqsgyx`, then the customer ID value to
+      use in the API is: `customers/00zqsgyx`. If you're using this API to
+      manage another organization, use `customers/{customer_id}`, where
+      `customer_id` is the customer to whom the device belongs.
     device: Required. The device to be created. The name field within this
       device is ignored in the create method. A new name is created by the
       method, and returned within the response. Only the fields `device_type`,
@@ -1639,6 +1637,7 @@ class DeviceUser(_messages.Message):
 
   Fields:
     compromisedState: Compromised State of the DeviceUser object
+    createTime: When the user first signed in to the device
     firstSyncTime: Output only. Most recent time when user registered with
       this service.
     languageCode: Output only. Default locale used on device, in IETF BCP-47
@@ -1701,14 +1700,15 @@ class DeviceUser(_messages.Message):
     PASSWORD_NOT_SET = 2
 
   compromisedState = _messages.EnumField('CompromisedStateValueValuesEnum', 1)
-  firstSyncTime = _messages.StringField(2)
-  languageCode = _messages.StringField(3)
-  lastSyncTime = _messages.StringField(4)
-  managementState = _messages.EnumField('ManagementStateValueValuesEnum', 5)
-  name = _messages.StringField(6)
-  passwordState = _messages.EnumField('PasswordStateValueValuesEnum', 7)
-  userAgent = _messages.StringField(8)
-  userEmail = _messages.StringField(9)
+  createTime = _messages.StringField(2)
+  firstSyncTime = _messages.StringField(3)
+  languageCode = _messages.StringField(4)
+  lastSyncTime = _messages.StringField(5)
+  managementState = _messages.EnumField('ManagementStateValueValuesEnum', 6)
+  name = _messages.StringField(7)
+  passwordState = _messages.EnumField('PasswordStateValueValuesEnum', 8)
+  userAgent = _messages.StringField(9)
+  userEmail = _messages.StringField(10)
 
 
 class DynamicGroupMetadata(_messages.Message):
@@ -2033,6 +2033,20 @@ class GroupRelation(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 4)
   relationType = _messages.EnumField('RelationTypeValueValuesEnum', 5)
   roles = _messages.MessageField('TransitiveMembershipRole', 6, repeated=True)
+
+
+class ListClientStatesResponse(_messages.Message):
+  r"""Response message that is returned in LRO result of ListClientStates
+  Operation.
+
+  Fields:
+    clientStates: Client states meeting the list restrictions.
+    nextPageToken: Token to retrieve the next page of results. Empty if there
+      are no more results.
+  """
+
+  clientStates = _messages.MessageField('ClientState', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
 
 
 class ListDeviceUsersResponse(_messages.Message):
@@ -2600,7 +2614,7 @@ class StandardQueryParameters(_messages.Message):
 
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
-  alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
+  alt = _messages.EnumField('AltValueValuesEnum', 3, default='json')
   callback = _messages.StringField(4)
   fields = _messages.StringField(5)
   key = _messages.StringField(6)

@@ -162,6 +162,18 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
         'test-cluster GCE 2 RUNNING antarctica-north42-a enabled',
         normalize_space=True)
 
+  def testListClusters_gkeBasedCluster(self):
+    cluster = self.MakeRunningCluster(
+        gkeClusterPath='projects/{0}/locations/{1}/clusters/my-cluster'.format(
+            self.Project(), self.ZONE))
+
+    self.ExpectListClusters([cluster])
+    self.RunDataproc('clusters list', output_format='')
+    self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
+    # There wont be a zone associated with GKE clusters listed from GA.
+    self.AssertOutputContains(
+        '{0} GKE RUNNING'.format(self.CLUSTER_NAME), normalize_space=True)
+
 
 class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
   """Tests for dataproc clusters list."""

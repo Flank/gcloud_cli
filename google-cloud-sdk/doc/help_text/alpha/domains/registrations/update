@@ -1,17 +1,19 @@
 NAME
-    gcloud alpha domains registrations update - update a domain registration
+    gcloud alpha domains registrations update - update a Cloud Domains
+        registration
 
 SYNOPSIS
     gcloud alpha domains registrations update REGISTRATION [--async]
-        [--registrant-contact-from-file=REGISTRANT_CONTACT_FROM_FILE]
-        [--update-labels=[KEY=VALUE,...]] [--validate-only]
-        [--whois-privacy=WHOIS_PRIVACY]
-        [--clear-labels | --remove-labels=[KEY,...]]
-        [--cloud-dns-zone=CLOUD_DNS_ZONE
-          | --name-servers=NAME_SERVER,...,[...]] [GCLOUD_WIDE_FLAG ...]
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command updates an existing registration.
+    (ALPHA) Update an existing registration. Currently used for updating labels
+    only. Run:
+
+        $ gcloud help alpha domains registrations configure
+
+    to see how to change management, DNS or contact settings.
 
 POSITIONAL ARGUMENTS
      Registration resource - The domain registration to update. This represents
@@ -32,26 +34,6 @@ FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
-     --registrant-contact-from-file=REGISTRANT_CONTACT_FROM_FILE
-        A YAML file containing the required WHOIS data. If specified, this file
-        must contain values for all required fields: email, phoneNumber and
-        postalAddress in google.type.PostalAddress format.
-
-        For more guidance on how to specify postalAddress, please see:
-        https://support.google.com/business/answer/6397478
-
-        Example file contents:
-
-            email: 'example@example.com'
-            phoneNumber: '+11234567890'
-            postalAddress:
-              regionCode: 'US'
-              postalCode: '94043'
-              administrativeArea: 'CA'
-              locality: 'Mountain View'
-              addressLines: ['1600 Amphitheatre Pkwy']
-              recipients: ['Jane Doe']
-
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
         modified, otherwise a new label is created.
@@ -60,21 +42,6 @@ FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
-
-     --validate-only
-        Don't actually update registration. Only validate arguments.
-
-     --whois-privacy=WHOIS_PRIVACY
-        The WHOIS privacy mode to use. WHOIS_PRIVACY must be one of:
-
-         publish-redacted-contact-data
-            Limited personal info will be available to the public. The actual
-            information redacted depends on the domain.
-         use-whois-privacy-proxy
-            Your contact info won't be available to the public. To help protect
-            your info and prevent spam, a third party provides alternate
-            contact info for your domain in the WHOIS directory at no extra
-            cost.
 
      At most one of these may be specified:
 
@@ -96,18 +63,6 @@ FLAGS
           silently ignored. If --update-labels is also specified then
           --remove-labels is applied first.
 
-     Set the addresses of authoritative name servers for the given domain. At
-     most one of these may be specified:
-
-       --cloud-dns-zone=CLOUD_DNS_ZONE
-          The name of the Cloud DNS managed-zone to set as the name server for
-          the domain. If it's in the same project, you can use short name. If
-          not, use the full resource name, e.g.:
-          --cloud-dns-zone=projects/example-project/managedZones/example-zone
-
-       --name-servers=NAME_SERVER,...,[...]
-          List of DNS name servers for the domain.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -117,10 +72,10 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To enable WHOIS privacy for example.com, run:
+    To add a label with key environment and value test for example.com, run:
 
         $ gcloud alpha domains registrations update example.com \
-            --whois-privacy=use-whois-privacy-proxy
+            --update-labels="project=example,environment=test"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

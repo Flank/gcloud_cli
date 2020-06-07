@@ -5,13 +5,13 @@ NAME
 SYNOPSIS
     gcloud alpha run services update-traffic [[SERVICE] --namespace=NAMESPACE]
         [--async] [--platform=PLATFORM]
-        [--clear-tags | --set-tags=[KEY=VALUE,...]
-          | --remove-tags=[KEY,...] --update-tags=[KEY=VALUE,...]]
+        [--clear-tags | --set-tags=[TAG=REVISION,...]
+          | --remove-tags=[TAG,...] --update-tags=[TAG=REVISION,...]]
         [--region=REGION
           | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
           | --context=CONTEXT --kubeconfig=KUBECONFIG]
-        [--to-latest | --to-revisions=[REVISION-NAME=PERCENTAGE,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--to-latest | --to-revisions=[REVISION-NAME=PERCENTAGE,...]
+          | --to-tags=[TAG=PERCENTAGE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Adjust the traffic assignments for a Cloud Run service.
@@ -66,17 +66,17 @@ FLAGS
        --clear-tags
           Remove all tags.
 
-       --set-tags=[KEY=VALUE,...]
+       --set-tags=[TAG=REVISION,...]
           List of key-value pairs to set as tags. All existing tags will be
           removed first.
 
        Only --update-tags and --remove-tags can be used together. If both are
        specified, --remove-tags will be applied first.
 
-         --remove-tags=[KEY,...]
+         --remove-tags=[TAG,...]
             List of tags to be removed.
 
-         --update-tags=[KEY=VALUE,...]
+         --update-tags=[TAG=REVISION,...]
             List of key-value pairs to set as tags.
 
      Arguments to locate resources, depending on the platform used. At most one
@@ -149,6 +149,22 @@ FLAGS
           to 55 percent. You can use "LATEST" as a special revision name to
           always put the given percentage of traffic on the latest ready
           revision.
+
+       --to-tags=[TAG=PERCENTAGE,...]
+          Comma separated list of traffic assignments in the form
+          TAG=PERCENTAGE. TAG must match a traffic tag on a revision of the
+          service. It may match a previously-set tag, or one assigned using the
+          --set-tags or --update-tags flags on this command. PERCENTAGE must be
+          an integer percentage between 0 and 100 inclusive. Up to 100 percent
+          of traffic may be assigned. If 100 percent of traffic is assigned,
+          the service traffic is updated as specified. If under 100 percent of
+          traffic is assigned, the service traffic is updated as specified to
+          the given tags, and other traffic is scaled up or down
+          proportionally. For example, assume the revision tagged next is
+          serving 40 percent of traffic and the revision tagged current is
+          serving 60 percent. If next is assigned 45 percent of traffic and no
+          assignment is made for current, the service is updated with next
+          assigned 45 percent of traffic and current scaled down to 55 percent.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

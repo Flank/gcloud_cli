@@ -13,9 +13,10 @@ SYNOPSIS
         [--create-subnetwork=[KEY=VALUE,...]]
         [--database-encryption-key=DATABASE_ENCRYPTION_KEY]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
-        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--no-enable-autoupgrade] [--enable-binauthz] [--enable-cloud-logging]
-        [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
+        [--disable-default-snat] [--disk-size=DISK_SIZE]
+        [--disk-type=DISK_TYPE] [--enable-autorepair] [--no-enable-autoupgrade]
+        [--enable-binauthz] [--enable-cloud-logging]
+        [--enable-cloud-monitoring] [--enable-cloud-run-alpha] [--enable-gvnic]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-logging-monitoring-system-only]
@@ -208,6 +209,17 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'.
 
+     --disable-default-snat
+        Disable default source NAT rules applied in cluster nodes.
+
+        By default, network traffic sending from Pods to outside of VPC will
+        get masqueraded by the node external IP. When this flag is set, no
+        default sNAT will be enforced on the cluster. The flag must be set if
+        the cluster uses privately used public IPs.
+
+        Must be used in conjunction with --enable-ip-alias and
+        --enable-private-nodes.
+
      --disk-size=DISK_SIZE
         Size for node VM boot disks. Defaults to 100GB.
 
@@ -272,6 +284,10 @@ FLAGS
 
         Cloud Run alpha clusters are not covered by the Cloud Run SLA and
         should not be used for production workloads.
+
+     --enable-gvnic
+        Enable the use of GVNIC for this cluster. Requires re-creation of nodes
+        using either a node-pool upgrade or node-pool creation.
 
      --enable-intra-node-visibility
         Enable Intra-node visibility for this cluster.

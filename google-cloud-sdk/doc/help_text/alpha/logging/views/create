@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging views create VIEW_ID --bucket=BUCKET
-        --location=LOCATION [--description=DESCRIPTION] [--filter=FILTER]
+        --location=LOCATION [--description=DESCRIPTION]
+        [--log-filter=LOG_FILTER]
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
           | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
         [GCLOUD_WIDE_FLAG ...]
@@ -26,7 +27,7 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         A textual description for the view.
 
-     --filter=FILTER
+     --log-filter=LOG_FILTER
         A filter for the view.
 
      At most one of these may be specified:

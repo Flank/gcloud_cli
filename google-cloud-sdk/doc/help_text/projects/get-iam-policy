@@ -2,7 +2,7 @@ NAME
     gcloud projects get-iam-policy - get IAM policy for a project
 
 SYNOPSIS
-    gcloud projects get-iam-policy PROJECT_ID [--filter=EXPRESSION]
+    gcloud projects get-iam-policy PROJECT_ID_OR_NUMBER [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -10,8 +10,8 @@ DESCRIPTION
     Gets the IAM policy for a project, given a project ID.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to get IAM policy for.
+     PROJECT_ID_OR_NUMBER
+        ID or number for the project you want to get IAM policy for.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

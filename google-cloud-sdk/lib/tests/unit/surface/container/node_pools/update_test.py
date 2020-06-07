@@ -485,6 +485,53 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self.ExpectGetNodePool(pool.name, response=pool)
     self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
 
+  def testSystemConfigFromFile(self):
+    pool_kwargs = {
+        'linuxNodeConfig':
+            self.msgs.LinuxNodeConfig(
+                sysctls=self.msgs.LinuxNodeConfig
+                .SysctlsValue(additionalProperties=[
+                    self.msgs.LinuxNodeConfig.SysctlsValue.AdditionalProperty(
+                        key='net.core.somaxconn', value='2048'),
+                    self.msgs.LinuxNodeConfig.SysctlsValue.AdditionalProperty(
+                        key='net.ipv4.tcp_rmem', value='4096 87380 6291456'),
+                ])),
+        'kubeletConfig':
+            self.msgs.NodeKubeletConfig(
+                cpuManagerPolicy='static',
+                cpuCfsQuota=True,
+                cpuCfsQuotaPeriod='10ms'),
+    }
+    pool = self._MakeNodePool(**pool_kwargs)
+    system_config_file = self.Touch(
+        self.temp_path,
+        contents="""
+kubeletConfig:
+  cpuManagerPolicy: static
+  cpuCFSQuota: true
+  cpuCFSQuotaPeriod: 10ms
+linuxConfig:
+  sysctl:
+    net.ipv4.tcp_rmem: '4096 87380 6291456'
+    net.core.somaxconn: '2048'
+        """)
+    cmdbase = (
+        self.node_pools_command_base.format(self.ZONE) +
+        ' update {node_pool} --cluster={cluster_name} ' +
+        '--system-config-from-file={system_config_file}')
+    self.ExpectUpdateNodePool(
+        self.NODE_POOL_NAME,
+        kubelet_config=pool_kwargs.get('kubeletConfig'),
+        linux_node_config=pool_kwargs.get('linuxNodeConfig'),
+        response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(
+        cmdbase.format(
+            node_pool=self.NODE_POOL_NAME,
+            cluster_name=self.CLUSTER_NAME,
+            system_config_file=system_config_file))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):

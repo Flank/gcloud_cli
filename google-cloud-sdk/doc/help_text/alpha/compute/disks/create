@@ -12,8 +12,8 @@ SYNOPSIS
         [--replica-zones=ZONE,ZONE] [--no-require-csek-key-create]
         [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
-          | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT
-          | --source-disk=SOURCE_DISK --source-disk-zone=SOURCE_DISK_ZONE
+          | --image-family=IMAGE_FAMILY | --source-disk=SOURCE_DISK
+          | --source-snapshot=SOURCE_SNAPSHOT
           | --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
           --source-in-place-snapshot-region=SOURCE_IN_PLACE_SNAPSHOT_REGION
           | --source-in-place-snapshot-zone=SOURCE_IN_PLACE_SNAPSHOT_ZONE]
@@ -65,7 +65,7 @@ FLAGS
         https://cloud.google.com/compute/docs/images/create-delete-deprecate-private-images#guest-os-features
         for descriptions of the supported features. GUEST_OS_FEATURE must be
         one of: BARE_METAL_LINUX_COMPATIBLE, GVNIC, MULTI_IP_SUBNET,
-        UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
+        SEV_CAPABLE, UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -159,6 +159,19 @@ FLAGS
           practice to use --image-family when the latest version of an image is
           needed.
 
+       --source-disk=SOURCE_DISK
+          Source disk used to create the disks. It is safe to delete a source
+          disk after a disk has been created from the source disk. To get a
+          list of disks in your current project, run gcloud compute disks list.
+          This flag is mutually exclusive with --image and --source-snapshot.
+
+          When using this option, the size of the disks must be at least as
+          large as the source disk size. Use --size to adjust the size of the
+          disks.
+
+          Source disk must be in the same zone/region as the disk to be
+          created.
+
        --source-snapshot=SOURCE_SNAPSHOT
           Source snapshot used to create the disks. It is safe to delete a
           snapshot after a disk has been created from the snapshot. In such
@@ -171,43 +184,6 @@ FLAGS
           When using this option, the size of the disks must be at least as
           large as the snapshot size. Use --size to adjust the size of the
           disks.
-
-       Source disk options
-
-         --source-disk=SOURCE_DISK
-            Source disk used to create the disks. It is safe to delete a source
-            disk after a disk has been created from the source disk. To get a
-            list of disks in your current project, run gcloud compute disks
-            list. This flag is mutually exclusive with --image and
-            --source-snapshot.
-
-            When using this option, the size of the disks must be at least as
-            large as the source disk size. Use --size to adjust the size of the
-            disks.
-
-            The value for this option can be the name of a disk with the zone
-            specified via --source-disk-zone flag.
-
-         --source-disk-zone=SOURCE_DISK_ZONE
-            Zone of the source disk to operate on. If not specified and the
-            compute/zone property isn't set, you may be prompted to select a
-            zone.
-
-            To avoid prompting when this flag is omitted, you can set the
-            compute/zone property:
-
-                $ gcloud config set compute/zone ZONE
-
-            A list of zones can be fetched by running:
-
-                $ gcloud compute zones list
-
-            To unset the property, run:
-
-                $ gcloud config unset compute/zone
-
-            Alternatively, the zone can be stored in the environment variable
-            CLOUDSDK_COMPUTE_ZONE.
 
        Source in place snapshot options
 

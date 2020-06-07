@@ -1,0 +1,93 @@
+
+.TH "GCLOUD_ALPHA_APIGEE_APIS_UNDEPLOY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee apis undeploy \- undeploy an Apigee API proxy from an environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee apis undeploy\fR [[\fIREVISION\fR]\ \fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Undeploy an Apigee API proxy from an environment.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Revision resource \- The API proxy revision to be undeployed, and the
+environment from which it should be removed. The revision defaults to
+\f5auto\fR, which will undeploy whichever revision is currently deployed, unless
+there is more than one such revision. The arguments in this group can be used to
+specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+[\fIREVISION\fR]
+ID of the revision or fully qualified identifier for the revision.
+
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+The API proxy to be undeployed.
+
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+The environment from which to undeploy the API proxy.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization of the proxy and environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To undeploy an API proxy called \f5\fImy\-api\fR\fR from the \f5\fItest\fR\fR
+environment of the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee apis undeploy \-\-environment=test \-\-api=my\-api
+.RE
+
+To undeploy revision 3 of an \f5my\-api\fR from the \f5test\fR environment of
+Apigee organization \f5\fItest\-org\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha apigee apis undeploy \-\-organization=test\-org \e
+    \-\-environment=test \-\-api=my\-api 3
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

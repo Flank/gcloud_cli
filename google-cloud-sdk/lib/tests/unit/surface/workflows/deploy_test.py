@@ -34,10 +34,10 @@ NEW_DESCRIPTION = 'test_workflow_new_description'
 NEW_SERVICE_ACCOUNT = 'test-account@my-project.iam.gserviceaccount.com'
 
 
-class WorkflowsDeployTestAlpha(base.WorkflowsUnitTestBase):
+class WorkflowsDeployTest(base.WorkflowsUnitTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDeploy_noId(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -181,3 +181,10 @@ class WorkflowsDeployTestAlpha(base.WorkflowsUnitTestBase):
                           id=WORKFLOW_ID,
                           desc=NEW_DESCRIPTION))
     self.assertEqual(result, new_workflow)
+
+
+class WorkflowsDeployTestAlpha(WorkflowsDeployTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+

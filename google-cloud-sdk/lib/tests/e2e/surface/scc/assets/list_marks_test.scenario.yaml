@@ -3,21 +3,21 @@ release_tracks: [ALPHA]
 summary:
 - execute:
   - command: |
-      scc assets list-marks --organization 345840165995 595423472147994486
+      scc assets list-marks --organization 702114178617 11773236938904334887
   - stdout: |
       marks:
         probermark: proberTestValue
         testA: valueA
         testB: valueB
-      name: organizations/345840165995/assets/595423472147994486/securityMarks
+      name: organizations/702114178617/assets/11773236938904334887/securityMarks
 actions:
 - execute_command:
     command: |
-      scc assets list-marks --organization 345840165995 595423472147994486
+      scc assets list-marks --organization 702114178617 11773236938904334887
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F595423472147994486%22
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/assets?alt=json&filter=name%3D%22organizations%2F702114178617%2Fassets%2F11773236938904334887%22
           method: GET
           headers: {}
           body: null
@@ -29,11 +29,11 @@ actions:
               "listAssetsResults": [
                 {
                   "asset": {
-                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "name": "organizations/702114178617/assets/11773236938904334887",
                     "securityCenterProperties": {
                       "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
                       "resourceType": "google.cloud.resourcemanager.Project",
-                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/702114178617",
                       "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
                       "resourceOwners": [
                         "user:riskdashboard.prober@cscc-prober-org.joonix.net"
@@ -42,13 +42,13 @@ actions:
                     "resourceProperties": {
                       "name": "prober project 1",
                       "lifecycleState": "active",
-                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
+                      "parent": "{\"id\":\"702114178617\",\"type\":\"organization\"}",
                       "projectId": "prober-project-1",
                       "createTime": "2018-09-12t17:39:00.974z",
                       "projectNumber": 428809690096
                     },
                     "securityMarks": {
-                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "name": "organizations/702114178617/assets/11773236938904334887/securityMarks",
                       "marks": {
                         "probermark": "proberTestValue",
                         "testB": "valueB",
@@ -64,11 +64,10 @@ actions:
               "readTime": "2019-03-13T23:51:51.569Z",
               "totalSize": 1
             }
-    - expect_stdout: |
-        marks:
-          probermark: proberTestValue
-          testA: valueA
-          testB: valueB
-        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_stdout:
+        matches: |
+            .*probermark: proberTestValue.*
+            .*testA: valueA.*
+            .*testB: valueB.*
     - expect_exit:
         code: 0

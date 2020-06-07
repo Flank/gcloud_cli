@@ -1,0 +1,134 @@
+
+.TH "GCLOUD_ALPHA_PUBSUB_LITE\-TOPICS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha pubsub lite\-topics create \- create a Pub/Sub Lite topic
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha pubsub lite\-topics create\fR \fITOPIC\fR \fB\-\-partitions\fR=\fIPARTITIONS\fR \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR [\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR] [\fB\-\-scale\fR=\fISCALE\fR;\ default=1] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Pub/Sub Lite topic.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITOPIC\fR
+Topic name.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-partitions\fR=\fIPARTITIONS\fR
+Number of partitions in the topic.
+
+.TP 2m
+\fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR
+Provisioned storage, in bytes, per partition. If the number of bytes stored in
+any of the topic's partitions exceeds this value, older messages will be dropped
+to make room for newer ones, regardless of the value of
+\f5message\-retention\-period\fR. A valid example value of this flag would be
+\f5per\-partition\-bytes=30GiB\fR.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR
+How long a published message is retained. If unset, messages will only be
+dropped to make space for new ones once the \f5per\-partition\-bytes\fR limit is
+reached. A valid example value of this flag would be
+\f5message\-retention\-period="2w"\fR.
+
+.TP 2m
+\fB\-\-scale\fR=\fISCALE\fR; default=1
+Topic partition scale value. Every partition in the topic is allocated
+throughput equivalent to \f5scale\fR times the standard partition throughput (4
+MiB/s of publishing throughput and 8 MiB/s of subscribing throughput). This is
+also reflected in the cost of this topic; a topic with \f5scale\fR of 2 and
+count of 10 is charged for 20 partitions.
+
+.TP 2m
+
+Location resource \- Identifies the Cloud zone this command will be executed on.
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [\-\-zone] on the command line with a fully specified name;
+set the property [pubsub/lite_zone] with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+ID of the location or fully qualified identifier for the location.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBpubsublite/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/pubsub/docs
+
+
+
+.SH "EXAMPLES"
+
+To create a Pub/Sub lite\-topic, run:
+
+.RS 2m
+$ gcloud alpha pubsub lite\-topics create mytopic \e
+    \-\-zone=us\-central1\-a \e
+    \-\-partitions=1 \e
+    \-\-scale=1 \e
+    \-\-per\-partition\-bytes=30GiB \e
+    \-\-message\-retention\-period=2w
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta pubsub lite\-topics create
+.RE
+

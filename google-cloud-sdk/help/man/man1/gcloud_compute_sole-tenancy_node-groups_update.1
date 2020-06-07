@@ -11,7 +11,7 @@ gcloud compute sole\-tenancy node\-groups update \- update a Compute Engine node
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute sole\-tenancy node\-groups update\fR \fINAME\fR [\fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-nodes\fR=\fIADD_NODES\fR\ |\ \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute sole\-tenancy node\-groups update\fR \fINAME\fR [\fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-nodes\fR=\fIADD_NODES\fR\ |\ \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]] [\fB\-\-autoscaler\-mode\fR=\fIAUTOSCALER_MODE\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,43 @@ The number of nodes to add to the node group.
 .TP 2m
 \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]
 The names of the nodes to remove from the group.
+
+.RE
+.sp
+.TP 2m
+
+Autoscaling policy for node groups.
+
+.RS 2m
+.TP 2m
+\fB\-\-autoscaler\-mode\fR=\fIAUTOSCALER_MODE\fR
+Set the mode of an autoscaler for a node group. \fIAUTOSCALER_MODE\fR must be
+one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+to turn off autoscaling.
+.TP 2m
+\fBon\fR
+to permit autoscaling to scale in and out.
+.TP 2m
+\fBonly\-scale\-out\fR
+to permit autoscaling to scale only out and not in.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR
+The maximum size of the node group. Must be smaller or equal to 100 and larger
+than or equal to \f5\-\-min\-nodes\fR. Must be specified if
+\f5\-\-autoscaler\-mode\fR is not \f5\fIoff\fR\fR.
+
+.TP 2m
+\fB\-\-min\-nodes\fR=\fIMIN_NODES\fR
+The minimum size of the node group. Default is 0 and must be an integer value
+smaller than or equal to \f5\-\-max\-nodes\fR.
 
 
 .RE

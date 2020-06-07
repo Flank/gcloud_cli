@@ -23,8 +23,8 @@ import datetime
 import json
 import os
 
-from googlecloudsdk.api_lib.iamcredentials import util as iamcredentials_util
 from googlecloudsdk.core import config
+from googlecloudsdk.core import http
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import creds
 from googlecloudsdk.core.credentials import devshell
@@ -41,12 +41,10 @@ from oauth2client import client
 from oauth2client import crypt
 from oauth2client import service_account
 from oauth2client.contrib import gce as oauth2client_gce
-import requests
 import sqlite3
 from google.auth import compute_engine
 from google.auth import crypt as google_auth_crypt
 from google.auth import jwt
-from google.auth.transport import requests as google_auth_requests
 from google.oauth2 import credentials as google_auth_credentials
 from google.oauth2 import service_account as google_auth_service_account
 
@@ -81,7 +79,7 @@ def _RefreshCredentials(credentials):
   if isinstance(credentials, client.OAuth2Credentials):
     credentials.refresh(httplib2.Http())
   else:
-    credentials.refresh(google_auth_requests.Request())
+    credentials.refresh(http.GoogleAuthRequest())
 
 
 def _RefreshCredentialsDict(creds_dict):
@@ -120,12 +118,6 @@ class StoreOperationsTests(sdk_test_base.SdkBase,
         httplib2.Http,
         'request',
         return_value=_MakeFakeOauth2clientCredsRefreshResponse())
-
-    # Mocks the refresh of google-auth credentials.
-    self.StartObjectPatch(
-        requests.Session,
-        'request',
-        return_value=_MakeFakeGoogleAuthCredsRefreshResponse())
 
     # Mocks the signer of oauth2client credentials.
     signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
@@ -911,25 +903,6 @@ class CredentialsConversionTests(sdk_test_base.SdkBase,
             'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
             '_scopes': config.CLOUDSDK_SCOPES,
             'service_account_email': 'from_gce@developer.gserviceaccount.com',
-        })
-
-  def testMaybeConvertImpersonationCredsToGoogleAuthCreds(self):
-    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(
-        iamcredentials_util.ImpersonationCredentials('service-account-id',
-                                                     'access-token',
-                                                     '2016-01-08T00:00:00Z',
-                                                     config.CLOUDSDK_SCOPES),
-        True)
-
-    self.assertIsInstance(
-        google_auth_cred,
-        iamcredentials_util.ImpersonationCredentialsGoogleAuth)
-    self.AssertCredentialsEqual(
-        google_auth_cred, {
-            'token': 'access-token',
-            'expiry': datetime.datetime(2016, 1, 8, 0, 0, 0),
-            '_scopes': config.CLOUDSDK_SCOPES,
-            '_service_account_id': 'service-account-id',
         })
 
   def testMaybeConvertP12ServiceAccountCredsToGoogleAuthCreds(self):

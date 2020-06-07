@@ -7,46 +7,48 @@ summary:
   - command: |
       privateca certificates describe projects/my-project/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
   - stdout: |
-      certificate_description:
-        subject_description:
-          common_name: describe_test
-          hex_serial_number: FFFFF
-          lifetime: 2592000s
-          not_after_time: '2020-03-22T15:14:00.105-07:00'
-          not_before_time: '2020-03-17T15:14:00.105-07:00'
+      certificateDescription:
+        subjectDescription:
+          commonName: describe_test
+          hexSerialNumber: FFFFF
+          lifetime: P30D
+          notAfterTime: '2020-03-22T15:14:00.105-07:00'
+          notBeforeTime: '2020-03-17T15:14:00.105-07:00'
           subject:
             organization: Google
-      create_time: '2020-03-17T15:14:00.105-07:00'
+      createTime: '2020-03-17T15:14:00.105-07:00'
+      lifetime: P30D
       name: projects/my-project/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-      pem_certificate: pem_cert
-      update_time: '2020-04-17T15:14:00.105-07:00'
+      pemCertificate: pem_cert
+      updateTime: '2020-04-17T15:14:00.105-07:00'
 - execute:
   - command: |
       privateca certificates describe my-cert --issuer-location europe-west1 --issuer my-ca
   - stdout: |
-      certificate_description:
-        config_values: {}
-        public_key:
+      certificateDescription:
+        configValues: {}
+        publicKey:
           key: '000000010101'
           type: PEM_RSA_KEY
-        subject_description:
-          common_name: describe_test
-          hex_serial_number: FFFFF
-          lifetime: 2592000s
-          not_after_time: '2020-03-22T15:14:00.105-07:00'
-          not_before_time: '2020-03-17T15:14:00.105-07:00'
+        subjectDescription:
+          commonName: describe_test
+          hexSerialNumber: FFFFF
+          lifetime: P30D
+          notAfterTime: '2020-03-22T15:14:00.105-07:00'
+          notBeforeTime: '2020-03-17T15:14:00.105-07:00'
           subject:
             organization: Google
-      create_time: '2020-03-17T15:14:00.105-07:00'
+      createTime: '2020-03-17T15:14:00.105-07:00'
+      lifetime: P30D
       name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-      pem_certificate: pem_cert
-      pem_certificate_chain:
+      pemCertificate: pem_cert
+      pemCertificateChain:
       - issuer_cert
       - root_cert
-      revocation_details:
-        revocation_state: SUPERSEDED
-        revocation_time: '2020-04-17T15:14:00.105-07:00'
-      update_time: '2020-04-17T15:14:00.105-07:00'
+      revocationDetails:
+        revocationState: SUPERSEDED
+        revocationTime: '2020-04-17T15:14:00.105-07:00'
+      updateTime: '2020-04-17T15:14:00.105-07:00'
 - execute:
   - command: |
       privateca certificates describe my-cert --issuer-location europe-west1 --issuer my-ca --format "value(pem_certificate)"
@@ -122,36 +124,38 @@ actions:
           body: |-
             {
               "name": "projects/my-project/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
-              "pem_certificate": "pem_cert",
-              "certificate_description" : {
-                "subject_description": {
+              "pemCertificate": "pem_cert",
+              "certificateDescription" : {
+                "subjectDescription": {
                   "subject" : {
                       "organization": "Google"
                   },
-                  "common_name": "describe_test",
-                  "hex_serial_number": "FFFFF",
+                  "commonName": "describe_test",
+                  "hexSerialNumber": "FFFFF",
                   "lifetime": "2592000s",
-                  "not_before_time": "2020-03-17T15:14:00.105-07:00",
-                  "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                  "notBeforeTime": "2020-03-17T15:14:00.105-07:00",
+                  "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                 }
               },
-              "create_time": "2020-03-17T15:14:00.105-07:00",
-              "update_time": "2020-04-17T15:14:00.105-07:00"
+              "createTime": "2020-03-17T15:14:00.105-07:00",
+              "updateTime": "2020-04-17T15:14:00.105-07:00",
+              "lifetime": "2592000s"
             }
     - expect_stdout: |
-        certificate_description:
-          subject_description:
-            common_name: describe_test
-            hex_serial_number: FFFFF
-            lifetime: 2592000s
-            not_after_time: '2020-03-22T15:14:00.105-07:00'
-            not_before_time: '2020-03-17T15:14:00.105-07:00'
+        certificateDescription:
+          subjectDescription:
+            commonName: describe_test
+            hexSerialNumber: FFFFF
+            lifetime: P30D
+            notAfterTime: '2020-03-22T15:14:00.105-07:00'
+            notBeforeTime: '2020-03-17T15:14:00.105-07:00'
             subject:
               organization: Google
-        create_time: '2020-03-17T15:14:00.105-07:00'
+        createTime: '2020-03-17T15:14:00.105-07:00'
+        lifetime: P30D
         name: projects/my-project/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-        pem_certificate: pem_cert
-        update_time: '2020-04-17T15:14:00.105-07:00'
+        pemCertificate: pem_cert
+        updateTime: '2020-04-17T15:14:00.105-07:00'
     - expect_exit:
         code: 0
 - execute_command:
@@ -170,56 +174,58 @@ actions:
           body: |-
             {
               "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
-              "pem_certificate": "pem_cert",
-              "certificate_description" : {
-                "subject_description": {
+              "pemCertificate": "pem_cert",
+              "certificateDescription" : {
+                "subjectDescription": {
                   "subject" : {
                       "organization": "Google"
                   },
-                  "common_name": "describe_test",
-                  "hex_serial_number": "FFFFF",
+                  "commonName": "describe_test",
+                  "hexSerialNumber": "FFFFF",
                   "lifetime": "2592000s",
-                  "not_before_time": "2020-03-17T15:14:00.105-07:00",
-                  "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                  "notBeforeTime": "2020-03-17T15:14:00.105-07:00",
+                  "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                 },
-                "config_values": {},
-                "public_key" : {
+                "configValues": {},
+                "publicKey" : {
                   "type": "PEM_RSA_KEY",
                   "key": "000000010101"
                 }
               },
-              "revocation_details": {
-                "revocation_state": "SUPERSEDED",
-                "revocation_time": "2020-04-17T15:14:00.105-07:00"
+              "revocationDetails": {
+                "revocationState": "SUPERSEDED",
+                "revocationTime": "2020-04-17T15:14:00.105-07:00"
               },
-              "pem_certificate_chain": ["issuer_cert", "root_cert"],
-              "create_time": "2020-03-17T15:14:00.105-07:00",
-              "update_time": "2020-04-17T15:14:00.105-07:00"
+              "pemCertificateChain": ["issuer_cert", "root_cert"],
+              "createTime": "2020-03-17T15:14:00.105-07:00",
+              "updateTime": "2020-04-17T15:14:00.105-07:00",
+              "lifetime": "2592000s"
             }
     - expect_stdout: |
-        certificate_description:
-          config_values: {}
-          public_key:
+        certificateDescription:
+          configValues: {}
+          publicKey:
             key: '000000010101'
             type: PEM_RSA_KEY
-          subject_description:
-            common_name: describe_test
-            hex_serial_number: FFFFF
-            lifetime: 2592000s
-            not_after_time: '2020-03-22T15:14:00.105-07:00'
-            not_before_time: '2020-03-17T15:14:00.105-07:00'
+          subjectDescription:
+            commonName: describe_test
+            hexSerialNumber: FFFFF
+            lifetime: P30D
+            notAfterTime: '2020-03-22T15:14:00.105-07:00'
+            notBeforeTime: '2020-03-17T15:14:00.105-07:00'
             subject:
               organization: Google
-        create_time: '2020-03-17T15:14:00.105-07:00'
+        createTime: '2020-03-17T15:14:00.105-07:00'
+        lifetime: P30D
         name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-        pem_certificate: pem_cert
-        pem_certificate_chain:
+        pemCertificate: pem_cert
+        pemCertificateChain:
         - issuer_cert
         - root_cert
-        revocation_details:
-          revocation_state: SUPERSEDED
-          revocation_time: '2020-04-17T15:14:00.105-07:00'
-        update_time: '2020-04-17T15:14:00.105-07:00'
+        revocationDetails:
+          revocationState: SUPERSEDED
+          revocationTime: '2020-04-17T15:14:00.105-07:00'
+        updateTime: '2020-04-17T15:14:00.105-07:00'
     - expect_exit:
         code: 0
 - execute_command:

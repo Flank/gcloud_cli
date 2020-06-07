@@ -26,7 +26,7 @@ import time
 from googlecloudsdk.api_lib.compute import iap_tunnel_websocket
 from googlecloudsdk.api_lib.compute import iap_tunnel_websocket_helper
 from googlecloudsdk.api_lib.compute import iap_tunnel_websocket_utils as utils
-from googlecloudsdk.core import http
+from googlecloudsdk.core import transport
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 
@@ -101,7 +101,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
         functools.partial(Reconnect, True))
     self.assertEqual(counts['reconnect'], 2)
 
-  @mock.patch.object(http, 'MakeUserAgentString', autospec=True)
+  @mock.patch.object(transport, 'MakeUserAgentString', autospec=True)
   @mock.patch.object(iap_tunnel_websocket_helper, 'IapTunnelWebSocketHelper',
                      autospec=True)
   def testStartNewWebSocket(self, websocket_helper_cls_mock,
@@ -124,7 +124,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
     self.assertIs(new_socket._websocket_helper, websocket_helper_mock)
     websocket_helper_mock.StartReceivingThread.assert_called_once()
 
-  @mock.patch.object(http, 'MakeUserAgentString', autospec=True)
+  @mock.patch.object(transport, 'MakeUserAgentString', autospec=True)
   @mock.patch.object(iap_tunnel_websocket_helper, 'IapTunnelWebSocketHelper',
                      autospec=True)
   def testStartNewWebSocketReconnect(self, websocket_helper_cls_mock,

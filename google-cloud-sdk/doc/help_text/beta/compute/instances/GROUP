@@ -88,6 +88,10 @@ COMMANDS
      get-iam-policy
         (BETA) Get the IAM policy for a Google Compute Engine instance.
 
+     get-screenshot
+        (BETA) Capture a screenshot (JPEG image) of the virtual machine
+        instance's display.
+
      get-serial-port-output
         (BETA) Read output from a virtual machine instance's serial port.
 
@@ -168,10 +172,6 @@ COMMANDS
      update-container
         (BETA) Updates Google Compute engine virtual machine instances running
         container images.
-
-     update-from-file
-        (BETA) Update a Compute Engine virtual machine instance using a
-        configuration file.
 
 NOTES
     This command is currently in BETA and may change without notice. These

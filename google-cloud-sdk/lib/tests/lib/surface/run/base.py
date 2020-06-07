@@ -23,7 +23,6 @@ import base64
 import itertools
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.command_lib.events import eventflow_operations
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.core import properties
@@ -33,6 +32,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 import mock
 
+
 ENV_FLAGS = ['--update-env-vars', '--set-env-vars',
              '--remove-env-vars', '--clear-env-vars']
 # All env var-related flags are mutually exclusive, except update and remove.
@@ -40,7 +40,6 @@ INVALID_ENV_FLAG_PAIRS = set(itertools.combinations(ENV_FLAGS, 2))
 INVALID_ENV_FLAG_PAIRS.discard(('--remove-env-vars', '--update-env-vars'))
 INVALID_ENV_FLAG_PAIRS.discard(('--update-env-vars', '--remove-env-vars'))
 INVALID_ENV_FLAG_PAIRS = list(INVALID_ENV_FLAG_PAIRS)
-
 
 DEFAULT_REGION = 'us-central1'
 
@@ -51,7 +50,7 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
                             sdk_test_base.WithFakeAuth):
   """Base class for Serverless surface tests."""
 
-  API_VERSION = 'v1alpha1'
+  API_VERSION = 'v1'
 
   def _ServiceRef(self, name, region=DEFAULT_REGION, project='fake-project'):
     return self._registry.Parse(
@@ -60,12 +59,13 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         collection='run.namespaces.services')
 
   def _NamespaceRef(self, region=DEFAULT_REGION, project='fake-project'):
-    ret = self._registry.Parse(project, collection='run.namespaces')
-    return ret
-
-  def _CoreNamespaceRef(self, name='fake-project'):
-    return self._registry.Parse(
-        name, collection='run.api.v1.namespaces', api_version='v1')
+    # TODO(b/150322097): Remove this when the api has been split.
+    # This try/except block is needed because the v1alpha1 and v1 run apis
+    # have different collection names for the namespaces.
+    try:
+      return self._registry.Parse(project, collection='run.namespaces')
+    except resources.InvalidCollectionException:
+      return self._registry.Parse(project, collection='run.api.v1.namespaces')
 
   def _RevisionRef(self, name, project='fake-project'):
     return self._registry.Parse(
@@ -78,25 +78,6 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         name,
         params={'namespacesId': project},
         collection='run.namespaces.domainmappings')
-
-  def _TriggerRef(self, name, project='fake-project'):
-    return self._registry.Parse(
-        name,
-        params={'namespacesId': project},
-        collection='run.namespaces.triggers')
-
-  def _SourceRef(self, name, plural_kind, project='fake-project'):
-    return self._registry.Parse(
-        name,
-        params={'namespacesId': project},
-        collection='run.namespaces.{}'.format(plural_kind))
-
-  def _SecretRef(self, name, project='fake-project'):
-    return self._registry.Parse(
-        name,
-        params={'namespacesId': project},
-        collection='run.api.v1.namespaces.secrets',
-        api_version='v1')
 
   def _MockConnectionContext(self, is_gke_context=False):
     self.connection_context = mock.Mock()
@@ -114,41 +95,6 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         'GetConnectionContext',
         return_value=self.connection_context)
 
-  def _SpecParameterAdditionalProperty(self, name, var_type, description):
-    return self.crd_messages.JSONSchemaProps.PropertiesValue.AdditionalProperty(
-        key=name,
-        value=self.crd_messages.JSONSchemaProps(
-            type=var_type, description=description))
-
-  def _SourceSchemaProperties(self,
-                              spec_properties=None,
-                              required_properties=None):
-    """Return the schema for a source CRD.
-
-    Args:
-      spec_properties: list(JSONSchemaProps.PropertiesValue.AdditionalProperty),
-        properties to specify in the schema spec.
-      required_properties: list(str) names of spec_properties to mark as
-        required.
-
-    Returns:
-      JSONSchemaProps for the source crd's openAPIV3Schema
-    """
-    spec_properties = [] if spec_properties is None else spec_properties
-    required_properties = ([] if required_properties is None else
-                           required_properties)
-    return self.crd_messages.JSONSchemaProps(
-        properties=self.crd_messages.JSONSchemaProps.PropertiesValue(
-            additionalProperties=[
-                self.crd_messages.JSONSchemaProps.PropertiesValue
-                .AdditionalProperty(
-                    key='spec',
-                    value=self.crd_messages.JSONSchemaProps(
-                        required=required_properties,
-                        properties=self.crd_messages.JSONSchemaProps.
-                        PropertiesValue(additionalProperties=spec_properties))),
-            ]))
-
   def SetUp(self):
     self._registry = resources.REGISTRY.Clone()
     properties.VALUES.run.region.Set(DEFAULT_REGION)
@@ -161,10 +107,6 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         serverless_operations,
         'Connect',
         return_value=self.operations_context)
-    self.eventflow_factory = self.StartObjectPatch(
-        eventflow_operations,
-        'Connect',
-        return_value=self.operations_context)
     self.is_interactive = self.StartObjectPatch(
         console_io, 'IsInteractive', return_value=True)
 
@@ -173,18 +115,6 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         _API_NAME, self.API_VERSION)
     self.mock_serverless_client._VERSION = self.API_VERSION  # pylint: disable=protected-access
     self.mock_serverless_client.MESSAGES_MODULE = self.serverless_messages
-
-    self.mock_crd_client = mock.Mock()
-    self.crd_messages = core_apis.GetMessagesModule(
-        _API_NAME, 'v1beta1')
-    self.mock_crd_client._VERSION = 'v1beta1'  # pylint: disable=protected-access
-    self.mock_crd_client.MESSAGES_MODULE = self.crd_messages
-
-    self.mock_core_client = mock.Mock()
-    self.core_messages = core_apis.GetMessagesModule(
-        _API_NAME, 'v1')
-    self.mock_core_client._VERSION = 'v1'  # pylint: disable=protected-access
-    self.mock_core_client.MESSAGES_MODULE = self.core_messages
 
     self.operations.GetActiveRevisions.return_value = {'rev.1': 100}
     self.operations.messages = self.serverless_messages
@@ -198,38 +128,14 @@ class ServerlessBase(ServerlessSurfaceBase):
 
   def SetUp(self):
     # Mock ServerlessApiClient
-    self.v1alpha1_client_class = core_apis.GetClientClass(
+    self.client_class = core_apis.GetClientClass(
         _API_NAME, self.API_VERSION)
-    self.v1alpha1_real_client = core_apis.GetClientInstance(
+    self.real_client = core_apis.GetClientInstance(
         _API_NAME, self.API_VERSION, no_http=True)
     self.mock_serverless_client = apitools_mock.Client(
-        self.v1alpha1_client_class, self.v1alpha1_real_client)
+        self.client_class, self.real_client)
     self.mock_serverless_client.Mock()
     self.addCleanup(self.mock_serverless_client.Unmock)
-
-    # If mock_serverless_client is already a v1beta1 client, trying to create
-    # another will cause problems, so we can just reuse it
-    self.mock_crd_client = self.mock_serverless_client
-    if self.API_VERSION != 'v1beta1':
-      self.v1beta1_client_class = core_apis.GetClientClass(_API_NAME, 'v1beta1')
-      self.v1beta1_real_client = core_apis.GetClientInstance(
-          _API_NAME, 'v1beta1', no_http=True)
-      self.mock_crd_client = apitools_mock.Client(
-          self.v1beta1_client_class, self.v1beta1_real_client)
-      self.mock_crd_client.Mock()
-      self.addCleanup(self.mock_crd_client.Unmock)
-
-    # If mock_serverless_client is already a v1 client, trying to create
-    # another will cause problems, so we can just reuse it
-    self.mock_core_client = self.mock_serverless_client
-    if self.API_VERSION != 'v1':
-      self.v1_client_class = core_apis.GetClientClass(_API_NAME, 'v1')
-      self.v1_real_client = core_apis.GetClientInstance(
-          _API_NAME, 'v1', no_http=True)
-      self.mock_core_client = apitools_mock.Client(
-          self.v1_client_class, self.v1_real_client)
-      self.mock_core_client.Mock()
-      self.addCleanup(self.mock_core_client.Unmock)
 
     # apitools_mock has trouble mocking the same API client twice, so
     # mock_serverless_client must be used for both `client` and `op_client`.
@@ -243,13 +149,6 @@ class ServerlessBase(ServerlessSurfaceBase):
             api_version=self.API_VERSION,
             region='us-central1',
             op_client=self.mock_serverless_client))
-    self.eventflow_client = (
-        eventflow_operations.EventflowOperations(
-            client=self.mock_serverless_client,
-            region='us-central1',
-            op_client=self.mock_serverless_client,
-            crd_client=self.mock_crd_client,
-            core_client=self.mock_core_client))
 
     # Convenience attributes for IAM policy testing.
     self.etag = b'my-etag'

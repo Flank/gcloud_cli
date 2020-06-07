@@ -1,0 +1,143 @@
+
+.TH "GCLOUD_ALPHA_APIGEE_APIS_DEPLOYMENTS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee apis deployments list \- list Apigee API proxy deployments
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee apis deployments list\fR [\fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR\ \fB\-\-revision\fR=\fIREVISION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR List Apigee proxy deployments.
+
+gcloud alpha apigee apis deployments list lists all deployments that include a
+specific Apigee API proxy.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+Revision resource \- The API proxy revision whose deployments should be listed.
+If a \f5\-\-revision\fR is not provided, all revisions will be listed. The
+arguments in this group can be used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+The API proxy whose deployments should be listed.
+
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+The environment whose deployments should be listed. If not provided, all
+environments will be listed.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization whose deployments should be listed.
+
+.TP 2m
+\fB\-\-revision\fR=\fIREVISION\fR
+ID of the revision or fully qualified identifier for the revision.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list all deployments of an API proxy called \f5\fImy\-proxy\fR\fR in the
+active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deployments list \-\-api=my\-proxy
+.RE
+
+To list all deployments of revision 4 of \f5\fImy\-proxy\fR\fR in the active
+Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deployments list \-\-revision=4 \e
+  \-\-api=my\-proxy
+.RE
+
+To list all deployments of \f5\fImy\-proxy\fR\fR to the \f5\fItest\fR\fR
+environment in an Apigee organization called \f5\fImy\-org\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deployments list \-\-organization=my\-org \e
+  \-\-api=my\-proxy \-\-environment=test
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

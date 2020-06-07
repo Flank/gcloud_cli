@@ -65,6 +65,31 @@ summary:
 - execute:
   - command: artifacts docker images list us-west1-docker.pkg.dev/my-project/not-docker-repo/my-image
   - error: '1: ^Invalid repository type NPM. The `artifacts docker` command group.*$'
+- execute:
+  - command: artifacts docker images list us-west1-docker.pkg.dev/my-project/docker-repo/my-image
+      --page-size=1
+  - stderr: ^Listing items under project my-project, location us-west1, repository
+      docker-repo..*$
+  - stdout: |
+      IMAGE                                                    DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+      us-west1-docker.pkg.dev/my-project/docker-repo/my-image  sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0  2019-04-10T15:08:45  2019-04-10T15:08:45
+
+      IMAGE                                                    DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+      us-west1-docker.pkg.dev/my-project/docker-repo/my-image  sha256:238d2f4c019e54bc29c9e6e3a03684bedb12bd65a65ae058401d52b020791e11  2019-04-10T17:23:53  2019-04-10T17:23:53
+- execute:
+  - command: artifacts docker images list us-west1-docker.pkg.dev/my-project/docker-repo/nested1
+      --page-size=1
+  - stderr: ^Listing items under project my-project, location us-west1, repository
+      docker-repo..*$
+  - stdout: |
+      IMAGE                                                                        DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+      us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/actual-image  sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0  2019-04-10T15:08:45  2019-04-10T15:08:45
+
+      IMAGE                                                                        DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+      us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/actual-image  sha256:238d2f4c019e54bc29c9e6e3a03684bedb12bd65a65ae058401d52b020791e11  2019-04-10T17:23:53  2019-04-10T17:23:53
+
+      IMAGE                                                                                 DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+      us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/nested3/another-image  sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0  2019-04-10T15:08:45  2019-04-10T15:08:45
 actions:
 - execute_command:
     command: config set artifacts/location us-west1
@@ -123,7 +148,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             packages:
             - name: projects/fake-project/locations/us-west1/repositories/my-repo/packages/my-image
               displayName: 'null'
@@ -139,7 +163,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             versions:
             - name: projects/fake-project/locations/us-west1/repositories/my-repo/packages/my-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
               description: desc
@@ -203,7 +226,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             packages:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image
               displayName: 'null'
@@ -219,7 +241,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             versions:
             - name: projects/kayla-npm/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
               description: desc
@@ -278,7 +299,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             versions:
             - name: projects/kayla-npm/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
               description: desc
@@ -347,7 +367,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             packages:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Factual-image
               displayName: 'null'
@@ -367,7 +386,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             versions:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Factual-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
               description: desc
@@ -387,7 +405,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             versions:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252nested3%252Fanother-image/versions/sha256:588eb1db084b48a5d064bdfc6a866de7a26cce036b7c25729dfbed5710ee6125
               description: desc
@@ -444,7 +461,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             packages:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image
               displayName: 'null'
@@ -460,7 +476,6 @@ actions:
           headers:
             status: '200'
           body:
-            nextPageToken: asdf
             versions:
             - name: projects/kayla-npm/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
               description: desc
@@ -552,3 +567,207 @@ actions:
         code: 1
         message:
           matches: ^Invalid repository type NPM. The `artifacts docker` command group.*
+- execute_command:
+    command: artifacts docker images list us-west1-docker.pkg.dev/my-project/docker-repo/my-image
+      --page-size=1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/my-project/locations/us-west1/repositories/docker-repo",
+              "format": "DOCKER"
+            }
+    - expect_stderr:
+        matches: ^Listing items under project my-project, location us-west1, repository
+          docker-repo..*
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/versions?alt=json&pageSize=1&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            versions:
+            - name: projects/kayla-npm/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
+              description: desc
+              updateTime: '2019-04-10T22:08:45.773883Z'
+              createTime: '2019-04-10T22:08:45.773883Z'
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/versions?alt=json&pageSize=1&pageToken=asdf&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            versions:
+            - name: projects/kayla-npm/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:238d2f4c019e54bc29c9e6e3a03684bedb12bd65a65ae058401d52b020791e11
+              description: null
+              updateTime: '2019-04-11T00:23:53.184760Z'
+              createTime: '2019-04-11T00:23:53.184760Z'
+    - expect_stdout: |
+        IMAGE                                                    DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+        us-west1-docker.pkg.dev/my-project/docker-repo/my-image  sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0  2019-04-10T15:08:45  2019-04-10T15:08:45
+
+        IMAGE                                                    DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+        us-west1-docker.pkg.dev/my-project/docker-repo/my-image  sha256:238d2f4c019e54bc29c9e6e3a03684bedb12bd65a65ae058401d52b020791e11  2019-04-10T17:23:53  2019-04-10T17:23:53
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts docker images list us-west1-docker.pkg.dev/my-project/docker-repo/nested1
+      --page-size=1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/my-project/locations/us-west1/repositories/docker-repo",
+              "format": "DOCKER"
+            }
+    - expect_stderr:
+        matches: ^Listing items under project my-project, location us-west1, repository
+          docker-repo..*
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1/versions?alt=json&pageSize=1&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            packages:
+            - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Factual-image
+              displayName: 'null'
+              updateTime: '2019-04-10T22:49:53.815214Z'
+              createTime: '2019-04-10T22:49:53.815214Z'
+            - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Fnested3%2Fanother-image
+              displayName: 'null'
+              updateTime: '2019-04-10T22:49:53.815214Z'
+              createTime: '2019-04-10T22:49:53.815214Z'
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Factual-image/versions?alt=json&pageSize=1&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            versions:
+            - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Factual-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
+              description: desc
+              updateTime: '2019-04-10T22:08:45.773883Z'
+              createTime: '2019-04-10T22:08:45.773883Z'
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Factual-image/versions?alt=json&pageSize=1&pageToken=asdf&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            versions:
+            - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Factual-image/versions/sha256:238d2f4c019e54bc29c9e6e3a03684bedb12bd65a65ae058401d52b020791e11
+              description: desc
+              updateTime: '2019-04-11T00:23:53.184760Z'
+              createTime: '2019-04-11T00:23:53.184760Z'
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fnested3%252Fanother-image/versions?alt=json&pageSize=1&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            versions:
+            - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%2Fnested2%2Factual-image/versions/sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0
+              description: desc
+              updateTime: '2019-04-10T22:08:45.773883Z'
+              createTime: '2019-04-10T22:08:45.773883Z'
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fnested3%252Fanother-image/versions?alt=json&pageSize=1&pageToken=asdf&view=BASIC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        IMAGE                                                                        DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+        us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/actual-image  sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0  2019-04-10T15:08:45  2019-04-10T15:08:45
+
+        IMAGE                                                                        DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+        us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/actual-image  sha256:238d2f4c019e54bc29c9e6e3a03684bedb12bd65a65ae058401d52b020791e11  2019-04-10T17:23:53  2019-04-10T17:23:53
+
+        IMAGE                                                                                 DIGEST                                                                   CREATE_TIME          UPDATE_TIME
+        us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/nested3/another-image  sha256:85f4828357ac32829660472d00cf6012bd98eea204f194e98d57a2d08af19ad0  2019-04-10T15:08:45  2019-04-10T15:08:45
+    - expect_exit:
+        code: 0

@@ -1,0 +1,116 @@
+title: ResourceSettings - Set value test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+- execute:
+  - command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+  - stdout: |
+      name: organizations/123/settings/gcp-basicBooleanSetting/value
+      value:
+        boolean_value: false
+- execute:
+  - command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+  - stdout: |
+      name: organizations/123/settings/gcp-basicBooleanSetting/value
+      value:
+        boolean_value: false
+actions:
+- write_file:
+    path: test_input.json
+    contents: |
+      {
+        "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
+        "value": {
+          "boolean_value": false
+         }
+      }
+- execute_command:
+    command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+    events:
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/123/settings/iam-projectCreatorRoles/value",
+              "value": {
+                "stringSetValue": {
+                  "values": [ "roles/storage.owner", "roles/compute.admin" ]
+                }
+              },
+              "etag": "O2VWGxZU01VnAfRU4Mu97w=="
+            }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+    events:
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+                "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
+                "value": {
+                  "boolean_value": false
+                }
+            }
+    - expect_stdout: |
+        name: organizations/123/settings/gcp-basicBooleanSetting/value
+        value:
+          boolean_value: false
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+    events:
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '404'
+          body: |
+            NOT_FOUND: Requested entity was not found.
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: POST
+          body: OrderedDict([(u'n', u'organizations/123/settings/gcp-basicBooleanSetting/value'),
+            (u'value', OrderedDict([(u'boolean_value', False)]))])
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+                "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
+                "value": {
+                  "boolean_value": false
+                }
+            }
+    - expect_stdout: |
+        name: organizations/123/settings/gcp-basicBooleanSetting/value
+        value:
+          boolean_value: false
+    - expect_exit:
+        code: 0

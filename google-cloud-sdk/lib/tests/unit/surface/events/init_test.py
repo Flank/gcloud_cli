@@ -27,11 +27,11 @@ from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.iam import iam_util as core_iam_util
 from googlecloudsdk.core.console import console_io
 from surface.events import init
-from tests.lib.surface.run import base
+from tests.lib.surface.events import base
 import mock
 
 
-class InitTestAlpha(base.ServerlessSurfaceBase):
+class InitTestAlpha(base.EventsBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -51,12 +51,10 @@ class InitTestAlpha(base.ServerlessSurfaceBase):
         collection='iam.projects.serviceAccounts.keys')
     self.operations.CreateOrReplaceServiceAccountSecret.return_value = (
         None, self.service_account_key_ref)
-    # Provide the superpower roles/owner permission to get around the validation
-    # logic by default
-    self.StartObjectPatch(
+    self.bind_missing_roles = self.StartObjectPatch(
         iam_util,
-        'GetProjectRolesForServiceAccount',
-        return_value=set(['roles/owner']))
+        'BindMissingRolesWithPrompt',
+    )
     self.mock_list_services = self.StartObjectPatch(
         serviceusage,
         'ListServices',
@@ -72,6 +70,15 @@ class InitTestAlpha(base.ServerlessSurfaceBase):
         'Initialized cluster [cluster-1] for Cloud Run eventing')
     self.AssertErrContains(self.service_account)
     self.AssertErrContains(self.service_account_key_ref.Name())
+    self.bind_missing_roles.assert_called_once_with(
+        self.service_account_ref,
+        [
+            'roles/cloudscheduler.admin',
+            'roles/logging.configWriter',
+            'roles/logging.privateLogViewer',
+            'roles/pubsub.admin',
+            'roles/storage.admin',
+        ])
 
   def testEventTypesFailFailNonGKE(self):
     """This command is only for initializing a cluster."""
@@ -98,40 +105,6 @@ class InitTestAlpha(base.ServerlessSurfaceBase):
     """Tests successful init with success message on no prompting allowed."""
     self.is_interactive.return_value = False
     self.runCommandAndAssertComplete()
-
-  def testServiceAccountHasAllRoles(self):
-    self.StartObjectPatch(
-        iam_util,
-        'GetProjectRolesForServiceAccount',
-        return_value=set([
-            'roles/pubsub.editor', 'roles/storage.admin',
-            'roles/cloudscheduler.admin', 'roles/pubsub.admin',
-            'roles/logging.configWriter', 'roles/logging.privateLogViewer'
-        ]))
-    self.WriteInput('y\n')
-    self.runCommandAndAssertComplete()
-
-  def testMissingServiceAccountRolesAreBound(self):
-    self.StartObjectPatch(
-        iam_util,
-        'GetProjectRolesForServiceAccount',
-        return_value=set([
-            'roles/pubsub.editor', 'roles/storage.admin',
-            'roles/cloudscheduler.admin', 'roles/pubsub.admin',
-        ]))
-    bind_roles = self.StartObjectPatch(
-        iam_util,
-        'BindProjectRolesForServiceAccount')
-    self.WriteInput('y\n')
-    self.WriteInput('y\n')
-    self.runCommandAndAssertComplete()
-    bind_roles.assert_called_once_with(
-        self.service_account_ref,
-        {'roles/logging.configWriter', 'roles/logging.privateLogViewer'})
-    self.AssertErrContains(
-        'This will bind the following project roles to this service account:\\n'
-        '- roles/logging.configWriter\\n'
-        '- roles/logging.privateLogViewer', normalize_space=True)
 
   def testMissingServicesAreEnabledEnablesOneService(self):
     # ListServices has been mocked out to return all required services as
@@ -173,6 +146,21 @@ class InitTestAlpha(base.ServerlessSurfaceBase):
                          'cloudscheduler.googleapis.com'])
     mock_wait_operation.assert_called_once_with(
         mock_batch_enable_api_call.return_value.name, serviceusage.GetOperation)
+
+  def testServiceAccountNotProvidedUsesDefault(self):
+    service_account = 'existing-account@gserviceaccount.com'
+    self.StartObjectPatch(
+        iam_util,
+        'GetOrCreateEventingServiceAccountWithPrompt',
+        return_value=service_account,
+    )
+    self.WriteInput('y\n')
+    self.WriteInput('y\n')
+    self.Run('events init --platform=gke --cluster=cluster-1 '
+             '--cluster-location=us-central1-a')
+    self.AssertErrContains(
+        'Initialized cluster [cluster-1] for Cloud Run eventing')
+    self.AssertErrContains(service_account)
 
 
 def _mock_service(name):

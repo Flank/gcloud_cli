@@ -43,9 +43,10 @@ FLAGS
         must be one of: always, never, on-demand.
 
      --[no-]assign-ip
-        Assign an IPv4 external address to this instance. This setting is
-        enabled by default when creating a new instance, but can be disabled to
-        use private IP connectivity. Use --assign-ip to enable and
+        Assign a public IP address to the instance. This is a public,
+        externally available IPv4 address that you can use to connect to your
+        instance when properly authorized. Use --assign-ip to enable a public
+        IP and --no-assign-ip to disable it. Use --assign-ip to enable and
         --no-assign-ip to disable.
 
      --async
@@ -95,8 +96,8 @@ FLAGS
         The database engine type and version. If left unspecified, the API
         defaults will be used. DATABASE_VERSION must be one of: MYSQL_5_5,
         MYSQL_5_6, MYSQL_5_7, POSTGRES_9_6, POSTGRES_10, POSTGRES_11,
-        SQLSERVER_2017_EXPRESS, SQLSERVER_2017_WEB, SQLSERVER_2017_STANDARD,
-        SQLSERVER_2017_ENTERPRISE.
+        POSTGRES_12, SQLSERVER_2017_EXPRESS, SQLSERVER_2017_WEB,
+        SQLSERVER_2017_STANDARD, SQLSERVER_2017_ENTERPRISE.
 
      --enable-bin-log
         Specified if binary log should be enabled. If backup configuration is

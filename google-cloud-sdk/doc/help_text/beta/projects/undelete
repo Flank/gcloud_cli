@@ -2,7 +2,7 @@ NAME
     gcloud beta projects undelete - undelete a project
 
 SYNOPSIS
-    gcloud beta projects undelete PROJECT_ID [GCLOUD_WIDE_FLAG ...]
+    gcloud beta projects undelete PROJECT_ID_OR_NUMBER [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Undeletes the project with the given project ID.
@@ -13,8 +13,8 @@ DESCRIPTION
         given project.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to undelete.
+     PROJECT_ID_OR_NUMBER
+        ID or number for the project you want to undelete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

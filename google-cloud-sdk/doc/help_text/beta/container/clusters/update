@@ -7,9 +7,10 @@ SYNOPSIS
         (--autoscaling-profile=AUTOSCALING_PROFILE
           | --complete-credential-rotation | --complete-ip-rotation
           | --database-encryption-key=DATABASE_ENCRYPTION_KEY
-          | --disable-database-encryption | --disable-workload-identity
-          | --enable-autoscaling | --enable-binauthz
-          | --enable-intra-node-visibility | --enable-legacy-authorization
+          | --disable-database-encryption | --disable-default-snat
+          | --disable-workload-identity | --enable-autoscaling
+          | --enable-binauthz | --enable-gvnic | --enable-intra-node-visibility
+          | --enable-legacy-authorization
           | --enable-logging-monitoring-system-only
           | --enable-master-authorized-networks | --enable-master-global-access
           | --enable-network-policy | --enable-pod-security-policy
@@ -103,6 +104,16 @@ REQUIRED FLAGS
           application layer. For more information, see
           https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
 
+       --disable-default-snat
+          Disable default source NAT rules applied in cluster nodes.
+
+          By default, network traffic sending from Pods to outside of VPC will
+          get masqueraded by the node external IP. When this flag is set, no
+          default sNAT will be enforced on the cluster. The flag must be set if
+          the cluster uses privately used public IPs.
+
+          Can only be used with private cluster in VPC Native network mode.
+
        --disable-workload-identity
           Disable Workload Identity on the cluster.
 
@@ -118,6 +129,10 @@ REQUIRED FLAGS
 
        --enable-binauthz
           Enable Binary Authorization for this cluster.
+
+       --enable-gvnic
+          Enable the use of GVNIC for this cluster. Requires re-creation of
+          nodes using either a node-pool upgrade or node-pool creation.
 
        --enable-intra-node-visibility
           Enable Intra-node visibility for this cluster.

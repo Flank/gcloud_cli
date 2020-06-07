@@ -32,6 +32,7 @@ import sys
 import tempfile
 
 from googlecloudsdk.api_lib.auth import service_account as auth_service_account
+from googlecloudsdk.api_lib.iamcredentials import util as iamcred_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -297,9 +298,7 @@ class WithServiceAuth(WithServiceAccountFile):
 
 
 class WithExpiredUserAuth(WithCoreModules):
-  """A base class for tests that require credentials to be refreshed.
-
-  """
+  """A base class for tests that require credentials to be refreshed."""
 
   def Project(self):
     return _TEST_CONFIG['property_overrides']['project']
@@ -347,6 +346,49 @@ class RefreshTokenAuth(object):
 
   def __exit__(self, ex_type, unused_value, unused_traceback):
     properties.VALUES.core.account.Set(self._orig_account)
+
+
+class ImpersonationAccountAuth(object):
+  """Context manager for tests with impersonation credentials."""
+
+  def __init__(self):
+    self._account = _TEST_CONFIG['auth_data']['user_account']['account']
+    self._refresh_token = _TEST_CONFIG['auth_data']['user_account'][
+        'refresh_token']
+    self._service_account_email = _TEST_CONFIG['auth_data']['service_account'][
+        'client_email']
+    self._project_override = _TEST_CONFIG['property_overrides'].get(
+        'project', None)
+
+    self._orig_account = None
+    self._orig_impersonate_service_account = None
+    self._orig_project = None
+    self._orig_impersonate_provider = None
+
+  def __enter__(self):
+    self._orig_account = properties.VALUES.core.account.Get()
+    self._orig_project = properties.VALUES.core.project.Get()
+    self._orig_impersonate_service_account = (
+        properties.VALUES.auth.impersonate_service_account.Get())
+
+    user_creds = c_store.AcquireFromToken(self._refresh_token)
+    c_store.ActivateCredentials(self._account, user_creds)
+    if self._project_override:
+      properties.VALUES.core.project.Set(self._project_override)
+    properties.VALUES.auth.impersonate_service_account.Set(
+        self._service_account_email)
+
+    self._orig_impersonate_provider = c_store.IMPERSONATION_TOKEN_PROVIDER
+    c_store.IMPERSONATION_TOKEN_PROVIDER = (
+        iamcred_util.ImpersonationAccessTokenProvider())
+    return self
+
+  def __exit__(self, exc_type, exc_val, exc_tb):
+    properties.VALUES.core.account.Set(self._orig_account)
+    properties.VALUES.core.project.Set(self._orig_project)
+    properties.VALUES.auth.impersonate_service_account.Set(
+        self._orig_impersonate_service_account)
+    c_store.IMPERSONATION_TOKEN_PROVIDER = self._orig_impersonate_provider
 
 
 class ServiceAccountAuth(object):

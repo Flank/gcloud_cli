@@ -36,11 +36,8 @@ class SubscriptionsPullGATest(base.CloudPubsubTestBase):
     self.svc = self.client.projects_subscriptions.Pull
     self.ack_svc = self.client.projects_subscriptions.Acknowledge
 
-  def _GetMessageOutput(self,
-                        data,
-                        msg_id,
-                        ack_id):
-    return '%s | %d | | %s' % (data, msg_id, ack_id)
+  def _GetMessageOutput(self, data, msg_id, ack_id, delivery_attempt=''):
+    return '%s | %d | | %s | %s' % (data, msg_id, delivery_attempt, ack_id)
 
   def testSubscriptionsPull(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -126,16 +123,16 @@ class SubscriptionsPullGATest(base.CloudPubsubTestBase):
 
     self.AssertOutputEquals(
         """\
-+----------------+------------+------------+--------+
-| DATA           | MESSAGE_ID | ATTRIBUTES | ACK_ID |
-+----------------+------------+------------+--------+
-| Hello, World!  | 123456     | attr0=0    | 0      |
-|                |            | attr1=1    |        |
-| World on Fire! | 654321     | attr0=0    | 1      |
-|                |            | attr1=1    |        |
-| Hello ?        | 987654     | attr0=0    | 2      |
-|                |            | attr1=1    |        |
-+----------------+------------+------------+--------+
++----------------+------------+------------+------------------+--------+
+| DATA           | MESSAGE_ID | ATTRIBUTES | DELIVERY_ATTEMPT | ACK_ID |
++----------------+------------+------------+------------------+--------+
+| Hello, World!  | 123456     | attr0=0    |                  | 0      |
+|                |            | attr1=1    |                  |        |
+| World on Fire! | 654321     | attr0=0    |                  | 1      |
+|                |            | attr1=1    |                  |        |
+| Hello ?        | 987654     | attr0=0    |                  | 2      |
+|                |            | attr1=1    |                  |        |
++----------------+------------+------------+------------------+--------+
         """,
         normalize_space=True)
 
@@ -200,7 +197,7 @@ class SubscriptionsPullGATest(base.CloudPubsubTestBase):
     self.Run('pubsub subscriptions pull subs1')
 
     self.AssertOutputContains(
-        'Hello, World! | 654321 | | 000', normalize_space=True)
+        'Hello, World! | 654321 | | | 000', normalize_space=True)
 
   def testSubscriptionsPullUrlSafeEncodedMessage(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -225,6 +222,28 @@ class SubscriptionsPullGATest(base.CloudPubsubTestBase):
 
     self.AssertOutputContains(
         self._GetMessageOutput('3c?', 654321, '000'), normalize_space=True)
+
+  def testSubscriptionsPullWithDeliveryAttempt(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    received_message = self.messages[0]
+    exp_received_message = self.msgs.ReceivedMessage(
+        ackId='000', message=received_message, deliveryAttempt=2)
+    exp_received_message.message.messageId = '1234567'
+
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsSubscriptionsPullRequest(
+            pullRequest=self.msgs.PullRequest(
+                maxMessages=1, returnImmediately=True),
+            subscription=sub_ref.RelativeName()),
+        response=self.msgs.PullResponse(
+            receivedMessages=[exp_received_message]))
+
+    self.Run('pubsub subscriptions pull subs1')
+
+    self.AssertOutputContains(
+        self._GetMessageOutput(
+            'Hello, World!', 1234567, '0', delivery_attempt=2),
+        normalize_space=True)
 
   def testSubscriptionsPullNoDeprecatedArgs(self):
     err = """\

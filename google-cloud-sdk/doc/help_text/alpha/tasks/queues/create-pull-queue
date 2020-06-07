@@ -39,9 +39,17 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To create a Cloud Tasks pull queue:
+
+        $ gcloud alpha tasks queues create-pull-queue my-queue
+        --max-attempts=10 --max-retry-duration=10s
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta tasks queues create-pull-queue
 

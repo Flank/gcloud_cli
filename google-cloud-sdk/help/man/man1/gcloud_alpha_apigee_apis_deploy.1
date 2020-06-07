@@ -1,0 +1,120 @@
+
+.TH "GCLOUD_ALPHA_APIGEE_APIS_DEPLOY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee apis deploy \- deploys an Apigee API proxy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee apis deploy\fR [[\fIREVISION\fR]\ \fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-override\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Deploy an Apigee API proxy to an environment.
+
+This command expects the API proxy's base path to not already be in use by a
+deployed proxy in the target environment. If it is in use, the deployment will
+fail by default. To instead undeploy the existing API proxy as part of the new
+deployment, use the \f5\-\-override\fR command.
+
+Once a particular revision of an API proxy has been deployed, that revision can
+no longer be modified. Any updates to the API proxy must be saved as a new
+revision.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Revision resource \- The API proxy revision to be deployed, and the environment
+in which to deploy it. The revision defaults to \f5latest\fR, a special value
+which will use the latest revision of the API proxy. The arguments in this group
+can be used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+[\fIREVISION\fR]
+ID of the revision or fully qualified identifier for the revision.
+
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+The API proxy to be deployed.
+
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+The environment in which to deploy the API proxy.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The Apigee organization of the proxy and environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-override\fR
+Whether to force the deployment of the new revision over the currently deployed
+revision by overriding conflict checks.
+
+If an existing API proxy revision is deployed, set this flag to ensure seamless
+deployment with zero downtime. In this case, the existing revision remains
+deployed until the new revision is fully deployed. If not set, you must undeploy
+the currently deployed revision before deploying the new revision.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To deploy the latest revision of the API proxy named \f5\fIdemo\fR\fR to the
+\f5\fItest\fR\fR environment, given that the API proxy and environment's
+matching Cloud Platform project has been set in gcloud settings, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deploy \-\-environment=test \-\-api=demo
+.RE
+
+To deploy revision 3 of that proxy, owned by an organization named
+\f5\fImy\-org\fR\fR, run, and replace any conflicting deployment that might
+already exist, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deploy 3 \-\-organization=my\-org \e
+    \-\-environment=test \-\-api=demo \-\-override
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

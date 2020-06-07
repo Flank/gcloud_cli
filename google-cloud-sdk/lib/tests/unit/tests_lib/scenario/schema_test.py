@@ -46,7 +46,8 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
   def SetUp(self):
     temp_file = self.Touch(self.root_path)
     self.scenario_context = schema.ScenarioContext(
-        None, temp_file, None, calliope_base.ReleaseTrack.GA, None, [], None,
+        None, temp_file, None, calliope_base.ReleaseTrack.GA,
+        session.ExecutionMode.REMOTE, [], None,
         None, None)
 
   def testSetPropertyAction(self):

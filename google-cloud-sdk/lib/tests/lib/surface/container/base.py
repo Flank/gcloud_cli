@@ -1103,6 +1103,8 @@ class BetaTestBase(GATestBase):
       node_pool.upgradeSettings = kwargs.get('upgradeSettings')
     else:
       node_pool.upgradeSettings = self._MakeDefaultUpgradeSettings()
+    node_pool.config.linuxNodeConfig = kwargs.get('linuxNodeConfig')
+    node_pool.config.kubeletConfig = kwargs.get('kubeletConfig')
     return node_pool
 
   def _MakeIPAllocationPolicy(self, **kwargs):
@@ -1159,7 +1161,9 @@ class BetaTestBase(GATestBase):
                            response=None,
                            exception=None,
                            zone=None,
-                           upgrade_settings=None):
+                           upgrade_settings=None,
+                           kubelet_config=None,
+                           linux_node_config=None):
     if not zone:
       zone = self.ZONE
     if locations is None:
@@ -1170,6 +1174,8 @@ class BetaTestBase(GATestBase):
                                                         node_pool_name),
         workloadMetadataConfig=workload_metadata_config,
         upgradeSettings=upgrade_settings,
+        kubeletConfig=kubelet_config,
+        linuxNodeConfig=linux_node_config,
         locations=locations)
     self.mocked_client.projects_locations_clusters_nodePools.Update.Expect(
         msg, response=response, exception=exception)

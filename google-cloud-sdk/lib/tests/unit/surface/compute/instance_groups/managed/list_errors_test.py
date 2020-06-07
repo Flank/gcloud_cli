@@ -27,20 +27,33 @@ from tests.lib import sdk_test_base
 from tests.lib.surface.compute import test_resources
 
 
-class InstanceGroupsListErrorsBetaZonalTest(sdk_test_base.WithFakeAuth,
+class InstanceGroupsListErrorsZonalTestBase(sdk_test_base.WithFakeAuth,
                                             cli_test_base.CliTestBase):
 
+  API_VERSION = 'v1'
+
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.API_VERSION))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', self.API_VERSION)
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://www.googleapis.com/compute/beta/'
+    self.endpoint_uri = (
+        'https://www.googleapis.com/compute/{api_version}/').format(
+            api_version=self.API_VERSION)
     self.project_uri = '{endpoint_uri}projects/fake-project'.format(
         endpoint_uri=self.endpoint_uri)
+
+
+class InstanceGroupsListErrorsZonalTest(
+    InstanceGroupsListErrorsZonalTestBase):
+
+  API_VERSION = 'v1'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testListErrorsNoPagination(self):
     request = self.messages.ComputeInstanceGroupManagersListErrorsRequest(
@@ -101,17 +114,18 @@ class InstanceGroupsListErrorsBetaZonalTest(sdk_test_base.WithFakeAuth,
         """)
 
 
+class InstanceGroupsListErrorsBetaZonalTest(InstanceGroupsListErrorsZonalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 class InstanceGroupsListErrorsAlphaZonalTest(
     InstanceGroupsListErrorsBetaZonalTest):
 
-  def SetUp(self):
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://www.googleapis.com/compute/alpha/'
-    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
-        endpoint_uri=self.endpoint_uri)

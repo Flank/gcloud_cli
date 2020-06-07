@@ -2,7 +2,7 @@ NAME
     gcloud beta projects move - move a project into an organization
 
 SYNOPSIS
-    gcloud beta projects move PROJECT_ID [--folder=FOLDER_ID]
+    gcloud beta projects move PROJECT_ID_OR_NUMBER [--folder=FOLDER_ID]
         [--organization=ORGANIZATION_ID] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -24,8 +24,8 @@ DESCRIPTION
       o The given project is already in an organization.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to move.
+     PROJECT_ID_OR_NUMBER
+        ID or number for the project you want to move.
 
 FLAGS
      --folder=FOLDER_ID

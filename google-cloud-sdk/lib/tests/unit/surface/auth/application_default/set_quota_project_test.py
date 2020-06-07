@@ -21,6 +21,7 @@ import os
 import textwrap
 
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core.credentials import creds
 from tests.lib import cli_test_base
@@ -70,6 +71,8 @@ class SetQuotaProjectTests(cli_test_base.CliTestBase):
     self.StartObjectPatch(
         config, 'ADCFilePath', return_value=self.adc_file_path)
     self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.adc_permission_checking = self.StartObjectPatch(
+        auth_util, 'AdcHasGivenPermissionOnProject', return_value=True)
 
   def testSetQuotaProject_NonExistingADC(self):
     with self.AssertRaisesExceptionMatches(
@@ -81,13 +84,21 @@ class SetQuotaProjectTests(cli_test_base.CliTestBase):
     creds.ADC(creds.FromJson(_GetJsonUserADC())).DumpADCToFile()
     self.RunSetQuotaProject()
     self.AssertFileEquals(_GetJsonUserExtendedADC(), self.adc_file_path)
-    self.AssertErrContains('Updated the quota project')
+    self.AssertErrContains('Quota project "fake-project" was added to ADC')
+
+  def testSetQuotaProject_ExistingUserCreds_NoPermission(self):
+    creds.ADC(creds.FromJson(_GetJsonUserADC())).DumpADCToFile()
+    self.adc_permission_checking.return_value = False
+    with self.AssertRaisesExceptionMatches(
+        auth_util.MissingPermissionOnQuotaProjectError,
+        'ADC does not have the "serviceusage.services.use" permission'):
+      self.RunSetQuotaProject()
 
   def testSetQuotaProject_ExistingServiceCreds(self):
     creds.ADC(creds.FromJson(_GetJsonServiceADC())).DumpADCToFile()
     with self.AssertRaisesExceptionMatches(
         exceptions.BadFileException,
-        'The credentials are not user credentials'):
+        'The application default credentials are not user credentials'):
       self.RunSetQuotaProject()
 
 

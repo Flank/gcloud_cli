@@ -1869,7 +1869,7 @@ class BetaDeploy(DeployWithFlexBase):
                                  runtime='python-compat')
     self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
     properties.VALUES.app.cloud_build_timeout.Set('100')
-    self._ExpectServiceDeployedWithBuildOptions(timeout='100')
+    self._ExpectServiceDeployedWithBuildOptions(timeout='100s')
     self.Run(
         'app deploy --bucket=gs://default-bucket/ --version=1 {0}'.format(
             service_path))

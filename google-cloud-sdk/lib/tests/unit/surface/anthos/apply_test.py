@@ -20,11 +20,15 @@ from __future__ import unicode_literals
 
 import os
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.anthos import test_base as anthos_test_base
 
 
-class ApplyTest(anthos_test_base.PackageUnitTestBase):
+class ApplyTestBeta(anthos_test_base.PackageUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.test_package = self.Touch(
@@ -46,6 +50,11 @@ class ApplyTest(anthos_test_base.PackageUnitTestBase):
             '--project',
             'my-project'])
 
+
+class ApplyTestALPHA(ApplyTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

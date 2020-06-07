@@ -79,6 +79,23 @@ EXAMPLES
         $ gcloud alpha compute org-security-policies list-rules list-rules \
             123456789
 
+    To list all the fields of the rules of an organization security policy with
+    ID ``123456789", run:
+
+        $ gcloud alpha compute org-security-policies list-rules list-rules \
+            123456789 --format="table(
+          priority,
+          action,
+          direction,
+          match.config.srcIpRanges.list():label=SRC_RANGES,
+          match.config.destIpRanges.list():label=DEST_RANGES,
+          match.config.layer4Configs.map().org_firewall_rule().list():label=PORT_RANGES,
+          targetServiceAccounts.list():label=TARGET_SVC_ACCT,
+          targetResources:label=TARGET_RESOURCES,
+          ruleTupleCount,
+          enableLogging,
+          description)"
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

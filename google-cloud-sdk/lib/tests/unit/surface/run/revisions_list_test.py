@@ -46,10 +46,10 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
       r.labels['cloud.googleapis.com/location'] = 'us-central1'
       r.annotations[revision.AUTHOR_ANNOTATION] = 'some{}@google.com'.format(i)
       r.status.conditions = [
-          self.serverless_messages.RevisionCondition(
+          self.serverless_messages.GoogleCloudRunV1Condition(
               type='Ready',
               status='Unknown' if i%2 else 'True'),
-          self.serverless_messages.RevisionCondition(
+          self.serverless_messages.GoogleCloudRunV1Condition(
               type='Active',
               status='Unknown' if i%2 else 'True')
       ]

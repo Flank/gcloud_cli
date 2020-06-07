@@ -34,6 +34,7 @@ from googlecloudsdk.api_lib.run import secret
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
 from googlecloudsdk.command_lib.events import exceptions
+from googlecloudsdk.command_lib.events import resource_args
 from googlecloudsdk.command_lib.events import stages
 from googlecloudsdk.command_lib.events import util
 from googlecloudsdk.command_lib.run import serverless_operations
@@ -250,8 +251,8 @@ class EventflowOperations(object):
       return None
     return trigger.Trigger(response, self.messages)
 
-  def CreateTrigger(self, trigger_ref, source_obj, event_type, target_service,
-                    broker):
+  def CreateTrigger(self, trigger_ref, source_obj, event_type, trigger_filters,
+                    target_service, broker):
     """Create a trigger that sends events to the target service.
 
     Args:
@@ -259,6 +260,7 @@ class EventflowOperations(object):
       source_obj: source.Source. The source object to be created after the
         trigger. If creating a custom event, this may be None.
       event_type: str, the event type the source will filter by.
+      trigger_filters: collections.OrderedDict()
       target_service: str, name of the Cloud Run service to subscribe.
       broker: str, name of the broker to act as a sink for the source.
 
@@ -273,6 +275,10 @@ class EventflowOperations(object):
       trigger_obj.filter_attributes[
           trigger.SOURCE_TRIGGER_LINK_FIELD] = 'link{}'.format(random.random())
     trigger_obj.filter_attributes[trigger.EVENT_TYPE_FIELD] = event_type
+
+    # event/flags.py ensures filter key doesn't include disallowed fields
+    trigger_obj.filter_attributes.update(trigger_filters)
+
     trigger_obj.subscriber = target_service
     trigger_obj.broker = broker
 
@@ -332,7 +338,9 @@ class EventflowOperations(object):
     """
     return registry.GetMethod(
         util.SOURCE_COLLECTION_NAME.format(
-            plural_kind=source_crd.source_kind_plural), method_name)
+            plural_kind=source_crd.source_kind_plural),
+        method_name,
+        api_version=resource_args.EVENTS_ALPHA_API_VERSION)
 
   def SourceGetMethod(self, source_crd):
     """Returns the request method for a Get request of this source."""
@@ -432,7 +440,9 @@ class EventflowOperations(object):
     # Passing the parent field is only needed for hosted, but shouldn't hurt
     # against an actual cluster
     namespace_ref = resources.REGISTRY.Parse(
-        properties.VALUES.core.project.Get(), collection='run.namespaces')
+        properties.VALUES.core.project.Get(),
+        collection='run.namespaces',
+        api_version=resource_args.EVENTS_ALPHA_API_VERSION)
 
     messages = self._crd_client.MESSAGES_MODULE
     request = messages.RunCustomresourcedefinitionsListRequest(

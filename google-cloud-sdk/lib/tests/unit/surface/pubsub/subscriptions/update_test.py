@@ -405,47 +405,6 @@ class SubscriptionsUpdateTest(base.CloudPubsubTestBase, parameterized.TestCase):
     with self.AssertRaisesExceptionMatches(exception, exception_message):
       self.Run('pubsub subscriptions update sub' + dead_letter_flags)
 
-
-class SubscriptionsUpdateTestBeta(SubscriptionsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-
-class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testUpdateAll(self):
-    sub_ref = util.ParseSubscription('sub', self.Project())
-    new_sub = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        ackDeadlineSeconds=100,
-        pushConfig=self.msgs.PushConfig(
-            pushEndpoint='https://my.appspot.com/push'),
-        retainAckedMessages=True,
-        messageRetentionDuration='259200s',
-        deadLetterPolicy=self.msgs.DeadLetterPolicy(
-            deadLetterTopic=util.ParseTopic('topic2',
-                                            self.Project()).RelativeName(),
-            maxDeliveryAttempts=5))
-
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub,
-            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
-                        'messageRetentionDuration,deadLetterPolicy')),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(
-        request=update_req, response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub --ack-deadline 100'
-             ' --push-endpoint https://my.appspot.com/push'
-             ' --retain-acked-messages --message-retention-duration 3d'
-             ' --dead-letter-topic topic2 --max-delivery-attempts 5')
-    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
-        sub_ref.RelativeName()))
-
   @parameterized.parameters(
       (' --min-retry-delay 20s --max-retry-delay 50s', '20s', '50s'),
       (' --min-retry-delay 20s', '20s', None),
@@ -507,6 +466,47 @@ class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta):
                                      exception_message):
     with self.AssertRaisesExceptionMatches(exception, exception_message):
       self.Run('pubsub subscriptions update sub' + retry_policy_flags)
+
+
+class SubscriptionsUpdateTestBeta(SubscriptionsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdateAll(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        ackDeadlineSeconds=100,
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://my.appspot.com/push'),
+        retainAckedMessages=True,
+        messageRetentionDuration='259200s',
+        deadLetterPolicy=self.msgs.DeadLetterPolicy(
+            deadLetterTopic=util.ParseTopic('topic2',
+                                            self.Project()).RelativeName(),
+            maxDeliveryAttempts=5))
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub,
+            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
+                        'messageRetentionDuration,deadLetterPolicy')),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --ack-deadline 100'
+             ' --push-endpoint https://my.appspot.com/push'
+             ' --retain-acked-messages --message-retention-duration 3d'
+             ' --dead-letter-topic topic2 --max-delivery-attempts 5')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
 
 
 if __name__ == '__main__':

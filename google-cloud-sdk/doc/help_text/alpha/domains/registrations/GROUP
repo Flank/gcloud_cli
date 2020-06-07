@@ -21,32 +21,40 @@ GROUPS
      authorization-code
         (ALPHA) Manage Cloud Domains registration's authorization code.
 
+     configure
+        (ALPHA) Configure Cloud Domains registrations' management, DNS or
+        contact settings.
+
      operations
         (ALPHA) Manage Cloud Domains operations.
 
 COMMANDS
     COMMAND is one of the following:
 
-     check-availability
-        (ALPHA) Check availability of a specific domain.
-
-     create
-        (ALPHA) Create a new domain registration.
+     delete
+        (ALPHA) Delete a Cloud Domains registration.
 
      describe
         (ALPHA) Describe an existing Cloud Domains registration.
 
-     detach
-        (ALPHA) Detach a domain registration.
+     export
+        (ALPHA) Export a Cloud Domains registration.
+
+     get-register-parameters
+        (ALPHA) Get register parameters (including availability) of a specific
+        domain.
 
      list
         (ALPHA) List Cloud Domains registrations.
+
+     register
+        (ALPHA) Register a new domain.
 
      search-domains
         (ALPHA) Search for available domains.
 
      update
-        (ALPHA) Update a domain registration.
+        (ALPHA) Update a Cloud Domains registration.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

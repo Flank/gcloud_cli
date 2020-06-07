@@ -2,7 +2,7 @@ NAME
     gcloud alpha projects update - update the name and/or labels of a project
 
 SYNOPSIS
-    gcloud alpha projects update PROJECT_ID
+    gcloud alpha projects update PROJECT_ID_OR_NUMBER
         (--name=NAME --update-labels=[KEY=VALUE,...] --clear-labels
           | --remove-labels=[KEY,...]) [GCLOUD_WIDE_FLAG ...]
 
@@ -15,8 +15,8 @@ DESCRIPTION
         given project.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to update.
+     PROJECT_ID_OR_NUMBER
+        ID or number for the project you want to update.
 
 REQUIRED FLAGS
      At least one of these must be specified:

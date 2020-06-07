@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: flaking
-    bug: b/152289882
 title: Lookup, describe, and update a Data Catalog entry.
 release_tracks: [BETA]
 summary:
@@ -12,13 +8,7 @@ summary:
       Created topic [projects/$$project$$/topics/$$my-topic$$].
 - execute:
   - command: data-catalog search $$my-topic$$ --include-project-ids=$$project$$ --limit=1
-  - stdout: |
-      ---
-      integratedSystem: CLOUD_PUBSUB
-      linkedResource: //pubsub.googleapis.com/projects/$$project$$/topics/$$my-topic$$
-      relativeResourceName: projects/$$project$$/locations/us-central1/entryGroups/@pubsub/entries/$$my-entry$$
-      searchResultSubtype: entry.data_stream.topic
-      searchResultType: ENTRY
+  - stdout: .*$$my-entry$$.*$
 - execute:
   - command: pubsub topics delete $$my-topic$$
   - stderr: |
@@ -31,7 +21,6 @@ actions:
 - define_reference:
     reference: project
     value: cloud-sdk-integration-testing
-
 - execute_command:
     command: pubsub topics create $$my-topic$$
     validation_only: true
@@ -41,7 +30,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command_until:
-    command: data-catalog entries lookup "pubsub.topic.`$$project$$`.$$my-topic$$"
+    command: data-catalog search $$my-topic$$ --include-project-ids=$$project$$
     exit_code: 0
     exponential_sleep_multiplier: '1.5'
     timeout: 60
@@ -62,14 +51,14 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '524'
+            content-length: '519'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             results:
             - searchResultType: ENTRY
               searchResultSubtype: entry.data_stream.topic
-              relativeResourceName: projects/$$project$$/locations/us-central1/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL2RhdGFjYXRhbG9nXzIwMTkxMDIyXzEyNDQ1Nl94M2Fq
+              relativeResourceName: projects/$$project$$/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL2RhdGFjYXRhbG9nXzIwMjAwNDI4XzExMDAwM184eG53
               linkedResource: //pubsub.googleapis.com/projects/$$project$$/topics/$$my-topic$$
               integratedSystem: CLOUD_PUBSUB
         expect_response:

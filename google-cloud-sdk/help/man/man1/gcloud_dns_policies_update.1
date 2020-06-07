@@ -11,7 +11,7 @@ gcloud dns policies update \- update an existing Cloud DNS policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dns policies update\fR \fIPOLICY\fR [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-networks\fR=[\fINETWORKS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dns policies update\fR \fIPOLICY\fR [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-networks\fR=[\fINETWORKS\fR,...]] [\fB\-\-private\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,6 +67,11 @@ Specifies whether to enable query logging. Defaults to False.
 .TP 2m
 \fB\-\-networks\fR=[\fINETWORKS\fR,...]
 The comma separated list of network names to associate with the policy.
+
+.TP 2m
+\fB\-\-private\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]
+List of alternative name servers to forward to. All addresses specified for this
+parameter will be reached through the VPC.
 
 
 .RE

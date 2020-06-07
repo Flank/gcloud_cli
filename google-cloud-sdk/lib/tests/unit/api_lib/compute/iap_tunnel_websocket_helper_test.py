@@ -136,6 +136,17 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertEqual(self.helper._websocket.send.call_count, 4)
     self.helper._websocket.send.assert_has_calls([mock.call(b'qwf', opcode=2)])
 
+    log.SetVerbosity(logging.DEBUG)
+    self.helper._websocket.send.side_effect = RuntimeError
+    self.assertRaises(iap_tunnel_websocket_helper.WebSocketSendError,
+                      self.helper.Send, b'xyz')
+    self.assertEqual(self.helper._websocket.send.call_count, 5)
+    self.helper._websocket.send.assert_has_calls([mock.call(b'xyz', opcode=2)])
+    log_debug_mock.assert_has_calls([
+        mock.call(
+            u'Error during WebSocket send of Data message.', exc_info=True)
+    ])
+
   @mock.patch.object(log, 'info', autospec=True)
   @mock.patch.object(log, 'debug', autospec=True)
   def testSendClose(self, log_debug_mock, log_info_mock):

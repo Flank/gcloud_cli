@@ -118,7 +118,4 @@ class AuthUnitTestBase(AnthosUnitTestBase):
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.mock_bin_exec = self.StartObjectPatch(
-        exec_utils, 'Exec',
-        autospec=True, side_effect=ExecMock)
     self.mock_bin_check.return_value = _MOCK_ANTHOS_AUTH_BINARY

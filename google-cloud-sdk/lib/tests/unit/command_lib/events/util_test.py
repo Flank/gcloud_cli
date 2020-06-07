@@ -27,10 +27,10 @@ from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
-from tests.lib.surface.run import base
+from tests.lib.surface.events import base
 
 
-class UtilTest(base.ServerlessBase):
+class UtilTest(base.EventsBase):
 
   def _MakeSourceCrds(self, num_sources, num_event_types_per_source):
     """Creates source CRDs with event types."""
@@ -47,8 +47,8 @@ class UtilTest(base.ServerlessBase):
       self.event_types = []
     for i, crd in enumerate(source_crds):
       crd.spec.group = 'events.api.group.{}'.format(i)
-      # Keep i == 0 to a valid source kind (CloudPubSubSource), but all others we'll append
-      # the index to keep the source kinds unique
+      # Keep i == 0 to a valid source kind (CloudPubSubSource), but all others
+      # we'll append the index to keep the source kinds unique
       source_kind = 'CloudPubSubSource' if i == 0 else 'CloudPubSubSource{}'.format(
           i)
       crd.spec.names = (
@@ -66,15 +66,14 @@ class UtilTest(base.ServerlessBase):
 
   def _MakeSource(self, source_crd):
     """Creates a source object of the type specified by source_crd."""
-    self.source = source.Source.New(self.mock_serverless_client,
-                                    'source-namespace',
+    self.source = source.Source.New(self.mock_client, 'source-namespace',
                                     source_crd.source_kind,
                                     source_crd.source_api_category)
     self.source.name = 'source-for-my-trigger'
 
   def _MakeTrigger(self, source_obj, event_type):
     """Creates a trigger object with the given source dependency and event type."""
-    self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
+    self.trigger = trigger.Trigger.New(self.mock_client, 'default')
     self.trigger.name = 'my-trigger'
     self.trigger.dependency = source_obj
     # TODO(b/141617597): Set to str(random.random()) without prepended string
@@ -139,7 +138,8 @@ class UtilTest(base.ServerlessBase):
     expected = resources.REGISTRY.Parse(
         'source-for-my-trigger',
         params={'namespacesId': 'source-namespace'},
-        collection='run.namespaces.cloudpubsubsources')
+        collection='run.namespaces.cloudpubsubsources',
+        api_version='v1alpha1')
     self.assertEqual(
         (expected, self.source_crds[0]),
         util.GetSourceRefAndCrdForTrigger(self.trigger, self.source_crds))

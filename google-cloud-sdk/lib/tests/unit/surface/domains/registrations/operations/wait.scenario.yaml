@@ -6,7 +6,7 @@ summary:
   - command: |
       domains registrations operations wait operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86
   - progress_tracker:
-    - message: Waiting for [operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86]
+    - message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         to complete
     - status: SUCCESS
 actions:
@@ -16,7 +16,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86?alt=json
           method: GET
           headers: {}
           body: null
@@ -27,46 +27,84 @@ actions:
             {
               "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
                 "createTime": "2019-01-14T13:20:39.218508799Z",
                 "endTime": "2019-01-14T13:20:52.606261846Z",
                 "target": "projects/fake-project/locations/global/registrations/example.com",
                 "verb": "update",
-                "apiVersion": "v1alpha1"
+                "apiVersion": "v1alpha2"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.Registration",
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.Registration",
                 "name": "projects/fake-project/locations/global/registrations/example.com",
                 "domainName": "example.com",
                 "createTime": "2019-01-11T14:09:08.068037639Z",
-                "updateTime": "2019-01-11T14:09:16.933570624Z",
                 "expireTime": "2020-01-11T14:09:12Z",
                 "state": "ACTIVE",
-                "dnsConfig": {},
-                "whoisConfig": {
-                    "privacy": "USE_WHOIS_PRIVACY_PROXY",
-                    "registrantContact": {
-                      "postalAddress": {
-                        "regionCode": "US",
-                        "postalCode": "94043",
-                        "administrativeArea": "CA",
-                        "locality": "Mountain View",
-                        "addressLines": [
-                          "1600 Amphitheatre Pkwy"
-                        ],
-                        "recipients": [
-                          "Test User"
-                        ]
-                      },
-                      "email": "testuser@google.com",
-                      "phoneNumber": "+1.1234567890"
-                    }
+                "managementSettings": {
+                  "transferLockState": "LOCKED"
+                },
+                "dnsSettings": {
+                  "customDns": {
+                    "nameServers": ["ns1.com", "ns2.com"]
                   }
+                },
+                "contactSettings": {
+                  "privacy": "PRIVATE_CONTACT_DATA",
+                  "registrantContact": {
+                    "postalAddress": {
+                      "regionCode": "US",
+                      "postalCode": "94043",
+                      "administrativeArea": "CA",
+                      "locality": "Mountain View",
+                      "addressLines": [
+                        "1600 Amphitheatre Pkwy"
+                      ],
+                      "recipients": [
+                        "Test User"
+                      ]
+                    },
+                    "email": "testuser@google.com",
+                    "phoneNumber": "+1.1234567890"
+                  },
+                  "adminContact": {
+                    "postalAddress": {
+                      "regionCode": "US",
+                      "postalCode": "94043",
+                      "administrativeArea": "CA",
+                      "locality": "Mountain View",
+                      "addressLines": [
+                        "1600 Amphitheatre Pkwy"
+                      ],
+                      "recipients": [
+                        "Test User"
+                      ]
+                    },
+                    "email": "testuser@google.com",
+                    "phoneNumber": "+1.1234567890"
+                  },
+                  "technicalContact": {
+                    "postalAddress": {
+                      "regionCode": "US",
+                      "postalCode": "94043",
+                      "administrativeArea": "CA",
+                      "locality": "Mountain View",
+                      "addressLines": [
+                        "1600 Amphitheatre Pkwy"
+                      ],
+                      "recipients": [
+                        "Test User"
+                      ]
+                    },
+                    "email": "testuser@google.com",
+                    "phoneNumber": "+1.1234567890"
+                  }
+                }
               }
             }
     - expect_progress_tracker:
-        message: Waiting for [operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86]
+        message: Waiting for 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
           to complete
         status: SUCCESS
     - expect_exit:

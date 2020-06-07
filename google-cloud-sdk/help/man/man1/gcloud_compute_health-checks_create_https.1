@@ -17,12 +17,11 @@ gcloud compute health\-checks create https \- create a HTTPS health check to mon
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute health\-checks create https\fR is used to create an HTTPS
-non\-legacy health check. HTTPS health checks monitor instances in a load
-balancer controlled by a target pool. All arguments to the command are optional
-except for the name of the health check. Note, by default, this health check
-monitors TCP port 80. For more information on load balancing, see
-https://cloud.google.com/compute/docs/load\-balancing\-and\-autoscaling/
+\fBgcloud compute health\-checks create https\fR is used to create a non\-legacy
+health check using the HTTPS protocol. You can use this health check for Google
+Cloud Platform load balancers or for managed instance group autohealing. For
+more information, see the health checks overview at:
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts
 
 
 
@@ -58,10 +57,9 @@ is marked as healthy. The default is 2.
 
 .TP 2m
 \fB\-\-host\fR=\fIHOST\fR
-The value of the host header used in this HTTP health check request. By default,
-this is empty and Google Compute Engine automatically sets the host header in
-health requests to the same external IP address as the forwarding rule
-associated with the target pool.
+The value of the host header used in this HTTP health check request. The host
+header is empty by default. When empty, the health check sets the host header to
+the IP address of the backend VM or endpoint.
 
 .TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR; default="NONE"

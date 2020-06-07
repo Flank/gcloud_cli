@@ -5,11 +5,16 @@ summary:
 - execute:
   - command: |
       domains registrations list
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: |
+      domains registrations list
   - stdout: |
-      DOMAIN        STATE     EXPIRE_TIME
-      example.com   ACTIVE    2019-11-23T11:15:09Z
-      google.com    ACTIVE    2020-01-11T10:12:09Z
-      detached.com  DETACHED
+      DOMAIN         STATE      EXPIRE_TIME
+      suspended.com  SUSPENDED  2020-01-11T14:09:12Z
+      example.com    ACTIVE     2020-01-11T14:09:12Z
+      exported.com   EXPORTED   2020-01-11T14:09:12Z
 actions:
 - execute_command:
     command: |
@@ -17,7 +22,27 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations?alt=json
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+            }
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations?alt=json
           method: GET
           headers: {}
           body: null
@@ -28,16 +53,58 @@ actions:
             {
               "registrations": [
                 {
-                  "name": "projects/fake-project/locations/global/registrations/example.com",
-                  "domainName": "example.com",
-                  "createTime": "2018-11-23T11:15:04.123212416Z",
-                  "updateTime": "2018-11-28T12:49:34.888985282Z",
-                  "expireTime": "2019-11-23T11:15:09Z",
-                  "state": "ACTIVE",
-                  "dnsConfig": {},
-                  "whoisConfig": {
-                    "privacy": "USE_WHOIS_PRIVACY_PROXY",
+                  "name": "projects/fake-project/locations/global/registrations/suspended.com",
+                  "domainName": "suspended.com",
+                  "createTime": "2019-01-11T14:09:08.068037639Z",
+                  "expireTime": "2020-01-11T14:09:12Z",
+                  "state": "SUSPENDED",
+                  "issues": [
+                    "UNVERIFIED_EMAIL"
+                  ],
+                  "managementSettings": {
+                    "transferLockState": "LOCKED"
+                  },
+                  "dnsSettings": {
+                    "customDns": {
+                      "nameServers": ["ns1.com", "ns2.com"]
+                    }
+                  },
+                  "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "REDACTED_CONTACT_DATA"],
+                  "contactSettings": {
+                    "privacy": "PRIVATE_CONTACT_DATA",
                     "registrantContact": {
+                      "postalAddress": {
+                        "regionCode": "US",
+                        "postalCode": "94043",
+                        "administrativeArea": "CA",
+                        "locality": "Mountain View",
+                        "addressLines": [
+                          "1600 Amphitheatre Pkwy"
+                        ],
+                        "recipients": [
+                          "Test User"
+                        ]
+                      },
+                      "email": "testuser@google.com",
+                      "phoneNumber": "+1.1234567890"
+                    },
+                    "adminContact": {
+                      "postalAddress": {
+                        "regionCode": "US",
+                        "postalCode": "94043",
+                        "administrativeArea": "CA",
+                        "locality": "Mountain View",
+                        "addressLines": [
+                          "1600 Amphitheatre Pkwy"
+                        ],
+                        "recipients": [
+                          "Test User"
+                        ]
+                      },
+                      "email": "testuser@google.com",
+                      "phoneNumber": "+1.1234567890"
+                    },
+                    "technicalContact": {
                       "postalAddress": {
                         "regionCode": "US",
                         "postalCode": "94043",
@@ -56,15 +123,33 @@ actions:
                   }
                 },
                 {
-                  "name": "projects/fake-project/locations/global/registrations/google.com",
-                  "domainName": "google.com",
-                  "createTime": "2019-01-11T10:12:04.123212416Z",
-                  "updateTime": "2019-01-11T10:42:34.888985282Z",
-                  "expireTime": "2020-01-11T10:12:09Z",
+                  "name": "projects/fake-project/locations/global/registrations/example.com",
+                  "domainName": "example.com",
+                  "createTime": "2019-01-11T14:09:08.068037639Z",
+                  "expireTime": "2020-01-11T14:09:12Z",
                   "state": "ACTIVE",
-                  "dnsConfig": {},
-                  "whoisConfig": {
-                    "privacy": "PUBLISH_REDACTED_WHOIS_DATA",
+                  "managementSettings": {
+                    "transferLockState": "UNLOCKED"
+                  },
+                  "dnsSettings": {
+                    "googleDomainsDns": {
+                      "nameServers": ["ns1.com", "ns2.com"],
+                      "dsState": "DS_RECORDS_PUBLISHED",
+                      "dsRecords": [{
+                        "keyTag": 24,
+                        "algorithm": "RSASHA1",
+                        "digestType": "SHA256",
+                        "digest": "2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d"
+                      }]
+                    },
+                    "glueRecords": [{
+                      "hostName": "ns1.example.com",
+                      "ipv4Addresses": ["8.8.8.8"]
+                    }]
+                  },
+                  "supportedPrivacy": ["PRIVATE_CONTACT_DATA", "REDACTED_CONTACT_DATA"],
+                  "contactSettings": {
+                    "privacy": "REDACTED_CONTACT_DATA",
                     "registrantContact": {
                       "postalAddress": {
                         "regionCode": "US",
@@ -78,24 +163,56 @@ actions:
                           "Test User"
                         ]
                       },
-                      "email": "testuser@example.com",
+                      "email": "testuser@google.com",
+                      "phoneNumber": "+1.1234567890"
+                    },
+                    "adminContact": {
+                      "postalAddress": {
+                        "regionCode": "US",
+                        "postalCode": "94043",
+                        "administrativeArea": "CA",
+                        "locality": "Mountain View",
+                        "addressLines": [
+                          "1600 Amphitheatre Pkwy"
+                        ],
+                        "recipients": [
+                          "Test User"
+                        ]
+                      },
+                      "email": "testuser@google.com",
+                      "phoneNumber": "+1.1234567890"
+                    },
+                    "technicalContact": {
+                      "postalAddress": {
+                        "regionCode": "US",
+                        "postalCode": "94043",
+                        "administrativeArea": "CA",
+                        "locality": "Mountain View",
+                        "addressLines": [
+                          "1600 Amphitheatre Pkwy"
+                        ],
+                        "recipients": [
+                          "Test User"
+                        ]
+                      },
+                      "email": "testuser@google.com",
                       "phoneNumber": "+1.1234567890"
                     }
                   }
                 },
                 {
-                  "name": "projects/fake-project/locations/global/registrations/detached.com",
-                  "domainName": "detached.com",
-                  "createTime": "2018-11-23T11:15:04.123212416Z",
-                  "updateTime": "2018-11-28T12:49:34.888985282Z",
-                  "state": "DETACHED"
+                  "name": "projects/fake-project/locations/global/registrations/exported.com",
+                  "domainName": "example.com",
+                  "createTime": "2019-01-11T14:09:08.068037639Z",
+                  "expireTime": "2020-01-11T14:09:12Z",
+                  "state": "EXPORTED"
                 }
               ]
             }
     - expect_stdout: |
-        DOMAIN        STATE     EXPIRE_TIME
-        example.com   ACTIVE    2019-11-23T11:15:09Z
-        google.com    ACTIVE    2020-01-11T10:12:09Z
-        detached.com  DETACHED
+        DOMAIN         STATE      EXPIRE_TIME
+        suspended.com  SUSPENDED  2020-01-11T14:09:12Z
+        example.com    ACTIVE     2020-01-11T14:09:12Z
+        exported.com   EXPORTED   2020-01-11T14:09:12Z
     - expect_exit:
         code: 0

@@ -23,10 +23,10 @@ from googlecloudsdk.api_lib.events import source
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
-from tests.lib.surface.run import base
+from tests.lib.surface.events import base
 
 
-class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
+class TriggersDescribeTestAlpha(base.EventsBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -45,7 +45,7 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
 
   def _MakeSource(self):
     """Creates a source and assigns it as output to GetSource."""
-    self.source = source.Source.New(self.mock_serverless_client, 'default',
+    self.source = source.Source.New(self.mock_client, 'default',
                                     'CloudPubSubSource',
                                     'sources.eventing.knative.dev')
     self.source.name = 'my-source'
@@ -56,10 +56,10 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
 
   def _MakeTrigger(self, source_obj):
     """Creates a trigger and assigns it as output to GetTrigger."""
-    self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
+    self.trigger = trigger.Trigger.New(self.mock_client, 'default')
     self.trigger.name = 'my-trigger'
     self.trigger.status.conditions = [
-        self.serverless_messages.TriggerCondition(type='Ready', status='True')
+        self.messages.TriggerCondition(type='Ready', status='True')
     ]
     self.trigger.dependency = source_obj
     self.trigger.filter_attributes[

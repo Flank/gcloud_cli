@@ -45,7 +45,6 @@ UPDATE_MODES = updates.Mode.FromEnv()
 DEBUG = bool(
     encoding.GetEncodedValue(os.environ, 'CLOUDSDK_SCENARIO_TESTING_DEBUG'))
 
-
 # Uncomment these lines to override the values.
 # SCENARIO_PREFIXES = ['e2e.surface.sql']
 # EXECUTION_MODE = session.ExecutionMode.REMOTE
@@ -79,14 +78,19 @@ class _GlobalDataHolder(object):
           'ERROR: No scenarios found matching the given prefix\n')
       sys.exit(1)
     else:
-      sys.__stderr__.write('Execution Mode: [{}]\n'.format(EXECUTION_MODE.name))
-      sys.__stderr__.write('Update Mode: [{}]\n'.format(
+      if EXECUTION_MODE == session.ExecutionMode.BOTH:
+        modes = '{}, {}'.format(session.ExecutionMode.REMOTE.name,
+                                session.ExecutionMode.LOCAL.name)
+      else:
+        modes = '{}'.format(EXECUTION_MODE.name)
+      sys.__stderr__.write('Execution Modes: [{}]\n'.format(modes))
+      sys.__stderr__.write('Update Modes: [{}]\n'.format(
           ', '.join([str(m) for m in UPDATE_MODES])))
       sys.__stderr__.write('Found UNIT Scenarios:\n')
       for s in self.unit_scenarios:
         sys.__stderr__.write('\t{}\n'.format(s))
       sys.__stderr__.write(
-          'Found E2E Scenarios (Running as {}):\n'.format(EXECUTION_MODE.name))
+          'Found E2E Scenarios (Running in modes: [{}]):\n'.format(modes))
       for s in self.e2e_scenarios:
         sys.__stderr__.write('\t{}\n'.format(s))
 
@@ -95,17 +99,17 @@ class _GlobalDataHolder(object):
     return self._TestParams(self.unit_scenarios)
 
   def TestParamsE2ELocal(self):
-    # If LOCAL is requested, run all e2e tests as LOCAL tests.
-    if EXECUTION_MODE == session.ExecutionMode.LOCAL:
+    # Run tests in LOCAL mode, if the chosen execution mode allows it.
+    if EXECUTION_MODE in [session.ExecutionMode.LOCAL,
+                          session.ExecutionMode.BOTH]:
       return self._TestParams(self.e2e_scenarios)
-    # Otherwise they will be run as REMOTE tests instead.
     return []
 
   def TestParamsE2ERemote(self):
-    # If REMOTE is requested, run all e2e tests as REMOTE tests.
-    if EXECUTION_MODE == session.ExecutionMode.REMOTE:
+    # Run tests in REMOTE mode, if the chosen execution mode allows it.
+    if EXECUTION_MODE in [session.ExecutionMode.REMOTE,
+                          session.ExecutionMode.BOTH]:
       return self._TestParams(self.e2e_scenarios)
-    # Otherwise they will be run as LOCAL tests instead.
     return []
 
   def _TestParams(self, configs):
@@ -163,6 +167,7 @@ class E2ELocal(test_base.ScenarioTestBase,
     # pylint:disable=protected-access
     return e2e_base._TEST_CONFIG['property_overrides']['project']
 
+
 for testcase in DATA.TestParamsE2ELocal():
   AddScenarioTestMethodToTestClass(E2ELocal, *testcase)
 
@@ -172,6 +177,7 @@ class E2ERemote(test_base.ScenarioTestBase,
                 parameterized.TestCase):
   """Tests that can be run REMOTE go here when REMOTE mode is requested."""
   EXECUTION_MODE = session.ExecutionMode.REMOTE
+
 
 for testcase in DATA.TestParamsE2ERemote():
   AddScenarioTestMethodToTestClass(E2ERemote, *testcase)
