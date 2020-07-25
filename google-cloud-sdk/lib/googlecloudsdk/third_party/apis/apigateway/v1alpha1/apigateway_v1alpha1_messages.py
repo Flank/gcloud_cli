@@ -348,7 +348,7 @@ class ApigatewayBackendConfig(_messages.Message):
       as an authorization header bearer token. The audience of the OIDC token
       is configured in the associated Service Config in the BackendRule option
       (https: //github.com/googleapis/googleapis/blob/ //
-      master/google/api/backend.proto#L125).
+      main/google/api/backend.proto#L125).
   """
 
   googleServiceAccount = _messages.StringField(1)

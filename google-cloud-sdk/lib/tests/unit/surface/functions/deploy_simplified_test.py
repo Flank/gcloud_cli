@@ -961,7 +961,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     )
     self.Run('functions deploy my-test {}'.format(source_flag))
 
-  def testDeployAddMasterTag(self):
+  def testDeployAddMainTag(self):
     self.MockUnpackedSourcesDirSize()
     self.ExpectGetFunction()
     self.ExpectResourceManagerTestIamPolicyBinding(False)
@@ -974,7 +974,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         function_name,
         source_repository_url=(
             'https://source.developers.google.com/projects/p/repos/r/'
-            'moveable-aliases/master'),
+            'moveable-aliases/main'),
     )
     create_request = self.GetFunctionsCreateRequest(function, location_path)
     operation_name = self.GetOperationName()

@@ -79,7 +79,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
                     source=self.cloudbuild_v1_messages.Source(
                         repoSource=self.cloudbuild_v1_messages.RepoSource(
                             repoName='default',
-                            branchName='master',
+                            branchName='main',
                         ),
                     ),
                     results=self.cloudbuild_v1_messages.Results(
@@ -100,7 +100,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self._Run(['builds', 'list'])
     self.AssertOutputContains("""\
 ID CREATE_TIME DURATION SOURCE IMAGES STATUS
-123-456-789  2016-05-26T00:00:00+00:00  4M59S default@master gcr.io/myproject/myimage-1 (+1 more) SUCCESS
+123-456-789  2016-05-26T00:00:00+00:00  4M59S default@main gcr.io/myproject/myimage-1 (+1 more) SUCCESS
 """, normalize_space=True)
 
   def testURI(self):

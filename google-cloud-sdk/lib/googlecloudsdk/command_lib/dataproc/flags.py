@@ -183,7 +183,7 @@ def AddParametersFlag(parser):
 
 
 def AddMinCpuPlatformArgs(parser):
-  """Add mininum CPU platform flags for both master and worker instances."""
+  """Add mininum CPU platform flags for both main and worker instances."""
   help_text = """\
       When specified, the VM will be scheduled on host with specified CPU
       architecture or a newer one. To list available CPU platforms in given
@@ -199,7 +199,7 @@ def AddMinCpuPlatformArgs(parser):
       https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
       """
   parser.add_argument(
-      '--master-min-cpu-platform',
+      '--main-min-cpu-platform',
       metavar='PLATFORM',
       required=False,
       help=help_text)

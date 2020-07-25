@@ -261,16 +261,16 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                         serviceAccountScopes=kwargs.get('serviceAccountScopes',
                                                         []),
                         zoneUri=kwargs.get('zoneUri', self.ZONE))),
-                masterConfig=kwargs.get(
-                    'masterConfig',
+                mainConfig=kwargs.get(
+                    'mainConfig',
                     self.messages.InstanceGroupConfig(
-                        numInstances=kwargs.get('masterConfigNumInstances',
+                        numInstances=kwargs.get('mainConfigNumInstances',
                                                 None),
                         imageUri=kwargs.get('imageUri', None),
-                        machineTypeUri=kwargs.get('masterMachineTypeUri', None),
-                        accelerators=make_accelerators('master'),
-                        diskConfig=kwargs.get('masterDiskConfig',
-                                              make_disk_config('master')))),
+                        machineTypeUri=kwargs.get('mainMachineTypeUri', None),
+                        accelerators=make_accelerators('main'),
+                        diskConfig=kwargs.get('mainDiskConfig',
+                                              make_disk_config('main')))),
                 secondaryWorkerConfig=secondary_worker_config,
                 workerConfig=kwargs.get(
                     'workerConfig',
@@ -300,7 +300,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                 clusterNamespace=kwargs.get('gkeClusterNamespace', None)))
       # zero out the gce configs that wont exist.
       cluster.config.gceClusterConfig = None
-      cluster.config.masterConfig = None
+      cluster.config.mainConfig = None
       cluster.config.workerConfig = None
       cluster.config.secondaryWorkerConfig = None
     return cluster
@@ -325,9 +325,9 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
 
   # Adding min_cpu_platform separately because min_cpu_platform field is not
   # visible other than in v1beta2
-  def AddMinCpuPlatform(self, cluster, master_min_cpu_platform,
+  def AddMinCpuPlatform(self, cluster, main_min_cpu_platform,
                         worker_min_cpu_platform):
-    cluster.config.masterConfig.minCpuPlatform = master_min_cpu_platform
+    cluster.config.mainConfig.minCpuPlatform = main_min_cpu_platform
     cluster.config.workerConfig.minCpuPlatform = worker_min_cpu_platform
     if cluster.config.secondaryWorkerConfig is None:
       cluster.config.secondaryWorkerConfig = self.messages.InstanceGroupConfig(

@@ -95,7 +95,7 @@ class AuditLogConfig(_messages.Message):
 
 class AuthorizedDomain(_messages.Message):
   r"""A domain that a user has been authorized to administer. To authorize use
-  of a domain, verify ownership via [Webmaster
+  of a domain, verify ownership via [Webmain
   Central](https://www.google.com/webmasters/verification/home).
 
   Fields:
@@ -619,7 +619,7 @@ class Configuration(_messages.Message):
   built. Users create new Revisions by updating the Configuration's spec. The
   "latest created" revision's name is available under status, as is the
   "latest ready" revision's name. See also: https://github.com/knative/serving
-  /blob/master/docs/spec/overview.md#configuration
+  /blob/main/docs/spec/overview.md#configuration
 
   Fields:
     apiVersion: The API version for this call such as
@@ -655,7 +655,7 @@ class ConfigurationCondition(_messages.Message):
     status: Status of the condition, one of True, False, Unknown.
     type: ConfigurationConditionType is used to communicate the status of the
       reconciliation process. See also: https://github.com/knative/serving/blo
-      b/master/docs/spec/errors.md#error-conditions-and-reporting Types
+      b/main/docs/spec/errors.md#error-conditions-and-reporting Types
       include:"Ready"
   """
 
@@ -2182,7 +2182,7 @@ class RevisionCondition(_messages.Message):
     status: Status of the condition, one of True, False, Unknown.
     type: RevisionConditionType is used to communicate the status of the
       reconciliation process. See also: https://github.com/knative/serving/blo
-      b/master/docs/spec/errors.md#error-conditions-and-reporting Types
+      b/main/docs/spec/errors.md#error-conditions-and-reporting Types
       include:  * "Ready": True when the Revision is ready. *
       "ResourcesAvailable": True when underlying resources have been
       provisioned. * "ContainerHealthy": True when the Revision readiness
@@ -2373,7 +2373,7 @@ class RouteCondition(_messages.Message):
     status: Status of the condition, one of "True", "False", "Unknown".
     type: RouteConditionType is used to communicate the status of the
       reconciliation process. See also: https://github.com/knative/serving/blo
-      b/master/docs/spec/errors.md#error-conditions-and-reporting Types
+      b/main/docs/spec/errors.md#error-conditions-and-reporting Types
       include: "Ready".
   """
 
@@ -4172,7 +4172,7 @@ class ServiceCondition(_messages.Message):
     status: Status of the condition, one of True, False, Unknown.
     type: ServiceConditionType is used to communicate the status of the
       reconciliation process. See also: https://github.com/knative/serving/blo
-      b/master/docs/spec/errors.md#error-conditions-and-reporting  Types
+      b/main/docs/spec/errors.md#error-conditions-and-reporting  Types
       include: "Ready", "ConfigurationsReady", and "RoutesReady". "Ready" will
       be true when the underlying Route and Configuration are ready.
   """

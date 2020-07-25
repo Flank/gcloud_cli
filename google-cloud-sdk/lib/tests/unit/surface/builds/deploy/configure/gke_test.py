@@ -573,7 +573,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
             httpMethod=self.scheduler_msg.HttpTarget.HttpMethodValueValuesEnum
             .POST,
             body=bytes(
-                '{{"projectId":"my-project","repoName":"{}","branchName":"master"}}'
+                '{{"projectId":"my-project","repoName":"{}","branchName":"main"}}'
                 .format(repo_name).encode('utf-8')),
             oauthToken=self.scheduler_msg.OAuthToken(
                 serviceAccountEmail='my-project@appspot.gserviceaccount.com'

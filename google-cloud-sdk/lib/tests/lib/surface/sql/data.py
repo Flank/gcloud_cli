@@ -249,7 +249,7 @@ def GetRequestInstance(project, instance_name):
       ipAddresses=[],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=None,
@@ -289,8 +289,8 @@ def GetRequestInstance(project, instance_name):
   )
 
 
-def GetExternalMasterRequestInstance(project, instance_name):
-  """Returns an empty external master instance for making create requests."""
+def GetExternalMainRequestInstance(project, instance_name):
+  """Returns an empty external main instance for making create requests."""
   return sqladmin_v1beta4.DatabaseInstance(
       backendType=None,
       connectionName=None,
@@ -303,7 +303,7 @@ def GetExternalMasterRequestInstance(project, instance_name):
       ipAddresses=[],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=sqladmin_v1beta4.OnPremisesConfiguration(
@@ -336,7 +336,7 @@ def GetPatchRequestInstance(project, instance_name):
       ipAddresses=[],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=None,
@@ -389,7 +389,7 @@ def GetV1Instance(project, instance_name):
       ipAddresses=[],
       ipv6Address='2000:3000:4000:1:92cd:7afd:2e22:9fa3',
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=268435456000,
       name=instance_name,
       onPremisesConfiguration=None,
@@ -488,7 +488,7 @@ def GetV2Instance(project, instance_name):
       ],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=None,
@@ -589,7 +589,7 @@ def GetPostgresInstance(project, instance_name):
       ],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=None,
@@ -662,7 +662,7 @@ def GetSqlServerInstance(project, instance_name):
       ],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=None,
@@ -713,8 +713,8 @@ def GetSqlServerInstance(project, instance_name):
   )
 
 
-def GetExternalMasterInstance(project, instance_name):
-  """Returns a sample external master DatabaseInstance named instance_name."""
+def GetExternalMainInstance(project, instance_name):
+  """Returns a sample external main DatabaseInstance named instance_name."""
   return sqladmin_v1beta4.DatabaseInstance(
       backendType=sqladmin_v1beta4.DatabaseInstance.BackendTypeValueValuesEnum
       .EXTERNAL,
@@ -729,7 +729,7 @@ def GetExternalMasterInstance(project, instance_name):
       ipAddresses=[],
       ipv6Address=None,
       kind='sql#instance',
-      masterInstanceName=None,
+      mainInstanceName=None,
       maxDiskSize=None,
       name=instance_name,
       onPremisesConfiguration=sqladmin_v1beta4.OnPremisesConfiguration(

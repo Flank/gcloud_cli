@@ -88,7 +88,7 @@ class ClusterConnectionTest(test_case.TestCase):
     mock_cluster = new_api_adapter.return_value.GetCluster.return_value
     ca_data = b'Lol I\'m a ca data file'
     encoded = base64.b64encode(ca_data)
-    mock_cluster.masterAuth.clusterCaCertificate = encoded
+    mock_cluster.mainAuth.clusterCaCertificate = encoded
     mock_cluster.endpoint = '1.1.1.1'
     with gke.ClusterConnectionInfo(opaque_cluster_ref) as (endpoint, filename):
       gke_api.GetCluster.assert_called_once_with(opaque_cluster_ref)

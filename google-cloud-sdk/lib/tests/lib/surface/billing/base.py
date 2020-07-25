@@ -41,7 +41,7 @@ BILLING_ACCOUNTS = [
     messages.BillingAccount(
         displayName='A Billing SubAccount',
         name='billingAccounts/222222-222222-222222',
-        masterBillingAccount='billingAccounts/111111-111111-111111',
+        mainBillingAccount='billingAccounts/111111-111111-111111',
         open=False,
     ),
 ]

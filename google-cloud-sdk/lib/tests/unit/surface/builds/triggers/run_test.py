@@ -45,12 +45,12 @@ class RunTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
         self.msg.CloudbuildProjectsTriggersRunRequest(
             projectId='my-project',
             triggerId='tacocat',
-            repoSource=self.msg.RepoSource(branchName='master')),
+            repoSource=self.msg.RepoSource(branchName='main')),
         response=self.msg.Operation(),
     )
     properties.VALUES.core.user_output_enabled.Set(False)
     self.Run(
-        ['alpha', 'builds', 'triggers', 'run', 'tacocat', '--branch=master'])
+        ['alpha', 'builds', 'triggers', 'run', 'tacocat', '--branch=main'])
 
   def test_run_tag(self):
     self.mocked_cloudbuild_v1.projects_triggers.Run.Expect(

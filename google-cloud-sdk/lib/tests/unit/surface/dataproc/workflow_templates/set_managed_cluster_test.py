@@ -81,7 +81,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     managed_cluster = self.MakeManagedCluster(
         clusterName=cluster_name,
         zoneUri='us-west1-a',
-        masterMachineTypeUri='n1-standard-2',
+        mainMachineTypeUri='n1-standard-2',
         workerConfigNumInstances=2)
     self.ExpectCallSetManagedCluster(
         workflow_template=workflow_template,
@@ -90,7 +90,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     result = self.RunDataproc('workflow-templates set-managed-cluster {0} '
                               '--cluster-name {1} '
                               '--zone us-west1-a --num-workers 2 '
-                              '--master-machine-type n1-standard-2'
+                              '--main-machine-type n1-standard-2'
                               ' {2}'.format(
                                   self.WORKFLOW_TEMPLATE,
                                   cluster_name,
@@ -119,10 +119,10 @@ class WorkflowTemplateSetManagedClusterUnitTest(
   def testSetManagedClusterFlags(self):
     cluster_name = 'test-cluster'
     zone = 'foo-zone'
-    master_machine_type = 'foo-type'
+    main_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
     bucket = 'foo-bucket'
-    num_masters = 3
+    num_mains = 3
     num_workers = 7
     num_secondary_workers = 5
     image_version = '1.7'
@@ -153,10 +153,10 @@ class WorkflowTemplateSetManagedClusterUnitTest(
         clusterName=cluster_name,
         configBucket=bucket,
         imageVersion=image_version,
-        masterMachineTypeUri=master_machine_type,
+        mainMachineTypeUri=main_machine_type,
         workerMachineTypeUri=worker_machine_type,
         networkUri=network_uri,
-        masterConfigNumInstances=num_masters,
+        mainConfigNumInstances=num_mains,
         workerConfigNumInstances=num_workers,
         secondaryWorkerConfigNumInstances=num_secondary_workers,
         zoneUri=zone,
@@ -177,9 +177,9 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                '--cluster-name {cluster_name} '
                '--bucket {bucket} '
                '--zone {zone} '
-               '--num-masters {num_masters} '
+               '--num-mains {num_mains} '
                '--num-workers {num_workers} '
-               '--master-machine-type {master_machine_type} '
+               '--main-machine-type {main_machine_type} '
                '--worker-machine-type {worker_machine_type} '
                '--network {network} '
                '--image-version {image_version} '
@@ -195,9 +195,9 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                    cluster_name=cluster_name,
                    bucket=bucket,
                    zone=zone,
-                   num_masters=num_masters,
+                   num_mains=num_mains,
                    num_workers=num_workers,
-                   master_machine_type=master_machine_type,
+                   main_machine_type=main_machine_type,
                    worker_machine_type=worker_machine_type,
                    network=network,
                    image_version=image_version,
@@ -277,10 +277,10 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
   def testSetManagedClusterFlags(self):
     cluster_name = 'test-cluster'
     zone = 'foo-zone'
-    master_machine_type = 'foo-type'
+    main_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
     bucket = 'foo-bucket'
-    num_masters = 3
+    num_mains = 3
     num_workers = 7
     num_secondary_workers = 5
     image_version = '1.7'
@@ -310,10 +310,10 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         clusterName=cluster_name,
         configBucket=bucket,
         imageVersion=image_version,
-        masterMachineTypeUri=master_machine_type,
+        mainMachineTypeUri=main_machine_type,
         workerMachineTypeUri=worker_machine_type,
         networkUri=network_uri,
-        masterConfigNumInstances=num_masters,
+        mainConfigNumInstances=num_mains,
         workerConfigNumInstances=num_workers,
         secondaryWorkerConfigNumInstances=num_secondary_workers,
         zoneUri=zone,
@@ -334,9 +334,9 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                '--cluster-name {cluster_name} '
                '--bucket {bucket} '
                '--zone {zone} '
-               '--num-masters {num_masters} '
+               '--num-mains {num_mains} '
                '--num-workers {num_workers} '
-               '--master-machine-type {master_machine_type} '
+               '--main-machine-type {main_machine_type} '
                '--worker-machine-type {worker_machine_type} '
                '--network {network} '
                '--image-version {image_version} '
@@ -352,9 +352,9 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                    cluster_name=cluster_name,
                    bucket=bucket,
                    zone=zone,
-                   num_masters=num_masters,
+                   num_mains=num_mains,
                    num_workers=num_workers,
-                   master_machine_type=master_machine_type,
+                   main_machine_type=main_machine_type,
                    worker_machine_type=worker_machine_type,
                    network=network,
                    image_version=image_version,
@@ -368,36 +368,36 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
 
   def testSetManagedClusterBetaFlags(self):
     cluster_name = 'test-cluster'
-    master_accelerator_type = 'foo-gpu'
+    main_accelerator_type = 'foo-gpu'
     worker_accelerator_type = 'bar-gpu'
     zone = 'foo-zone'
     image = 'test-image'
     image_uri = ('https://compute.googleapis.com/compute/beta/projects/'
                  'fake-project/global/images/test-image')
-    master_machine_type = 'foo-type'
+    main_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
-    master_min_cpu_platform = 'Intel Skylake'
+    main_min_cpu_platform = 'Intel Skylake'
     worker_min_cpu_platform = 'Intel Haswell'
     managed_cluster = self.MakeManagedCluster(
         clusterName=cluster_name,
         projectId=self.Project(),
-        masterAcceleratorTypeUri=master_accelerator_type,
-        masterAcceleratorCount=1,
+        mainAcceleratorTypeUri=main_accelerator_type,
+        mainAcceleratorCount=1,
         workerAcceleratorTypeUri=worker_accelerator_type,
         workerAcceleratorCount=2,
-        masterMachineTypeUri=master_machine_type,
+        mainMachineTypeUri=main_machine_type,
         workerMachineTypeUri=worker_machine_type,
-        masterBootDiskSizeGb=15,
+        mainBootDiskSizeGb=15,
         workerBootDiskSizeGb=30,
         secondaryWorkerBootDiskSizeGb=42,
-        masterBootDiskType='pd-standard',
+        mainBootDiskType='pd-standard',
         workerBootDiskType='pd-ssd',
         secondaryWorkerBootDiskType='pd-standard',
         internalIpOnly=True,
         imageUri=image_uri,
         zoneUri=zone,
         enableHttpPortAccess=True)
-    self.AddMinCpuPlatform(managed_cluster, master_min_cpu_platform,
+    self.AddMinCpuPlatform(managed_cluster, main_min_cpu_platform,
                            worker_min_cpu_platform)
 
     workflow_template = self.MakeWorkflowTemplate()
@@ -406,29 +406,29 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
 
     command = ('workflow-templates set-managed-cluster {template} '
                '--cluster-name {cluster_name} '
-               '--master-accelerator type={master_accelerator_type},count=1 '
+               '--main-accelerator type={main_accelerator_type},count=1 '
                '--worker-accelerator type={worker_accelerator_type},count=2 '
-               '--master-boot-disk-size 15GB '
+               '--main-boot-disk-size 15GB '
                '--worker-boot-disk-size 30GB '
-               '--master-boot-disk-type pd-standard '
+               '--main-boot-disk-type pd-standard '
                '--worker-boot-disk-type pd-ssd '
-               '--master-machine-type {master_machine_type} '
+               '--main-machine-type {main_machine_type} '
                '--worker-machine-type {worker_machine_type} '
                '--image {image} '
                '--secondary-worker-boot-disk-size 42GB '
                '--secondary-worker-boot-disk-type pd-standard '
-               '--master-min-cpu-platform="{master_min_cpu_platform}" '
+               '--main-min-cpu-platform="{main_min_cpu_platform}" '
                '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
                '--no-address '
                '--zone {zone} '
                '--enable-component-gateway ').format(
                    template=self.WORKFLOW_TEMPLATE,
                    cluster_name=cluster_name,
-                   master_accelerator_type=master_accelerator_type,
+                   main_accelerator_type=main_accelerator_type,
                    worker_accelerator_type=worker_accelerator_type,
-                   master_machine_type=master_machine_type,
+                   main_machine_type=main_machine_type,
                    worker_machine_type=worker_machine_type,
-                   master_min_cpu_platform=master_min_cpu_platform,
+                   main_min_cpu_platform=main_min_cpu_platform,
                    worker_min_cpu_platform=worker_min_cpu_platform,
                    image=image,
                    zone=zone)

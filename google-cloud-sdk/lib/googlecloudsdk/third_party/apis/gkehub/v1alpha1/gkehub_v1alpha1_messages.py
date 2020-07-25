@@ -875,7 +875,7 @@ class GitConfig(_messages.Message):
       level of the repo to sync. Default: the root directory of the
       repository.
     secretType: Git revision (tag or hash) to check out. Default HEAD.
-    syncBranch: The branch of the repository to sync from. Default: master.
+    syncBranch: The branch of the repository to sync from. Default: main.
     syncRepo: The URL of the Git repository to use as the source of truth.
     syncRev: Git revision (tag or hash) to check out. Default HEAD.
     syncWaitSecs: Period in seconds between consecutive syncs. Default: 15.

@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#% description: Creates a VM running a Salt master daemon in a Docker container.
+#% description: Creates a VM running a Salt main daemon in a Docker container.
 #% parameters:
 #% - name: zone
 #%   type: string
 #%   description: Zone to create the resources in.
 #%   required: true
-"""Generates config for a VM running a SaltStack master.
+"""Generates config for a VM running a SaltStack main.
 
 Just for fun this template is in Python, while the others in this
 directory are in Jinja2.
@@ -31,7 +31,7 @@ def GenerateConfig(evaluation_context):
   return """
 resources:
 - type: compute.v1.firewall
-  name: %(master)s-firewall
+  name: %(main)s-firewall
   properties:
     network: https://www.googleapis.com/compute/v1/projects/%(project)s/global/networks/default
     sourceRanges: [ "0.0.0.0/0" ]
@@ -39,7 +39,7 @@ resources:
     - IPProtocol: tcp
       ports: [ "4505", "4506" ]
 - type: compute.v1.instance
-  name: %(master)s
+  name: %(main)s
   properties:
     zone: %(zone)s
     machineType: https://www.googleapis.com/compute/v1/projects/%(project)s/zones/%(zone)s/machineTypes/f1-micro
@@ -63,8 +63,8 @@ resources:
           sudo echo 'deb http://debian.saltstack.com/debian wheezy-saltstack main' >> /etc/apt/sources.list
           sudo wget -q -O- http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key | sudo apt-key add -
           sudo apt-get update
-          sudo apt-get -y install salt-master
-          sudo salt-master -l debug
-""" % {"master": evaluation_context.env["name"],
+          sudo apt-get -y install salt-main
+          sudo salt-main -l debug
+""" % {"main": evaluation_context.env["name"],
        "project": evaluation_context.env["project"],
        "zone": evaluation_context.properties["zone"]}

@@ -58,7 +58,7 @@ class WorkflowTemplates(base.Group):
 
   To update managed cluster in a workflow template, run:
 
-    $ {command} set-managed-cluster my_template --num-masters 5
+    $ {command} set-managed-cluster my_template --num-mains 5
 
   To update cluster selector in a workflow template, run:
 

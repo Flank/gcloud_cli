@@ -222,7 +222,7 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             self.msgs.NodeManagement(
                 autoRepair=False, autoUpgrade=False, upgradeOptions=None),
         'authorizedNetworks':
-            self.msgs.MasterAuthorizedNetworksConfig(
+            self.msgs.MainAuthorizedNetworksConfig(
                 enabled=True,
                 cidrBlocks=[
                     self.msgs.CidrBlock(cidrBlock='10.0.0.1/32'),
@@ -274,7 +274,7 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     return_args = cluster_kwargs.copy()
     self.updateResponse(
         return_args,
-        currentMasterVersion=cluster_kwargs['clusterApiVersion'],
+        currentMainVersion=cluster_kwargs['clusterApiVersion'],
         currentNodeCount=1999,
         currentNodeVersion=cluster_kwargs['clusterApiVersion'],
         imageType=cluster_kwargs['imageType'].upper())
@@ -310,8 +310,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         '--preemptible '
         '--no-enable-autorepair '
         '--no-enable-autoupgrade '
-        '--enable-master-authorized-networks '
-        '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 '
+        '--enable-main-authorized-networks '
+        '--main-authorized-networks=10.0.0.1/32,10.0.0.2/32 '
         '--no-issue-client-certificate '
         '--metadata key=value,key2=value2 '
         '--enable-vertical-pod-autoscaling'.format(**cluster_kwargs))
@@ -625,10 +625,10 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     self.AssertErrContains(
         'The required property [project] is not currently set.')
 
-  def testCreateMasterAuthorizedNetworksDisable(self):
+  def testCreateMainAuthorizedNetworksDisable(self):
     cluster_kwargs = {
         'authorizedNetworks':
-            self.messages.MasterAuthorizedNetworksConfig(enabled=False),
+            self.messages.MainAuthorizedNetworksConfig(enabled=False),
     }
     # Cluster create returns operation pending
     self.ExpectCreateCluster(
@@ -642,17 +642,17 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     self.ExpectGetCluster(return_cluster)
     self.Run(
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--no-enable-master-authorized-networks'.format(name=self.CLUSTER_NAME))
+        '--no-enable-main-authorized-networks'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
-  def testCreateInvalidMasterAuthorizedNetworksWithoutEnable(self):
+  def testCreateInvalidMainAuthorizedNetworksWithoutEnable(self):
     with self.assertRaises(c_util.Error):
       self.Run(
           self.clusters_command_base.format(self.ZONE) +
-          ' create {0} --master-authorized-networks=10.0.0.1/32'.format(
+          ' create {0} --main-authorized-networks=10.0.0.1/32'.format(
               self.CLUSTER_NAME))
-      self.AssertErrContains('Cannot use --master-authorized-networks')
+      self.AssertErrContains('Cannot use --main-authorized-networks')
 
   def testEnableIPAlias(self):
     cluster_kwargs = {}
@@ -788,7 +788,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     cluster_kwargs = {}
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
-    expected_cluster.masterAuth = self.messages.MasterAuth(
+    expected_cluster.mainAuth = self.messages.MainAuth(
         clientCertificateConfig=(self.messages.ClientCertificateConfig(
             issueClientCertificate=expect_issue)))
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
@@ -953,7 +953,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     # Get returns valid cluster
     return_args = cluster_kwargs.copy()
     self.updateResponse(
-        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
+        return_args, clusterApiVersion='0.18.2', currentMainVersion1='0.18.2')
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
     self.Run(
@@ -974,7 +974,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     )
     expected_cluster.ipAllocationPolicy = policy
     config = self._MakePrivateClusterConfig(
-        enablePrivateNodes=True, masterIpv4Cidr='172.16.10.0/28')
+        enablePrivateNodes=True, mainIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -987,7 +987,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-ip-alias '
         '--enable-private-nodes '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
@@ -1006,7 +1006,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     config = self._MakePrivateClusterConfig(
         enablePrivateNodes=True,
         enablePrivateEndpoint=True,
-        masterIpv4Cidr='172.16.10.0/28')
+        mainIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -1020,7 +1020,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
         '--enable-ip-alias '
         '--enable-private-nodes '
         '--enable-private-endpoint '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
@@ -2206,7 +2206,7 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     # Get returns valid cluster
     return_args = cluster_kwargs.copy()
     self.updateResponse(
-        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
+        return_args, clusterApiVersion='0.18.2', currentMainVersion1='0.18.2')
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
     self.Run(
@@ -2235,7 +2235,7 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     # Get returns valid cluster
     return_args = cluster_kwargs.copy()
     self.updateResponse(
-        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
+        return_args, clusterApiVersion='0.18.2', currentMainVersion1='0.18.2')
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
     self.Run(
@@ -2483,7 +2483,7 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     )
     expected_cluster.ipAllocationPolicy = policy
     config = self._MakePrivateClusterConfig(
-        enablePrivateNodes=True, masterIpv4Cidr='172.16.10.0/28')
+        enablePrivateNodes=True, mainIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -2496,16 +2496,16 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-ip-alias '
         '--private-cluster '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
   @parameterized.parameters(
-      (' --enable-master-global-access ', True),
-      (' --no-enable-master-global-access ', False),
+      (' --enable-main-global-access ', True),
+      (' --no-enable-main-global-access ', False),
   )
-  def testEnableMasterGlobalAccess(self, flags, enabled):
+  def testEnableMainGlobalAccess(self, flags, enabled):
     cluster_kwargs = {
         'name': self.CLUSTER_NAME,
     }
@@ -2516,12 +2516,12 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         useIpAliases=True,
     )
     expected_cluster.ipAllocationPolicy = policy
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+    main_global_access_config = self.msgs.PrivateClusterMainGlobalAccessConfig(
         enabled=enabled)
     config = self._MakePrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config,
+        mainGlobalAccessConfig=main_global_access_config,
         enablePrivateNodes=True,
-        masterIpv4Cidr='172.16.10.0/28')
+        mainIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -2534,7 +2534,7 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-ip-alias '
         '--private-cluster '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '{flags}'
         '--quiet'.format(name=self.CLUSTER_NAME, flags=flags))
     self.AssertOutputContains('RUNNING')
@@ -3844,7 +3844,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
         clusterIpv4Cidr=None, createSubnetwork=False, useIpAliases=True)
     expected_cluster.ipAllocationPolicy = policy
     config = self._MakePrivateClusterConfig(
-        enablePrivateNodes=True, masterIpv4Cidr='172.16.10.0/28')
+        enablePrivateNodes=True, mainIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
     default_snat_status = self.msgs.DefaultSnatStatus(
         disabled=True)
@@ -3862,7 +3862,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-ip-alias '
         '--enable-private-nodes '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '--disable-default-snat '
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
@@ -3872,7 +3872,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     command = (
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-private-nodes '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '--disable-default-snat '
         '--quiet '.format(name=self.CLUSTER_NAME))
     self.AssertRaisesExceptionMatches(
@@ -3884,7 +3884,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     command = (
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-ip-alias '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '--disable-default-snat '
         '--quiet '.format(name=self.CLUSTER_NAME))
     self.AssertRaisesExceptionMatches(
@@ -4025,10 +4025,10 @@ linuxConfig:
         flags=flags))
 
   @parameterized.parameters(
-      (' --enable-master-global-access ', True),
-      (' --no-enable-master-global-access ', False),
+      (' --enable-main-global-access ', True),
+      (' --no-enable-main-global-access ', False),
   )
-  def testEnableMasterGlobalAccess(self, flags, enabled):
+  def testEnableMainGlobalAccess(self, flags, enabled):
     cluster_kwargs = {
         'name': self.CLUSTER_NAME,
     }
@@ -4039,12 +4039,12 @@ linuxConfig:
         useIpAliases=True,
     )
     expected_cluster.ipAllocationPolicy = policy
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+    main_global_access_config = self.msgs.PrivateClusterMainGlobalAccessConfig(
         enabled=enabled)
     config = self._MakePrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config,
+        mainGlobalAccessConfig=main_global_access_config,
         enablePrivateNodes=True,
-        masterIpv4Cidr='172.16.10.0/28')
+        mainIpv4Cidr='172.16.10.0/28')
     expected_cluster.privateClusterConfig = config
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -4057,7 +4057,7 @@ linuxConfig:
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
         '--enable-ip-alias '
         '--private-cluster '
-        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--main-ipv4-cidr=172.16.10.0/28 '
         '{flags}'
         '--quiet'.format(name=self.CLUSTER_NAME, flags=flags))
     self.AssertOutputContains('RUNNING')

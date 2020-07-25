@@ -109,7 +109,7 @@ def RemoveNonImportableFields(cluster):
       # templates, at least until that FR is resolved.
       config.lifecycleConfig.autoDeleteTime = None
 
-    for group in (config.masterConfig, config.workerConfig,
+    for group in (config.mainConfig, config.workerConfig,
                   config.secondaryWorkerConfig):
       if group is not None:
         group.instanceNames = []

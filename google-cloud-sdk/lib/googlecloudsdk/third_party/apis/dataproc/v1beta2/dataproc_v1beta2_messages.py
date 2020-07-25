@@ -290,19 +290,19 @@ class ClusterConfig(_messages.Message):
     gkeClusterConfig: Optional. The Kubernetes Engine config for Dataproc
       clusters deployed to Kubernetes. Setting this is considered mutually
       exclusive with Compute Engine-based options such as gce_cluster_config,
-      master_config, worker_config, secondary_worker_config, and
+      main_config, worker_config, secondary_worker_config, and
       autoscaling_config.
     initializationActions: Optional. Commands to execute on each node after
-      config is completed. By default, executables are run on master and all
+      config is completed. By default, executables are run on main and all
       worker nodes. You can test a node's <code>role</code> metadata to run an
-      executable on a master or worker node, as shown below using curl (you
+      executable on a main or worker node, as shown below using curl (you
       can also use wget): ROLE=$(curl -H Metadata-Flavor:Google
       http://metadata/computeMetadata/v1beta2/instance/attributes/dataproc-
-      role) if [[ "${ROLE}" == 'Master' ]]; then   ... master specific actions
+      role) if [[ "${ROLE}" == 'Main' ]]; then   ... main specific actions
       ... else   ... worker specific actions ... fi
     lifecycleConfig: Optional. The config setting for auto delete cluster
       schedule.
-    masterConfig: Optional. The Compute Engine config settings for the master
+    mainConfig: Optional. The Compute Engine config settings for the main
       instance in a cluster.
     secondaryWorkerConfig: Optional. The Compute Engine config settings for
       additional worker instances in a cluster.
@@ -321,7 +321,7 @@ class ClusterConfig(_messages.Message):
   gkeClusterConfig = _messages.MessageField('GkeClusterConfig', 6)
   initializationActions = _messages.MessageField('NodeInitializationAction', 7, repeated=True)
   lifecycleConfig = _messages.MessageField('LifecycleConfig', 8)
-  masterConfig = _messages.MessageField('InstanceGroupConfig', 9)
+  mainConfig = _messages.MessageField('InstanceGroupConfig', 9)
   secondaryWorkerConfig = _messages.MessageField('InstanceGroupConfig', 10)
   securityConfig = _messages.MessageField('SecurityConfig', 11)
   softwareConfig = _messages.MessageField('SoftwareConfig', 12)
@@ -2332,11 +2332,11 @@ class InstanceGroupAutoscalingPolicyConfig(_messages.Message):
 
 class InstanceGroupConfig(_messages.Message):
   r"""The config settings for Compute Engine resources in an instance group,
-  such as a master or worker group.
+  such as a main or worker group.
 
   Enums:
     PreemptibilityValueValuesEnum: Optional. Specifies the preemptibility of
-      the instance group.The default value for master and worker groups is
+      the instance group.The default value for main and worker groups is
       NON_PREEMPTIBLE. This default cannot be changed.The default value for
       secondary instances is PREEMPTIBLE.
 
@@ -2375,16 +2375,16 @@ class InstanceGroupConfig(_messages.Message):
       (https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-
       cpu).
     numInstances: Optional. The number of VM instances in the instance group.
-      For master instance groups, must be set to 1.
+      For main instance groups, must be set to 1.
     preemptibility: Optional. Specifies the preemptibility of the instance
-      group.The default value for master and worker groups is NON_PREEMPTIBLE.
+      group.The default value for main and worker groups is NON_PREEMPTIBLE.
       This default cannot be changed.The default value for secondary instances
       is PREEMPTIBLE.
   """
 
   class PreemptibilityValueValuesEnum(_messages.Enum):
     r"""Optional. Specifies the preemptibility of the instance group.The
-    default value for master and worker groups is NON_PREEMPTIBLE. This
+    default value for main and worker groups is NON_PREEMPTIBLE. This
     default cannot be changed.The default value for secondary instances is
     PREEMPTIBLE.
 
@@ -2392,7 +2392,7 @@ class InstanceGroupConfig(_messages.Message):
       PREEMPTIBILITY_UNSPECIFIED: Preemptibility is unspecified, the system
         will choose the appropriate setting for each instance group.
       NON_PREEMPTIBLE: Instances are non-preemptible.This option is allowed
-        for all instance groups and is the only valid value for Master and
+        for all instance groups and is the only valid value for Main and
         Worker instance groups.
       PREEMPTIBLE: Instances are preemptible.This option is allowed only for
         secondary worker groups.
@@ -2729,7 +2729,7 @@ class KerberosConfig(_messages.Message):
       cluster (default: false). Set this field to true to enable Kerberos on a
       cluster.
     kdcDbKeyUri: Optional. The Cloud Storage URI of a KMS encrypted file
-      containing the master key of the KDC database.
+      containing the main key of the KDC database.
     keyPasswordUri: Optional. The Cloud Storage URI of a KMS encrypted file
       containing the password to the user provided key. For the self-signed
       certificate, this password is generated by Dataproc.
@@ -4470,7 +4470,7 @@ class YarnApplication(_messages.Message):
     progress: Output only. The numerical progress of the application, from 1
       to 100.
     state: Output only. The application state.
-    trackingUrl: Output only. The HTTP URL of the ApplicationMaster,
+    trackingUrl: Output only. The HTTP URL of the ApplicationMain,
       HistoryServer, or TimelineServer that provides application-specific
       information. The URL uses the internal hostname, and requires a proxy
       server for resolution and, possibly, access.

@@ -146,30 +146,30 @@ The count of the accelerator must be greater than 0.
       (4, dict([('count', 3), ('type', 'nvidia-tesla-t4')]), 3),
       (5, dict([('count', 4), ('type', 'tpu-v2')]), 4),
   )
-  def testMasterAcceleratorType(self, index, accelerator, expected_count):
+  def testMainAcceleratorType(self, index, accelerator, expected_count):
     parser = util.ArgumentParser()
     expected_type = self._getAcceleratorTypes()[index]
-    flags.GetMasterAccelerator().AddToParser(parser)
-    args = parser.parse_args(['--master-accelerator',
+    flags.GetMainAccelerator().AddToParser(parser)
+    args = parser.parse_args(['--main-accelerator',
                               'type={0},count={1}'.format(
                                   accelerator['type'], accelerator['count'])])
 
     self.assertEqual(expected_type,
-                     args.master_accelerator['type'])
+                     args.main_accelerator['type'])
     self.assertEqual(expected_count,
-                     args.master_accelerator['count'])
+                     args.main_accelerator['count'])
 
-  def testMasterAcceleratorTypeErrors(self):
+  def testMainAcceleratorTypeErrors(self):
     parser = util.ArgumentParser()
-    flags.GetMasterAccelerator().AddToParser(parser)
+    flags.GetMainAccelerator().AddToParser(parser)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            _INVALID_ACCELERATOR_MESSAGE):
-      parser.parse_args(['--master-accelerator', 'type=bad_type,count=2'])
+      parser.parse_args(['--main-accelerator', 'type=bad_type,count=2'])
 
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError, 'The count of the accelerator '
                                          'must be greater than 0.'):
-      parser.parse_args(['--master-accelerator',
+      parser.parse_args(['--main-accelerator',
                          'type=nvidia-tesla-p4,count=0'])
 
   @parameterized.parameters(

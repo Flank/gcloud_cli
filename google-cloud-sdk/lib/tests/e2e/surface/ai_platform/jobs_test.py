@@ -63,7 +63,7 @@ class MlJobsTests(e2e_base.WithServiceAuth, parameterized.TestCase):
          '    --region us-central1 '
          '    --module-name trainer.task '
          '    --packages {package} '
-         '    --master-image-uri gcr.io/deeplearning-platform-release/tf2-cpu '
+         '    --main-image-uri gcr.io/deeplearning-platform-release/tf2-cpu '
          '    --async').format(bucket_url=self.BUCKET_REF.ToUrl(),
                                package=package), module_name):
       # Cancel immediately so we don't do any real work
@@ -123,7 +123,7 @@ class MlJobsTests(e2e_base.WithServiceAuth, parameterized.TestCase):
                          '    --region us-central1 '
                          '    --runtime-version 1.12 '
                          '    --scale-tier CUSTOM  '
-                         '    --master-machine-type n1-standard-16 '
+                         '    --main-machine-type n1-standard-16 '
                          '    --worker-machine-type n1-standard-16'
                          '    --worker-count 2'
                          '    --module-name trainer.task '

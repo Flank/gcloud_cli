@@ -61,7 +61,7 @@ class DescribeTestBase(object):
     if training:
       training_input = msgs.TrainingInput(
           args=['--train_dir=gs://my_bucket/my_job/train'],
-          masterType='master-type',
+          mainType='main-type',
           packageUris=[
               'gs://my-bucket/cloudmldist/012345/trainer-0.0.0.tar.gz'
           ],
@@ -186,7 +186,7 @@ resource=ml_job%2Fjob_id%2Fmy_job&project=fake-project
     +-------------+------------+---------------+-----------------------+------------------------+-------------+-------------+--------------+
     |    REGION   | SCALE_TIER | PYTHON_MODULE | PARAMETER_SERVER_TYPE | PARAMETER_SERVER_COUNT | MASTER_TYPE | WORKER_TYPE | WORKER_COUNT |
     +-------------+------------+---------------+-----------------------+------------------------+-------------+-------------+--------------+
-    | us-central1 | BASIC      | trainer.task  | parameter-server-type | 10                     | master-type | worker-type | 100          |
+    | us-central1 | BASIC      | trainer.task  | parameter-server-type | 10                     | main-type | worker-type | 100          |
     +-------------+------------+---------------+-----------------------+------------------------+-------------+-------------+--------------+
     +---------------------------------+
     |     Training Output Summary     |

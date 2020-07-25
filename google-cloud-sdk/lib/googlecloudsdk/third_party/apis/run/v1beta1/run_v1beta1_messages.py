@@ -23,7 +23,7 @@ class CustomResourceColumnDefinition(_messages.Message):
       'name' format is applied to the primary identifier column to assist in
       clients identifying column is the resource name. See
       https://github.com/OAI/OpenAPI-
-      Specification/blob/master/versions/2.0.md#data-types for more. +optional
+      Specification/blob/main/versions/2.0.md#data-types for more. +optional
     jsonPath: JSONPath is a simple JSON path, i.e. with array notation.
     name: name is a human readable name for the column.
     priority: priority is an integer defining the relative importance of this
@@ -32,7 +32,7 @@ class CustomResourceColumnDefinition(_messages.Message):
       higher priority. +optional
     type: type is an OpenAPI type definition for this column. See
       https://github.com/OAI/OpenAPI-
-      Specification/blob/master/versions/2.0.md#data-types for more.
+      Specification/blob/main/versions/2.0.md#data-types for more.
   """
 
   description = _messages.StringField(1)

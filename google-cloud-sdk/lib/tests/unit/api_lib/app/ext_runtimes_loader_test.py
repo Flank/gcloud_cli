@@ -116,8 +116,8 @@ class LoaderTests(sdk_test_base.SdkBase):
     if set_latest:
       self.repo[b'refs/tags/latest'] = commit_id
 
-    # This second commit will just show up under refs/heads/master, we add it
-    # to verify that we're pulling from "latest" tag, and not from "master".
+    # This second commit will just show up under refs/heads/main, we add it
+    # to verify that we're pulling from "latest" tag, and not from "main".
     self._CommitFile(b'second contents', b'second commit')
 
     if start_server:
@@ -142,7 +142,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     # Verify that updating an existing repo works.  (We do a commit and then
     # update the latest tag to verify that both tags and objects get fetched).
     self._CommitFile(b'third contents', b'third commit')
-    self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/master']
+    self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/main']
     loader.InstallRuntimeDef(self._GetRepoUrl(), self.repo_clone)
     self.AssertFileExistsWithContents(b'third contents', self.repo_clone,
                                       'myfile')
@@ -173,7 +173,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     self._MakeRepo(set_latest=False)
     loader.InstallRuntimeDef(self._GetRepoUrl(), self.repo_clone)
 
-    # Since there's no "latest" tag, we should get the head of "master" which
+    # Since there's no "latest" tag, we should get the head of "main" which
     # will be the second commit.
     self.AssertFileExistsWithContents(b'second contents', self.repo_clone,
                                       'myfile')
@@ -203,7 +203,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     self._MakeRepo()
     loader.InstallRuntimeDef(self._GetRepoUrl(), self.repo_clone)
     self._CommitFile(b'third contents', b'third commit')
-    self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/master']
+    self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/main']
 
     # Make the files in the target dir readonly.
     for dirpath, dirnames, filenames in os.walk(six.text_type(self.repo_clone)):
@@ -233,7 +233,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     with self.assertRaises(loader.InvalidRepositoryError):
       loader.InstallRuntimeDef(self.repo_path, self.repo_clone)
 
-  def testCreateFromNoMasterBranch(self):
+  def testCreateFromNoMainBranch(self):
     self._MakeRepo(set_latest=False, start_server=False,
                    branch='refs/heads/foo')
     loader.InstallRuntimeDef(self.repo_path, self.repo_clone)

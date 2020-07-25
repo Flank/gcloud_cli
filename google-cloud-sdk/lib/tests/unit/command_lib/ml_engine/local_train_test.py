@@ -53,7 +53,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
   def SetUp(self):
     self.version_patcher = mock.patch(
         'googlecloudsdk.command_lib.ml_engine.local_train.GetPrimaryNodeName',
-        return_value='master')
+        return_value='main')
     self.version_patcher.start()
 
   def TearDown(self):
@@ -63,7 +63,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
       pass
 
   @sdk_test_base.Filters.RunOnlyOnGCE
-  def testMakeProcess_Master(self):
+  def testMakeProcess_Main(self):
     package_dir = self.Resource(
         'tests', 'unit', 'command_lib', 'ml_engine', 'test_data',
         'package_root')
@@ -77,7 +77,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
         module_name,
         run_root,
         args=args,
-        task_type='master',
+        task_type='main',
         index=0,
         cluster={},
         stdout=subprocess.PIPE
@@ -126,7 +126,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
         poll=poll_mock,
         terminate=terminate_mock)
 
-  def testRunDistributedErrorMaster(self):
+  def testRunDistributedErrorMain(self):
     a = self._mockMakeProcess()
     b = self._mockMakeProcess()
     popen_mock = self.StartPatch('subprocess.Popen', side_effect=[
@@ -187,14 +187,14 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
     environ_cp['CLOUDSDK_PYTHON'] = 'DUMMY_STRING'
     self.StartPatch('os.environ', return_value=environ_cp)
     exec_mock = self.StartPatch('googlecloudsdk.core.execution_utils.Exec')
-    local_train.MakeProcess('foo', 'bar', task_type='master')
+    local_train.MakeProcess('foo', 'bar', task_type='main')
     exec_cmd = exec_mock.call_args[0][0]
     self.assertNotEqual(exec_cmd[0], 'DUMMY_STRING')
 
   def testArgs(self):
     exec_mock = self.StartPatch('googlecloudsdk.core.execution_utils.Exec')
     args = ['foo', 'bar']
-    local_train.MakeProcess('baz', 'zap', task_type='master', args=args)
+    local_train.MakeProcess('baz', 'zap', task_type='main', args=args)
     exec_cmd = exec_mock.call_args[0][0]
     self.assertEqual(exec_cmd[3:], args)
 
@@ -206,7 +206,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
         'subprocess.Popen',
         return_value=_TensorFlowVersionTestHelper(b'1.0', 0))
     result = local_train.GetPrimaryNodeName()
-    self.assertEqual(result, 'master')
+    self.assertEqual(result, 'main')
     # 2.x with binary
     self.StartPatch(
         'subprocess.Popen',
@@ -217,7 +217,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
     self.StartPatch(
         'subprocess.Popen', return_value=_TensorFlowVersionTestHelper('1.0', 0))
     result = local_train.GetPrimaryNodeName()
-    self.assertEqual(result, 'master')
+    self.assertEqual(result, 'main')
     # tf not installed. function won't raise if tf not installed. The check
     # is enforced by higer level of the sdk.
     self.StartPatch(

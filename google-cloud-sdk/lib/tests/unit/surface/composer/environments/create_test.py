@@ -870,7 +870,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
         enablePrivateEnvironment=True,
         privateClusterConfig=self.messages.PrivateClusterConfig(
             enablePrivateEndpoint=True,
-            masterIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK))
+            mainIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK))
 
     ip_allocation_policy = self.messages.IPAllocationPolicy(useIpAliases=True)
 
@@ -892,7 +892,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
     args = [
         'create', '--project', self.TEST_PROJECT, '--location',
         self.TEST_LOCATION, '--enable-ip-alias', '--enable-private-environment',
-        '--enable-private-endpoint', '--master-ipv4-cidr',
+        '--enable-private-endpoint', '--main-ipv4-cidr',
         self.TEST_MASTER_IPV4_CIDR_BLOCK, '--async', self.TEST_ENVIRONMENT_ID
     ]
     actual_op = self.RunEnvironments(*args)
@@ -908,7 +908,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
         enablePrivateEnvironment=True,
         privateClusterConfig=self.messages.PrivateClusterConfig(
             enablePrivateEndpoint=True,
-            masterIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK),
+            mainIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK),
         webServerIpv4CidrBlock=self.TEST_WEB_SERVER_IPV4_CIDR_BLOCK,
         cloudSqlIpv4CidrBlock=self.TEST_CLOUD_SQL_IPV4_CIDR_BLOCK)
 
@@ -932,7 +932,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
     actual_op = self.RunEnvironments(
         'create', '--project', self.TEST_PROJECT, '--location',
         self.TEST_LOCATION, '--enable-ip-alias', '--enable-private-environment',
-        '--enable-private-endpoint', '--master-ipv4-cidr',
+        '--enable-private-endpoint', '--main-ipv4-cidr',
         self.TEST_MASTER_IPV4_CIDR_BLOCK, '--web-server-ipv4-cidr',
         self.TEST_WEB_SERVER_IPV4_CIDR_BLOCK, '--cloud-sql-ipv4-cidr',
         self.TEST_CLOUD_SQL_IPV4_CIDR_BLOCK, '--async',
@@ -1030,12 +1030,12 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
 
     with self.AssertRaisesExceptionRegexp(
         command_util.Error,
-        r'Cannot specify {} without {}.'.format('--master-ipv4-cidr',
+        r'Cannot specify {} without {}.'.format('--main-ipv4-cidr',
                                                 required_dep)):
 
       self.RunEnvironments('create', '--project', self.TEST_PROJECT,
                            '--location', self.TEST_LOCATION, '--async',
-                           '--master-ipv4-cidr',
+                           '--main-ipv4-cidr',
                            self.TEST_MASTER_IPV4_CIDR_BLOCK,
                            self.TEST_ENVIRONMENT_ID)
 
@@ -1117,7 +1117,7 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
         enablePrivateEnvironment=True,
         privateClusterConfig=self.messages.PrivateClusterConfig(
             enablePrivateEndpoint=True,
-            masterIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK))
+            mainIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK))
 
     ip_allocation_policy = self.messages.IPAllocationPolicy(useIpAliases=True)
 
@@ -1139,7 +1139,7 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
     args = [
         'create', '--project', self.TEST_PROJECT, '--location',
         self.TEST_LOCATION, '--enable-ip-alias', '--enable-private-environment',
-        '--enable-private-endpoint', '--master-ipv4-cidr',
+        '--enable-private-endpoint', '--main-ipv4-cidr',
         self.TEST_MASTER_IPV4_CIDR_BLOCK, '--web-server-allow-all', '--async',
         self.TEST_ENVIRONMENT_ID
     ]
@@ -1156,7 +1156,7 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
         enablePrivateEnvironment=True,
         privateClusterConfig=self.messages.PrivateClusterConfig(
             enablePrivateEndpoint=True,
-            masterIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK),
+            mainIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK),
         webServerIpv4CidrBlock=self.TEST_WEB_SERVER_IPV4_CIDR_BLOCK,
         cloudSqlIpv4CidrBlock=self.TEST_CLOUD_SQL_IPV4_CIDR_BLOCK)
 
@@ -1180,7 +1180,7 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
     actual_op = self.RunEnvironments(
         'create', '--project', self.TEST_PROJECT, '--location',
         self.TEST_LOCATION, '--enable-ip-alias', '--enable-private-environment',
-        '--enable-private-endpoint', '--master-ipv4-cidr',
+        '--enable-private-endpoint', '--main-ipv4-cidr',
         self.TEST_MASTER_IPV4_CIDR_BLOCK, '--web-server-ipv4-cidr',
         self.TEST_WEB_SERVER_IPV4_CIDR_BLOCK, '--cloud-sql-ipv4-cidr',
         self.TEST_CLOUD_SQL_IPV4_CIDR_BLOCK, '--web-server-allow-all',

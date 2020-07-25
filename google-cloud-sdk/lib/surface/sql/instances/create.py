@@ -96,11 +96,11 @@ def AddBaseArgs(parser):
   flags.AddMaintenanceWindowDay(parser)
   flags.AddMaintenanceWindowHour(parser)
   parser.add_argument(
-      '--master-instance-name',
+      '--main-instance-name',
       required=False,
-      help=('Name of the instance which will act as master in the '
+      help=('Name of the instance which will act as main in the '
             'replication setup. The newly created instance will be a read '
-            'replica of the specified master instance.'))
+            'replica of the specified main instance.'))
   flags.AddMemory(parser)
   # TODO(b/31989340): add remote completion
   # TODO(b/73362371): Make specifying a location required.
@@ -151,7 +151,7 @@ def AddBaseArgs(parser):
 
 def AddBetaArgs(parser):
   """Declare beta flag and positional arguments for this command parser."""
-  flags.AddExternalMasterGroup(parser)
+  flags.AddExternalMainGroup(parser)
   flags.AddInstanceResizeLimit(parser)
   flags.AddNetwork(parser)
   labels_util.AddCreateLabelsFlags(parser)
@@ -191,48 +191,48 @@ def RunBaseCreateCommand(args, release_track):
       params={'project': properties.VALUES.core.project.GetOrFail},
       collection='sql.instances')
 
-  # Get the region, tier, and database version from the master if these fields
+  # Get the region, tier, and database version from the main if these fields
   # are not specified.
   # TODO(b/64266672): Remove once API does not require these fields.
-  if args.IsSpecified('master_instance_name'):
-    master_instance_ref = client.resource_parser.Parse(
-        args.master_instance_name,
+  if args.IsSpecified('main_instance_name'):
+    main_instance_ref = client.resource_parser.Parse(
+        args.main_instance_name,
         params={'project': properties.VALUES.core.project.GetOrFail},
         collection='sql.instances')
     try:
-      master_instance_resource = sql_client.instances.Get(
+      main_instance_resource = sql_client.instances.Get(
           sql_messages.SqlInstancesGetRequest(
               project=instance_ref.project,
-              instance=master_instance_ref.instance))
+              instance=main_instance_ref.instance))
     except apitools_exceptions.HttpError as error:
       # TODO(b/64292220): Remove once API gives helpful error message.
-      log.debug('operation : %s', six.text_type(master_instance_ref))
+      log.debug('operation : %s', six.text_type(main_instance_ref))
       exc = exceptions.HttpException(error)
       if resource_property.Get(exc.payload.content,
                                resource_lex.ParseKey('error.errors[0].reason'),
                                None) == 'notAuthorized':
-        msg = ('You are either not authorized to access the master instance or '
+        msg = ('You are either not authorized to access the main instance or '
                'it does not exist.')
         raise exceptions.HttpException(msg)
       raise
     if not args.IsSpecified('region'):
-      args.region = master_instance_resource.region
+      args.region = main_instance_resource.region
     if not args.IsSpecified('database_version'):
-      args.database_version = master_instance_resource.databaseVersion.name
+      args.database_version = main_instance_resource.databaseVersion.name
     if not args.IsSpecified('tier') and not (
         args.IsSpecified('cpu') or
-        args.IsSpecified('memory')) and master_instance_resource.settings:
-      args.tier = master_instance_resource.settings.tier
+        args.IsSpecified('memory')) and main_instance_resource.settings:
+      args.tier = main_instance_resource.settings.tier
 
-    # Validate master/replica CMEK configurations.
-    if master_instance_resource.diskEncryptionConfiguration:
-      if args.region == master_instance_resource.region:
-        # Warn user that same-region replicas inherit their master's CMEK
+    # Validate main/replica CMEK configurations.
+    if main_instance_resource.diskEncryptionConfiguration:
+      if args.region == main_instance_resource.region:
+        # Warn user that same-region replicas inherit their main's CMEK
         # configuration.
-        command_util.ShowCmekWarning('replica', 'the master instance')
+        command_util.ShowCmekWarning('replica', 'the main instance')
       elif not args.IsSpecified('disk_encryption_key'):
         # Raise error that cross-region replicas require their own CMEK key if
-        # the master is CMEK.
+        # the main is CMEK.
         raise exceptions.RequiredArgumentException(
             '--disk-encryption-key',
             '`--disk-encryption-key` is required when creating a cross-region '
@@ -241,7 +241,7 @@ def RunBaseCreateCommand(args, release_track):
         command_util.ShowCmekWarning('replica')
     elif args.IsSpecified('disk_encryption_key'):
       # Raise error that cross-region replicas cannot be CMEK encrypted if their
-      # master is not.
+      # main is not.
       raise sql_exceptions.ArgumentError(
           '`--disk-encryption-key` cannot be specified when creating a replica '
           'of an instance without customer-managed encryption.')
@@ -264,7 +264,7 @@ def RunBaseCreateCommand(args, release_track):
   # V1 instances are deprecated.
   # Note that the exception type is intentionally vague because the user may not
   # have directly supplied the offending argument.  For example, creating a read
-  # replica defaults its tier to that of its master.
+  # replica defaults its tier to that of its main.
   if api_util.IsInstanceV1(sql_messages, instance_resource):
     raise sql_exceptions.ArgumentError(
         'First Generation instances can no longer be created.')

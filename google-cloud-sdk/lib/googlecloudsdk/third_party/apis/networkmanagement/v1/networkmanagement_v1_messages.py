@@ -361,7 +361,7 @@ class DropInfo(_messages.Message):
       TRAFFIC_TYPE_BLOCKED: The type of traffic is blocked and the user cannot
         configure a firewall rule to enable it. See [Always blocked
         traffic](/vpc/docs/firewalls# blockedtraffic) for more details.
-      GKE_MASTER_UNAUTHORIZED_ACCESS: Access to GKE master's endpoint is not
+      GKE_MASTER_UNAUTHORIZED_ACCESS: Access to GKE main's endpoint is not
         authorized. See [Access to the cluster endpoints](/kubernetes-
         engine/docs/how-to/ private-clusters#access_to_the_cluster_endpoints)
         for more details.
@@ -559,7 +559,7 @@ class ForwardInfo(_messages.Message):
       VPN_GATEWAY: Forwarded to a Cloud VPN gateway.
       INTERCONNECT: Forwarded to an Cloud Interconnect connection.
       GKE_MASTER: Forwarded to a Google Kubernetes Engine Container cluster
-        master.
+        main.
       IMPORTED_CUSTOM_ROUTE_NEXT_HOP: Forwarded to the next hop of a custom
         route imported from a peering VPC.
     """

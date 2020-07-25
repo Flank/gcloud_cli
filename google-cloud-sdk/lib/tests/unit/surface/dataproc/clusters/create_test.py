@@ -206,24 +206,24 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     project = 'foo-project'
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
-    master_machine_type = 'foo-type'
+    main_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
-    master_accelerator_type = 'foo-gpu'
+    main_accelerator_type = 'foo-gpu'
     worker_accelerator_type = 'bar-gpu'
     secondary_worker_accelerator_type = 'foo-bar-gpu'
-    master_local_ssds = 1
+    main_local_ssds = 1
     worker_local_ssds = 2
     secondary_worker_local_ssds = 3
-    master_boot_disk_size = 42
-    master_boot_disk_type = 'pd-standard'
+    main_boot_disk_size = 42
+    main_boot_disk_type = 'pd-standard'
     worker_boot_disk_size = 42
     worker_boot_disk_type = 'pd-standard'
     secondary_worker_boot_disk_size = 42
     secondary_worker_boot_disk_type = 'pd-standard'
-    master_min_cpu_platform = 'Intel Skylake'
+    main_min_cpu_platform = 'Intel Skylake'
     worker_min_cpu_platform = 'Intel Haswell'
     bucket = 'foo-bucket'
-    num_masters = 3
+    num_mains = 3
     num_workers = 7
     num_secondary_workers = 5
     secondary_worker_type = 'non-preemptible'
@@ -252,25 +252,25 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         clusterName=cluster_name,
         configBucket=bucket,
         imageVersion=image_version,
-        masterMachineTypeUri=master_machine_type,
+        mainMachineTypeUri=main_machine_type,
         workerMachineTypeUri=worker_machine_type,
-        masterAcceleratorTypeUri=master_accelerator_type,
-        masterAcceleratorCount=1,
+        mainAcceleratorTypeUri=main_accelerator_type,
+        mainAcceleratorCount=1,
         workerAcceleratorTypeUri=worker_accelerator_type,
         workerAcceleratorCount=2,
         secondaryWorkerAcceleratorTypeUri=secondary_worker_accelerator_type,
         secondaryWorkerAcceleratorCount=3,
-        masterNumLocalSsds=master_local_ssds,
+        mainNumLocalSsds=main_local_ssds,
         workerNumLocalSsds=worker_local_ssds,
         secondaryWorkerNumLocalSsds=secondary_worker_local_ssds,
-        masterBootDiskSizeGb=master_boot_disk_size,
-        masterBootDiskType=master_boot_disk_type,
+        mainBootDiskSizeGb=main_boot_disk_size,
+        mainBootDiskType=main_boot_disk_type,
         workerBootDiskSizeGb=worker_boot_disk_size,
         workerBootDiskType=worker_boot_disk_type,
         secondaryWorkerBootDiskSizeGb=secondary_worker_boot_disk_size,
         secondaryWorkerBootDiskType=secondary_worker_boot_disk_type,
         networkUri=network_uri,
-        masterConfigNumInstances=num_masters,
+        mainConfigNumInstances=num_mains,
         workerConfigNumInstances=num_workers,
         secondaryWorkerConfigNumInstances=num_secondary_workers,
         secondaryWorkerType=secondary_worker_type,
@@ -289,31 +289,31 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     self.AddEncryptionConfig(expected_request_cluster,
                              'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
     self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
-    self.AddMinCpuPlatform(expected_request_cluster, master_min_cpu_platform,
+    self.AddMinCpuPlatform(expected_request_cluster, main_min_cpu_platform,
                            worker_min_cpu_platform)
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-    self.AddMinCpuPlatform(expected_response_cluster, master_min_cpu_platform,
+    self.AddMinCpuPlatform(expected_response_cluster, main_min_cpu_platform,
                            worker_min_cpu_platform)
 
     command = (
         'clusters --project {project} create {cluster} '
         '--bucket {bucket} '
         '--zone {zone} '
-        '--num-masters {num_masters} '
+        '--num-mains {num_mains} '
         '--num-workers {num_workers} '
-        '--master-machine-type {master_machine_type} '
+        '--main-machine-type {main_machine_type} '
         '--worker-machine-type {worker_machine_type} '
-        '--master-accelerator type={master_accelerator_type},count=1 '
+        '--main-accelerator type={main_accelerator_type},count=1 '
         '--worker-accelerator type={worker_accelerator_type},count=2 '
         '--secondary-worker-accelerator '
         'type={secondary_worker_accelerator_type},count=3 '
-        '--num-master-local-ssds={master_local_ssds} '
+        '--num-main-local-ssds={main_local_ssds} '
         '--num-worker-local-ssds={worker_local_ssds} '
         '--num-secondary-worker-local-ssds={secondary_worker_local_ssds} '
-        '--master-boot-disk-size {master_boot_disk_size}GB'
-        ' --master-boot-disk-type {master_boot_disk_type} '
+        '--main-boot-disk-size {main_boot_disk_size}GB'
+        ' --main-boot-disk-type {main_boot_disk_type} '
         '--worker-boot-disk-size {worker_boot_disk_size}GB'
         ' --worker-boot-disk-type {worker_boot_disk_type} '
         '--secondary-worker-boot-disk-size {secondary_worker_boot_disk_size}GB'
@@ -327,7 +327,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         '--service-account {service_account} '
         '--scopes {scopes} '
         '--no-address '
-        '--master-min-cpu-platform="{master_min_cpu_platform}" '
+        '--main-min-cpu-platform="{main_min_cpu_platform}" '
         '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
         '--properties core:com.foo=foo,hdfs:com.bar=bar '
         '--tags tag1,tag2 '
@@ -341,23 +341,23 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
             cluster=cluster_name,
             bucket=bucket,
             zone=zone,
-            num_masters=num_masters,
+            num_mains=num_mains,
             num_workers=num_workers,
-            master_machine_type=master_machine_type,
+            main_machine_type=main_machine_type,
             worker_machine_type=worker_machine_type,
-            master_accelerator_type=master_accelerator_type,
+            main_accelerator_type=main_accelerator_type,
             worker_accelerator_type=worker_accelerator_type,
             secondary_worker_accelerator_type=secondary_worker_accelerator_type,
-            master_local_ssds=master_local_ssds,
+            main_local_ssds=main_local_ssds,
             worker_local_ssds=worker_local_ssds,
             secondary_worker_local_ssds=secondary_worker_local_ssds,
-            master_boot_disk_size=master_boot_disk_size,
-            master_boot_disk_type=master_boot_disk_type,
+            main_boot_disk_size=main_boot_disk_size,
+            main_boot_disk_type=main_boot_disk_type,
             worker_boot_disk_size=worker_boot_disk_size,
             worker_boot_disk_type=worker_boot_disk_type,
             secondary_worker_boot_disk_size=secondary_worker_boot_disk_size,
             secondary_worker_boot_disk_type=secondary_worker_boot_disk_type,
-            master_min_cpu_platform=master_min_cpu_platform,
+            main_min_cpu_platform=main_min_cpu_platform,
             worker_min_cpu_platform=worker_min_cpu_platform,
             network=network,
             image_version=image_version,
@@ -676,14 +676,14 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     self.AssertErrContains('Creating [{0}] with operation [{1}].'.format(
         self.ClusterUri(), self.OperationName()))
 
-  def testCreateClusterUnsupportedNumMasters(self):
-    masters = 2
-    err_message = ('Number of masters must be 1 (Standard) or 3 '
+  def testCreateClusterUnsupportedNumMains(self):
+    mains = 2
+    err_message = ('Number of mains must be 1 (Standard) or 3 '
                    '(High Availability)')
     with self.AssertRaisesArgumentErrorMatches(err_message):
       self.RunDataproc(
-          'clusters create {name} --zone={zone} --num-masters={masters}'.format(
-              name=self.CLUSTER_NAME, zone=self.ZONE, masters=masters))
+          'clusters create {name} --zone={zone} --num-mains={mains}'.format(
+              name=self.CLUSTER_NAME, zone=self.ZONE, mains=mains))
 
   def testCreateClusterWarnings(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
@@ -818,13 +818,13 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     cluster_name = 'foo-cluster'
     zone_url = ('https://compute.googleapis.com/compute/v1/projects/'
                 'foo-project/zones/foo-zone')
-    master_machine_type_url = (
+    main_machine_type_url = (
         'https://compute.googleapis.com/compute/v1/projects/'
         'foo-project/zones/foo-zone/machineTypes/foo-type')
     worker_machine_type_url = (
         'https://compute.googleapis.com/compute/v1/projects/'
         'foo-project/zones/foo-zone/machineTypes/bar-type')
-    master_accelerator_type_url = (
+    main_accelerator_type_url = (
         'https://www.googleapis.com/compute/v1/projects/'
         'foo-project/zones/foo-zone/acceleratorTypes/foo-gpu')
     worker_accelerator_type_url = (
@@ -833,10 +833,10 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         projectId=project,
-        masterMachineTypeUri=master_machine_type_url,
+        mainMachineTypeUri=main_machine_type_url,
         workerMachineTypeUri=worker_machine_type_url,
-        masterAcceleratorTypeUri=master_accelerator_type_url,
-        masterAcceleratorCount=1,
+        mainAcceleratorTypeUri=main_accelerator_type_url,
+        mainAcceleratorCount=1,
         workerAcceleratorTypeUri=worker_accelerator_type_url,
         workerAcceleratorCount=2,
         zoneUri=zone_url)
@@ -846,16 +846,16 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
     command = ('clusters --project {project} create {cluster} '
-               '--master-machine-type {master_machine_type} '
+               '--main-machine-type {main_machine_type} '
                '--worker-machine-type {worker_machine_type} '
-               '--master-accelerator type={master_accelerator_type},count=1 '
+               '--main-accelerator type={main_accelerator_type},count=1 '
                '--worker-accelerator type={worker_accelerator_type},count=2 '
                '--zone {zone} ').format(
                    project=project,
                    cluster=cluster_name,
-                   master_machine_type=master_machine_type_url,
+                   main_machine_type=main_machine_type_url,
                    worker_machine_type=worker_machine_type_url,
-                   master_accelerator_type=master_accelerator_type_url,
+                   main_accelerator_type=main_accelerator_type_url,
                    worker_accelerator_type=worker_accelerator_type_url,
                    zone=zone_url)
 
@@ -1398,17 +1398,17 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     project = 'foo-project'
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
-    master_machine_type = 'foo-type'
+    main_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         projectId=project,
-        masterMachineTypeUri=master_machine_type,
+        mainMachineTypeUri=main_machine_type,
         workerMachineTypeUri=worker_machine_type,
-        masterBootDiskSizeGb=15,
+        mainBootDiskSizeGb=15,
         workerBootDiskSizeGb=30,
         secondaryWorkerBootDiskSizeGb=42,
-        masterBootDiskType='pd-standard',
+        mainBootDiskType='pd-standard',
         workerBootDiskType='pd-ssd',
         secondaryWorkerBootDiskType='pd-standard',
         internalIpOnly=True,
@@ -1425,11 +1425,11 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
     command = ('clusters --project {project} create {cluster} '
-               '--master-boot-disk-size 15GB '
+               '--main-boot-disk-size 15GB '
                '--worker-boot-disk-size 30GB '
-               '--master-boot-disk-type pd-standard '
+               '--main-boot-disk-type pd-standard '
                '--worker-boot-disk-type pd-ssd '
-               '--master-machine-type {master_machine_type} '
+               '--main-machine-type {main_machine_type} '
                '--worker-machine-type {worker_machine_type} '
                '--secondary-worker-boot-disk-size 42GB '
                '--secondary-worker-boot-disk-type pd-standard '
@@ -1444,7 +1444,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                '--enable-component-gateway ').format(
                    project=project,
                    cluster=cluster_name,
-                   master_machine_type=master_machine_type,
+                   main_machine_type=main_machine_type,
                    worker_machine_type=worker_machine_type,
                    zone=zone,
                    autoscaling_policy_uri=autoscaling_policy_uri)
@@ -1458,7 +1458,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
   def testCreateWithUrls(self):
     """Tests zonal resource urls specific to Beta track."""
     project = 'foo-project'
-    master_accelerator_type_url = (
+    main_accelerator_type_url = (
         'https://compute.googleapis.com/compute/beta/projects/'
         'foo-project/zones/foo-zone/acceleratorTypes/foo-gpu')
     worker_accelerator_type_url = (
@@ -1470,18 +1470,18 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         projectId=project,
-        masterAcceleratorTypeUri=master_accelerator_type_url,
-        masterAcceleratorCount=1,
+        mainAcceleratorTypeUri=main_accelerator_type_url,
+        mainAcceleratorCount=1,
         workerAcceleratorTypeUri=worker_accelerator_type_url,
         workerAcceleratorCount=2,
         zoneUri=zone)
     command = ('clusters --project {project} create {cluster} '
-               '--master-accelerator type={master_accelerator_type},count=1 '
+               '--main-accelerator type={main_accelerator_type},count=1 '
                '--worker-accelerator type={worker_accelerator_type},count=2 '
                '--zone {zone} ').format(
                    project=project,
                    cluster=cluster_name,
-                   master_accelerator_type=master_accelerator_type_url,
+                   main_accelerator_type=main_accelerator_type_url,
                    worker_accelerator_type=worker_accelerator_type_url,
                    zone=zone)
 

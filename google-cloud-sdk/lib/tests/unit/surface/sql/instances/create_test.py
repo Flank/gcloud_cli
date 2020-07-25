@@ -482,9 +482,9 @@ instance-1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 
   def testCreateReadReplica(self):
     # This test ensures that the replica adopts the db version, tier, and
-    # region from the master to the replica without being specified.
+    # region from the main to the replica without being specified.
 
-    master_diff = {
+    main_diff = {
         'name':
             'create-instance1',
         'settings': {
@@ -515,15 +515,15 @@ instance-1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
             .MYSQL_5_7,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'create-instance1'
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
 
-    self.Run('sql instances create create-replica1 --master-instance-name '
+    self.Run('sql instances create create-replica1 --main-instance-name '
              'create-instance1')
     # pylint:disable=line-too-long
     self.AssertOutputContains(
@@ -537,10 +537,10 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0         - 
 
   def testCreateCrossRegionReplica(self):
     # This test ensures that the replica adopts the db version, tier gets
-    # automatically copied from the master to the replica without being
+    # automatically copied from the main to the replica without being
     # specified, but that region is overriden.
 
-    master_diff = {
+    main_diff = {
         'name': 'create-instance1',
         'settings': {
             'tier': 'db-n1-standard-2',
@@ -565,14 +565,14 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0         - 
             self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
             .MYSQL_5_7,
         'region': 'us-east1',
-        'masterInstanceName': 'create-instance1',
+        'mainInstanceName': 'create-instance1',
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
 
-    self.Run('sql instances create create-replica1 --master-instance-name '
+    self.Run('sql instances create create-replica1 --main-instance-name '
              'create-instance1 --region=us-east1')
     # pylint:disable=line-too-long
     self.AssertOutputContains(
@@ -592,14 +592,14 @@ create-replica1  MYSQL_5_7         us-east1 db-n1-standard-2  0.0.0.0         - 
     with self.AssertRaisesExceptionRegexp(
         sql_exceptions.ArgumentError,
         r'First Generation instances can no longer be created\.'):
-      self.Run('sql instances create create-replica1 --master-instance-name '
+      self.Run('sql instances create create-replica1 --main-instance-name '
                'create-instance1')
 
   def testCreateReadReplicaOverridingTier(self):
     # This test ensures that the user is able to specify a tier different than
-    # the tier of the master.
+    # the tier of the main.
 
-    master_diff = {
+    main_diff = {
         'name':
             'create-instance1',
         'settings': {
@@ -630,15 +630,15 @@ create-replica1  MYSQL_5_7         us-east1 db-n1-standard-2  0.0.0.0         - 
             .MYSQL_5_7,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'create-instance1',
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
 
-    self.Run('sql instances create create-replica1 --master-instance-name '
+    self.Run('sql instances create create-replica1 --main-instance-name '
              'create-instance1 --tier=db-n1-standard-4')
     # pylint:disable=line-too-long
     self.AssertOutputContains(
@@ -650,9 +650,9 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
 
   def testCreateReadReplicaOverridingCustomMachineType(self):
     # This test ensures that the user is able to specify a custom machine type
-    # different than the custom machine type of the master.
+    # different than the custom machine type of the main.
 
-    master_diff = {
+    main_diff = {
         'name':
             'create-instance1',
         'settings': {
@@ -683,15 +683,15 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
             .POSTGRES_9_6,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'create-instance1',
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
 
-    self.Run('sql instances create create-replica1 --master-instance-name '
+    self.Run('sql instances create create-replica1 --main-instance-name '
              'create-instance1  --cpu=2 --memory=7680MiB')
     # pylint:disable=line-too-long
     self.AssertOutputContains(
@@ -707,7 +707,7 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
 
-    master_diff = {
+    main_diff = {
         'name':
             'create-instance1',
         'diskEncryptionConfiguration':
@@ -733,20 +733,20 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
         'databaseVersion':
             self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
             .MYSQL_5_7,
-        'masterInstanceName':
+        'mainInstanceName':
             'create-instance1'
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
 
-    self.Run('sql instances create create-replica1 --master-instance-name '
+    self.Run('sql instances create create-replica1 --main-instance-name '
              'create-instance1')
     # Check that the CMEK warning was displayed.
     self.assertEqual(prompt_mock.call_count, 0)
     self.AssertErrContains(
-        'Your replica will be encrypted with the master instance\'s '
+        'Your replica will be encrypted with the main instance\'s '
         'customer-managed encryption key. If anyone destroys this key, all '
         'data encrypted with it will be permanently lost.')
 
@@ -754,12 +754,12 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
     # This test ensures that the create warning shows up when a replica of an
     # instance with a customer-managed encryption key is being created,
     # instead of the message indicating that the key will be inherited from
-    # the master instance.
+    # the main instance.
     key = 'projects/example/locations/us-east1/keyRings/somekey/cryptoKeys/a'
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
 
-    master_diff = {
+    main_diff = {
         'name': 'create-instance1',
         'diskEncryptionConfiguration':
             self.messages.DiskEncryptionConfiguration(
@@ -787,15 +787,15 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
         'databaseVersion':
             self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
             .MYSQL_5_7,
-        'masterInstanceName': 'create-instance1',
+        'mainInstanceName': 'create-instance1',
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
 
     self.Run(
-        'sql instances create create-replica1 --master-instance-name '
+        'sql instances create create-replica1 --main-instance-name '
         'create-instance1 --region us-east1 --disk-encryption-key="{}"'.format(
             key))
     # Check that the CMEK warning was displayed.
@@ -808,7 +808,7 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
   def testCreateCrossRegionReplicaMissingCmek(self):
     # This test ensures that the a disk encryption key has been provided when
     # creating a cross-region replica of a CMEK instance.
-    master_diff = {
+    main_diff = {
         'name': 'create-instance1',
         'diskEncryptionConfiguration':
             self.messages.DiskEncryptionConfiguration(
@@ -822,19 +822,19 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
             self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
             .MYSQL_5_7,
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     with self.AssertRaisesExceptionRegexp(exceptions.RequiredArgumentException,
                                           r'Missing required argument '
                                           r'\[--disk-encryption-key\]'):
       self.Run(
-          'sql instances create create-replica1 --master-instance-name '
+          'sql instances create create-replica1 --main-instance-name '
           'create-instance1 --region us-east1')
 
   def testCreateCrossRegionReplicaExtraneousCmek(self):
     # This test ensures that the a disk encryption key has not been provided
     # when creating a cross-region replica of a non-CMEK instance.
     key = 'projects/example/locations/us-east1/keyRings/somekey/cryptoKeys/a'
-    master_diff = {
+    main_diff = {
         'name':
             'create-instance1',
         'settings': {
@@ -846,29 +846,29 @@ create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         - 
             self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
             .MYSQL_5_7,
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), main_diff)
     with self.AssertRaisesExceptionRegexp(
         sql_exceptions.ArgumentError,
         r'`--disk-encryption-key` cannot be specified when creating a replica '
         'of an instance without customer-managed encryption.'):
-      self.Run('sql instances create create-replica1 --master-instance-name '
+      self.Run('sql instances create create-replica1 --main-instance-name '
                'create-instance1 --region us-east1 --disk-encryption-key="{}"'
                .format(key))
 
-  def testCreateNoMaster(self):
+  def testCreateNoMain(self):
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
-            instance='master-name',
+            instance='main-name',
             project=self.Project(),),
         exception=http_error.MakeHttpError(
             code=409,
             reason='notAuthorized',))
 
     with self.AssertRaisesHttpExceptionRegexp(r'You are either not authorized '
-                                              'to access the master instance or'
+                                              'to access the main instance or'
                                               ' it does not exist.'):
-      self.Run('sql instances create replica-name --master-instance-name='
-               'master-name')
+      self.Run('sql instances create replica-name --main-instance-name='
+               'main-name')
 
   def testCreateSecondGenFlags(self):
     diff = {
@@ -1115,7 +1115,7 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), diff)
     self.Run('sql instances create some-instance --root-password=somepassword')
 
   def testCreateSqlServerWithoutRootPassword(self):
@@ -1218,7 +1218,7 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
     self.Run('sql instances create create-instance '
              '--database-flags first=one,second=2')
 
-  def testCreateExternalMasterWithDefaultPort(self):
+  def testCreateExternalMainWithDefaultPort(self):
     diff = {
         'name':
             'xm-instance',
@@ -1226,13 +1226,13 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
             self.messages.OnPremisesConfiguration(
                 kind='sql#onPremisesConfiguration', hostPort='127.0.0.1:3306')
     }
-    self.ExpectInstanceInsert(self.GetExternalMasterRequestInstance(), diff)
+    self.ExpectInstanceInsert(self.GetExternalMainRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), diff)
     self.Run('sql instances create xm-instance '
              '--source-ip-address=127.0.0.1')
 
-  def testCreateExternalMasterWithCustomPort(self):
+  def testCreateExternalMainWithCustomPort(self):
     diff = {
         'name':
             'xm-instance',
@@ -1240,14 +1240,14 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
             self.messages.OnPremisesConfiguration(
                 kind='sql#onPremisesConfiguration', hostPort='127.0.0.1:8080')
     }
-    self.ExpectInstanceInsert(self.GetExternalMasterRequestInstance(), diff)
+    self.ExpectInstanceInsert(self.GetExternalMainRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), diff)
     self.Run('sql instances create xm-instance '
              '--source-ip-address=127.0.0.1 --source-port=8080')
 
-  def testCreateExternalMasterReplicaWithoutSSL(self):
-    master_diff = {
+  def testCreateExternalMainReplicaWithoutSSL(self):
+    main_diff = {
         'name':
             'xm-instance',
         'databaseVersion':
@@ -1269,11 +1269,11 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
             .MYSQL_5_7,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                kind='sql#demoteMainMysqlReplicaConfiguration',
                 mysqlReplicaConfiguration=self.messages
                 .MySqlReplicaConfiguration(
                     kind='sql#mysqlReplicaConfiguration',
@@ -1281,19 +1281,19 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                     password='somepword',
                     dumpFilePath='gs://xm-bucket/dumpfile.sql'))
     }
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
     self.Run('sql instances create xm-instance-replica '
-             '--master-username=root --master-password=somepword '
-             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
-             '--master-instance-name=xm-instance')
+             '--main-username=root --main-password=somepword '
+             '--main-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--main-instance-name=xm-instance')
 
-  def testCreateExternalMasterReplicaWithPasswordPrompt(self):
+  def testCreateExternalMainReplicaWithPasswordPrompt(self):
     # The password prompt flag should cause getpass to get called.
     self.StartObjectPatch(getpass, 'getpass', return_value='somepword')
-    master_diff = {
+    main_diff = {
         'name':
             'xm-instance',
         'databaseVersion':
@@ -1315,11 +1315,11 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
             .MYSQL_5_7,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                kind='sql#demoteMainMysqlReplicaConfiguration',
                 mysqlReplicaConfiguration=self.messages
                 .MySqlReplicaConfiguration(
                     kind='sql#mysqlReplicaConfiguration',
@@ -1327,20 +1327,20 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                     password='somepword',
                     dumpFilePath='gs://xm-bucket/dumpfile.sql'))
     }
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
     self.Run('sql instances create xm-instance-replica '
-             '--master-username=root --prompt-for-master-password '
-             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
-             '--master-instance-name=xm-instance')
+             '--main-username=root --prompt-for-main-password '
+             '--main-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--main-instance-name=xm-instance')
 
-  def testCreateExternalMasterReplicaWithCACert(self):
+  def testCreateExternalMainReplicaWithCACert(self):
     # Need file read mock to get cert file contents.
     read_file_mock = self.StartObjectPatch(
         files, 'ReadFileContents', return_value='file_data')
-    master_diff = {
+    main_diff = {
         'name':
             'xm-instance',
         'databaseVersion':
@@ -1362,11 +1362,11 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
             .MYSQL_5_7,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                kind='sql#demoteMainMysqlReplicaConfiguration',
                 mysqlReplicaConfiguration=self.messages
                 .MySqlReplicaConfiguration(
                     kind='sql#mysqlReplicaConfiguration',
@@ -1375,25 +1375,25 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                     dumpFilePath='gs://xm-bucket/dumpfile.sql',
                     caCertificate='file_data'))
     }
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
     self.Run('sql instances create xm-instance-replica '
-             '--master-username=root --master-password=somepword '
-             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
-             '--master-instance-name=xm-instance '
-             '--master-ca-certificate-path=/path/to/ca_cert.pem')
+             '--main-username=root --main-password=somepword '
+             '--main-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--main-instance-name=xm-instance '
+             '--main-ca-certificate-path=/path/to/ca_cert.pem')
 
     # File contents should be read once, for the CA Cert
     # (plus one for the properties framework).
     self.assertEqual(read_file_mock.call_count, 2)
 
-  def testCreateExternalMasterWithCAAndClientCerts(self):
+  def testCreateExternalMainWithCAAndClientCerts(self):
     # Need file read mock to get cert file contents.
     read_file_mock = self.StartObjectPatch(
         files, 'ReadFileContents', return_value='file_data')
-    master_diff = {
+    main_diff = {
         'name':
             'xm-instance',
         'databaseVersion':
@@ -1415,11 +1415,11 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
             .MYSQL_5_7,
         'region':
             'us-west1',
-        'masterInstanceName':
+        'mainInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                kind='sql#demoteMainMysqlReplicaConfiguration',
                 mysqlReplicaConfiguration=self.messages
                 .MySqlReplicaConfiguration(
                     kind='sql#mysqlReplicaConfiguration',
@@ -1430,33 +1430,33 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                     clientCertificate='file_data',
                     clientKey='file_data'))
     }
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), main_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
     self.Run('sql instances create xm-instance-replica '
-             '--master-username=root --master-password=somepword '
-             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
-             '--master-instance-name=xm-instance '
+             '--main-username=root --main-password=somepword '
+             '--main-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--main-instance-name=xm-instance '
              '--client-certificate-path=/path/to/client_cert.pem '
              '--client-key-path=/path/to/client_key.pem '
-             '--master-ca-certificate-path=/path/to/ca_cert.pem')
+             '--main-ca-certificate-path=/path/to/ca_cert.pem')
 
     # File contents should be read three times, one for each cert
     # (plus one for the properties framework).
     self.assertEqual(read_file_mock.call_count, 4)
 
-  def testCreateExternalMasterReplicaWithoutMasterId(self):
+  def testCreateExternalMainReplicaWithoutMainId(self):
     with self.AssertRaisesExceptionRegexp(
         exceptions.RequiredArgumentException,
-        r'To create a read replica of an external master instance, '
-        r'\[--master-instance-name\] must be specified'):
+        r'To create a read replica of an external main instance, '
+        r'\[--main-instance-name\] must be specified'):
       self.Run('sql instances create xm-instance-replica '
-               '--master-username=root --master-password=somepword '
-               '--master-dump-file-path=gs://xm-bucket/dumpfile.sql ')
+               '--main-username=root --main-password=somepword '
+               '--main-dump-file-path=gs://xm-bucket/dumpfile.sql ')
 
-  def testCreateExternalMasterReplicaWithoutPassword(self):
-    master_diff = {
+  def testCreateExternalMainReplicaWithoutPassword(self):
+    main_diff = {
         'name':
             'xm-instance',
         'databaseVersion':
@@ -1465,15 +1465,15 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
         'region':
             'us-west1',
     }
-    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceGet(self.GetExternalMainInstance(), main_diff)
     with self.AssertRaisesExceptionRegexp(
         exceptions.RequiredArgumentException,
-        r'To create a read replica of an external master instance, '
-        r'\[--master-password\] or \[--prompt-for-master-password\] '
+        r'To create a read replica of an external main instance, '
+        r'\[--main-password\] or \[--prompt-for-main-password\] '
         r'must be specified'):
       self.Run('sql instances create xm-instance-replica '
-               '--master-username=root --master-instance-name=xm-instance '
-               '--master-dump-file-path=gs://xm-bucket/dumpfile.sql ')
+               '--main-username=root --main-instance-name=xm-instance '
+               '--main-dump-file-path=gs://xm-bucket/dumpfile.sql ')
 
   def testCreatePrivateNetwork(self):
     diff = {

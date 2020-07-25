@@ -44,7 +44,7 @@ def GetLatestVersion():
   """Get the latest available kubernetes cluster version."""
   code, out, err = Run([
       'gcloud', 'container', 'get-server-config', '--zone', 'us-central1-a',
-      '--format=value(validMasterVersions)'
+      '--format=value(validMainVersions)'
   ])
   if code:
     print(err, file=sys.stderr)
@@ -64,7 +64,7 @@ def GetCurrentVersion():
   """Get the current kubernetes cluster version."""
   code, out, err = Run([
       'gcloud', 'container', 'clusters', 'describe', CLUSTER_NAME,
-      '--region=us-central1-a', '--format=value(currentMasterVersion)'
+      '--region=us-central1-a', '--format=value(currentMainVersion)'
   ])
   if code:
     print(err, file=sys.stderr)
@@ -108,7 +108,7 @@ def main():
   current_version = GetCurrentVersion()
   if latest_version != current_version:
     code, _, err = Run([
-        'gcloud', 'container', 'clusters', 'upgrade', CLUSTER_NAME, '--master',
+        'gcloud', 'container', 'clusters', 'upgrade', CLUSTER_NAME, '--main',
         '--region=us-central1-a',
         '--cluster-version={version}'.format(version=latest_version), '--quiet'
     ])

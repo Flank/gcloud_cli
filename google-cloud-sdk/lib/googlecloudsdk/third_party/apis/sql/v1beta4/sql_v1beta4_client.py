@@ -462,29 +462,29 @@ operation might cause your instance to restart.
         supports_download=False,
     )
 
-    def DemoteMaster(self, request, global_params=None):
+    def DemoteMain(self, request, global_params=None):
       r"""Demotes the stand-alone instance to be a Cloud SQL read replica for an.
 external database server.
 
       Args:
-        request: (SqlInstancesDemoteMasterRequest) input message
+        request: (SqlInstancesDemoteMainRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
         (Operation) The response message.
       """
-      config = self.GetMethodConfig('DemoteMaster')
+      config = self.GetMethodConfig('DemoteMain')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    DemoteMaster.method_config = lambda: base_api.ApiMethodInfo(
+    DemoteMain.method_config = lambda: base_api.ApiMethodInfo(
         http_method='POST',
-        method_id='sql.instances.demoteMaster',
+        method_id='sql.instances.demoteMain',
         ordered_params=['project', 'instance'],
         path_params=['instance', 'project'],
         query_params=[],
-        relative_path='sql/v1beta4/projects/{project}/instances/{instance}/demoteMaster',
-        request_field='instancesDemoteMasterRequest',
-        request_type_name='SqlInstancesDemoteMasterRequest',
+        relative_path='sql/v1beta4/projects/{project}/instances/{instance}/demoteMain',
+        request_field='instancesDemoteMainRequest',
+        request_type_name='SqlInstancesDemoteMainRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -1044,7 +1044,7 @@ SQL instance in the reverse chronological order of the start time.
     )
 
     def StartExternalSync(self, request, global_params=None):
-      r"""Start External master migration.
+      r"""Start External main migration.
 
       Args:
         request: (SqlProjectsInstancesStartExternalSyncRequest) input message
@@ -1070,7 +1070,7 @@ SQL instance in the reverse chronological order of the start time.
     )
 
     def VerifyExternalSyncSettings(self, request, global_params=None):
-      r"""Verify External master external sync settings.
+      r"""Verify External main external sync settings.
 
       Args:
         request: (SqlProjectsInstancesVerifyExternalSyncSettingsRequest) input message

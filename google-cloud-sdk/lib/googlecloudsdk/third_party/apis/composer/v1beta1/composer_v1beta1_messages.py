@@ -741,19 +741,19 @@ class PrivateClusterConfig(_messages.Message):
   Fields:
     enablePrivateEndpoint: Optional. If `true`, access to the public endpoint
       of the GKE cluster is denied.
-    masterIpv4CidrBlock: Optional. The CIDR block from which IPv4 range for
-      GKE master will be reserved. If left blank, the default value of
+    mainIpv4CidrBlock: Optional. The CIDR block from which IPv4 range for
+      GKE main will be reserved. If left blank, the default value of
       '172.16.0.0/23' is used.
-    masterIpv4ReservedRange: Output only. The IP range in CIDR notation to use
-      for the hosted master network. This range is used for assigning internal
-      IP addresses to the cluster master or set of masters and to the internal
+    mainIpv4ReservedRange: Output only. The IP range in CIDR notation to use
+      for the hosted main network. This range is used for assigning internal
+      IP addresses to the cluster main or set of mains and to the internal
       load balancer virtual IP. This range must not overlap with any other
       ranges in use within the cluster's network.
   """
 
   enablePrivateEndpoint = _messages.BooleanField(1)
-  masterIpv4CidrBlock = _messages.StringField(2)
-  masterIpv4ReservedRange = _messages.StringField(3)
+  mainIpv4CidrBlock = _messages.StringField(2)
+  mainIpv4ReservedRange = _messages.StringField(3)
 
 
 class PrivateEnvironmentConfig(_messages.Message):
@@ -771,7 +771,7 @@ class PrivateEnvironmentConfig(_messages.Message):
       for a Private IP Cloud Composer environment.
     webServerIpv4CidrBlock: Optional. The CIDR block from which IP range for
       web server will be reserved. Needs to be disjoint from
-      private_cluster_config.master_ipv4_cidr_block and
+      private_cluster_config.main_ipv4_cidr_block and
       cloud_sql_ipv4_cidr_block.
     webServerIpv4ReservedRange: Output only. The IP range reserved for the
       tenant project's App Engine VMs.

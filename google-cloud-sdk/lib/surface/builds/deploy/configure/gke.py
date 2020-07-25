@@ -983,8 +983,8 @@ class ConfigureGKEDeploy(base.Command):
             httpMethod=messages.HttpTarget.HttpMethodValueValuesEnum.POST,
             body=bytes(
                 # We don't actually use the branchName value but it has to be
-                # set to an existing branch, so set it to master.
-                '{{"projectId":"{}","repoName":"{}","branchName":"master"}}'
+                # set to an existing branch, so set it to main.
+                '{{"projectId":"{}","repoName":"{}","branchName":"main"}}'
                 .format(project, repo_name)
                 .encode('utf-8')),
             oauthToken=messages.OAuthToken(

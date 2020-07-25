@@ -243,7 +243,7 @@ def pytest_collection_modifyitems(config, items):
     seed = config.getoption('random_seed')
     if not seed:
       seed = int(time.time() * 1000)
-    if _is_master_slave(config):
+    if _is_main_subordinate(config):
       sys.stderr.write('Using random seed: {0}\n'.format(seed))
     rnd.seed(seed)
 
@@ -268,7 +268,7 @@ def pytest_collection_modifyitems(config, items):
         key=lambda item: order.get(_test_name(item), unknown_test_priority))
 
 
-def _is_master_slave(config):
-  if hasattr(config, 'slaveinput'):
-    return config.slaveinput.get('slaveid') == 'gw0'
+def _is_main_subordinate(config):
+  if hasattr(config, 'subordinateinput'):
+    return config.subordinateinput.get('subordinateid') == 'gw0'
   return True

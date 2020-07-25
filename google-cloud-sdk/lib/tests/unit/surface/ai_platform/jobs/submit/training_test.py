@@ -639,14 +639,14 @@ class TrainTestBase(object):
         contents=json.dumps({
             'trainingInput': {
                 'scaleTier': 'BASIC_GPU',
-                'masterConfig':
+                'mainConfig':
                     {'imageUri': 'gcr.io/project/containerimage'}}}))
     scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
     training_input = self.short_msgs.TrainingInput(
         scaleTier=scale_tier_enum.BASIC_GPU,
         region='us-central1',
         args=['--model-dir=gs://my-bucket'],
-        masterConfig=self.short_msgs.ReplicaConfig(
+        mainConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage'))
     self.client.projects_jobs.Create.Expect(
         self._MakeCreateRequest(
@@ -671,11 +671,11 @@ class TrainTestBase(object):
         scaleTier=scale_tier_enum.CUSTOM,
         region='us-central1',
         args=['--model-dir=gs://my-bucket'],
-        masterConfig=self.short_msgs.ReplicaConfig(
+        mainConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage',
             acceleratorConfig=self.short_msgs.AcceleratorConfig(
                 type=accelerator_type_enum.NVIDIA_TESLA_K80, count=2)),
-        masterType='complex_model_m',
+        mainType='complex_model_m',
         parameterServerConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage2',
             acceleratorConfig=self.short_msgs.AcceleratorConfig(
@@ -699,9 +699,9 @@ class TrainTestBase(object):
     self.Run('{} jobs submit training my_job '
              '    --scale-tier CUSTOM  '
              '    --region us-central1 '
-             '    --master-machine-type complex_model_m'
-             '    --master-accelerator type=nvidia-tesla-k80,count=2'
-             '    --master-image-uri gcr.io/project/containerimage'
+             '    --main-machine-type complex_model_m'
+             '    --main-accelerator type=nvidia-tesla-k80,count=2'
+             '    --main-image-uri gcr.io/project/containerimage'
              '    --parameter-server-machine-type large_model'
              '    --parameter-server-count 2'
              '    --parameter-server-accelerator type=nvidia-tesla-p100,count=2'
@@ -718,9 +718,9 @@ class TrainTestBase(object):
         scaleTier=scale_tier_enum.CUSTOM,
         region='us-central1',
         args=['--model-dir=gs://my-bucket'],
-        masterConfig=self.short_msgs.ReplicaConfig(
+        mainConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage'),
-        masterType='complex_model_m')
+        mainType='complex_model_m')
     self.client.projects_jobs.Create.Expect(
         self._MakeCreateRequest(
             self.short_msgs.Job(
@@ -731,8 +731,8 @@ class TrainTestBase(object):
     self.Run('{} jobs submit training my_job '
              '    --scale-tier CUSTOM  '
              '    --region us-central1 '
-             '    --master-machine-type complex_model_m'
-             '    --master-image-uri gcr.io/project/containerimage'
+             '    --main-machine-type complex_model_m'
+             '    --main-image-uri gcr.io/project/containerimage'
              '    -- --model-dir=gs://my-bucket '.format(module_name))
 
   def testTrain_CustomContainerUseChief(self, module_name):
@@ -741,9 +741,9 @@ class TrainTestBase(object):
         scaleTier=scale_tier_enum.CUSTOM,
         region='us-central1',
         args=['--model-dir=gs://my-bucket'],
-        masterConfig=self.short_msgs.ReplicaConfig(
+        mainConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage'),
-        masterType='complex_model_m',
+        mainType='complex_model_m',
         useChiefInTfConfig=True)
     self.client.projects_jobs.Create.Expect(
         self._MakeCreateRequest(
@@ -753,33 +753,33 @@ class TrainTestBase(object):
     self.Run('{} jobs submit training my_job '
              '    --scale-tier CUSTOM  '
              '    --region us-central1 '
-             '    --master-machine-type complex_model_m'
-             '    --master-image-uri gcr.io/project/containerimage'
+             '    --main-machine-type complex_model_m'
+             '    --main-image-uri gcr.io/project/containerimage'
              '    --use-chief-in-tf-config true'
              '    -- --model-dir=gs://my-bucket '.format(module_name))
 
   def testTrain_CustomContainerErrors(self, module_name):
     # Image URI Validation
     with self.AssertRaisesExceptionMatches(flags.ArgumentError,
-                                           ('Only one of --master-image-uri,'
+                                           ('Only one of --main-image-uri,'
                                             ' --runtime-version can be set.')):
       self.Run('{} jobs submit training my_job '
                '    --scale-tier CUSTOM  '
                '    --region us-central1 '
                '    --runtime-version foobar'
-               '    --master-machine-type complex_model_m'
-               '    --master-accelerator type=nvidia-tesla-k80,count=2'
-               '    --master-image-uri gcr.io/project/containerimage'
+               '    --main-machine-type complex_model_m'
+               '    --main-accelerator type=nvidia-tesla-k80,count=2'
+               '    --main-image-uri gcr.io/project/containerimage'
                '    -- --model-dir=gs://my-bucket '.format(module_name))
     # machine type required
     with self.AssertRaisesExceptionMatches(
-        flags.ArgumentError, ('--master-machine-type is required if scale-tier'
+        flags.ArgumentError, ('--main-machine-type is required if scale-tier'
                               ' is set to `CUSTOM`.')):
       self.Run('{} jobs submit training my_job '
                '    --scale-tier CUSTOM  '
                '    --region us-central1 '
-               '    --master-accelerator type=nvidia-tesla-k80,count=2'
-               '    --master-image-uri gcr.io/project/containerimage'
+               '    --main-accelerator type=nvidia-tesla-k80,count=2'
+               '    --main-image-uri gcr.io/project/containerimage'
                '    -- --model-dir=gs://my-bucket '.format(module_name))
 
   def testTrain_CustomContainerConfigFile(self, module_name):
@@ -788,7 +788,7 @@ class TrainTestBase(object):
         contents=json.dumps({
             'trainingInput': {
                 'scaleTier': 'CUSTOM',
-                'masterConfig':
+                'mainConfig':
                     {'imageUri': 'gcr.io/project/containerimage'}}}))
     scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
     accelerator_type_enum = (self.short_msgs.AcceleratorConfig.
@@ -797,11 +797,11 @@ class TrainTestBase(object):
         scaleTier=scale_tier_enum.CUSTOM,
         region='us-central1',
         args=['--model-dir=gs://my-bucket'],
-        masterConfig=self.short_msgs.ReplicaConfig(
+        mainConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage',
             acceleratorConfig=self.short_msgs.AcceleratorConfig(
                 type=accelerator_type_enum.NVIDIA_TESLA_K80, count=2)),
-        masterType='complex_model_m',
+        mainType='complex_model_m',
         parameterServerConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage2',
             acceleratorConfig=self.short_msgs.AcceleratorConfig(
@@ -825,9 +825,9 @@ class TrainTestBase(object):
     self.Run('{} jobs submit training my_job '
              '    --config {} '
              '    --region us-central1 '
-             '    --master-machine-type complex_model_m'
-             '    --master-accelerator type=nvidia-tesla-k80,count=2'
-             '    --master-image-uri gcr.io/project/containerimage'
+             '    --main-machine-type complex_model_m'
+             '    --main-accelerator type=nvidia-tesla-k80,count=2'
+             '    --main-image-uri gcr.io/project/containerimage'
              '    --parameter-server-machine-type large_model'
              '    --parameter-server-count 2'
              '    --parameter-server-accelerator type=nvidia-tesla-p100,count=2'
@@ -1173,11 +1173,11 @@ class TrainTestBeta(TrainTestBase, base.MlBetaPlatformTestBase):
         scaleTier=scale_tier_enum.CUSTOM,
         region='us-central1',
         args=['--model-dir=gs://my-bucket'],
-        masterConfig=self.short_msgs.ReplicaConfig(
+        mainConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage',
             acceleratorConfig=self.short_msgs.AcceleratorConfig(
                 type=accelerator_type_enum.NVIDIA_TESLA_K80, count=2)),
-        masterType='complex_model_m',
+        mainType='complex_model_m',
         parameterServerConfig=self.short_msgs.ReplicaConfig(
             imageUri='gcr.io/project/containerimage2',
             acceleratorConfig=self.short_msgs.AcceleratorConfig(
@@ -1202,9 +1202,9 @@ class TrainTestBeta(TrainTestBase, base.MlBetaPlatformTestBase):
     self.Run('{} jobs submit training my_job '
              '    --scale-tier CUSTOM  '
              '    --region us-central1 '
-             '    --master-machine-type complex_model_m'
-             '    --master-accelerator type=nvidia-tesla-k80,count=2'
-             '    --master-image-uri gcr.io/project/containerimage'
+             '    --main-machine-type complex_model_m'
+             '    --main-accelerator type=nvidia-tesla-k80,count=2'
+             '    --main-image-uri gcr.io/project/containerimage'
              '    --parameter-server-machine-type large_model'
              '    --parameter-server-count 2'
              '    --parameter-server-accelerator type=nvidia-tesla-p100,count=2'

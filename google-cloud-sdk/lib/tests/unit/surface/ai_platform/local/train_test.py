@@ -32,7 +32,7 @@ class LocalTrainTestBase(object):
 
   def SetUp(self):
     self.get_primary_node_mock = self.StartObjectPatch(
-        local_train, 'GetPrimaryNodeName', return_value='master')
+        local_train, 'GetPrimaryNodeName', return_value='main')
     self.run_mock = self.StartObjectPatch(local_train, 'RunDistributed',
                                           return_value=0)
     self.make_proc_mock = self.StartObjectPatch(local_train, 'MakeProcess',
@@ -92,7 +92,7 @@ class LocalTrainTestBase(object):
         'test_package.test_task',
         os.getcwd(),
         args=['foo', '--job-dir', 'gs://foo/bar/'],
-        task_type='master')
+        task_type='main')
 
   def testLocalTrainSingleWorkerExitNonZero(self, module_name):
     self.make_proc_mock.return_value = 1
@@ -105,7 +105,7 @@ class LocalTrainTestBase(object):
         'test_package.test_task',
         os.getcwd(),
         args=['foo'],
-        task_type='master')
+        task_type='main')
 
   def testLocalTrainSingleWorkerLocalJobDir(self, module_name):
     self.Run('{} local train --module-name test_package.test_task '
@@ -116,7 +116,7 @@ class LocalTrainTestBase(object):
         'test_package.test_task',
         os.getcwd(),
         args=['foo', '--job-dir', self.temp_path],
-        task_type='master')
+        task_type='main')
 
   def testLocalTrainSingleWorkerChief(self, module_name):
     self.get_primary_node_mock.return_value = 'chief'

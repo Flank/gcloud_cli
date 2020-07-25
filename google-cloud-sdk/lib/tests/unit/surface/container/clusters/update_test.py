@@ -213,14 +213,14 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         flags='--no-enable-autoscaling '
         '--max-nodes=1 ')
 
-  def testEnableMasterAuthorizedNetworks(self):
-    desired = self.msgs.MasterAuthorizedNetworksConfig(enabled=True)
+  def testEnableMainAuthorizedNetworks(self):
+    desired = self.msgs.MainAuthorizedNetworksConfig(enabled=True)
     self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
-        flags='--enable-master-authorized-networks ')
+        self.msgs.ClusterUpdate(desiredMainAuthorizedNetworksConfig=desired),
+        flags='--enable-main-authorized-networks ')
 
-  def testEnableMasterAuthorizedNetworksWithSourceRanges(self):
-    desired = self.msgs.MasterAuthorizedNetworksConfig(
+  def testEnableMainAuthorizedNetworksWithSourceRanges(self):
+    desired = self.msgs.MainAuthorizedNetworksConfig(
         enabled=True,
         cidrBlocks=[
             self.msgs.CidrBlock(cidrBlock='10.0.0.1/32'),
@@ -228,46 +228,46 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         ],
     )
     self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
-        flags='--enable-master-authorized-networks '
-        '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
+        self.msgs.ClusterUpdate(desiredMainAuthorizedNetworksConfig=desired),
+        flags='--enable-main-authorized-networks '
+        '--main-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
 
-  def testEnableMasterAuthorizedNetworksWithMaxSourceRanges(self):
+  def testEnableMainAuthorizedNetworksWithMaxSourceRanges(self):
     cidr_blocks = []
     msgs_cidr_blocks = []
     for i in range(1, api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS_PUBLIC + 1):
       cidr = '10.0.0.%d/32' % i
       cidr_blocks.append(cidr)
       msgs_cidr_blocks.append(self.msgs.CidrBlock(cidrBlock=cidr))
-    desired = self.msgs.MasterAuthorizedNetworksConfig(
+    desired = self.msgs.MainAuthorizedNetworksConfig(
         enabled=True, cidrBlocks=msgs_cidr_blocks)
 
     self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
-        flags='--enable-master-authorized-networks '
-        '--master-authorized-networks=' + ','.join(cidr_blocks))
+        self.msgs.ClusterUpdate(desiredMainAuthorizedNetworksConfig=desired),
+        flags='--enable-main-authorized-networks '
+        '--main-authorized-networks=' + ','.join(cidr_blocks))
 
-  def testDisableMasterAuthorizedNetworks(self):
-    desired = self.msgs.MasterAuthorizedNetworksConfig(enabled=False)
+  def testDisableMainAuthorizedNetworks(self):
+    desired = self.msgs.MainAuthorizedNetworksConfig(enabled=False)
     self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
-        flags='--no-enable-master-authorized-networks ')
+        self.msgs.ClusterUpdate(desiredMainAuthorizedNetworksConfig=desired),
+        flags='--no-enable-main-authorized-networks ')
 
-  def testInvalidMasterAuthorizedNetworksWithoutEnable(self):
+  def testInvalidMainAuthorizedNetworksWithoutEnable(self):
     name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(c_util.Error):
       self.Run(
           self.clusters_command_base.format(self.ZONE) + ' update {0} '
-          '--no-enable-master-authorized-networks '
-          '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 '.format(name))
-      self.AssertErrContains('Cannot use --master-authorized-networks')
+          '--no-enable-main-authorized-networks '
+          '--main-authorized-networks=10.0.0.1/32,10.0.0.2/32 '.format(name))
+      self.AssertErrContains('Cannot use --main-authorized-networks')
 
-  def testInvalidMasterAuthorizedNetworksAlone(self):
+  def testInvalidMainAuthorizedNetworksAlone(self):
     with self.AssertRaisesArgumentErrorRegexp('^Exactly one of '):
       self.Run(
           self.clusters_command_base.format(self.ZONE) + ' update clustername '
-          '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
+          '--main-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
 
   def testEnableLegacyAbac(self):
     self._TestLegacyAbac(enabled=True, flags='--enable-legacy-authorization ')
@@ -548,14 +548,14 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     action = self.action_set_password
     password = '1234567890abcdef'
     flags = '--password=' + password
-    auth = self.msgs.MasterAuth(password=password)
-    self._TestUpdateMasterAuth(action, auth, password, flags=flags)
+    auth = self.msgs.MainAuth(password=password)
+    self._TestUpdateMainAuth(action, auth, password, flags=flags)
 
   def testSetPasswordPrompt(self):
     action = self.action_set_password
     password = '1234567890abcdef'
-    auth = self.msgs.MasterAuth(password=password)
-    self._TestUpdateMasterAuth(action, auth, password, flags='--set-password ')
+    auth = self.msgs.MainAuth(password=password)
+    self._TestUpdateMainAuth(action, auth, password, flags='--set-password ')
 
   def testSetPasswordError(self):
     """Correctly handle errors from the GKE API."""
@@ -563,10 +563,10 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     name = 'tobeupdated'
     password = '1234567890abcdef'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetMasterAuth(
+    self.ExpectSetMainAuth(
         cluster_name=name,
         action=self.action_set_password,
-        update=self.msgs.MasterAuth(password=password),
+        update=self.msgs.MainAuth(password=password),
         exception=http_error.MakeHttpError(500, 'internal error'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -578,8 +578,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
   def testGeneratePassword(self):
     action = self.action_generate_password
     password = ''
-    auth = self.msgs.MasterAuth(password=password)
-    self._TestUpdateMasterAuth(
+    auth = self.msgs.MainAuth(password=password)
+    self._TestUpdateMainAuth(
         action, auth, password, flags='--generate-password ')
 
   def testGeneratePasswordError(self):
@@ -587,10 +587,10 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
 
     name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetMasterAuth(
+    self.ExpectSetMainAuth(
         cluster_name=name,
         action=self.action_generate_password,
-        update=self.msgs.MasterAuth(password=''),
+        update=self.msgs.MainAuth(password=''),
         exception=http_error.MakeHttpError(500, 'internal error'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -605,8 +605,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
   def testEnableBasicAuth(self, flags):
     action = self.action_set_username
     password = ''
-    auth = self.msgs.MasterAuth(username='admin')
-    self._TestUpdateMasterAuth(action, auth, password, flags=flags)
+    auth = self.msgs.MainAuth(username='admin')
+    self._TestUpdateMainAuth(action, auth, password, flags=flags)
 
   @parameterized.parameters(
       '--username=admin --password=ahoy',
@@ -615,15 +615,15 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
   def testEnableBasicAuthWithPassword(self, flags):
     action = self.action_set_username
     password = ''
-    auth = self.msgs.MasterAuth(username='admin', password='ahoy')
-    self._TestUpdateMasterAuth(action, auth, password, flags=flags)
+    auth = self.msgs.MainAuth(username='admin', password='ahoy')
+    self._TestUpdateMainAuth(action, auth, password, flags=flags)
 
   @parameterized.parameters('--username=""', '--no-enable-basic-auth')
   def testDisableBasicAuth(self, flags):
     action = self.action_set_username
     password = ''
-    auth = self.msgs.MasterAuth(username='')
-    self._TestUpdateMasterAuth(action, auth, password, flags=flags)
+    auth = self.msgs.MainAuth(username='')
+    self._TestUpdateMainAuth(action, auth, password, flags=flags)
 
   @parameterized.parameters(
       '--username="" --password=asdf',
@@ -658,10 +658,10 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     name = 'tobeupdated'
     username = 'person'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetMasterAuth(
+    self.ExpectSetMainAuth(
         cluster_name=name,
         action=self.action_set_username,
-        update=self.msgs.MasterAuth(username=username),
+        update=self.msgs.MainAuth(username=username),
         exception=http_error.MakeHttpError(500, 'internal error'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -726,14 +726,14 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         'operations on the cluster (including delete) until it has run'
         ' to completion.')
 
-  def _TestUpdateMasterAuth(self, action, update, password, flags):
-    name = 'tosetmasterauth'
+  def _TestUpdateMainAuth(self, action, update, password, flags):
+    name = 'tosetmainauth'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetMasterAuth(
+    self.ExpectSetMainAuth(
         cluster_name=name,
         action=action,
         update=update,
-        response=self._MakeOperation(operationType=self.op_set_master_auth))
+        response=self._MakeOperation(operationType=self.op_set_main_auth))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.WriteInput(password + '\n')
     self.Run(
@@ -960,7 +960,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetNetworkPolicy(
         cluster_name=name,
-        response=self._MakeOperation(operationType=self.op_set_master_auth))
+        response=self._MakeOperation(operationType=self.op_set_main_auth))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
         self.clusters_command_base.format(self.ZONE) +
@@ -2442,14 +2442,14 @@ resourceLimits:
         flags='--no-enable-stackdriver-kubernetes')
 
   @parameterized.parameters(
-      ('--enable-master-global-access ', True),
-      ('--no-enable-master-global-access ', False),
+      ('--enable-main-global-access ', True),
+      ('--no-enable-main-global-access ', False),
   )
-  def testMasterGlobalAccess(self, flags, enabled):
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+  def testMainGlobalAccess(self, flags, enabled):
+    main_global_access_config = self.msgs.PrivateClusterMainGlobalAccessConfig(
         enabled=enabled)
     desired = self.msgs.PrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config)
+        mainGlobalAccessConfig=main_global_access_config)
     self._TestUpdate(
         self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
         flags=flags)
@@ -2577,14 +2577,14 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
           ' update test-cluster --release-channel={0}'.format(channel_name))
 
   @parameterized.parameters(
-      ('--enable-master-global-access ', True),
-      ('--no-enable-master-global-access ', False),
+      ('--enable-main-global-access ', True),
+      ('--no-enable-main-global-access ', False),
   )
-  def testMasterGlobalAccess(self, flags, enabled):
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+  def testMainGlobalAccess(self, flags, enabled):
+    main_global_access_config = self.msgs.PrivateClusterMainGlobalAccessConfig(
         enabled=enabled)
     desired = self.msgs.PrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config)
+        mainGlobalAccessConfig=main_global_access_config)
     self._TestUpdate(
         self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
         flags=flags)

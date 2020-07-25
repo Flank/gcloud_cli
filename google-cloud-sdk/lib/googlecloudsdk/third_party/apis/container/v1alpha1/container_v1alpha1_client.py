@@ -404,7 +404,7 @@ clusters.
           }
 
     def CompleteIpRotation(self, request, global_params=None):
-      r"""Completes master IP rotation.
+      r"""Completes main IP rotation.
 
       Args:
         request: (CompleteIPRotationRequest) input message
@@ -727,32 +727,32 @@ instead.
         supports_download=False,
     )
 
-    def SetMasterAuth(self, request, global_params=None):
-      r"""Sets master auth materials. Currently supports changing the admin password.
+    def SetMainAuth(self, request, global_params=None):
+      r"""Sets main auth materials. Currently supports changing the admin password.
 or a specific cluster, either via password generation or explicitly setting
 the password.
 Modify basic_auth.csv and reset the K8S API server.
 
       Args:
-        request: (SetMasterAuthRequest) input message
+        request: (SetMainAuthRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
         (Operation) The response message.
       """
-      config = self.GetMethodConfig('SetMasterAuth')
+      config = self.GetMethodConfig('SetMainAuth')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    SetMasterAuth.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1alpha1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}:setMasterAuth',
+    SetMainAuth.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}:setMainAuth',
         http_method='POST',
-        method_id='container.projects.locations.clusters.setMasterAuth',
+        method_id='container.projects.locations.clusters.setMainAuth',
         ordered_params=['name'],
         path_params=['name'],
         query_params=[],
-        relative_path='v1alpha1/{+name}:setMasterAuth',
+        relative_path='v1alpha1/{+name}:setMainAuth',
         request_field='<request>',
-        request_type_name='SetMasterAuthRequest',
+        request_type_name='SetMainAuthRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -839,7 +839,7 @@ Modify basic_auth.csv and reset the K8S API server.
     )
 
     def StartIpRotation(self, request, global_params=None):
-      r"""Starts master IP rotation.
+      r"""Starts main IP rotation.
 
       Args:
         request: (StartIPRotationRequest) input message
@@ -892,29 +892,29 @@ Modify basic_auth.csv and reset the K8S API server.
         supports_download=False,
     )
 
-    def UpdateMaster(self, request, global_params=None):
-      r"""Updates the master for a specific cluster.
+    def UpdateMain(self, request, global_params=None):
+      r"""Updates the main for a specific cluster.
 
       Args:
-        request: (UpdateMasterRequest) input message
+        request: (UpdateMainRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
         (Operation) The response message.
       """
-      config = self.GetMethodConfig('UpdateMaster')
+      config = self.GetMethodConfig('UpdateMain')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    UpdateMaster.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1alpha1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}:updateMaster',
+    UpdateMain.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}:updateMain',
         http_method='POST',
-        method_id='container.projects.locations.clusters.updateMaster',
+        method_id='container.projects.locations.clusters.updateMain',
         ordered_params=['name'],
         path_params=['name'],
         query_params=[],
-        relative_path='v1alpha1/{+name}:updateMaster',
+        relative_path='v1alpha1/{+name}:updateMain',
         request_field='<request>',
-        request_type_name='UpdateMasterRequest',
+        request_type_name='UpdateMainRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -1356,7 +1356,7 @@ This makes no changes if the last upgrade successfully completed.
     )
 
     def CompleteIpRotation(self, request, global_params=None):
-      r"""Completes master IP rotation.
+      r"""Completes main IP rotation.
 
       Args:
         request: (CompleteIPRotationRequest) input message
@@ -1587,28 +1587,28 @@ instead.
         supports_download=False,
     )
 
-    def Master(self, request, global_params=None):
-      r"""Updates the master for a specific cluster.
+    def Main(self, request, global_params=None):
+      r"""Updates the main for a specific cluster.
 
       Args:
-        request: (UpdateMasterRequest) input message
+        request: (UpdateMainRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
         (Operation) The response message.
       """
-      config = self.GetMethodConfig('Master')
+      config = self.GetMethodConfig('Main')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    Master.method_config = lambda: base_api.ApiMethodInfo(
+    Main.method_config = lambda: base_api.ApiMethodInfo(
         http_method='POST',
-        method_id='container.projects.zones.clusters.master',
+        method_id='container.projects.zones.clusters.main',
         ordered_params=['projectId', 'zone', 'clusterId'],
         path_params=['clusterId', 'projectId', 'zone'],
         query_params=[],
-        relative_path='v1alpha1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/master',
+        relative_path='v1alpha1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/main',
         request_field='<request>',
-        request_type_name='UpdateMasterRequest',
+        request_type_name='UpdateMainRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -1691,31 +1691,31 @@ instead.
         supports_download=False,
     )
 
-    def SetMasterAuth(self, request, global_params=None):
-      r"""Sets master auth materials. Currently supports changing the admin password.
+    def SetMainAuth(self, request, global_params=None):
+      r"""Sets main auth materials. Currently supports changing the admin password.
 or a specific cluster, either via password generation or explicitly setting
 the password.
 Modify basic_auth.csv and reset the K8S API server.
 
       Args:
-        request: (SetMasterAuthRequest) input message
+        request: (SetMainAuthRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
         (Operation) The response message.
       """
-      config = self.GetMethodConfig('SetMasterAuth')
+      config = self.GetMethodConfig('SetMainAuth')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    SetMasterAuth.method_config = lambda: base_api.ApiMethodInfo(
+    SetMainAuth.method_config = lambda: base_api.ApiMethodInfo(
         http_method='POST',
-        method_id='container.projects.zones.clusters.setMasterAuth',
+        method_id='container.projects.zones.clusters.setMainAuth',
         ordered_params=['projectId', 'zone', 'clusterId'],
         path_params=['clusterId', 'projectId', 'zone'],
         query_params=[],
-        relative_path='v1alpha1/projects/{projectId}/zones/{zone}/clusters/{clusterId}:setMasterAuth',
+        relative_path='v1alpha1/projects/{projectId}/zones/{zone}/clusters/{clusterId}:setMainAuth',
         request_field='<request>',
-        request_type_name='SetMasterAuthRequest',
+        request_type_name='SetMainAuthRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -1747,7 +1747,7 @@ Modify basic_auth.csv and reset the K8S API server.
     )
 
     def StartIpRotation(self, request, global_params=None):
-      r"""Starts master IP rotation.
+      r"""Starts main IP rotation.
 
       Args:
         request: (StartIPRotationRequest) input message

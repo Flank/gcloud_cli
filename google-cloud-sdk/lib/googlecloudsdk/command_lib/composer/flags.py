@@ -68,7 +68,7 @@ _ENV_VAR_NAME_ERROR = (
 
 _INVALID_IPV4_CIDR_BLOCK_ERROR = ('Invalid format of IPV4 CIDR block.')
 _INVALID_GKE_MASTER_IPV4_CIDR_BLOCK_ERROR = (
-    'Not a valid IPV4 CIDR block value for the kubernetes master')
+    'Not a valid IPV4 CIDR block value for the kubernetes main')
 _INVALID_WEB_SERVER_IPV4_CIDR_BLOCK_ERROR = (
     'Not a valid IPV4 CIDR block value for the Airflow web server')
 _INVALID_CLOUD_SQL_IPV4_CIDR_BLOCK_ERROR = (
@@ -410,11 +410,11 @@ ENABLE_PRIVATE_ENDPOINT_FLAG = base.Argument(
     default=None,
     action='store_true',
     help="""\
-    Environment cluster is managed using the private IP address of the master
-    API endpoint. Therefore access to the master endpoint must be from
+    Environment cluster is managed using the private IP address of the main
+    API endpoint. Therefore access to the main endpoint must be from
     internal IP addresses.
 
-    If not specified, the master API endpoint will be accessible by its public
+    If not specified, the main API endpoint will be accessible by its public
     IP address.
 
     Cannot be specified unless '--enable-private-environnment' is also
@@ -439,9 +439,9 @@ def _GetIpv4CidrMaskSize(ipv4_cidr_block):
   return 32 - (network.num_addresses.bit_length() - 1)
 
 
-def _IsValidMasterIpv4CidrBlockWithMaskSize(ipv4_cidr_block, min_mask_size,
+def _IsValidMainIpv4CidrBlockWithMaskSize(ipv4_cidr_block, min_mask_size,
                                             max_mask_size):
-  """Validates that IPV4 CIDR block arg for the cluster master is a valid value.
+  """Validates that IPV4 CIDR block arg for the cluster main is a valid value.
 
   Args:
     ipv4_cidr_block: str, the IPV4 CIDR block string to validate.
@@ -461,17 +461,17 @@ def _IsValidMasterIpv4CidrBlockWithMaskSize(ipv4_cidr_block, min_mask_size,
 
 
 _IS_VALID_MASTER_IPV4_CIDR_BLOCK = (
-    lambda cidr: _IsValidMasterIpv4CidrBlockWithMaskSize(cidr, 23, 28))
+    lambda cidr: _IsValidMainIpv4CidrBlockWithMaskSize(cidr, 23, 28))
 
 MASTER_IPV4_CIDR_BLOCK_FORMAT_VALIDATOR = arg_parsers.CustomFunctionValidator(
     _IS_VALID_MASTER_IPV4_CIDR_BLOCK, _INVALID_GKE_MASTER_IPV4_CIDR_BLOCK_ERROR)
 
 MASTER_IPV4_CIDR_FLAG = base.Argument(
-    '--master-ipv4-cidr',
+    '--main-ipv4-cidr',
     default=None,
     type=MASTER_IPV4_CIDR_BLOCK_FORMAT_VALIDATOR,
     help="""\
-    IPv4 CIDR range to use for the cluste master network. This should have a
+    IPv4 CIDR range to use for the cluste main network. This should have a
     size of the netmask between 23 and 28.
 
     Cannot be specified unless '--enable-private-environnment' is also
@@ -479,7 +479,7 @@ MASTER_IPV4_CIDR_FLAG = base.Argument(
     """)
 
 _IS_VALID_WEB_SERVER_IPV4_CIDR_BLOCK = (
-    lambda cidr: _IsValidMasterIpv4CidrBlockWithMaskSize(cidr, 24, 29))
+    lambda cidr: _IsValidMainIpv4CidrBlockWithMaskSize(cidr, 24, 29))
 
 WEB_SERVER_IPV4_CIDR_BLOCK_FORMAT_VALIDATOR = arg_parsers.CustomFunctionValidator(
     _IS_VALID_WEB_SERVER_IPV4_CIDR_BLOCK,
@@ -498,7 +498,7 @@ WEB_SERVER_IPV4_CIDR_FLAG = base.Argument(
     """)
 
 _IS_VALID_CLOUD_SQL_IPV4_CIDR_BLOCK = (
-    lambda cidr: _IsValidMasterIpv4CidrBlockWithMaskSize(cidr, 0, 24))
+    lambda cidr: _IsValidMainIpv4CidrBlockWithMaskSize(cidr, 0, 24))
 
 CLOUD_SQL_IPV4_CIDR_BLOCK_FORMAT_VALIDATOR = arg_parsers.CustomFunctionValidator(
     _IS_VALID_CLOUD_SQL_IPV4_CIDR_BLOCK,

@@ -37,9 +37,9 @@ class CreateGitHub(base.CreateCommand):
 
               $ {command} --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --branch-pattern=".*" --build-config="cloudbuild.yaml"
 
-            To create a pull request trigger for master:
+            To create a pull request trigger for main:
 
-              $ {command} --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --pull-request-pattern="^master$" --build-config="cloudbuild.yaml"
+              $ {command} --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --pull-request-pattern="^main$" --build-config="cloudbuild.yaml"
           """,
   }
 

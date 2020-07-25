@@ -36,7 +36,7 @@ def GetPrimaryNodeName():
 
   Returns:
     str, the name of the primary node. If running in tensorflow 1.x,
-    return 'master'. If running in tensorflow 2.x, return 'chief'.
+    return 'main'. If running in tensorflow 2.x, return 'chief'.
     If tensorflow is not installed in local envrionment, it will return
     the default name 'chief'.
   Raises:
@@ -66,7 +66,7 @@ def GetPrimaryNodeName():
   if 'decode' in dir(tf_version):
     tf_version = tf_version.decode('utf-8')
   if tf_version.startswith('1.'):
-    return 'master'
+    return 'main'
   elif tf_version.startswith('2.'):
     return 'chief'
   log.warning(

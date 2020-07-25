@@ -174,7 +174,7 @@ class JobsClientTest(base.MlGaPlatformTestBase, parameterized.TestCase):
     test_yaml = """
         jobId: rea1
         trainingInput:
-          masterConfig:
+          mainConfig:
             imageUri: image
           scaleTier: CUSTOM
           runtimeVersion: '0.12'
@@ -204,7 +204,7 @@ class JobsClientTest(base.MlGaPlatformTestBase, parameterized.TestCase):
     job = self.short_msgs.Job(
         jobId='the_real_job',
         trainingInput=self.short_msgs.TrainingInput(
-            masterConfig=self.short_msgs.ReplicaConfig(
+            mainConfig=self.short_msgs.ReplicaConfig(
                 imageUri=image_uri),
             region='us-east1'))
     self.assertEqual(self.jobs_client.IsCustomContainerTraining(job), expected)

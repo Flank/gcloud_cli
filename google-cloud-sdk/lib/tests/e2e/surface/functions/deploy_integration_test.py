@@ -259,7 +259,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
         '--source '
         'https://source.developers.google.com/projects/'
         'cloud-sdk-integration-testing/'
-        'repos/foom/moveable-aliases/master/paths//'.format(self.function_name))
+        'repos/foom/moveable-aliases/main/paths//'.format(self.function_name))
 
   def TearDown(self):
     # Calling this from AddCleanup handler will trigger an exception

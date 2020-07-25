@@ -147,7 +147,7 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'statusMessage': 'Running',
         'endpoint': self.ENDPOINT,
         'clusterApiVersion': version,
-        'currentMasterVersion': version,
+        'currentMainVersion': version,
         'ca_data': 'fakecertificateauthoritydata',
         'key_data': 'fakeclientkeydata',
         'cert_data': 'fakeclientcertificatedata',
@@ -178,12 +178,12 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     return self._RunningCluster(**defaults)
 
   def _RunningPrivateCluster(self, **kwargs):
-    master_ipv4_cidr = kwargs.get('masterIpv4Cidr', self.MASTER_IPV4_CIDR)
+    main_ipv4_cidr = kwargs.get('mainIpv4Cidr', self.MASTER_IPV4_CIDR)
     private_endpoint = kwargs.get('privateEndpoint', self.PRIVATE_ENDPOINT)
     config = self._MakePrivateClusterConfig(
         enablePrivateNodes=True,
         enablePrivateEndpoint=False,
-        masterIpv4Cidr=master_ipv4_cidr,
+        mainIpv4Cidr=main_ipv4_cidr,
     )
     config.privateEndpoint = private_endpoint
     defaults = {'privateClusterConfig': config}
@@ -238,9 +238,9 @@ class TestBase(cli_test_base.CliTestBase):
     self.op_pending = self.messages.Operation.StatusValueValuesEnum.PENDING
     self.op_abort = self.messages.Operation.StatusValueValuesEnum.ABORTING
     self.op_upgrade_nodes = self.messages.Operation.OperationTypeValueValuesEnum.UPGRADE_NODES  # pylint: disable=line-too-long
-    self.op_upgrade_master = self.messages.Operation.OperationTypeValueValuesEnum.UPGRADE_MASTER  # pylint: disable=line-too-long
+    self.op_upgrade_main = self.messages.Operation.OperationTypeValueValuesEnum.UPGRADE_MASTER  # pylint: disable=line-too-long
     self.op_update_cluster = self.messages.Operation.OperationTypeValueValuesEnum.UPDATE_CLUSTER  # pylint: disable=line-too-long
-    self.op_set_master_auth = self.messages.Operation.OperationTypeValueValuesEnum.SET_MASTER_AUTH  # pylint: disable=line-too-long
+    self.op_set_main_auth = self.messages.Operation.OperationTypeValueValuesEnum.SET_MASTER_AUTH  # pylint: disable=line-too-long
     self.op_set_labels = self.messages.Operation.OperationTypeValueValuesEnum.SET_LABELS  # pylint: disable=line-too-long
     self.compute_op_done = self.compute_messages.Operation.StatusValueValuesEnum.DONE  # pylint: disable=line-too-long
     self.compute_op_pending = self.compute_messages.Operation.StatusValueValuesEnum.PENDING  # pylint: disable=line-too-long
@@ -250,9 +250,9 @@ class TestBase(cli_test_base.CliTestBase):
     self.error = self.messages.Cluster.StatusValueValuesEnum.ERROR
     self.reconciling = self.messages.Cluster.StatusValueValuesEnum.RECONCILING
     self.degraded = self.messages.Cluster.StatusValueValuesEnum.DEGRADED
-    self.action_set_password = self.messages.SetMasterAuthRequest.ActionValueValuesEnum.SET_PASSWORD  # pylint: disable=line-too-long
-    self.action_generate_password = self.messages.SetMasterAuthRequest.ActionValueValuesEnum.GENERATE_PASSWORD  # pylint: disable=line-too-long
-    self.action_set_username = self.messages.SetMasterAuthRequest.ActionValueValuesEnum.SET_USERNAME  # pylint: disable=line-too-long
+    self.action_set_password = self.messages.SetMainAuthRequest.ActionValueValuesEnum.SET_PASSWORD  # pylint: disable=line-too-long
+    self.action_generate_password = self.messages.SetMainAuthRequest.ActionValueValuesEnum.GENERATE_PASSWORD  # pylint: disable=line-too-long
+    self.action_set_username = self.messages.SetMainAuthRequest.ActionValueValuesEnum.SET_USERNAME  # pylint: disable=line-too-long
 
   def _MakeCluster(self, **kwargs):
     # Avoid side effects by copying all these args. This ensures that when we
@@ -281,7 +281,7 @@ class TestBase(cli_test_base.CliTestBase):
         statusMessage=kwargs.get('statusMessage'),
         zone=kwargs.get('zone'),
         initialClusterVersion=kwargs.get('clusterApiVersion'),
-        currentMasterVersion=kwargs.get('currentMasterVersion'),
+        currentMainVersion=kwargs.get('currentMainVersion'),
         network=kwargs.get('network'),
         subnetwork=kwargs.get('subnetwork'),
         loggingService=kwargs.get('loggingService'),
@@ -296,7 +296,7 @@ class TestBase(cli_test_base.CliTestBase):
         enableKubernetesAlpha=kwargs.get('enableKubernetesAlpha'),
         expireTime=kwargs.get('expireTime'),
         selfLink=kwargs.get('selfLink'),
-        masterAuthorizedNetworksConfig=kwargs.get('authorizedNetworks'),
+        mainAuthorizedNetworksConfig=kwargs.get('authorizedNetworks'),
         legacyAbac=kwargs.get('legacyAbac'),
         resourceLabels=kwargs.get('labels'),
         maintenancePolicy=kwargs.get('maintenancePolicy'),
@@ -315,7 +315,7 @@ class TestBase(cli_test_base.CliTestBase):
         kwargs.get('ca_data') is not None or
         kwargs.get('key_data') is not None or
         kwargs.get('cert_data') is not None):
-      c.masterAuth = self.messages.MasterAuth(
+      c.mainAuth = self.messages.MainAuth(
           password=kwargs.get('password'),
           username=kwargs.get('username'),
           clusterCaCertificate=kwargs.get('ca_data'),
@@ -323,7 +323,7 @@ class TestBase(cli_test_base.CliTestBase):
           clientCertificate=kwargs.get('cert_data'),
       )
       if kwargs.get('issueClientCertificate') is not None:
-        c.masterAuth.clientCertificateConfig = (
+        c.mainAuth.clientCertificateConfig = (
             self.messages.ClientCertificateConfig(
                 issueClientCertificate=kwargs.get('issueClientCertificate')))
 
@@ -443,10 +443,10 @@ class TestBase(cli_test_base.CliTestBase):
       config.enablePrivateNodes = kwargs['enablePrivateNodes']
     if 'enablePrivateEndpoint' in kwargs:
       config.enablePrivateEndpoint = kwargs['enablePrivateEndpoint']
-    if 'masterIpv4Cidr' in kwargs:
-      config.masterIpv4CidrBlock = kwargs['masterIpv4Cidr']
-    if 'masterGlobalAccessConfig' in kwargs:
-      config.masterGlobalAccessConfig = kwargs['masterGlobalAccessConfig']
+    if 'mainIpv4Cidr' in kwargs:
+      config.mainIpv4CidrBlock = kwargs['mainIpv4Cidr']
+    if 'mainGlobalAccessConfig' in kwargs:
+      config.mainGlobalAccessConfig = kwargs['mainGlobalAccessConfig']
     return config
 
   def _ServerConfig(self):
@@ -638,8 +638,8 @@ class TestBase(cli_test_base.CliTestBase):
   def ExpectUpdateCluster(self, cluster_name, update, response):
     raise NotImplementedError('ExpectUpdateCluster is not overridden')
 
-  def ExpectSetMasterAuth(self, cluster_name, action, update, response):
-    raise NotImplementedError('ExpectSetMasterAuth is not overridden')
+  def ExpectSetMainAuth(self, cluster_name, action, update, response):
+    raise NotImplementedError('ExpectSetMainAuth is not overridden')
 
   def ExpectLegacyAbac(self, cluster_name, enabled, response):
     raise NotImplementedError('ExpectLegacyAbac is not overridden')
@@ -934,14 +934,14 @@ class GATestBase(TestBase):
             update=update),
         response=response)
 
-  def ExpectSetMasterAuth(self,
+  def ExpectSetMainAuth(self,
                           cluster_name,
                           action,
                           update,
                           response=None,
                           exception=None):
-    self.mocked_client.projects_locations_clusters.SetMasterAuth.Expect(
-        self.msgs.SetMasterAuthRequest(
+    self.mocked_client.projects_locations_clusters.SetMainAuth.Expect(
+        self.msgs.SetMainAuthRequest(
             name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
                                                     cluster_name),
             action=action,
@@ -1021,7 +1021,7 @@ class GATestBase(TestBase):
       response = None
     else:
       response = self.messages.ServerConfig(
-          defaultClusterVersion='1.2.3', validMasterVersions=['1.3.2'])
+          defaultClusterVersion='1.2.3', validMainVersions=['1.3.2'])
     self.mocked_client.projects_locations.GetServerConfig.Expect(
         self.messages.ContainerProjectsLocationsGetServerConfigRequest(
             name=api_adapter.ProjectLocation(self.PROJECT_ID, location)),

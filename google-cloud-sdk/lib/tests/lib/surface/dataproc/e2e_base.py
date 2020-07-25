@@ -96,9 +96,9 @@ class DataprocIntegrationTestBase(
   def CreateCluster(self, args=''):
     result = self.RunDataproc((
         'clusters create {name} '
-        '--master-machine-type {master_machine} '
+        '--main-machine-type {main_machine} '
         '--worker-machine-type {worker_machine} '
-        '--master-boot-disk-size {master_disk_size} '
+        '--main-boot-disk-size {main_disk_size} '
         '--worker-boot-disk-size {worker_disk_size} '
         '--num-workers 2 '
         '--network {network} '
@@ -106,9 +106,9 @@ class DataprocIntegrationTestBase(
         '--zone {zone} '
         '{args} ').format(
             name=self.cluster_name,
-            master_machine=self.MASTER_MACHINE_TYPE,
+            main_machine=self.MASTER_MACHINE_TYPE,
             worker_machine=self.WORKER_MACHINE_TYPE,
-            master_disk_size=self.MASTER_DISK_SIZE,
+            main_disk_size=self.MASTER_DISK_SIZE,
             worker_disk_size=self.WORKER_DISK_SIZE,
             network=self.NETWORK,
             zone=self.zone,

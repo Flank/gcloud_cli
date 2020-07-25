@@ -313,7 +313,7 @@ class DatabaseInstance(_messages.Message):
       instances: <b>MYSQL_5_6</b> (default) or <b>MYSQL_5_5</b>
     InstanceTypeValueValuesEnum: The instance type. This can be one of the
       following. <br><b>CLOUD_SQL_INSTANCE</b>: A Cloud SQL instance that is
-      not replicating from a master. <br><b>ON_PREMISES_INSTANCE</b>: An
+      not replicating from a main. <br><b>ON_PREMISES_INSTANCE</b>: An
       instance running on the customer's premises.
       <br><b>READ_REPLICA_INSTANCE</b>: A Cloud SQL instance configured as a
       read-replica.
@@ -366,14 +366,14 @@ class DatabaseInstance(_messages.Message):
       secondary zone.
     instanceType: The instance type. This can be one of the following.
       <br><b>CLOUD_SQL_INSTANCE</b>: A Cloud SQL instance that is not
-      replicating from a master. <br><b>ON_PREMISES_INSTANCE</b>: An instance
+      replicating from a main. <br><b>ON_PREMISES_INSTANCE</b>: An instance
       running on the customer's premises. <br><b>READ_REPLICA_INSTANCE</b>: A
       Cloud SQL instance configured as a read-replica.
     ipAddresses: The assigned IP addresses for the instance.
     ipv6Address: The IPv6 address assigned to the instance. This property is
       applicable only to First Generation instances.
     kind: This is always <b>sql#instance</b>.
-    masterInstanceName: The name of the instance which will act as master in
+    mainInstanceName: The name of the instance which will act as main in
       the replication setup.
     maxDiskSize: The maximum disk size of the instance in bytes.
     name: Name of the Cloud SQL instance. This does not include the project
@@ -476,7 +476,7 @@ class DatabaseInstance(_messages.Message):
   class InstanceTypeValueValuesEnum(_messages.Enum):
     r"""The instance type. This can be one of the following.
     <br><b>CLOUD_SQL_INSTANCE</b>: A Cloud SQL instance that is not
-    replicating from a master. <br><b>ON_PREMISES_INSTANCE</b>: An instance
+    replicating from a main. <br><b>ON_PREMISES_INSTANCE</b>: An instance
     running on the customer's premises. <br><b>READ_REPLICA_INSTANCE</b>: A
     Cloud SQL instance configured as a read-replica.
 
@@ -543,7 +543,7 @@ class DatabaseInstance(_messages.Message):
 
     Fields:
       available: The availability status of the failover replica. A false
-        status indicates that the failover replica is out of sync. The master
+        status indicates that the failover replica is out of sync. The main
         can only failover to the failover replica when the status is true.
       name: The name of the failover replica. If specified at instance
         creation, a failover replica is created for the instance. The name
@@ -567,7 +567,7 @@ class DatabaseInstance(_messages.Message):
   ipAddresses = _messages.MessageField('IpMapping', 11, repeated=True)
   ipv6Address = _messages.StringField(12)
   kind = _messages.StringField(13)
-  masterInstanceName = _messages.StringField(14)
+  mainInstanceName = _messages.StringField(14)
   maxDiskSize = _messages.IntegerField(15)
   name = _messages.StringField(16)
   onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 17)
@@ -598,57 +598,57 @@ class DatabasesListResponse(_messages.Message):
   kind = _messages.StringField(2)
 
 
-class DemoteMasterConfiguration(_messages.Message):
-  r"""Read-replica configuration for connecting to the on-premises master.
+class DemoteMainConfiguration(_messages.Message):
+  r"""Read-replica configuration for connecting to the on-premises main.
 
   Fields:
-    kind: This is always <b>sql#demoteMasterConfiguration</b>.
+    kind: This is always <b>sql#demoteMainConfiguration</b>.
     mysqlReplicaConfiguration: MySQL specific configuration when replicating
-      from a MySQL on-premises master. Replication configuration information
+      from a MySQL on-premises main. Replication configuration information
       such as the username, password, certificates, and keys are not stored in
       the instance metadata. The configuration information is used only to set
       up the replication connection and is stored by MySQL in a file named
-      <b>master.info</b> in the data directory.
+      <b>main.info</b> in the data directory.
   """
 
   kind = _messages.StringField(1)
-  mysqlReplicaConfiguration = _messages.MessageField('DemoteMasterMySqlReplicaConfiguration', 2)
+  mysqlReplicaConfiguration = _messages.MessageField('DemoteMainMySqlReplicaConfiguration', 2)
 
 
-class DemoteMasterContext(_messages.Message):
-  r"""Database instance demote master context.
+class DemoteMainContext(_messages.Message):
+  r"""Database instance demote main context.
 
   Fields:
-    kind: This is always <b>sql#demoteMasterContext</b>.
-    masterInstanceName: The name of the instance which will act as on-premises
-      master in the replication setup.
+    kind: This is always <b>sql#demoteMainContext</b>.
+    mainInstanceName: The name of the instance which will act as on-premises
+      main in the replication setup.
     replicaConfiguration: Configuration specific to read-replicas replicating
-      from the on-premises master.
+      from the on-premises main.
     verifyGtidConsistency: Verify GTID consistency for demote operation.
       Default value: <b>True</b>. Second Generation instances only.  Setting
       this flag to false enables you to bypass GTID consistency check between
-      on-premises master and Cloud SQL instance during the demotion operation
+      on-premises main and Cloud SQL instance during the demotion operation
       but also exposes you to the risk of future replication failures. Change
       the value only if you know the reason for the GTID divergence and are
       confident that doing so will not cause any replication issues.
   """
 
   kind = _messages.StringField(1)
-  masterInstanceName = _messages.StringField(2)
-  replicaConfiguration = _messages.MessageField('DemoteMasterConfiguration', 3)
+  mainInstanceName = _messages.StringField(2)
+  replicaConfiguration = _messages.MessageField('DemoteMainConfiguration', 3)
   verifyGtidConsistency = _messages.BooleanField(4)
 
 
-class DemoteMasterMySqlReplicaConfiguration(_messages.Message):
+class DemoteMainMySqlReplicaConfiguration(_messages.Message):
   r"""Read-replica configuration specific to MySQL databases.
 
   Fields:
     caCertificate: PEM representation of the trusted CA's x509 certificate.
-    clientCertificate: PEM representation of the slave's x509 certificate.
-    clientKey: PEM representation of the slave's private key. The
+    clientCertificate: PEM representation of the subordinate's x509 certificate.
+    clientKey: PEM representation of the subordinate's private key. The
       corresponsing public key is encoded in the client's certificate. The
-      format of the slave's private key can be either PKCS #1 or PKCS #8.
-    kind: This is always <b>sql#demoteMasterMysqlReplicaConfiguration</b>.
+      format of the subordinate's private key can be either PKCS #1 or PKCS #8.
+    kind: This is always <b>sql#demoteMainMysqlReplicaConfiguration</b>.
     password: The password for the replication connection.
     username: The username for the replication connection.
   """
@@ -763,14 +763,14 @@ class ExportContext(_messages.Message):
       r"""Options for exporting from MySQL.
 
       Fields:
-        masterData: Option to include SQL statement required to set up
+        mainData: Option to include SQL statement required to set up
           replication. <br>If set to <b>1</b>, the dump file includes  a
           CHANGE MASTER TO statement with the binary log coordinates. <br>If
           set to <b>2</b>, the CHANGE MASTER TO statement is written as  a SQL
           comment, and has no effect. All other values are ignored.
       """
 
-      masterData = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+      mainData = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
     mysqlExportOptions = _messages.MessageField('MysqlExportOptionsValue', 1)
     schemaOnly = _messages.BooleanField(2)
@@ -1020,14 +1020,14 @@ class InstancesCloneRequest(_messages.Message):
   cloneContext = _messages.MessageField('CloneContext', 1)
 
 
-class InstancesDemoteMasterRequest(_messages.Message):
-  r"""Database demote master request.
+class InstancesDemoteMainRequest(_messages.Message):
+  r"""Database demote main request.
 
   Fields:
-    demoteMasterContext: Contains details about the demoteMaster operation.
+    demoteMainContext: Contains details about the demoteMain operation.
   """
 
-  demoteMasterContext = _messages.MessageField('DemoteMasterContext', 1)
+  demoteMainContext = _messages.MessageField('DemoteMainContext', 1)
 
 
 class InstancesExportRequest(_messages.Message):
@@ -1180,9 +1180,9 @@ class IpMapping(_messages.Message):
       PRIMARY: IP address the customer is supposed to connect to. Usually this
         is the load balancer's IP address
       OUTGOING: Source IP address of the connection a read replica establishes
-        to its external master. This IP address can be whitelisted by the
+        to its external main. This IP address can be whitelisted by the
         customer in case it has a firewall that filters incoming connection to
-        its on premises master.
+        its on premises main.
       PRIVATE: Private IP used when using private IPs and network peering.
       MIGRATED_1ST_GEN: V1 IP of a migrated instance. We want the user to
         decommission this IP as soon as the migration is complete. Note: V1
@@ -1268,24 +1268,24 @@ class MySqlReplicaConfiguration(_messages.Message):
 
   Fields:
     caCertificate: PEM representation of the trusted CA's x509 certificate.
-    clientCertificate: PEM representation of the slave's x509 certificate.
-    clientKey: PEM representation of the slave's private key. The
+    clientCertificate: PEM representation of the subordinate's x509 certificate.
+    clientKey: PEM representation of the subordinate's private key. The
       corresponsing public key is encoded in the client's certificate.
     connectRetryInterval: Seconds to wait between connect retries. MySQL's
       default is 60 seconds.
     dumpFilePath: Path to a SQL dump file in Google Cloud Storage from which
-      the slave instance is to be created. The URI is in the form
+      the subordinate instance is to be created. The URI is in the form
       gs://bucketName/fileName. Compressed gzip files (.gz) are also
       supported. Dumps should have the binlog co-ordinates from which
-      replication should begin. This can be accomplished by setting --master-
+      replication should begin. This can be accomplished by setting --main-
       data to 1 when using mysqldump.
     kind: This is always <b>sql#mysqlReplicaConfiguration</b>.
-    masterHeartbeatPeriod: Interval in milliseconds between replication
+    mainHeartbeatPeriod: Interval in milliseconds between replication
       heartbeats.
     password: The password for the replication connection.
     sslCipher: A list of permissible ciphers to use for SSL encryption.
     username: The username for the replication connection.
-    verifyServerCertificate: Whether or not to check the master's Common Name
+    verifyServerCertificate: Whether or not to check the main's Common Name
       value in the certificate that it sends during the SSL handshake.
   """
 
@@ -1295,7 +1295,7 @@ class MySqlReplicaConfiguration(_messages.Message):
   connectRetryInterval = _messages.IntegerField(4, variant=_messages.Variant.INT32)
   dumpFilePath = _messages.StringField(5)
   kind = _messages.StringField(6)
-  masterHeartbeatPeriod = _messages.IntegerField(7)
+  mainHeartbeatPeriod = _messages.IntegerField(7)
   password = _messages.StringField(8)
   sslCipher = _messages.StringField(9)
   username = _messages.StringField(10)
@@ -1307,8 +1307,8 @@ class OnPremisesConfiguration(_messages.Message):
 
   Fields:
     caCertificate: PEM representation of the trusted CA's x509 certificate.
-    clientCertificate: PEM representation of the slave's x509 certificate.
-    clientKey: PEM representation of the slave's private key. The
+    clientCertificate: PEM representation of the subordinate's x509 certificate.
+    clientKey: PEM representation of the subordinate's private key. The
       corresponsing public key is encoded in the client's certificate.
     dumpFilePath: The dump file to create the Cloud SQL replica.
     hostPort: The host and port of the on-premises instance in host:port
@@ -1425,7 +1425,7 @@ class Operation(_messages.Message):
       CREATE_CLONE: Creates clone instance.
       RESCHEDULE_MAINTENANCE: Reschedule maintenance to another time.
       START_EXTERNAL_SYNC: Starts external sync of a Cloud SQL EM replica to
-        an external master.
+        an external main.
     """
     SQL_OPERATION_TYPE_UNSPECIFIED = 0
     IMPORT = 1
@@ -1539,22 +1539,22 @@ class OperationsListResponse(_messages.Message):
 
 
 class ReplicaConfiguration(_messages.Message):
-  r"""Read-replica configuration for connecting to the master.
+  r"""Read-replica configuration for connecting to the main.
 
   Fields:
     failoverTarget: Specifies if the replica is the failover target. If the
       field is set to <b>true</b> the replica will be designated as a failover
-      replica. In case the master instance fails, the replica instance will be
-      promoted as the new master instance.  <p>Only one replica can be
+      replica. In case the main instance fails, the replica instance will be
+      promoted as the new main instance.  <p>Only one replica can be
       specified as failover target, and the replica has to be in different
-      zone with the master instance.
+      zone with the main instance.
     kind: This is always <b>sql#replicaConfiguration</b>.
     mysqlReplicaConfiguration: MySQL specific configuration when replicating
-      from a MySQL on-premises master. Replication configuration information
+      from a MySQL on-premises main. Replication configuration information
       such as the username, password, certificates, and keys are not stored in
       the instance metadata. The configuration information is used only to set
       up the replication connection and is stored by MySQL in a file named
-      <b>master.info</b> in the data directory.
+      <b>main.info</b> in the data directory.
   """
 
   failoverTarget = _messages.BooleanField(1)
@@ -2014,7 +2014,7 @@ class SqlDatabasesUpdateRequest(_messages.Message):
 
 
 class SqlExternalSyncSettingError(_messages.Message):
-  r"""External master migration setting error.
+  r"""External main migration setting error.
 
   Enums:
     TypeValueValuesEnum: Identifies the specific error that occurred.
@@ -2127,18 +2127,18 @@ class SqlInstancesDeleteRequest(_messages.Message):
   project = _messages.StringField(2, required=True)
 
 
-class SqlInstancesDemoteMasterRequest(_messages.Message):
-  r"""A SqlInstancesDemoteMasterRequest object.
+class SqlInstancesDemoteMainRequest(_messages.Message):
+  r"""A SqlInstancesDemoteMainRequest object.
 
   Fields:
     instance: Cloud SQL instance name.
-    instancesDemoteMasterRequest: A InstancesDemoteMasterRequest resource to
+    instancesDemoteMainRequest: A InstancesDemoteMainRequest resource to
       be passed as the request body.
     project: ID of the project that contains the instance.
   """
 
   instance = _messages.StringField(1, required=True)
-  instancesDemoteMasterRequest = _messages.MessageField('InstancesDemoteMasterRequest', 2)
+  instancesDemoteMainRequest = _messages.MessageField('InstancesDemoteMainRequest', 2)
   project = _messages.StringField(3, required=True)
 
 

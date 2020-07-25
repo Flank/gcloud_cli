@@ -93,23 +93,23 @@ class TransformTest(test_case.Base):
         'source': {
             'repoSource': {
                 'repoName': 'my-repo',
-                'branchName': 'master'
+                'branchName': 'main'
             }
         }
     }
     out = transforms.TransformBuildSource(r, undefined=_UNDEFINED)
-    self.assertEqual(out, 'my-repo@master')
+    self.assertEqual(out, 'my-repo@main')
 
   def testTransformBuildSourceNoRepoName(self):
     r = {
         'source': {
             'repoSource': {
-                'branchName': 'master'
+                'branchName': 'main'
             }
         }
     }
     out = transforms.TransformBuildSource(r, undefined=_UNDEFINED)
-    self.assertEqual(out, 'default@master')
+    self.assertEqual(out, 'default@main')
 
   def testTransformBuildSourceTag(self):
     r = {
