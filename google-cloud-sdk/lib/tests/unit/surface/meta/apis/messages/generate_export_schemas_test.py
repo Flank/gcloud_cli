@@ -116,7 +116,7 @@ properties:
     type: booleanconstraint
   constraintDefault:
     description: |-
-      The evaluation behavior of this constraint in the absense of 'Policy'.
+      The evaluation behavior of this constraint in the absence of 'Policy'.
     type: string
     enum:
     - ALLOW

@@ -211,8 +211,11 @@ platform/bq/third_party/rsa/asn1.py
 platform/bq/third_party/rsa/common.py
 platform/bq/third_party/rsa/core.py
 platform/bq/third_party/rsa/key.py
+platform/bq/third_party/rsa/machine_size.py
 platform/bq/third_party/rsa/pem.py
 platform/bq/third_party/rsa/pkcs1.py
+platform/bq/third_party/rsa/pkcs1_v2.py
+platform/bq/third_party/rsa/prime.py
 platform/bq/third_party/rsa/randnum.py
 platform/bq/third_party/rsa/transform.py
 platform/bq/third_party/rsa/varblock.py

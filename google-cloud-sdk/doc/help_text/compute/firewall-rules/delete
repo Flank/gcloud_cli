@@ -1,13 +1,12 @@
 NAME
-    gcloud compute firewall-rules delete - delete Google Compute Engine
-        firewall rules
+    gcloud compute firewall-rules delete - delete Compute Engine firewall rules
 
 SYNOPSIS
     gcloud compute firewall-rules delete NAME [NAME ...] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute firewall-rules delete deletes one or more Google Compute
-    Engine firewall rules.
+    gcloud compute firewall-rules delete deletes one or more Compute Engine
+    firewall rules.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

@@ -94,8 +94,17 @@ DESCRIPTION
             comma) separated list.
 
          key = value
-            True if key is equal to value. Equivalent to :, with the exception
-            that the trailing * prefix match is not supported.
+            True if key is equal to value, or [deprecated] equivalent to : with
+            the exception that the trailing * prefix match is not supported.
+
+            For historical reasons, this operation currently behaves
+            differently for different Google APIs. For many APIs, this is True
+            if key is equal to value. For a few APIs, this is currently
+            equivalent to :, with the exception that the trailing * prefix
+            match is not supported. However, this behaviour is being phased
+            out, and use of = for those APIs is deprecated; for those APIs, if
+            you want matching, you should use : instead of =, and if you want
+            to test for equality, you can use key <= value AND key >= value.
 
          key =( value ... )
             True if key is equal to any value in the (space, tab, newline, ,)
@@ -145,10 +154,10 @@ EXAMPLES
         $ gcloud compute instances list --filter="machineType:f1-micro"
 
     List Compute Engine instance resources using a regular expression for zone
-    prefix us and not MachineType f1-micro:
+    us and not MachineType f1-micro:
 
         $ gcloud compute instances list \
-            --filter="zone ~ ^us AND -machineType:f1-micro"
+            --filter="zone ~ us AND -machineType:f1-micro"
 
     List Compute Engine instance resources with tag my-tag:
 

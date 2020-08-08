@@ -10,7 +10,7 @@ SYNOPSIS
           | --dockerfile=DOCKERFILE --dockerfile-dir=DOCKERFILE_DIR;
           default="/" --dockerfile-image=DOCKERFILE_IMAGE)
           : --description=DESCRIPTION
-          --ignored-files=[GLOB,...] --included-files=[GLOB,...]])
+          --ignored-files=[GLOB,...] --included-files=[GLOB,...] --name=NAME])
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -20,10 +20,9 @@ REQUIRED FLAGS
      Exactly one of these must be specified:
 
        --trigger-config=PATH
-          Path to a YAML or JSON file containing the trigger configuration.
-
-          For more details, see:
-          https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers
+          Path to Build Trigger config file (JSON or YAML format). For more
+          details, see
+          https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers#BuildTrigger
 
        Flag based trigger configuration
 
@@ -46,6 +45,9 @@ REQUIRED FLAGS
          --included-files=[GLOB,...]
             Glob filter. Changes affecting at least one included file will
             trigger builds.
+
+         --name=NAME
+            Build trigger name.
 
          Exactly one of these must be specified:
 
@@ -140,7 +142,7 @@ EXAMPLES
     To create a push trigger for all branches:
 
         $ gcloud alpha builds triggers create cloud-source-repositories \
-            --repo="my-repo" --branch-pattern=".*" \
+            --name="my-trigger" --repo="my-repo" --branch-pattern=".*" \
             --build-config="cloudbuild.yaml"
 
 NOTES

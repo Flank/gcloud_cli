@@ -34,6 +34,17 @@ class Collections(enum.Enum):
       ['name'],
       True
   )
+  ORGANIZATIONS_ANALYTICS_DATASTORES = (
+      'organizations.analytics.datastores',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/analytics/datastores/'
+              '{datastoresId}',
+      },
+      ['name'],
+      True
+  )
   ORGANIZATIONS_APIPRODUCTS = (
       'organizations.apiproducts',
       '{+name}',
@@ -140,12 +151,44 @@ class Collections(enum.Enum):
       ['name'],
       True
   )
+  ORGANIZATIONS_ENVGROUPS = (
+      'organizations.envgroups',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/envgroups/{envgroupsId}',
+      },
+      ['name'],
+      True
+  )
+  ORGANIZATIONS_ENVGROUPS_ATTACHMENTS = (
+      'organizations.envgroups.attachments',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/envgroups/{envgroupsId}/'
+              'attachments/{attachmentsId}',
+      },
+      ['name'],
+      True
+  )
   ORGANIZATIONS_ENVIRONMENTS = (
       'organizations.environments',
       '{+name}',
       {
           '':
               'organizations/{organizationsId}/environments/{environmentsId}',
+      },
+      ['name'],
+      True
+  )
+  ORGANIZATIONS_ENVIRONMENTS_ANALYTICS_EXPORTS = (
+      'organizations.environments.analytics.exports',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/environments/{environmentsId}/'
+              'analytics/exports/{exportsId}',
       },
       ['name'],
       True
@@ -285,6 +328,27 @@ class Collections(enum.Enum):
           '':
               'organizations/{organizationsId}/environments/{environmentsId}/'
               'targetservers/{targetserversId}',
+      },
+      ['name'],
+      True
+  )
+  ORGANIZATIONS_INSTANCES = (
+      'organizations.instances',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/instances/{instancesId}',
+      },
+      ['name'],
+      True
+  )
+  ORGANIZATIONS_INSTANCES_ATTACHMENTS = (
+      'organizations.instances.attachments',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/instances/{instancesId}/'
+              'attachments/{attachmentsId}',
       },
       ['name'],
       True

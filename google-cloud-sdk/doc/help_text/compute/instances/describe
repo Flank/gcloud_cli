@@ -60,7 +60,7 @@ EXAMPLES
     using the '--format' flag:
 
         $ gcloud compute instances describe test-instance \
-            --format='yaml(name,status,disks)'
+            --format="yaml(name,status,disks)"
 
 NOTES
     These variants are also available:

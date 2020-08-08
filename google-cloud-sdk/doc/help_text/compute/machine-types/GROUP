@@ -1,6 +1,5 @@
 NAME
-    gcloud compute machine-types - read Google Compute Engine virtual machine
-        types
+    gcloud compute machine-types - read Compute Engine virtual machine types
 
 SYNOPSIS
     gcloud compute machine-types COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -26,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        Describe a Google Compute Engine machine type.
+        Describe a Compute Engine machine type.
 
      list
         List Google Compute Engine machine types.

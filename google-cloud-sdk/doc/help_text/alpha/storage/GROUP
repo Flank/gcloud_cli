@@ -27,6 +27,9 @@ COMMANDS
      copy
         (ALPHA) Upload, download, and copy Cloud Storage objects.
 
+     cp
+        (ALPHA) Upload, download, and copy Cloud Storage objects.
+
      delete
         (ALPHA) Delete Cloud Storage objects and buckets.
 

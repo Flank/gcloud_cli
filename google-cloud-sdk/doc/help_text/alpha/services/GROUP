@@ -28,6 +28,9 @@ GROUPS
      operations
         (ALPHA) Manage Operation for various services.
 
+     quota
+        (ALPHA) Manage service consumer quota.
+
      vpc-peerings
         (ALPHA) VPC Peerings to various services.
 

@@ -326,7 +326,11 @@
           "$ref": "GoogleCloudMlV1__Scheduling"
         },
         "network": {
-          "description": "Optional. The full name of the Google Compute Engine\n[network](\/compute\/docs\/networks-and-firewalls#networks) to which the Job\nis peered. For example, projects\/12345\/global\/networks\/myVPC. Format is of\nthe form projects\/{project}\/global\/networks\/{network}. Where {project} is a\nproject number, as in '12345', and {network} is network name.\".\n\nPrivate services access must already be configured for the network. If left\nunspecified, the Job is not peered with any network. Learn more -\nConnecting Job to user network over private\nIP.",
+          "description": "Optional. The full name of the [Compute Engine network](\/vpc\/docs\/vpc) to which the\nJob is peered. For example, `projects\/12345\/global\/networks\/myVPC`. The\nformat of this field is `projects\/{project}\/global\/networks\/{network}`,\nwhere {project} is a project number (like `12345`) and {network} is network\nname.\n\nPrivate services access must already be configured for the network. If left\nunspecified, the Job is not peered with any network. [Learn about using VPC\nNetwork Peering.](\/ai-platform\/training\/docs\/vpc-peering).",
+          "type": "string"
+        },
+        "serviceAccount": {
+          "description": "Optional. The email address of a service account to use when running the\ntraining appplication. You must have the `iam.serviceAccounts.actAs`\npermission for the specified service account. In addition, the AI Platform\nTraining Google-managed service account must have the\n`roles\/iam.serviceAccountAdmin` role for the specified service account.\n[Learn more about configuring a service\naccount.](\/ai-platform\/training\/docs\/custom-service-account)\n\nIf not specified, the AI Platform Training Google-managed service account\nis used by default.",
           "type": "string"
         },
         "useChiefInTfConfig": {
@@ -577,12 +581,14 @@
           "description": "Optional. The multi-trial Neural Architecture Search (NAS) algorithm\ntype. Defaults to `NAS_MULTI_TRIAL_ALGORITHM_REINFORCEMENT_LEARNING`.",
           "enumDescriptions": [
             "",
-            "The Reinforcement Learning Algorithm for Multi-trial Neural\nArchitecture Search (NAS)."
+            "The Reinforcement Learning Algorithm for Multi-trial Neural\nArchitecture Search (NAS).",
+            "The Grid Search Algorithm for Multi-trial Neural\nArchitecture Search (NAS)."
           ],
           "type": "string",
           "enum": [
             "MULTI_TRIAL_ALGORITHM_UNSPECIFIED",
-            "REINFORCEMENT_LEARNING"
+            "REINFORCEMENT_LEARNING",
+            "GRID_SEARCH"
           ]
         },
         "nasTargetRewardMetric": {
@@ -649,6 +655,10 @@
         "maxWaitTime": {
           "type": "string",
           "format": "google-duration"
+        },
+        "resilientToWorkerRestart": {
+          "description": "Optional. If true, reschedules an entire job if a worker gets restarted.\nThis feature can be used by distributed training jobs that are not\nresilient to workers leaving and joining a job.",
+          "type": "boolean"
         }
       }
     },
@@ -914,7 +924,7 @@
           "$ref": "GoogleCloudMlV1__AblationAttribution"
         },
         "integratedGradientsAttribution": {
-          "description": "Attributes credit by computing the Aumann-Shapley value taking advantage\nof the model's fully differentiable structure. Refer to this paper for\nmore details: http:\/\/proceedings.mlr.press\/v70\/sundararajan17a.html",
+          "description": "Attributes credit by computing the Aumann-Shapley value taking advantage\nof the model's fully differentiable structure. Refer to this paper for\nmore details: https:\/\/arxiv.org\/abs\/1703.01365",
           "$ref": "GoogleCloudMlV1__IntegratedGradientsAttribution"
         },
         "sampledShapleyAttribution": {
@@ -956,6 +966,61 @@
           "description": "Number of steps for approximating the path integral.\nA good value to start is 50 and gradually increase until the\nsum to diff property is met within the desired error range.",
           "type": "integer",
           "format": "int32"
+        },
+        "smoothGradConfig": {
+          "description": "Config for SmoothGrad approximation of gradients.\nWhen enabled, the gradients are approximated by averaging the gradients\nfrom noisy samples in the vicinity of the inputs. Adding\nnoise can help improve the computed gradients, see here for why:\nhttps:\/\/arxiv.org\/pdf\/1706.03825.pdf",
+          "$ref": "GoogleCloudMlV1__SmoothGradConfig"
+        }
+      }
+    },
+    "GoogleCloudMlV1__SmoothGradConfig": {
+      "id": "GoogleCloudMlV1__SmoothGradConfig",
+      "description": "Config for SmoothGrad approximation of gradients.\nWhen enabled, the gradients are approximated by averaging the gradients from\nnoisy samples in the vicinity of the inputs. Adding noise can help improve\nthe computed gradients. See here for why https:\/\/arxiv.org\/pdf\/1706.03825.pdf",
+      "type": "object",
+      "properties": {
+        "noiseSigma": {
+          "description": "If set, this std. deviation will be used to apply noise to all features.",
+          "type": "number",
+          "format": "float"
+        },
+        "featureNoiseSigma": {
+          "description": "Alternatively, set this to use different noise_sigma per feature.\nOne entry per feature. No noise is added to features that are not set.",
+          "$ref": "GoogleCloudMlV1__FeatureNoiseSigma"
+        },
+        "noisySampleCount": {
+          "description": "The number of gradient samples to use for\napproximation. The higher this number, the more accurate the gradient\nis, but the runtime complexity of IG increases by this factor as well.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "GoogleCloudMlV1__FeatureNoiseSigma": {
+      "id": "GoogleCloudMlV1__FeatureNoiseSigma",
+      "description": "Noise sigma by features. Noise sigma represents the standard deviation of the\ngaussian kernel that will be used to add noise to interpolated inputs prior\nto computing gradients.",
+      "type": "object",
+      "properties": {
+        "noiseSigma": {
+          "description": "Noise sigma per feature. No noise is added to features that are not set.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1_FeatureNoiseSigma_NoiseSigmaForFeature"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_FeatureNoiseSigma_NoiseSigmaForFeature": {
+      "id": "GoogleCloudMlV1_FeatureNoiseSigma_NoiseSigmaForFeature",
+      "description": "Noise sigma for a single feature.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the input feature for which noise sigma is provided.",
+          "type": "string"
+        },
+        "sigma": {
+          "description": "Standard deviation of gaussian kernel for noise.",
+          "type": "number",
+          "format": "float"
         }
       }
     },
@@ -980,6 +1045,10 @@
           "description": "Number of steps for approximating the path integral.\nA good value to start is 50 and gradually increase until the\nsum to diff property is met within the desired error range.",
           "type": "integer",
           "format": "int32"
+        },
+        "smoothGradConfig": {
+          "description": "Config for SmoothGrad approximation of gradients.\nWhen enabled, the gradients are approximated by averaging the gradients\nfrom noisy samples in the vicinity of the inputs. Adding\nnoise can help improve the computed gradients, see here for why:\nhttps:\/\/arxiv.org\/pdf\/1706.03825.pdf",
+          "$ref": "GoogleCloudMlV1__SmoothGradConfig"
         }
       }
     },
@@ -1705,6 +1774,39 @@
         },
         "maxNodes": {
           "description": "Optional. The maximum number of nodes to scale this model under load. The actual\nvalue will depend on resource quota and availability.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "metrics": {
+          "description": "Optional. MetricSpec contains the specifications to use to calculate the desired\nnodes count.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__MetricSpec"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1__MetricSpec": {
+      "id": "GoogleCloudMlV1__MetricSpec",
+      "description": "MetricSpec contains the specifications to use to calculate the desired\nnodes count when autoscaling is enabled.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "metric name.",
+          "enumDescriptions": [
+            "Unspecified MetricName.",
+            "CPU usage.",
+            "GPU duty cycle."
+          ],
+          "type": "string",
+          "enum": [
+            "METRIC_NAME_UNSPECIFIED",
+            "CPU_USAGE",
+            "GPU_DUTY_CYCLE"
+          ]
+        },
+        "target": {
+          "description": "Target specifies the target value for the given metric; once real metric\ndeviates from the threshold by a certain percentage, the node count\nchanges.",
           "type": "integer",
           "format": "int32"
         }
@@ -2574,7 +2676,7 @@
     },
     "GoogleIamV1__AuditConfig": {
       "id": "GoogleIamV1__AuditConfig",
-      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
+      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\",\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\"\n            },\n            {\n              \"log_type\": \"ADMIN_READ\"\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\",\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\"\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
       "type": "object",
       "properties": {
         "service": {
@@ -2592,7 +2694,7 @@
     },
     "GoogleIamV1__AuditLogConfig": {
       "id": "GoogleIamV1__AuditLogConfig",
-      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
+      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\"\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
       "type": "object",
       "properties": {
         "logType": {

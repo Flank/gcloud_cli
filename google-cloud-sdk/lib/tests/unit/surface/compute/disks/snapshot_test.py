@@ -58,11 +58,15 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
   def TearDown(self):
     self.api_mock.batch_responder.AssertDone()
 
-  def _GetCreateSnapshotRequest(self, disk_ref, snapshot_ref, description=None,
+  def _GetCreateSnapshotRequest(self,
+                                disk_ref,
+                                snapshot_ref,
+                                description=None,
                                 guest_flush=False,
                                 raw_encryption_key=None,
                                 rsa_encryption_key=None,
-                                storage_location=None):
+                                storage_location=None,
+                                chain_name=None):
     if disk_ref.Collection() == 'compute.regionDisks':
       service = self.api_mock.adapter.apitools_client.regionDisks
       request_type = (
@@ -77,6 +81,8 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
       payload.guestFlush = guest_flush
     except AttributeError:
       pass
+    if chain_name is not None:
+      payload.snapshot.chainName = chain_name
     if description is not None:
       payload.snapshot.description = description
     if raw_encryption_key:
@@ -674,6 +680,27 @@ class DisksSnapshotTestBeta(DisksSnapshotTestGA):
     self.Run('compute disks snapshot {disk} '
              '--csek-key-file={keyfile} --async'
              .format(disk=disk_ref.SelfLink(), keyfile=csek_key_file))
+
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(
+        'Disk snapshot in progress for [{}].\n'
+        'Use [gcloud compute operations describe URI] command to check '
+        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
+
+  def testSnapshotChain(self):
+    disk_ref = self._GetDiskRef('disk-1')
+    snapshot_ref = self._GetSnapshotRef('snapshot-1')
+    operation_ref = self._GetOperationRef('operation-1')
+
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetCreateSnapshotRequest(
+            disk_ref, snapshot_ref, chain_name='testchain'),
+         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
+    ])
+
+    self.Run(
+        'compute disks snapshot {disk} --snapshot-names {snapshot} --chain-name testchain --async'
+        .format(disk=disk_ref.SelfLink(), snapshot=snapshot_ref.SelfLink()))
 
     self.AssertOutputEquals('')
     self.AssertErrEquals(

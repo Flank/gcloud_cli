@@ -7,9 +7,10 @@ SYNOPSIS
         [--authorized-networks=NETWORK,[NETWORK,...]]
         [--availability-type=AVAILABILITY_TYPE] [--no-backup]
         [--backup-location=BACKUP_LOCATION]
-        [--backup-start-time=BACKUP_START_TIME] [--cpu=CPU]
-        [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
+        [--backup-start-time=BACKUP_START_TIME] [--collation=COLLATION]
+        [--cpu=CPU] [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
         [--database-version=DATABASE_VERSION] [--enable-bin-log]
+        [--enable-point-in-time-recovery]
         [--failover-replica-name=FAILOVER_REPLICA_NAME]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
@@ -79,6 +80,10 @@ FLAGS
         Start time of daily backups, specified in the 24 hour format - HH:MM,
         in the UTC timezone.
 
+     --collation=COLLATION
+        Cloud SQL server-level collation setting, which specifies the set of
+        rules for comparing characters in a character set.
+
      --cpu=CPU
         Whole number value indicating how many cores are desired in the
         machine. Both --cpu and --memory must be specified if a custom machine
@@ -94,14 +99,19 @@ FLAGS
 
      --database-version=DATABASE_VERSION
         The database engine type and version. If left unspecified, the API
-        defaults will be used. DATABASE_VERSION must be one of: MYSQL_5_5,
-        MYSQL_5_6, MYSQL_5_7, POSTGRES_9_6, POSTGRES_10, POSTGRES_11,
-        POSTGRES_12, SQLSERVER_2017_EXPRESS, SQLSERVER_2017_WEB,
-        SQLSERVER_2017_STANDARD, SQLSERVER_2017_ENTERPRISE.
+        defaults will be used. DATABASE_VERSION must be one of: MYSQL_5_6,
+        MYSQL_5_7, POSTGRES_9_6, POSTGRES_10, POSTGRES_11, POSTGRES_12,
+        SQLSERVER_2017_EXPRESS, SQLSERVER_2017_WEB, SQLSERVER_2017_STANDARD,
+        SQLSERVER_2017_ENTERPRISE.
 
      --enable-bin-log
         Specified if binary log should be enabled. If backup configuration is
         disabled, binary log must be disabled as well.
+
+     --enable-point-in-time-recovery
+        Specifies if point-in-time recovery (using write-ahead log archiving)
+        should be enabled. If backup configuration is disabled, point-in-time
+        recovery must be disabled as well.
 
      --failover-replica-name=FAILOVER_REPLICA_NAME
         Also create a failover replica with the specified name.

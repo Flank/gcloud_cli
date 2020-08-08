@@ -18,13 +18,15 @@ POSITIONAL ARGUMENTS
        Command-line flags to configure the WorkerPool:
 
          WORKER_POOL
-            The WorkerPool to update. This positional must be specified if any
-            of the other arguments in this group are specified.
+            The unique identifier for the custom worker pool to update. This
+            value should be 1-63 characters, and valid characters are
+            [a-z][0-9]- This positional must be specified if any of the other
+            arguments in this group are specified.
 
          --peered-network=PEERED_NETWORK
-            Network which workers are peered to.
+            VPC network to which workers are peered.
 
-            default network is used if empty string.
+            If not specified, the workers are not peered to any network.
 
          --region=REGION
             The Cloud region where the WorkerPool is.
@@ -37,12 +39,12 @@ POSITIONAL ARGUMENTS
               If not given, Cloud Build will use a standard disk size.
 
            --worker-machine-type=WORKER_MACHINE_TYPE
-              Machine Type of the worker, such as n1-standard-1.
+              Compute Engine machine type for a worker pool.
 
-              See https://cloud.google.com/compute/docs/machine-types.
+              For information on supported machine types, see
+              https://cloud.google.com/cloud-build/docs/custom-workers/worker-pool-config-file.
 
-              If left blank, Cloud Build will use a standard unspecified
-              machine to create the worker pool.
+              If unspecified, Cloud Build uses a standard machine type.
 
        --config-from-file=CONFIG_FROM_FILE
           A file that contains updates to the configuration for the WorkerPool.
@@ -59,5 +61,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta builds worker-pools update
 

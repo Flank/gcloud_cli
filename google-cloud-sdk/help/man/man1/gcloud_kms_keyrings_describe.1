@@ -11,7 +11,7 @@ gcloud kms keyrings describe \- get metadata for a keyring
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud kms keyrings describe\fR \fIKEYRING\fR [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud kms keyrings describe\fR (\fIKEYRING\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,21 +25,25 @@ Returns metadata for the given keyring.
 
 .RS 2m
 .TP 2m
-\fIKEYRING\fR
-Name of the key ring to describe.
 
-
-.RE
-.sp
-
-.SH "FLAGS"
+Keyring resource \- The KMS keyring resource. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [keyring] on the command line with a fully
+specified name; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
+\fIKEYRING\fR
+ID of the keyring or fully qualified identifier for the keyring. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Location of the keyring.
+The Cloud location for the keyring.
 
 
+.RE
 .RE
 .sp
 

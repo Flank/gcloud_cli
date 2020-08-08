@@ -1,14 +1,14 @@
 NAME
-    gcloud compute instance-templates delete - delete Google Compute Engine
-        virtual machine instance templates
+    gcloud compute instance-templates delete - delete Compute Engine virtual
+        machine instance templates
 
 SYNOPSIS
     gcloud compute instance-templates delete NAME [NAME ...]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-templates delete deletes one or more Google Compute
-    Engine virtual machine instance templates.
+    gcloud compute instance-templates delete deletes one or more Compute Engine
+    virtual machine instance templates.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

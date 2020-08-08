@@ -85,9 +85,9 @@ At most one of these may be specified:
 .TP 2m
 \fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 
-Condition of the binding to be added. When condition is explicitly specified as
-\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
-When \-\-condition is specified and is not a \f5None\fR condition,
+The condition of the binding to be added. When the condition is explicitly
+specified as \f5None\fR (\f5\-\-condition=None\fR), a binding without a
+condition is added. When the condition is specified and is not \f5None\fR,
 \f5\-\-role\fR cannot be a primitive role. Primitive roles are
 \f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
 
@@ -98,12 +98,11 @@ uses a subset of Common Expression Language syntax.
 
 .TP 2m
 \fBtitle\fR
-(Required) Title for the expression, i.e. a short string describing its purpose.
+(Required) A short string describing the purpose of the expression.
 
 .TP 2m
 \fBdescription\fR
-(Optional) Description for the expression. This is a longer text which describes
-the expression.
+(Optional) Additional description for the expression.
 
 NOTE: An unsatisfied condition will not allow access via this binding.
 

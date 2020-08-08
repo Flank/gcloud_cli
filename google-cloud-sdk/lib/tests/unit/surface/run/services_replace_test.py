@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.projects import util as projects_util
 from googlecloudsdk.command_lib.run import exceptions
-from surface.run import deploy
+from googlecloudsdk.command_lib.run import messages_util
 from tests.lib import parameterized
 from tests.lib.surface.run import base
 
@@ -39,8 +39,9 @@ class ReplaceTestAlpha(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.service = mock.NonCallableMock()
     self.operations.GetService.return_value = self.service
     self.operations.ReleaseService.return_value = None
-    self.StartObjectPatch(deploy, 'GetStartDeployMessage')
-    self.StartObjectPatch(deploy, 'GetSuccessMessageForSynchronousDeploy')
+    self.StartObjectPatch(messages_util, 'GetStartDeployMessage')
+    self.StartObjectPatch(messages_util,
+                          'GetSuccessMessageForSynchronousDeploy')
     self.StartObjectPatch(projects_util, 'GetProjectNumber', return_value=123)
     self._MockConnectionContext()
 

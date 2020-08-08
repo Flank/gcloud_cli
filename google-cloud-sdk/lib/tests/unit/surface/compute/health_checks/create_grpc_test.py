@@ -25,12 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
-                                      parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+class HealthChecksCreateGrpcTest(test_base.BaseTest, parameterized.TestCase):
 
   def RunCreate(self, command):
     self.Run('compute health-checks create grpc %s' % command)
@@ -43,10 +38,10 @@ class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
       self.CheckRequests()
 
   def testUriSupport(self):
-    self.RunCreate("""
-          https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
-          --port 80
-        """)
+    uri = 'https://compute.googleapis.com/compute/%s/projects/my-project/global/healthChecks/my-health-check' % (
+        self.track.prefix or 'v1')
+    command = uri + ' --port 80'
+    self.RunCreate(command)
 
     self.CheckRequests(
         [(self.compute.healthChecks, 'Insert',
@@ -237,6 +232,13 @@ class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
         'be specified when using: --use-serving-port'):
       self.RunCreate('my-health-check --use-serving-port --port 80')
 
+
+class HealthChecksCreateGrpcBetaTest(HealthChecksCreateGrpcTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -265,12 +267,15 @@ class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
               project='my-project'))],)
 
 
-class RegionHealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
-                                            parameterized.TestCase):
+class HealthChecksCreateGrpcAlphaTest(HealthChecksCreateGrpcBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+
+class RegionHealthChecksCreateGrpcTest(test_base.BaseTest,
+                                       parameterized.TestCase):
 
   def RunCreate(self, command):
     self.Run(
@@ -306,10 +311,10 @@ class RegionHealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
       self.CheckRequests()
 
   def testUriSupport(self):
-    self.RunCreate("""
-          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
-          --port 80
-        """)
+    uri = 'https://compute.googleapis.com/compute/%s/projects/my-project/regions/us-west-1/healthChecks/my-health-check' % (
+        self.track.prefix or 'v1')
+    command = uri + ' --port 80'
+    self.RunCreate(command)
 
     self.CheckRequests(
         [(self.compute.regionHealthChecks, 'Insert',
@@ -481,6 +486,13 @@ class RegionHealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
               project='my-project',
               region='us-west-1'))],)
 
+
+class RegionHealthChecksCreateGrpcBetaTest(RegionHealthChecksCreateGrpcTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -508,6 +520,14 @@ class RegionHealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
                   logConfig=expected_log_config),
               project='my-project',
               region='us-west-1'))],)
+
+
+class RegionHealthChecksCreateGrpcAlphaTest(RegionHealthChecksCreateGrpcBetaTest
+                                           ):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
 
 if __name__ == '__main__':

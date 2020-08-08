@@ -1,0 +1,140 @@
+title: compute bulk instances create test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Create Attached Disk Test
+  - command: compute instances bulk create --predefined-names=my-instance --project=my-project
+      --zone=us-east1-b --create-disk=size=10GB,mode=ro,type=SSD,image=debian-8,image-project=debian-cloud,device-name=data,auto-delete=yes
+  - stderr: |
+      Bulk create request finished with status message: [VM instances created: 1, failed: 0.]
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: alpha
+      BETA: beta
+      GA: v1
+- execute_command:
+    label: Create Attached Disk Test
+    command: compute instances bulk create --predefined-names=my-instance --project=my-project
+      --zone=us-east1-b --create-disk=size=10GB,mode=ro,type=SSD,image=debian-8,image-project=debian-cloud,device-name=data,auto-delete=yes
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            kind: compute#project
+            id: '17966956004057981335'
+            creationTimestamp: '2014-09-30T07:55:22.502-07:00'
+            name: my-project'
+            enabledFeatures:
+            - $$api-version$$-api
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/my-project
+            defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
+            xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
+            defaultNetworkTier: PREMIUM
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/instances/bulkInsert?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              count: '1'
+              instance:
+                canIpForward: false
+                deletionProtection: false
+                disks:
+                - boot: true
+                  initializeParams:
+                    sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/debian-cloud/global/images/family/debian-10
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                - autoDelete: true
+                  boot: false
+                  deviceName: data
+                  initializeParams:
+                    diskSizeGb: '10'
+                    diskType: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/diskTypes/SSD
+                    sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/debian-cloud/global/images/debian-8
+                  mode: READ_ONLY
+                  type: PERSISTENT
+                machineType: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/machineTypes/n1-standard-1
+                metadata: {}
+                name: unused
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+              minCount: '1'
+              predefinedNames:
+              - my-instance
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: '3994683993927832025'
+            name: operation-1588358963704-5a49aa3ceb13f-5e6a5b58-95306383
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b
+            operationType: bulkInsert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/my-project
+            targetId: '193063108346'
+            status: RUNNING
+            statusMessage: Bulk insert initiated
+            user: nathanlooney@google.com
+            progress: 0
+            insertTime: '2020-05-01T11:49:26.902-07:00'
+            startTime: '2020-05-01T11:49:26.911-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/operations/operation-1588358963704-5a49aa3ceb13f-5e6a5b58-95306383
+            selfLinkWithId: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/operations/3994683993927832025
+            kind: compute#operation
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/operations/operation-1588358963704-5a49aa3ceb13f-5e6a5b58-95306383/wait?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: '3994683993927832025'
+            name: operation-1588358963704-5a49aa3ceb13f-5e6a5b58-95306383
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b
+            operationType: bulkInsert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/my-project
+            targetId: '193063108346'
+            status: DONE
+            statusMessage: 'VM instances created: 1, failed: 0.'
+            user: nathanlooney@google.com
+            progress: 100
+            insertTime: '2020-05-01T11:49:26.902-07:00'
+            startTime: '2020-05-01T11:49:26.911-07:00'
+            endTime: '2020-05-01T11:49:34.038-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/operations/operation-1588358963704-5a49aa3ceb13f-5e6a5b58-95306383
+            selfLinkWithId: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/us-east1-b/operations/3994683993927832025
+            kind: compute#operation
+    - expect_stderr: |
+        Bulk create request finished with status message: [VM instances created: 1, failed: 0.]
+    - expect_exit:
+        code: 0

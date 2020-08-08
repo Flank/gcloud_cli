@@ -19,7 +19,7 @@ gcloud alpha compute instance\-groups managed describe\-instance \- describe an 
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed
 describe\-instance\fR describes an instance in a managed instance group, listing
-all it's attributes in the YAML format.
+all its attributes in YAML format.
 
 
 
@@ -28,7 +28,7 @@ all it's attributes in the YAML format.
 .RS 2m
 .TP 2m
 \fINAME\fR
-Name of the managed instance group to describe instance in.
+Name of the managed instance group to describe the instance.
 
 
 .RE
@@ -39,7 +39,7 @@ Name of the managed instance group to describe instance in.
 .RS 2m
 .TP 2m
 \fB\-\-instance\fR=\fIINSTANCE\fR
-Name of the instance in the managed instance group to describe.
+Name of the managed instance group that contains the instance to describe.
 
 
 .RE
@@ -55,7 +55,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-Region of the managed instance group to describe instance in. If not specified,
+Region of the managed instance group to describe the instance. If not specified,
 you may be prompted to select a region.
 
 A list of regions can be fetched by running:
@@ -69,7 +69,7 @@ invocation.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-Zone of the managed instance group to describe instance in. If not specified,
+Zone of the managed instance group to describe the instance. If not specified,
 you may be prompted to select a zone.
 
 A list of zones can be fetched by running:
@@ -115,5 +115,9 @@ $ gcloud alpha compute instance\-groups managed describe\-instance \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed describe\-instance
+.RE
 

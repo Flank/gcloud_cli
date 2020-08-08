@@ -65,6 +65,7 @@ SOLUTIONS_CATEGORY = 'Solutions'
 SERVERLESS_CATEGORY = 'Serverless'
 UNCATEGORIZED_CATEGORY = 'Other'
 IDENTITY_CATEGORY = 'Identity'
+COMMERCE_CATEGORY = 'Commerce'
 
 
 # Common markdown.
@@ -674,14 +675,14 @@ class BinaryBackedCommand(six.with_metaclass(abc.ABCMeta, Command)):
   def _DefaultOperationResponseHandler(response):
     """Process results of BinaryOperation Execution."""
     if response.stdout:
-      log.status.Print(response.stdout)
-
-    if response.failed:
-      log.error(response.stderr)
-      return None
+      log.Print(response.stdout)
 
     if response.stderr:
       log.status.Print(response.stderr)
+
+    if response.failed:
+      return None
+
     return response.stdout
 
 
@@ -938,6 +939,26 @@ def EnableUserProjectQuota():
   """Enable the quota header for current project."""
   properties.VALUES.billing.quota_project.Set(
       properties.VALUES.billing.CURRENT_PROJECT)
+
+
+def AllowGoogleAuth():
+  """Allows the command group to use google auth for authentication.
+
+  Call this function in the Filter method of the command group
+  to enable google-auth.
+  """
+  properties.VALUES.auth.google_auth_allowed.Set(True)
+
+
+def UseGoogleAuth():
+  """Returns True if using google-auth to authenticate the http request.
+
+  auth/disable_load_google_auth is a global switch to turn off google-auth in
+  case google-auth is buggy. auth/google_auth_allowed is an internal property
+  to opt-in surface.
+  """
+  return (properties.VALUES.auth.google_auth_allowed.GetBool() and
+          not properties.VALUES.auth.disable_load_google_auth.GetBool())
 
 
 def LogCommand(prog, args):

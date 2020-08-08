@@ -1,0 +1,211 @@
+title: commerce procurement consumer order modify scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue
+      --product-request line-item-id=lineItemId,line-item-change-type=UPDATE,product-external-name=productId,flavor-external-name=flavorId,region=us-west-1,value=double:1.6,count=int:2
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/CHANGE_LINE_ITEM-operationId
+- execute:
+  - command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue --quote-change-type UPDATE --new-quote-external-name quoteId
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/CHANGE_LINE_ITEM-operationId
+- execute:
+  - command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue
+      --product-request line-item-id=lineItemId,line-item-change-type=CANCEL
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-operationId
+- execute:
+  - command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue --quote-change-type CANCEL
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-operationId
+- execute:
+  - command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue
+      --product-request line-item-id=lineItemId,line-item-change-type=REVERT_CANCELLATION
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/REVERT_LINE_ITEM_CANCELLATION-operationId
+- execute:
+  - command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue --quote-change-type REVERT_CANCELLATION
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/REVERT_LINE_ITEM_CANCELLATION-operationId
+actions:
+- execute_command:
+    command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue
+      --product-request line-item-id=lineItemId,line-item-change-type=UPDATE,product-external-name=productId,flavor-external-name=flavorId,region=us-west-1,value=double:1.6,count=int:2
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:modify?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              etag: tagValue
+              modifyProductsOrderRequest:
+                modifications:
+                - changeType: LINE_ITEM_CHANGE_TYPE_UPDATE
+                  lineItemId: lineItemId
+                  newLineItemInfo:
+                    flavorExternalName: flavorId
+                    parameters:
+                    - name: region
+                      value:
+                        stringValue: us-west-1
+                    - name: value
+                      value:
+                        doubleValue: 1.6
+                    - name: count
+                      value:
+                        int64Value: '2'
+                    productExternalName: productId
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/CHANGE_LINE_ITEM-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/CHANGE_LINE_ITEM-operationId
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue --quote-change-type UPDATE --new-quote-external-name quoteId
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:modify?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              etag: tagValue
+              modifyQuoteOrderRequest:
+                changeType: QUOTE_CHANGE_TYPE_UPDATE
+                newQuoteExternalName: quoteId
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/CHANGE_LINE_ITEM-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/CHANGE_LINE_ITEM-operationId
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue
+      --product-request line-item-id=lineItemId,line-item-change-type=CANCEL
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:modify?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              etag: tagValue
+              modifyProductsOrderRequest:
+                modifications:
+                - changeType: LINE_ITEM_CHANGE_TYPE_CANCEL
+                  lineItemId: lineItemId
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-operationId
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue --quote-change-type CANCEL
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:modify?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              etag: tagValue
+              modifyQuoteOrderRequest:
+                changeType: QUOTE_CHANGE_TYPE_CANCEL
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-operationId
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue
+      --product-request line-item-id=lineItemId,line-item-change-type=REVERT_CANCELLATION
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:modify?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              etag: tagValue
+              modifyProductsOrderRequest:
+                modifications:
+                - changeType: LINE_ITEM_CHANGE_TYPE_REVERT_CANCELLATION
+                  lineItemId: lineItemId
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/REVERT_LINE_ITEM_CANCELLATION-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/REVERT_LINE_ITEM_CANCELLATION-operationId
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      commerce-procurement consumer orders modify orderId --billing-account billingAccountId --etag tagValue --quote-change-type REVERT_CANCELLATION
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:modify?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              etag: tagValue
+              modifyQuoteOrderRequest:
+                changeType: QUOTE_CHANGE_TYPE_REVERT_CANCELLATION
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/REVERT_LINE_ITEM_CANCELLATION-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/REVERT_LINE_ITEM_CANCELLATION-operationId
+    - expect_exit:
+        code: 0

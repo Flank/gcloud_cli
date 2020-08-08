@@ -51,10 +51,13 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
         apis_internal, '_GetClientInstance', return_value=self.mock_client)
 
   def testConnectAnthos(self):
+    api_version = 'v1alpha1'
+
     mock_context = mock.Mock()
     mock_context.__enter__ = mock.Mock(return_value=mock_context)
     mock_context.__exit__ = mock.Mock(return_value=False)
     mock_context.supports_one_platform = False
+    mock_context.api_version = api_version
     mock_context.region = None
 
     with eventflow_operations.Connect(mock_context) as eventflow_client:
@@ -62,15 +65,18 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
       self.assertEqual(eventflow_client._core_client, self.mock_client)
       self.assertEqual(eventflow_client._crd_client, self.mock_client)
       self.assertEqual(eventflow_client._op_client, self.mock_client)
+      self.assertEqual(eventflow_client._api_version, api_version)
       self.assertIsNone(eventflow_client._region)
 
   def testConnectManaged(self):
+    api_version = 'v1alpha1'
     region = 'us-central1'
 
     mock_context = mock.Mock()
     mock_context.__enter__ = mock.Mock(return_value=mock_context)
     mock_context.__exit__ = mock.Mock(return_value=False)
     mock_context.supports_one_platform = True
+    mock_context.api_version = api_version
     mock_context.region = region
 
     with eventflow_operations.Connect(mock_context) as eventflow_client:
@@ -78,6 +84,7 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
       self.assertIsNone(eventflow_client._core_client)
       self.assertEqual(eventflow_client._crd_client, self.mock_client)
       self.assertEqual(eventflow_client._op_client, self.mock_client)
+      self.assertEqual(eventflow_client._api_version, api_version)
       self.assertEqual(eventflow_client._region, region)
 
 
@@ -85,7 +92,7 @@ class EventflowOperationsTest(base.EventsBase):
 
   def SetUp(self):
     self.eventflow_client = eventflow_operations.EventflowOperations(
-        self.mock_client, self.region, self.mock_core_client,
+        self.mock_client, self.api_version, self.region, self.mock_core_client,
         self.mock_crd_client, self.mock_client)
     self.StartObjectPatch(random, 'random', return_value=0)
     self.StartObjectPatch(util, 'WaitForCondition')
@@ -422,6 +429,9 @@ class EventflowOperationsTest(base.EventsBase):
         {},
     )
     self.assertEqual(source_obj, created_source)
+    self.assertEqual(
+        created_source.spec.sink.ref.apiVersion,
+        'eventing.knative.dev/v1alpha1')
 
   def testCreateSourceFailsIfAlreadyExists(self):
     trigger_obj = self._MakeTrigger(

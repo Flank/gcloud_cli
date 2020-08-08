@@ -49,7 +49,7 @@ class TriggersDeleteTestAlpha(base.EventsBase):
                                     'CloudPubSubSource',
                                     'sources.eventing.knative.dev')
     self.source.name = 'my-source'
-    self.source.sink = 'my-broker'
+    self.source.set_sink('my-broker', 'v1alpha1')
     self.source.spec.project = 'fake-project'
     self.source.spec.topic = 'my-topic'
     self.operations.GetSource.return_value = self.source

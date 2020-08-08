@@ -24,7 +24,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.health_checks import test_resources
 
 messages = core_apis.GetMessagesModule('compute', 'v1')
 
@@ -122,16 +122,15 @@ class HttpHealthChecksDeleteTest(test_base.BaseTest,
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
-    self.RunCompletion(
-        'compute http-health-checks delete h',
-        [
-            'health-check-http-1',
-            'health-check-http-2',
-            'health-check-https',
-            'health-check-ssl',
-            'health-check-tcp',
-            'health-check-http2',
-        ])
+    self.RunCompletion('compute http-health-checks delete h', [
+        'health-check-http-1',
+        'health-check-http-2',
+        'health-check-https',
+        'health-check-ssl',
+        'health-check-tcp',
+        'health-check-http2',
+        'health-check-grpc',
+    ])
 
 
 if __name__ == '__main__':

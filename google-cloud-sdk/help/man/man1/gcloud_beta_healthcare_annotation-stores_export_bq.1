@@ -1,0 +1,119 @@
+
+.TH "GCLOUD_BETA_HEALTHCARE_ANNOTATION\-STORES_EXPORT_BQ" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta healthcare annotation\-stores export bq \- export Cloud Healthcare API Annotation records to BigQuery
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta healthcare annotation\-stores export bq\fR (\fIANNOTATION_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-bq\-table\fR=\fIBQ_TABLE\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Export Cloud Healthcare API Annotation records to BigQuery.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+AnnotationStore resource \- Cloud Healthcare API Annotation store to export
+annotations from. The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [annotation_store] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIANNOTATION_STORE\fR
+ID of the annotationStore or fully qualified identifier for the annotationStore.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+Cloud Healthcare dataset.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-bq\-table\fR=\fIBQ_TABLE\fR
+BigQuery table that annotation records will be exported to.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBhealthcare/v1beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/healthcare
+
+
+
+.SH "EXAMPLES"
+
+To export the annotation\-store 'test\-annotation\-store' to the BigQuery table
+\'bqtable' in the BigQuery dataset \f5bqdataset\fR, run:
+
+.RS 2m
+$ gcloud beta healthcare annotation\-stores export bq \e
+    test\-annotation\-store \e
+    \-\-bq\-table=bq://my\-project.bqdataset.bqtable \e
+    \-\-dataset=test\-dataset
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha healthcare annotation\-stores export bq
+.RE
+

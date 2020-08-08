@@ -11,7 +11,7 @@ gcloud beta compute backend\-services remove\-backend \- remove a backend from a
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute backend\-services remove\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-global\-network\-endpoint\-group\fR\ |\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute backend\-services remove\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-global\-network\-endpoint\-group\fR\ |\ \fB\-\-network\-endpoint\-group\-region\fR=\fINETWORK_ENDPOINT_GROUP_REGION\fR\ |\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -138,6 +138,33 @@ At most one of these may be specified:
 .TP 2m
 \fB\-\-global\-network\-endpoint\-group\fR
 If set, the network endpoint group is global.
+
+.TP 2m
+\fB\-\-network\-endpoint\-group\-region\fR=\fINETWORK_ENDPOINT_GROUP_REGION\fR
+Region of the network endpoint group to remove from the backend service. If not
+specified, you may be prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
 \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR

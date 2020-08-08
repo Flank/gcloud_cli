@@ -45,6 +45,10 @@ Registry repository.
 \fB(ALPHA)\fR Delete an Artifact Registry repository.
 
 .TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Describe an Artifact Registry repository.
+
+.TP 2m
 \fBget\-iam\-policy\fR
 \fB(ALPHA)\fR Get IAM policy for an Artifact Registry repository.
 
@@ -77,6 +81,12 @@ To delete a repository with the name \f5my\-repo\fR, run:
 
 .RS 2m
 $ gcloud alpha artifacts repositories delete my\-repo
+.RE
+
+To describe a repository with the name \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud alpha artifacts repositories describe my\-repo
 .RE
 
 To list all Artifact Registry repositories, run:

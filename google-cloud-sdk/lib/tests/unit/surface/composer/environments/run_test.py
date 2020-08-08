@@ -171,7 +171,9 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
     fake_exec.AddCallback(
         0, self.MakeFetchKubectlNamespaceCallback([('default', 'Active')]))
     fake_exec.AddCallback(
-        1, self.MakeGetPodsCallback([('pod1', 'running'), ('pod2', 'running')]))
+        1, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus('pod1', 'running', 'true'),
+             command_util.GkePodStatus('pod2', 'running', 'true')]))
 
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'Desired GKE pod not found'):
@@ -198,7 +200,8 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
     fake_exec.AddCallback(
         0, self.MakeFetchKubectlNamespaceCallback([('default', 'Active')]))
     fake_exec.AddCallback(
-        1, self.MakeGetPodsCallback([(self.TEST_POD, 'running')]))
+        1, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus(self.TEST_POD, 'running', 'true')]))
     fake_exec.AddCallback(2, self.MakeKubectlExecCallback(self.TEST_POD))
 
     self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
@@ -226,7 +229,8 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
     fake_exec.AddCallback(
         0, self.MakeFetchKubectlNamespaceCallback([('default', 'Active')]))
     fake_exec.AddCallback(
-        1, self.MakeGetPodsCallback([(self.TEST_POD, 'running')]))
+        1, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus(self.TEST_POD, 'running', 'true')]))
     fake_exec.AddCallback(
         2, self.MakeKubectlExecCallback(self.TEST_POD, subcmd_args=subcmd_args))
 
@@ -257,9 +261,48 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
     fake_exec.AddCallback(
         0, self.MakeFetchKubectlNamespaceCallback([('default', 'Active')]))
     fake_exec.AddCallback(
-        1, self.MakeGetPodsCallback([(self.TEST_POD, 'running')]))
+        1, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus(self.TEST_POD, 'running', 'true')]))
 
     # Ensure that the '--yes' argument is added to the list of 'delete_dag' args
+    # if it is not present.
+    fake_exec.AddCallback(
+        2,
+        self.MakeKubectlExecCallback(
+            self.TEST_POD, subcmd=subcmd, subcmd_args=subcmd_args + ['--yes']))
+
+    self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
+                         self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, subcmd,
+                         '--', *subcmd_args)
+
+    fake_exec.Verify()
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testSubcommandRun_Backfill(self, exec_mock, tmp_kubeconfig_mock):
+    test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
+        self.messages.Environment.StateValueValuesEnum.RUNNING)
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=test_env_object)
+
+    subcmd = 'backfill'
+    subcmd_args = []
+
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    fake_exec.AddCallback(
+        0, self.MakeFetchKubectlNamespaceCallback([('default', 'Active')]))
+    fake_exec.AddCallback(
+        1, self.MakeGetPodsCallback([
+            command_util.GkePodStatus(self.TEST_POD, 'running', 'true')]))
+
+    # Ensure that the '--yes' argument is added to the list of 'backfill' args
     # if it is not present.
     fake_exec.AddCallback(
         2,

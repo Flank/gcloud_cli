@@ -151,31 +151,6 @@ class TopicsPublishTest(base.CloudPubsubTestBase):
                    self.message_data[0]))
 
 
-class TopicsPublishAlphaTest(TopicsPublishTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testTopicsPublishWithOrderingKey(self):
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    topic = topic_ref.RelativeName()
-    ordering_key = 'in-order'
-    message = self.messages[0]
-    message.orderingKey = ordering_key
-    self.svc.Expect(
-        request=self.msgs.PubsubProjectsTopicsPublishRequest(
-            publishRequest=self.msgs.PublishRequest(
-                messages=self.messages[0:1]),
-            topic=topic),
-        response=self.msgs.PublishResponse(messageIds=self.message_ids[0:1]))
-
-    result = self.Run(
-        'pubsub topics publish topic1 --message "{0}" --ordering-key "{1}"'
-        .format(self.message_data[0], ordering_key))
-
-    self.assertEqual(result.messageIds, ['123456'])
-
-
 class TopicsPublishBetaTest(TopicsPublishTest):
 
   def SetUp(self):
@@ -219,6 +194,25 @@ class TopicsPublishBetaTest(TopicsPublishTest):
         exceptions.ConflictingArgumentsException,
         'arguments not allowed simultaneously: MESSAGE_BODY, --message'):
       self.Run('pubsub topics publish topic1 msg1 --message msg2')
+
+  def testTopicsPublishWithOrderingKey(self):
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    topic = topic_ref.RelativeName()
+    ordering_key = 'in-order'
+    message = self.messages[0]
+    message.orderingKey = ordering_key
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsTopicsPublishRequest(
+            publishRequest=self.msgs.PublishRequest(
+                messages=self.messages[0:1]),
+            topic=topic),
+        response=self.msgs.PublishResponse(messageIds=self.message_ids[0:1]))
+
+    result = self.Run(
+        'pubsub topics publish topic1 --message "{0}" --ordering-key "{1}"'
+        .format(self.message_data[0], ordering_key))
+
+    self.assertEqual(result.messageIds, ['123456'])
 
 
 class TopicsPublishGATest(base.CloudPubsubTestBase, parameterized.TestCase):

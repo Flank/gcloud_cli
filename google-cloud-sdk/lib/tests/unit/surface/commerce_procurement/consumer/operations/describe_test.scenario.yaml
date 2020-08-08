@@ -1,0 +1,268 @@
+title: commerce procurement consumer operation describe scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      commerce-procurement consumer operations describe --free-trial-operation CREATE_FREE_TRIAL-Operation-Id --free-trial freeTrialId
+  - stdout: |
+      done: true
+      name: projects/projectNumber/freeTrials/freeTrialId/operations/CREATE_FREE_TRIAL-Operation-Id
+      response:
+        '@type': type.googleapis.com/google.cloud.commerce.consumer.procurement.v1alpha1.FreeTrial
+        credit:
+          creationDate: '2020-07-08T19:38:53.280199Z'
+          endTime: '2020-08-07T19:38:51.959Z'
+          remainingAmount:
+            currencyCode: USD
+            units: '3000'
+          startTime: '2020-07-08T07:00:00Z'
+          value:
+            currencyCode: USD
+            units: '3000'
+        name: projects/projectNumber/freeTrials/freeTrialId
+        productExternalName: productId
+        provider: providers/providerId
+- execute:
+  - command: |
+      commerce-procurement consumer operations describe --order-operation CANCEL-ORDER-Operation-Id --billing-account billingAccountId --order orderId
+  - stdout: |
+      done: true
+      name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-Operation-Id
+      response:
+        '@type': type.googleapis.com/google.cloud.commerce.consumer.procurement.v1alpha1.Order
+        account: billingAccounts/billingAccountId/accounts/accountId
+        createTime: '2019-10-08T17:10:11.325Z'
+        displayName: display_name
+        etag: W/"17326087020599874811"
+        lineItems:
+        - changeHistory:
+          - changeEffectiveTime: '2019-10-08T17:12:28.337Z'
+            changeId: changeId1
+            changeState: LINE_ITEM_CHANGE_STATE_COMPLETED
+            changeType: LINE_ITEM_CHANGE_TYPE_CREATE
+            createTime: '2019-10-08T17:10:11.325Z'
+            newLineItemInfo:
+              entitlementInfo:
+                id: entitlementId
+              flavorExternalName: flavorId
+              productExternalName: productId
+              subscription:
+                endTime: '2020-10-08T07:00:00Z'
+            updateTime: '2019-10-08T17:12:28.337Z'
+          lineItemId: lineItemId
+          lineItemInfo:
+            entitlementInfo:
+              id: entitlementId
+            flavorExternalName: flavorId
+            productExternalName: productId
+            subscription:
+              endTime: '2020-10-08T07:00:00Z'
+          pendingChange:
+            changeEffectiveTime: '2020-10-08T07:00:00Z'
+            changeId: changeId2
+            changeState: LINE_ITEM_CHANGE_STATE_APPROVED
+            changeType: LINE_ITEM_CHANGE_TYPE_CANCEL
+            createTime: '2020-07-10T21:10:22.017Z'
+            oldLineItemInfo:
+              entitlementInfo:
+                id: entitlementId
+              flavorExternalName: flavorId
+              productExternalName: productId
+              subscription:
+                endTime: '2020-10-08T07:00:00Z'
+            updateTime: '2020-07-10T21:10:22.017Z'
+        name: billingAccounts/billingAccountId/orders/orderId
+        orderState: ORDER_STATE_PENDING_CANCELLATION
+        provider: providers/providerId
+        updateTime: '2020-07-10T21:10:22.017Z'
+actions:
+- execute_command:
+    command: |
+      commerce-procurement consumer operations describe --free-trial-operation CREATE_FREE_TRIAL-Operation-Id --free-trial freeTrialId
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/projects/fake-project/freeTrials/freeTrialId/operations/CREATE_FREE_TRIAL-Operation-Id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "name": "projects/projectNumber/freeTrials/freeTrialId/operations/CREATE_FREE_TRIAL-Operation-Id",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.commerce.consumer.procurement.v1alpha1.FreeTrial",
+                "name": "projects/projectNumber/freeTrials/freeTrialId",
+                "provider": "providers/providerId",
+                "productExternalName": "productId",
+                "credit": {
+                  "value": {
+                    "currencyCode": "USD",
+                    "units": "3000"
+                  },
+                  "remainingAmount": {
+                    "currencyCode": "USD",
+                    "units": "3000"
+                  },
+                  "creationDate": "2020-07-08T19:38:53.280199Z",
+                  "startTime": "2020-07-08T07:00:00Z",
+                  "endTime": "2020-08-07T19:38:51.959Z"
+                }
+              }
+            }
+    - expect_stdout: |
+        done: true
+        name: projects/projectNumber/freeTrials/freeTrialId/operations/CREATE_FREE_TRIAL-Operation-Id
+        response:
+          '@type': type.googleapis.com/google.cloud.commerce.consumer.procurement.v1alpha1.FreeTrial
+          credit:
+            creationDate: '2020-07-08T19:38:53.280199Z'
+            endTime: '2020-08-07T19:38:51.959Z'
+            remainingAmount:
+              currencyCode: USD
+              units: '3000'
+            startTime: '2020-07-08T07:00:00Z'
+            value:
+              currencyCode: USD
+              units: '3000'
+          name: projects/projectNumber/freeTrials/freeTrialId
+          productExternalName: productId
+          provider: providers/providerId
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      commerce-procurement consumer operations describe --order-operation CANCEL-ORDER-Operation-Id --billing-account billingAccountId --order orderId
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-Operation-Id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-Operation-Id",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.commerce.consumer.procurement.v1alpha1.Order",
+                "name": "billingAccounts/billingAccountId/orders/orderId",
+                "provider": "providers/providerId",
+                "account": "billingAccounts/billingAccountId/accounts/accountId",
+                "orderState": "ORDER_STATE_PENDING_CANCELLATION",
+                "lineItems": [
+                  {
+                    "lineItemId": "lineItemId",
+                    "lineItemInfo": {
+                      "productExternalName": "productId",
+                      "flavorExternalName": "flavorId",
+                      "subscription": {
+                        "endTime": "2020-10-08T07:00:00Z"
+                      },
+                      "entitlementInfo": {
+                        "id": "entitlementId"
+                      }
+                    },
+                    "pendingChange": {
+                      "changeId": "changeId2",
+                      "changeType": "LINE_ITEM_CHANGE_TYPE_CANCEL",
+                      "oldLineItemInfo": {
+                        "productExternalName": "productId",
+                        "flavorExternalName": "flavorId",
+                        "subscription": {
+                          "endTime": "2020-10-08T07:00:00Z"
+                        },
+                        "entitlementInfo": {
+                          "id": "entitlementId"
+                        }
+                      },
+                      "changeState": "LINE_ITEM_CHANGE_STATE_APPROVED",
+                      "changeEffectiveTime": "2020-10-08T07:00:00Z",
+                      "createTime": "2020-07-10T21:10:22.017Z",
+                      "updateTime": "2020-07-10T21:10:22.017Z"
+                    },
+                    "changeHistory": [
+                      {
+                        "changeId": "changeId1",
+                        "changeType": "LINE_ITEM_CHANGE_TYPE_CREATE",
+                        "newLineItemInfo": {
+                          "productExternalName": "productId",
+                          "flavorExternalName": "flavorId",
+                          "subscription": {
+                            "endTime": "2020-10-08T07:00:00Z"
+                          },
+                          "entitlementInfo": {
+                            "id": "entitlementId"
+                          }
+                        },
+                        "changeState": "LINE_ITEM_CHANGE_STATE_COMPLETED",
+                        "changeEffectiveTime": "2019-10-08T17:12:28.337Z",
+                        "createTime": "2019-10-08T17:10:11.325Z",
+                        "updateTime": "2019-10-08T17:12:28.337Z"
+                      }
+                    ]
+                  }
+                ],
+                "createTime": "2019-10-08T17:10:11.325Z",
+                "updateTime": "2020-07-10T21:10:22.017Z",
+                "displayName": "display_name",
+                "etag": "W/\"17326087020599874811\""
+              }
+            }
+    - expect_stdout: |
+        done: true
+        name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL-ORDER-Operation-Id
+        response:
+          '@type': type.googleapis.com/google.cloud.commerce.consumer.procurement.v1alpha1.Order
+          account: billingAccounts/billingAccountId/accounts/accountId
+          createTime: '2019-10-08T17:10:11.325Z'
+          displayName: display_name
+          etag: W/"17326087020599874811"
+          lineItems:
+          - changeHistory:
+            - changeEffectiveTime: '2019-10-08T17:12:28.337Z'
+              changeId: changeId1
+              changeState: LINE_ITEM_CHANGE_STATE_COMPLETED
+              changeType: LINE_ITEM_CHANGE_TYPE_CREATE
+              createTime: '2019-10-08T17:10:11.325Z'
+              newLineItemInfo:
+                entitlementInfo:
+                  id: entitlementId
+                flavorExternalName: flavorId
+                productExternalName: productId
+                subscription:
+                  endTime: '2020-10-08T07:00:00Z'
+              updateTime: '2019-10-08T17:12:28.337Z'
+            lineItemId: lineItemId
+            lineItemInfo:
+              entitlementInfo:
+                id: entitlementId
+              flavorExternalName: flavorId
+              productExternalName: productId
+              subscription:
+                endTime: '2020-10-08T07:00:00Z'
+            pendingChange:
+              changeEffectiveTime: '2020-10-08T07:00:00Z'
+              changeId: changeId2
+              changeState: LINE_ITEM_CHANGE_STATE_APPROVED
+              changeType: LINE_ITEM_CHANGE_TYPE_CANCEL
+              createTime: '2020-07-10T21:10:22.017Z'
+              oldLineItemInfo:
+                entitlementInfo:
+                  id: entitlementId
+                flavorExternalName: flavorId
+                productExternalName: productId
+                subscription:
+                  endTime: '2020-10-08T07:00:00Z'
+              updateTime: '2020-07-10T21:10:22.017Z'
+          name: billingAccounts/billingAccountId/orders/orderId
+          orderState: ORDER_STATE_PENDING_CANCELLATION
+          provider: providers/providerId
+          updateTime: '2020-07-10T21:10:22.017Z'
+    - expect_exit:
+        code: 0

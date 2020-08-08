@@ -112,8 +112,19 @@ class Filters(base.TopicCommand):
 
           _key_ *=* _value_:::
 
-          True if _key_ is equal to _value_.  Equivalent to *:*, with the
-          exception that the trailing ```*``` prefix match is not supported.
+          True if _key_ is equal to _value_, or [deprecated] equivalent to *:*
+          with the exception that the trailing ```*``` prefix match is not
+          supported.
+          +
+          For historical reasons, this operation currently behaves differently
+          for different Google APIs. For many APIs, this is True if key is
+          equal to value. For a few APIs, this is currently equivalent to *:*,
+          with the exception that the trailing ```*``` prefix match is not
+          supported. However, this behaviour is being phased out, and use of
+          ```=``` for those APIs is deprecated; for those APIs, if you want
+          matching, you should use ```:``` instead of ```=```, and if you want
+          to test for equality, you can use
+          _key_ <= _value_ AND _key_ >= _value_.
 
           _key_ *=(* _value_ ... *)*:::
 
@@ -175,9 +186,9 @@ class Filters(base.TopicCommand):
             $ gcloud compute instances list --filter="machineType:f1-micro"
 
           List Compute Engine instance resources using a regular expression for
-          zone prefix *us* and not MachineType *f1-micro*:
+          zone *us* and not MachineType *f1-micro*:
 
-            $ gcloud compute instances list --filter="zone ~ ^us AND -machineType:f1-micro"
+            $ gcloud compute instances list --filter="zone ~ us AND -machineType:f1-micro"
 
           List Compute Engine instance resources with tag *my-tag*:
 

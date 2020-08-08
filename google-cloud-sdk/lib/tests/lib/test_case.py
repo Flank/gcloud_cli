@@ -435,18 +435,26 @@ class TestCase(unittest.TestCase, object):
   def _CatchThreadCreation(self):
     # Whenever a thread is created, hold on to a reference so that we can block
     # on its completion.
-    backup_thread = threading.Thread
     self._created_threads = []
-    def StoreCreatedThread(*args, **kwargs):
+
+    stdlib_thread_init = threading.Thread.__init__
+
+    def InstrumentedThreadInit(thread_self, *args, **kwargs):
       current_stack = [enc.Decode(s) for s in traceback.format_stack()]
       # Skip the last few entries to get to the Thread creation call
       # (1) Mock: `__call__` (2) Mock: `_mock_call` (3) StoreCreatedThread
       current_stack = current_stack[:-3]
-      thread_info = _ThreadInfo(backup_thread(*args, **kwargs),
-                                ''.join(current_stack))
+      thread_info = _ThreadInfo(thread_self, ''.join(current_stack))
       self._created_threads.append(thread_info)
-      return thread_info.thread
-    self.StartPatch('threading.Thread').side_effect = StoreCreatedThread
+
+      stdlib_thread_init(thread_self, *args, **kwargs)
+
+    threading.Thread.__init__ = InstrumentedThreadInit
+
+    def Unpatch():
+      threading.Thread.__init__ = stdlib_thread_init
+
+    self.addCleanup(Unpatch)
 
     # Check that all threads are dead before a test ends.
     def _CheckThreadsAreDead():
@@ -460,9 +468,11 @@ class TestCase(unittest.TestCase, object):
           time.sleep(0.1)  # Give some time for threads to shutdown.
           num_retrials -= 1
         else:
-          raise ThreadCleanupError(
-              'Some threads created by the test are not cleaned up!\n\n' +
-              '\n\n'.join(info.creation_stack_trace for info in alive_threads))
+          report = 'Some threads created by the test are not cleaned up!\n\n'
+          report += ''.join('Thread creation time traceback for %r:\n%s\n\n' %
+                            (info.thread, info.creation_stack_trace)
+                            for info in alive_threads)
+          raise ThreadCleanupError(report)
 
     self.addCleanup(_CheckThreadsAreDead)
 

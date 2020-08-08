@@ -6,14 +6,12 @@ SYNOPSIS
     gcloud alpha compute networks subnets create NAME --network=NETWORK
         --range=RANGE [--aggregation-interval=AGGREGATION_INTERVAL]
         [--description=DESCRIPTION] [--enable-flow-logs]
-        [--enable-private-ip-google-access] [--enable-private-ipv6-access]
-        [--flow-sampling=FLOW_SAMPLING]
+        [--enable-private-ip-google-access] [--flow-sampling=FLOW_SAMPLING]
         [--logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL]
         [--logging-filter-expr=LOGGING_FILTER_EXPR]
         [--logging-flow-sampling=LOGGING_FLOW_SAMPLING]
         [--logging-metadata=LOGGING_METADATA]
         [--logging-metadata-fields=[METADATA_FIELD,...]] [--metadata=METADATA]
-        [--private-ipv6-google-access-service-accounts=EMAIL,[EMAIL,...]]
         [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--purpose=PURPOSE] [--region=REGION] [--role=ROLE]
         [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
@@ -54,9 +52,6 @@ OPTIONAL FLAGS
      --enable-private-ip-google-access
         Enable/disable access to Google Cloud APIs from this subnet for
         instances without a public ip address.
-
-     --enable-private-ipv6-access
-        Enable/disable private IPv6 access for the subnet.
 
      --flow-sampling=FLOW_SAMPLING
         Can only be specified if VPC flow logging for this subnetwork is
@@ -104,16 +99,10 @@ OPTIONAL FLAGS
         not include GKE annotations. METADATA must be one of:
         exclude-all-metadata, include-all-metadata.
 
-     --private-ipv6-google-access-service-accounts=EMAIL,[EMAIL,...]
-        The service accounts can be used to selectively turn on Private IPv6
-        Google Access only on the VMs primary service account matching the
-        value.
-
      --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
         The private IPv6 google access type for the VMs in this subnet.
         PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
-        enable-bidirectional-access, enable-outbound-vm-access,
-        enable-outbound-vm-access-for-service-accounts.
+        enable-bidirectional-access, enable-outbound-vm-access.
 
      --purpose=PURPOSE
         The purpose of this subnetwork. PURPOSE must be one of:

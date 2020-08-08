@@ -46,14 +46,13 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command will read an IAM policy defined in a JSON file
-    'policy.json' and set it for a template with identifier 'example-template'
+    The following command will read an IAM policy defined in a JSON file        'policy.json' and set it for a template with identifier 'example-template'
 
         $ gcloud beta dataproc workflow-templates set-iam-policy \
-            example-template policy.json
+        example-template policy.json
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of the
-    policy file format and contents.
+        See https://cloud.google.com/iam/docs/managing-policies for details
+        of the policy file format and contents.
 
 NOTES
     This command is currently in BETA and may change without notice. These

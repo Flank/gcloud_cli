@@ -1,0 +1,63 @@
+title: Certificate Manager map describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager maps describe simple-map
+  - stdout: |
+      createTime: '2019-09-23T11:01:01.747248893Z'
+      description: some desc
+      gclbTargets:
+      - ipConfig:
+        - ipAddress: 35.230.234.248
+          port: 443
+      labels:
+        key: value
+      name: projects/fake-project/locations/global/certificateMaps/simple-map
+actions:
+- execute_command:
+    command: |
+      certificate-manager maps describe simple-map
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/simple-map?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/certificateMaps/simple-map",
+              "createTime": "2019-09-23T11:01:01.747248893Z",
+              "labels": {
+                "key": "value"
+              },
+              "gclbTargets": [
+                {
+                  "ipConfig": [
+                    {
+                      "ipAddress": "35.230.234.248",
+                      "port": 443
+                    }
+                  ]
+                }
+              ],
+              "description": "some desc"
+            }
+
+    - expect_stdout: |
+        createTime: '2019-09-23T11:01:01.747248893Z'
+        description: some desc
+        gclbTargets:
+        - ipConfig:
+          - ipAddress: 35.230.234.248
+            port: 443
+        labels:
+          key: value
+        name: projects/fake-project/locations/global/certificateMaps/simple-map
+    - expect_exit:
+        code: 0

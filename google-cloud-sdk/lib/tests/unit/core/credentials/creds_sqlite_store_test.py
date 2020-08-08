@@ -160,7 +160,7 @@ class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
               'client_id': 'client_id',
               'client_secret': 'client_secret',
               'refresh_token': 'fake-token',
-              'token_uri': creds._TOKEN_URI,
+              'token_uri': creds.TOKEN_URI,
           })
 
     self.TestStoreOperations(creds_stored, True, VerifiyLoadedCredentials)
@@ -176,7 +176,7 @@ class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
               'client_id': 'foo.apps.googleusercontent.com',
               'client_secret': 'file-secret',
               'refresh_token': 'file-token',
-              'token_uri': creds._TOKEN_URI,
+              'token_uri': creds.TOKEN_URI,
           })
 
     self.TestStoreOperations(creds_stored, False, VerifyLoadedCredentials)
@@ -192,7 +192,7 @@ class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
               'client_id': 'foo.apps.googleusercontent.com',
               'client_secret': 'file-secret',
               'refresh_token': 'file-token',
-              'token_uri': creds._TOKEN_URI,
+              'token_uri': creds.TOKEN_URI,
           })
 
     self.TestStoreOperations(creds_stored, True, VerifyLoadedCredentials)
@@ -251,7 +251,7 @@ class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
               'private_key':
                   '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
               '_token_uri':
-                  'https://oauth2.googleapis.com/token',
+                  creds.TOKEN_URI,
               'project_id':
                   'bar-test',
           })

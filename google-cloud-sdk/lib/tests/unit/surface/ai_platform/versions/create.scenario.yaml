@@ -1,0 +1,31 @@
+title: ai-platform versions create scenario test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ai-platform versions create v --model m --origin=gs://dummy --region
+      europe-west4 --async
+  - stderr: |
+      Using endpoint [https://europe-west4-ml.googleapis.com/]
+actions:
+- execute_command:
+    command: ai-platform versions create v --model m --origin=gs://dummy --region
+      europe-west4 --async
+    events:
+    - expect_stderr: |
+        Using endpoint [https://europe-west4-ml.googleapis.com/]
+    - api_call:
+        expect_request:
+          uri: https://europe-west4-ml.googleapis.com/v1/projects/fake-project/models/m/versions?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              deploymentUri: gs://dummy
+              name: v
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0

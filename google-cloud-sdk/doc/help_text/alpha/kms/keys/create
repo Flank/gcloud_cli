@@ -2,10 +2,9 @@ NAME
     gcloud alpha kms keys create - create a new key
 
 SYNOPSIS
-    gcloud alpha kms keys create KEY --purpose=PURPOSE
-        [--default-algorithm=DEFAULT_ALGORITHM] [--keyring=KEYRING]
-        [--labels=[KEY=VALUE,...]] [--location=LOCATION]
-        [--next-rotation-time=NEXT_ROTATION_TIME]
+    gcloud alpha kms keys create (KEY : --keyring=KEYRING --location=LOCATION)
+        --purpose=PURPOSE [--default-algorithm=DEFAULT_ALGORITHM]
+        [--labels=[KEY=VALUE,...]] [--next-rotation-time=NEXT_ROTATION_TIME]
         [--protection-level=PROTECTION_LEVEL; default="software"]
         [--rotation-period=ROTATION_PERIOD] [--skip-initial-version-creation]
         [GCLOUD_WIDE_FLAG ...]
@@ -41,8 +40,23 @@ DESCRIPTION
     protection level external.
 
 POSITIONAL ARGUMENTS
-     KEY
-        Name of the key to create.
+     Key resource - The KMS key resource. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the argument [key] on the command line
+     with a fully specified name; set the property [core/project]. This must be
+     specified.
+
+       KEY
+          ID of the key or fully qualified identifier for the key. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --keyring=KEYRING
+          The KMS keyring of the key.
+
+       --location=LOCATION
+          The Cloud location for the key.
 
 REQUIRED FLAGS
      --purpose=PURPOSE
@@ -63,9 +77,6 @@ OPTIONAL FLAGS
         rsa-sign-pss-2048-sha256, rsa-sign-pss-3072-sha256,
         rsa-sign-pss-4096-sha256, rsa-sign-pss-4096-sha512.
 
-     --keyring=KEYRING
-        Key ring of the key.
-
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -73,9 +84,6 @@ OPTIONAL FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
-
-     --location=LOCATION
-        Location of the key.
 
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes

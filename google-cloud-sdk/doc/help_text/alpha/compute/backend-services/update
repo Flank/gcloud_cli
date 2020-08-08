@@ -8,7 +8,7 @@ SYNOPSIS
         [--connection-drain-on-failover]
         [--connection-draining-timeout=CONNECTION_DRAINING_TIMEOUT]
         [--description=DESCRIPTION] [--drop-traffic-if-unhealthy]
-        [--[no-]enable-cdn] [--enable-logging]
+        [--[no-]enable-cdn] [--[no-]enable-logging]
         [--failover-ratio=FAILOVER_RATIO] [--health-checks=HEALTH_CHECK,[...]]
         [--no-health-checks] [--http-health-checks=HTTP_HEALTH_CHECK,[...]]
         [--https-health-checks=HTTPS_HEALTH_CHECK,[...]]
@@ -92,10 +92,11 @@ FLAGS
         the edge of Google's network. Cloud CDN is disabled by default. Use
         --enable-cdn to enable and --no-enable-cdn to disable.
 
-     --enable-logging
+     --[no-]enable-logging
         The logging options for the load balancer traffic served by this
         backend service. If logging is enabled, logs will be exported to
-        Stackdriver. Enabled by default.
+        Stackdriver. Enabled by default. Use --enable-logging to enable and
+        --no-enable-logging to disable.
 
      --failover-ratio=FAILOVER_RATIO
         If the ratio of the healthy VMs in the primary backend is at or below
@@ -181,7 +182,7 @@ FLAGS
         The security policy that will be set for this backend service.
 
      --session-affinity=SESSION_AFFINITY
-        The type of TCP session affinity to use. Not supported for UDP.
+        The type of session affinity to use. Supports both TCP and UDP.
         SESSION_AFFINITY must be one of:
 
          CLIENT_IP

@@ -8,7 +8,8 @@ SYNOPSIS
         [--master-accelerator=[count=COUNT],[type=TYPE]]
         [--master-image-uri=MASTER_IMAGE_URI]
         [--master-machine-type=MASTER_MACHINE_TYPE] [--module-name=MODULE_NAME]
-        [--package-path=PACKAGE_PATH] [--packages=[PACKAGE,...]]
+        [--network=NETWORK] [--package-path=PACKAGE_PATH]
+        [--packages=[PACKAGE,...]]
         [--parameter-server-accelerator=[count=COUNT],[type=TYPE]]
         [--parameter-server-image-uri=PARAMETER_SERVER_IMAGE_URI]
         [--python-version=PYTHON_VERSION] [--region=REGION]
@@ -158,6 +159,17 @@ FLAGS
 
      --module-name=MODULE_NAME
         Name of the module to run.
+
+     --network=NETWORK
+        The full name of the Google Compute Engine network
+        (https://cloud.google.com/vpc/docs) to which the Job is peered with.
+        For example, projects/12345/global/networks/myVPC. The format is of the
+        form projects/{project}/global/networks/{network}, where {project} is a
+        project number, as in '12345', and {network} is network name. Private
+        services access must already have been configured
+        (https://cloud.google.com/vpc/docs/configure-private-services-access)
+        for the network. If unspecified, the Job is not peered with any
+        network.
 
      --package-path=PACKAGE_PATH
         Path to a Python package to build. This should point to a local

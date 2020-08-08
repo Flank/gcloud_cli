@@ -1,6 +1,6 @@
 NAME
-    gcloud compute firewall-rules - list, create, update, and delete Google
-        Compute Engine firewall rules
+    gcloud compute firewall-rules - list, create, update, and delete Compute
+        Engine firewall rules
 
 SYNOPSIS
     gcloud compute firewall-rules COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -26,16 +26,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a Google Compute Engine firewall rule.
+        Create a Compute Engine firewall rule.
 
      delete
-        Delete Google Compute Engine firewall rules.
+        Delete Compute Engine firewall rules.
 
      describe
-        Describe a Google Compute Engine firewall rule.
+        Describe a Compute Engine firewall rule.
 
      list
-        List Google Compute Engine firewall rules.
+        List Compute Engine firewall rules.
 
      update
         Update a firewall rule.

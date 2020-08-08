@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute networks subnets set-iam-policy - set the IAM policy
-        for a Google Compute Engine subnetwork
+        for a Compute Engine subnetwork
 
 SYNOPSIS
     gcloud alpha compute networks subnets set-iam-policy

@@ -13,8 +13,8 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-groups managed create creates a Google Compute
-    Engine managed instance group.
+    gcloud compute instance-groups managed create creates a Compute Engine
+    managed instance group.
 
     For example, running:
 

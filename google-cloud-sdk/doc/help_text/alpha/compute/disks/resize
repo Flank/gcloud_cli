@@ -6,8 +6,7 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute disks resize resizes a Google Compute Engine
-    disk(s).
+    (ALPHA) gcloud alpha compute disks resize resizes a Compute Engine disk(s).
 
     Only increasing disk size is supported. Disks can be resized regardless of
     whether they are attached.

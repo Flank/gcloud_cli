@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute instance-templates set-iam-policy - set the IAM policy
-        for a Google Compute Engine instance template
+        for a Compute Engine instance template
 
 SYNOPSIS
     gcloud beta compute instance-templates set-iam-policy INSTANCE_TEMPLATE

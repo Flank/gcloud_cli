@@ -35,6 +35,8 @@ summary:
 - execute:
   - command: |
       domains registrations get-register-parameters ÜniCode.com.
+  - stderr: |
+      Domain name '?niCode.com.' has been normalized to equivalent 'xn--nicode-2ya.com'.
   - stdout: |
       availability: UNAVAILABLE
       domainName: xn--nicode-2ya.com
@@ -144,6 +146,8 @@ actions:
     command: |
       domains registrations get-register-parameters ÜniCode.com.
     events:
+    - expect_stderr: |
+        Domain name '?niCode.com.' has been normalized to equivalent 'xn--nicode-2ya.com'.
     - api_call:
         expect_request:
           uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:retrieveRegisterParameters?alt=json&domainName=xn--nicode-2ya.com

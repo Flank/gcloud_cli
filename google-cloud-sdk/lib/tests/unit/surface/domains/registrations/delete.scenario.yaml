@@ -21,6 +21,7 @@ summary:
     - message: You are about to delete registration 'xn--nicode-2ya.com'
     - input: y
   - stderr: |
+      Started 'operation-1547476889506-57f6c0a4c148b-c24dcd67-77529218'
       Delete in progress for registration [xn--nicode-2ya.com].
 actions:
 - execute_command:
@@ -113,6 +114,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547476889506-57f6c0a4c148b-c24dcd67-77529218'
         Delete in progress for registration [xn--nicode-2ya.com].
     - expect_exit:
         code: 0

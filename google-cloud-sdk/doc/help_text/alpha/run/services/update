@@ -7,14 +7,14 @@ SYNOPSIS
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
         [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
         [--memory=MEMORY] [--min-instances=MIN_INSTANCES] [--platform=PLATFORM]
-        [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT]
-        [--no-traffic]
+        [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--tag=TAG]
+        [--timeout=TIMEOUT] [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
         [--clear-vpc-connector --revision-suffix=REVISION_SUFFIX
-          --vpc-connector=VPC_CONNECTOR
+          --vpc-connector=VPC_CONNECTOR --vpc-egress=VPC_EGRESS
           --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
           | --clear-cloudsql-instances
           | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
@@ -60,8 +60,8 @@ FLAGS
         pass an empty string.
 
      --concurrency=CONCURRENCY
-        Set the number of concurrent requests allowed per container instance. A
-        concurrency of 0 or unspecified indicates any number of concurrent
+        Set the maximum number of concurrent requests allowed per container
+        instance. If concurrency is unspecified, any number of concurrent
         requests are allowed. To unset this field, provide the special value
         default.
 
@@ -103,7 +103,7 @@ FLAGS
         this field, pass the special value "default".
 
      --service-account=SERVICE_ACCOUNT
-        The service account associated with the revision of the service. The
+        Service account associated with the revision of the service. The
         service account represents the identity of the running revision, and
         determines what permissions the revision has. For the managed platform,
         this is the email address of an IAM service account. For the
@@ -111,6 +111,9 @@ FLAGS
         Kubernetes service account in the same namespace as the service. If not
         provided, the revision will use the default service account of the
         project, or default Kubernetes namespace service account respectively.
+
+     --tag=TAG
+        Traffic tag to assign to the newly created revision.
 
      --timeout=TIMEOUT
         Set the maximum request execution time (timeout). It is specified as a
@@ -189,6 +192,17 @@ FLAGS
 
        --vpc-connector=VPC_CONNECTOR
           Set a VPC connector for this Service.
+
+       --vpc-egress=VPC_EGRESS
+          The outbound traffic to send through the VPC connector for this
+          Service. This Service must have a VPC connector to set VPC egress.
+          VPC_EGRESS must be one of:
+
+           all
+              Sends all outbound traffic through the VPC connector.
+           private-ranges-only
+              Default option. Sends outbound traffic to private IP addresses
+              defined by RFC1918 through the VPC connector.
 
        These flags modify the Cloud SQL instances this Service connects to. You
        can specify a name of a Cloud SQL instance if it's in the same project

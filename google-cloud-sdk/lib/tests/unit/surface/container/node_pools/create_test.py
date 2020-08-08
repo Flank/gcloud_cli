@@ -181,6 +181,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         'sandboxConfig':
             self.msgs.SandboxConfig(
                 type=self.msgs.SandboxConfig.TypeValueValuesEnum.GVISOR),
+        'bootDiskKmsKey':
+            'projects/bing/locations/baz/keyRings/bar/cryptoKeys/foo',
     }
 
     self.ExpectCreateNodePool(
@@ -225,7 +227,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --enable-autorepair'
         ' --metadata key=value,key2=value2'
         ' --max-pods-per-node=30'
-        ' --sandbox type=gvisor'.format(**pool_kwargs))
+        ' --sandbox type=gvisor'
+        ' --boot-disk-kms-key={bootDiskKmsKey}'.format(**pool_kwargs))
     # pylint: disable=line-too-long
     self.AssertErrContains(
         """WARNING: Starting in 1.12, new node pools will be created with \

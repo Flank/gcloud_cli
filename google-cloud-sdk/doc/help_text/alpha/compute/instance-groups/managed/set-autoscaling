@@ -56,6 +56,10 @@ FLAGS
          none
             (Default) No predictions are made based on the scaling metric when
             calculating the number of VM instances.
+         optimize-availability
+            Predictive autoscaling predicts the future values of the scaling
+            metric and scales a MIG in advance to ensure that new VM instances
+            are ready in time to cover the predicted peak.
          standard
             Standard predictive autoscaling predicts the future values of the
             scaling metric and then scales a MIG to ensure that new VM
@@ -98,12 +102,17 @@ FLAGS
         MODE must be one of:
 
          off
-            To turn off autoscaling, while keeping the new configuration.
+            Turns off autoscaling, while keeping the new configuration.
          on
-            To permit autoscaling to scale up and down (default for new
+            Permits autoscaling to scale out and in (default for new
             autoscalers).
+         only-scale-out
+            Permits autoscaling to scale only out and not in.
          only-up
-            To permit autoscaling to scale only up and not down.
+            (DEPRECATED) Permits autoscaling to scale only out and not in.
+
+                Value `only-up` is deprecated. Use `--mode only-scale-out`
+                instead.
 
      --remove-stackdriver-metric=METRIC
         Stackdriver metric to remove from autoscaling configuration. If the

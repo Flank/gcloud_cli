@@ -1,13 +1,13 @@
 NAME
-    gcloud compute firewall-rules describe - describe a Google Compute Engine
-        firewall rule
+    gcloud compute firewall-rules describe - describe a Compute Engine firewall
+        rule
 
 SYNOPSIS
     gcloud compute firewall-rules describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute firewall-rules describe displays all data associated with a
-    Google Compute Engine firewall rule in a project.
+    Compute Engine firewall rule in a project.
 
 POSITIONAL ARGUMENTS
      NAME

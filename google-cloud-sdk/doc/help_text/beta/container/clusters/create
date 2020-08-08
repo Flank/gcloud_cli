@@ -10,20 +10,23 @@ SYNOPSIS
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY]
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
+        [--cluster-version=CLUSTER_VERSION]
         [--create-subnetwork=[KEY=VALUE,...]]
         [--database-encryption-key=DATABASE_ENCRYPTION_KEY]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
         [--disable-default-snat] [--disk-size=DISK_SIZE]
         [--disk-type=DISK_TYPE] [--enable-autorepair] [--no-enable-autoupgrade]
         [--enable-binauthz] [--enable-cloud-logging]
-        [--enable-cloud-monitoring] [--enable-cloud-run-alpha] [--enable-gvnic]
+        [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
+        [--enable-dataplane-v2] [--enable-gvnic]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-logging-monitoring-system-only]
         [--enable-master-global-access] [--enable-network-policy]
         [--enable-pod-security-policy] [--enable-shielded-nodes]
         [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
-        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
+        [--identity-provider=IDENTITY_PROVIDER] [--image-type=IMAGE_TYPE]
+        [--issue-client-certificate]
         [--istio-config=[auth=MTLS_PERMISSIVE,...]] [--labels=[KEY=VALUE,...]]
         [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
@@ -35,12 +38,15 @@ SYNOPSIS
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--node-labels=[NODE_LABEL,...]] [--node-taints=[NODE_TAINT,...]]
-        [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
+        [--preemptible] [--release-channel=CHANNEL]
         [--security-group=SECURITY_GROUP] [--services-ipv4-cidr=CIDR]
         [--services-secondary-range-name=NAME]
         [--shielded-integrity-monitoring] [--shielded-secure-boot]
-        [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
-        [--workload-metadata=WORKLOAD_METADATA] [--workload-pool=WORKLOAD_POOL]
+        [--subnetwork=SUBNETWORK]
+        [--system-config-from-file=SYSTEM_CONFIG_FROM_FILE]
+        [--tags=TAG,[TAG,...]] [--workload-metadata=WORKLOAD_METADATA]
+        [--workload-pool=WORKLOAD_POOL]
         [--additional-zones=ZONE,[ZONE,...] | --node-locations=ZONE,[ZONE,...]]
         [[--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
@@ -69,8 +75,6 @@ SYNOPSIS
         [--password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
-        [--release-channel=CHANNEL
-          | --cluster-version=CLUSTER_VERSION --node-version=NODE_VERSION]
         [--reservation=RESERVATION --reservation-affinity=RESERVATION_AFFINITY]
         [--scopes=[SCOPE,...];
           default="gke-default" --service-account=SERVICE_ACCOUNT]
@@ -108,7 +112,7 @@ FLAGS
         flag will be enabled. The others will be disabled. Default addons:
         HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
         HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        NetworkPolicy, CloudRun, Istio, ApplicationManager, NodeLocalDNS,
+        NetworkPolicy, CloudRun, NodeLocalDNS, Istio, ApplicationManager,
         GcePersistentDiskCsiDriver, ConfigConnector.
 
      --allow-route-overlap
@@ -152,6 +156,15 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'. Cannot be used
         with --create-subnetwork.
+
+     --cluster-version=CLUSTER_VERSION
+        The Kubernetes version to use for the master and nodes. Defaults to
+        server-specified.
+
+        The default Kubernetes version is available using the following
+        command.
+
+            $ gcloud container get-server-config
 
      --create-subnetwork=[KEY=VALUE,...]
         Create a new subnetwork for the cluster. The name and range of the
@@ -285,6 +298,10 @@ FLAGS
         Cloud Run alpha clusters are not covered by the Cloud Run SLA and
         should not be used for production workloads.
 
+     --enable-dataplane-v2
+        Enables the new eBPF dataplane for GKE clusters that is required for
+        network security, scalability and visibility features.
+
      --enable-gvnic
         Enable the use of GVNIC for this cluster. Requires re-creation of nodes
         using either a node-pool upgrade or node-pool creation.
@@ -355,6 +372,12 @@ FLAGS
 
      --enable-vertical-pod-autoscaling
         Enable vertical pod autoscaling for a cluster.
+
+     --identity-provider=IDENTITY_PROVIDER
+        Enable 3P identity provider on the cluster.
+
+        Currently, the only accepted identity provider is the identity provider
+        of Hub membership for hub workload pool PROJECT_ID.hub.id.goog.
 
      --image-type=IMAGE_TYPE
         The image type to use for the cluster. Defaults to server-specified.
@@ -553,6 +576,14 @@ FLAGS
         To read more about node-taints, see
         https://cloud.google.com/kubernetes-engine/docs/node-taints.
 
+     --node-version=NODE_VERSION
+        The Kubernetes version to use for nodes. Defaults to server-specified.
+
+        The default Kubernetes version is available using the following
+        command.
+
+            $ gcloud container get-server-config
+
      --num-nodes=NUM_NODES; default=3
         The number of nodes to be created in each of the cluster's zones.
 
@@ -565,6 +596,32 @@ FLAGS
         preemptible VM instances. See
         https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
         information on how to use Preemptible VMs with Kubernetes Engine.
+
+     --release-channel=CHANNEL
+        Release channel a cluster is subscribed to.
+
+        When a cluster is subscribed to a release channel, Google maintains
+        both the master version and the node version. Node auto-upgrade
+        defaults to true and cannot be disabled.
+
+        CHANNEL must be one of:
+
+         rapid
+            'rapid' channel is offered on an early access basis for customers
+            who want to test new releases.
+
+            WARNING: Versions available in the 'rapid' channel may be subject
+            to unresolved issues with no known workaround and are not subject
+            to any SLAs.
+
+         regular
+            Clusters subscribed to 'regular' receive versions that are
+            considered GA quality. 'regular' is intended for production users
+            who want to take advantage of new features.
+
+         stable
+            Clusters subscribed to 'stable' receive versions that are known to
+            be stable and reliable in production.
 
      --security-group=SECURITY_GROUP
         The name of the RBAC security group for use with Google security groups
@@ -613,6 +670,47 @@ FLAGS
         specified by --network.
 
         Cannot be used with the "--create-subnetwork" option.
+
+     --system-config-from-file=SYSTEM_CONFIG_FROM_FILE
+        Path of the YAML/JSON file that contains the node configuration,
+        including Linux kernel parameters (sysctls) and kubelet configs.
+
+        Example:
+
+            kubeletConfig:
+              cpuManagerPolicy: static
+            linuxConfig:
+              sysctl:
+                net.core.somaxconn: '2048'
+                net.ipv4.tcp_rmem: '4096 87380 6291456'
+
+        List of supported kubelet configs in 'kubeletConfig'.
+
+          KEY                VALUE
+          cpuManagerPolicy   either 'static' or 'default'
+          cpuCFSQuota        true or false (enabled by default)
+          cpuCFSQuotaPeriod  interval (e.g., '100ms')
+
+        List of supported sysctls in 'linuxConfig'.
+
+          KEY                                         VALUE
+          net.core.netdev_max_backlog                 Any positive integer, less
+                                                      than 2147483647
+          net.core.rmem_max                           Any positive integer, less
+                                                      than 2147483647
+          net.core.wmem_default                       Any positive integer, less
+                                                      than 2147483647
+          net.core.wmem_max                           Any positive integer, less
+                                                      than 2147483647
+          net.core.optmem_max                         Any positive integer, less
+                                                      than 2147483647
+          net.core.somaxconn                          Must be [128, 2147483647]
+          net.ipv4.tcp_rmem                           Any positive integer tuple
+          net.ipv4.tcp_wmem                           Any positive integer tuple
+          net.ipv4.tcp_tw_reuse                       Must be {0, 1}
+
+        Note, updating the system configuration of an existing node pool
+        requires recreation of the nodes which which might cause a disruption.
 
      --tags=TAG,[TAG,...]
         Applies the given Compute Engine tags (comma separated) on all nodes in
@@ -1106,63 +1204,6 @@ FLAGS
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
-     --release-channel cannot be specified if Custom Version Flags
-     (--cluster-version or --node-version) are used. At most one of these may
-     be specified:
-
-       --release-channel=CHANNEL
-          Release channel a cluster is subscribed to.
-
-          When a cluster is subscribed to a release channel, GKE maintains both
-          the master version and the node version. Node auto-upgrade defaults
-          to true and cannot be disabled. Updates to version related fields
-          (e.g. --cluster-version) return an error.
-
-          CHANNEL must be one of:
-
-           rapid
-              WARNING: 'rapid' is recommended for testing, and not for
-              production workloads. Clusters on 'rapid' are not covered by GKE
-              SLA.
-
-              Clusters subscribed to 'rapid' receive the latest qualified
-              components, before any other channel. 'rapid' is intended for
-              early testers and developers who require new features. New
-              upgrades will occur roughly weekly.
-
-           regular
-              Clusters subscribed to 'regular' receive versions that are
-              considered GA quality. 'regular' is intended for production users
-              who want to take advantage of new features. New upgrades will
-              occur roughly every few weeks.
-
-           stable
-              Clusters subscribed to 'stable' receive versions that are known
-              to be stable and reliable in production. 'stable' is intended for
-              production users who need stability above all else, or for whom
-              frequent upgrades are too risky. New upgrades will occur roughly
-              every few months.
-
-       Custom Version Flags:
-
-         --cluster-version=CLUSTER_VERSION
-            The Kubernetes version to use for the master and nodes. Defaults to
-            server-specified.
-
-            The default Kubernetes version is available using the following
-            command.
-
-                $ gcloud container get-server-config
-
-         --node-version=NODE_VERSION
-            The Kubernetes version to use for nodes. Defaults to
-            server-specified.
-
-            The default Kubernetes version is available using the following
-            command.
-
-                $ gcloud container get-server-config
-
      Specifies the reservation for the default initial node pool.
 
        --reservation=RESERVATION
@@ -1216,6 +1257,7 @@ FLAGS
                                      https://www.googleapis.com/auth/trace.append
               logging-write          https://www.googleapis.com/auth/logging.write
               monitoring             https://www.googleapis.com/auth/monitoring
+              monitoring-read        https://www.googleapis.com/auth/monitoring.read
               monitoring-write       https://www.googleapis.com/auth/monitoring.write
               pubsub                 https://www.googleapis.com/auth/pubsub
               service-control        https://www.googleapis.com/auth/servicecontrol

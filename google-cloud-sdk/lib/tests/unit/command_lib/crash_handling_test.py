@@ -92,7 +92,7 @@ class LogAndExceptionsAndMessages(cli_test_base.CliTestBase):
 
   def testHandleGcloudCrashUsageFalsePropertyWithUnicodeMessage(self):
     # disable_usage_reporting is set to False
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     msg = 'Example Ṳᾔḯ¢◎ⅾℯ exception message text'
     exception = Exception(msg)
     properties.VALUES.core.disable_usage_reporting.Set(False)

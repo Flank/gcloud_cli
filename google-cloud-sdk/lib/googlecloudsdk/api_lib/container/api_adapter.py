@@ -255,15 +255,30 @@ ENABLE_AUTO_REPAIR = 'autoRepair'
 SCOPES = 'scopes'
 AUTOPROVISIONING_LOCATIONS = 'autoprovisioningLocations'
 DEFAULT_ADDONS = [INGRESS, HPA]
-ADDONS_OPTIONS = DEFAULT_ADDONS + [DASHBOARD, NETWORK_POLICY, CLOUDRUN]
+ADDONS_OPTIONS = DEFAULT_ADDONS + [
+    DASHBOARD,
+    NETWORK_POLICY,
+    CLOUDRUN,
+    NODELOCALDNS,
+]
 BETA_ADDONS_OPTIONS = ADDONS_OPTIONS + [
     ISTIO,
     APPLICATIONMANAGER,
-    NODELOCALDNS,
     GCEPDCSIDRIVER,
     CONFIGCONNECTOR,
 ]
 ALPHA_ADDONS_OPTIONS = BETA_ADDONS_OPTIONS + [CLOUDBUILD]
+
+APISERVER = 'APISERVER'
+SCHEDULER = 'SCHEDULER'
+CONTROLLER_MANAGER = 'CONTROLLER_MANAGER'
+ADDON_MANAGER = 'ADDON_MANAGER'
+MASTER_LOGS_OPTIONS = [
+    APISERVER,
+    SCHEDULER,
+    CONTROLLER_MANAGER,
+    ADDON_MANAGER,
+]
 
 
 def CheckResponse(response):
@@ -401,6 +416,7 @@ class CreateClusterOptions(object):
       subnetwork=None,
       addons=None,
       istio_config=None,
+      cloud_run_config=None,
       local_ssd_count=None,
       local_ssd_volume_configs=None,
       boot_disk_kms_key=None,
@@ -463,8 +479,8 @@ class CreateClusterOptions(object):
       metadata=None,
       enable_network_egress_metering=None,
       enable_resource_consumption_metering=None,
-      identity_namespace=None,
       workload_pool=None,
+      identity_provider=None,
       enable_shielded_nodes=None,
       linux_sysctls=None,
       disable_default_snat=None,
@@ -497,6 +513,16 @@ class CreateClusterOptions(object):
       autoprovisioning_min_cpu_platform=None,
       enable_master_global_access=None,
       enable_gvnic=None,
+      enable_master_metrics=None,
+      master_logs=None,
+      release_channel=None,
+      notification_config=None,
+      auto_gke=None,
+      private_ipv6_google_access_type=None,
+      enable_confidential_nodes=None,
+      cluster_dns=None,
+      cluster_dns_scope=None,
+      cluster_dns_domain=None,
   ):
     self.node_machine_type = node_machine_type
     self.node_source_image = node_source_image
@@ -518,6 +544,7 @@ class CreateClusterOptions(object):
     self.subnetwork = subnetwork
     self.addons = addons
     self.istio_config = istio_config
+    self.cloud_run_config = cloud_run_config
     self.local_ssd_count = local_ssd_count
     self.local_ssd_volume_configs = local_ssd_volume_configs
     self.boot_disk_kms_key = boot_disk_kms_key
@@ -580,8 +607,8 @@ class CreateClusterOptions(object):
     self.metadata = metadata
     self.enable_network_egress_metering = enable_network_egress_metering
     self.enable_resource_consumption_metering = enable_resource_consumption_metering
-    self.identity_namespace = identity_namespace
     self.workload_pool = workload_pool
+    self.identity_provider = identity_provider
     self.enable_shielded_nodes = enable_shielded_nodes
     self.linux_sysctls = linux_sysctls
     self.disable_default_snat = disable_default_snat
@@ -614,6 +641,16 @@ class CreateClusterOptions(object):
     self.autoprovisioning_min_cpu_platform = autoprovisioning_min_cpu_platform
     self.enable_master_global_access = enable_master_global_access
     self.enable_gvnic = enable_gvnic
+    self.enable_master_metrics = enable_master_metrics
+    self.master_logs = master_logs
+    self.release_channel = release_channel
+    self.notification_config = notification_config
+    self.auto_gke = auto_gke
+    self.private_ipv6_google_access_type = private_ipv6_google_access_type
+    self.enable_confidential_nodes = enable_confidential_nodes
+    self.cluster_dns = cluster_dns
+    self.cluster_dns_scope = cluster_dns_scope
+    self.cluster_dns_domain = cluster_dns_domain
 
 
 class UpdateClusterOptions(object):
@@ -628,8 +665,12 @@ class UpdateClusterOptions(object):
                logging_service=None,
                enable_stackdriver_kubernetes=None,
                enable_logging_monitoring_system_only=None,
+               master_logs=None,
+               no_master_logs=None,
+               enable_master_metrics=None,
                disable_addons=None,
                istio_config=None,
+               cloud_run_config=None,
                enable_autoscaling=None,
                min_nodes=None,
                max_nodes=None,
@@ -648,8 +689,8 @@ class UpdateClusterOptions(object):
                security_profile_runtime_rules=None,
                autoscaling_profile=None,
                enable_peering_route_sharing=None,
-               identity_namespace=None,
                workload_pool=None,
+               identity_provider=None,
                disable_workload_identity=None,
                enable_shielded_nodes=None,
                disable_default_snat=None,
@@ -680,7 +721,9 @@ class UpdateClusterOptions(object):
                tpu_ipv4_cidr=None,
                enable_master_global_access=None,
                enable_tpu_service_networking=None,
-               enable_gvnic=None):
+               enable_gvnic=None,
+               notification_config=None,
+               private_ipv6_google_access_type=None):
     self.version = version
     self.update_master = bool(update_master)
     self.update_nodes = bool(update_nodes)
@@ -689,8 +732,12 @@ class UpdateClusterOptions(object):
     self.logging_service = logging_service
     self.enable_stackdriver_kubernetes = enable_stackdriver_kubernetes
     self.enable_logging_monitoring_system_only = enable_logging_monitoring_system_only
+    self.no_master_logs = no_master_logs
+    self.master_logs = master_logs
+    self.enable_master_metrics = enable_master_metrics
     self.disable_addons = disable_addons
     self.istio_config = istio_config
+    self.cloud_run_config = cloud_run_config
     self.enable_autoscaling = enable_autoscaling
     self.min_nodes = min_nodes
     self.max_nodes = max_nodes
@@ -709,8 +756,8 @@ class UpdateClusterOptions(object):
     self.autoscaling_profile = autoscaling_profile
     self.enable_intra_node_visibility = enable_intra_node_visibility
     self.enable_peering_route_sharing = enable_peering_route_sharing
-    self.identity_namespace = identity_namespace
     self.workload_pool = workload_pool
+    self.identity_provider = identity_provider
     self.disable_workload_identity = disable_workload_identity
     self.enable_shielded_nodes = enable_shielded_nodes
     self.disable_default_snat = disable_default_snat
@@ -743,6 +790,8 @@ class UpdateClusterOptions(object):
     self.enable_tpu_service_networking = enable_tpu_service_networking
     self.enable_master_global_access = enable_master_global_access
     self.enable_gvnic = enable_gvnic
+    self.notification_config = notification_config
+    self.private_ipv6_google_access_type = private_ipv6_google_access_type
 
 
 class SetMasterAuthOptions(object):
@@ -1168,6 +1217,7 @@ class APIAdapter(object):
       else:
         cluster.networkConfig.enableL4ilbSubsetting = options.enable_l4_ilb_subsetting
 
+    self.ParseClusterDNSOptions(options, cluster)
     if options.enable_legacy_authorization is not None:
       cluster.legacyAbac = self.messages.LegacyAbac(
           enabled=bool(options.enable_legacy_authorization))
@@ -1265,6 +1315,20 @@ class APIAdapter(object):
 
     if options.enable_gvnic:
       cluster.enableGvnic = options.enable_gvnic
+
+    if options.boot_disk_kms_key:
+      for pool in cluster.nodePools:
+        pool.config.bootDiskKmsKey = options.boot_disk_kms_key
+
+    _AddReleaseChannelToCluster(cluster, options, self.messages)
+
+    if options.auto_gke:
+      cluster.autogke = self.messages.AutoGKE()
+      cluster.autogke.enabled = True
+
+    if options.enable_confidential_nodes:
+      cluster.confidentialNodes = self.messages.ConfidentialNodes(
+          enabled=options.enable_confidential_nodes)
 
     return cluster
 
@@ -1548,6 +1612,42 @@ class APIAdapter(object):
           authorized_networks.cidrBlocks.append(
               self.messages.CidrBlock(cidrBlock=network))
       cluster.masterAuthorizedNetworksConfig = authorized_networks
+
+  def ParseClusterDNSOptions(self, options, cluster):
+    """Parses the options for ClusterDNS."""
+    if options.cluster_dns is None:
+      if options.cluster_dns_scope:
+        raise util.Error(
+            PREREQUISITE_OPTION_ERROR_MSG.format(
+                prerequisite='cluster-dns', opt='cluster-dns-scope'))
+      if options.cluster_dns_domain:
+        raise util.Error(
+            PREREQUISITE_OPTION_ERROR_MSG.format(
+                prerequisite='cluster-dns', opt='cluster-dns-domain'))
+      return
+
+    dns_config = self.messages.DNSConfig()
+    provider_enum = self.messages.DNSConfig.ClusterDnsValueValuesEnum
+    if options.cluster_dns.lower() == 'clouddns':
+      dns_config.clusterDns = provider_enum.CLOUD_DNS
+    else:
+      dns_config.clusterDns = provider_enum.PLATFORM_DEFAULT
+
+    if options.cluster_dns_scope is not None:
+      scope_enum = self.messages.DNSConfig.ClusterDnsScopeValueValuesEnum
+      if options.cluster_dns_scope.lower() == 'cluster':
+        dns_config.clusterDnsScope = scope_enum.CLUSTER_SCOPE
+      else:
+        dns_config.clusterDnsScope = scope_enum.VPC_SCOPE
+
+    if options.cluster_dns_domain is not None:
+      dns_config.clusterDnsDomain = options.cluster_dns_domain
+
+    if cluster.networkConfig is None:
+      cluster.networkConfig = self.messages.NetworkConfig(
+          dnsConfig=dns_config)
+    else:
+      cluster.networkConfig.dnsConfig = dns_config
 
   def CreateCluster(self, cluster_ref, options):
     """Handles CreateCluster options that are specific to a release track.
@@ -1901,6 +2001,11 @@ class APIAdapter(object):
       update = self.messages.ClusterUpdate(
           desiredEnableGvnic=options.enable_gvnic)
 
+    if options.release_channel is not None:
+      update = self.messages.ClusterUpdate(
+          desiredReleaseChannel=_GetReleaseChannelForClusterUpdate(
+              options, self.messages))
+
     return update
 
   def UpdateCluster(self, cluster_ref, options):
@@ -1941,6 +2046,7 @@ class APIAdapter(object):
         update.desiredAddonsConfig.cloudRunConfig = (
             self.messages.CloudRunConfig(
                 disabled=options.disable_addons.get(CLOUDRUN)))
+
 
     op = self.client.projects_locations_clusters.Update(
         self.messages.UpdateClusterRequest(
@@ -2871,15 +2977,11 @@ class V1Beta1Adapter(V1Adapter):
         options.autoscaling_profile is not None):
       cluster.autoscaling = self.CreateClusterAutoscalingCommon(
           None, options, False)
-    if options.boot_disk_kms_key:
-      for pool in cluster.nodePools:
-        pool.config.bootDiskKmsKey = options.boot_disk_kms_key
     if options.workload_pool:
       cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
           workloadPool=options.workload_pool)
-    elif options.identity_namespace:
-      cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
-          identityNamespace=options.identity_namespace)
+      if options.identity_provider:
+        cluster.workloadIdentityConfig.identityProvider = options.identity_provider
     if options.enable_master_global_access is not None:
       if not options.enable_private_nodes:
         raise util.Error(
@@ -2889,7 +2991,7 @@ class V1Beta1Adapter(V1Adapter):
       cluster.privateClusterConfig.masterGlobalAccessConfig = \
           self.messages.PrivateClusterMasterGlobalAccessConfig(
               enabled=options.enable_master_global_access)
-    _AddReleaseChannelToCluster(cluster, options, self.messages)
+    _AddNotificationConfigToCluster(cluster, options, self.messages)
 
     cluster.loggingService = None
     cluster.monitoringService = None
@@ -2910,6 +3012,35 @@ class V1Beta1Adapter(V1Adapter):
       else:
         cluster.ipAllocationPolicy.useRoutes = True
 
+    if options.datapath_provider is not None:
+      if cluster.networkConfig is None:
+        cluster.networkConfig = self.messages.NetworkConfig()
+      if options.datapath_provider.lower() == 'legacy':
+        cluster.networkConfig.datapathProvider = \
+            self.messages.NetworkConfig.DatapathProviderValueValuesEnum.LEGACY_DATAPATH
+      elif options.datapath_provider.lower() == 'advanced':
+        cluster.networkConfig.datapathProvider = \
+            self.messages.NetworkConfig.DatapathProviderValueValuesEnum.ADVANCED_DATAPATH
+      else:
+        raise util.Error(
+            DATAPATH_PROVIDER_ILL_SPECIFIED_ERROR_MSG.format(
+                provider=options.datapath_provider))
+
+    if options.dataplane_v2 is not None and options.dataplane_v2:
+      if cluster.networkConfig is None:
+        cluster.networkConfig = self.messages.NetworkConfig()
+      cluster.networkConfig.datapathProvider = \
+            self.messages.NetworkConfig.DatapathProviderValueValuesEnum.ADVANCED_DATAPATH
+
+    if options.private_ipv6_google_access_type is not None:
+      if cluster.networkConfig is None:
+        cluster.networkConfig = self.messages.NetworkConfig()
+      cluster.networkConfig.privateIpv6GoogleAccess = util.GetPrivateIpv6GoogleAccessTypeMapper(
+          self.messages,
+          hidden=True).GetEnumForChoice(options.private_ipv6_google_access_type)
+
+    cluster.master = _GetMasterForClusterCreate(options, self.messages)
+
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
         cluster=cluster)
@@ -2923,18 +3054,18 @@ class V1Beta1Adapter(V1Adapter):
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
               workloadPool=options.workload_pool))
-    elif options.identity_namespace:
+    elif options.identity_provider:
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
-              identityNamespace=options.identity_namespace))
+              identityProvider=options.identity_provider))
     elif options.disable_workload_identity:
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
               workloadPool=''))
 
-    if options.release_channel is not None:
+    if options.notification_config is not None:
       update = self.messages.ClusterUpdate(
-          desiredReleaseChannel=_GetReleaseChannelForClusterUpdate(
+          desiredNotificationConfig=_GetNotificationConfigForClusterUpdate(
               options, self.messages))
 
     if options.enable_stackdriver_kubernetes:
@@ -2950,6 +3081,17 @@ class V1Beta1Adapter(V1Adapter):
       update = self.messages.ClusterUpdate(
           desiredClusterTelemetry=self.messages.ClusterTelemetry(
               type=self.messages.ClusterTelemetry.TypeValueValuesEnum.DISABLED))
+
+    if options.private_ipv6_google_access_type is not None:
+      update = self.messages.ClusterUpdate(
+          desiredPrivateIpv6GoogleAccess=util
+          .GetPrivateIpv6GoogleAccessTypeMapperForUpdate(
+              self.messages, hidden=True).GetEnumForChoice(
+                  options.private_ipv6_google_access_type))
+
+    master = _GetMasterForClusterUpdate(options, self.messages)
+    if master is not None:
+      update = self.messages.ClusterUpdate(desiredMaster=master)
 
     if not update:
       # if reached here, it's possible:
@@ -3187,9 +3329,6 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     if options.local_ssd_volume_configs:
       for pool in cluster.nodePools:
         self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
-    if options.boot_disk_kms_key:
-      for pool in cluster.nodePools:
-        pool.config.bootDiskKmsKey = options.boot_disk_kms_key
     if options.addons:
       # CloudRun is disabled by default.
       if CLOUDRUN in options.addons:
@@ -3199,8 +3338,12 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           raise util.Error(CLOUDRUN_INGRESS_KUBERNETES_DISABLED_ERROR_MSG)
         enable_alpha_features = options.enable_cloud_run_alpha if \
             options.enable_cloud_run_alpha is not None else False
+        load_balancer_type = _GetCloudRunLoadBalancerType(
+            options, self.messages)
         cluster.addonsConfig.cloudRunConfig = self.messages.CloudRunConfig(
-            disabled=False, enableAlphaFeatures=enable_alpha_features)
+            disabled=False,
+            enableAlphaFeatures=enable_alpha_features,
+            loadBalancerType=load_balancer_type)
       # Cloud Build is disabled by default.
       if CLOUDBUILD in options.addons:
         if not options.enable_stackdriver_kubernetes:
@@ -3222,9 +3365,8 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     if options.workload_pool:
       cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
           workloadPool=options.workload_pool)
-    elif options.identity_namespace:
-      cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
-          identityNamespace=options.identity_namespace)
+      if options.identity_provider:
+        cluster.workloadIdentityConfig.identityProvider = options.identity_provider
     if options.security_profile is not None:
       cluster.securityProfile = self.messages.SecurityProfile(
           name=options.security_profile)
@@ -3248,6 +3390,7 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           self.messages.PrivateClusterMasterGlobalAccessConfig(
               enabled=options.enable_master_global_access)
     _AddReleaseChannelToCluster(cluster, options, self.messages)
+    _AddNotificationConfigToCluster(cluster, options, self.messages)
     if options.enable_cost_management:
       cluster.costManagementConfig = self.messages.CostManagementConfig(
           enabled=True)
@@ -3277,12 +3420,28 @@ class V1Alpha1Adapter(V1Beta1Adapter):
         raise util.Error(
             DATAPATH_PROVIDER_ILL_SPECIFIED_ERROR_MSG.format(
                 provider=options.datapath_provider))
+
+    if options.dataplane_v2 is not None and options.dataplane_v2:
+      if cluster.networkConfig is None:
+        cluster.networkConfig = self.messages.NetworkConfig()
+      cluster.networkConfig.datapathProvider = \
+            self.messages.NetworkConfig.DatapathProviderValueValuesEnum.ADVANCED_DATAPATH
+
     if not options.enable_ip_alias and options.enable_ip_alias is not None:
       if cluster.ipAllocationPolicy is None:
         cluster.ipAllocationPolicy = self.messages.IPAllocationPolicy(
             useRoutes=True)
       else:
         cluster.ipAllocationPolicy.useRoutes = True
+
+    if options.private_ipv6_google_access_type is not None:
+      if cluster.networkConfig is None:
+        cluster.networkConfig = self.messages.NetworkConfig()
+      cluster.networkConfig.privateIpv6GoogleAccess = util.GetPrivateIpv6GoogleAccessTypeMapper(
+          self.messages,
+          hidden=True).GetEnumForChoice(options.private_ipv6_google_access_type)
+
+    cluster.master = _GetMasterForClusterCreate(options, self.messages)
 
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
@@ -3297,10 +3456,10 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
               workloadPool=options.workload_pool))
-    elif options.identity_namespace:
+    elif options.identity_provider:
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
-              identityNamespace=options.identity_namespace))
+              identityProvider=options.identity_provider))
     elif options.disable_workload_identity:
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
@@ -3322,6 +3481,11 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           desiredReleaseChannel=_GetReleaseChannelForClusterUpdate(
               options, self.messages))
 
+    if options.notification_config is not None:
+      update = self.messages.ClusterUpdate(
+          desiredNotificationConfig=_GetNotificationConfigForClusterUpdate(
+              options, self.messages))
+
     if options.enable_stackdriver_kubernetes:
       update = self.messages.ClusterUpdate(
           desiredClusterTelemetry=self.messages.ClusterTelemetry(
@@ -3335,6 +3499,17 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       update = self.messages.ClusterUpdate(
           desiredClusterTelemetry=self.messages.ClusterTelemetry(
               type=self.messages.ClusterTelemetry.TypeValueValuesEnum.DISABLED))
+
+    if options.private_ipv6_google_access_type is not None:
+      update = self.messages.ClusterUpdate(
+          desiredPrivateIpv6GoogleAccess=util
+          .GetPrivateIpv6GoogleAccessTypeMapperForUpdate(
+              self.messages, hidden=True).GetEnumForChoice(
+                  options.private_ipv6_google_access_type))
+
+    master = _GetMasterForClusterUpdate(options, self.messages)
+    if master is not None:
+      update = self.messages.ClusterUpdate(desiredMaster=master)
 
     if not update:
       # if reached here, it's possible:
@@ -3358,9 +3533,12 @@ class V1Alpha1Adapter(V1Beta1Adapter):
         update.desiredAddonsConfig.istioConfig = self.messages.IstioConfig(
             disabled=options.disable_addons.get(ISTIO), auth=istio_auth)
       if options.disable_addons.get(CLOUDRUN) is not None:
+        load_balancer_type = _GetCloudRunLoadBalancerType(
+            options, self.messages)
         update.desiredAddonsConfig.cloudRunConfig = (
             self.messages.CloudRunConfig(
-                disabled=options.disable_addons.get(CLOUDRUN)))
+                disabled=options.disable_addons.get(CLOUDRUN),
+                loadBalancerType=load_balancer_type))
       if options.disable_addons.get(APPLICATIONMANAGER) is not None:
         update.desiredAddonsConfig.kalmConfig = (
             self.messages.KalmConfig(
@@ -3387,8 +3565,6 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     pool = self.CreateNodePoolCommon(node_pool_ref, options)
     if options.local_ssd_volume_configs:
       self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
-    if options.boot_disk_kms_key:
-      pool.config.bootDiskKmsKey = options.boot_disk_kms_key
     if options.enable_autoprovisioning is not None:
       pool.autoscaling.autoprovisioned = options.enable_autoprovisioning
     if options.node_group is not None:
@@ -3560,6 +3736,17 @@ class V1Alpha1Adapter(V1Beta1Adapter):
                                             cluster_ref.clusterId)))
 
 
+def _GetCloudRunLoadBalancerType(options, messages):
+  if options.cloud_run_config is not None:
+    input_load_balancer_type = options.cloud_run_config.get(
+        'load-balancer-type')
+    if input_load_balancer_type is not None:
+      if input_load_balancer_type == 'INTERNAL':
+        return messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
+      return messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
+  return messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_UNSPECIFIED
+
+
 def _AddMetadataToNodeConfig(node_config, options):
   if not options.metadata:
     return
@@ -3678,6 +3865,18 @@ def _AddReleaseChannelToCluster(cluster, options, messages):
         channel=channels[options.release_channel])
 
 
+def _AddNotificationConfigToCluster(cluster, options, messages):
+  """Adds notification config to Cluster."""
+  nc = options.notification_config
+  if nc is not None:
+    pubsub = messages.PubSub()
+    if 'pubsub' in nc:
+      pubsub.enabled = nc['pubsub'] == 'ENABLED'
+    if 'pubsub-topic' in nc:
+      pubsub.topic = nc['pubsub-topic']
+    cluster.notificationConfig = messages.NotificationConfig(pubsub=pubsub)
+
+
 def _GetReleaseChannelForClusterUpdate(options, messages):
   """Gets the ReleaseChannel from update options."""
   if options.release_channel is not None:
@@ -3690,6 +3889,18 @@ def _GetReleaseChannelForClusterUpdate(options, messages):
     return messages.ReleaseChannel(channel=channels[options.release_channel])
 
 
+def _GetNotificationConfigForClusterUpdate(options, messages):
+  """Gets the NotificationConfig from update options."""
+  nc = options.notification_config
+  if nc is not None:
+    pubsub = messages.PubSub()
+    if 'pubsub' in nc:
+      pubsub.enabled = nc['pubsub'] == 'ENABLED'
+    if 'pubsub-topic' in nc:
+      pubsub.topic = nc['pubsub-topic']
+    return messages.NotificationConfig(pubsub=pubsub)
+
+
 def _GetTpuConfigForClusterUpdate(options, messages):
   """Gets the TpuConfig from update options."""
   if options.enable_tpu is not None:
@@ -3700,6 +3911,67 @@ def _GetTpuConfigForClusterUpdate(options, messages):
         ipv4CidrBlock=options.tpu_ipv4_cidr,
         useServiceNetworking=options.enable_tpu_service_networking,
     )
+
+
+def _GetMasterForClusterCreate(options, messages):
+  """Gets the Master from create options."""
+  if options.master_logs is not None or options.enable_master_metrics is not None:
+    config = messages.MasterSignalsConfig()
+
+    if options.master_logs is not None:
+      if APISERVER in options.master_logs:
+        config.logEnabledComponents.append(
+            messages.MasterSignalsConfig
+            .LogEnabledComponentsValueListEntryValuesEnum.APISERVER)
+      if SCHEDULER in options.master_logs:
+        config.logEnabledComponents.append(
+            messages.MasterSignalsConfig
+            .LogEnabledComponentsValueListEntryValuesEnum.SCHEDULER)
+      if CONTROLLER_MANAGER in options.master_logs:
+        config.logEnabledComponents.append(
+            messages.MasterSignalsConfig
+            .LogEnabledComponentsValueListEntryValuesEnum.CONTROLLER_MANAGER)
+      if ADDON_MANAGER in options.master_logs:
+        config.logEnabledComponents.append(
+            messages.MasterSignalsConfig
+            .LogEnabledComponentsValueListEntryValuesEnum.ADDON_MANAGER)
+    if options.enable_master_metrics is not None:
+      config.enableMetrics = options.enable_master_metrics
+    return messages.Master(signalsConfig=config)
+
+
+def _GetMasterForClusterUpdate(options, messages):
+  """Gets the Master from update options."""
+  if options.no_master_logs:
+    options.master_logs = []
+  if options.master_logs is not None:
+    config = messages.MasterSignalsConfig()
+    if APISERVER in options.master_logs:
+      config.logEnabledComponents.append(
+          messages.MasterSignalsConfig
+          .LogEnabledComponentsValueListEntryValuesEnum.APISERVER)
+    if SCHEDULER in options.master_logs:
+      config.logEnabledComponents.append(
+          messages.MasterSignalsConfig
+          .LogEnabledComponentsValueListEntryValuesEnum.SCHEDULER)
+    if CONTROLLER_MANAGER in options.master_logs:
+      config.logEnabledComponents.append(
+          messages.MasterSignalsConfig
+          .LogEnabledComponentsValueListEntryValuesEnum.CONTROLLER_MANAGER)
+    if ADDON_MANAGER in options.master_logs:
+      config.logEnabledComponents.append(
+          messages.MasterSignalsConfig
+          .LogEnabledComponentsValueListEntryValuesEnum.ADDON_MANAGER)
+    return messages.Master(signalsConfig=config)
+
+  if options.enable_master_metrics is not None:
+    config = messages.MasterSignalsConfig(
+        enableMetrics=options.enable_master_metrics,
+        logEnabledComponents=[
+            messages.MasterSignalsConfig
+            .LogEnabledComponentsValueListEntryValuesEnum.COMPONENT_UNSPECIFIED
+        ])
+    return messages.Master(signalsConfig=config)
 
 
 def ProjectLocation(project, location):

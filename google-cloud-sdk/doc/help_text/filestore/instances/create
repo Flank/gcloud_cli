@@ -33,24 +33,19 @@ REQUIRED FLAGS
      --file-share=[capacity=CAPACITY],[name=NAME]
         File share configuration for an instance. Specifying both name and
         capacity is required.
-
          capacity
             The desired size of the volume. The capacity must be a whole number
             followed by a size unit such as TB for terabyte. If no size unit is
             specified, GB is assumed. The minimum size for a standard instance
             is 1TB. The minimum size for a premium instance is 2.5TB.
-
          name
             The desired logical name of the volume.
-
      --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE]
         Network configuration for a Cloud Filestore instance. Specifying
         reserved-ip-range is optional.
-
          name
             The name of the Google Compute Engine VPC network to which the
             instance is connected.
-
          reserved-ip-range
             A /29 CIDR block in one of the internal IP address ranges
             (https://www.arin.net/knowledge/address_filters.html) that
@@ -101,9 +96,10 @@ EXAMPLES
     The following command creates a Cloud Filestore instance named NAME with a
     single volume.
 
-        $ gcloud filestore instances create NAME --description=DESCRIPTION \
-            --tier=TIER --file-share=name=VOLUME_NAME,capacity=CAPACITY \
-            --network=name=NETWORK_NAME,reserved-ip-range=RESERVED-IP-RANGE
+        $ gcloud filestore instances create NAME   \
+            --description=DESCRIPTION --tier=TIER   \
+            --file-share=name=VOLUME_NAME,capacity=CAPACITY   \
+            --network=name=NETWORK_NAME,reserved-ip-range=RESERVED_IP_RANGE
 
 NOTES
     These variants are also available:

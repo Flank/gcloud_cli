@@ -262,7 +262,9 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertFalse(self.helper.IsClosed())
 
   @mock.patch.object(log, 'info', autospec=True)
-  def testOnError(self, log_info_mock):
+  @mock.patch.object(log, 'debug', autospec=True)
+  def testOnError(self, log_debug_mock, log_info_mock):
+    log.SetVerbosity(logging.INFO)
     log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
     self.helper._OnError(Exception('some error'))
     self.assertEqual(self.helper.ErrorMsg(), 'some error')
@@ -270,6 +272,12 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     log_info_mock.assert_has_calls(
         [mock.call('Error during WebSocket processing:\n'
                    'Exception: some error\n')])
+
+    log.SetVerbosity(logging.DEBUG)
+    self.helper._OnError(Exception('some error'))
+    self.assertEqual(log_debug_mock.call_count, 2)
+    log_debug_mock.assert_has_calls(
+        [mock.call('Error during WebSocket processing.', exc_info=True)])
 
   @mock.patch.object(log, 'info', autospec=True)
   def testReceiveFromWebSocketNormal(self, log_info_mock):

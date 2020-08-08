@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ from tests.lib.core.resource import resource_printer_test_base
 class CsvPrinterTest(resource_printer_test_base.Base):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testDefault(self):
     self.Print(style='csv')
@@ -45,7 +45,7 @@ class CsvPrinterTest(resource_printer_test_base.Base):
         """))
 
   def testDefaultUtf8(self):
-    self.Print(style='csv', encoding='utf8')
+    self.Print(style='csv', encoding='utf-8')
     self.AssertOutputEquals(textwrap.dedent("""\
         name,quote,id
         Ṁöë,.TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW,1267
@@ -98,7 +98,7 @@ class CsvPrinterTest(resource_printer_test_base.Base):
 class CsvPrinterAttributeTest(resource_printer_test_base.Base):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testDefault(self):
     self.Print(style='csv')

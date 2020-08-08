@@ -11,7 +11,7 @@ gcloud beta app deploy \- deploy the local code and/or configuration of your app
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-no\-cache\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-appyaml\fR=\fIAPPYAML\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-no\-cache\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -28,11 +28,11 @@ Note, for Java8 Standard apps, you must add the path to the
 \f5appengine\-web.xml\fR file inside the WEB\-INF directory. gcloud beta app
 deploy skips files specified in the .gcloudignore file (see \f5gcloud topic
 gcloudignore\fR for more information). For Java11 Standard, you can either use
-the yaml file, or a Maven pom.xml or, if the application is a single
-self\-contained jar, you can give the path to the jar and a simple service
-configuration will be generated. You can deploy Java11 Maven source projects by
-specifying the location of your project's pom.xml file, and it will be built and
-deployed using App Engine Buildpacks.
+the yaml file, a Maven pom.xml, or a Gradle build.gradle. Alternatively, if the
+application is a single self\-contained jar, you can give the path to the jar
+and a simple service configuration will be generated. You can deploy Java11
+Maven source projects by specifying the location of your project's pom.xml file,
+and it will be built and deployed using App Engine Buildpacks.
 
 
 
@@ -53,6 +53,11 @@ app.yaml) in the current directory.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-appyaml\fR=\fIAPPYAML\fR
+Deploy with a specific app.yaml that will replace the one defined in the
+DEPLOYABLE.
+
 .TP 2m
 \fB\-\-bucket\fR=\fIBUCKET\fR
 The Google Cloud Storage bucket used to stage files associated with the
@@ -136,6 +141,12 @@ To deploy an App Engine Standard Java11 Maven source project, run:
 
 .RS 2m
 $ gcloud beta app deploy ~/my_app/pom.xml
+.RE
+
+To deploy an App Engine Standard Java11 Gradle source project, run:
+
+.RS 2m
+$ gcloud beta app deploy ~/my_app/build.gradle
 .RE
 
 By default, the service is deployed the current project configured via:

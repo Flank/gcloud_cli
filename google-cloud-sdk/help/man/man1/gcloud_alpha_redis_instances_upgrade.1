@@ -101,8 +101,8 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBredis/v1beta1\fR API. The full documentation for this
-API can be found at: https://cloud.google.com/memorystore/docs/redis/
+This command uses the \fBredis/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/memorystore/docs/redis/
 
 
 
@@ -123,9 +123,10 @@ $ gcloud alpha redis instances upgrade my\-redis\-instance \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud redis instances upgrade
 $ gcloud beta redis instances upgrade
 .RE
 

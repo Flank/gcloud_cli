@@ -41,11 +41,11 @@ The location of the source to build. The location can be a directory on a local
 disk or a gzipped archive file (.tar.gz) in Google Cloud Storage. If the source
 is a local directory, this command skips the files specified in the
 \f5\-\-ignore\-file\fR. If \f5\-\-ignore\-file\fR is not specified,
-use\f5.gcloudignore\fR file. If a \f5.gitignore\fR file is present in the local
-source directory, gcloud will use a Git\-compatible \f5.gcloudignore\fR file
-that respects your .gitignored files. The global \f5.gitignore\fR is not
-respected. For more information on \f5.gcloudignore\fR, see \f5gcloud topic
-gcloudignore\fR.
+use\f5.gcloudignore\fR file. If a \f5.gcloudignore\fR file is absent and a
+\f5.gitignore\fR file is present in the local source directory, gcloud will use
+a generated Git\-compatible \f5.gcloudignore\fR file that respects your
+.gitignored files. The global \f5.gitignore\fR is not respected. For more
+information on \f5.gcloudignore\fR, see \f5gcloud topic gcloudignore\fR.
 
 .TP 2m
 \fB\-\-no\-source\fR

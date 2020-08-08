@@ -11,7 +11,7 @@ gcloud beta compute commitments update\-reservations \- update the resource shap
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute commitments update\-reservations\fR \fICOMMITMENT\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR\ |\ [\fB\-\-reservation\fR=\fIRESERVATION\fR\ :\ \fB\-\-reservation\-zone\fR=\fIRESERVATION_ZONE\fR\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-reservation\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute commitments update\-reservations\fR \fICOMMITMENT\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR\ |\ [\fB\-\-dest\-reservation\fR=[\fImachine\-type\fR=\fIMACHINE\-TYPE\fR],[\fImin\-cpu\-platform\fR=\fIMIN\-CPU\-PLATFORM\fR],[\fIrequire\-specific\-reservation\fR=\fIREQUIRE\-SPECIFIC\-RESERVATION\fR],[\fIreservation\fR=\fIRESERVATION\fR],[\fIreservation\-zone\fR=\fIRESERVATION\-ZONE\fR],[\fIvm\-count\fR=\fIVM\-COUNT\fR]\ \fB\-\-source\-reservation\fR=[\fImachine\-type\fR=\fIMACHINE\-TYPE\fR],[\fImin\-cpu\-platform\fR=\fIMIN\-CPU\-PLATFORM\fR],[\fIrequire\-specific\-reservation\fR=\fIREQUIRE\-SPECIFIC\-RESERVATION\fR],[\fIreservation\fR=\fIRESERVATION\fR],[\fIreservation\-zone\fR=\fIRESERVATION\-ZONE\fR],[\fIvm\-count\fR=\fIVM\-COUNT\fR]\ :\ \fB\-\-dest\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-dest\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-source\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-source\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,61 +64,88 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 
-Manage the reservations to be created with the commitment. At most one of these
+Manage reservations that are attached to the commitment. At most one of these
 may be specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR
-Path to a YAML file of multiple reservations' configuration.
+Path to a YAML file of two reservations' configuration.
 
 .TP 2m
 
-Manage the reservation to be created with the commitment.
+Specify source and destination reservations configuration.
 
 .RS 2m
 .TP 2m
-\fB\-\-reservation\fR=\fIRESERVATION\fR
-Name of the reservation to operate on. This flag must be specified if any of the
-other arguments in this group are specified.
-
-.TP 2m
-\fB\-\-reservation\-zone\fR=\fIRESERVATION_ZONE\fR
-Zone of the reservation to operate on. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
-zone.
-
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/zone ZONE
+\fB\-\-dest\-reservation\fR=[\fImachine\-type\fR=\fIMACHINE\-TYPE\fR],[\fImin\-cpu\-platform\fR=\fIMIN\-CPU\-PLATFORM\fR],[\fIrequire\-specific\-reservation\fR=\fIREQUIRE\-SPECIFIC\-RESERVATION\fR],[\fIreservation\fR=\fIRESERVATION\fR],[\fIreservation\-zone\fR=\fIRESERVATION\-ZONE\fR],[\fIvm\-count\fR=\fIVM\-COUNT\fR]
+destination reservation configuration.
 .RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
-
+.sp
 .TP 2m
-
-Manage the specific SKU reservation properties to create.
+\fBreservation\fR
+Name of the destination reservation to operate on.
+.TP 2m
+\fBreservation\-zone\fR
+Zone of the destination reservation to operate on.
+.TP 2m
+\fBvm\-count\fR
+The number of VM instances that are allocated to this reservation. The value of
+this field must be an int in the range [1, 1000].
+.TP 2m
+\fBmachine\-type\fR
+The type of machine (name only) which has a fixed number of vCPUs and a fixed
+amount of memory. This also includes specifying custom machine type following
+\f5custom\-number_of_CPUs\-amount_of_memory\fR pattern, e.g.
+\f5custom\-32\-29440\fR.
+.TP 2m
+\fBmin\-cpu\-platform\fR
+Optional minimum CPU platform of the reservation to create.
+.TP 2m
+\fBrequire\-specific\-reservation\fR
+Indicates whether the reservation can be consumed by VMs with "any reservation"
+defined. If enabled, then only VMs that target this reservation by name using
+\f5\-\-reservation\-affinity=specific\fR can consume from this reservation. This
+flag must be specified if any of the other arguments in this group are
+specified.
 
 .RS 2m
 .TP 2m
-\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
+\fB\-\-source\-reservation\fR=[\fImachine\-type\fR=\fIMACHINE\-TYPE\fR],[\fImin\-cpu\-platform\fR=\fIMIN\-CPU\-PLATFORM\fR],[\fIrequire\-specific\-reservation\fR=\fIREQUIRE\-SPECIFIC\-RESERVATION\fR],[\fIreservation\fR=\fIRESERVATION\fR],[\fIreservation\-zone\fR=\fIRESERVATION\-ZONE\fR],[\fIvm\-count\fR=\fIVM\-COUNT\fR]
+source reservation configuration.
+.RE
+.sp
+.TP 2m
+\fBreservation\fR
+Name of the source reservation to operate on.
+.TP 2m
+\fBreservation\-zone\fR
+Zone of the source reservation to operate on.
+.TP 2m
+\fBvm\-count\fR
+The number of VM instances that are allocated to this reservation. The value of
+this field must be an int in the range [1, 1000].
+.TP 2m
+\fBmachine\-type\fR
+The type of machine (name only) which has a fixed number of vCPUs and a fixed
+amount of memory. This also includes specifying custom machine type following
+\f5custom\-number_of_CPUs\-amount_of_memory\fR pattern, e.g.
+\f5custom\-32\-29440\fR.
+.TP 2m
+\fBmin\-cpu\-platform\fR
+Optional minimum CPU platform of the reservation to create.
+.TP 2m
+\fBrequire\-specific\-reservation\fR
+Indicates whether the reservation can be consumed by VMs with "any reservation"
+defined. If enabled, then only VMs that target this reservation by name using
+\f5\-\-reservation\-affinity=specific\fR can consume from this reservation. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-dest\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
 Manage the configuration of the type and number of accelerator cards attached.
-.RE
 .RE
 .sp
 .TP 2m
@@ -132,7 +159,7 @@ accelerator\-types list\fR to learn about all available accelerator types.
 
 .RS 2m
 .TP 2m
-\fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
+\fB\-\-dest\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
 Manage the size and the interface of local SSD to use. See
 https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
 .RE
@@ -147,31 +174,35 @@ operating systems. NVME may provide higher performance.
 The size of the local SSD in base\-2 GB.
 .RS 2m
 .TP 2m
-\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
-The type of machine (name only) which has a fixed number of vCPUs and a fixed
-amount of memory. This also includes specifying custom machine type following
-\f5custom\-number_of_CPUs\-amount_of_memory\fR pattern, e.g.
-\f5custom\-32\-29440\fR.
+\fB\-\-source\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
+Manage the configuration of the type and number of accelerator cards attached.
+.RE
+.sp
+.TP 2m
+\fBcount\fR
+The number of accelerators to attach to each instance in the reservation.
+.TP 2m
+\fBtype\fR
+The specific type (e.g. \f5nvidia\-tesla\-k80\fR for nVidia Tesla K80) of
+accelerator to attach to instances in the reservation. Use \f5gcloud compute
+accelerator\-types list\fR to learn about all available accelerator types.
 
 .RS 2m
 .TP 2m
-\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
-Optional minimum CPU platform of the reservation to create.
-
-.TP 2m
-\fB\-\-require\-specific\-reservation\fR
-Indicates whether the reservation can be consumed by VMs with "any reservation"
-defined. If enabled, then only VMs that target this reservation by name using
-\f5\-\-reservation\-affinity=specific\fR can consume from this reservation.
-
-.TP 2m
-\fB\-\-vm\-count\fR=\fIVM_COUNT\fR
-The number of VM instances that are allocated to this reservation. The value of
-this field must be an int in the range [1, 1000].
-
-
+\fB\-\-source\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
+Manage the size and the interface of local SSD to use. See
+https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
 .RE
-.RE
+.sp
+.TP 2m
+\fBinterface\fR
+The kind of disk interface exposed to the VM for this SSD. Valid values are
+\f5scsi\fR and \f5nvme\fR. SCSI is the default and is supported by more guest
+operating systems. NVME may provide higher performance.
+.TP 2m
+\fBsize\fR
+The size of the local SSD in base\-2 GB.
+
 .RE
 .RE
 .sp
@@ -197,6 +228,9 @@ run:
 $ gcloud beta compute commitments update\-reservations commitment\-1 \e
     \-\-reservations\-from\-file=reservations.yaml
 .RE
+
+For detailed examples, please refer to
+https://cloud.google.com/compute/docs/instances/reserving\-zonal\-resources#modifying_reservations_that_are_attached_to_commitments
 
 
 

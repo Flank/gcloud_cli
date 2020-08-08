@@ -42,8 +42,16 @@ Run \fB$ gcloud help\fR for details.
 \fB(ALPHA)\fR Manage Apigee API proxies.
 
 .TP 2m
+\fBapplications\fR
+\fB(ALPHA)\fR Manage third\-party applications which call Apigee API proxies.
+
+.TP 2m
 \fBdeployments\fR
 \fB(ALPHA)\fR Manage deployments of Apigee proxies in runtime environments.
+
+.TP 2m
+\fBdevelopers\fR
+\fB(ALPHA)\fR Manage Apigee developers.
 
 .TP 2m
 \fBenvironments\fR
@@ -52,6 +60,10 @@ Run \fB$ gcloud help\fR for details.
 .TP 2m
 \fBorganizations\fR
 \fB(ALPHA)\fR Manage Apigee organizations.
+
+.TP 2m
+\fBproducts\fR
+\fB(ALPHA)\fR Manage Apigee API products.
 
 
 .RE
@@ -62,27 +74,29 @@ Run \fB$ gcloud help\fR for details.
 To list API proxies in the active Cloud Platform project, run:
 
 .RS 2m
-$ gcloud alpha apis list
+$ gcloud alpha apigee apis list
 .RE
 
 To deploy an API proxy named \f5\fIhello\-world\fR\fR to the \f5\fItest\fR\fR
 environment, run:
 
 .RS 2m
-$ gcloud alpha apis deploy \-\-environment=test \-\-api=hello\-world
+$ gcloud alpha apigee apis deploy \-\-environment=test \e
+    \-\-api=hello\-world
 .RE
 
 To get the status of that deployment, run:
 
 .RS 2m
-$ gcloud alpha deployments describe \-\-environment=test \e
+$ gcloud alpha apigee deployments describe \-\-environment=test \e
     \-\-api=hello\-world
 .RE
 
 To undeploy that API proxy, run:
 
 .RS 2m
-$ gcloud alpha apis undeploy \-\-environment=test \-\-api=hello\-world
+$ gcloud alpha apigee apis undeploy \-\-environment=test \e
+    \-\-api=hello\-world
 .RE
 
 

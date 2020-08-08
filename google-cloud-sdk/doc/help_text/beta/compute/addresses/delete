@@ -6,8 +6,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute addresses delete releases one or more Google
-    Compute Engine IP addresses.
+    (BETA) gcloud beta compute addresses delete releases one or more Compute
+    Engine IP addresses.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

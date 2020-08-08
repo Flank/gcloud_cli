@@ -43,11 +43,11 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To run a job from the flex template, run:
 
-        $ gcloud beta dataflow flex-template run my-job               \
-            --template-file-gcs-location=gs://flex-template-path           \
-                --region=europe-west1               \
-            --parameters=input="gs://input",output="gs://output-path",     \
-                     max_num_workers=5
+        $ gcloud beta dataflow flex-template run my-job \
+            --template-file-gcs-location=gs://flex-template-path \
+            --region=europe-west1 \
+            --parameters=input="gs://input",output="gs://output-path",\
+        max_num_workers=5
 
 NOTES
     This command is currently in BETA and may change without notice.

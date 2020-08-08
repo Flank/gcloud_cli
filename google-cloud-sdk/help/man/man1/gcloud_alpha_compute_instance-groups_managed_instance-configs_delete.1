@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed instance\-configs delete \- delete
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed instance\-configs delete\fR \fINAME\fR \fB\-\-instances\fR=\fIINSTANCE\fR,[\fIINSTANCE\fR,...] [\fB\-\-no\-update\-instance\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed instance\-configs delete\fR \fINAME\fR \fB\-\-instances\fR=\fIINSTANCE\fR,[\fIINSTANCE\fR,...] [\fB\-\-instance\-update\-minimal\-action\fR=\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR;\ default="none"] [\fB\-\-no\-update\-instance\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,6 +52,29 @@ Names of instances to delete instance\-configs from.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-instance\-update\-minimal\-action\fR=\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR; default="none"
+Perform at least this action on the instance while updating, if
+\f5\-\-update\-instance\fR is set to \f5true\fR.
+\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBnone\fR
+No action
+.TP 2m
+\fBrefresh\fR
+Apply properties that are possible to apply without stopping the instance
+.TP 2m
+\fBreplace\fR
+Delete the instance and create it again
+.TP 2m
+\fBrestart\fR
+Stop the instance and start it again
+.RE
+.sp
+
+
 .TP 2m
 \fB\-\-update\-instance\fR
 Apply the configuration changes immediately to the instance. If you disable this

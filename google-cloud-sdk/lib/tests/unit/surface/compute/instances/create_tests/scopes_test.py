@@ -281,6 +281,59 @@ class InstancesCreateScopesTest(create_test_base.InstancesCreateTestBase):
 
     self.CheckRequests()
 
+  def testAccountWithNoScopes(self):
+    m = self.messages
+
+    self.make_requests.side_effect = iter([
+        [
+            m.Zone(name='central2-a'),
+        ],
+        [],
+    ])
+
+    self.Run("""
+          compute instances create instance-1
+            --no-scopes
+            --service-account=1234@project.gserviceaccount.com
+            --zone central2-a
+          """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[m.ServiceAccount(
+                      email='1234@project.gserviceaccount.com'),],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
 
 if __name__ == '__main__':
   test_case.main()

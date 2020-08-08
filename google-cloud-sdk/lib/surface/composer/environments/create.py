@@ -157,8 +157,8 @@ information on how to structure KEYs and VALUEs, run
       the created environment.""")
 
   image_version_type = arg_parsers.RegexpValidator(
-      r'^composer-(\d+\.\d+.\d+|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
-      'must be in the form \'composer-A.B.C-airflow-X.Y[.Z]\' or '
+      r'^composer-(\d+\.\d+.\d+(?:-[a-z]+\.\d+)?|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
+      'must be in the form \'composer-A.B.C[-D.E]-airflow-X.Y[.Z]\' or '
       '\'latest\' can be provided in place of the Cloud Composer version '
       'string. For example: \'composer-latest-airflow-1.10.0\'.')
   version_group.add_argument(
@@ -167,7 +167,8 @@ information on how to structure KEYs and VALUEs, run
       help="""Version of the image to run in the environment.
 
       The image version encapsulates the versions of both Cloud Composer
-      and Apache Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+      and Apache Airflow. Must be of the form
+      `composer-A.B.C[-D.E]-airflow-X.Y[.Z]`.
 
       The Cloud Composer and Airflow versions are semantic versions.
       `latest` can be provided instead of an explicit Cloud Composer
@@ -361,6 +362,7 @@ class CreateBeta(Create):
     flags.WEB_SERVER_ALLOW_IP.AddToParser(web_server_group)
     flags.WEB_SERVER_ALLOW_ALL.AddToParser(web_server_group)
     flags.WEB_SERVER_DENY_ALL.AddToParser(web_server_group)
+    flags.CLOUD_SQL_MACHINE_TYPE.AddToParser(parser)
 
   def Run(self, args):
     if self._support_web_server_access_control:
@@ -412,6 +414,7 @@ class CreateBeta(Create):
         web_server_ipv4_cidr=args.web_server_ipv4_cidr,
         cloud_sql_ipv4_cidr=args.cloud_sql_ipv4_cidr,
         web_server_access_control=self.web_server_access_control,
+        cloud_sql_machine_type=args.cloud_sql_machine_type,
         release_track=self.ReleaseTrack())
 
 
@@ -431,6 +434,7 @@ class CreateAlpha(CreateBeta):
   @staticmethod
   def Args(parser):
     _CommonArgs(parser)
+    flags.CLOUD_SQL_MACHINE_TYPE.AddToParser(parser)
 
     # Private IP falgs without ranges missing in alpha.
     flags.AddPrivateIpEnvironmentFlags(parser, False)
@@ -474,4 +478,5 @@ class CreateAlpha(CreateBeta):
         private_environment=args.enable_private_environment,
         private_endpoint=args.enable_private_endpoint,
         master_ipv4_cidr=args.master_ipv4_cidr,
+        cloud_sql_machine_type=args.cloud_sql_machine_type,
         release_track=self.ReleaseTrack())

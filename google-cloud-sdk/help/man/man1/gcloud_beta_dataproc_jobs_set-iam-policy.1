@@ -73,16 +73,20 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-The following command will read an IAM policy defined in a JSON file
-\'policy.json' and set it for a job with identifier 'example\-job'
+The following command will read an IAM policy defined in a JSON file.RS 2m
+'policy.json' and set it for a job with identifier 'example\-job'
+
+.RE
 
 .RS 2m
 $ gcloud beta dataproc jobs set\-iam\-policy example\-job policy.json
 .RE
 
 
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
+.RS 2m
+See https://cloud.google.com/iam/docs/managing\-policies for details
+of the policy file format and contents.
+.RE
 
 
 

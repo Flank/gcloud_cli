@@ -27,37 +27,33 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding to a Google Compute Engine instance
-        template.
+        (ALPHA) Add IAM policy binding to a Compute Engine instance template.
 
      create
         (ALPHA) Create a Compute Engine virtual machine instance template.
 
      create-with-container
-        (ALPHA) Creates Google Compute Engine virtual machine instance template
-        running Docker images.
+        (ALPHA) Creates a Compute Engine a virtual machine instance template
+        that runs a Docker container.
 
      delete
-        (ALPHA) Delete Google Compute Engine virtual machine instance
-        templates.
+        (ALPHA) Delete Compute Engine virtual machine instance templates.
 
      describe
         (ALPHA) Describe a virtual machine instance template.
 
      get-iam-policy
-        (ALPHA) Get the IAM policy for a Google Compute Engine instance
-        template.
+        (ALPHA) Get the IAM policy for a Compute Engine instance template.
 
      list
         (ALPHA) List Google Compute Engine instance templates.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding from a Google Compute Engine instance
+        (ALPHA) Remove IAM policy binding from a Compute Engine instance
         template.
 
      set-iam-policy
-        (ALPHA) Set the IAM policy for a Google Compute Engine instance
-        template.
+        (ALPHA) Set the IAM policy for a Compute Engine instance template.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

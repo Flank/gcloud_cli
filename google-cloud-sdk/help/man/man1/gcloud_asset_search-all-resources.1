@@ -1,0 +1,209 @@
+
+.TH "GCLOUD_ASSET_SEARCH\-ALL\-RESOURCES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud asset search\-all\-resources \- searches all Cloud resources within the specified accessible scope, such as a project, folder or organization
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud asset search\-all\-resources\fR [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-order\-by\fR=\fIORDER_BY\fR] [\fB\-\-query\fR=\fIQUERY\fR] [\fB\-\-scope\fR=\fISCOPE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Searches all Cloud resources within the specified scope, such as a project,
+folder or organization. The caller must be granted the
+\f5\fIcloudasset.assets.searchAllResources\fR\fR permission on the desired
+scope.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]
+A list of asset types to search. If not specified or empty, it will search all
+the searchable asset types
+(https://cloud.google.com/asset\-inventory/docs/supported\-asset\-types#searchable_asset_types).
+Example:
+\f5\fIcloudresourcemanager.googleapis.com/Project,compute.googleapis.com/Instance\fR\fR
+to search project and VM instance resources.
+
+.TP 2m
+\fB\-\-order\-by\fR=\fIORDER_BY\fR
+A comma\-separated list of fields specifying the sorting order of the results.
+The default order is ascending. Add \f5\fI DESC\fR\fR after the field name to
+indicate descending order. Redundant space characters are ignored. Example:
+\f5\fIlocation DESC, name\fR\fR. Only string fields in the response are
+sortable, including \f5name\fR, \f5displayName\fR, \f5description\fR and
+\f5location\fR.
+
+Both \f5\-\-order\-by\fR and \f5\-\-sort\-by\fR flags can be used to sort the
+output, with the following differences:
+
+.RS 2m
+.IP "\(em" 2m
+The \f5\-\-order\-by\fR flag performs server\-side sorting (better performance),
+while the \f5\-\-sort\-by\fR flag performs client\-side sorting.
+.IP "\(em" 2m
+The \f5\-\-sort\-by\fR flag supports all the fields in the output, while the
+\f5\-\-order\-by\fR flag only supports limited fields as shown above.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-query\fR=\fIQUERY\fR
+The query statement. See how to construct a query
+(https://cloud.google.com/asset\-inventory/docs/searching\-resources#how_to_construct_a_query)
+for more details. If not specified or empty, it will search all the resources
+within the specified \f5scope\fR.
+
+Examples:
+
+.RS 2m
+.IP "\(em" 2m
+\f5name : "Important"\fR to find Cloud resources whose name contains
+\f5\fIImportant\fR\fR as a word.
+.IP "\(em" 2m
+\f5displayName : "Impor*"\fR to find Cloud resources whose display name contains
+\f5\fIImpor\fR\fR as a prefix.
+.IP "\(em" 2m
+\f5description : "*por*"\fR to find Cloud resources whose description contains
+\f5\fIpor\fR\fR as a substring.
+.IP "\(em" 2m
+\f5location : "us\-west*"\fR to find Cloud resources whose location is prefixed
+with \f5\fIus\-west\fR\fR.
+.IP "\(em" 2m
+\f5labels : "prod"\fR to find Cloud resources whose labels contain
+\f5\fIprod\fR\fR as a key or value.
+.IP "\(em" 2m
+\f5labels.env : "prod"\fR to find Cloud resources which have a label
+\f5\fIenv\fR\fR and its value is \f5\fIprod\fR\fR.
+.IP "\(em" 2m
+\f5labels.env : *\fR to find Cloud resources which have a label \f5\fIenv\fR\fR.
+.IP "\(em" 2m
+\f5"Important"\fR to find Cloud resources which contain \f5\fIImportant\fR\fR as
+a word in any of the searchable fields.
+.IP "\(em" 2m
+\f5"Impor*"\fR to find Cloud resources which contain \f5\fIImpor\fR\fR as a
+prefix in any of the searchable fields.
+.IP "\(em" 2m
+\f5"*por*"\fR to find Cloud resources which contain \f5\fIpor\fR\fR as a
+substring in any of the searchable fields.
+.IP "\(em" 2m
+\f5("Important" AND location : ("us\-west1" OR "global"))\fR to find Cloud
+resources which contain \f5\fIImportant\fR\fR as a word in any of the searchable
+fields and are also located in the \f5\fIus\-west1\fR\fR region or the
+\f5\fIglobal\fR\fR location.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-scope\fR=\fISCOPE\fR
+A scope can be a project, a folder, or an organization. The search is limited to
+the Cloud resources within this scope. The caller must be granted the
+\f5\fIcloudasset.assets.searchAllResources\fR\fR permission on the desired
+scope. If not specified, the configured project property
+(https://cloud.google.com//sdk/docs/configurations#setting_configuration_properties)
+will be used. To find the configured project, run: \f5gcloud config get\-value
+project\fR. To change the setting, run: \f5gcloud config set project
+PROJECT_ID\fR.
+
+The allowed values are:
+
+.RS 2m
+.IP "\(em" 2m
+\f5projects/{PROJECT_ID}\fR (e.g., \f5\fIprojects/foo\-bar\fR\fR)
+.IP "\(em" 2m
+\f5projects/{PROJECT_NUMBER}\fR (e.g., \f5\fIprojects/12345678\fR\fR)
+.IP "\(em" 2m
+\f5folders/{FOLDER_NUMBER}\fR (e.g., \f5\fIfolders/1234567\fR\fR)
+.IP "\(em" 2m
+\f5organizations/{ORGANIZATION_NUMBER}\fR (e.g.
+\f5\fIorganizations/123456\fR\fR)
+.RE
+.RE
+.sp
+
+
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To search all the Cloud resources whose full resource names contain the
+\f5\fIxyz\fR\fR substring, within \f5\fIorganizations/123456\fR\fR, ensure the
+caller has been granted the \f5\fIcloudasset.assets.searchAllResources\fR\fR
+permission on the organization and run:
+
+.RS 2m
+$ gcloud beta asset search\-all\-resources \e
+    \-\-scope='organizations/123456' \-\-query='name : "*xyz*"'
+.RE
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta asset search\-all\-resources
+.RE
+

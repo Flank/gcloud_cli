@@ -50,6 +50,14 @@ Run \fB$ gcloud help\fR for details.
 \fB(ALPHA)\fR Display detailed information about a target gRPC proxy.
 
 .TP 2m
+\fBexport\fR
+\fB(ALPHA)\fR Export a target gRPC proxy.
+
+.TP 2m
+\fBimport\fR
+\fB(ALPHA)\fR Import a target gRPC proxy.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List Google Compute Engine target gRPC proxies.
 
@@ -62,5 +70,10 @@ Run \fB$ gcloud help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute target\-grpc\-proxies
+$ gcloud beta compute target\-grpc\-proxies
+.RE
 

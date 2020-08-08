@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute interconnects attachments partner create - create a
-        Google Compute Engine partner interconnect attachment
+        Compute Engine partner interconnect attachment
 
 SYNOPSIS
     gcloud alpha compute interconnects attachments partner create NAME

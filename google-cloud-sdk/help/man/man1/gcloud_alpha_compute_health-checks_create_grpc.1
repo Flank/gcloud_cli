@@ -137,7 +137,9 @@ If given, use the "serving port" for health checks:
 .RS 2m
 .IP "\(bu" 2m
 When health checking network endpoints in a Network Endpoint Group, use the port
-specified with each endpoint.
+specified with each endpoint. \f5\-\-use\-serving\-port\fR must be used when
+using a Network Endpoint Group as a backend as this flag specifies the
+\f5portSpecification\fR option for a Health Check object.
 .IP "\(bu" 2m
 When health checking other backends, use the port of the backend service.
 .RE
@@ -163,5 +165,10 @@ Run \fB$ gcloud help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute health\-checks create grpc
+$ gcloud beta compute health\-checks create grpc
+.RE
 

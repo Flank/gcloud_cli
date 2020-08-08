@@ -5,8 +5,8 @@ summary:
 - execute:
   - command: recommender recommendations list --project=my-project --location=my-location --recommender=my-recommender
   - stdout: |
-      ID                 LOCATION     RECOMMENDER     PRIMARY_IMPACT_CATEGORY  STATE      LAST_REFRESH_TIME
-      my-recommendation  my-location  my-recommender  SECURITY                 SUCCEEDED  2019-02-06T06:42:31Z
+      RECOMMENDATION_ID  LOCATION     RECOMMENDER     PRIMARY_IMPACT_CATEGORY  RECOMMENDATION_STATE  LAST_REFRESH_TIME
+      my-recommendation  my-location  my-recommender  SECURITY                 SUCCEEDED             2019-02-06T06:42:31Z
 actions:
 - define_reference:
     reference: api-version
@@ -117,7 +117,7 @@ actions:
               ]
             }
     - expect_stdout: |
-        ID                 LOCATION     RECOMMENDER     PRIMARY_IMPACT_CATEGORY  STATE      LAST_REFRESH_TIME
-        my-recommendation  my-location  my-recommender  SECURITY                 SUCCEEDED  2019-02-06T06:42:31Z
+        RECOMMENDATION_ID  LOCATION     RECOMMENDER     PRIMARY_IMPACT_CATEGORY  RECOMMENDATION_STATE  LAST_REFRESH_TIME
+        my-recommendation  my-location  my-recommender  SECURITY                 SUCCEEDED             2019-02-06T06:42:31Z
     - expect_exit:
         code: 0

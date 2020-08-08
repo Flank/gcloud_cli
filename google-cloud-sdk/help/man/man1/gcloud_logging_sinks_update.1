@@ -18,9 +18,8 @@ gcloud logging sinks update \- updates a sink
 .SH "DESCRIPTION"
 
 Changes the \fB[destination]\fR or \fB\-\-log\-filter\fR associated with a sink.
-The new destination must already exist and Stackdriver Logging must have
-permission to write to it. Log entries are exported to the new destination
-immediately.
+The new destination must already exist and Cloud Logging must have permission to
+write to it. Log entries are exported to the new destination immediately.
 
 
 
@@ -69,7 +68,7 @@ Update a sink associated with this organization.
 \fB\-\-project\fR=\fIPROJECT_ID\fR
 Update a sink associated with this project.
 
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.

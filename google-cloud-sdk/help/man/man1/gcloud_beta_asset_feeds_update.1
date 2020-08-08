@@ -11,7 +11,7 @@ gcloud beta asset feeds update \- update an existing Cloud Asset Inventory Feed
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta asset feeds update\fR \fIFEED_ID\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR] [\fB\-\-add\-asset\-names\fR=[\fIASSET\-NAMES\fR,...]\ |\ \fB\-\-clear\-asset\-names\fR\ |\ \fB\-\-remove\-asset\-names\fR=[\fIASSET\-NAMES\fR,...]] [\fB\-\-add\-asset\-types\fR=[\fIASSET\-TYPES\fR,...]\ |\ \fB\-\-clear\-asset\-types\fR\ |\ \fB\-\-remove\-asset\-types\fR=[\fIASSET\-TYPES\fR,...]] [\fB\-\-clear\-content\-type\fR\ |\ \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta asset feeds update\fR \fIFEED_ID\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR] [\fB\-\-add\-asset\-names\fR=[\fIASSET\-NAMES\fR,...]\ |\ \fB\-\-clear\-asset\-names\fR\ |\ \fB\-\-remove\-asset\-names\fR=[\fIASSET\-NAMES\fR,...]] [\fB\-\-add\-asset\-types\fR=[\fIASSET\-TYPES\fR,...]\ |\ \fB\-\-clear\-asset\-types\fR\ |\ \fB\-\-remove\-asset\-types\fR=[\fIASSET\-TYPES\fR,...]] [\fB\-\-clear\-condition\-description\fR\ |\ \fB\-\-condition\-description\fR=\fICONDITION_DESCRIPTION\fR] [\fB\-\-clear\-condition\-expression\fR\ |\ \fB\-\-condition\-expression\fR=\fICONDITION_EXPRESSION\fR] [\fB\-\-clear\-condition\-title\fR\ |\ \fB\-\-condition\-title\fR=\fICONDITION_TITLE\fR] [\fB\-\-clear\-content\-type\fR\ |\ \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,7 +53,7 @@ Organization of the feed.
 \fB\-\-project\fR=\fIPROJECT_ID\fR
 project of the feed.
 
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.
@@ -117,6 +117,54 @@ Empty the current assetTypes.
 .TP 2m
 \fB\-\-remove\-asset\-types\fR=[\fIASSET\-TYPES\fR,...]
 Remove the given values from the current assetTypes.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-condition\-description\fR
+Clear any existing condition description setting on the feed. Condition
+description will be empty.
+
+.TP 2m
+\fB\-\-condition\-description\fR=\fICONDITION_DESCRIPTION\fR
+Condition description to overwrite the existing one.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-condition\-expression\fR
+Clear any existing condition expression setting on the feed. No condition will
+be applied to feed.
+
+.TP 2m
+\fB\-\-condition\-expression\fR=\fICONDITION_EXPRESSION\fR
+Condition expression to overwrite the existing one.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-condition\-title\fR
+Clear any existing condition title setting on the feed. Condition title will be
+empty.
+
+.TP 2m
+\fB\-\-condition\-title\fR=\fICONDITION_TITLE\fR
+Condition title to overwrite the existing one.
 
 .RE
 .sp

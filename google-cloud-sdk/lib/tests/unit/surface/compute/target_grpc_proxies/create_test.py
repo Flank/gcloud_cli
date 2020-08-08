@@ -22,15 +22,15 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class TargetGrpcProxiesCreateAlphaTest(test_base.BaseTest):
+class TargetGrpcProxiesCreateV1Test(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'v1'
     self.SelectApi(self._api)
-    self._target_grpc_proxies_api = self.compute_alpha.targetGrpcProxies
+    self._target_grpc_proxies_api = self.compute_v1.targetGrpcProxies
 
   def RunCreate(self, command):
-    self.Run('alpha compute target-grpc-proxies create %s' % command)
+    self.Run('compute target-grpc-proxies create %s' % command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = [[
@@ -125,9 +125,18 @@ class TargetGrpcProxiesCreateAlphaTest(test_base.BaseTest):
             urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/global/urlMaps/my-map'.format(self.api)))
     ]]
-    self.Run('{0} compute target-grpc-proxies create my-proxy '
-             '--description "My target gRPC proxy with default scope" '
-             '--url-map my-map'.format(self._api))
+
+    # self.RunCreate('my-proxy'
+    #          '--description "My target gRPC proxy with default scope" '
+    #          '--url-map my-map')
+    self.RunCreate("""
+        my-proxy
+          --description "My target gRPC proxy with default scope"
+          --url-map my-map
+        """)
+    # self.Run('{0} compute target-grpc-proxies create my-proxy '
+    #          '--description "My target gRPC proxy with default scope" '
+    #          '--url-map my-map'.format(self._api))
     self.CheckRequests([
         (self._target_grpc_proxies_api, 'Insert',
          self.messages.ComputeTargetGrpcProxiesInsertRequest(
@@ -145,6 +154,28 @@ class TargetGrpcProxiesCreateAlphaTest(test_base.BaseTest):
       my-proxy  my-map   False
       """,
         normalize_space=True)
+
+
+class TargetGrpcProxiesCreateBetaTest(TargetGrpcProxiesCreateV1Test):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_grpc_proxies_api = self.compute_beta.targetGrpcProxies
+
+  def RunCreate(self, command):
+    self.Run('beta compute target-grpc-proxies create %s' % command)
+
+
+class TargetGrpcProxiesCreateAlphaTest(TargetGrpcProxiesCreateBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_grpc_proxies_api = self.compute_alpha.targetGrpcProxies
+
+  def RunCreate(self, command):
+    self.Run('alpha compute target-grpc-proxies create %s' % command)
 
 
 if __name__ == '__main__':

@@ -130,3 +130,6 @@ test-targets-for-shard.good:
 
 num-uniform-shards.good:
   num-uniform-shards: 2
+
+grant-permissions.good:
+  grant-permissions: none

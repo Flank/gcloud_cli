@@ -21,7 +21,7 @@ summary:
     - input: '3'
   - prompt:
     - message: 'Full name:  '
-    - input: ''
+    - input: '   '
   - stderr: |2
        Name must not be empty.
   - prompt:
@@ -162,7 +162,7 @@ actions:
         user_input: '3'
     - expect_prompt_response:
         message: 'Full name:  '
-        user_input: ''
+        user_input: '   '
     - expect_stderr: |2
          Name must not be empty.
     - expect_prompt_response:

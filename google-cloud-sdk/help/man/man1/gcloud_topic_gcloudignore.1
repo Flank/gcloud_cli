@@ -46,6 +46,15 @@ behavior), run:
 $ gcloud config set gcloudignore/enabled false
 .RE
 
+The default \f5.gcloudignore\fR file, which can be overriden with
+\f5\-\-ignore\-file\fR, is as follows:
+
+.RS 2m
+.gcloudignore
+.git
+.gitignore
+.RE
+
 
 
 .SH "SYNTAX"
@@ -123,8 +132,8 @@ that point in the file. It does not recurse (that is, the included file
 \fBcannot\fR \f5#!include\fR another file) and cannot be anywhere but the
 top\-level directory to be uploaded.
 
-The \f5gcloud meta list\-files\-for\-upload\fR command can be used to display
-files files that will uploaded.
+The gcloud meta list\-files\-for\-upload command can be used to display files
+files that will uploaded.
 
 
 

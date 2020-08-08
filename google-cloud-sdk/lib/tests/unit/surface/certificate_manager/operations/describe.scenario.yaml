@@ -1,0 +1,178 @@
+title: Certificate Manager operations describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager operations describe operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+        apiVersion: v1alpha1
+        createTime: '2020-06-26T01:11:00.591836958Z'
+        endTime: '2020-06-26T01:11:00.891516932Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+        verb: create
+      name: projects/fake-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+      response:
+        '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry
+        certificates:
+        - projects/307841421122/locations/global/certificates/simple-cert
+        - projects/307841421122/locations/global/certificates/another-cert
+        createTime: '2020-06-26T01:11:00.502671715Z'
+        matcher: PRIMARY
+        name: projects/fake-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+        state: PENDING
+        updateTime: '2020-06-26T01:11:00.502671715Z'
+- execute:
+  - command: |
+      certificate-manager operations describe operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e --project overridden-project
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+        apiVersion: v1alpha1
+        createTime: '2020-06-26T01:11:00.591836958Z'
+        endTime: '2020-06-26T01:11:00.891516932Z'
+        requestedCancellation: false
+        target: projects/overridden-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+        verb: create
+      name: projects/overridden-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+      response:
+        '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry
+        certificates:
+        - projects/307841421122/locations/global/certificates/simple-cert
+        - projects/307841421122/locations/global/certificates/another-cert
+        createTime: '2020-06-26T01:11:00.502671715Z'
+        matcher: PRIMARY
+        name: projects/overridden-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+        state: PENDING
+        updateTime: '2020-06-26T01:11:00.502671715Z'
+actions:
+- execute_command:
+    command: |
+      certificate-manager operations describe operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-26T01:11:00.591836958Z",
+                "endTime": "2020-06-26T01:11:00.891516932Z",
+                "target": "projects/fake-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry",
+                "name": "projects/fake-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                "createTime": "2020-06-26T01:11:00.502671715Z",
+                "updateTime": "2020-06-26T01:11:00.502671715Z",
+                "certificates": [
+                  "projects/307841421122/locations/global/certificates/simple-cert",
+                  "projects/307841421122/locations/global/certificates/another-cert"
+                ],
+                "state": "PENDING",
+                "matcher": "PRIMARY"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+          apiVersion: v1alpha1
+          createTime: '2020-06-26T01:11:00.591836958Z'
+          endTime: '2020-06-26T01:11:00.891516932Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+          verb: create
+        name: projects/fake-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+        response:
+          '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry
+          certificates:
+          - projects/307841421122/locations/global/certificates/simple-cert
+          - projects/307841421122/locations/global/certificates/another-cert
+          createTime: '2020-06-26T01:11:00.502671715Z'
+          matcher: PRIMARY
+          name: projects/fake-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+          state: PENDING
+          updateTime: '2020-06-26T01:11:00.502671715Z'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager operations describe operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e --project overridden-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/overridden-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/overridden-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-26T01:11:00.591836958Z",
+                "endTime": "2020-06-26T01:11:00.891516932Z",
+                "target": "projects/overridden-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry",
+                "name": "projects/overridden-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                "createTime": "2020-06-26T01:11:00.502671715Z",
+                "updateTime": "2020-06-26T01:11:00.502671715Z",
+                "certificates": [
+                  "projects/307841421122/locations/global/certificates/simple-cert",
+                  "projects/307841421122/locations/global/certificates/another-cert"
+                ],
+                "state": "PENDING",
+                "matcher": "PRIMARY"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+          apiVersion: v1alpha1
+          createTime: '2020-06-26T01:11:00.591836958Z'
+          endTime: '2020-06-26T01:11:00.891516932Z'
+          requestedCancellation: false
+          target: projects/overridden-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+          verb: create
+        name: projects/overridden-project/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+        response:
+          '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry
+          certificates:
+          - projects/307841421122/locations/global/certificates/simple-cert
+          - projects/307841421122/locations/global/certificates/another-cert
+          createTime: '2020-06-26T01:11:00.502671715Z'
+          matcher: PRIMARY
+          name: projects/overridden-project/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry
+          state: PENDING
+          updateTime: '2020-06-26T01:11:00.502671715Z'
+    - expect_exit:
+        code: 0

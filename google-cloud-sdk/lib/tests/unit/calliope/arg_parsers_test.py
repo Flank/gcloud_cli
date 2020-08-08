@@ -895,6 +895,10 @@ class ArgListTest(subtests.Base):
                  '`gcloud topic escaping` for information on providing list or '
                  'dictionary flag values with special characters.'))
 
+    # Custom delimiters.
+    self.Run(['foo;baz'], 'foo;baz', custom_delim_char=None)
+    self.Run(['foo', 'baz'], 'foo;baz', custom_delim_char=';')
+
 
 # We need to break this out separately because parameterized and subtests don't
 # work well together.
@@ -935,6 +939,55 @@ class ArgListParameterizedTest(parameterized.TestCase):
     arg_list = arg_parsers.ArgList(min_length=min_length, max_length=max_length)
     self.assertEqual(arg_list.GetUsageMsg(False, 'REALLY_REALLY_LONG_METAVAR'),
                      expected)
+
+
+class ArgListDefaultDelimiterTest(parameterized.TestCase):
+
+  class _AtDelimitedArgList(arg_parsers.ArgList):
+    DEFAULT_DELIM_CHAR = '@'
+
+  @parameterized.parameters(
+      # Standard case
+      (0, None, None, '[FOO@...]'),
+      # Just a min length
+      (1, None, None, 'FOO@[FOO@...]'),
+      (2, None, None, 'FOO@FOO@[FOO@...]'),
+      (3, None, None, 'FOO@FOO@FOO@[FOO@...]'),
+      # Just a max length
+      (0, 1, None, '[FOO]'),
+      (0, 2, None, '[FOO@[FOO]]'),
+      (0, 3, None, '[FOO@...]'),
+      # Both a min and max length
+      (1, 3, None, 'FOO@[FOO@[FOO]]'),
+      (1, 4, None, 'FOO@[FOO@...]'),
+      (2, 3, None, 'FOO@FOO@[FOO]'),
+      (3, 3, None, 'FOO@FOO@FOO'),
+      # Custom delimiter char
+      (0, None, ';', '[FOO;...]'),
+      (2, 3, ';', 'FOO;FOO;[FOO]'),
+  )
+  def testArgListUsage(self, min_length, max_length,
+                       custom_delim_char, expected):
+    arg_list = self._AtDelimitedArgList(
+        min_length=min_length, max_length=max_length,
+        custom_delim_char=custom_delim_char)
+    self.assertEqual(arg_list.GetUsageMsg(False, 'FOO'), expected)
+
+  @parameterized.parameters(
+      (0, None, '[REALLY_REALLY_LONG_METAVAR@...]'),
+      (1, None, 'REALLY_REALLY_LONG_METAVAR@[...]'),
+      (2, None, 'REALLY_REALLY_LONG_METAVAR@...@[...]'),
+      (3, None, 'REALLY_REALLY_LONG_METAVAR@...@[...]'),
+      (0, 3, '[REALLY_REALLY_LONG_METAVAR@...]'),
+      (1, 3, 'REALLY_REALLY_LONG_METAVAR@[...]'),
+      (2, 3, 'REALLY_REALLY_LONG_METAVAR@...@[...]'),
+      (3, 3, 'REALLY_REALLY_LONG_METAVAR@...@[...]'),
+  )
+  def testArgListUsage_LongMetavar(self, min_length, max_length, expected):
+    arg_list = self._AtDelimitedArgList(
+        min_length=min_length, max_length=max_length)
+    self.assertEqual(
+        arg_list.GetUsageMsg(False, 'REALLY_REALLY_LONG_METAVAR'), expected)
 
 
 class ArgListTokenizeTest(subtests.Base):

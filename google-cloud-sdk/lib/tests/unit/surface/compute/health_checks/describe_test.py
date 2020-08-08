@@ -25,7 +25,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.health_checks import test_resources
 
 import mock
 
@@ -36,6 +36,28 @@ class HealthChecksDescribeTest(test_base.BaseTest,
 
   def RunDescribe(self, command):
     self.Run('compute health-checks describe %s' % command)
+
+  def testSimpleCaseGrpc(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.HEALTH_CHECKS[6]],
+    ])
+
+    self.RunDescribe('my-health-check')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],)
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            grpcHealthCheck:
+              grpcServiceName: gRPC-service
+              port: 88
+            name: health-check-grpc
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-grpc
+            type: GRPC
+            """))
 
   def testSimpleCaseHttp(self):
     self.make_requests.side_effect = iter([
@@ -169,16 +191,15 @@ class HealthChecksDescribeTest(test_base.BaseTest,
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
-    self.RunCompletion(
-        'compute health-checks describe h',
-        [
-            'health-check-https',
-            'health-check-http-1',
-            'health-check-http-2',
-            'health-check-tcp',
-            'health-check-ssl',
-            'health-check-http2',
-        ])
+    self.RunCompletion('compute health-checks describe h', [
+        'health-check-https',
+        'health-check-http-1',
+        'health-check-http-2',
+        'health-check-tcp',
+        'health-check-ssl',
+        'health-check-http2',
+        'health-check-grpc',
+    ])
 
 
 class HealthChecksDescribeBetaTest(HealthChecksDescribeTest):
@@ -193,29 +214,6 @@ class HealthChecksDescribeAlphaTest(HealthChecksDescribeBetaTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-
-  def testSimpleCaseGrpc(self):
-    self.make_requests.side_effect = iter([
-        [test_resources.HEALTH_CHECKS_ALPHA[0]],
-    ])
-
-    self.RunDescribe('my-health-check')
-
-    self.CheckRequests(
-        [(self.compute.healthChecks,
-          'Get',
-          self.messages.ComputeHealthChecksGetRequest(
-              healthCheck='my-health-check',
-              project='my-project'))],
-    )
-    self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
-            grpcHealthCheck:
-              grpcServiceName: gRPC-service
-              port: 88
-            name: health-check-grpc
-            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-grpc
-            type: GRPC
-            """))
 
 
 class RegionHealthChecksDescribeTest(test_base.BaseTest,
@@ -241,10 +239,10 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
                 port=8080,
                 portName='happy-http-port',
                 requestPath='/testpath',
-                proxyHeader=(self.messages.HTTPHealthCheck.
-                             ProxyHeaderValueValuesEnum.PROXY_V1)),
-            selfLink=(
-                self.URI_PREFIX + 'global/healthChecks/health-check-http-1')),
+                proxyHeader=(self.messages.HTTPHealthCheck
+                             .ProxyHeaderValueValuesEnum.PROXY_V1)),
+            selfLink=(self.URI_PREFIX +
+                      'global/healthChecks/health-check-http-1')),
         self.messages.HealthCheck(
             name='health-check-http-2',
             type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
@@ -252,10 +250,10 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
                 host='www.example.com',
                 port=80,
                 requestPath='/',
-                proxyHeader=self.messages.HTTPHealthCheck.
-                ProxyHeaderValueValuesEnum.NONE),
-            selfLink=(
-                self.URI_PREFIX + 'global/healthChecks/health-check-http-2')),
+                proxyHeader=self.messages.HTTPHealthCheck
+                .ProxyHeaderValueValuesEnum.NONE),
+            selfLink=(self.URI_PREFIX +
+                      'global/healthChecks/health-check-http-2')),
     ]
 
     self.region_health_checks = [
@@ -284,11 +282,42 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
                              ProxyHeaderValueValuesEnum.PROXY_V1)),
             selfLink=(self.URI_PREFIX +
                       'regions/region-1/healthChecks/health-check-ssl'),
-            region='region-1')
+            region='region-1'),
+        self.messages.HealthCheck(
+            name='health-check-grpc',
+            type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
+            grpcHealthCheck=self.messages.GRPCHealthCheck(
+                port=88, grpcServiceName='gRPC-service'),
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/healthChecks/health-check-grpc'),
+            region='region-1'),
     ]
 
   def RunDescribe(self, command):
     self.Run('compute health-checks describe --region us-west-1 %s' % command)
+
+  def testSimpleCaseGrpc(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.HEALTH_CHECKS[6]],
+    ])
+
+    self.RunDescribe('my-health-check')
+
+    self.CheckRequests([(self.compute.regionHealthChecks, 'Get',
+                         self.messages.ComputeRegionHealthChecksGetRequest(
+                             healthCheck='my-health-check',
+                             project='my-project',
+                             region='us-west-1'))],)
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            grpcHealthCheck:
+              grpcServiceName: gRPC-service
+              port: 88
+            name: health-check-grpc
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-grpc
+            type: GRPC
+            """))
 
   def testSimpleCaseHttp(self):
     self.make_requests.side_effect = iter([
@@ -433,6 +462,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
         'health-check-tcp',
         'health-check-ssl',
         'health-check-http2',
+        'health-check-grpc',
     ])
 
   def testHealthChecksCompleterRegional(self):
@@ -469,6 +499,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
             'health-check-http-2',
             'health-check-tcp',
             'health-check-ssl',
+            'health-check-grpc',
         ],
         cli=self.cli,
     )
@@ -490,27 +521,6 @@ class RegionHealthChecksDescribeAlphaTest(RegionHealthChecksDescribeBetaTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-
-  def testSimpleCaseGrpc(self):
-    self.make_requests.side_effect = iter([
-        [test_resources.HEALTH_CHECKS_ALPHA[0]],
-    ])
-
-    self.RunDescribe('my-health-check')
-
-    self.CheckRequests([(self.compute.regionHealthChecks, 'Get',
-                         self.messages.ComputeRegionHealthChecksGetRequest(
-                             healthCheck='my-health-check',
-                             project='my-project',
-                             region='us-west-1'))],)
-    self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
-            grpcHealthCheck:
-              grpcServiceName: gRPC-service
-              port: 88
-            name: health-check-grpc
-            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-grpc
-            type: GRPC
-            """))
 
 
 if __name__ == '__main__':

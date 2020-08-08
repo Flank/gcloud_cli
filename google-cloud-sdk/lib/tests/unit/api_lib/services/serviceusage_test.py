@@ -28,6 +28,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
   """Unit tests for services module."""
 
   OPERATION_NAME = 'operations/abc.0000000000'
+  OVERRIDE_ID = 'hello-override'
 
   def testEnableApiCall_Success(self):
     """Test EnableApiCall returns operation when successful."""
@@ -35,8 +36,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
         name=self.OPERATION_NAME, done=False)
     self.ExpectEnableApiCall(self.OPERATION_NAME)
 
-    got = serviceusage.EnableApiCall(self.PROJECT_NAME,
-                                     self.DEFAULT_SERVICE_NAME)
+    got = serviceusage.EnableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
     self.assertEqual(got, want)
 
@@ -47,7 +47,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
 
     with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException, r'Error.'):
-      serviceusage.EnableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+      serviceusage.EnableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
   def testBatchEnableApiCall_Success(self):
     """Test BatchEnableApiCall returns operation when successful."""
@@ -56,8 +56,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
     self.ExpectBatchEnableApiCall(self.OPERATION_NAME)
 
     got = serviceusage.BatchEnableApiCall(
-        self.PROJECT_NAME,
-        [self.DEFAULT_SERVICE_NAME, self.DEFAULT_SERVICE_NAME_2])
+        self.PROJECT_NAME, [self.DEFAULT_SERVICE, self.DEFAULT_SERVICE_2])
 
     self.assertEqual(got, want)
 
@@ -67,8 +66,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
         name=self.OPERATION_NAME, done=False)
     self.ExpectDisableApiCall(self.OPERATION_NAME)
 
-    got = serviceusage.DisableApiCall(self.PROJECT_NAME,
-                                      self.DEFAULT_SERVICE_NAME)
+    got = serviceusage.DisableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
     self.assertEqual(got, want)
 
@@ -78,26 +76,26 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
     self.ExpectDisableApiCall(None, error=server_error)
 
     with self.assertRaisesRegex(exceptions.Error, r'Error.'):
-      serviceusage.DisableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+      serviceusage.DisableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE)
     self.AssertErrContains('--force')
 
   def testGetService_Disabled(self):
     """Test GetService."""
     want = self._NewServiceConfig(
-        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=False)
+        self.PROJECT_NAME, self.DEFAULT_SERVICE, enabled=False)
     self.ExpectGetService(want)
 
-    got = serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+    got = serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
     self.assertEqual(got, want)
 
   def testGetService_Enabled(self):
     """Test GetService."""
     want = self._NewServiceConfig(
-        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=True)
+        self.PROJECT_NAME, self.DEFAULT_SERVICE, enabled=True)
     self.ExpectGetService(want)
 
-    got = serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+    got = serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
     self.assertEqual(got, want)
 
@@ -108,7 +106,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
 
     with self.assertRaisesRegex(exceptions.GetServicePermissionDeniedException,
                                 r'Error.'):
-      serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+      serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
   def testIsServiceEnabled_Disabled(self):
     service = self.services_messages.GoogleApiServiceusageV1Service(
@@ -128,7 +126,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
 
   def testListServicesCall(self):
     """Test ListServices returns operation when successful."""
-    want = [self.DEFAULT_SERVICE_NAME, self.DEFAULT_SERVICE_NAME_2]
+    want = [self.DEFAULT_SERVICE, self.DEFAULT_SERVICE_2]
     self.ExpectListServicesCall()
 
     got = serviceusage.ListServices(self.PROJECT_NAME, False, None, 10)
@@ -158,7 +156,7 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
     self.ExpectGenerateServiceIdentityCall(email, unique_id)
 
     got_email, got_unique_id = serviceusage.GenerateServiceIdentity(
-        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+        self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
     self.assertEqual(got_email, email)
     self.assertEqual(got_unique_id, unique_id)
@@ -171,4 +169,126 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
     with self.assertRaisesRegex(
         exceptions.GenerateServiceIdentityPermissionDeniedException, r'Error.'):
       serviceusage.GenerateServiceIdentity(self.PROJECT_NAME,
-                                           self.DEFAULT_SERVICE_NAME)
+                                           self.DEFAULT_SERVICE)
+
+  def testListQuotaMetrics(self):
+    """Test ListQuotaMetrics returns metrics when successful."""
+    want = [self.mutate_quota_metric, self.default_quota_metric]
+    self.ExpectListQuotaMetricsCall(want)
+
+    got = serviceusage.ListQuotaMetrics(self.DEFAULT_CONSUMER,
+                                        self.DEFAULT_SERVICE)
+    self.assertEqual(list(got), want)
+
+  def testUpdateQuotaOverrideCall(self):
+    want = self.services_v1beta1_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectUpdateQuotaOverrideCall(self.mutate_limit_name,
+                                       self.mutate_metric, self.unit, 666,
+                                       self.OPERATION_NAME)
+
+    dimensions = None
+    got = serviceusage.UpdateQuotaOverrideCall(self.DEFAULT_CONSUMER,
+                                               self.DEFAULT_SERVICE,
+                                               self.mutate_metric, self.unit,
+                                               dimensions, 666)
+
+    self.assertEqual(got, want)
+
+  def testUpdateQuotaOverrideCall_WithDimensions(self):
+    want = self.services_v1beta1_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectUpdateQuotaOverrideCall(
+        self.mutate_limit_name,
+        self.mutate_metric,
+        self.unit,
+        666,
+        self.OPERATION_NAME,
+        dimensions=[('regions', 'us-central1')],
+        force=True)
+
+    got = serviceusage.UpdateQuotaOverrideCall(
+        self.DEFAULT_CONSUMER,
+        self.DEFAULT_SERVICE,
+        self.mutate_metric,
+        self.unit, {'regions': 'us-central1'},
+        666,
+        force=True)
+
+    self.assertEqual(got, want)
+
+  def testUpdateQuotaOverrideCall_failed(self):
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectUpdateQuotaOverrideCall(
+        self.mutate_limit_name,
+        self.mutate_metric,
+        self.unit,
+        666,
+        None,
+        error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.UpdateQuotaOverridePermissionDeniedException, r'Error.'):
+      dimensions = None
+      serviceusage.UpdateQuotaOverrideCall(self.DEFAULT_CONSUMER,
+                                           self.DEFAULT_SERVICE,
+                                           self.mutate_metric, self.unit,
+                                           dimensions, 666)
+
+  def testDeleteQuotaOverrideCall(self):
+    want = self.services_v1beta1_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectListQuotaMetricsCall(
+        [self.mutate_quota_metric, self.default_quota_metric])
+    self.ExpectDeleteQuotaOverrideCall(self.mutate_limit_name,
+                                       self.mutate_metric, self.unit,
+                                       self.OVERRIDE_ID, self.OPERATION_NAME)
+
+    got = serviceusage.DeleteQuotaOverrideCall(self.DEFAULT_CONSUMER,
+                                               self.DEFAULT_SERVICE,
+                                               self.mutate_metric, self.unit,
+                                               self.OVERRIDE_ID)
+
+    self.assertEqual(got, want)
+
+  def testDeleteQuotaOverrideCall_WithDimensions(self):
+    want = self.services_v1beta1_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectListQuotaMetricsCall(
+        [self.mutate_quota_metric, self.default_quota_metric])
+    self.ExpectDeleteQuotaOverrideCall(
+        self.mutate_limit_name,
+        self.mutate_metric,
+        self.unit,
+        self.OVERRIDE_ID,
+        self.OPERATION_NAME,
+        force=True)
+
+    got = serviceusage.DeleteQuotaOverrideCall(
+        self.DEFAULT_CONSUMER,
+        self.DEFAULT_SERVICE,
+        self.mutate_metric,
+        self.unit,
+        self.OVERRIDE_ID,
+        force=True)
+
+    self.assertEqual(got, want)
+
+  def testDeleteQuotaOverrideCall_failed(self):
+    self.ExpectListQuotaMetricsCall(
+        [self.mutate_quota_metric, self.default_quota_metric])
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectDeleteQuotaOverrideCall(
+        self.mutate_limit_name,
+        self.mutate_metric,
+        self.unit,
+        self.OVERRIDE_ID,
+        None,
+        error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.DeleteQuotaOverridePermissionDeniedException, r'Error.'):
+      serviceusage.DeleteQuotaOverrideCall(self.DEFAULT_CONSUMER,
+                                           self.DEFAULT_SERVICE,
+                                           self.mutate_metric, self.unit,
+                                           self.OVERRIDE_ID)

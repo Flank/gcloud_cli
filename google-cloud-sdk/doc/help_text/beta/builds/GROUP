@@ -21,6 +21,9 @@ GROUPS
      triggers
         (BETA) Create and manage build triggers for Google Cloud Build.
 
+     worker-pools
+        (BETA) Manage worker pools for Google Cloud Build.
+
 COMMANDS
     COMMAND is one of the following:
 

@@ -71,12 +71,17 @@ OPTIONAL FLAGS
         MODE must be one of:
 
          off
-            To turn off autoscaling, while keeping the new configuration.
+            Turns off autoscaling, while keeping the new configuration.
          on
-            To permit autoscaling to scale up and down (default for new
+            Permits autoscaling to scale out and in (default for new
             autoscalers).
+         only-scale-out
+            Permits autoscaling to scale only out and not in.
          only-up
-            To permit autoscaling to scale only up and not down.
+            (DEPRECATED) Permits autoscaling to scale only out and not in.
+
+                Value `only-up` is deprecated. Use `--mode only-scale-out`
+                instead.
 
      --scale-based-on-cpu
         Autoscaler will be based on CPU utilization.

@@ -74,7 +74,7 @@ Please insert following snippet into your pom.xml
       <extension>
         <groupId>com.google.cloud.artifactregistry</groupId>
         <artifactId>artifactregistry-maven-wagon</artifactId>
-        <version>2.0.1</version>
+        <version>2.1.0</version>
       </extension>
     </extensions>
   </build>

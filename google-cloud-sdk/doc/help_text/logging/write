@@ -17,7 +17,7 @@ DESCRIPTION
     or resource type.
 
     gcloud logging write should be used for simple testing purposes. Check
-    Stackdriver Logging agent for a proper way to send log entries:
+    Cloud Logging agent for a proper way to send log entries:
     https://cloud.google.com/logging/docs/agent/
 
 POSITIONAL ARGUMENTS
@@ -50,7 +50,7 @@ FLAGS
        --project=PROJECT_ID
           Write log entries associated with this project.
 
-          The Google Cloud Platform project name to use for this invocation. If
+          The Google Cloud Platform project ID to use for this invocation. If
           omitted, then the current project is assumed; the current project can
           be listed using gcloud config list --format='text(core.project)' and
           can be set using gcloud config set project PROJECTID.

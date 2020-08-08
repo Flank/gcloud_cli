@@ -53,6 +53,9 @@ COMMANDS
      list
         (ALPHA) List workflow templates.
 
+     remove-dag-timeout
+        (ALPHA) Remove DAG timeout from workflow template.
+
      remove-job
         (ALPHA) Remove a job from workflow template.
 
@@ -61,6 +64,9 @@ COMMANDS
 
      set-cluster-selector
         (ALPHA) Set cluster selector for the workflow template.
+
+     set-dag-timeout
+        (ALPHA) Set DAG timeout on workflow template.
 
      set-iam-policy
         (ALPHA) Set IAM policy for a template.

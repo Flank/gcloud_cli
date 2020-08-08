@@ -45,9 +45,8 @@ to enable and \fB\-\-no\-deletion\-protection\fR to disable.
 
 .TP 2m
 \fB\-\-[no\-]enable\-display\-device\fR
-Enable a display device for instances using a Windows image. Use
-\fB\-\-enable\-display\-device\fR to enable and
-\fB\-\-no\-enable\-display\-device\fR to disable.
+Enable a display device on VM instances. Use \fB\-\-enable\-display\-device\fR
+to enable and \fB\-\-no\-enable\-display\-device\fR to disable.
 
 .TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
@@ -215,7 +214,7 @@ result:
 
 .RS 2m
 $ gcloud alpha compute instances describe example\-disk \e
-    \-\-format='default(labels)'
+    \-\-format="default(labels)"
 .RE
 
 

@@ -7,6 +7,13 @@ summary:
       game operations describe my-operation --location us-central1
   - stdout: |
       name: projects/fake-project/locations/us-central1/operations/my-operation
+- execute:
+  - command: |
+      game operations list --location us-central1
+  - stdout: |
+      ID                                                       LOCATION     DONE
+      operation-1592954826441-5a8c8b292c307-dc1558c4-386dccad  us-central1  True
+      operation-1592954060489-5a8c884eb43ae-6e180aa4-17bceb26  us-central1  True
 actions:
 - define_reference:
     reference: api-version
@@ -30,5 +37,72 @@ actions:
           body:
             name: projects/fake-project/locations/us-central1/operations/my-operation
     - expect_stdout: "name: projects/fake-project/locations/us-central1/operations/my-operation\n"
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game operations list --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/xwxw-test-3/locations/us-central1/operations/operation-1592954826441-5a8c8b292c307-dc1558c4-386dccad",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                    "createTime": "2020-06-23T23:27:06.456689711Z",
+                    "endTime": "2020-06-23T23:27:06.787044021Z",
+                    "target": "projects/xwxw-test-3/locations/us-central1/realms/realm-quickstart/gameServerClusters/cluster-quickstart",
+                    "verb": "delete",
+                    "requestedCancellation": false,
+                    "apiVersion": "$$api-version$$"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.protobuf.Empty"
+                  }
+                },
+                {
+                  "name": "projects/xwxw-test-3/locations/us-central1/operations/operation-1592954060489-5a8c884eb43ae-6e180aa4-17bceb26",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                    "createTime": "2020-06-23T23:14:20.547198806Z",
+                    "endTime": "2020-06-23T23:14:20.756494309Z",
+                    "target": "projects/xwxw-test-3/locations/us-central1/realms/realm-quickstart/gameServerClusters/cluster-quickstart",
+                    "verb": "update",
+                    "requestedCancellation": false,
+                    "apiVersion": "$$api-version$$"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerCluster",
+                    "name": "projects/xwxw-test-3/locations/us-central1/realms/realm-quickstart/gameServerClusters/cluster-quickstart",
+                    "createTime": "2020-06-18T00:24:05.530059238Z",
+                    "updateTime": "2020-06-23T23:14:20.553689287Z",
+                    "connectionInfo": {
+                      "namespace": "default",
+                      "gkeClusterReference": {
+                        "cluster": "projects/xwxw-test-3/locations/us-central1-a/clusters/gcgs-quickstart"
+                      }
+                    },
+                    "etag": "OLFLwkxFdFXm-rQqMQfGktEC_aI6YIu8EXwlmSGXhkY"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        ID                                                       LOCATION     DONE
+        operation-1592954826441-5a8c8b292c307-dc1558c4-386dccad  us-central1  True
+        operation-1592954060489-5a8c884eb43ae-6e180aa4-17bceb26  us-central1  True
     - expect_exit:
         code: 0

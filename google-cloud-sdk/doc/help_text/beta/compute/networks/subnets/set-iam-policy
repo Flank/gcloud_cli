@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute networks subnets set-iam-policy - set the IAM policy
-        for a Google Compute Engine subnetwork
+        for a Compute Engine subnetwork
 
 SYNOPSIS
     gcloud beta compute networks subnets set-iam-policy

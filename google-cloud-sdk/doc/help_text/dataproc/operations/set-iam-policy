@@ -44,15 +44,13 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command will read an IAM policy defined in a JSON file
-    'policy.json' and set it for an operation with identifier
-    'example-operation'
+    The following command will read an IAM policy defined in a JSON file        'policy.json' and set it for an operation with identifier 'example-operation'
 
         $ gcloud dataproc operations set-iam-policy example-operation \
-            policy.json
+        policy.json
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of the
-    policy file format and contents.
+        See https://cloud.google.com/iam/docs/managing-policies for details
+        of the policy file format and contents.
 
 NOTES
     These variants are also available:

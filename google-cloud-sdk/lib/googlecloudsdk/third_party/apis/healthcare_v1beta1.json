@@ -256,7 +256,7 @@
     },
     "AuditConfig": {
       "id": "AuditConfig",
-      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
+      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\",\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\"\n            },\n            {\n              \"log_type\": \"ADMIN_READ\"\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\",\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\"\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
       "type": "object",
       "properties": {
         "service": {
@@ -274,7 +274,7 @@
     },
     "AuditLogConfig": {
       "id": "AuditLogConfig",
-      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
+      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\"\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
       "type": "object",
       "properties": {
         "logType": {
@@ -424,6 +424,369 @@
       "properties": {
       }
     },
+    "AnnotationStore": {
+      "id": "AnnotationStore",
+      "description": "An Annotation store that can store annotation resources such as\nlabels and tags for text, image and audio.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the Annotation store, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "labels": {
+          "description": "Optional. User-supplied key-value pairs used to organize Annotation stores.\n\nLabel keys must be between 1 and 63 characters long, have a UTF-8 encoding\nof maximum 128 bytes, and must conform to the\nfollowing PCRE regular expression:\n\\p{Ll}\\p{Lo}{0,62}\n\nLabel values must be between 1 and 63 characters long, have\na UTF-8 encoding of maximum 128 bytes, and must conform to the\nfollowing PCRE regular expression: [\\p{Ll}\\p{Lo}\\p{N}_-]{0,63}\n\nNo more than 64 labels can be associated with a given store.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ListAnnotationStoresResponse": {
+      "id": "ListAnnotationStoresResponse",
+      "description": "Lists the Annotation stores\nin the given dataset.",
+      "type": "object",
+      "properties": {
+        "annotationStores": {
+          "description": "The returned Annotation stores. Won't be more Annotation stores than the\nvalue of page_size in the request.",
+          "type": "array",
+          "items": {
+            "$ref": "AnnotationStore"
+          }
+        },
+        "nextPageToken": {
+          "description": "Token to retrieve the next page of results or empty if there are no more\nresults in the list.",
+          "type": "string"
+        }
+      }
+    },
+    "Annotation": {
+      "id": "Annotation",
+      "description": "An annotation record.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the Annotation, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}\/annotations\/{annotation_id}`.",
+          "type": "string"
+        },
+        "annotationSource": {
+          "description": "Details of the source.",
+          "$ref": "AnnotationSource"
+        },
+        "resourceAnnotation": {
+          "description": "Annotations for resource. For example, classification tags.",
+          "$ref": "ResourceAnnotation"
+        },
+        "imageAnnotation": {
+          "description": "Annotations for images. For example, bounding polygons.",
+          "$ref": "ImageAnnotation"
+        },
+        "textAnnotation": {
+          "description": "Annotations for sensitive texts. For example, a range that describes the\nlocation of sensitive text.",
+          "$ref": "SensitiveTextAnnotation"
+        },
+        "customData": {
+          "description": "Additional information for this annotation record, such as annotator and\nverifier information or study campaign.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "AnnotationSource": {
+      "id": "AnnotationSource",
+      "description": "AnnotationSource holds the source information of the annotation.",
+      "type": "object",
+      "properties": {
+        "cloudHealthcareSource": {
+          "description": "Cloud Healthcare API resource.",
+          "$ref": "CloudHealthcareSource"
+        }
+      }
+    },
+    "CloudHealthcareSource": {
+      "id": "CloudHealthcareSource",
+      "description": "Cloud Healthcare API resource.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Full path of a Cloud Healthcare API resource.",
+          "type": "string"
+        }
+      }
+    },
+    "ResourceAnnotation": {
+      "id": "ResourceAnnotation",
+      "description": "Resource level annotation.",
+      "type": "object",
+      "properties": {
+        "label": {
+          "description": "A description of the annotation record.",
+          "type": "string"
+        }
+      }
+    },
+    "ImageAnnotation": {
+      "id": "ImageAnnotation",
+      "description": "Image annotation.",
+      "type": "object",
+      "properties": {
+        "boundingPolys": {
+          "description": "The list of polygons outlining the sensitive regions in the image.",
+          "type": "array",
+          "items": {
+            "$ref": "BoundingPoly"
+          }
+        },
+        "frameIndex": {
+          "description": "0-based index of the image frame. For example, an image frame in a DICOM\ninstance.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "BoundingPoly": {
+      "id": "BoundingPoly",
+      "description": "A bounding polygon for the detected image annotation.",
+      "type": "object",
+      "properties": {
+        "vertices": {
+          "description": "List of the vertices of this polygon.",
+          "type": "array",
+          "items": {
+            "$ref": "Vertex"
+          }
+        },
+        "label": {
+          "description": "A description of this polygon.",
+          "type": "string"
+        }
+      }
+    },
+    "Vertex": {
+      "id": "Vertex",
+      "description": "A 2D coordinate in an image. The origin is the top-left.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "X coordinate.",
+          "type": "number",
+          "format": "float"
+        },
+        "y": {
+          "description": "Y coordinate.",
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "SensitiveTextAnnotation": {
+      "id": "SensitiveTextAnnotation",
+      "description": "A TextAnnotation specifies a text range that includes sensitive information.",
+      "type": "object",
+      "properties": {
+        "details": {
+          "description": "Maps from a resource slice. For example, FHIR resource field path to a set\nof sensitive text findings. For example,\nAppointment.Narrative text1 --> {findings_1, findings_2, findings_3}",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "Detail"
+          }
+        }
+      }
+    },
+    "Detail": {
+      "id": "Detail",
+      "description": "Contains multiple sensitive information findings for each resource slice.",
+      "type": "object",
+      "properties": {
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "Finding"
+          }
+        }
+      }
+    },
+    "Finding": {
+      "id": "Finding",
+      "type": "object",
+      "properties": {
+        "infoType": {
+          "description": "The type of information stored in this text range. For example,\nHumanName, BirthDate, or Address.",
+          "type": "string"
+        },
+        "start": {
+          "description": "Zero-based starting index of the found text, inclusively.",
+          "type": "string",
+          "format": "int64"
+        },
+        "end": {
+          "description": "Zero-based ending index of the found text, exclusively.",
+          "type": "string",
+          "format": "int64"
+        },
+        "quote": {
+          "description": "The snippet of the sensitive text. This field is only populated during\ndeidentification if `store_quote` is set to true in DeidentifyConfig.",
+          "type": "string"
+        }
+      }
+    },
+    "ListAnnotationsResponse": {
+      "id": "ListAnnotationsResponse",
+      "description": "Lists the Annotations in the specified\nAnnotation store.",
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "description": "The returned Annotations. Won't be more values than the value of\npage_size in the request. See `AnnotationView` in the request for\npopulated fields.",
+          "type": "array",
+          "items": {
+            "$ref": "Annotation"
+          }
+        },
+        "nextPageToken": {
+          "description": "Token to retrieve the next page of results or empty if there are no more\nresults in the list.",
+          "type": "string"
+        }
+      }
+    },
+    "ImportAnnotationsRequest": {
+      "id": "ImportAnnotationsRequest",
+      "description": "Request to import\nAnnotations. The\nAnnotations to be imported must have client-supplied resource names which\nindicate the annotation resource. The import operation is not atomic. If a\nfailure occurs, any annotations already imported are not removed.",
+      "type": "object",
+      "properties": {
+        "gcsSource": {
+          "$ref": "GoogleCloudHealthcareV1beta1AnnotationGcsSource"
+        }
+      }
+    },
+    "GoogleCloudHealthcareV1beta1AnnotationGcsSource": {
+      "id": "GoogleCloudHealthcareV1beta1AnnotationGcsSource",
+      "description": "Specifies the configuration for importing data from Cloud Storage.",
+      "type": "object",
+      "properties": {
+        "uri": {
+          "description": "Points to a Cloud Storage URI containing file(s) with\ncontent only. The URI must be in the following format:\n`gs:\/\/{bucket_id}\/{object_id}`. The URI can include wildcards in\n`object_id` and thus identify multiple files. Supported wildcards:\n '*' to match 0 or more non-separator characters\n '**' to match 0 or more characters (including separators). Must be used\n at\n      the end of a path and with no other wildcards in the\n      path. Can also be used with a file extension (such as .dcm), which\n      imports all files with the extension in the specified directory and\n      its sub-directories. For example,\n      `gs:\/\/my-bucket\/my-directory\/**.json` imports all files with .json\n      extensions in `my-directory\/` and its sub-directories.\n '?' to match 1 character\nAll other URI formats are invalid.\nFiles matching the wildcard are expected to contain content only, no\nmetadata.",
+          "type": "string"
+        }
+      }
+    },
+    "ExportAnnotationsRequest": {
+      "id": "ExportAnnotationsRequest",
+      "description": "Request to export\nAnnotations. The\nexport operation is not atomic. If a\nfailure occurs, any annotations already exported are not removed.",
+      "type": "object",
+      "properties": {
+        "gcsDestination": {
+          "description": "The Cloud Storage destination, which requires the\n`roles\/storage.objectAdmin` Cloud IAM role.",
+          "$ref": "GoogleCloudHealthcareV1beta1AnnotationGcsDestination"
+        },
+        "bigqueryDestination": {
+          "description": "The BigQuery output destination, which requires two IAM roles:\n  `roles\/bigquery.dataEditor` and `roles\/bigquery.jobUser`.",
+          "$ref": "GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination"
+        }
+      }
+    },
+    "GoogleCloudHealthcareV1beta1AnnotationGcsDestination": {
+      "id": "GoogleCloudHealthcareV1beta1AnnotationGcsDestination",
+      "description": "The Cloud Storage location for export.",
+      "type": "object",
+      "properties": {
+        "uriPrefix": {
+          "description": "The Cloud Storage destination to export to.\nURI for a Cloud Storage directory where the server writes result files, in\nthe format `gs:\/\/{bucket-id}\/{path\/to\/destination\/dir}`. If there is no\ntrailing slash, the service appends one when composing the object path.\nThe user is responsible for creating the Cloud Storage bucket referenced in\n`uri_prefix`.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination": {
+      "id": "GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination",
+      "description": "The BigQuery table for export.",
+      "type": "object",
+      "properties": {
+        "tableUri": {
+          "description": "BigQuery URI to a table, up to 2000 characters long, must be of the form\nbq:\/\/projectId.bqDatasetId.tableId.",
+          "type": "string"
+        },
+        "force": {
+          "description": "If the destination table already exists and this flag is `TRUE`, the table\nis overwritten by the contents of the input store. If the flag is not\nset and the destination table already exists, the export call returns an\nerror.",
+          "type": "boolean"
+        },
+        "schemaType": {
+          "description": "Specifies the schema format to export.",
+          "enumDescriptions": [
+            "Same as SIMPLE.",
+            "A flatterned version of\nAnnotation."
+          ],
+          "type": "string",
+          "enum": [
+            "SCHEMA_TYPE_UNSPECIFIED",
+            "SIMPLE"
+          ]
+        }
+      }
+    },
+    "EvaluateAnnotationStoreRequest": {
+      "id": "EvaluateAnnotationStoreRequest",
+      "description": "Request to evaluate an Annotation store against a\nground truth [Annotation store].",
+      "type": "object",
+      "properties": {
+        "evalInfoTypeMapping": {
+          "description": "Optional. InfoType mapping for `eval_store`. Different resources can map to\nthe same infoType. For example, `PERSON_NAME`, `PERSON`, `NAME`, and\n`HUMAN` are different. To map all of these into a single\ninfoType (such as `PERSON_NAME`), specify the following mapping:\n```\n  info_type_mapping[\"PERSON\"] = \"PERSON_NAME\"\n  info_type_mapping[\"NAME\"] = \"PERSON_NAME\"\n  info_type_mapping[\"HUMAN\"] = \"PERSON_NAME\"\n```\nUnmentioned infoTypes, such as `DATE`, are treated as identity\nmapping. For example:\n```\n  info_type_mapping[\"DATE\"] = \"DATE\"\n```\nInfoTypes are case-insensitive.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "goldenStore": {
+          "description": "The Annotation store to use as ground truth, in the format of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "goldenInfoTypeMapping": {
+          "description": "Optional. Similar to `eval_info_type_mapping`, infoType mapping for\n`golden_store`.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "bigqueryDestination": {
+          "description": "The BigQuery table where the server writes the output.\nBigQueryDestination requires the `roles\/bigquery.dataEditor` and\n`roles\/bigquery.jobUser` Cloud IAM roles.",
+          "$ref": "GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination"
+        },
+        "infoTypeConfig": {
+          "$ref": "InfoTypeConfig"
+        }
+      }
+    },
+    "InfoTypeConfig": {
+      "id": "InfoTypeConfig",
+      "description": "Specifies how to use infoTypes for evaluation. For example, a user might\nonly want to evaluate `PERSON`, `LOCATION`, and `AGE`.",
+      "type": "object",
+      "properties": {
+        "strictMatching": {
+          "description": "If `TRUE`, infoTypes described by `filter` are used for evaluation.\nOtherwise, infoTypes are not considered for evaluation.\nFor example:\n\n* Annotated text:\n  \"Toronto is a location\"\n* Finding 1:\n  `{\"infoType\": \"PERSON\", \"quote\": \"Toronto\", \"start\": 0, \"end\": 7}`\n* Finding 2:\n  `{\"infoType\": \"CITY\", \"quote\": \"Toronto\", \"start\": 0, \"end\": 7}`\n* Finding 3:\n  `{}`\n* Ground truth:\n  `{\"infoType\": \"LOCATION\", \"quote\": \"Toronto\", \"start\": 0, \"end\": 7}`\n\nWhen `strict_matching` is `TRUE`:\n\n* Finding 1: 1 false positive\n* Finding 2: 1 false positive\n* Finding 3: 1 false negative\n\nWhen `strict_matching` is `FALSE`:\n\n* Finding 1: 1 true positive\n* Finding 2: 1 true positive\n* Finding 3: 1 false negative",
+          "type": "boolean"
+        },
+        "evaluateList": {
+          "$ref": "FilterList"
+        },
+        "ignoreList": {
+          "$ref": "FilterList"
+        }
+      }
+    },
+    "FilterList": {
+      "id": "FilterList",
+      "description": "List of infoTypes to be filtered.",
+      "type": "object",
+      "properties": {
+        "infoTypes": {
+          "description": "These infoTypes are based on after the `eval_info_type_mapping` and\n`golden_info_type_mapping`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "DeidentifyFhirStoreRequest": {
       "id": "DeidentifyFhirStoreRequest",
       "description": "Creates a new FHIR store with sensitive information de-identified.",
@@ -459,6 +822,10 @@
         "image": {
           "description": "Configures de-identification of image pixels wherever they are found in the\nsource_dataset.",
           "$ref": "ImageConfig"
+        },
+        "annotation": {
+          "description": "Configures how annotations, meaning that the location and infoType\nof sensitive information findings, are created during de-identification.\nIf unspecified, no annotations are created.",
+          "$ref": "AnnotationConfig"
         },
         "text": {
           "description": "Configures de-identification of text wherever it is found in the\nsource_dataset.",
@@ -548,7 +915,7 @@
           "enumDescriptions": [
             "No action specified.",
             "Transform the entire field based on transformations specified in\nTextConfig. When the specified transformation cannot be applied to a\nfield, RedactConfig is used. For example, a Crypto Hash\ntransformation can't be applied to a FHIR Date field.",
-            "Inspect and transform any found PHI.",
+            "Inspect and transform any found PHI. When `AnnotationConfig` is\nprovided, annotations of PHI will be generated, except for Date and Datetime.",
             "Do not transform."
           ],
           "type": "string",
@@ -581,6 +948,21 @@
             "REDACT_SENSITIVE_TEXT",
             "REDACT_NO_TEXT"
           ]
+        }
+      }
+    },
+    "AnnotationConfig": {
+      "id": "AnnotationConfig",
+      "description": "Specifies how to store annotations during de-identification operation.",
+      "type": "object",
+      "properties": {
+        "annotationStoreName": {
+          "description": "The name of the annotation store, in the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`).\n\n * The destination annotation store must be in the same project as the\n   source data. De-identifying data across multiple projects is not\n   supported.\n * The destination annotation store must exist when using\n   DeidentifyDicomStore or\n   DeidentifyFhirStore.\n   DeidentifyDataset\n   automatically creates the destination annotation store.",
+          "type": "string"
+        },
+        "storeQuote": {
+          "description": "If set to true, the sensitive texts are included in\nSensitiveTextAnnotation\nof Annotation.",
+          "type": "boolean"
         }
       }
     },
@@ -741,7 +1123,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. Resource name of the dataset, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}`.",
+          "description": "Resource name of the dataset, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}`.",
           "type": "string"
         },
         "timeZone": {
@@ -789,7 +1171,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. Resource name of the DICOM store, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/dicomStores\/{dicom_store_id}`.",
+          "description": "Resource name of the DICOM store, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/dicomStores\/{dicom_store_id}`.",
           "type": "string"
         },
         "notificationConfig": {
@@ -888,7 +1270,7 @@
     },
     "GoogleCloudHealthcareV1beta1DicomBigQueryDestination": {
       "id": "GoogleCloudHealthcareV1beta1DicomBigQueryDestination",
-      "description": "The BigQuery table where the server writes the output.",
+      "description": "The BigQuery table where the server writes output.",
       "type": "object",
       "properties": {
         "tableUri": {
@@ -896,7 +1278,7 @@
           "type": "string"
         },
         "force": {
-          "description": "If the destination table already exists and this flag is `TRUE`, the table\nis overwritten by the contents of the DICOM store. If the flag is not\nset and the destination table already exists, the export call returns an\nerror.",
+          "description": "This flag is being replaced by write_disposition which provides additional\noptions. force=false is equivalent to WRITE_EMPTY and force=true is\nequivalent to WRITE_TRUNCATE.",
           "type": "boolean"
         }
       }
@@ -934,7 +1316,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. Resource name of the HL7v2 store, of the form\n`projects\/{project_id}\/datasets\/{dataset_id}\/hl7V2Stores\/{hl7v2_store_id}`.",
+          "description": "Resource name of the HL7v2 store, of the form\n`projects\/{project_id}\/datasets\/{dataset_id}\/hl7V2Stores\/{hl7v2_store_id}`.",
           "type": "string"
         },
         "notificationConfig": {
@@ -991,7 +1373,7 @@
       "type": "object",
       "properties": {
         "schematizedParsingType": {
-          "description": "Determines how messages that don't parse successfully are handled.",
+          "description": "Determines how messages that fail to parse are handled.",
           "enumDescriptions": [
             "Unspecified schematized parsing type, equivalent to `SOFT_FAIL`.",
             "Messages that fail to parse are still stored and ACKed but a parser error\nis stored in place of the schematized data.",
@@ -1420,6 +1802,28 @@
         }
       }
     },
+    "ImportMessagesRequest": {
+      "id": "ImportMessagesRequest",
+      "description": "Request to import messages.",
+      "type": "object",
+      "properties": {
+        "gcsSource": {
+          "description": "Cloud Storage source data location and import configuration.\n\nThe Cloud Storage location requires the `roles\/storage.objectViewer`\nCloud IAM role.",
+          "$ref": "GcsSource"
+        }
+      }
+    },
+    "GcsSource": {
+      "id": "GcsSource",
+      "description": "Specifies the configuration for importing data from Cloud Storage.",
+      "type": "object",
+      "properties": {
+        "uri": {
+          "description": "Points to a Cloud Storage URI containing file(s) to import.\n\nThe URI must be in the following format: `gs:\/\/{bucket_id}\/{object_id}`.\nThe URI can include wildcards in `object_id` and thus identify multiple\nfiles. Supported wildcards:\n\n*  `*` to match 0 or more non-separator characters\n*  `**` to match 0 or more characters (including separators). Must be used\nat the end of a path and with no other wildcards in the\npath. Can also be used with a file extension (such as .ndjson), which\nimports all files with the extension in the specified directory and\nits sub-directories. For example, `gs:\/\/my-bucket\/my-directory\/**.ndjson`\nimports all files with `.ndjson` extensions in `my-directory\/` and its\nsub-directories.\n*  `?` to match 1 character\n\nFiles matching the wildcard are expected to contain content only, no\nmetadata.",
+          "type": "string"
+        }
+      }
+    },
     "SearchResourcesRequest": {
       "id": "SearchResourcesRequest",
       "description": "Request to search the resources in the specified FHIR store.",
@@ -1511,7 +1915,7 @@
           "$ref": "SchemaConfig"
         },
         "force": {
-          "description": "If this flag is `TRUE`, all tables will be deleted from the dataset before\nthe new exported tables are written. If the flag is not set and the\ndestination dataset contains tables, the export call returns an error.",
+          "description": "This flag is being replaced by write_disposition which provides additional\noptions. force=false is equivalent to WRITE_EMPTY and force=true is\nequivalent to WRITE_TRUNCATE.",
           "type": "boolean"
         }
       }
@@ -1688,6 +2092,105 @@
         },
         "failure": {
           "description": "The number of units that failed in the operation.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "EvaluateAnnotationStoreResponse": {
+      "id": "EvaluateAnnotationStoreResponse",
+      "description": "Response for successful Annotation store evaluation operations. This\nstructure is included in the\nresponse upon operation completion.",
+      "type": "object",
+      "properties": {
+        "evalStore": {
+          "description": "The evaluated Annotation store, in the format of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "goldenStore": {
+          "description": "The ground truth Annotation store, in the format of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "goldenCount": {
+          "description": "The number of Annotations in the ground\ntruth Annotation store successfully\nprocessed.",
+          "type": "string",
+          "format": "int64"
+        },
+        "matchedCount": {
+          "description": "The number of Annotations\nin the eval store that match with corresponding annotations\nin the ground truth Annotation store. Two matched\nannotations both annotate the same resource defined in\nAnnotationSource.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ExportAnnotationsResponse": {
+      "id": "ExportAnnotationsResponse",
+      "description": "Response for successful annotation export operations. This structure is\nincluded in response upon operation\ncompletion.",
+      "type": "object",
+      "properties": {
+        "annotationStore": {
+          "description": "The annotation_store used for the export operation,\nin the format of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "successCount": {
+          "description": "The total number of annotations successfully exported.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ExportAnnotationsErrorDetails": {
+      "id": "ExportAnnotationsErrorDetails",
+      "description": "Response for failed annotation export operations. This structure\nis included in error\ndetails upon operation completion.",
+      "type": "object",
+      "properties": {
+        "annotationStore": {
+          "description": "The annotation_store used for the export operation, in the format of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "successCount": {
+          "description": "The number of annotations successfully exported.",
+          "type": "string",
+          "format": "int64"
+        },
+        "errorCount": {
+          "description": "The number of annotations that had error.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ImportAnnotationsResponse": {
+      "id": "ImportAnnotationsResponse",
+      "description": "Final response of importing\nAnnotations in\nsuccessful case. This structure is included in the\nresponse. It is only included\nwhen the operation finishes.",
+      "type": "object",
+      "properties": {
+        "annotationStore": {
+          "description": "The annotation_store that the annotations were imported to,\nin the format\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "successCount": {
+          "description": "The number of the input annotations. All input have been\nimported successfully.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ImportAnnotationsErrorDetails": {
+      "id": "ImportAnnotationsErrorDetails",
+      "description": "Final response of importing\nAnnotations in\npartial or total failure case. This structure is included in the\nerror\ndetails. It is only included when the operation\nfinishes.",
+      "type": "object",
+      "properties": {
+        "annotationStore": {
+          "description": "The annotation_store that the annotations were imported to. The name\nis in the format\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+          "type": "string"
+        },
+        "successCount": {
+          "description": "The number of annotations that have been imported.",
+          "type": "string",
+          "format": "int64"
+        },
+        "errorCount": {
+          "description": "The number of annotations that had errors.",
           "type": "string",
           "format": "int64"
         }
@@ -1896,6 +2399,13 @@
           "type": "string",
           "format": "int64"
         }
+      }
+    },
+    "ImportMessagesResponse": {
+      "id": "ImportMessagesResponse",
+      "description": "Final response of importing messages.\nThis structure is included in the\nresponse to describe the detailed\noutcome. It is only included when the operation finishes successfully.",
+      "type": "object",
+      "properties": {
       }
     }
   },
@@ -2188,7 +2698,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Output only. Resource name of the dataset, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}`.",
+                      "description": "Resource name of the dataset, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+$",
@@ -2453,7 +2963,7 @@
                       "httpMethod": "PATCH",
                       "parameters": {
                         "name": {
-                          "description": "Output only. Resource name of the DICOM store, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/dicomStores\/{dicom_store_id}`.",
+                          "description": "Resource name of the DICOM store, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/dicomStores\/{dicom_store_id}`.",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/dicomStores\/[^\/]+$",
@@ -3189,7 +3699,7 @@
                                   "scopes": [
                                     "https://www.googleapis.com/auth/cloud-platform"
                                   ],
-                                  "description": "DeleteInstance deletes an instance associated with the given study, series,\nand SOP Instance UID. Delete requests are equivalent to the GET requests\nspecified in the Retrieve transaction."
+                                  "description": "DeleteInstance deletes an instance associated with the given study, series,\nand SOP Instance UID. Delete requests are equivalent to the GET requests\nspecified in the Retrieve transaction.\nStudy and series search results can take a few seconds to be updated after\nan instance is deleted using DeleteInstance."
                                 }
                               }
                               ,
@@ -3492,7 +4002,7 @@
                       "httpMethod": "PATCH",
                       "parameters": {
                         "name": {
-                          "description": "Output only. Resource name of the HL7v2 store, of the form\n`projects\/{project_id}\/datasets\/{dataset_id}\/hl7V2Stores\/{hl7v2_store_id}`.",
+                          "description": "Resource name of the HL7v2 store, of the form\n`projects\/{project_id}\/datasets\/{dataset_id}\/hl7V2Stores\/{hl7v2_store_id}`.",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/hl7V2Stores\/[^\/]+$",
@@ -3518,6 +4028,34 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
                       "description": "Updates the HL7v2 store."
+                    },
+                    "import": {
+                      "id": "healthcare.projects.locations.datasets.hl7V2Stores.import",
+                      "path": "v1beta1/{+name}:import",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/hl7V2Stores/{hl7V2StoresId}:import",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "The name of the target HL7v2 store, in the format\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/hl7v2Stores\/{hl7v2_store_id}`",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/hl7V2Stores\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "ImportMessagesRequest"
+                      },
+                      "response": {
+                        "$ref": "Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Import messages to the HL7v2 store by loading data from the specified\nsources. This method is optimized to load large quantities of data using\nimport semantics that ignore some HL7v2 store configuration options and are\nnot suitable for all use cases. It is primarily intended to load data into\nan empty HL7v2 store that is not being used by other clients.\n\nAn existing message will be overwritten if a duplicate message is imported.\nA duplicate message is a message with the same raw bytes as a message that\nalready exists in this HL7v2 store. When a message is overwritten, its\nlabels will also be overwritten.\n\nThe import operation is idempotent unless the input data contains multiple\nvalid messages with the same raw bytes but different labels. In that case,\nafter the import completes, the store contains exactly one message\nwith those raw bytes but there is no ordering guarantee on which version\nof the labels it has. The operation result counters do not count\nduplicated raw bytes as an error and count one success for each message in\nthe input, which might result in a success count larger than the number\nof messages in the HL7v2 store.\n\nIf some messages fail to import, for example due to parsing errors,\nsuccessfully imported messages are not rolled back.\n\nThis method returns an Operation that can\nbe used to track the status of the import by calling\nGetOperation.\n\nImmediate fatal errors appear in the\nerror field, errors are also logged\nto Cloud Logging (see [Viewing\nlogs](\/healthcare\/docs\/how-tos\/logging)). Otherwise, when the operation\nfinishes, a response of type ImportMessagesResponse is returned in the\nresponse field.\nThe metadata field type for this\noperation is OperationMetadata."
                     }
                   }
                   ,
@@ -3550,7 +4088,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Ingests a new HL7v2 message from the hospital and sends a notification to\nthe Cloud Pub\/Sub topic. Return is an HL7v2 ACK message if the message was\nsuccessfully stored. Otherwise an error is returned."
+                          "description": "Parses and stores an HL7v2 message. This method triggers an asynchronous\nnotification to any Cloud Pub\/Sub topic configured in\nprojects.locations.datasets.hl7V2Stores.Hl7V2NotificationConfig, if the\nfiltering matches the message. If an MLLP adapter is configured to listen\nto a Cloud Pub\/Sub topic, the adapter transmits the message when a\nnotification is received. This method also generates a response\ncontaining an HL7v2 acknowledgement (`ACK`) message when successful or a\nnegative acknowledgement (`NACK`) message in case of error, suitable for\nreplying to HL7v2 interface systems that expect these acknowledgements."
                         },
                         "create": {
                           "id": "healthcare.projects.locations.datasets.hl7V2Stores.messages.create",
@@ -3578,7 +4116,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Creates a message and sends a notification to the Cloud Pub\/Sub topic. If\nconfigured, the MLLP adapter listens to messages created by this method and\nsends those back to the hospital. A successful response indicates the\nmessage has been persisted to storage and a Cloud Pub\/Sub notification has\nbeen sent. Sending to the hospital by the MLLP adapter happens\nasynchronously."
+                          "description": "Parses and stores an HL7v2 message. This method triggers an asynchronous\nnotification to any Cloud Pub\/Sub topic configured in\nprojects.locations.datasets.hl7V2Stores.Hl7V2NotificationConfig, if the\nfiltering matches the message. If an MLLP adapter is configured to listen\nto a Cloud Pub\/Sub topic, the adapter transmits the message when a\nnotification is received."
                         },
                         "get": {
                           "id": "healthcare.projects.locations.datasets.hl7V2Stores.messages.get",
@@ -3602,6 +4140,7 @@
                                 "RAW_ONLY",
                                 "PARSED_ONLY",
                                 "FULL",
+                                "SCHEMATIZED_ONLY",
                                 "BASIC"
                               ]
                             }
@@ -3685,6 +4224,7 @@
                                 "RAW_ONLY",
                                 "PARSED_ONLY",
                                 "FULL",
+                                "SCHEMATIZED_ONLY",
                                 "BASIC"
                               ]
                             }
@@ -4108,7 +4648,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Creates a FHIR resource.\n\nImplements the FHIR standard create interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#create),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#create),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#create)),\nwhich creates a new resource with a server-assigned resource ID.\n\nAlso supports the FHIR standard conditional create interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#ccreate),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#ccreate),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#ccreate)),\nspecified by supplying an `If-None-Exist` header containing a FHIR search\nquery. If no resources match this search query, the server processes the\ncreate operation as normal.\n\nThe request body must contain a JSON-encoded FHIR resource, and the request\nheaders must contain `Content-Type: application\/fhir+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the resource as it was created on the server, including the\nserver-assigned resource ID and version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead."
+                          "description": "Creates a FHIR resource.\n\nImplements the FHIR standard create interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#create),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#create),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#create)),\nwhich creates a new resource with a server-assigned resource ID.\n\nAlso supports the FHIR standard conditional create interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#ccreate),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#ccreate),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#ccreate)),\nspecified by supplying an `If-None-Exist` header containing a FHIR search\nquery. If no resources match this search query, the server processes the\ncreate operation as normal.\n\nThe request body must contain a JSON-encoded FHIR resource, and the request\nheaders must contain `Content-Type: application\/fhir+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the resource as it was created on the server, including the\nserver-assigned resource ID and version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nFor samples that show how to call `create`, see\n[Creating a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#creating_a_fhir_resource)."
                         },
                         "read": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.read",
@@ -4133,7 +4673,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Gets the contents of a FHIR resource.\n\nImplements the FHIR standard read interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#read),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#read),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#read)).\n\nAlso supports the FHIR standard conditional read interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#cread),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#cread),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#cread))\nspecified by supplying an `If-Modified-Since` header with a date\/time value\nor an `If-None-Match` header with an ETag value.\n\nOn success, the response body contains a JSON-encoded representation\nof the resource.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead."
+                          "description": "Gets the contents of a FHIR resource.\n\nImplements the FHIR standard read interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#read),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#read),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#read)).\n\nAlso supports the FHIR standard conditional read interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#cread),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#cread),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#cread))\nspecified by supplying an `If-Modified-Since` header with a date\/time value\nor an `If-None-Match` header with an ETag value.\n\nOn success, the response body contains a JSON-encoded representation\nof the resource.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nFor samples that show how to call `read`, see\n[Getting a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#getting_a_fhir_resource)."
                         },
                         "vread": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.vread",
@@ -4158,7 +4698,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Gets the contents of a version (current or historical) of a FHIR resource\nby version ID.\n\nImplements the FHIR standard vread interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#vread),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#vread),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#vread)).\n\nOn success, the response body contains a JSON-encoded representation\nof the resource.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead."
+                          "description": "Gets the contents of a version (current or historical) of a FHIR resource\nby version ID.\n\nImplements the FHIR standard vread interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#vread),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#vread),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#vread)).\n\nOn success, the response body contains a JSON-encoded representation\nof the resource.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nFor samples that show how to call `vread`, see\n[Retrieving a FHIR resource\nversion](\/healthcare\/docs\/how-tos\/fhir-resources#retrieving_a_fhir_resource_version)."
                         },
                         "delete": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.delete",
@@ -4183,7 +4723,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Deletes a FHIR resource.\n\nImplements the FHIR standard delete interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#delete),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#delete),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#delete)).\n\nNote: Unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources are moved to a history\nrepository that can still be retrieved through vread\nand related methods, unless they are removed by the\npurge method."
+                          "description": "Deletes a FHIR resource.\n\nImplements the FHIR standard delete interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#delete),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#delete),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#delete)).\n\nNote: Unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources are moved to a history\nrepository that can still be retrieved through vread\nand related methods, unless they are removed by the\npurge method.\n\nFor samples that show how to call `delete`, see\n[Deleting a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#deleting_a_fhir_resource)."
                         },
                         "conditionalDelete": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalDelete",
@@ -4216,7 +4756,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Deletes FHIR resources that match a search query.\n\nImplements the FHIR standard conditional delete interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.12.1),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#2.21.0.13.1),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#3.1.0.7.1)).\nIf multiple resources match, all matching resources are deleted.\n\nSearch terms are provided as query parameters following the same pattern as\nthe search method.\n\nNote: Unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources are moved to a history\nrepository that can still be retrieved through vread\nand related methods, unless they are removed by the\npurge method.\n\nThis method requires the`healthcare.fhirStores.searchResources` and\n`healthcare.fhirResources.delete` permissions on the parent FHIR store."
+                          "description": "Deletes FHIR resources that match a search query.\n\nImplements the FHIR standard conditional delete interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.12.1),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#2.21.0.13.1),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#3.1.0.7.1)).\nIf multiple resources match, all matching resources are deleted.\n\nSearch terms are provided as query parameters following the same pattern as\nthe search method.\n\nNote: Unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources are moved to a history\nrepository that can still be retrieved through vread\nand related methods, unless they are removed by the\npurge method.\n\nThis method requires the`healthcare.fhirStores.searchResources` and\n`healthcare.fhirResources.delete` permissions on the parent FHIR store.\n\nFor samples that show how to call `conditionalDelete`, see\n[Conditionally deleting a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#conditionally_deleting_a_fhir_resource)."
                         },
                         "update": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.update",
@@ -4244,7 +4784,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Updates the entire contents of a resource.\n\nImplements the FHIR standard update interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#update),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#update),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#update)).\n\nIf the specified resource does\nnot exist and the FHIR store has\nenable_update_create set, creates the\nresource with the client-specified ID.\n\nThe request body must contain a JSON-encoded FHIR resource, and the request\nheaders must contain `Content-Type: application\/fhir+json`. The resource\nmust contain an `id` element having an identical value to the ID in the\nREST path of the request.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead."
+                          "description": "Updates the entire contents of a resource.\n\nImplements the FHIR standard update interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#update),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#update),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#update)).\n\nIf the specified resource does\nnot exist and the FHIR store has\nenable_update_create set, creates the\nresource with the client-specified ID.\n\nThe request body must contain a JSON-encoded FHIR resource, and the request\nheaders must contain `Content-Type: application\/fhir+json`. The resource\nmust contain an `id` element having an identical value to the ID in the\nREST path of the request.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nFor samples that show how to call `update`, see\n[Updating a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#updating_a_fhir_resource)."
                         },
                         "conditionalUpdate": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalUpdate",
@@ -4280,7 +4820,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "If a resource is found based on the search criteria specified in the query\nparameters, updates the entire contents of that resource.\n\nImplements the FHIR standard conditional update interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.10.2),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#cond-update),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#cond-update)).\n\nSearch terms are provided as query parameters following the same pattern as\nthe search method.\n\nIf the search criteria identify more than one match, the request\nreturns a `412 Precondition Failed` error.\nIf the search criteria identify zero matches, and the supplied resource\nbody contains an `id`, and the FHIR store has\nenable_update_create set, creates the\nresource with the client-specified ID. If the search criteria identify zero\nmatches, and the supplied resource body does not contain an `id`, the\nresource is created with a server-assigned ID as per the\ncreate method.\n\nThe request body must contain a JSON-encoded FHIR resource, and the request\nheaders must contain `Content-Type: application\/fhir+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThis method requires the`healthcare.fhirStores.searchResources` and\n`healthcare.fhirResources.update` permissions on the parent FHIR store."
+                          "description": "If a resource is found based on the search criteria specified in the query\nparameters, updates the entire contents of that resource.\n\nImplements the FHIR standard conditional update interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.10.2),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#cond-update),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#cond-update)).\n\nSearch terms are provided as query parameters following the same pattern as\nthe search method.\n\nIf the search criteria identify more than one match, the request\nreturns a `412 Precondition Failed` error.\nIf the search criteria identify zero matches, and the supplied resource\nbody contains an `id`, and the FHIR store has\nenable_update_create set, creates the\nresource with the client-specified ID. If the search criteria identify zero\nmatches, and the supplied resource body does not contain an `id`, the\nresource is created with a server-assigned ID as per the\ncreate method.\n\nThe request body must contain a JSON-encoded FHIR resource, and the request\nheaders must contain `Content-Type: application\/fhir+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThis method requires the`healthcare.fhirStores.searchResources` and\n`healthcare.fhirResources.update` permissions on the parent FHIR store.\n\nFor samples that show how to call `conditionalUpdate`, see\n[Conditionally updating a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#conditionally_updating_a_fhir_resource)."
                         },
                         "patch": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.patch",
@@ -4308,7 +4848,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Updates part of an existing resource by applying the operations specified\nin a [JSON Patch](http:\/\/jsonpatch.com\/) document.\n\nImplements the FHIR standard patch interaction\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#patch),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#patch)).\n\nDSTU2 doesn't define a patch method, but the server supports it in the same\nway it supports STU3.\n\nThe request body must contain a JSON Patch document, and the request\nheaders must contain `Content-Type: application\/json-patch+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead."
+                          "description": "Updates part of an existing resource by applying the operations specified\nin a [JSON Patch](http:\/\/jsonpatch.com\/) document.\n\nImplements the FHIR standard patch interaction\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#patch),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#patch)).\n\nDSTU2 doesn't define a patch method, but the server supports it in the same\nway it supports STU3.\n\nThe request body must contain a JSON Patch document, and the request\nheaders must contain `Content-Type: application\/json-patch+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nFor samples that show how to call `patch`, see\n[Patching a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#patching_a_fhir_resource)."
                         },
                         "conditionalPatch": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalPatch",
@@ -4344,7 +4884,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "If a resource is found based on the search criteria specified in the query\nparameters, updates part of that resource by applying the operations\nspecified in a [JSON Patch](http:\/\/jsonpatch.com\/) document.\n\nImplements the FHIR standard conditional patch interaction\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#patch),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#patch)).\n\nDSTU2 doesn't define a conditional patch method, but the server supports it\nin the same way it supports STU3.\n\nSearch terms are provided as query parameters following the same pattern as\nthe search method.\n\nIf the search criteria identify more than one match, the request\nreturns a `412 Precondition Failed` error.\n\nThe request body must contain a JSON Patch document, and the request\nheaders must contain `Content-Type: application\/json-patch+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThis method requires the`healthcare.fhirStores.searchResources` permission\non the parent FHIR store and the `healthcare.fhirResources.patch`\npermission on the requested FHIR store resource."
+                          "description": "If a resource is found based on the search criteria specified in the query\nparameters, updates part of that resource by applying the operations\nspecified in a [JSON Patch](http:\/\/jsonpatch.com\/) document.\n\nImplements the FHIR standard conditional patch interaction\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#patch),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#patch)).\n\nDSTU2 doesn't define a conditional patch method, but the server supports it\nin the same way it supports STU3.\n\nSearch terms are provided as query parameters following the same pattern as\nthe search method.\n\nIf the search criteria identify more than one match, the request\nreturns a `412 Precondition Failed` error.\n\nThe request body must contain a JSON Patch document, and the request\nheaders must contain `Content-Type: application\/json-patch+json`.\n\nOn success, the response body contains a JSON-encoded representation\nof the updated resource, including the server-assigned version ID.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThis method requires the`healthcare.fhirStores.searchResources` permission\non the parent FHIR store and the `healthcare.fhirResources.patch`\npermission on the requested FHIR store resource.\n\nFor samples that show how to call `conditionalPatch`, see\n[Conditionally patching a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#conditionally_patching_a_fhir_resource)."
                         },
                         "search": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.search",
@@ -4376,7 +4916,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results."
+                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results.\n\nFor samples and detailed information, see [Searching for FHIR\nresources](\/healthcare\/docs\/how-tos\/fhir-search) and [Advanced FHIR search\nfeatures](\/healthcare\/docs\/how-tos\/fhir-advanced-search)."
                         },
                         "search": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.search",
@@ -4406,7 +4946,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results."
+                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results.\n\nFor samples and detailed information, see [Searching for FHIR\nresources](\/healthcare\/docs\/how-tos\/fhir-search) and [Advanced FHIR search\nfeatures](\/healthcare\/docs\/how-tos\/fhir-advanced-search)."
                         },
                         "search": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.search",
@@ -4441,7 +4981,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results."
+                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results.\n\nFor samples and detailed information, see [Searching for FHIR\nresources](\/healthcare\/docs\/how-tos\/fhir-search) and [Advanced FHIR search\nfeatures](\/healthcare\/docs\/how-tos\/fhir-advanced-search)."
                         },
                         "search": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.search",
@@ -4469,7 +5009,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results."
+                          "description": "Searches for resources in the given FHIR store according to criteria\nspecified as query parameters.\n\nImplements the FHIR standard search interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#search),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#search),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#search))\nusing the search semantics described in the FHIR Search specification\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/search.html),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/search.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/search.html)).\n\nSupports three methods of search defined by the specification:\n\n*  `GET [base]?[parameters]` to search across all resources.\n*  `GET [base]\/[type]?[parameters]` to search resources of a specified\ntype.\n*  `POST [base]\/[type]\/_search?[parameters]` as an alternate form having\nthe same semantics as the `GET` method.\n\nThe `GET` methods do not support compartment searches. The `POST` method\ndoes not support `application\/x-www-form-urlencoded` search parameters.\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\nsearch.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe server's capability statement, retrieved through\ncapabilities, indicates what search parameters\nare supported on each FHIR resource. A list of all search parameters\ndefined by the specification can be found in the FHIR Search Parameter\nRegistry\n([STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/searchparameter-registry.html),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/searchparameter-registry.html)).\nFHIR search parameters for DSTU2 can be found on each resource's definition\npage.\n\nSupported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,\n`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.\n\nSupported search result parameters: `_sort`, `_count`, `_include`,\n`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.\n\nThe maximum number of search results returned defaults to 100, which can\nbe overridden by the `_count` parameter up to a maximum limit of 1000. If\nthere are additional results, the returned `Bundle` contains\npagination links.\n\nResources with a total size larger than 5MB or a field count larger than\n50,000 might not be fully searchable as the server might trim its generated\nsearch index in those cases.\n\nNote: FHIR resources are indexed asynchronously, so there might be a slight\ndelay between the time a resource is created or changes and when the change\nis reflected in search results.\n\nFor samples and detailed information, see [Searching for FHIR\nresources](\/healthcare\/docs\/how-tos\/fhir-search) and [Advanced FHIR search\nfeatures](\/healthcare\/docs\/how-tos\/fhir-advanced-search)."
                         },
                         "Patient-everything": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.Patient-everything",
@@ -4495,7 +5035,7 @@
                               "type": "string"
                             },
                             "_page_token": {
-                              "description": "Used to retrieve the next or previous page of results\nwhen using pagination. Value should be set to the value of `page_token` set\nin next or previous page links' URLs. Next and previous page are returned\nin the response bundle's links field, where `link.relation` is \"previous\"\nor \"next\".\n\nOmit `page_token` if no previous request has been made.",
+                              "description": "Used to retrieve the next or previous page of results\nwhen using pagination. Set `_page_token` to the value of _page_token set\nin next or previous page links' url. Next and previous page are returned\nin the response bundle's links field, where `link.relation` is \"previous\"\nor \"next\".\n\nOmit `_page_token` if no previous request has been made.",
                               "location": "query",
                               "type": "string"
                             },
@@ -4504,6 +5044,16 @@
                               "location": "query",
                               "type": "integer",
                               "format": "int32"
+                            },
+                            "_since": {
+                              "description": "If provided, only resources updated after this time are\nreturned. The time uses the format YYYY-MM-DDThh:mm:ss.sss+zz:zz.\nFor example, `2015-02-07T13:28:17.239+02:00` or `2017-01-01T00:00:00Z`.\nThe time must be specified to the second and include a time zone.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "_type": {
+                              "description": "String of comma-delimited FHIR resource types. If provided, only resources\nof the specified resource type(s) are returned.",
+                              "location": "query",
+                              "type": "string"
                             }
                           },
                           "parameterOrder": [
@@ -4515,7 +5065,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Retrieves a Patient resource and resources related to that patient.\n\nImplements the FHIR extended operation Patient-everything\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/patient-operations.html#everything),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/patient-operations.html#everything),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/patient-operations.html#everything)).\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\noperation.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe resources in scope for the response are:\n\n* The patient resource itself.\n* All the resources directly referenced by the patient resource.\n* Resources directly referencing the patient resource that meet the\n  inclusion criteria. The inclusion criteria are based on the membership\n  rules in the patient compartment definition\n  ([DSTU2](https:\/\/hl7.org\/fhir\/DSTU2\/compartment-patient.html),\n  [STU3](http:\/\/www.hl7.org\/fhir\/stu3\/compartmentdefinition-patient.html),\n  [R4](https:\/\/hl7.org\/fhir\/R4\/compartmentdefinition-patient.html)), which\n  details the eligible resource types and referencing search parameters."
+                          "description": "Retrieves a Patient resource and resources related to that patient.\n\nImplements the FHIR extended operation Patient-everything\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/patient-operations.html#everything),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/patient-operations.html#everything),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/patient-operations.html#everything)).\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `searchset`, containing the results of the\noperation.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nThe resources in scope for the response are:\n\n* The patient resource itself.\n* All the resources directly referenced by the patient resource.\n* Resources directly referencing the patient resource that meet the\n  inclusion criteria. The inclusion criteria are based on the membership\n  rules in the patient compartment definition\n  ([DSTU2](https:\/\/hl7.org\/fhir\/DSTU2\/compartment-patient.html),\n  [STU3](http:\/\/www.hl7.org\/fhir\/stu3\/compartmentdefinition-patient.html),\n  [R4](https:\/\/hl7.org\/fhir\/R4\/compartmentdefinition-patient.html)), which\n  details the eligible resource types and referencing search parameters.\n\nFor samples that show how to call `Patient-everything`, see\n[Getting all patient compartment\nresources](\/healthcare\/docs\/how-tos\/fhir-resources#getting_all_patient_compartment_resources)."
                         },
                         "Observation-lastn": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.Observation-lastn",
@@ -4593,7 +5143,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Executes all the requests in the given Bundle.\n\nImplements the FHIR standard batch\/transaction interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#transaction),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#transaction),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#transaction)).\n\nSupports all interactions within a bundle, except search. This method\naccepts Bundles of type `batch` and `transaction`, processing them\naccording to the batch processing rules\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.16.1),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#2.21.0.17.1),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#brules))\nand transaction processing rules\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.16.2),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#2.21.0.17.2),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#trules)).\n\nThe request body must contain a JSON-encoded FHIR `Bundle` resource, and\nthe request headers must contain `Content-Type: application\/fhir+json`.\n\nFor a batch bundle or a successful transaction the response body\ncontains a JSON-encoded representation of a `Bundle` resource of type\n`batch-response` or `transaction-response` containing one entry for each\nentry in the request, with the outcome of processing the entry. In the\ncase of an error for a transaction bundle, the response body contains\na JSON-encoded `OperationOutcome` resource describing the reason for the\nerror. If the request cannot be mapped to a valid API method on a FHIR\nstore, a generic GCP error might be returned instead.\n\nThis method requires permission for executing the requests in the bundle.\nThe `executeBundle` permission grants permission to execute the request in\nthe bundle but you must grant sufficient permissions to execute the\nindividual requests in the bundle. For example, if the bundle contains a\n`create` request, you must have permission to execute the `create` request.\n\nLogging is available for the `executeBundle` permission."
+                          "description": "Executes all the requests in the given Bundle.\n\nImplements the FHIR standard batch\/transaction interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#transaction),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#transaction),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#transaction)).\n\nSupports all interactions within a bundle, except search. This method\naccepts Bundles of type `batch` and `transaction`, processing them\naccording to the batch processing rules\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.16.1),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#2.21.0.17.1),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#brules))\nand transaction processing rules\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#2.1.0.16.2),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#2.21.0.17.2),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#trules)).\n\nThe request body must contain a JSON-encoded FHIR `Bundle` resource, and\nthe request headers must contain `Content-Type: application\/fhir+json`.\n\nFor a batch bundle or a successful transaction the response body\ncontains a JSON-encoded representation of a `Bundle` resource of type\n`batch-response` or `transaction-response` containing one entry for each\nentry in the request, with the outcome of processing the entry. In the\ncase of an error for a transaction bundle, the response body contains\na JSON-encoded `OperationOutcome` resource describing the reason for the\nerror. If the request cannot be mapped to a valid API method on a FHIR\nstore, a generic GCP error might be returned instead.\n\nThis method requires permission for executing the requests in the bundle.\nThe `executeBundle` permission grants permission to execute the request in\nthe bundle but you must grant sufficient permissions to execute the\nindividual requests in the bundle. For example, if the bundle contains a\n`create` request, you must have permission to execute the `create` request.\n\nLogging is available for the `executeBundle` permission.\n\nFor samples that show how to call `executeBundle`, see\n[Managing FHIR resources using FHIR\nbundles](\/healthcare\/docs\/how-tos\/fhir-bundles)."
                         },
                         "history": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.history",
@@ -4639,7 +5189,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Lists all the versions of a resource (including the current version and\ndeleted versions) from the FHIR store.\n\nImplements the per-resource form of the FHIR standard history interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#history),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#history),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#history)).\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `history`, containing the version history\nsorted from most recent to oldest versions.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead."
+                          "description": "Lists all the versions of a resource (including the current version and\ndeleted versions) from the FHIR store.\n\nImplements the per-resource form of the FHIR standard history interaction\n([DSTU2](https:\/\/hl7.org\/implement\/standards\/fhir\/DSTU2\/http.html#history),\n[STU3](https:\/\/hl7.org\/implement\/standards\/fhir\/STU3\/http.html#history),\n[R4](https:\/\/hl7.org\/implement\/standards\/fhir\/R4\/http.html#history)).\n\nOn success, the response body contains a JSON-encoded representation\nof a `Bundle` resource of type `history`, containing the version history\nsorted from most recent to oldest versions.\nErrors generated by the FHIR store contain a JSON-encoded\n`OperationOutcome` resource describing the reason for the error. If the\nrequest cannot be mapped to a valid API method on a FHIR store, a generic\nGCP error might be returned instead.\n\nFor samples that show how to call `history`, see\n[Listing FHIR resource\nversions](\/healthcare\/docs\/how-tos\/fhir-resources#listing_fhir_resource_versions)."
                         },
                         "Resource-purge": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.Resource-purge",
@@ -4664,7 +5214,7 @@
                           "scopes": [
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
-                          "description": "Deletes all the historical versions of a resource (excluding the current\nversion) from the FHIR store. To remove all versions of a resource, first\ndelete the current version and then call this method.\n\nThis is not a FHIR standard operation."
+                          "description": "Deletes all the historical versions of a resource (excluding the current\nversion) from the FHIR store. To remove all versions of a resource, first\ndelete the current version and then call this method.\n\nThis is not a FHIR standard operation.\n\nFor samples that show how to call `Resource-purge`, see\n[Deleting historical versions of a FHIR\nresource](\/healthcare\/docs\/how-tos\/fhir-resources#deleting_historical_versions_of_a_fhir_resource)."
                         },
                         "ConceptMap-translate": {
                           "id": "healthcare.projects.locations.datasets.fhirStores.fhir.ConceptMap-translate",
@@ -4853,6 +5403,418 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
                       "description": "Returns permissions that a caller has on the specified resource.\nIf the resource does not exist, this will return an empty set of\npermissions, not a `NOT_FOUND` error.\n\nNote: This operation is designed to be used for building permission-aware\nUIs and command-line tools, not for authorization checking. This operation\nmay \"fail open\" without warning."
+                    },
+                    "create": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.create",
+                      "path": "v1beta1/{+parent}/annotationStores",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "parent": {
+                          "description": "The name of the dataset this Annotation store belongs to.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+$",
+                          "type": "string"
+                        },
+                        "annotationStoreId": {
+                          "description": "The ID of the Annotation store that is being created.\nThe string must match the following regex: `[\\p{L}\\p{N}_\\-\\.]{1,256}`.",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "request": {
+                        "$ref": "AnnotationStore"
+                      },
+                      "response": {
+                        "$ref": "AnnotationStore"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Creates a new Annotation store within the parent dataset."
+                    },
+                    "get": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.get",
+                      "path": "v1beta1/{+name}",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "name": {
+                          "description": "The resource name of the Annotation store to get.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "AnnotationStore"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Gets the specified Annotation store or returns NOT_FOUND if it does not\nexist."
+                    },
+                    "delete": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.delete",
+                      "path": "v1beta1/{+name}",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}",
+                      "httpMethod": "DELETE",
+                      "parameters": {
+                        "name": {
+                          "description": "The resource name of the Annotation store to delete.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "Empty"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Deletes the specified Annotation store and removes all annotations that are\ncontained within it."
+                    },
+                    "patch": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.patch",
+                      "path": "v1beta1/{+name}",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}",
+                      "httpMethod": "PATCH",
+                      "parameters": {
+                        "name": {
+                          "description": "Resource name of the Annotation store, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                          "type": "string"
+                        },
+                        "updateMask": {
+                          "description": "The update mask applies to the resource. For the `FieldMask` definition,\nsee\nhttps:\/\/developers.google.com\/protocol-buffers\/docs\/reference\/google.protobuf#fieldmask",
+                          "location": "query",
+                          "type": "string",
+                          "format": "google-fieldmask"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "AnnotationStore"
+                      },
+                      "response": {
+                        "$ref": "AnnotationStore"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Updates the specified Annotation store."
+                    },
+                    "list": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.list",
+                      "path": "v1beta1/{+parent}/annotationStores",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "parent": {
+                          "description": "Name of the dataset.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+$",
+                          "type": "string"
+                        },
+                        "pageSize": {
+                          "description": "Limit on the number of Annotation stores to return in a single response.\nIf zero the default page size of 100 is used.",
+                          "location": "query",
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "pageToken": {
+                          "description": "The next_page_token value returned from the previous List request, if any.",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "filter": {
+                          "description": "Restricts stores returned to those matching a filter. Syntax:\nhttps:\/\/cloud.google.com\/appengine\/docs\/standard\/python\/search\/query_strings\nOnly filtering on labels is supported, for example `labels.key=value`.",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "response": {
+                        "$ref": "ListAnnotationStoresResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Lists the Annotation stores in the given dataset for a source store."
+                    },
+                    "import": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.import",
+                      "path": "v1beta1/{+annotationStore}:import",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:import",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "annotationStore": {
+                          "description": "The name of the Annotation store to which the server imports\nannotations, in the format\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "annotationStore"
+                      ],
+                      "request": {
+                        "$ref": "ImportAnnotationsRequest"
+                      },
+                      "response": {
+                        "$ref": "Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Import\nAnnotations to\nthe Annotation\nstore by\nloading data from the specified sources.\nIf the request is successful, a detailed response is returned as of type\nImportAnnotationsResponse, contained in the\nresponse field when the\noperation finishes.\nThe metadata field type is\nOperationMetadata.\nIf errors occur, the error\nfield type is ImportAnnotationsErrorDetails.\nErrors are also logged to Cloud Logging\n(see [Viewing logs](\/healthcare\/docs\/how-tos\/logging))."
+                    },
+                    "export": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.export",
+                      "path": "v1beta1/{+annotationStore}:export",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:export",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "annotationStore": {
+                          "description": "The name of the Annotation store to export annotations to, in\nthe format of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "annotationStore"
+                      ],
+                      "request": {
+                        "$ref": "ExportAnnotationsRequest"
+                      },
+                      "response": {
+                        "$ref": "Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Export\nAnnotations from\nthe Annotation\nstore.\nIf the request is successful, a detailed response is returned of type\nExportAnnotationsResponse, contained in the\nresponse field when the\noperation finishes.\nThe metadata field type is\nOperationMetadata.\nIf errors occur, the error\nfield type is ImportAnnotationsErrorDetails.\nErrors are also logged to Cloud Logging\n(see [Viewing logs](\/healthcare\/docs\/how-tos\/logging))."
+                    },
+                    "evaluate": {
+                      "id": "healthcare.projects.locations.datasets.annotationStores.evaluate",
+                      "path": "v1beta1/{+evalStore}:evaluate",
+                      "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:evaluate",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "evalStore": {
+                          "description": "The Annotation store to compare against `golden_store`, in the\nformat of\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}`.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "evalStore"
+                      ],
+                      "request": {
+                        "$ref": "EvaluateAnnotationStoreRequest"
+                      },
+                      "response": {
+                        "$ref": "Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Evaluate an Annotation store against a\nground truth Annotation store.\nWhen the operation finishes successfully, a detailed response is returned\nof type EvaluateAnnotationStoreResponse, contained in the response. The metadata field type is\nOperationMetadata.\nErrors are logged to Cloud Logging\n(see [Viewing logs](\/healthcare\/docs\/how-tos\/logging))."
+                    }
+                  }
+                  ,
+                  "resources": {
+                    "annotations": {
+                      "methods": {
+                        "create": {
+                          "id": "healthcare.projects.locations.datasets.annotationStores.annotations.create",
+                          "path": "v1beta1/{+parent}/annotations",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}/annotations",
+                          "httpMethod": "POST",
+                          "parameters": {
+                            "parent": {
+                              "description": "The name of the Annotation store this annotation belongs to. For example,\n`projects\/my-project\/locations\/us-central1\/datasets\/mydataset\/annotationStores\/myannotationstore`.",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                              "type": "string"
+                            }
+                          },
+                          "parameterOrder": [
+                            "parent"
+                          ],
+                          "request": {
+                            "$ref": "Annotation"
+                          },
+                          "response": {
+                            "$ref": "Annotation"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Creates a new Annotation record. It is\nvalid to create Annotation objects for the same source more than once since\na unique ID is assigned to each record by this service."
+                        },
+                        "get": {
+                          "id": "healthcare.projects.locations.datasets.annotationStores.annotations.get",
+                          "path": "v1beta1/{+name}",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}/annotations/{annotationsId}",
+                          "httpMethod": "GET",
+                          "parameters": {
+                            "name": {
+                              "description": "The resource name of the Annotation to retrieve.",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+\/annotations\/[^\/]+$",
+                              "type": "string"
+                            }
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "response": {
+                            "$ref": "Annotation"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Gets an Annotation."
+                        },
+                        "delete": {
+                          "id": "healthcare.projects.locations.datasets.annotationStores.annotations.delete",
+                          "path": "v1beta1/{+name}",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}/annotations/{annotationsId}",
+                          "httpMethod": "DELETE",
+                          "parameters": {
+                            "name": {
+                              "description": "The resource name of the Annotation to delete.",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+\/annotations\/[^\/]+$",
+                              "type": "string"
+                            }
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "response": {
+                            "$ref": "Empty"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Deletes an Annotation or returns\nNOT_FOUND if it does not exist."
+                        },
+                        "patch": {
+                          "id": "healthcare.projects.locations.datasets.annotationStores.annotations.patch",
+                          "path": "v1beta1/{+name}",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}/annotations/{annotationsId}",
+                          "httpMethod": "PATCH",
+                          "parameters": {
+                            "name": {
+                              "description": "Resource name of the Annotation, of the form\n`projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}\/annotationStores\/{annotation_store_id}\/annotations\/{annotation_id}`.",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+\/annotations\/[^\/]+$",
+                              "type": "string"
+                            },
+                            "updateMask": {
+                              "description": "The update mask applies to the resource. For the `FieldMask` definition,\nsee\nhttps:\/\/developers.google.com\/protocol-buffers\/docs\/reference\/google.protobuf#fieldmask",
+                              "location": "query",
+                              "type": "string",
+                              "format": "google-fieldmask"
+                            }
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "request": {
+                            "$ref": "Annotation"
+                          },
+                          "response": {
+                            "$ref": "Annotation"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Updates the Annotation."
+                        },
+                        "list": {
+                          "id": "healthcare.projects.locations.datasets.annotationStores.annotations.list",
+                          "path": "v1beta1/{+parent}/annotations",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}/annotations",
+                          "httpMethod": "GET",
+                          "parameters": {
+                            "parent": {
+                              "description": "Name of the Annotation store to retrieve Annotations from.",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+\/annotationStores\/[^\/]+$",
+                              "type": "string"
+                            },
+                            "pageSize": {
+                              "description": "Limit on the number of Annotations to return in a single response.\nIf zero the default page size of 100 is used.",
+                              "location": "query",
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "pageToken": {
+                              "description": "The next_page_token value returned from the previous List request, if any.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "filter": {
+                              "description": "Restricts Annotations returned to those matching a filter. Functions\navailable for filtering are:\n\n- `matches(\"annotation_source.cloud_healthcare_source.name\", substring)`.\nFilter on `cloud_healthcare_source.name`. For example:\n`matches(\"annotation_source.cloud_healthcare_source.name\", \"some source\")`.\n\n- `matches(\"annotation\", substring)`. Filter on all fields of annotation.\nFor example: `matches(\"annotation\", \"some-content\")`.\n\n- `type(\"text\")`, `type(\"image\")`, `type(\"resource\")`. Filter on the type\nof annotation `data`.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "view": {
+                              "description": "Controls which fields are populated in the response.",
+                              "location": "query",
+                              "type": "string",
+                              "enum": [
+                                "ANNOTATION_VIEW_UNSPECIFIED",
+                                "ANNOTATION_VIEW_BASIC",
+                                "ANNOTATION_VIEW_FULL"
+                              ]
+                            }
+                          },
+                          "parameterOrder": [
+                            "parent"
+                          ],
+                          "response": {
+                            "$ref": "ListAnnotationsResponse"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Lists the Annotations in the given\nAnnotation store for a source\nresource."
+                        }
+                      }
                     }
                   }
                 },

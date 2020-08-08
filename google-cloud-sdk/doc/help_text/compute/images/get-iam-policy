@@ -1,6 +1,6 @@
 NAME
-    gcloud compute images get-iam-policy - get the IAM policy for a Google
-        Compute Engine image
+    gcloud compute images get-iam-policy - get the IAM policy for a Compute
+        Engine image
 
 SYNOPSIS
     gcloud compute images get-iam-policy IMAGE [--filter=EXPRESSION]
@@ -9,11 +9,11 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute images get-iam-policy displays the IAM policy associated
-    with a Google Compute Engine image in a project. If formatted as JSON, the
-    output can be edited and used as a policy file for set-iam-policy. The
-    output includes an "etag" field identifying the version emitted and
-    allowing detection of concurrent policy updates; see $ {parent}
-    set-iam-policy for additional details.
+    with a Compute Engine image in a project. If formatted as JSON, the output
+    can be edited and used as a policy file for set-iam-policy. The output
+    includes an "etag" field identifying the version emitted and allowing
+    detection of concurrent policy updates; see $ {parent} set-iam-policy for
+    additional details.
 
 POSITIONAL ARGUMENTS
      Image resource - The image to display the IAM policy for. This represents

@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha vmware clusters - manage clusters in VMware privateclouds
+
+SYNOPSIS
+    gcloud alpha vmware clusters COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage clusters in VMware privateclouds.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Cloud VMware cluster.
+
+     delete
+        (ALPHA) Delete a Cloud VMware cluster.
+
+     describe
+        (ALPHA) Describe a Cloud VMware cluster.
+
+     list
+        (ALPHA) List Cloud VMware clusters.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

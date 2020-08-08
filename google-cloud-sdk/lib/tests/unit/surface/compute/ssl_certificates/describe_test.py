@@ -34,7 +34,7 @@ class SslCertificatesDescribeTest(test_base.BaseTest,
 
   def SetUp(self):
     self.SelectApi(self._api)
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self._resources = test_resources.MakeSslCertificates(
         self.messages, self.api)
 

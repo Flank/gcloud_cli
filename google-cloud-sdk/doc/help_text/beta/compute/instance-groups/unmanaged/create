@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instance-groups unmanaged create creates a new
-    Google Compute Engine unmanaged instance group. For example:
+    Compute Engine unmanaged instance group. For example:
 
         $ gcloud beta compute instance-groups unmanaged create \
             example-instance-group --zone us-central1-a

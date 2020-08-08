@@ -5,23 +5,23 @@
 
 .SH "NAME"
 .HP
-gcloud compute disks create \- create Google Compute Engine persistent disks
+gcloud compute disks create \- create Compute Engine persistent disks
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute disks create\fR creates one or more Google Compute Engine
-persistent disks. When creating virtual machine instances, disks can be attached
-to the instances through the \f5gcloud compute instances create\fR command.
-Disks can also be attached to instances that are already running using \f5gcloud
-compute instances attach\-disk\fR.
+\fBgcloud compute disks create\fR creates one or more Compute Engine persistent
+disks. When creating virtual machine instances, disks can be attached to the
+instances through the \f5gcloud compute instances create\fR command. Disks can
+also be attached to instances that are already running using \f5gcloud compute
+instances attach\-disk\fR.
 
 Disks are zonal resources, so they reside in a particular zone for their entire
 lifetime. The contents of a disk can be moved to a different zone by
@@ -31,6 +31,9 @@ disk can also be moved across project or zone by creating an image (using
 \f5gcloud compute images create\fR) and creating a new disk using
 \f5\-\-image\fR in the desired project and/or zone.
 
+For a comprehensive guide, including details on minimum and maximum disk size,
+refer to: https://cloud.google.com/compute/docs/disks
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -38,7 +41,8 @@ disk can also be moved across project or zone by creating an image (using
 .RS 2m
 .TP 2m
 \fIDISK_NAME\fR [\fIDISK_NAME\fR ...]
-Names of the disks to create.
+Names of the disks to create. For details on the naming convention for this
+resource, refer to: https://cloud.google.com/compute/docs/naming\-resources
 
 
 .RE
@@ -115,8 +119,9 @@ Size of the disks. The value must be a whole number followed by a size unit of
 specified, GB is assumed. For example, \f5\fI10GB\fR\fR will produce 10 gigabyte
 disks. Disk size must be a multiple of 1 GB. Limit your boot disk size to 2TB to
 account for MBR partition table limitations. If disk size is not specified, the
-default size of 500GB for standard disks and 100GB for pd\-ssd disks will be
-used.
+default size of 500GB for pd\-standard disks, 100GB for pd\-balanced disks, and
+100GB for pd\-ssd disks will be used. For details about disk size limits, refer
+to: https://cloud.google.com/compute/docs/disks
 
 .TP 2m
 \fB\-\-type\fR=\fITYPE\fR
@@ -164,6 +169,18 @@ available as both regular and Shielded VM images. When a family is specified
 instead of an image, the latest non\-deprecated image associated with that
 family is used. It is best practice to use \-\-image\-family when the latest
 version of an image is needed.
+
+.TP 2m
+\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR
+Source disk used to create the disks. It is safe to delete a source disk after a
+disk has been created from the source disk. To get a list of disks in your
+current project, run \f5gcloud compute disks list\fR. This flag is mutually
+exclusive with \fB\-\-image\fR and \fB\-\-source\-snapshot\fR.
+
+When using this option, the size of the disks must be at least as large as the
+source disk size. Use \fB\-\-size\fR to adjust the size of the disks.
+
+Source disk must be in the same zone/region as the disk to be created.
 
 .TP 2m
 \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR

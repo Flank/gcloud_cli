@@ -33,6 +33,14 @@ COMMANDS
      get-history
         Get the update history of assets that overlaps a time window.
 
+     search-all-iam-policies
+        Searches all IAM policies within the specified accessible scope, such
+        as a project, folder or organization.
+
+     search-all-resources
+        Searches all Cloud resources within the specified accessible scope,
+        such as a project, folder or organization.
+
 NOTES
     These variants are also available:
 

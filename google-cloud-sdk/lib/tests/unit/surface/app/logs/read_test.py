@@ -375,7 +375,7 @@ class LogsReadTest(logs_base.LogsTestBase):
 
   def testUnicode(self):
     """Test that unicode entries are correctly formatted."""
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     response_entries = messages.ListLogEntriesResponse(
         entries=[UNICODE_ENTRY_1])
     self.v2_client.entries.List.Expect(self._CreateRequest(), response_entries)

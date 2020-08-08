@@ -1,0 +1,65 @@
+title: commerce procurement consumer account list scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      commerce-procurement consumer accounts list --billing-account 123 --page-size 1 --page-token random
+  - stdout: |
+      ---
+      accounts:
+      - approvals:
+        - name: signup
+          state: APPROVED
+          updateTime: '2019-07-26T19:38:40.029Z'
+        createTime: '2019-07-26T18:00:26.139Z'
+        name: billingAccounts/123/accounts/account2
+        provider: providers/provider2
+        updateTime: '2019-07-26T19:38:40.029Z'
+      nextPageToken: next-random
+actions:
+- execute_command:
+    command: |
+      commerce-procurement consumer accounts list --billing-account 123 --page-size 1 --page-token random
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/123/accounts?alt=json&pageSize=1&pageToken=random
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "accounts": [
+                {
+                  "name": "billingAccounts/123/accounts/account2",
+                  "provider": "providers/provider2",
+                  "approvals": [
+                    {
+                      "name": "signup",
+                      "state": "APPROVED",
+                      "updateTime": "2019-07-26T19:38:40.029Z"
+                    }
+                  ],
+                  "createTime": "2019-07-26T18:00:26.139Z",
+                  "updateTime": "2019-07-26T19:38:40.029Z"
+                }
+              ],
+              "nextPageToken": "next-random"
+            }
+    - expect_stdout: |
+        ---
+        accounts:
+        - approvals:
+          - name: signup
+            state: APPROVED
+            updateTime: '2019-07-26T19:38:40.029Z'
+          createTime: '2019-07-26T18:00:26.139Z'
+          name: billingAccounts/123/accounts/account2
+          provider: providers/provider2
+          updateTime: '2019-07-26T19:38:40.029Z'
+        nextPageToken: next-random
+    - expect_exit:
+        code: 0

@@ -95,24 +95,6 @@ class CommandBuilderTests(base.Base):
                           'documentation for this API can be found at: '
                           'https://cloud.google.com/docs'})
 
-  def testCommandBuilerWithGoogleAuth(self):
-    # google-auth is not used by default.
-    cd = self.MakeCommandData()
-    yaml_command_translator.CommandBuilder(
-        yaml_command_schema.CommandData('describe', cd),
-        ['abc', 'xyz', 'describe'])
-    self.methods_mock.assert_called_once_with(
-        'foo.instances', api_version=None, use_google_auth=False)
-    self.methods_mock.reset_mock()
-
-    # google-auth will be used if the command data demands so.
-    cd['request']['use_google_auth'] = True
-    yaml_command_translator.CommandBuilder(
-        yaml_command_schema.CommandData('describe', cd),
-        ['abc', 'xyz', 'describe'])
-    self.methods_mock.assert_called_once_with(
-        'foo.instances', api_version=None, use_google_auth=True)
-
   def testUnknownCommandType(self):
     cb = yaml_command_translator.CommandBuilder(
         yaml_command_schema.CommandData('describe', self.MakeCommandData()),

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute disks snapshot \- create snapshots of Google Compute Engine persistent disks
+gcloud compute disks snapshot \- create snapshots of Compute Engine persistent disks
 
 
 
@@ -29,6 +29,10 @@ https://cloud.google.com/compute/docs/disks/snapshot\-best\-practices
 gcloud compute disks snapshot waits until the operation returns a status of
 \f5READY\fR or \f5FAILED\fR, or reaches the maximum timeout, and returns the
 last known details of the snapshot.
+
+Note: To create snapshots, the following IAM permissions are necessary
+\f5\fIcompute.disks.createSnapshot\fR\fR, \f5\fIcompute.snapshots.create\fR\fR,
+\f5\fIcompute.snapshots.get\fR\fR, and \f5\fIcompute.zoneOperations.get\fR\fR.
 
 
 

@@ -11,7 +11,7 @@ gcloud alpha kms keys list \- list the keys within a keyring
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys list\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys list\fR (\fB\-\-keyring\fR=\fIKEYRING\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,18 +21,29 @@ gcloud alpha kms keys list \- list the keys within a keyring
 
 
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Keyring resource \- The KMS keyring resource. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-keyring] on the command line with a fully
+specified name; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
-Key ring of the key.
+ID of the keyring or fully qualified identifier for the keyring. This flag must
+be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Location of the key.
+The Cloud location for the keyring.
 
 
+.RE
 .RE
 .sp
 

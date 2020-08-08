@@ -448,12 +448,6 @@ AVAILABLE PROPERTIES
             Username to use when connecting, if the proxy requires
             authentication.
 
-     pubsub
-         lite_zone
-            Default zone to use when working with zonal Pub/Sub Lite resources.
-            When a --zone flag is required but not provided, the command will
-            fall back to this value, if set.
-
      redis
          region
             Default region to use when working with Cloud Memorystore for Redis
@@ -499,6 +493,12 @@ AVAILABLE PROPERTIES
          disable_prompts
             If True, gcloud will not prompt you to take periodic usage
             experience surveys.
+
+     vmware
+         location
+            Default location to use when working with Cloud VMware resources.
+            When a --location flag is required but not provided, the command
+            will fall back to this value, if set.
 
 NOTES
     This command is currently in BETA and may change without notice. These

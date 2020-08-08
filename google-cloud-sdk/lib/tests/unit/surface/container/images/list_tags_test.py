@@ -69,7 +69,7 @@ class ListTagsGATest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 403, 'body': 'some body'})
     exception = docker_http.V2DiagnosticException(
-        response, 'some content'.encode('utf8'))
+        response, 'some content'.encode('utf-8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
@@ -80,7 +80,7 @@ class ListTagsGATest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 404, 'body': 'some body'})
     exception = docker_http.V2DiagnosticException(
-        response, 'some content'.encode('utf8'))
+        response, 'some content'.encode('utf-8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
@@ -159,8 +159,8 @@ sha1 tag1 2016-04-14T20:47:07
         '{digest} {tags} {timestamp}'.format(
             digest='sha2', tags='tag2,tag3', timestamp=newer_expected_time),
         normalize_space=True)
-    self.AssertOutputContains(
-        '{digest} {tags}'.format(digest='sha3', tags='tag4'),
+    self.AssertOutputMatches(
+        '{digest}.*{tags}'.format(digest='sha3', tags='tag4'),
         normalize_space=True)
 
     # Verify descending order of the timestamps.
@@ -210,7 +210,7 @@ class ListTagsAlphaAndBetaTest(cli_test_base.CliTestBase,
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 403, 'body': 'some body'})
     exception = docker_http.V2DiagnosticException(
-        response, 'some content'.encode('utf8'))
+        response, 'some content'.encode('utf-8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags(track)
@@ -222,7 +222,7 @@ class ListTagsAlphaAndBetaTest(cli_test_base.CliTestBase,
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 404, 'body': 'some body'})
     exception = docker_http.V2DiagnosticException(
-        response, 'some content'.encode('utf8'))
+        response, 'some content'.encode('utf-8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags(track)
@@ -455,8 +455,8 @@ sha1 tag1 2016-04-14T20:47:07
             _from='gcr.io/google-appengine/python',
             build='2076ecf0-e411-4828-843e-88ad3a97b897'),
         normalize_space=True)
-    self.AssertOutputContains(
-        '{digest} {tags} {sha1} {vulnz} {_from} {build}'.format(
+    self.AssertOutputMatches(
+        '{digest} {tags}.*{sha1} {vulnz} {_from} {build}'.format(
             digest='sha3',
             tags='tag4',
             vulnz='HIGH=1',

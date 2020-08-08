@@ -1,0 +1,85 @@
+title: vmware clusters describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      vmware clusters describe sample-cluster --privatecloud=private-cloud-1 --location=us-central1 --project=sample-project
+  - stdout: |
+      createTime: '2020-06-07T21:15:48.587021815Z'
+      defaultZone: us-central1-a
+      name: projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster
+      nodeCount: 4
+      nodeType: n1-standard-8
+      nodes:
+      - nodeId: node-0-87e2ca84-a2a6-486d-9038-50c07994559f
+        type: n1-standard-8
+      - nodeId: node-1-e0b4ba6e-26a2-451e-b06b-f338b9d521d7
+        type: n1-standard-8
+      - nodeId: node-2-b44841b8-c102-42c4-a05b-c135ce3d6e68
+        type: n1-standard-8
+      - nodeId: node-3-79dfaa73-c7dd-4ea4-8d50-b1c36a5dce8d
+        type: n1-standard-8
+      status: READY
+      updateTime: '2020-06-07T21:25:36.126930409Z'
+actions:
+- execute_command:
+    command: |
+      vmware clusters describe sample-cluster --privatecloud=private-cloud-1 --location=us-central1 --project=sample-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://sddc.googleapis.com/v1alpha1/projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster",
+              "nodeType": "n1-standard-8",
+              "nodeCount": 4,
+              "nodes": [
+                {
+                  "nodeId": "node-0-87e2ca84-a2a6-486d-9038-50c07994559f",
+                  "type": "n1-standard-8"
+                },
+                {
+                  "nodeId": "node-1-e0b4ba6e-26a2-451e-b06b-f338b9d521d7",
+                  "type": "n1-standard-8"
+                },
+                {
+                  "nodeId": "node-2-b44841b8-c102-42c4-a05b-c135ce3d6e68",
+                  "type": "n1-standard-8"
+                },
+                {
+                  "nodeId": "node-3-79dfaa73-c7dd-4ea4-8d50-b1c36a5dce8d",
+                  "type": "n1-standard-8"
+                }
+              ],
+              "defaultZone": "us-central1-a",
+              "createTime": "2020-06-07T21:15:48.587021815Z",
+              "updateTime": "2020-06-07T21:25:36.126930409Z",
+              "status": "READY"
+            }
+    - expect_stdout: |
+        createTime: '2020-06-07T21:15:48.587021815Z'
+        defaultZone: us-central1-a
+        name: projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster
+        nodeCount: 4
+        nodeType: n1-standard-8
+        nodes:
+        - nodeId: node-0-87e2ca84-a2a6-486d-9038-50c07994559f
+          type: n1-standard-8
+        - nodeId: node-1-e0b4ba6e-26a2-451e-b06b-f338b9d521d7
+          type: n1-standard-8
+        - nodeId: node-2-b44841b8-c102-42c4-a05b-c135ce3d6e68
+          type: n1-standard-8
+        - nodeId: node-3-79dfaa73-c7dd-4ea4-8d50-b1c36a5dce8d
+          type: n1-standard-8
+        status: READY
+        updateTime: '2020-06-07T21:25:36.126930409Z'
+    - expect_exit:
+        code: 0

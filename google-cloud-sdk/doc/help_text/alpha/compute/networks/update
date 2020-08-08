@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute networks update - update a Google Compute Engine
-        network
+    gcloud alpha compute networks update - update a Compute Engine network
 
 SYNOPSIS
     gcloud alpha compute networks update NAME [--async] [--mtu=MTU]
@@ -8,8 +7,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute networks update is used to update Google
-    Compute Engine networks.
+    (ALPHA) gcloud alpha compute networks update is used to update Compute
+    Engine networks.
 
 POSITIONAL ARGUMENTS
      NAME

@@ -6,11 +6,20 @@ SYNOPSIS
     gcloud alpha compute commitments update-reservations COMMITMENT
         [--region=REGION]
         [--reservations-from-file=RESERVATIONS_FROM_FILE
-          | [--reservation=RESERVATION : --reservation-zone=RESERVATION_ZONE
-          --accelerator=[count=COUNT],[type=TYPE]
-          --local-ssd=[interface=INTERFACE],[size=SIZE]
-          --machine-type=MACHINE_TYPE --min-cpu-platform=MIN_CPU_PLATFORM
-          --require-specific-reservation --vm-count=VM_COUNT]]
+          | [--dest-reservation=[machine-type=MACHINE-TYPE],
+          [min-cpu-platform=MIN-CPU-PLATFORM],
+          [require-specific-reservation=REQUIRE-SPECIFIC-RESERVATION],
+          [reservation=RESERVATION],
+          [reservation-zone=RESERVATION-ZONE],[vm-count=VM-COUNT]
+          --source-reservation=[machine-type=MACHINE-TYPE],
+          [min-cpu-platform=MIN-CPU-PLATFORM],
+          [require-specific-reservation=REQUIRE-SPECIFIC-RESERVATION],
+          [reservation=RESERVATION],
+          [reservation-zone=RESERVATION-ZONE],[vm-count=VM-COUNT]
+          : --dest-accelerator=[count=COUNT],[type=TYPE]
+          --dest-local-ssd=[interface=INTERFACE],[size=SIZE]
+          --source-accelerator=[count=COUNT],[type=TYPE]
+          --source-local-ssd=[interface=INTERFACE],[size=SIZE]]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -41,42 +50,61 @@ FLAGS
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
 
-     Manage the reservations to be created with the commitment. At most one of
+     Manage reservations that are attached to the commitment. At most one of
      these may be specified:
 
        --reservations-from-file=RESERVATIONS_FROM_FILE
-          Path to a YAML file of multiple reservations' configuration.
+          Path to a YAML file of two reservations' configuration.
 
-       Manage the reservation to be created with the commitment.
+       Specify source and destination reservations configuration.
 
-         --reservation=RESERVATION
-            Name of the reservation to operate on. This flag must be specified
-            if any of the other arguments in this group are specified.
+         --dest-reservation=[machine-type=MACHINE-TYPE],[min-cpu-platform=MIN-CPU-PLATFORM],[require-specific-reservation=REQUIRE-SPECIFIC-RESERVATION],[reservation=RESERVATION],[reservation-zone=RESERVATION-ZONE],[vm-count=VM-COUNT]
+            destination reservation configuration.
+       reservation
+          Name of the destination reservation to operate on.
+       reservation-zone
+          Zone of the destination reservation to operate on.
+       vm-count
+          The number of VM instances that are allocated to this reservation.
+          The value of this field must be an int in the range [1, 1000].
+       machine-type
+          The type of machine (name only) which has a fixed number of vCPUs and
+          a fixed amount of memory. This also includes specifying custom
+          machine type following custom-number_of_CPUs-amount_of_memory
+          pattern, e.g. custom-32-29440.
+       min-cpu-platform
+          Optional minimum CPU platform of the reservation to create.
+       require-specific-reservation
+          Indicates whether the reservation can be consumed by VMs with "any
+          reservation" defined. If enabled, then only VMs that target this
+          reservation by name using --reservation-affinity=specific can consume
+          from this reservation. This flag must be specified if any of the
+          other arguments in this group are specified.
 
-         --reservation-zone=RESERVATION_ZONE
-            Zone of the reservation to operate on. If not specified and the
-            compute/zone property isn't set, you may be prompted to select a
-            zone.
+           --source-reservation=[machine-type=MACHINE-TYPE],[min-cpu-platform=MIN-CPU-PLATFORM],[require-specific-reservation=REQUIRE-SPECIFIC-RESERVATION],[reservation=RESERVATION],[reservation-zone=RESERVATION-ZONE],[vm-count=VM-COUNT]
+              source reservation configuration.
+       reservation
+          Name of the source reservation to operate on.
+       reservation-zone
+          Zone of the source reservation to operate on.
+       vm-count
+          The number of VM instances that are allocated to this reservation.
+          The value of this field must be an int in the range [1, 1000].
+       machine-type
+          The type of machine (name only) which has a fixed number of vCPUs and
+          a fixed amount of memory. This also includes specifying custom
+          machine type following custom-number_of_CPUs-amount_of_memory
+          pattern, e.g. custom-32-29440.
+       min-cpu-platform
+          Optional minimum CPU platform of the reservation to create.
+       require-specific-reservation
+          Indicates whether the reservation can be consumed by VMs with "any
+          reservation" defined. If enabled, then only VMs that target this
+          reservation by name using --reservation-affinity=specific can consume
+          from this reservation. This flag must be specified if any of the
+          other arguments in this group are specified.
 
-            To avoid prompting when this flag is omitted, you can set the
-            compute/zone property:
-
-                $ gcloud config set compute/zone ZONE
-
-            A list of zones can be fetched by running:
-
-                $ gcloud compute zones list
-
-            To unset the property, run:
-
-                $ gcloud config unset compute/zone
-
-            Alternatively, the zone can be stored in the environment variable
-            CLOUDSDK_COMPUTE_ZONE.
-
-         Manage the specific SKU reservation properties to create.
-
-           --accelerator=[count=COUNT],[type=TYPE]
+           --dest-accelerator=[count=COUNT],[type=TYPE]
               Manage the configuration of the type and number of accelerator
               cards attached.
        count
@@ -88,37 +116,38 @@ FLAGS
           compute accelerator-types list to learn about all available
           accelerator types.
 
-               --local-ssd=[interface=INTERFACE],[size=SIZE]
-                  Manage the size and the interface of local SSD to use. See
-                  https://cloud.google.com/compute/docs/disks/local-ssd for
-                  more information.
+           --dest-local-ssd=[interface=INTERFACE],[size=SIZE]
+              Manage the size and the interface of local SSD to use. See
+              https://cloud.google.com/compute/docs/disks/local-ssd for more
+              information.
        interface
           The kind of disk interface exposed to the VM for this SSD. Valid
           values are scsi and nvme. SCSI is the default and is supported by
           more guest operating systems. NVME may provide higher performance.
        size
           The size of the local SSD in base-2 GB.
-               --machine-type=MACHINE_TYPE
-                  The type of machine (name only) which has a fixed number of
-                  vCPUs and a fixed amount of memory. This also includes
-                  specifying custom machine type following
-                  custom-number_of_CPUs-amount_of_memory pattern, e.g.
-                  custom-32-29440.
+           --source-accelerator=[count=COUNT],[type=TYPE]
+              Manage the configuration of the type and number of accelerator
+              cards attached.
+       count
+          The number of accelerators to attach to each instance in the
+          reservation.
+       type
+          The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+          accelerator to attach to instances in the reservation. Use gcloud
+          compute accelerator-types list to learn about all available
+          accelerator types.
 
-               --min-cpu-platform=MIN_CPU_PLATFORM
-                  Optional minimum CPU platform of the reservation to create.
-
-               --require-specific-reservation
-                  Indicates whether the reservation can be consumed by VMs with
-                  "any reservation" defined. If enabled, then only VMs that
-                  target this reservation by name using
-                  --reservation-affinity=specific can consume from this
-                  reservation.
-
-               --vm-count=VM_COUNT
-                  The number of VM instances that are allocated to this
-                  reservation. The value of this field must be an int in the
-                  range [1, 1000].
+           --source-local-ssd=[interface=INTERFACE],[size=SIZE]
+              Manage the size and the interface of local SSD to use. See
+              https://cloud.google.com/compute/docs/disks/local-ssd for more
+              information.
+       interface
+          The kind of disk interface exposed to the VM for this SSD. Valid
+          values are scsi and nvme. SCSI is the default and is supported by
+          more guest operating systems. NVME may provide higher performance.
+       size
+          The size of the local SSD in base-2 GB.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -134,6 +163,9 @@ EXAMPLES
 
         $ gcloud alpha compute commitments update-reservations \
             commitment-1 --reservations-from-file=reservations.yaml
+
+    For detailed examples, please refer to
+    https://cloud.google.com/compute/docs/instances/reserving-zonal-resources#modifying_reservations_that_are_attached_to_commitments
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

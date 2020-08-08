@@ -26,9 +26,6 @@ COMMANDS
      dev
         (ALPHA) Run a Cloud Run service in a local development environment.
 
-     export
-        (ALPHA) Writes skaffold and kubernetes files for local development.
-
 EXAMPLES
     To set up a local development environment, run:
 

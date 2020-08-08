@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute forwarding-rules delete deletes one or more
-    Google Compute Engine forwarding rules.
+    Compute Engine forwarding rules.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

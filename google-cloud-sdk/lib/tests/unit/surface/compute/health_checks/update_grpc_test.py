@@ -29,13 +29,13 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
-                                      test_case.WithOutputCapture,
-                                      parameterized.TestCase):
+class HealthChecksUpdateGrpcTest(test_base.BaseTest,
+                                 test_case.WithOutputCapture,
+                                 parameterized.TestCase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
 
   def testNoArgs(self):
     with self.AssertRaisesToolExceptionRegexp(
@@ -57,11 +57,14 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
         [],
     ])
 
-    self.Run("""
-        compute health-checks update grpc
-          https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
-          --grpc-service-name "new"
-        """)
+    uri = 'https://compute.googleapis.com/compute/%s/projects/my-project/global/healthChecks/my-health-check' % (
+        self.track.prefix or 'v1')
+    command = 'compute health-checks update grpc ' + uri + (
+        ' '
+        '--grpc-service-name'
+        ' "new"')
+
+    self.Run(command)
 
     self.CheckRequests(
         [(self.compute.healthChecks, 'Get',
@@ -654,6 +657,13 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               project='my-project'))],
     )
 
+
+class HealthChecksUpdateGrpcBetaTest(HealthChecksUpdateGrpcTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -723,12 +733,15 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
     )
 
 
-class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
-                                            parameterized.TestCase):
+class HealthChecksUpdateGrpcAlphaTest(HealthChecksUpdateGrpcBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+
+class RegionHealthChecksUpdateGrpcTest(test_base.BaseTest,
+                                       parameterized.TestCase):
 
   def testNoArgs(self):
     with self.AssertRaisesToolExceptionRegexp(
@@ -752,11 +765,13 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
         [],
     ])
 
-    self.Run("""
-        compute health-checks update grpc
-          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
-          --grpc-service-name "new"
-        """)
+    uri = 'https://compute.googleapis.com/compute/%s/projects/my-project/regions/us-west-1/healthChecks/my-health-check' % (
+        self.track.prefix or 'v1')
+    command = 'compute health-checks update grpc ' + uri + (
+        ' '
+        '--grpc-service-name'
+        ' "new"')
+    self.Run(command)
 
     self.CheckRequests(
         [(self.compute.regionHealthChecks, 'Get',
@@ -1307,6 +1322,13 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               region='us-west-1'))],
     )
 
+
+class RegionHealthChecksUpdateGrpcBetaTest(RegionHealthChecksUpdateGrpcTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -1380,6 +1402,14 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               project='my-project',
               region='us-west-1'))],
     )
+
+
+class RegionHealthChecksUpdateGrpcAlphaTest(RegionHealthChecksUpdateGrpcBetaTest
+                                           ):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 NAME
-    gcloud compute networks create - create a Google Compute Engine network
+    gcloud compute networks create - create a Compute Engine network
 
 SYNOPSIS
     gcloud compute networks create NAME

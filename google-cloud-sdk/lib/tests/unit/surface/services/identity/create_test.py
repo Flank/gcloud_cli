@@ -36,7 +36,7 @@ class CreateTest(unit_test_base.SUUnitTestBase):
                                            self.UNIQUE_ID)
 
     self.Run('services identity create --service={0} --project={1}'.format(
-        self.DEFAULT_SERVICE_NAME, self.PROJECT_NAME))
+        self.DEFAULT_SERVICE, self.PROJECT_NAME))
     self.AssertErrContains('Service identity created: hello@world.com')
 
 

@@ -594,6 +594,10 @@ class ComputeFilterRewriteTest(subtests.Base):
     T((None, 'direction ne INGRESS'), '-direction=INGRESS')
     T((None, 'direction eq INGRESS'), '-direction!=INGRESS')
 
+    # input field transformation to API field
+    T((None, 'machineType eq ".*(mt123).*"'),
+      'machine_type~mt123')
+
 
 class ComputeFilterRewriteResourceTest(subtests.Base):
 

@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute addresses update - update a Google Compute Engine
-        address
+    gcloud alpha compute addresses update - update a Compute Engine address
 
 SYNOPSIS
     gcloud alpha compute addresses update NAME
@@ -9,8 +8,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute addresses update updates labels for a Google
-    Compute Engine address.
+    (ALPHA) gcloud alpha compute addresses update updates labels for a Compute
+    Engine address.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -78,7 +77,7 @@ EXAMPLES
     To list existing labels for address 'example-address', run:
 
         $ gcloud alpha compute addresses describe example-address \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

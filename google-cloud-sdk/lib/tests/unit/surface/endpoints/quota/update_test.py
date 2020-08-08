@@ -31,32 +31,26 @@ class UpdateTestAlpha(unit_test_base.SCMUnitTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testUpdate(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
     self.ExpectUpdateQuotaOverrideCall(self.mutate_limit_name,
-                                       self.mutate_metric, self.unit,
-                                       self.OVERRIDE_ID, 666,
+                                       self.mutate_metric, self.unit, 666,
                                        self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
     self.Run('endpoints quota update --service=example.googleapis.com '
              '--consumer=projects/helloworld '
              '--metric=example.googleapis.com/mutate_requests '
-             '--unit=1/min/{project} --override-id=hello-override --value=666')
+             '--unit=1/min/{project} --value=666')
     self.AssertErrEquals(
         """\
 Operation "operations/123" finished successfully.
 """,
         normalize_space=True)
 
-  def testCreate_force(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
+  def testUpdate_force(self):
     self.ExpectUpdateQuotaOverrideCall(
         self.mutate_limit_name,
         self.mutate_metric,
         self.unit,
-        self.OVERRIDE_ID,
         666,
         self.OPERATION_NAME,
         force=True)
@@ -65,7 +59,7 @@ Operation "operations/123" finished successfully.
     self.Run('endpoints quota update --service=example.googleapis.com '
              '--consumer=projects/helloworld '
              '--metric=example.googleapis.com/mutate_requests '
-             '--unit=1/min/{project} --override-id=hello-override '
+             '--unit=1/min/{project} '
              '--value=666 --force')
     self.AssertErrEquals(
         """\
@@ -74,13 +68,10 @@ Operation "operations/123" finished successfully.
         normalize_space=True)
 
   def testUpdate_dimensions(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
     self.ExpectUpdateQuotaOverrideCall(
         self.mutate_limit_name,
         self.mutate_metric,
         self.unit,
-        self.OVERRIDE_ID,
         666,
         self.OPERATION_NAME,
         dimensions=[('regions', 'us-central1'), ('zones', 'us-central1-c')])
@@ -89,7 +80,7 @@ Operation "operations/123" finished successfully.
     self.Run('endpoints quota update --service=example.googleapis.com '
              '--consumer=projects/helloworld '
              '--metric=example.googleapis.com/mutate_requests '
-             '--unit=1/min/{project} --override-id=hello-override --value=666 '
+             '--unit=1/min/{project} --value=666 '
              '--dimensions=regions=us-central1 '
              '--dimensions=zones=us-central1-c')
     self.AssertErrEquals(

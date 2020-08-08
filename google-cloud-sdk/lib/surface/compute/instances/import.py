@@ -55,7 +55,7 @@ class Import(base.CreateCommand):
     instances_flags.AddDeletionProtectionFlag(parser)
     instances_flags.AddNetworkTierArgs(parser, instance=True)
     labels_util.AddCreateLabelsFlags(parser)
-    daisy_utils.AddCommonDaisyArgs(parser, add_log_location=False)
+    daisy_utils.AddCommonDaisyArgs(parser)
     daisy_utils.AddExtraCommonDaisyArgs(parser)
 
     instances_flags.INSTANCES_ARG_FOR_IMPORT.AddArgument(
@@ -199,6 +199,7 @@ Import.detailed_help = {
         *  Translate the boot disk to make it bootable in Google Compute Engine.
         *  Create a VM instance using OVF metadata and imported disks and boot it.
 
+        OVF import tool requires Cloud Build to be enabled. See [](https://cloud.google.com/compute/docs/import/import-ovf-files#enable-cloud-build)
         Virtual machine instances, images and disks in Compute engine and files
         stored on Cloud Storage incur charges. See [](https://cloud.google.com/compute/docs/images/importing-virtual-disks#resource_cleanup).
         """,

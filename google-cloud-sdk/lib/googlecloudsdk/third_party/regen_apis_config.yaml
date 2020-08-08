@@ -56,6 +56,12 @@ apis:
       resources:
         customer:
           path: customer/{customerId}
+  anthosevents:
+    v1:
+      discovery_doc: anthosevents_v1.json
+      default: true
+    v1beta1:
+      discovery_doc: anthosevents_v1beta1.json
   apikeys:
     v2alpha1:
       discovery_doc: apikeys_v2alpha1.json
@@ -81,6 +87,8 @@ apis:
         projects:
           path: projects/{projectId}
   artifactregistry:
+    v1alpha1:
+      discovery_doc: artifactregistry_v1alpha1.json
     v1beta1:
       discovery_doc: artifactregistry_v1beta1.json
       default: true
@@ -125,11 +133,6 @@ apis:
       discovery_doc: cloudasset_v1beta1.json
     v1:
       discovery_doc: cloudasset_v1.json
-    v1p1alpha1:
-      discovery_doc: cloudasset_v1p1alpha1.json
-      resources:
-        iamPolicies:
-          path: iamPolicies
     v1p1beta1:
       discovery_doc: cloudasset_v1p1beta1.json
       resources:
@@ -145,6 +148,8 @@ apis:
       discovery_doc: cloudasset_v1p4beta1.json
     v1p5alpha1:
       discovery_doc: cloudasset_v1p5alpha1.json
+    v1p5beta1:
+      discovery_doc: cloudasset_v1p5beta1.json
   cloudbilling:
     v1:
       discovery_doc: cloudbilling_v1.json
@@ -179,6 +184,14 @@ apis:
       resources:
         projects:
           path: projects/{projectId}
+    v1beta1:
+      discovery_doc: cloudbuild_v1beta1.json
+      resources:
+        projects:
+          path: projects/{projectId}
+  cloudcommerceconsumerprocurement:
+    v1alpha1:
+      discovery_doc: cloudcommerceconsumerprocurement_v1alpha1.json
   clouddebugger:
     v2:
       discovery_doc: clouddebugger_v2.json
@@ -353,6 +366,8 @@ apis:
           path: entries
         projects.locations.tagTemplates.fields:
           path: projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}
+        projects.locations.tagTemplates.fields.enumValues:
+          path: projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}/enumValues/{enumValuesId}
         projects.locations.entryGroups.entries.tags:
           path: projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags/{tagsId}
     v1:
@@ -364,6 +379,8 @@ apis:
           path: entries
         projects.locations.tagTemplates.fields:
           path: projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}
+        projects.locations.tagTemplates.fields.enumValues:
+          path: projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}/enumValues/{enumValuesId}
         projects.locations.entryGroups.entries.tags:
           path: projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags/{tagsId}
   dataflow:
@@ -440,6 +457,9 @@ apis:
       default: true
     v1alpha2:
       discovery_doc: domains_v1alpha2.json
+  eventarc:
+    v1beta1:
+      discovery_doc: eventarc_v1beta1.json
   eventflow:
     v1beta2:
       discovery_doc: eventflow_v1beta2.json
@@ -524,9 +544,12 @@ apis:
   iam:
     v1:
       discovery_doc: iam_v1.json
+      default: true
       resources:
         iamPolicies:
           path: iamPolicies
+    v2alpha1:
+      discovery_doc: iam_v2alpha1.json
   iamassist:
     v1alpha2:
       resources:
@@ -631,6 +654,9 @@ apis:
   networkservices:
     v1alpha1:
       discovery_doc: networkservices_v1alpha1.json
+  networksecurity:
+    v1alpha1:
+      discovery_doc: networksecurity_v1alpha1.json
   notebooks:
     v1beta1:
       discovery_doc: notebooks_v1beta1.json
@@ -650,6 +676,11 @@ apis:
         iam:
           path: iam
       discovery_doc: policytroubleshooter_v1.json
+    v2alpha1:
+      resources:
+        iam:
+          path: iam
+      discovery_doc: policytroubleshooter_v2alpha1.json
   privateca:
     v1alpha1:
       discovery_doc: privateca_v1alpha1.json
@@ -700,19 +731,10 @@ apis:
     v1beta1:
       discovery_doc: runtimeconfig_v1beta1.json
   secretmanager:
-    v1beta1:
-      discovery_doc: secretmanager_v1beta1.json
     v1:
       discovery_doc: secretmanager_v1.json
       default: true
   securitycenter:
-    v1beta1:
-      discovery_doc: securitycenter_v1beta1.json
-      resources:
-        organizations.sources.findings:
-          path: organizations/{organizationsId}/sources/{sourcesId}/findings/{findingId}
-        organizations.assets:
-          path: organizations/{organizationsId}/assets/{assetsId}
     v1:
       discovery_doc: securitycenter_v1.json
       resources:
@@ -723,15 +745,6 @@ apis:
         organizations.notificationConfigs:
           path: organizations/{organizationsId}/notificationConfigs/{notificationConfigsId}
       default: true
-    v1p1beta1:
-      discovery_doc: securitycenter_v1p1beta1.json
-      resources:
-        organizations.sources.findings:
-          path: organizations/{organizationsId}/sources/{sourcesId}/findings/{findingId}
-        organizations.assets:
-          path: organizations/{organizationsId}/assets/{assetsId}
-        organizations.notificationConfigs:
-          path: organizations/{organizationsId}/notificationConfigs/{notificationConfigsId}
   serviceconsumermanagement:
     v1beta1:
       discovery_doc: serviceconsumermanagement_v1beta1.json
@@ -917,3 +930,6 @@ apis:
       default: true
     v1beta:
       discovery_doc: workflows_v1beta.json
+  sddc:
+    v1alpha1:
+      discovery_doc: sddc_v1alpha1.json

@@ -32,6 +32,7 @@ class PublicDelegatedPrefixesTest(e2e_test_base.BaseTest):
 
   # Special values that are treated as test by Arcus so it skips RPC steps.
   TEST_RANGE = '127.127.0.0/20'
+  TEST_PDP_RANGE = '127.127.0.0/22'
   TEST_SUB_RANGE = '127.127.1.0/24'
   TEST_VERIFICATION_IP = '127.127.1.1'
   TEST_DESCRIPTION = 'GOOGLE_INTERNAL_TEST_PREFIX'
@@ -61,7 +62,7 @@ class PublicDelegatedPrefixesTest(e2e_test_base.BaseTest):
     try:
       self.Run('compute public-delegated-prefixes create {0} '
                '--global --range={1} --public-advertised-prefix={2}'
-               .format(pdp_name, self.TEST_RANGE, self.pap_name))
+               .format(pdp_name, self.TEST_PDP_RANGE, self.pap_name))
       self.AssertNewErrContains(pdp_name)
       yield pdp_name
     finally:

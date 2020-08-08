@@ -1,0 +1,41 @@
+apiVersion: authentication.gke.io/v1alpha1
+kind: ClientConfig
+metadata:
+  creationTimestamp: '100001'
+spec:
+  certificateAuthorityData: ABCD12345abcde
+  name: mycluster
+  oidcConfig:
+    certificateAuthorityData: msakdfjshsdjkfh123==
+    clientID: kubernetes
+    clientSecret: ULTRA_SECRET
+    cloudConsoleRedirectURI: ''
+    extraParams: resource=CustomeKubernetesClaim
+    issuerURI: https://test.example-gcp.com/adfs
+    kubectlRedirectURI: http://127.0.0.1:6630/callback
+    scopes: allatclaim
+  server: https://127.0.0.1:443
+  type: oidc
+  useHTTPProxy: 'false'
+status: {}
+---
+apiVersion: authentication.gke.io/v1alpha1
+kind: ClientConfig
+metadata:
+  creationTimestamp: '100001'
+spec:
+  certificateAuthorityData: NMDNE54321grets
+  name: my-other-cluster
+  oidcConfig:
+    certificateAuthorityData: weripowekrw;h123==
+    clientID: kubernetes
+    clientSecret: ULTRA_SECRET_2
+    cloudConsoleRedirectURI: ''
+    extraParams: resource=CustomeKubernetesClaim
+    issuerURI: https://test.example-gcp.com/adfs
+    kubectlRedirectURI: http://127.0.1.1:6630/callback
+    scopes: allatclaim
+  server: https://127.0.1.1:443
+  type: oidc
+  useHTTPProxy: 'false'
+status: {}

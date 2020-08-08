@@ -11,7 +11,7 @@ gcloud beta container node\-pools update \- updates a node pool in a running clu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR\ |\ \fB\-\-enable\-autoprovisioning\fR\ \fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR\ |\ \fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR\ \fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-system\-config\-from\-file\fR=\fISYSTEM_CONFIG_FROM_FILE\fR\ |\ \fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR\ |\ \fB\-\-enable\-autoprovisioning\fR\ \fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR\ |\ \fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR\ \fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,57 @@ Multiple locations can be specified, separated by commas. For example:
 $ gcloud beta container node\-pools update node\-pool\-1 \e
     \-\-node\-locations=us\-central1\-a,us\-central1\-b
 .RE
+
+.TP 2m
+\fB\-\-system\-config\-from\-file\fR=\fISYSTEM_CONFIG_FROM_FILE\fR
+Path of the YAML/JSON file that contains the node configuration, including Linux
+kernel parameters (sysctls) and kubelet configs.
+
+Example:
+
+.RS 2m
+kubeletConfig:
+  cpuManagerPolicy: static
+linuxConfig:
+  sysctl:
+    net.core.somaxconn: '2048'
+    net.ipv4.tcp_rmem: '4096 87380 6291456'
+.RE
+
+List of supported kubelet configs in 'kubeletConfig'.
+
+
+.TS
+tab(	);
+l(17)B l(34)B
+l(17) l(34).
+KEY	VALUE
+cpuManagerPolicy	either 'static' or 'default'
+cpuCFSQuota	true or false (enabled by default)
+cpuCFSQuotaPeriod	interval (e.g., '100ms')
+.TE
+
+List of supported sysctls in 'linuxConfig'.
+
+
+.TS
+tab(	);
+l(42)B l(42)B
+l(42) l(42).
+KEY	VALUE
+net.core.netdev_max_backlog	Any positive integer, less than 2147483647
+net.core.rmem_max	Any positive integer, less than 2147483647
+net.core.wmem_default	Any positive integer, less than 2147483647
+net.core.wmem_max	Any positive integer, less than 2147483647
+net.core.optmem_max	Any positive integer, less than 2147483647
+net.core.somaxconn	Must be [128, 2147483647]
+net.ipv4.tcp_rmem	Any positive integer tuple
+net.ipv4.tcp_wmem	Any positive integer tuple
+net.ipv4.tcp_tw_reuse	Must be {0, 1}
+.TE
+
+Note, updating the system configuration of an existing node pool requires
+recreation of the nodes which which might cause a disruption.
 
 .TP 2m
 \fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR

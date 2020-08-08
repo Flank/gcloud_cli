@@ -3,7 +3,7 @@
   "discoveryVersion": "v1",
   "id": "dns:v1alpha2",
   "name": "dns",
-  "canonicalName": "dns",
+  "canonicalName": "Dns",
   "version": "v1alpha2",
   "revision": "0",
   "title": "Cloud DNS API",
@@ -21,7 +21,6 @@
   "servicePath": "",
   "baseUrl": "https://dns.googleapis.com/",
   "batchPath": "batch",
-  "version_module": true,
   "fullyEncodeReservedExpansion": true,
   "parameters": {
     "access_token": {
@@ -1120,12 +1119,6 @@
         }
       }
     },
-    "PoliciesDeleteResponse": {
-      "id": "PoliciesDeleteResponse",
-      "type": "object",
-      "properties": {
-      }
-    },
     "PoliciesPatchResponse": {
       "id": "PoliciesPatchResponse",
       "type": "object",
@@ -2106,9 +2099,6 @@
             "project",
             "policy"
           ],
-          "response": {
-            "$ref": "PoliciesDeleteResponse"
-          },
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform",
             "https://www.googleapis.com/auth/ndev.clouddns.readwrite"

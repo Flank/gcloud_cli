@@ -87,7 +87,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                     rb=self.results_bucket, uo=self.results_dir, aa=APP_APK))),
         testSetup=self.testing_msgs.TestSetup(
             account=self.testing_msgs.Account(
-                googleAuto=self.testing_msgs.GoogleAuto())),
+                googleAuto=self.testing_msgs.GoogleAuto()),
+            dontAutograntPermissions=False),
         disableVideoRecording=video,
         disablePerformanceMetrics=metrics,
         testTimeout=timeout)
@@ -98,7 +99,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                                    metrics=False,
                                    auto_login=False,
                                    obb_file=None,
-                                   other_files=None):
+                                   other_files=None,
+                                   dont_autogrant_permissions=None):
     """Build a TestSpecification for an AndroidInstrumentationTest."""
     spec = self.testing_msgs.TestSpecification(
         androidInstrumentationTest=self.testing_msgs.AndroidInstrumentationTest(
@@ -109,7 +111,7 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                 gcsPath='gs://{rb}/{uo}/{ta}'.format(
                     rb=self.results_bucket, uo=self.results_dir, ta=TEST_APK)),
             orchestratorOption=ORCHESTRATOR_ENUMS.DO_NOT_USE_ORCHESTRATOR),
-        testSetup=self.testing_msgs.TestSetup(),
+        testSetup=self.testing_msgs.TestSetup(dontAutograntPermissions=False),
         disableVideoRecording=video,
         disablePerformanceMetrics=metrics,
         testTimeout=timeout)
@@ -129,6 +131,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                 regularFile=self.testing_msgs.RegularFile(
                     content=self._BuildFileReference(device_path[1:]),
                     devicePath=device_path)))
+    if dont_autogrant_permissions:
+      spec.testSetup.dontAutograntPermissions = dont_autogrant_permissions
     return spec
 
   def _BuildFileReference(self, file_to_upload):
@@ -145,7 +149,7 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                     rb=self.results_bucket, uo=self.results_dir, aa=APP_APK)),
             scenarios=scenarios,
             scenarioLabels=labels),
-        testSetup=self.testing_msgs.TestSetup(),
+        testSetup=self.testing_msgs.TestSetup(dontAutograntPermissions=False),
         disableVideoRecording=False,
         disablePerformanceMetrics=False,
         testTimeout='900s')
@@ -397,7 +401,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
         metrics=True,
         auto_login=True,
         obb_file=OBB_FILE,
-        other_files=OTHER_FILES_PARSED_LIST)
+        other_files=OTHER_FILES_PARSED_LIST,
+        dont_autogrant_permissions=True)
     matrix = self.ExpectMatrixCreate(
         spec, [DEVICE_2, DEVICE_1, DEFAULT_DEVICE], track='BETA')
     self.ExpectMatrixGet(matrix, M_PENDING, [VALIDATING])
@@ -414,6 +419,7 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
              '--device model=EsperiaXYZ,version=C,locale=kl,orientation=wonky '
              '--device model=Nexus2099,version=P,locale=ro '
              '--device orientation=askew '
+             '--grant-permissions=none '
              '--no-record-video --no-performance-metrics --no-use-orchestrator'
              .format(
                  aa=APP_PATH,

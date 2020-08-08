@@ -30,6 +30,9 @@ COMMANDS
      describe
         (ALPHA) Describes a Cloud Pub/Sub topic.
 
+     detach-subscription
+        (ALPHA) Detaches one or more Cloud Pub/Sub subscriptions.
+
      get-iam-policy
         (ALPHA) Get the IAM policy for a topic.
 

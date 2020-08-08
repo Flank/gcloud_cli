@@ -28,6 +28,15 @@ EXAMPLES
 
         $ gcloud beta compute snapshots delete snapshot-1 snapshot-2
 
+    To list all snapshots that were created before a specific date, use the
+    --filter flag with the gcloud beta compute snapshots list command.
+
+        $ gcloud beta compute snapshots list \
+            --filter="creationTimestamp<'2017-01-01'"
+
+    For more information on how to use --filter with the list command, run $
+    gcloud topic filters.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

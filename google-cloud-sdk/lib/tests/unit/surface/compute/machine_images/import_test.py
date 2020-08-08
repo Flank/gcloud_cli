@@ -61,13 +61,14 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
                            errors_to_collect=None,
                            progress_tracker=None,
                            followup_overrides=None,
+                           always_return_operation=None,
                            no_followup=None,
                            http=None,
                            errors=None,
                            batch_url=None,
                            log_result=None,
                            timeout=None):
-      del requests, errors_to_collect, progress_tracker, followup_overrides, no_followup, http, errors, batch_url, log_result, timeout
+      del requests, errors_to_collect, progress_tracker, followup_overrides, no_followup, http, errors, batch_url, log_result, timeout, always_return_operation
       # For the call to daisy_utils.ValidateZone
       raise exceptions.ToolException('')
 
@@ -107,9 +108,11 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
                    step,
                    async_flag=False,
                    permissions=None,
-                   timeout='7200s'):
+                   timeout='7200s',
+                   log_location=None):
     self.PrepareDaisyMocks(
-        step, async_flag=async_flag, permissions=permissions, timeout=timeout)
+        step, async_flag=async_flag, permissions=permissions, timeout=timeout,
+        log_location=log_location)
 
   def testCommonCase(self):
     self.PrepareMocks(self.GetOVFImportStep())
@@ -552,7 +555,7 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
   def testSourceFileErrorOnInvalidGCSPath(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        r'Invalid value for [source-uri]: must be a path to an object or a directory in Google Cloud Storage'
+        r'Invalid value for [source-uri]: must be a path to an object or a directory in Cloud Storage'
     ):
       self._RunFlags("""
                {0} --source-uri {1} --os {2}
@@ -587,6 +590,25 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
     with self.AssertRaisesExceptionRegexp(exceptions.InvalidArgumentException,
                                           error):
       self.doZoneFlagTest(zone=invalid_zone, is_valid_zone=False)
+
+  def testLogLocationDir(self):
+    self.doTestLogLocation('gs://foo/bar')
+    self.doTestLogLocation('https://storage.googleapis.com/foo/bar')
+
+  def testLogLocationDirTrailingSlash(self):
+    self.doTestLogLocation('gs://foo/bar/')
+    self.doTestLogLocation('https://storage.googleapis.com/foo/bar/')
+
+  def testLogLocationBucketOnly(self):
+    self.doTestLogLocation('gs://foo')
+    self.doTestLogLocation('https://storage.googleapis.com/foo')
+
+  def doTestLogLocation(self, log_location):
+    self.PrepareMocks(self.GetOVFImportStep(), log_location=log_location)
+    self._RunAndAssertSuccess("""
+               {0} --source-uri {1} --os {2} --log-location {3}
+               """.format(self.machine_image_name, self.source_uri, self.os,
+                          log_location))
 
 
 if __name__ == '__main__':

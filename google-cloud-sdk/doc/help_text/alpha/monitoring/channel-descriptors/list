@@ -19,7 +19,7 @@ EXAMPLES
     The following command prints all supported notification channel types:
 
         $ gcloud alpha monitoring channel-descriptors list \
-            --format='value(type)'
+            --format="value(type)"
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

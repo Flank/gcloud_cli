@@ -22,13 +22,14 @@ from googlecloudsdk.api_lib.domains import registrations
 from googlecloudsdk.command_lib.domains import dns_util
 from googlecloudsdk.command_lib.domains import util
 from googlecloudsdk.core import exceptions
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 
 
 class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
                                 sdk_test_base.SdkBase):
 
-  def testGooglDomainsNameServersEquivalent(self):
+  def testGoogleDomainsNameServersEquivalent(self):
     messages = registrations.GetMessagesModule()
 
     prev_dns_settings = messages.DnsSettings(
@@ -52,7 +53,20 @@ class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
             dsRecords=[messages.DsRecord(digest='hash')]))
     new_dns_settings = messages.DnsSettings(
         customDns=messages.CustomDns(
-            nameServers=['ns1.com', 'ns2.com']))
+            nameServers=['ns1.com.', 'ns2.com.']))
+    self.assertTrue(
+        dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
+
+  def testCustomNameServersDifferentOrderEquivalent(self):
+    messages = registrations.GetMessagesModule()
+
+    prev_dns_settings = messages.DnsSettings(
+        customDns=messages.CustomDns(
+            nameServers=['ns1.com', 'ns2.com'],
+            dsRecords=[messages.DsRecord(digest='hash')]))
+    new_dns_settings = messages.DnsSettings(
+        customDns=messages.CustomDns(
+            nameServers=['ns2.com', 'ns1.com']))
     self.assertTrue(
         dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
 
@@ -83,39 +97,38 @@ class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
         dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
 
 
-class ParseYearlyPriceTest(sdk_test_base.WithFakeAuth, sdk_test_base.SdkBase):
+class ParseYearlyPriceTest(sdk_test_base.WithFakeAuth, sdk_test_base.SdkBase,
+                           parameterized.TestCase):
 
-  def test12USD(self):
+  @parameterized.parameters(('12USD'), ('12.00USD'), ('12 USD'), ('12.00 USD'))
+  def test12USD(self, price_string):
     messages = registrations.GetMessagesModule()
     expected = messages.Money(units=12, nanos=0, currencyCode='USD')
+    self.assertEqual(util.ParseYearlyPrice(price_string), expected)
 
-    for test_case in ['12USD', '12.00USD']:
-      self.assertEqual(util.ParseYearlyPrice(test_case), expected)
-
-  def test050PLN(self):
+  @parameterized.parameters(('0.50PLN'), ('0.50 PLN'))
+  def test050PLN(self, price_string):
     messages = registrations.GetMessagesModule()
     expected = messages.Money(units=0, nanos=50 * 10**7, currencyCode='PLN')
+    self.assertEqual(util.ParseYearlyPrice(price_string), expected)
 
-    for test_case in ['0.50PLN']:
-      self.assertEqual(util.ParseYearlyPrice(test_case), expected)
-
-  def testIncorrect(self):
-    for test_case in ['USD12', '12$', '$12.', '-34USD', '12', 'USD']:
-      with self.assertRaises(exceptions.Error):
-        util.ParseYearlyPrice(test_case)
+  @parameterized.parameters(('USD12'), ('12$'), ('$12.'), ('-34USD'), ('12'),
+                            ('USD'))
+  def testIncorrect(self, price_string):
+    with self.assertRaises(exceptions.Error):
+      util.ParseYearlyPrice(price_string)
 
 
-class NormalizeDomainNameTest(sdk_test_base.WithFakeAuth,
-                              sdk_test_base.SdkBase):
+class NormalizeDomainNameTest(sdk_test_base.WithFakeAuth, sdk_test_base.SdkBase,
+                              parameterized.TestCase):
 
-  def testNormalized(self):
-    for (domain, normalized) in [
-        ('foo.com', 'foo.com'), ('FoO.cOm.', 'foo.com'),
-        ('Cześć.點看.com', 'xn--cze-spa33b.xn--c1yn36f.com')
-    ]:
-      self.assertEqual(util.NormalizeDomainName(domain), normalized)
+  @parameterized.parameters(
+      ('foo.com', 'foo.com'), ('FoO.cOm.', 'foo.com'),
+      ('Cześć.點看.com', 'xn--cze-spa33b.xn--c1yn36f.com'))
+  def testNormalized(self, domain, normalized):
+    self.assertEqual(util.NormalizeDomainName(domain), normalized)
 
-  def testError(self):
-    for domain in ['xn--ą.com', 'foo..', '.foo', 'x' * 70]:
-      with self.assertRaises(exceptions.Error):
-        util.NormalizeDomainName(domain)
+  @parameterized.parameters(('xn--ą.com'), ('foo..'), ('.foo'), ('x' * 70))
+  def testError(self, domain):
+    with self.assertRaises(exceptions.Error):
+      util.NormalizeDomainName(domain)

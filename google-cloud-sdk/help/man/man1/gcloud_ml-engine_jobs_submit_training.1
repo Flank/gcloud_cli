@@ -11,7 +11,7 @@ gcloud ml\-engine jobs submit training \- submit an AI Platform training job
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-use\-chief\-in\-tf\-config\fR=\fIUSE_CHIEF_IN_TF_CONFIG\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-use\-chief\-in\-tf\-config\fR=\fIUSE_CHIEF_IN_TF_CONFIG\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -380,6 +380,33 @@ cancelled with
 .RS 2m
 $ gcloud ai\-platform jobs cancel JOB_ID
 .RE
+
+.RE
+.sp
+.TP 2m
+
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the job. The 'AI Platform Service Agent' service account must
+hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'. The arguments in this
+group can be used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-kms\-key\fR=\fIKMS_KEY\fR
+ID of the key or fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR
+The Cloud project for the key.
 
 .RE
 .sp

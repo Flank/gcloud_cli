@@ -58,6 +58,13 @@ To print the env variables exports for a datastore emulator, run:
 $ gcloud alpha emulators datastore env\-init \-\-data\-dir=DATA\-DIR
 .RE
 
+You can use this command to set env vars in a bash script by adding the below
+line in the script.
+
+.RS 2m
+eval $(gcloud alpha emulators datastore env\-init \-\-data\-dir=DATA\-DIR)
+.RE
+
 
 
 .SH "NOTES"

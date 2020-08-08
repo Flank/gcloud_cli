@@ -1,0 +1,128 @@
+
+.TH "GCLOUD_REDIS_INSTANCES_UPGRADE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud redis instances upgrade \- upgrade a Memorystore for Redis instance to a specified Redis version
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud redis instances upgrade\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-redis\-version\fR=\fIVERSION\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Upgrade a Memorystore for Redis instance to a specified Redis version.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- Arguments and flags that specify the Memorystore for Redis
+instance you want to upgrade. The arguments in this group can be used to specify
+the attributes of this resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [instance] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Redis region of the instance. Overrides the default redis/region
+property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-redis\-version\fR=\fIVERSION\fR
+Target version of Redis software. You can only upgrade to the next highest
+version. For example, you must upgrade an instance from redis_3_2 to redis_4_0
+before you can upgrade the instance to redis_5_0. \fIVERSION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBredis_4_0\fR
+Redis 4.0 compatibility
+.TP 2m
+\fBredis_5_0\fR
+Redis 5.0 compatibility
+.RE
+.sp
+
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBredis/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/memorystore/docs/redis/
+
+
+
+.SH "EXAMPLES"
+
+To upgrade an instance with the name \f5my\-redis\-instance\fR in region
+\f5us\-central1\fR to Redis version 4.0 run:
+
+.RS 2m
+$ gcloud redis instances upgrade my\-redis\-instance \e
+    \-\-region=us\-central1 \-\-redis\-version=redis_4_0
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha redis instances upgrade
+$ gcloud beta redis instances upgrade
+.RE
+

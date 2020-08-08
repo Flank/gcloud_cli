@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute commitments list - list Google Compute Engine
-        commitments
+    gcloud alpha compute commitments list - list Compute Engine commitments
 
 SYNOPSIS
     gcloud alpha compute commitments list [NAME ...]
@@ -9,7 +8,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List Google Compute Engine commitments.
+    (ALPHA) List Compute Engine commitments.
 
 POSITIONAL ARGUMENTS
      [NAME ...]

@@ -1,6 +1,6 @@
 NAME
-    gcloud compute instance-groups managed update - update Google Compute
-        Engine managed instance groups
+    gcloud compute instance-groups managed update - update Compute Engine
+        managed instance groups
 
 SYNOPSIS
     gcloud compute instance-groups managed update NAME
@@ -12,18 +12,18 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-groups managed update allows you to specify or
-    modify AutoHealingPolicy for an existing managed instance group.
+    gcloud compute instance-groups managed update lets you specify or modify
+    AutoHealingPolicy for an existing managed instance group.
 
-    When updating the AutoHealingPolicy, you may specify the health check,
+    When updating the AutoHealingPolicy, you can specify the health check,
     initial delay, or both. If the field is unspecified, its value won't be
-    modified. If --health-check is specified, the health check will be used to
+    modified. If --health-check is specified, the health check is used to
     monitor the health of your application. Whenever the health check signal
     for the instance becomes UNHEALTHY, the autohealing action (RECREATE) on an
-    instance will be performed.
+    instance is performed.
 
-    If no health check is specified, the instance autohealing will be triggered
-    by the instance status only (i.e. the autohealing action (RECREATE) on an
+    If no health check is specified, the instance autohealing is triggered by
+    the instance status only (i.e., the autohealing action (RECREATE) on an
     instance will be performed if instance.status is not RUNNING).
 
 POSITIONAL ARGUMENTS

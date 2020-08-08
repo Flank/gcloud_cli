@@ -46,7 +46,7 @@ class _Object(object):
 _ASCII = 'Unicode'
 _ISO_8859_1 = b'\xdc\xf1\xee\xe7\xf2\xd0\xe9'  # ÜñîçòÐé
 _UNICODE = 'Ṳᾔḯ¢◎ⅾℯ'
-_UTF8 = _UNICODE.encode('utf8')
+_UTF8 = _UNICODE.encode('utf-8')
 
 
 class ConsoleAttrTestBase(test_case.WithOutputCapture):
@@ -71,12 +71,12 @@ class ConsoleAttrEncodingTests(ConsoleAttrTestBase):
     self.assertEqual(attr.GetEncoding(), 'ascii')
 
   def testEncodingUtf8(self):
-    attr = console_attr.GetConsoleAttr(encoding='utf8', reset=True)
-    self.assertEqual(attr.GetEncoding(), 'utf8')
+    attr = console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
+    self.assertEqual(attr.GetEncoding(), 'utf-8')
 
   def testResetEncodingUtf8(self):
-    attr = console_attr.ResetConsoleAttr(encoding='utf8')
-    self.assertEqual(attr.GetEncoding(), 'utf8')
+    attr = console_attr.ResetConsoleAttr(encoding='utf-8')
+    self.assertEqual(attr.GetEncoding(), 'utf-8')
 
   def testEncodingWin(self):
     attr = console_attr.GetConsoleAttr(encoding='win', reset=True)
@@ -101,7 +101,7 @@ class ConsoleAttrEncodingTests(ConsoleAttrTestBase):
     if locale_encoding and 'cp1252' in locale_encoding:
       self.assertEqual(attr.GetEncoding(), 'ascii')
     else:
-      self.assertEqual(attr.GetEncoding(), 'utf8')
+      self.assertEqual(attr.GetEncoding(), 'utf-8')
 
   def testEncodingStdOutWin(self):
     sys.stdout = mock.MagicMock()
@@ -256,7 +256,7 @@ class Utf8ConsoleAttrTests(ConsoleAttrTestBase):
 
   def SetUp(self):
     self.StartEnvPatch({'TERM': 'dumb'})
-    self._con = console_attr.GetConsoleAttr(encoding='utf8', reset=True)
+    self._con = console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
 
   def testBoxLineCharactersUnicode(self):
     box = self._con.GetBoxLineCharacters()
@@ -289,7 +289,7 @@ class ScreenConsoleAttrTests(ConsoleAttrTestBase):
   def SetUp(self):
     self.StartEnvPatch({'TERM': 'screen'})
     self.buf = io.StringIO()
-    self._con = console_attr.GetConsoleAttr(encoding='utf8', reset=True)
+    self._con = console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
 
   def testFontBoldScreen(self):
     font = self._con.GetFontCode(bold=True)
@@ -486,7 +486,7 @@ class XtermConsoleAttrTests(ConsoleAttrTestBase):
 
   def SetUp(self):
     self.StartEnvPatch({'TERM': 'xterm'})
-    self._con = console_attr.GetConsoleAttr(encoding='utf8', reset=True)
+    self._con = console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
 
   def testFontBoldXterm(self):
     font = self._con.GetFontCode(bold=True)
@@ -535,7 +535,7 @@ class Xterm256ConsoleAttrTests(ConsoleAttrTestBase):
 
   def SetUp(self):
     self.StartEnvPatch({'TERM': 'xterm-256'})
-    self._con = console_attr.GetConsoleAttr(encoding='utf8', reset=True)
+    self._con = console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
 
   def testFontBoldXterm256(self):
     font = self._con.GetFontCode(bold=True)
@@ -744,16 +744,16 @@ class ConsoleAttrSafeTextTests(ConsoleAttrTestBase):
 
   def testSafeTextUnicodeToUtf8(self):
     expected = _UNICODE
-    actual = console_attr.SafeText(_UNICODE, encoding='utf8')
+    actual = console_attr.SafeText(_UNICODE, encoding='utf-8')
     self.assertEqual(expected, actual)
 
   def testSafeTextUtf8ToUtf8(self):
     expected = _UNICODE
-    actual = console_attr.SafeText(_UTF8, encoding='utf8')
+    actual = console_attr.SafeText(_UTF8, encoding='utf-8')
     self.assertEqual(expected, actual)
 
   def testSafeTextUtf8ToUtf8DefaultEncoding(self):
-    console_attr.GetConsoleAttr(encoding='utf8', reset=True)
+    console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
     expected = _UNICODE
     actual = console_attr.SafeText(_UTF8)
     self.assertEqual(expected, actual)
@@ -807,20 +807,20 @@ class ConsoleAttrDecodeTests(ConsoleAttrTestBase):
 
   def testDecodeUtf8Attr(self):
     self.StartObjectPatch(
-        console_attr.ConsoleAttr, 'GetEncoding').return_value = 'utf8'
+        console_attr.ConsoleAttr, 'GetEncoding').return_value = 'utf-8'
     expected = _UNICODE
     actual = console_attr.Decode(_UTF8)
     self.assertEqual(expected, actual)
 
   def testDecodeUtf8AttrKwarg(self):
     expected = _ISO_8859_1.decode('iso-8859-1')
-    actual = console_attr.Decode(_ISO_8859_1, encoding='utf8')
+    actual = console_attr.Decode(_ISO_8859_1, encoding='utf-8')
     self.assertEqual(expected, actual)
 
   def testDecodeUtf8FileSyetem(self):
     self.StartObjectPatch(
         console_attr.ConsoleAttr, 'GetEncoding').return_value = 'ascii'
-    self.StartObjectPatch(sys, 'getfilesystemencoding').return_value = 'utf8'
+    self.StartObjectPatch(sys, 'getfilesystemencoding').return_value = 'utf-8'
     expected = _UNICODE
     actual = console_attr.Decode(_UTF8)
     self.assertEqual(expected, actual)
@@ -829,7 +829,7 @@ class ConsoleAttrDecodeTests(ConsoleAttrTestBase):
     self.StartObjectPatch(
         console_attr.ConsoleAttr, 'GetEncoding').return_value = 'ascii'
     self.StartObjectPatch(sys, 'getfilesystemencoding').return_value = 'ascii'
-    self.StartObjectPatch(sys, 'getdefaultencoding').return_value = 'utf8'
+    self.StartObjectPatch(sys, 'getdefaultencoding').return_value = 'utf-8'
     expected = _UNICODE
     actual = console_attr.Decode(_UTF8)
     self.assertEqual(expected, actual)

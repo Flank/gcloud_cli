@@ -5,7 +5,7 @@ SYNOPSIS
     gcloud alpha apigee apis deploy
         [[REVISION]
           --api=API --environment=ENVIRONMENT --organization=ORGANIZATION]
-        [--override] [GCLOUD_WIDE_FLAG ...]
+        [--basepath=BASEPATH] [--override] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Deploy an Apigee API proxy to an environment.
@@ -39,6 +39,10 @@ POSITIONAL ARGUMENTS
           The Apigee organization of the proxy and environment.
 
 FLAGS
+     --basepath=BASEPATH
+        Base path where the API proxy revision should be deployed. Defaults to
+        / if not provided.
+
      --override
         Whether to force the deployment of the new revision over the currently
         deployed revision by overriding conflict checks.

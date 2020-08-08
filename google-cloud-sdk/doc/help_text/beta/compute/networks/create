@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute networks create - create a Google Compute Engine
-        network
+    gcloud beta compute networks create - create a Compute Engine network
 
 SYNOPSIS
     gcloud beta compute networks create NAME

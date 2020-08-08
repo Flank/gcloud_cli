@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute diagnose routes - routes to/from Google Compute Engine
+    gcloud alpha compute diagnose routes - routes to/from Compute Engine
         virtual machine instances
 
 SYNOPSIS
@@ -15,7 +15,7 @@ SYNOPSIS
         [-- TRACEROUTE_ARGS ...]
 
 DESCRIPTION
-    (ALPHA) Routes to/from Google Compute Engine virtual machine instances.
+    (ALPHA) Routes to/from Compute Engine virtual machine instances.
 
     NOTE: The name filtering will cycle through all the VMs in the project.
     Depending on the size of the project, this could be a considerable amount
@@ -42,8 +42,8 @@ FLAGS
      --container=CONTAINER
         The name or ID of a container inside of the virtual machine instance to
         connect to. This only applies to virtual machines that are using a
-        Google Container-Optimized virtual machine image. For more information,
-        see https://cloud.google.com/compute/docs/containers
+        Container-Optimized OS virtual machine image. For more information, see
+        https://cloud.google.com/compute/docs/containers
 
      --dry-run
         Print the equivalent scp/ssh command that would be run to stdout,
@@ -128,7 +128,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To route to/from Google Compute Engine virtual machine instances, run:
+    To route to/from Compute Engine virtual machine instances, run:
 
         $ gcloud alpha compute diagnose routes
 

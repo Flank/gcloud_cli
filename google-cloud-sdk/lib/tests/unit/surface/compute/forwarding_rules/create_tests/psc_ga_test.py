@@ -31,7 +31,6 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
     self.Run("""
         compute forwarding-rules create forwarding-rule-1
         --global
-        --load-balancing-scheme=INTERNAL_MANAGED
         --address=192.168.2.100
         --target-google-apis-bundle all-apis
         --network network1
@@ -44,9 +43,7 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
                   target=('all-apis'),
                   network=('{compute_uri}/projects/my-project/global/networks/'
                            'network1'.format(compute_uri=self.compute_uri)),
-                  IPAddress='192.168.2.100',
-                  loadBalancingScheme=self.messages.ForwardingRule
-                  .LoadBalancingSchemeValueValuesEnum.INTERNAL_MANAGED),
+                  IPAddress='192.168.2.100'),
               project='my-project'))],)
 
   def testValidRequestVpcSc(self):
@@ -55,7 +52,6 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
     self.Run("""
         compute forwarding-rules create forwarding-rule-1
         --global
-        --load-balancing-scheme=INTERNAL_MANAGED
         --address={}
         --target-google-apis-bundle vpc-sc
         --network network1
@@ -68,9 +64,7 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
                   target='vpc-sc',
                   network=('{compute_uri}/projects/my-project/global/networks/'
                            'network1'.format(compute_uri=self.compute_uri)),
-                  IPAddress=address_uri,
-                  loadBalancingScheme=self.messages.ForwardingRule
-                  .LoadBalancingSchemeValueValuesEnum.INTERNAL_MANAGED),
+                  IPAddress=address_uri),
               project='my-project'))],)
 
   def testBadBundleName(self):
@@ -80,9 +74,22 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
       self.Run("""
           compute forwarding-rules create forwarding-rule-1
           --global
-          --load-balancing-scheme=INTERNAL_MANAGED
           --address=10.1.1.1
           --target-google-apis-bundle notabundle
+          --network network1
+      """)
+    self.CheckRequests()
+
+  def testBadLbType(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.InvalidArgumentException,
+        '.*--load-balancing-scheme flag is not allowed for PSC-GoogleApis.*'):
+      self.Run("""
+          compute forwarding-rules create forwarding-rule-1
+          --global
+          --address=10.1.1.1
+          --load-balancing-scheme=INTERNAL_MANAGED
+          --target-google-apis-bundle vpc-sc
           --network network1
       """)
     self.CheckRequests()

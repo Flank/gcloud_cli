@@ -6,8 +6,8 @@ SYNOPSIS
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute interconnects attachments delete deletes Google Compute
-    Engine interconnect attachment.
+    gcloud compute interconnects attachments delete deletes Compute Engine
+    interconnect attachment.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

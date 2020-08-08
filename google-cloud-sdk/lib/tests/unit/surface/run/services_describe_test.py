@@ -35,17 +35,32 @@ class DescribeTestBeta(base.ServerlessSurfaceBase):
         self.mock_serverless_client, 'doot')
     self.mock_service.name = 'simon'
     self.mock_service.metadata.creationTimestamp = '2018/01/02 00:00:00'
+    self.mock_service.annotations[
+        'serving.knative.dev/creator'] = 'me@example.com'
     self.mock_service.template.image = 'gcr.io/foo/bar:latest'
+    self.mock_service.template_annotations[
+        'serving.knative.dev/creator'] = 'me@example.com'
     self.mock_service.template.env_vars.literals['n1'] = 'v1'
     self.mock_service.template.env_vars.literals['n2'] = 'v2'
 
   def testDescribe_Succeed_Yaml(self):
-    """Tests successful describe with default output format."""
+    """Tests successful describe with yaml output format."""
     self.operations.GetService.return_value = self.mock_service
     self.Run('run services describe simon --format yaml')
     for s in [
+        'spec', 'kind: Service', 'name: simon', 'name: n1', 'value: v1',
+        'namespace: doot', 'serving.knative.dev/creator: me@example.com']:
+      self.AssertOutputMatches(s)
+
+  def testDescribe_Succeed_Export(self):
+    """Tests successful describe with export output format."""
+    self.operations.GetService.return_value = self.mock_service
+    self.Run('run services describe simon --format export')
+    for s in [
         'spec', 'kind: Service', 'name: simon', 'name: n1', 'value: v1']:
       self.AssertOutputMatches(s)
+    for s in ['2018']:
+      self.AssertOutputNotMatches(s)
 
   def testDescribe_Succeed_Default(self):
     """Tests successful describe with default output format."""

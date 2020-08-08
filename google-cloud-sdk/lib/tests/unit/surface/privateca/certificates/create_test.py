@@ -44,14 +44,6 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
     self.messages = privateca_base.GetMessagesModule()
-    self.key_gen_mock = mock.patch.object(
-        key_generation, 'RSAKeyGen',
-        return_value=(b'private', b'public')).start()
-    self.cert_name_mock = mock.patch.object(
-        certificate_utils, 'GenerateCertId',
-        return_value='00000000-AAA-AAA').start()
-    self.addCleanup(self.key_gen_mock.stop)
-    self.addCleanup(self.cert_name_mock.stop)
 
     self.test_cert = files.ReadFileContents(
         self.Resource('tests', 'unit', 'surface', 'privateca', 'test_data',
@@ -63,6 +55,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
                              parent_name,
                              cert_name,
                              request_id,
+                             public_key,
                              lifetime='P30D',
                              reusable_config=None,
                              subject_config=None):
@@ -92,7 +85,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
                 publicKey=self.messages.PublicKey(
                     type=self.messages.PublicKey.TypeValueValuesEnum
                     .PEM_RSA_KEY,
-                    key=self.key_gen_mock.return_value[1]))))
+                    key=public_key))))
 
     self.mock_client.projects_locations_certificateAuthorities_certificates.Create.Expect(
         request=request, response=response)
@@ -107,12 +100,17 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
-  def testCreateKeyGen(self, request_id_mock):
+  @mock.patch.object(
+      certificate_utils, 'GenerateCertId', return_value='00000000-AAA-AAA')
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testCreateKeyGen(self, key_gen_mock, cert_name_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
     self._ExpectCreateOperation(
         parent_name,
-        self.cert_name_mock.return_value,
-        request_id_mock.return_value,
+        cert_name_mock.return_value,
+        request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
         reusable_config=self._MakeIsCaReusableConfig(is_ca=False),
         subject_config=self.messages.SubjectConfig(
             commonName='google.com',
@@ -131,12 +129,15 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
-  def testCreateKeyGenWithAltNames(self, request_id_mock):
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testCreateKeyGenWithAltNames(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
     self._ExpectCreateOperation(
         parent_name,
         'cert',
-        request_id_mock.return_value,
+        request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
         lifetime='P20Y',
         reusable_config=self._MakeIsCaReusableConfig(is_ca=False),
         subject_config=self.messages.SubjectConfig(
@@ -153,12 +154,15 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
-  def testCreateKeyGenWithSubjectAndSan(self, request_id_mock):
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testCreateKeyGenWithSubjectAndSan(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
     self._ExpectCreateOperation(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
         reusable_config=self._MakeIsCaReusableConfig(is_ca=False),
         subject_config=self.messages.SubjectConfig(
             commonName='google.com',
@@ -175,13 +179,16 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
-  def testReusableConfig(self, request_id_mock):
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testReusableConfig(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
     reusable_config_name = 'projects/project/locations/loc/reusableConfigs/config'
     self._ExpectCreateOperation(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
         reusable_config=self.messages.ReusableConfigWrapper(
             reusableConfig=reusable_config_name),
         subject_config=self.messages.SubjectConfig(
@@ -197,12 +204,15 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
-  def testReusableConfigValues(self, request_id_mock):
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testReusableConfigValues(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
     self._ExpectCreateOperation(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
         reusable_config=self.messages.ReusableConfigWrapper(
             reusableConfigValues=self.messages.ReusableConfigValues(
                 keyUsage=self.messages.KeyUsage(

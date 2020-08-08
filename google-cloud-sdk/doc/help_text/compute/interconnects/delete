@@ -1,13 +1,12 @@
 NAME
-    gcloud compute interconnects delete - delete Google Compute Engine
-        interconnects
+    gcloud compute interconnects delete - delete Compute Engine interconnects
 
 SYNOPSIS
     gcloud compute interconnects delete NAME [NAME ...] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute interconnects delete deletes Google Compute Engine
-    interconnects. Interconnects        can only be deleted when no other resources (e.g.,
+    gcloud compute interconnects delete deletes Compute Engine interconnects.
+    Interconnects        can only be deleted when no other resources (e.g.,
         InterconnectAttachments) refer to them.
 
 POSITIONAL ARGUMENTS

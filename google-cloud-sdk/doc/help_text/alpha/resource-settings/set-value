@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha resource-settings set-value - set an resource setting from a
-        JSON or YAML file
+    gcloud alpha resource-settings set-value - update the value of a resource
+        setting
 
 SYNOPSIS
     gcloud alpha resource-settings set-value SETTING_NAME
@@ -9,9 +9,13 @@ SYNOPSIS
           | --project=PROJECT_ID) [--etag=etag] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This first converts the contents of the specified file into a
-    setting object. It then fetches the current setting using GetSetting. If it
-    does not exist, the setting is created using CreateSetting.
+    (ALPHA) Update the value of a resource setting
+
+    This first converts the contents of the specified file into a setting
+    object. It then fetches the current setting using GetSetting. If it does
+    not exist, the setting is created using CreateSetting. If it does, the
+    retrieved setting is checked to see if it needs to be updated. If so, the
+    setting is updated using UpdateSetting.
 
 POSITIONAL ARGUMENTS
      SETTING_NAME
@@ -54,9 +58,8 @@ EXAMPLES
             --value-file="./test_input.json"
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

@@ -27,7 +27,6 @@ from tests.lib.surface.ml_engine import base
 class LocationsDescribeTest(base.MlAlphaPlatformTestBase):
 
   def SetUp(self):
-    properties.VALUES.core.user_output_enabled.Set(False)
     m = self.short_msgs
     # Capability Types
     training = m.Capability.TypeValueValuesEnum.TRAINING

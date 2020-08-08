@@ -1,6 +1,6 @@
 NAME
     gcloud compute networks subnets update - updates properties of an existing
-        Google Compute Engine subnetwork
+        Compute Engine subnetwork
 
 SYNOPSIS
     gcloud compute networks subnets update NAME
@@ -12,11 +12,12 @@ SYNOPSIS
         [--logging-metadata-fields=[METADATA_FIELD,...]] [--region=REGION]
         [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
           | --[no-]enable-private-ip-google-access
+          | --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
           | --remove-secondary-ranges=PROPERTY=VALUE,[...] | --role=ROLE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Updates properties of an existing Google Compute Engine subnetwork.
+    Updates properties of an existing Compute Engine subnetwork.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -107,6 +108,11 @@ FLAGS
             instances without a public ip address. Use
             --enable-private-ip-google-access to enable and
             --no-enable-private-ip-google-access to disable.
+
+         --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+            The private IPv6 google access type for the VMs in this subnet.
+            PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
+            enable-bidirectional-access, enable-outbound-vm-access.
 
          --remove-secondary-ranges=PROPERTY=VALUE,[...]
             Removes secondary ranges from the subnetwork.

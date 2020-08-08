@@ -29,6 +29,10 @@ from googlecloudsdk.core.credentials import store
 from tests.lib import sdk_test_base
 
 
+class _ServerTerminatedError(ValueError):
+  pass
+
+
 class AuthReferenceServer(threading.Thread):
   """Fake implementation of auth server."""
 
@@ -55,6 +59,7 @@ class AuthReferenceServer(threading.Thread):
     os.environ[devshell.DEVSHELL_ENV_IPV6_ENABLED] = str(self.port)
     self._socket.bind(('localhost', self.port))
     self._socket.listen(0)
+    self._stopped = False
     self.start()
     return self
 
@@ -62,10 +67,26 @@ class AuthReferenceServer(threading.Thread):
     self.Stop()
 
   def Stop(self):
+    self._stopped = True
     del os.environ[devshell.DEVSHELL_ENV]
     del os.environ[devshell.DEVSHELL_CLIENT_PORT]
     del os.environ[devshell.DEVSHELL_ENV_IPV6_ENABLED]
     self._socket.close()
+
+  def _AcceptOrCancel(self):
+    """accept(), but watch for a Stop request and abort faster."""
+    old_timeout = self._socket.gettimeout()
+    timeout_step_sec = 0.2
+    self._socket.settimeout(timeout_step_sec)
+    for _ in range(int(old_timeout / timeout_step_sec)):
+      try:
+        s, unused_addr = self._socket.accept()
+        break
+      except socket.timeout:
+        if self._stopped:
+          raise _ServerTerminatedError()
+    self._socket.settimeout(old_timeout)
+    return s
 
   def run(self):
     s = None
@@ -73,8 +94,8 @@ class AuthReferenceServer(threading.Thread):
       while True:
         try:
           self._socket.settimeout(15)
-          s, unused_addr = self._socket.accept()
-          resp_1 = s.recv(6).decode('utf8')
+          s = self._AcceptOrCancel()
+          resp_1 = s.recv(6).decode('utf-8')
           if '\n' not in resp_1:
             raise Exception('invalid request data')
           nstr, extra = resp_1.split('\n', 1)
@@ -82,16 +103,16 @@ class AuthReferenceServer(threading.Thread):
           n = int(nstr)
           to_read = n-len(extra)
           if to_read > 0:
-            resp_buffer += s.recv(to_read, socket.MSG_WAITALL).decode('utf8')
+            resp_buffer += s.recv(to_read, socket.MSG_WAITALL).decode('utf-8')
           if resp_buffer != '[]':
             raise Exception('bad request')
           msg = devshell.MessageToJSON(self.response)
           l = len(msg)
-          s.sendall(('%d\n%s' % (l, msg)).encode('utf8'))
+          s.sendall(('%d\n%s' % (l, msg)).encode('utf-8'))
         finally:
           if s:
             s.close()
-    except socket.error:
+    except (socket.error, _ServerTerminatedError):
       pass
 
 

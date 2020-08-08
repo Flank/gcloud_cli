@@ -1,6 +1,6 @@
 NAME
     gcloud alpha recommender insights mark-dismissed - mark an insight's state
-        as DISMISSED. Can be applied to insights in ACTIVE state
+        as DISMISSED
 
 SYNOPSIS
     gcloud alpha recommender insights mark-dismissed

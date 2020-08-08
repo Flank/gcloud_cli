@@ -56,13 +56,16 @@ An optional description of this resource.
 
 .TP 2m
 \fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR
-Determines the maintenance behavior during host maintenance events.
+Determines the maintenance behavior during host maintenance events. For more
+information, see
+https://cloud.google.com/compute/docs/nodes#maintenance_policies.
 \fIMAINTENANCE_POLICY\fR must be one of:
 
 .RS 2m
 .TP 2m
 \fBdefault\fR
-VM instances on the host are live migrated to a new physical server.
+VM instances on the host are live migrated to a new physical server. This is the
+default setting.
 .TP 2m
 \fBmigrate\-within\-node\-group\fR
 VM instances on the host are live migrated to another node within the same node

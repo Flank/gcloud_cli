@@ -11,7 +11,7 @@ gcloud alpha healthcare datasets create \- create a Cloud Healthcare API dataset
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha healthcare datasets create\fR (\fIDATASET\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha healthcare datasets create\fR (\fIDATASET\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-storage\-class\fR=\fISTORAGE_CLASS\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,6 +54,12 @@ Google Cloud location.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-storage\-class\fR=\fISTORAGE_CLASS\fR
+Default blob storage class to store DICOM instances in this dataset.
+\fISTORAGE_CLASS\fR must be one of: \fBblob\-storage\-class\-unspecified\fR,
+\fBcoldline\fR, \fBnearline\fR, \fBstandard\fR.
 
 .TP 2m
 \fB\-\-time\-zone\fR=\fITIME_ZONE\fR

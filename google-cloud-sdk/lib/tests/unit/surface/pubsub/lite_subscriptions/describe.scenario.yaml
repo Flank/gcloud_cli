@@ -21,21 +21,6 @@ summary:
       The [subscription] resource is not properly specified.
       Failed to find attribute [zone]. The attribute can be set in the following ways: 
       - provide the argument [--zone] on the command line
-      - set the property [pubsub/lite_zone]
-- execute:
-  - command: |
-      pubsub lite-subscriptions describe subscription1
-  - error: '1: .*provide the argument \[--zone\] on the command line.*$'
-- set_property: pubsub/lite_zone europe-west1-a
-- execute:
-  - command: |
-      pubsub lite-subscriptions describe subscription1
-  - stdout: |
-      deliveryConfig:
-        deliveryRequirement: DELIVER_IMMEDIATELY
-      name: projects/12345/locations/europe-west1-a/subscriptions/subscription1
-      topic: projects/12345/locations/us-central1-a/topics/topic1
-- set_property: 'pubsub/lite_zone '
 - execute:
   - command: |
       pubsub lite-subscriptions describe subscription1
@@ -107,7 +92,6 @@ actions:
           The [subscription] resource is not properly specified.
           Failed to find attribute [zone]. The attribute can be set in the following ways: 
           - provide the argument [--zone] on the command line
-          - set the property [pubsub/lite_zone]
 - execute_command:
     command: |
       pubsub lite-subscriptions describe subscription1
@@ -117,66 +101,6 @@ actions:
         message:
           matches: .*provide the argument \[--zone\] on the command line.*
 
-- set_property:
-    pubsub/lite_zone: europe-west1-a
-- execute_command:
-    command: |
-      pubsub lite-subscriptions describe subscription1
-    events:
-    - api_call:
-        expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "projectNumber": "12345",
-              "projectId": "fake-project",
-              "lifecycleState": "ACTIVE",
-              "name": "fake-project",
-              "createTime": "2019-07-19T15:49:12.034Z",
-              "parent": {
-                "type": "folder",
-                "id": "54321"
-              }
-            }
-    - api_call:
-        expect_request:
-          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/europe-west1-a/subscriptions/subscription1?alt=json
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "name": "projects/12345/locations/europe-west1-a/subscriptions/subscription1",
-              "topic": "projects/12345/locations/us-central1-a/topics/topic1",
-              "deliveryConfig": {
-                "deliveryRequirement": "DELIVER_IMMEDIATELY"
-              }
-            }
-    - expect_stdout: |
-        deliveryConfig:
-          deliveryRequirement: DELIVER_IMMEDIATELY
-        name: projects/12345/locations/europe-west1-a/subscriptions/subscription1
-        topic: projects/12345/locations/us-central1-a/topics/topic1
-    - expect_exit:
-        code: 0
-
-- set_property:
-    pubsub/lite_zone: ''
-- execute_command:
-    command: |
-      pubsub lite-subscriptions describe subscription1
-    events:
-    - expect_exit:
-        code: 1
-        message:
-          matches: .*provide the argument \[--zone\] on the command line.*
 
 - execute_command:
     command: |

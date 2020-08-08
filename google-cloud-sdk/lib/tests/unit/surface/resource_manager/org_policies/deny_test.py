@@ -18,11 +18,15 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.resource_manager import exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
 
 class OrgPoliciesDenyTest(testbase.OrgPoliciesUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDenyOrgPolicyProject(self):
     self.mock_projects.GetOrgPolicy.Expect(
@@ -94,6 +98,17 @@ class OrgPoliciesDenyTest(testbase.OrgPoliciesUnitTestBase):
     return self.RunOrgPolicies('deny', constraint, self.VALUE_A, self.VALUE_B,
                                *args)
 
+
+class OrgPoliciesDenyAlphaTest(OrgPoliciesDenyTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class OrgPoliciesDenyBetaTest(OrgPoliciesDenyTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,7 +1,6 @@
 NAME
     gcloud alpha recommender recommendations mark-active - mark a
-        recommendation's state as ACTIVE. Can only be performed on a
-        recommendation in DISMISSED state
+        recommendation's state as ACTIVE
 
 SYNOPSIS
     gcloud alpha recommender recommendations mark-active
@@ -9,8 +8,8 @@ SYNOPSIS
         --etag=ETAG [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Mark a recommendation's state as ACTIVE. Can only be performed on a
-    recommendation in DISMISSED state.
+    (ALPHA) Mark a recommendation's state as ACTIVE. Can be applied to
+    recommendations in DISMISSED state.
 
 POSITIONAL ARGUMENTS
      Recommendation resource - The Cloud Recommendation to mark as active. The

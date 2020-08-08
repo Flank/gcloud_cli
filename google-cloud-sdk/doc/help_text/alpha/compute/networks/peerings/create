@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute networks peerings create - create a Google Compute
-        Engine network peering
+    gcloud alpha compute networks peerings create - create a Compute Engine
+        network peering
 
 SYNOPSIS
     gcloud alpha compute networks peerings create NAME --network=NETWORK

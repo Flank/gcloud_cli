@@ -105,7 +105,7 @@ class MakeSignaturePayloadTest(binauthz_test_base.BinauthzTestBase):
 
   def testGoodUrl(self):
     sig = json.loads(binauthz_command_util.MakeSignaturePayload(
-        'docker.io/nginblah@{}'.format(self.digest)).decode('utf8'))
+        'docker.io/nginblah@{}'.format(self.digest)).decode('utf-8'))
     self.assertEqual(self.repository,
                      sig['critical']['identity']['docker-reference'])
     self.assertEqual(self.digest,
@@ -118,7 +118,7 @@ class MakeSignaturePayloadTest(binauthz_test_base.BinauthzTestBase):
     self.assertEqual(
         binauthz_command_util.MakeSignaturePayloadDict(url),
         json.loads(binauthz_command_util.MakeSignaturePayload(
-            url).decode('utf8')),
+            url).decode('utf-8')),
     )
 
   def testBadUrl(self):

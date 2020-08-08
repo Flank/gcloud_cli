@@ -40,7 +40,7 @@ class EnableTest(unit_test_base.SUUnitTestBase):
     self.ExpectEnableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('services enable %s' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services enable %s' % self.DEFAULT_SERVICE)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
@@ -49,8 +49,8 @@ class EnableTest(unit_test_base.SUUnitTestBase):
     self.ExpectBatchEnableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('services enable %s %s' % (self.DEFAULT_SERVICE_NAME,
-                                        self.DEFAULT_SERVICE_NAME_2))
+    self.Run('services enable %s %s' %
+             (self.DEFAULT_SERVICE, self.DEFAULT_SERVICE_2))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
@@ -58,7 +58,7 @@ class EnableTest(unit_test_base.SUUnitTestBase):
     self.track = track
     self.ExpectEnableApiCall(self.OPERATION_NAME)
 
-    self.Run('services enable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services enable %s --async' % self.DEFAULT_SERVICE)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
@@ -69,7 +69,7 @@ class EnableTest(unit_test_base.SUUnitTestBase):
 
     with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException, r'Error.'):
-      self.Run('services enable %s' % self.DEFAULT_SERVICE_NAME)
+      self.Run('services enable %s' % self.DEFAULT_SERVICE)
 
 
 if __name__ == '__main__':

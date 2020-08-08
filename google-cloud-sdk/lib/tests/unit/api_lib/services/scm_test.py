@@ -37,93 +37,27 @@ class ServiceConsumerManagementTest(unit_test_base.SCMUnitTestBase):
     got = scm.ListQuotaMetrics(self.DEFAULT_SERVICE, self.DEFAULT_CONSUMER)
     self.assertEqual([v for v in got], want)
 
-  def testCreateQuotaOverrideCall(self):
-    want = self.services_messages.Operation(
-        name=self.OPERATION_NAME, done=False)
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
-    self.ExpectCreateQuotaOverrideCall(self.mutate_limit_name,
-                                       self.mutate_metric, self.unit, 666,
-                                       self.OPERATION_NAME)
-
-    dimensions = None
-    got = scm.CreateQuotaOverrideCall(self.DEFAULT_SERVICE,
-                                      self.DEFAULT_CONSUMER, self.mutate_metric,
-                                      self.unit, dimensions, 666)
-
-    self.assertEqual(got, want)
-
-  def testCreateQuotaOverrideCall_WithDimensions(self):
-    want = self.services_messages.Operation(
-        name=self.OPERATION_NAME, done=False)
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
-    self.ExpectCreateQuotaOverrideCall(
-        self.mutate_limit_name,
-        self.mutate_metric,
-        self.unit,
-        666,
-        self.OPERATION_NAME,
-        dimensions=[('regions', 'us-central1')],
-        force=True)
-
-    got = scm.CreateQuotaOverrideCall(
-        self.DEFAULT_SERVICE,
-        self.DEFAULT_CONSUMER,
-        self.mutate_metric,
-        self.unit, {'regions': 'us-central1'},
-        666,
-        force=True)
-
-    self.assertEqual(got, want)
-
-  def testCreateQuotaOverrideCall_failed(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
-    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
-    self.ExpectCreateQuotaOverrideCall(
-        self.mutate_limit_name,
-        self.mutate_metric,
-        self.unit,
-        666,
-        None,
-        error=server_error)
-
-    with self.assertRaisesRegex(
-        exceptions.CreateQuotaOverridePermissionDeniedException, r'Error.'):
-      dimensions = None
-      scm.CreateQuotaOverrideCall(self.DEFAULT_SERVICE, self.DEFAULT_CONSUMER,
-                                  self.mutate_metric, self.unit, dimensions,
-                                  666)
-
   def testUpdateQuotaOverrideCall(self):
     want = self.services_messages.Operation(
         name=self.OPERATION_NAME, done=False)
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
     self.ExpectUpdateQuotaOverrideCall(self.mutate_limit_name,
-                                       self.mutate_metric, self.unit,
-                                       self.OVERRIDE_ID, 666,
+                                       self.mutate_metric, self.unit, 666,
                                        self.OPERATION_NAME)
 
     dimensions = None
     got = scm.UpdateQuotaOverrideCall(self.DEFAULT_SERVICE,
                                       self.DEFAULT_CONSUMER, self.mutate_metric,
-                                      self.unit, self.OVERRIDE_ID, dimensions,
-                                      666)
+                                      self.unit, dimensions, 666)
 
     self.assertEqual(got, want)
 
   def testUpdateQuotaOverrideCall_WithDimensions(self):
     want = self.services_messages.Operation(
         name=self.OPERATION_NAME, done=False)
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
     self.ExpectUpdateQuotaOverrideCall(
         self.mutate_limit_name,
         self.mutate_metric,
         self.unit,
-        self.OVERRIDE_ID,
         666,
         self.OPERATION_NAME,
         dimensions=[('regions', 'us-central1')],
@@ -133,22 +67,18 @@ class ServiceConsumerManagementTest(unit_test_base.SCMUnitTestBase):
         self.DEFAULT_SERVICE,
         self.DEFAULT_CONSUMER,
         self.mutate_metric,
-        self.unit,
-        self.OVERRIDE_ID, {'regions': 'us-central1'},
+        self.unit, {'regions': 'us-central1'},
         666,
         force=True)
 
     self.assertEqual(got, want)
 
   def testUpdateQuotaOverrideCall_failed(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectUpdateQuotaOverrideCall(
         self.mutate_limit_name,
         self.mutate_metric,
         self.unit,
-        self.OVERRIDE_ID,
         666,
         None,
         error=server_error)
@@ -157,8 +87,8 @@ class ServiceConsumerManagementTest(unit_test_base.SCMUnitTestBase):
         exceptions.UpdateQuotaOverridePermissionDeniedException, r'Error.'):
       dimensions = None
       scm.UpdateQuotaOverrideCall(self.DEFAULT_SERVICE, self.DEFAULT_CONSUMER,
-                                  self.mutate_metric, self.unit,
-                                  self.OVERRIDE_ID, dimensions, 666)
+                                  self.mutate_metric, self.unit, dimensions,
+                                  666)
 
   def testDeleteQuotaOverrideCall(self):
     want = self.services_messages.Operation(

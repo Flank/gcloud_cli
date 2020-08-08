@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha vmware privateclouds - manage privateclouds in Cloud VMware
+
+SYNOPSIS
+    gcloud alpha vmware privateclouds COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage privateclouds in Cloud VMware.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Cloud VMware privatecloud.
+
+     delete
+        (ALPHA) Delete a Cloud VMware privatecloud.
+
+     describe
+        (ALPHA) Describe a Cloud VMware privatecloud.
+
+     list
+        (ALPHA) List Cloud VMware privateclouds.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

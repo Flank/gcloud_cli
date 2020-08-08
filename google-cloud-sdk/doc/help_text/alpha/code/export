@@ -3,14 +3,13 @@ NAME
         development
 
 SYNOPSIS
-    gcloud alpha code export
-        [--build-context-directory=BUILD_CONTEXT_DIRECTORY] [--builder=BUILDER]
-        [--cloudsql-instances=[CLOUDSQL_INSTANCE,...]] [--cpu-limit=CPU_LIMIT]
-        [--dockerfile=DOCKERFILE; default="Dockerfile"]
-        [--image-name=IMAGE_NAME]
+    gcloud alpha code export [--cloudsql-instances=[CLOUDSQL_INSTANCE,...]]
+        [--cpu=CPU] [--image=IMAGE]
         [--kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"]
-        [--local-port=LOCAL_PORT] [--memory-limit=MEMORY_LIMIT]
-        [--service-name=SERVICE_NAME]
+        [--local-port=LOCAL_PORT] [--memory=MEMORY]
+        [--service-name=SERVICE_NAME] [--source=SOURCE]
+        [--appengine | --builder=BUILDER
+          | --dockerfile=DOCKERFILE; default="Dockerfile"]
         [--application-default-credential | --service-account=SERVICE_ACCOUNT]
         [--env-vars=[KEY=VALUE,...] | --env-vars-file=FILE_PATH]
         [--skaffold-file=SKAFFOLD_FILE; default="skaffold.yaml"
@@ -27,26 +26,16 @@ DESCRIPTION
     be used instead.
 
 FLAGS
-     --build-context-directory=BUILD_CONTEXT_DIRECTORY
-        If set, use this as the context directory when building the container
-        image. Otherwise, the directory of the Dockerfile will be used.
-
-     --builder=BUILDER
-        Build with a given Cloud Native Computing Foundation Buildpack builder.
-
      --cloudsql-instances=[CLOUDSQL_INSTANCE,...]
         Cloud SQL instance connection strings. Must be in the form
         <project>:<region>:<instance>.
 
-     --cpu-limit=CPU_LIMIT
+     --cpu=CPU
         Container CPU limit. Limit is expressed as a number of CPUs. Fractional
         CPU limits are allowed (e.g. 1.5).
 
-     --dockerfile=DOCKERFILE; default="Dockerfile"
-        Dockerfile for the service image.
-
-     --image-name=IMAGE_NAME
-        Name for the built docker image.
+     --image=IMAGE
+        Name for the built image.
 
      --kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"
         File containing yaml specifications for kubernetes resources.
@@ -55,7 +44,7 @@ FLAGS
         Local port to which the service connection is forwarded. If this flag
         is not set, then a random port is chosen.
 
-     --memory-limit=MEMORY_LIMIT
+     --memory=MEMORY
         Container memory limit. Limit is expressed either as an integer
         representing the number of bytes or an integer followed by a unit
         suffix. Valid unit suffixes are "B", "KB", "MB", "GB", "TB", "KiB",
@@ -63,6 +52,24 @@ FLAGS
 
      --service-name=SERVICE_NAME
         Name of the service.
+
+     --source=SOURCE
+        The directory containing the source to build. If not specified, the
+        current directory is used.
+
+     At most one of these may be specified:
+
+       --appengine
+          Build with a Cloud Native Computing Foundation Buildpack builder
+          selected from gcr.io/gae-runtimes/buildpacks, according to the App
+          Engine runtime specified in app.yaml.
+
+       --builder=BUILDER
+          Build with a given Cloud Native Computing Foundation Buildpack
+          builder.
+
+       --dockerfile=DOCKERFILE; default="Dockerfile"
+          Dockerfile for the service image.
 
      At most one of these may be specified:
 
@@ -100,8 +107,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. If this
-    command fails with API permission errors despite specifying the right
-    project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
 

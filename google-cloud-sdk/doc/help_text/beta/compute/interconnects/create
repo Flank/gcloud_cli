@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute interconnects create - create a Google Compute Engine
+    gcloud beta compute interconnects create - create a Compute Engine
         interconnect
 
 SYNOPSIS

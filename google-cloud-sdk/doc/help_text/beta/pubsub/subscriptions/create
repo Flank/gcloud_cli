@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud beta pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
-        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
-        [--labels=[KEY=VALUE,...]]
+        [--ack-deadline=ACK_DEADLINE] [--enable-message-ordering]
+        [--expiration-period=EXPIRATION_PERIOD] [--labels=[KEY=VALUE,...]]
+        [--message-filter=MESSAGE_FILTER]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
         [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
         [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
@@ -53,6 +54,11 @@ OPTIONAL FLAGS
         The number of seconds the system will wait for a subscriber to
         acknowledge receiving a message before re-attempting delivery.
 
+     --enable-message-ordering
+        Whether to receive messages with the same ordering key in order. If
+        set, messages with the same ordering key are sent to subscribers in the
+        order that Pub/Sub receives them.
+
      --expiration-period=EXPIRATION_PERIOD
         The subscription will expire if it is inactive for the given period.
         Valid values are strings of the form INTEGER[UNIT], where UNIT is one
@@ -68,6 +74,12 @@ OPTIONAL FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --message-filter=MESSAGE_FILTER
+        Expression to filter messages. If set, Pub/Sub only delivers the
+        messages that match the filter. The expression must be a non-empty
+        string in the Pub/Sub filtering language
+        (https://cloud.google.com/pubsub/docs/filtering).
 
      --message-retention-duration=MESSAGE_RETENTION_DURATION
         How long to retain unacknowledged messages in the subscription's

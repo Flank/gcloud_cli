@@ -1,9 +1,5 @@
-filters:
-  skip:
-    reason: stdout changed
-    bug: b/153889005
 title: Create, Describe, Update, List and Delete a backup
-release_tracks: [ALPHA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -111,10 +107,6 @@ actions:
               sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
         return_response:
           headers:
-            cache-control: private
-            content-length: '554'
-            content-type: application/json; charset=UTF-8
-            expect-ct: preload
             status: '200'
           body:
             name: operations/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$/locations/us-east1-b/operations/7007571945579088155
@@ -141,15 +133,13 @@ actions:
           - endTime
           - sizeBytes
           headers:
-            cache-control: private
-            content-length: '468'
-            content-type: application/json; charset=UTF-8
-            expect-ct: preload
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
             sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
             state: READY
+            encryptionInfo:
+              encryptionType: GOOGLE_DEFAULT_ENCRYPTION
     - expect_stderr: |
         Created backup [$$my-backup$$].
     - expect_exit:
@@ -171,9 +161,6 @@ actions:
           - endTime
           - sizeBytes
           headers:
-            cache-control: private
-            content-length: '1207'
-            content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: $$operation$$
@@ -221,6 +208,8 @@ actions:
     events:
     - expect_stdout:
         matches: |
+          encryptionInfo:
+            encryptionType: GOOGLE_DEFAULT_ENCRYPTION
           endTime: '.*'
           expireTime: '.*'
           name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
@@ -240,6 +229,8 @@ actions:
         Updated backup [$$my-backup$$].
     - expect_stdout:
         matches: |
+          encryptionInfo:
+            encryptionType: GOOGLE_DEFAULT_ENCRYPTION
           endTime: '.*'
           expireTime: '.*'
           name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$

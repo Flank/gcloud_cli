@@ -72,13 +72,13 @@ $ gcloud app versions stop v1 v2
 To stop a single version on a single service, run:
 
 .RS 2m
-$ gcloud app versions stop \-\-service servicename v1
+$ gcloud app versions stop \-\-service=servicename v1
 .RE
 
 To stop multiple versions in a single service, run:
 
 .RS 2m
-$ gcloud app versions stop \-\-service servicename v1 v2
+$ gcloud app versions stop \-\-service=servicename v1 v2
 .RE
 
 Note that that last example may be more simply written using the \f5services

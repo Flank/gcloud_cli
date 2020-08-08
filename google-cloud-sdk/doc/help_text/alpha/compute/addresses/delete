@@ -6,8 +6,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute addresses delete releases one or more Google
-    Compute Engine IP addresses.
+    (ALPHA) gcloud alpha compute addresses delete releases one or more Compute
+    Engine IP addresses.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

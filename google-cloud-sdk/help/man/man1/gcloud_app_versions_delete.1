@@ -59,7 +59,7 @@ Run \fB$ gcloud help\fR for details.
 To delete a specific version of a specific service, run:
 
 .RS 2m
-$ gcloud app versions delete \-\-service myService v1
+$ gcloud app versions delete \-\-service=myService v1
 .RE
 
 To delete a named version across all services, run:
@@ -71,7 +71,7 @@ $ gcloud app versions delete v1
 To delete multiple versions of a specific service, run:
 
 .RS 2m
-$ gcloud app versions delete \-\-service myService v1 v2
+$ gcloud app versions delete \-\-service=myService v1 v2
 .RE
 
 To delete multiple named versions across all services, run:

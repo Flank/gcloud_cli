@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_BETA_PUBSUB_TOPICS_DETACH\-SUBSCRIPTION" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub topics detach\-subscription \- detaches one or more Cloud Pub/Sub subscriptions
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub topics detach\-subscription\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Detaches one or more Cloud Pub/Sub subscriptions.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Subscription resource \- One or more subscriptions to detach. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[subscription] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR ...]
+IDs of the subscriptions or fully qualified identifiers for the subscriptions.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To detach a Cloud Pub/Sub subscription, run:
+
+.RS 2m
+$ gcloud beta pubsub topics detach\-subscription mysubscription
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha pubsub topics detach\-subscription
+.RE
+

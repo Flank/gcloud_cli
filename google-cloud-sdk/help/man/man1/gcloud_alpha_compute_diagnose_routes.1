@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute diagnose routes \- routes to/from Google Compute Engine virtual machine instances
+gcloud alpha compute diagnose routes \- routes to/from Compute Engine virtual machine instances
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute diagnose routes \- routes to/from Google Compute Engine vir
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Routes to/from Google Compute Engine virtual machine instances.
+\fB(ALPHA)\fR Routes to/from Compute Engine virtual machine instances.
 
 NOTE: The name filtering will cycle through all the VMs in the project.
 Depending on the size of the project, this could be a considerable amount of
@@ -58,8 +58,8 @@ $ gcloud alpha compute diagnose routes example\-instance \-\- \-w 0.5 \e
 .TP 2m
 \fB\-\-container\fR=\fICONTAINER\fR
 The name or ID of a container inside of the virtual machine instance to connect
-to. This only applies to virtual machines that are using a Google
-Container\-Optimized virtual machine image. For more information, see
+to. This only applies to virtual machines that are using a Container\-Optimized
+OS virtual machine image. For more information, see
 https://cloud.google.com/compute/docs/containers
 
 .TP 2m
@@ -169,7 +169,7 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To route to/from Google Compute Engine virtual machine instances, run:
+To route to/from Compute Engine virtual machine instances, run:
 
 .RS 2m
 $ gcloud alpha compute diagnose routes

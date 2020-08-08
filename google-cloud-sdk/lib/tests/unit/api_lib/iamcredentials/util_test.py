@@ -110,7 +110,7 @@ class UtilTests(sdk_test_base.SdkBase):
           util.ImpersonationAccessTokenProvider())
       http.Http().request('http://foo.com', 'GET', None, {})
       access_token = request_mock.call_args[0][3][b'Authorization']
-      self.assertEqual(access_token, b'Bearer ' + fake_token.encode('utf8'))
+      self.assertEqual(access_token, b'Bearer ' + fake_token.encode('utf-8'))
     finally:
       store.IMPERSONATION_TOKEN_PROVIDER = None
 

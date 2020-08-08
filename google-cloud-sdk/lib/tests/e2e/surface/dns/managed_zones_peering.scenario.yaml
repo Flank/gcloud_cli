@@ -1,15 +1,19 @@
+filters:
+  skip:
+    reason: exceeding quota for peeringZonesPerTargetNetwork
+    bug: b/158315036
 title: Create and update a managed zone with a peering config
 release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: dns managed-zones create $$zone$$ --dns-name $$zone$$.com --description
-      ZONE! --visibility private --networks '' --target-network default --target-project
+      ZONE! --visibility private --networks '' --target-network do-not-delete-dns-test-network --target-project
       cloud-sdk-integration-testing
   - stderr: |
       Created [https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
 - execute:
-  - command: dns managed-zones update $$zone$$ --target-network do-not-delete-test-network
+  - command: dns managed-zones update $$zone$$ --target-network do-not-delete-dns-test-network-2
       --target-project cloud-sdk-integration-testing
   - progress_tracker:
     - message: Updating managed zone [$$zone$$]
@@ -17,7 +21,7 @@ summary:
 - execute:
   - command: dns managed-zones describe $$zone$$ --format 'text(peeringConfig.targetNetwork.networkUrl)'
   - stdout: |
-      peeringConfig.targetNetwork.networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+      peeringConfig.targetNetwork.networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network-2
 - execute:
   - command: dns managed-zones delete $$zone$$
   - stderr: |
@@ -37,7 +41,7 @@ actions:
 
 - execute_command:
     command: dns managed-zones create $$zone$$ --dns-name $$zone$$.com --description
-      ZONE! --visibility private --networks '' --target-network default --target-project
+      ZONE! --visibility private --networks '' --target-network do-not-delete-dns-test-network --target-project
       cloud-sdk-integration-testing
     events:
     - api_call:
@@ -52,7 +56,7 @@ actions:
               name: $$zone$$
               peeringConfig:
                 targetNetwork:
-                  networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
+                  networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network
               privateVisibilityConfig: {}
               visibility: private
         return_response:
@@ -73,7 +77,7 @@ actions:
             visibility: private
             peeringConfig:
               targetNetwork:
-                networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
+                networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network
                 kind: dns#managedZonePeeringConfigTargetNetwork
               kind: dns#managedZonePeeringConfig
             kind: dns#managedZone
@@ -83,7 +87,7 @@ actions:
         code: 0
 
 - execute_command:
-    command: dns managed-zones update $$zone$$ --target-network do-not-delete-test-network
+    command: dns managed-zones update $$zone$$ --target-network do-not-delete-dns-test-network-2
       --target-project cloud-sdk-integration-testing
     events:
     - api_call:
@@ -96,7 +100,7 @@ actions:
               name: $$zone$$
               peeringConfig:
                 targetNetwork:
-                  networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                  networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network-2
         return_response:
           headers:
             cache-control: private
@@ -121,7 +125,7 @@ actions:
                 visibility: private
                 peeringConfig:
                   targetNetwork:
-                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network
                     kind: dns#managedZonePeeringConfigTargetNetwork
                   kind: dns#managedZonePeeringConfig
                 kind: dns#managedZone
@@ -136,7 +140,7 @@ actions:
                 visibility: private
                 peeringConfig:
                   targetNetwork:
-                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network-2
                     kind: dns#managedZonePeeringConfigTargetNetwork
                   kind: dns#managedZonePeeringConfig
                 kind: dns#managedZone
@@ -177,7 +181,7 @@ actions:
                 visibility: private
                 peeringConfig:
                   targetNetwork:
-                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network
                     kind: dns#managedZonePeeringConfigTargetNetwork
                   kind: dns#managedZonePeeringConfig
                 kind: dns#managedZone
@@ -192,7 +196,7 @@ actions:
                 visibility: private
                 peeringConfig:
                   targetNetwork:
-                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network-2
                     kind: dns#managedZonePeeringConfigTargetNetwork
                   kind: dns#managedZonePeeringConfig
                 kind: dns#managedZone
@@ -229,12 +233,12 @@ actions:
             visibility: private
             peeringConfig:
               targetNetwork:
-                networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network-2
                 kind: dns#managedZonePeeringConfigTargetNetwork
               kind: dns#managedZonePeeringConfig
             kind: dns#managedZone
     - expect_stdout: |
-        peeringConfig.targetNetwork.networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+        peeringConfig.targetNetwork.networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-dns-test-network-2
     - expect_exit:
         code: 0
 - execute_command:

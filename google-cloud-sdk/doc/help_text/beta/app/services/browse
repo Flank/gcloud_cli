@@ -46,7 +46,7 @@ EXAMPLES
 
     To show multiple services side-by-side with a specific version, run:
 
-        $ gcloud beta app services browse s1 s2 --version v1
+        $ gcloud beta app services browse s1 s2 --version=v1
 
 NOTES
     This command is currently in BETA and may change without notice. This

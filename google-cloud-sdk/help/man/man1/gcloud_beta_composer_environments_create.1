@@ -11,7 +11,7 @@ gcloud beta composer environments create \- create and initialize a Cloud Compos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cloud\-sql\-ipv4\-cidr\fR=\fICLOUD_SQL_IPV4_CIDR\fR\ \fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-web\-server\-allow\-all\fR\ |\ \fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]\ |\ \fB\-\-web\-server\-deny\-all\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-cloud\-sql\-machine\-type\fR=\fICLOUD_SQL_MACHINE_TYPE\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cloud\-sql\-ipv4\-cidr\fR=\fICLOUD_SQL_IPV4_CIDR\fR\ \fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-web\-server\-allow\-all\fR\ |\ \fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]\ |\ \fB\-\-web\-server\-deny\-all\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -66,6 +66,10 @@ environments update\fR.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-cloud\-sql\-machine\-type\fR=\fICLOUD_SQL_MACHINE_TYPE\fR
+Cloud SQL machine type used by the Airflow database.
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR; default="100GB"
@@ -165,7 +169,8 @@ Version of the image to run in the environment.
 
 .RS 2m
 The image version encapsulates the versions of both Cloud Composer
-and Apache Airflow. Must be of the form `composer\-A.B.C\-airflow\-X.Y[.Z]`.
+and Apache Airflow. Must be of the form
+`composer\-A.B.C[\-D.E]\-airflow\-X.Y[.Z]`.
 .RE
 
 .RS 2m
@@ -190,8 +195,7 @@ Private Clusters
 IPv4 CIDR range to use for the Cloud SQL network. This should have a size of the
 netmask not greater than 24.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .TP 2m
 \fB\-\-enable\-private\-endpoint\fR
@@ -202,8 +206,7 @@ addresses.
 If not specified, the master API endpoint will be accessible by its public IP
 address.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .TP 2m
 \fB\-\-enable\-private\-environment\fR
@@ -218,16 +221,14 @@ Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
 IPv4 CIDR range to use for the cluste master network. This should have a size of
 the netmask between 23 and 28.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .TP 2m
 \fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR
 IPv4 CIDR range to use for the Airflow web server network. This should have a
 size of the netmask between 24 and 29.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .RE
 .sp

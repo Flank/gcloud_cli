@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute external-vpn-gateways update - update a Google Compute
-        Engine external VPN gateway
+    gcloud beta compute external-vpn-gateways update - update a Compute Engine
+        external VPN gateway
 
 SYNOPSIS
     gcloud beta compute external-vpn-gateways update NAME
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute external-vpn-gateways update updates labels for
-    a Google Compute Engine external VPN gateway. For example:
+    a Compute Engine external VPN gateway. For example:
 
         $ gcloud beta compute external-vpn-gateways update example-gateway \
           --update-labels=k0=value1,k1=value2 --remove-labels=k3
@@ -25,7 +25,7 @@ DESCRIPTION
     To list existing labels
 
         $ gcloud beta compute external-vpn-gateways describe \
-            example-gateway --format='default(labels)'
+            example-gateway --format="default(labels)"
 
 POSITIONAL ARGUMENTS
      NAME

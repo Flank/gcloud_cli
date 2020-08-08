@@ -1,0 +1,136 @@
+title: vmware clusters create test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      vmware clusters create sample-cluster --privatecloud=private-cloud-1 --location=us-central1 --project=sample-project --zone=us-central1-a --node-count=4
+  - progress_tracker:
+    - message: waiting for cluster [https://sddc.googleapis.com/v1alpha1/projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster]
+        to be created
+    - status: SUCCESS
+actions:
+- execute_command:
+    command: |
+      vmware clusters create sample-cluster --privatecloud=private-cloud-1 --location=us-central1 --project=sample-project --zone=us-central1-a --node-count=4
+    events:
+    - api_call:
+        expect_request:
+          uri: https://sddc.googleapis.com/v1alpha1/projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters?alt=json&clusterId=sample-cluster&managementCluster=True
+          method: POST
+          headers: {}
+          body:
+            json:
+              defaultZone: us-central1-a
+              nodeCount: 4
+              nodeType: c1-highmem-72-metal
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/sample-project/locations/us-central1/operations/operation-1591564547425-5a784ff7c8343-f2c08b43-95e96c90",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.sddc.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-07T21:15:48.591506843Z",
+                "target": "projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://sddc.googleapis.com/v1alpha1/projects/sample-project/locations/us-central1/operations/operation-1591564547425-5a784ff7c8343-f2c08b43-95e96c90?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/sample-project/locations/us-central1/operations/operation-1591564547425-5a784ff7c8343-f2c08b43-95e96c90",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.sddc.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-07T21:15:48.591506843Z",
+                "endTime": "2020-06-07T21:25:36.120381170Z",
+                "target": "projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.sddc.v1alpha1.Cluster",
+                "name": "projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster",
+                "nodeType": "n1-standard-8",
+                "nodeCount": 4,
+                "nodes": [
+                  {
+                    "nodeId": "node-0-87e2ca84-a2a6-486d-9038-50c07994559f",
+                    "type": "n1-standard-8"
+                  },
+                  {
+                    "nodeId": "node-1-e0b4ba6e-26a2-451e-b06b-f338b9d521d7",
+                    "type": "n1-standard-8"
+                  },
+                  {
+                    "nodeId": "node-2-b44841b8-c102-42c4-a05b-c135ce3d6e68",
+                    "type": "n1-standard-8"
+                  },
+                  {
+                    "nodeId": "node-3-79dfaa73-c7dd-4ea4-8d50-b1c36a5dce8d",
+                    "type": "n1-standard-8"
+                  }
+                ],
+                "defaultZone": "us-central1-a",
+                "createTime": "2020-06-07T21:15:48.587021815Z",
+                "updateTime": "2020-06-07T21:15:48.587021815Z",
+                "status": "READY"
+              }
+            }
+    - expect_progress_tracker:
+        message: waiting for cluster [https://sddc.googleapis.com/v1alpha1/projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster]
+          to be created
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://sddc.googleapis.com/v1alpha1/projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster?alt=json
+          method: GET
+          headers: {}
+          body: |
+            {
+              "name": "projects/sample-project/locations/us-central1/clusterGroups/private-cloud-1/clusters/sample-cluster",
+              "nodeType": "n1-standard-8",
+              "nodeCount": 4,
+              "nodes": [
+                {
+                  "nodeId": "node-0-87e2ca84-a2a6-486d-9038-50c07994559f",
+                  "type": "n1-standard-8"
+                },
+                {
+                  "nodeId": "node-1-e0b4ba6e-26a2-451e-b06b-f338b9d521d7",
+                  "type": "n1-standard-8"
+                },
+                {
+                  "nodeId": "node-2-b44841b8-c102-42c4-a05b-c135ce3d6e68",
+                  "type": "n1-standard-8"
+                },
+                {
+                  "nodeId": "node-3-79dfaa73-c7dd-4ea4-8d50-b1c36a5dce8d",
+                  "type": "n1-standard-8"
+                }
+              ],
+              "defaultZone": "us-central1-a",
+              "createTime": "2020-06-07T21:15:48.587021815Z",
+              "updateTime": "2020-06-07T21:25:36.126930409Z",
+              "status": "READY"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0

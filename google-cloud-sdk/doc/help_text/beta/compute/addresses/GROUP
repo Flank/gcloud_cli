@@ -38,7 +38,7 @@ COMMANDS
         (BETA) List addresses.
 
      update
-        (BETA) Update a Google Compute Engine address.
+        (BETA) Update a Compute Engine address.
 
 NOTES
     This command is currently in BETA and may change without notice. These

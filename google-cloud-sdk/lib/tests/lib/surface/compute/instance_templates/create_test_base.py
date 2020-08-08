@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import random
 
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_templates import test_resources
 
 import mock
 

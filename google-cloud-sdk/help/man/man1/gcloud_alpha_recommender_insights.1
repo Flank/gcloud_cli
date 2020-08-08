@@ -47,18 +47,15 @@ Run \fB$ gcloud help\fR for details.
 
 .TP 2m
 \fBmark\-accepted\fR
-\fB(ALPHA)\fR Mark an insight's state as ACCEPTED. Can be applied to insights in
-ACTIVE or ACCEPTED state.
+\fB(ALPHA)\fR Mark an insight's state as ACCEPTED.
 
 .TP 2m
 \fBmark\-active\fR
-\fB(ALPHA)\fR Mark an insight's state as ACTIVE. Can be applied to insights in
-DISMISSED state.
+\fB(ALPHA)\fR Mark an insight's state as ACTIVE.
 
 .TP 2m
 \fBmark\-dismissed\fR
-\fB(ALPHA)\fR Mark an insight's state as DISMISSED. Can be applied to insights
-in ACTIVE state.
+\fB(ALPHA)\fR Mark an insight's state as DISMISSED.
 
 
 .RE
@@ -69,9 +66,10 @@ in ACTIVE state.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud recommender insights
 $ gcloud beta recommender insights
 .RE
 

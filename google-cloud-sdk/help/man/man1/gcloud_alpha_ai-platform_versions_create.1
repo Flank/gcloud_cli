@@ -11,7 +11,7 @@ gcloud alpha ai\-platform versions create \- create a new AI Platform version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-args\fR=[\fIARG\fR,...]\ \fB\-\-command\fR=[\fICOMMAND\fR,...]\ \fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-image\fR=\fIIMAGE\fR\ \fB\-\-ports\fR=[\fIARG\fR,...]\ \fB\-\-health\-route\fR=\fIHEALTH_ROUTE\fR\ \fB\-\-predict\-route\fR=\fIPREDICT_ROUTE\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,10 +51,8 @@ Name of the model.
 .RS 2m
 .TP 2m
 \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
-Manage the accelerator config for GPU serving. When deploying a model with the
-new Alpha Google Compute Engine Machine Types, a GPU accelerator may also be
-selected. Accelerator config for version creation is currently available in
-us\-central1 only.
+Manage the accelerator config for GPU serving. When deploying a model with
+Compute Engine Machine Types, a GPU accelerator may also be selected.
 
 .RS 2m
 .TP 2m
@@ -65,7 +63,10 @@ The type of the accelerator. Choices are 'nvidia\-tesla\-k80',
 
 .TP 2m
 \fBcount\fR
-The number of accelerators to attach to each machine running the job.
+The number of accelerators to attach to each machine running the job. This is
+usually 1; scaling parameters are configured using \f5manualScaling\fR or
+\f5autoScaling\fR flags.
+
 .RE
 .sp
 .TP 2m
@@ -135,7 +136,7 @@ numbers.
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
 Type of machine on which to serve the model. Currently only applies to online
 prediction. For available machine types, see
-https://cloud.google.com/ml\-engine/docs/tensorflow/online\-predict#machine\-types.
+https://cloud.google.com/ai\-platform/prediction/docs/machine\-types\-online\-prediction#available_machine_types.
 
 .TP 2m
 \fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR; default=50
@@ -197,6 +198,51 @@ Bucket in which to stage training archives.
 Required only if a file upload is necessary (that is, other flags include local
 paths) and no other flags implicitly specify an upload path.
 
+.TP 2m
+
+Configure the container to be deployed.
+
+.RS 2m
+.TP 2m
+\fB\-\-args\fR=[\fIARG\fR,...]
+Comma\-separated arguments passed to the command run by the container image. If
+not specified and no '\-\-command' is provided, the container image's default
+Cmd is used.
+
+.TP 2m
+\fB\-\-command\fR=[\fICOMMAND\fR,...]
+Entrypoint for the container image. If not specified, the container image's
+default Entrypoint is run.
+
+.TP 2m
+\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables.
+
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+Name of the container image to deploy (e.g. gcr.io/myproject/server:latest).
+
+.TP 2m
+\fB\-\-ports\fR=[\fIARG\fR,...]
+Container ports to receive requests at. Must be a number between 1 and 65535,
+inclusive.
+
+.TP 2m
+
+Flags to control the paths that requests and health checks are sent to.
+
+.RS 2m
+.TP 2m
+\fB\-\-health\-route\fR=\fIHEALTH_ROUTE\fR
+HTTP path to send health checks to inside the container.
+
+.TP 2m
+\fB\-\-predict\-route\fR=\fIPREDICT_ROUTE\fR
+HTTP path to send prediction requests to inside the container.
+
+.RE
+.RE
+.sp
 .TP 2m
 
 Configure user code in prediction. AI Platform allows a model to have

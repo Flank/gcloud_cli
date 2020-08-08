@@ -17,8 +17,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import re
 from googlecloudsdk.core import config
 from tests.lib import cli_test_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
@@ -71,6 +73,17 @@ class VersionTest(cli_test_base.CliTestBase):
     current_versions_mock.UpdatesAvailable.return_value = True
     self.Run('version')
     self.AssertErrContains('Updates are available')
+
+  # Not all components are installed outside of the bundle so core, alpha, and
+  # beta do not always exist.
+  @sdk_test_base.Filters.RunOnlyInBundle
+  def testVersion_AlphaBetaVersionsSameAsCore(self):
+    self.Run('version')
+    output = self.GetOutput()
+    core_line = re.search(r'core (.+)', output)
+    core_version = core_line.group(1)
+    self.AssertOutputContains('alpha {}'.format(core_version))
+    self.AssertOutputContains('beta {}'.format(core_version))
 
 
 if __name__ == '__main__':

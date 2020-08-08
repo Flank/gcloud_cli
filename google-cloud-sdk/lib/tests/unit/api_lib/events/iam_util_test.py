@@ -22,6 +22,7 @@ from apitools.base.py import exceptions
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.events import iam_util
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -164,8 +165,12 @@ class TestBindMissingRolesWithPrompt(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.email = 'test-account@fake-project.iam.gserviceaccount.com'
-    self.service_account_ref = 'projects/-/serviceAccounts/{}'.format(
-        self.email)
+    self.service_account_ref = resources.REGISTRY.Parse(
+        self.email,
+        params={'projectsId': '-'},
+        collection='iam.projects.serviceAccounts'
+    )
+
     self.get_roles = self.StartObjectPatch(
         iam_util,
         '_GetProjectRolesForServiceAccount',
@@ -212,7 +217,7 @@ class TestBindMissingRolesWithPrompt(cli_test_base.CliTestBase):
     self.bind_roles.assert_called_once_with(
         self.service_account_ref, {'roles/role3', 'roles/role4'})
     self.AssertErrContains(
-        'This will bind the following project roles to this service account:\\n'
+        'This will bind the following project roles to the service account [test-account@fake-project.iam.gserviceaccount.com]:\\n'
         '- roles/role3\\n'
         '- roles/role4', normalize_space=True)
 

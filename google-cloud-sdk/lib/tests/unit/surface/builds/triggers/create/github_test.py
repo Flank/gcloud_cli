@@ -26,12 +26,15 @@ from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
 class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
-                 sdk_test_base.WithTempCWD):
+                 sdk_test_base.WithTempCWD, parameterized.TestCase):
+
+  message = core_apis.GetMessagesModule('cloudbuild', 'v1')
 
   def SetUp(self):
     properties.VALUES.core.project.Set('my-project')
@@ -41,105 +44,206 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
     self.mocked_cloudbuild_v1.Mock()
     self.addCleanup(self.mocked_cloudbuild_v1.Unmock)
 
-    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1')
-
-  def test_create_github_trigger_dockerfile(self):
-    trigger = self.msg.BuildTrigger(
-        description='foo',
-        github=self.msg.GitHubEventsConfig(
-            owner='gcb',
-            name='test',
-            push=self.msg.PushFilter(branch='.*'),
-        ),
-        build=self.msg.Build(steps=[
-            self.msg.BuildStep(
-                name='gcr.io/cloud-builders/docker',
-                dir='/',
-                args=[
-                    'build', '-t',
-                    'gcr.io/my-project/github.com/gcb/test:$COMMIT_SHA', '-f',
-                    'Dockerfile', '.'
-                ],
-            )
-        ]))
+  @parameterized.parameters(
+      {
+          'command': [
+              'alpha', 'builds', 'triggers', 'create', 'github',
+              '--name=my-trigger', '--description=foo', '--repo-owner=gcb',
+              '--repo-name=test', '--branch-pattern=.*',
+              '--dockerfile=Dockerfile'
+          ],
+          'trigger':
+              message.BuildTrigger(
+                  name='my-trigger',
+                  description='foo',
+                  github=message.GitHubEventsConfig(
+                      owner='gcb',
+                      name='test',
+                      push=message.PushFilter(branch='.*'),
+                  ),
+                  build=message.Build(steps=[
+                      message.BuildStep(
+                          name='gcr.io/cloud-builders/docker',
+                          dir='/',
+                          args=[
+                              'build', '-t',
+                              'gcr.io/my-project/github.com/gcb/test:$COMMIT_SHA',
+                              '-f', 'Dockerfile', '.'
+                          ],
+                      )
+                  ])),
+      },
+      {
+          'command': [
+              'alpha',
+              'builds',
+              'triggers',
+              'create',
+              'github',
+              '--name=my-trigger',
+              '--description=foo',
+              '--repo-owner=gcb',
+              '--repo-name=test',
+              '--branch-pattern=.*',
+              '--dockerfile=Dockerfile',
+              '--dockerfile-image=gcr.io/other-project/github.com/other:abc123',
+          ],
+          'trigger':
+              message.BuildTrigger(
+                  name='my-trigger',
+                  description='foo',
+                  github=message.GitHubEventsConfig(
+                      owner='gcb',
+                      name='test',
+                      push=message.PushFilter(branch='.*'),
+                  ),
+                  build=message.Build(steps=[
+                      message.BuildStep(
+                          name='gcr.io/cloud-builders/docker',
+                          dir='/',
+                          args=[
+                              'build', '-t',
+                              'gcr.io/other-project/github.com/other:abc123',
+                              '-f', 'Dockerfile', '.'
+                          ],
+                      )
+                  ])),
+      },
+      {
+          'command': [
+              'alpha', 'builds', 'triggers', 'create', 'github',
+              '--repo-owner=gcb', '--repo-name=test', '--tag-pattern=.*',
+              '--build-config=cloudbuild.yaml',
+              '--substitutions=_FAVORITE_COLOR=blue', '--included-files=src/**',
+              '--ignored-files=docs/**'
+          ],
+          'trigger':
+              message.BuildTrigger(
+                  github=message.GitHubEventsConfig(
+                      owner='gcb',
+                      name='test',
+                      push=message.PushFilter(tag='.*',),
+                  ),
+                  filename='cloudbuild.yaml',
+                  substitutions=message.BuildTrigger
+                  .SubstitutionsValue(additionalProperties=[
+                      message.BuildTrigger.SubstitutionsValue
+                      .AdditionalProperty(key='_FAVORITE_COLOR', value='blue')
+                  ]),
+                  includedFiles=['src/**'],
+                  ignoredFiles=['docs/**'],
+              ),
+      },
+  )
+  def test_create_github_trigger(self, command, trigger):
     want = copy.deepcopy(trigger)
     want.id = 'id'
     self.mocked_cloudbuild_v1.projects_triggers.Create.Expect(
-        self.msg.CloudbuildProjectsTriggersCreateRequest(
+        self.message.CloudbuildProjectsTriggersCreateRequest(
             projectId='my-project', buildTrigger=trigger),
         response=want)
     properties.VALUES.core.user_output_enabled.Set(False)
-    resp = self.Run([
-        'alpha', 'builds', 'triggers', 'create', 'github', '--description=foo',
-        '--repo-owner=gcb', '--repo-name=test', '--branch-pattern=.*',
-        '--dockerfile=Dockerfile'
-    ])
+    resp = self.Run(command)
     self.assertEqual(want, resp)
 
-  def test_create_github_trigger_pr_configfile(self):
-    trigger = self.msg.BuildTrigger(
-        github=self.msg.GitHubEventsConfig(
-            owner='gcb',
-            name='test',
-            pullRequest=self.msg.PullRequestFilter(
-                branch='.*',
-                commentControl=self.msg.PullRequestFilter
-                .CommentControlValueValuesEnum.COMMENTS_ENABLED,
-            ),
-        ),
-        filename='cloudbuild.yaml',
-        substitutions=encoding.PyValueToMessage(
-            self.msg.BuildTrigger.SubstitutionsValue,
-            {'_FAVORITE_COLOR': 'blue'}),
-    )
+  @parameterized.parameters([
+      {
+          'command': [
+              'alpha',
+              'builds',
+              'triggers',
+              'create',
+              'github',
+              '--repo-owner=gcb',
+              '--repo-name=test',
+              '--tag-pattern=.*',
+              '--build-config=cloudbuild.yaml',
+              '--comment-control=COMMENTS_ENABLED',
+          ],
+          'regex': '--pull-request-pattern must be specified',
+      },
+  ])
+  def test_create_github_trigger_fails(self, command, regex):
+    properties.VALUES.core.user_output_enabled.Set(False)
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError, regex):
+      self.Run(command)
+
+  @parameterized.parameters([
+      {
+          'command': [
+              'alpha',
+              'builds',
+              'triggers',
+              'create',
+              'github',
+              '--repo-owner=gcb',
+              '--repo-name=test',
+              '--build-config=cloudbuild.yaml',
+              '--comment-control=COMMENTS_BAD',
+          ],
+          'regex': 'argument --comment-control: --pull-request-pattern must be '
+                   'specified.',
+      },
+  ])
+  def test_create_github_trigger_fails_with_bad_comment_control_value(
+      self, command, regex):
+    properties.VALUES.core.user_output_enabled.Set(False)
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError, regex):
+      self.Run(command)
+
+  @parameterized.parameters([
+      {
+          'command': [
+              'alpha',
+              'builds',
+              'triggers',
+              'create',
+              'github',
+              '--repo-owner=gcb',
+              '--repo-name=test',
+              '--build-config=cloudbuild.yaml',
+              '--comment-control',
+          ],
+          'regex': 'argument --comment-control: expected one argument',
+      },
+  ])
+  def test_create_github_trigger_fails_with_no_comment_control_value(
+      self, command, regex):
+    properties.VALUES.core.user_output_enabled.Set(False)
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError, regex):
+      self.Run(command)
+
+  @parameterized.parameters([
+      message.BuildTrigger(
+          github=message.GitHubEventsConfig(
+              owner='gcb',
+              name='test',
+              pullRequest=message.PullRequestFilter(
+                  branch='.*',
+                  commentControl=message.PullRequestFilter
+                  .CommentControlValueValuesEnum.COMMENTS_ENABLED,
+              ),
+          ),
+          filename='cloudbuild.yaml',
+          substitutions=encoding.PyValueToMessage(
+              message.BuildTrigger.SubstitutionsValue,
+              {'_FAVORITE_COLOR': 'blue'}),
+      ),
+  ])
+  def test_create_github_trigger_with_config_file(self, trigger):
     path = self.Touch(
         '.', 'trigger.json', contents=encoding.MessageToJson(trigger))
 
     want = copy.deepcopy(trigger)
     want.id = 'id'
-
     self.mocked_cloudbuild_v1.projects_triggers.Create.Expect(
-        self.msg.CloudbuildProjectsTriggersCreateRequest(
+        self.message.CloudbuildProjectsTriggersCreateRequest(
             projectId='my-project', buildTrigger=trigger),
         response=want)
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
         'alpha', 'builds', 'triggers', 'create', 'github', '--trigger-config',
         path
-    ])
-    self.assertEqual(want, resp)
-
-  def test_create_github_trigger_subs(self):
-    trigger = self.msg.BuildTrigger(
-        github=self.msg.GitHubEventsConfig(
-            owner='gcb',
-            name='test',
-            push=self.msg.PushFilter(tag='.*',),
-        ),
-        filename='cloudbuild.yaml',
-        substitutions=self.msg.BuildTrigger.SubstitutionsValue(
-            additionalProperties=[
-                self.msg.BuildTrigger.SubstitutionsValue.AdditionalProperty(
-                    key='_FAVORITE_COLOR', value='blue')
-            ]),
-        includedFiles=['src/**'],
-        ignoredFiles=['docs/**'],
-    )
-
-    want = copy.deepcopy(trigger)
-    want.id = 'id'
-
-    self.mocked_cloudbuild_v1.projects_triggers.Create.Expect(
-        self.msg.CloudbuildProjectsTriggersCreateRequest(
-            projectId='my-project', buildTrigger=trigger),
-        response=want)
-    properties.VALUES.core.user_output_enabled.Set(False)
-    resp = self.Run([
-        'alpha', 'builds', 'triggers', 'create', 'github', '--repo-owner=gcb',
-        '--repo-name=test', '--tag-pattern=.*',
-        '--build-config=cloudbuild.yaml',
-        '--substitutions=_FAVORITE_COLOR=blue', '--included-files=src/**',
-        '--ignored-files=docs/**'
     ])
     self.assertEqual(want, resp)
 

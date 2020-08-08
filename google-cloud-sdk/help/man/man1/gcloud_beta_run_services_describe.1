@@ -162,10 +162,17 @@ To obtain details about a given service:
 $ gcloud beta run services describe <service\-name>
 .RE
 
-To get those details in the Knative yaml format:
+To get those details in the YAML format:
 
 .RS 2m
 $ gcloud beta run services describe <service\-name> \-\-format=yaml
+.RE
+
+To get them in YAML format suited to export (omitting metadata specific to this
+deployment and status info):
+
+.RS 2m
+$ gcloud beta run services describe <service\-name> \-\-format=export
 .RE
 
 

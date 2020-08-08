@@ -24,11 +24,10 @@ from tests.lib import test_case
 from tests.lib.surface.firebase.test import unit_base
 import six
 
-# Note: Testing is a Google API platform, ToolResults uses older API endpoints.
 PROD_TESTING = 'https://testing.googleapis.com/'
 TEST_TESTING = 'https://test-testing.sandbox.googleapis.com/'
 PROD_RESULTS = 'https://www.googleapis.com/toolresults/v1beta3/'
-TEST_RESULTS = 'https://www-googleapis-test.sandbox.google.com/toolresults/v1/'
+TEST_RESULTS = 'https://staging-toolresults.sandbox.googleapis.com/toolresults/v1beta3/'
 
 
 class EndpointTests(unit_base.TestMockClientTest):

@@ -1,0 +1,417 @@
+title: ACM hub feature apply config test
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      container hub config-management enable
+  - stderr: |
+      Enabling service anthos$$feature_api$$.googleapis.com
+  - stderr: |
+      Operation "operations/acf.f36dc690-d3c6-4cb7-b72c-4f51015a1d7b" finished successfully.
+  - progress_tracker:
+    - message: Waiting for Feature $$feature_display_name$$ to be created
+    - status: SUCCESS
+  - stderr: |
+      WARNING: generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com
+- execute:
+  - command: |
+      container hub config-management enable
+  - stderr: |
+      Enabling service anthos$$feature_api$$.googleapis.com
+  - progress_tracker:
+    - message: Waiting for Feature $$feature_display_name$$ to be created
+    - status: SUCCESS
+  - stderr: |
+      WARNING: generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com
+actions:
+- define_reference:
+    reference: feature
+    value: config-management
+- define_reference:
+    reference: feature_api
+    value: configmanagement
+- define_reference:
+    reference: feature_display_name
+    value: Config Management
+- define_reference:
+    reference: project
+    value: fake-project
+
+# Enable Configmanagement Feature should also enable anthosconfigmanagement.googleapis.com service
+- execute_command:
+    command: |
+      container hub config-management enable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1/projects/$$project$$/services/anthos$$feature_api$$.googleapis.com:enable?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |-
+            {
+              "name": "operations/acf.f36dc690-d3c6-4cb7-b72c-4f51015a1d7b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Any"
+              }
+            }
+    - expect_stderr: |
+        Enabling service anthos$$feature_api$$.googleapis.com
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1/operations/acf.f36dc690-d3c6-4cb7-b72c-4f51015a1d7b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |-
+            {
+              "name": "operations/acf.f36dc690-d3c6-4cb7-b72c-4f51015a1d7b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.api.serviceusage.v1.EnableServiceResponse",
+                "service": {
+                  "name": "projects/907916173386/services/anthos$$feature_api$$.googleapis.com",
+                  "config": {
+                    "name": "anthos$$feature_api$$.googleapis.com",
+                    "title": "Anthos $$feature_display_name$$ API",
+                    "documentation": {
+                      "summary": "Anthos $$feature_display_name$$"
+                    },
+                    "quota": {},
+                    "authentication": {},
+                    "legacy": {
+                      "apiV1Name": "anthos$$feature_api$$.googleapis.com",
+                      "devconsole": {
+                        "learnmoreUrl": "https://cloud.google.com/anthos-$$feature$$/docs/"
+                      }
+                    },
+                    "usage": {
+                      "requirements": [
+                        "serviceusage.googleapis.com/tos/cloud"
+                      ]
+                    },
+                    "migration": {},
+                    "features": [
+                      "googleprod.com/service/use-monarch"
+                    ]
+                  },
+                  "state": "ENABLED",
+                  "parent": "projects/907916173386"
+                }
+              }
+            }
+
+    - expect_stderr: |
+        Operation "operations/acf.f36dc690-d3c6-4cb7-b72c-4f51015a1d7b" finished successfully.
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features?alt=json&featureId=$$feature_api$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              configmanagementFeatureSpec:
+                membershipConfigs: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2020-05-27T19:02:04.420300625Z",
+                "target": "projects/$$project$$/locations/global/features/$$feature_api$$",
+                "verb": "create",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+            content-type: application/json; charset=UTF-8
+          body: |-
+            {
+              "name": "projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2020-05-27T19:02:04.420300625Z",
+                "endTime": "2020-05-27T19:02:05.837866955Z",
+                "target": "projects/$$project$$/locations/global/features/$$feature_api$$",
+                "verb": "create",
+                "statusDetail": "generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gkehub.v1alpha1.Feature",
+                "name": "projects/$$project$$/locations/global/features/$$feature_api$$",
+                "featureState": {
+                  "lifecycleState": "ENABLED"
+                },
+                "createTime": "2020-05-27T19:02:04.397054838Z",
+                "updateTime": "2020-05-27T19:02:04.397054838Z",
+                "$$feature_api$$FeatureSpec": {}
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for Feature $$feature_display_name$$ to be created
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+            content-type: application/json; charset=UTF-8
+          body: |-
+            {
+              "name": "projects/mynomos/locations/global/features/$$feature_api$$",
+              "featureState": {
+                "lifecycleState": "ENABLED"
+              },
+              "createTime": "2020-05-27T19:02:04.397054838Z",
+              "updateTime": "2020-05-27T19:02:05.858963332Z",
+              "$$feature_api$$FeatureSpec": {}
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+            content-type: application/json; charset=UTF-8
+          body: |-
+            {
+              "name": "projects/mynomos/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2020-05-27T19:02:04.420300625Z",
+                "endTime": "2020-05-27T19:02:05.837866955Z",
+                "target": "projects/mynomos/locations/global/features/$$feature_api$$",
+                "verb": "create",
+                "statusDetail": "generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gkehub.v1alpha1.Feature",
+                "name": "projects/mynomos/locations/global/features/$$feature_api$$",
+                "featureState": {
+                  "lifecycleState": "ENABLED"
+                },
+                "createTime": "2020-05-27T19:02:04.397054838Z",
+                "updateTime": "2020-05-27T19:02:04.397054838Z",
+                "$$feature_api$$FeatureSpec": {}
+              }
+            }
+    - expect_stderr: |
+        WARNING: generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com
+    - expect_exit:
+        code: 0
+
+# Enable Configmanagement Feature, anthosconfigmanagement.googleapis.com service is enabled beforehand
+- execute_command:
+    command: |
+      container hub config-management enable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1/projects/$$project$$/services/anthos$$feature_api$$.googleapis.com:enable?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |-
+            {
+              "name": "operations/noop.DONE_OPERATION",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.api.serviceusage.v1.EnableServiceResponse",
+                "service": {
+                  "name": "projects/907916173386/services/anthos$$feature_api$$.googleapis.com",
+                  "config": {
+                    "name": "anthos$$feature_api$$.googleapis.com",
+                    "title": "Anthos $$feature_display_name$$ API",
+                    "documentation": {
+                      "summary": "Anthos $$feature_display_name$$"
+                    },
+                    "quota": {},
+                    "authentication": {},
+                    "legacy": {
+                      "apiV1Name": "anthos$$feature_api$$.googleapis.com",
+                      "devconsole": {
+                        "learnmoreUrl": "https://cloud.google.com/anthos-$$feature$$/docs/"
+                      }
+                    },
+                    "usage": {
+                      "requirements": [
+                        "serviceusage.googleapis.com/tos/cloud"
+                      ]
+                    },
+                    "migration": {},
+                    "features": [
+                      "googleprod.com/service/use-monarch"
+                    ]
+                  },
+                  "state": "ENABLED",
+                  "parent": "projects/907916173386"
+                }
+              }
+            }
+    - expect_stderr: |
+        Enabling service anthos$$feature_api$$.googleapis.com
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features?alt=json&featureId=$$feature_api$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              configmanagementFeatureSpec:
+                membershipConfigs: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2020-05-27T19:02:04.420300625Z",
+                "target": "projects/$$project$$/locations/global/features/$$feature_api$$",
+                "verb": "create",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+            content-type: application/json; charset=UTF-8
+          body: |-
+            {
+              "name": "projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2020-05-27T19:02:04.420300625Z",
+                "endTime": "2020-05-27T19:02:05.837866955Z",
+                "target": "projects/$$project$$/locations/global/features/$$feature_api$$",
+                "verb": "create",
+                "statusDetail": "generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gkehub.v1alpha1.Feature",
+                "name": "projects/$$project$$/locations/global/features/$$feature_api$$",
+                "featureState": {
+                  "lifecycleState": "ENABLED"
+                },
+                "createTime": "2020-05-27T19:02:04.397054838Z",
+                "updateTime": "2020-05-27T19:02:04.397054838Z",
+                "$$feature_api$$FeatureSpec": {}
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for Feature $$feature_display_name$$ to be created
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+            content-type: application/json; charset=UTF-8
+          body: |-
+            {
+              "name": "projects/mynomos/locations/global/features/$$feature_api$$",
+              "featureState": {
+                "lifecycleState": "ENABLED"
+              },
+              "createTime": "2020-05-27T19:02:04.397054838Z",
+              "updateTime": "2020-05-27T19:02:05.858963332Z",
+              "$$feature_api$$FeatureSpec": {}
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+            content-type: application/json; charset=UTF-8
+          body: |-
+            {
+              "name": "projects/mynomos/locations/global/operations/operation-1590606124322-5a6a5d9048f5b-c9bbccd7-0c30684e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2020-05-27T19:02:04.420300625Z",
+                "endTime": "2020-05-27T19:02:05.837866955Z",
+                "target": "projects/mynomos/locations/global/features/$$feature_api$$",
+                "verb": "create",
+                "statusDetail": "generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gkehub.v1alpha1.Feature",
+                "name": "projects/mynomos/locations/global/features/$$feature_api$$",
+                "featureState": {
+                  "lifecycleState": "ENABLED"
+                },
+                "createTime": "2020-05-27T19:02:04.397054838Z",
+                "updateTime": "2020-05-27T19:02:04.397054838Z",
+                "$$feature_api$$FeatureSpec": {}
+              }
+            }
+    - expect_stderr: |
+        WARNING: generic::failed_precondition: WARNING: $$feature_api$$ feature will eventually require enablement of autopush-anthos.sandbox.googleapis.com
+    - expect_exit:
+        code: 0

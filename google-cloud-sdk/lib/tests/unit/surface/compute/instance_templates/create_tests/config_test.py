@@ -134,13 +134,13 @@ class InstanceTemplatesCreateShieldedInstanceConfigAlphaTest(
     self.api_version = 'alpha'
 
 
-class InstanceTemplatesCreateConfidentialInstanceConfigAlphaTest(
+class InstanceTemplatesCreateConfidentialInstanceConfigBetaTest(
     create_test_base.InstanceTemplatesCreateTestBase, parameterized.TestCase):
   """Test creation of VM instances with Confidential Instance Config."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
   @parameterized.named_parameters(
       ('EnableConfidentialCompute', '--confidential-compute', True),
@@ -188,6 +188,14 @@ class InstanceTemplatesCreateConfidentialInstanceConfigAlphaTest(
           ))],
     )
 
+
+class InstanceTemplatesCreateConfidentialInstanceConfigAlphaTest(
+    InstanceTemplatesCreateConfidentialInstanceConfigBetaTest):
+  """Test creation of VM instances with Confidential Instance Config."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 if __name__ == '__main__':
   test_case.main()

@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha ml-engine versions update (VERSION : --model=MODEL)
-        [--config=CONFIG] [--description=DESCRIPTION] [--region=REGION]
+        [--config=YAML_FILE] [--description=DESCRIPTION] [--region=REGION]
         [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -28,7 +28,7 @@ POSITIONAL ARGUMENTS
           The model for the version.
 
 FLAGS
-     --config=CONFIG
+     --config=YAML_FILE
         Path to a YAML configuration file containing configuration parameters
         for the version
         (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)

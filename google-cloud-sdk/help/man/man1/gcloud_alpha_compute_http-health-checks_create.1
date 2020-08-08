@@ -67,9 +67,9 @@ is marked as healthy. The default is 2.
 .TP 2m
 \fB\-\-host\fR=\fIHOST\fR
 The value of the host header used in this HTTP health check request. By default,
-this is empty and Google Compute Engine automatically sets the host header in
-health requests to the same external IP address as the forwarding rule
-associated with the target pool.
+this is empty and Compute Engine automatically sets the host header in health
+requests to the same external IP address as the forwarding rule associated with
+the target pool.
 
 .TP 2m
 \fB\-\-port\fR=\fIPORT\fR; default=80
@@ -82,12 +82,12 @@ The request path that this health check monitors. For example,
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="5s"
-If Google Compute Engine doesn't receive an HTTP 200 response from the instance
-by the time specified by the value of this flag, the health check request is
-considered a failure. For example, specifying \f5\fI10s\fR\fR will cause the
-check to wait for 10 seconds before considering the request a failure. The
-default value is \f5\fI5s\fR\fR. See $ gcloud topic datetimes for information on
-duration formats.
+If Compute Engine doesn't receive an HTTP 200 response from the instance by the
+time specified by the value of this flag, the health check request is considered
+a failure. For example, specifying \f5\fI10s\fR\fR will cause the check to wait
+for 10 seconds before considering the request a failure. The default value is
+\f5\fI5s\fR\fR. See $ gcloud topic datetimes for information on duration
+formats.
 
 .TP 2m
 \fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR; default=2

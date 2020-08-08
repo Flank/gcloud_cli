@@ -30,7 +30,8 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --ciphertext-file=CIPHERTEXT_FILE
-        File path of the ciphertext file to decrypt.
+        File path of the ciphertext file to decrypt. This file should contain
+        the result of encrypting a file with gcloud kms encrypt.
 
      --plaintext-file=PLAINTEXT_FILE
         File path of the plaintext file to output.
@@ -42,6 +43,14 @@ OPTIONAL FLAGS
 
      --key=KEY
         Cloud KMS key to use for decryption.
+        * For symmetric keys, Cloud KMS detects the decryption key version
+          from the ciphertext. If you specify a key version as part of a
+          symmetric decryption request, an error is logged and decryption
+          fails.
+        * For asymmetric keys, the encryption key version can't be detected
+          automatically. You must keep track of this information and provide
+          the key version in the decryption request. The key version itself is
+          not sensitive data and does not need to be encrypted.
 
      --keyring=KEYRING
         Key ring of the key.

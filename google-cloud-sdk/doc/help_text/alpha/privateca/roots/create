@@ -4,14 +4,16 @@ NAME
 
 SYNOPSIS
     gcloud alpha privateca roots create CERTIFICATE_AUTHORITY
-        --subject=[SUBJECT,...]
         (--kms-key-version=KMS_KEY_VERSION : --kms-key=KMS_KEY
           --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT)
-        [--dns-san=[DNS_SAN,...]] [--email-san=[EMAIL_SAN,...]]
-        [--ip-san=[IP_SAN,...]] [--issuance-policy=ISSUANCE_POLICY]
-        [--labels=[KEY=VALUE,...]] [--no-publish-ca-cert] [--no-publish-crl]
+        [--bucket=BUCKET] [--dns-san=[DNS_SAN,...]]
+        [--email-san=[EMAIL_SAN,...]] [--ip-san=[IP_SAN,...]]
+        [--issuance-policy=ISSUANCE_POLICY] [--labels=[KEY=VALUE,...]]
+        [--no-publish-ca-cert] [--no-publish-crl] [--subject=[SUBJECT,...]]
         [--uri-san=[URI_SAN,...]] [--validity=VALIDITY; default="P10Y"]
+        [--from-ca=FROM_CA : --from-ca-location=FROM_CA_LOCATION
+          --from-ca-project=FROM_CA_PROJECT]
         [[--reusable-config=REUSABLE_CONFIG
           : --extended-key-usages=[EXTENDED_KEY_USAGES,...]
           --key-usages=[KEY_USAGES,...] --max-chain-length=MAX_CHAIN_LENGTH]]
@@ -32,10 +34,6 @@ POSITIONAL ARGUMENTS
           Certificate Authority.
 
 REQUIRED FLAGS
-     --subject=[SUBJECT,...]
-        X.501 name of the certificate subject. Example:--subject
-        "C=US,ST=California,L=Mountain View,O=Google LLC,CN=google.com"
-
      Key version resource - The KMS key version backing this CA. The arguments
      in this group can be used to specify the attributes of this resource. This
      must be specified.
@@ -58,6 +56,11 @@ REQUIRED FLAGS
           The Cloud project for the key version.
 
 OPTIONAL FLAGS
+     --bucket=BUCKET
+        The name of an existing storage bucket to use for storing the CA
+        certificate and CRLs. If omitted, a new bucket with an auto-generated
+        name will be created in the same project and location as the CA.
+
      --dns-san=[DNS_SAN,...]
         One or more comma-separated DNS Subject Alternative Names.
 
@@ -100,11 +103,31 @@ OPTIONAL FLAGS
 
         Enabled by default, use --no-publish-crl to disable.
 
+     --subject=[SUBJECT,...]
+        X.501 name of the certificate subject. Example:--subject
+        "C=US,ST=California,L=Mountain View,O=Google LLC,CN=google.com"
+
      --uri-san=[URI_SAN,...]
         One or more comma-separated URI Subject Alternative Names.
 
      --validity=VALIDITY; default="P10Y"
         The validity of this CA, as an ISO8601 duration. Defaults to 10 years.
+
+     Source CA resource - An existing CA from which to copy configuration
+     values for the new CA. You can still override any of those values by
+     explicitly providing the appropriate flags. The arguments in this group
+     can be used to specify the attributes of this resource.
+
+       --from-ca=FROM_CA
+          ID of the source CA or fully qualified identifier for the source CA.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+       --from-ca-location=FROM_CA_LOCATION
+          The location of the source CA.
+
+       --from-ca-project=FROM_CA_PROJECT
+          Project ID of the Google Cloud Platform project for the source CA.
 
      The X.509 configuration used for the CA certificate. At most one of these
      may be specified:
@@ -152,25 +175,39 @@ EXAMPLES
     To create a root CA that supports one layer of subordinates:
 
         $ gcloud alpha privateca roots create prod-root \
-          --kms-key-version "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --kms-key-version \
+          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
+          \
           --subject "CN=Joonix Production Root CA" \
           --max-chain-length 1
 
     To create a root CA and restrict what it can issue:
 
         $ gcloud alpha privateca roots create prod-root \
-          --kms-key-version "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --kms-key-version \
+          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
+          \
           --subject "CN=Joonix Production Root CA" \
           --issuance-policy policy.yaml
 
     To create a root CA that doesn't publicly publish CA certificate and CRLs:
 
         $ gcloud alpha privateca roots create root-2 \
-          --kms-key-version "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --kms-key-version \
+          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
+          \
           --subject "CN=Joonix Production Root CA" \
           --issuance-policy policy.yaml \
           --no-publish-ca-cert \
           --no-publish-crl
+
+    To create a root CA that is based on an existing CA:
+
+        $ gcloud alpha privateca roots create prod-root \
+          --kms-key-version \
+          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
+          \
+          --from-ca source-root --from-ca-location us-central1
 
 NOTES
     This command is an internal implementation detail and may change or

@@ -11,7 +11,7 @@ gcloud asset feeds create \- create a Cloud Asset Inventory Feed
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud asset feeds create\fR \fIFEED_ID\fR \fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR (\fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...]\ \fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]) (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud asset feeds create\fR \fIFEED_ID\fR \fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR (\fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...]\ \fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]) (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-condition\-description\fR=\fICONDITION_DESCRIPTION\fR] [\fB\-\-condition\-expression\fR=\fICONDITION_EXPRESSION\fR] [\fB\-\-condition\-title\fR=\fICONDITION_TITLE\fR] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -81,7 +81,7 @@ Organization of the feed.
 \fB\-\-project\fR=\fIPROJECT_ID\fR
 project of the feed.
 
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.
@@ -100,6 +100,19 @@ different project for quota and billing, use \f5\-\-billing\-project\fR or
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-condition\-description\fR=\fICONDITION_DESCRIPTION\fR
+Description of the feed condition. For reference only.
+
+.TP 2m
+\fB\-\-condition\-expression\fR=\fICONDITION_EXPRESSION\fR
+Feed condition expression. If not specified, no condition will be applied to
+feed.
+
+.TP 2m
+\fB\-\-condition\-title\fR=\fICONDITION_TITLE\fR
+Title of the feed condition. For reference only.
+
 .TP 2m
 \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
 Asset content type. If not specified, no content but the asset name and type

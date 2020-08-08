@@ -22,24 +22,25 @@ import textwrap
 
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.load_balancing import test_resources
 
 
-class TargetGrpcProxiesDescribeAlphaTest(test_base.BaseTest):
-
-  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+class TargetGrpcProxiesDescribeV1Test(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'v1'
     self.SelectApi(self._api)
-    self._target_grpc_proxies_api = self.compute_alpha.targetGrpcProxies
+    self._target_grpc_proxies_api = self.compute_v1.targetGrpcProxies
 
   def RunDescribe(self, command):
-    self.Run('alpha compute target-grpc-proxies describe %s' % command)
+    self.Run('compute target-grpc-proxies describe %s' % command)
+
+  def GetTestResources(self):
+    return test_resources.TARGET_GRPC_PROXIES_V1
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
-        [test_resources.TARGET_GRPC_PROXIES_ALPHA[0]],
+        [self.GetTestResources()[0]],
     ])
     self.RunDescribe('target-grpc-proxy-1')
     self.CheckRequests(
@@ -51,10 +52,38 @@ class TargetGrpcProxiesDescribeAlphaTest(test_base.BaseTest):
         textwrap.dedent("""\
             description: My first proxy
             name: target-grpc-proxy-1
-            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/targetGrpcProxies/target-grpc-proxy-1
-            urlMap: https://compute.googleapis.com/compute/alpha/projects/my-project/global/urlMaps/url-map-1
+            selfLink: https://compute.googleapis.com/compute/{0}/projects/my-project/global/targetGrpcProxies/target-grpc-proxy-1
+            urlMap: https://compute.googleapis.com/compute/{0}/projects/my-project/global/urlMaps/url-map-1
             validateForProxyless: false
-            """))
+            """.format(self._api)))
+
+
+class TargetGrpcProxiesDescribeBetaTest(TargetGrpcProxiesDescribeV1Test):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_grpc_proxies_api = self.compute_beta.targetGrpcProxies
+
+  def RunDescribe(self, command):
+    self.Run('beta compute target-grpc-proxies describe %s' % command)
+
+  def GetTestResources(self):
+    return test_resources.TARGET_GRPC_PROXIES_BETA
+
+
+class TargetGrpcProxiesDescribeAlphaTest(TargetGrpcProxiesDescribeBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_grpc_proxies_api = self.compute_alpha.targetGrpcProxies
+
+  def RunDescribe(self, command):
+    self.Run('alpha compute target-grpc-proxies describe %s' % command)
+
+  def GetTestResources(self):
+    return test_resources.TARGET_GRPC_PROXIES_ALPHA
 
 
 if __name__ == '__main__':

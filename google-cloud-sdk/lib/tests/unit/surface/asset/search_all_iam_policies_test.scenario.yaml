@@ -1,5 +1,5 @@
 title: surface unit test for asset search-all-iam-policies
-release_tracks: [BETA]
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: core/project proj-foo
@@ -34,13 +34,23 @@ summary:
 actions:
 - set_property:
     core/project: proj-foo  # `projects/proj-foo` has project number `projects/123`
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1p1beta1
+      GA: v1
+- define_reference:
+    reference: method-url
+    track_values:
+      BETA: "/iamPolicies:searchAll"
+      GA: ":searchAllIamPolicies"
 - execute_command:
     # Search with --scope specified with project number.
     command: asset search-all-iam-policies --scope "projects/123" --query "policy:roles/owner"
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1beta1/projects/123/iamPolicies:searchAll?alt=json&query=policy%3Aroles%2Fowner
+          uri: https://cloudasset.googleapis.com/$$api-version$$/projects/123$$method-url$$?alt=json&pageSize=20&query=policy%3Aroles%2Fowner
           method: GET
           headers: {}
           body: null
@@ -68,17 +78,17 @@ actions:
               }
             }
     - expect_stdout: |
-        results:
-        - policy:
-            bindings:
-            - members:
-              - user:user1@google.com
-              - user:user2@google.com
-              role: roles/owner
-            etag: a0052064237355214362
-            version: 1
-          project: projects/123
-          resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
+        ---
+        policy:
+          bindings:
+          - members:
+            - user:user1@google.com
+            - user:user2@google.com
+            role: roles/owner
+          etag: a0052064237355214362
+          version: 1
+        project: projects/123
+        resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
     - expect_exit:
         code: 0
 - execute_command:
@@ -87,7 +97,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1beta1/projects/proj-foo/iamPolicies:searchAll?alt=json&query=policy%3Aroles%2Fowner
+          uri: https://cloudasset.googleapis.com/$$api-version$$/projects/proj-foo$$method-url$$?alt=json&pageSize=20&query=policy%3Aroles%2Fowner
           method: GET
           headers: {}
           body: null
@@ -115,17 +125,17 @@ actions:
               }
             }
     - expect_stdout: |
-        results:
-        - policy:
-            bindings:
-            - members:
-              - user:user1@google.com
-              - user:user2@google.com
-              role: roles/owner
-            etag: a0052064237355214362
-            version: 1
-          project: projects/123
-          resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
+        ---
+        policy:
+          bindings:
+          - members:
+            - user:user1@google.com
+            - user:user2@google.com
+            role: roles/owner
+          etag: a0052064237355214362
+          version: 1
+        project: projects/123
+        resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
     - expect_exit:
         code: 0
 - execute_command:
@@ -134,7 +144,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1beta1/projects/proj-foo/iamPolicies:searchAll?alt=json&query=policy%3Aroles%2Fowner
+          uri: https://cloudasset.googleapis.com/$$api-version$$/projects/proj-foo$$method-url$$?alt=json&pageSize=20&query=policy%3Aroles%2Fowner
           method: GET
           headers: {}
           body: null
@@ -162,16 +172,16 @@ actions:
               }
             }
     - expect_stdout: |
-        results:
-        - policy:
-            bindings:
-            - members:
-              - user:user1@google.com
-              - user:user2@google.com
-              role: roles/owner
-            etag: a0052064237355214362
-            version: 1
-          project: projects/123
-          resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
+        ---
+        policy:
+          bindings:
+          - members:
+            - user:user1@google.com
+            - user:user2@google.com
+            role: roles/owner
+          etag: a0052064237355214362
+          version: 1
+        project: projects/123
+        resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
     - expect_exit:
         code: 0

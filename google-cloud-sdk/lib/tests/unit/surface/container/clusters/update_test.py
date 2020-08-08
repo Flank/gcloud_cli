@@ -174,6 +174,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
                 kubernetesDashboard=self.msgs.KubernetesDashboard(
                     disabled=True))),
         flags='--update-addons KubernetesDashboard=DISABLED')
+
+  def testUpdateAddonsCloudRun(self):
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
@@ -184,6 +186,33 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
             desiredAddonsConfig=self.msgs.AddonsConfig(
                 cloudRunConfig=self.msgs.CloudRunConfig(disabled=True))),
         flags='--update-addons CloudRun=DISABLED')
+
+  def testUpdateAddonsNodeLocalDNS(self):
+    self.WriteInput('y')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=False))),
+        flags='--update-addons NodeLocalDNS=DISABLED')
+
+    self.WriteInput('y')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=True))),
+        flags='--update-addons NodeLocalDNS=ENABLED')
+
+    self._TestUpdateAbort(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=False))),
+        flags='--update-addons NodeLocalDNS=DISABLED')
+
+    self._TestUpdateAbort(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=True))),
+        flags='--update-addons NodeLocalDNS=ENABLED')
 
   def testEnableClusterAutoscaler(self):
     self._TestUpdate(
@@ -1583,9 +1612,9 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         ],
         autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
-              '--max-cpu 100 --min-cpu 8 '
-              '--autoprovisioning-max-surge-upgrade=1 '
-              '--autoprovisioning-max-unavailable-upgrade=2 ')
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-max-surge-upgrade=1 '
+        '--autoprovisioning-max-unavailable-upgrade=2 ')
 
   def testEnableAutoprovisioningWithNodeManagement(self):
     self._TestUpdateAutoprovisioning(
@@ -1601,9 +1630,9 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         ],
         autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
-              '--max-cpu 100 --min-cpu 8 '
-              '--no-enable-autoprovisioning-autorepair '
-              '--enable-autoprovisioning-autoupgrade')
+        '--max-cpu 100 --min-cpu 8 '
+        '--no-enable-autoprovisioning-autorepair '
+        '--enable-autoprovisioning-autoupgrade')
 
   def testEnableAutoprovisioningWithNodeManagementAndUpgradeSettings(self):
     self._TestUpdateAutoprovisioning(
@@ -1621,11 +1650,11 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         ],
         autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
-              '--max-cpu 100 --min-cpu 8 '
-              '--autoprovisioning-max-surge-upgrade=1 '
-              '--autoprovisioning-max-unavailable-upgrade=2 '
-              '--no-enable-autoprovisioning-autorepair '
-              '--enable-autoprovisioning-autoupgrade ')
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-max-surge-upgrade=1 '
+        '--autoprovisioning-max-unavailable-upgrade=2 '
+        '--no-enable-autoprovisioning-autorepair '
+        '--enable-autoprovisioning-autoupgrade ')
 
   def testEnableAutoprovisioningWithManagementFromFile(self):
     autoprovisioning_config_file = self.Touch(
@@ -1938,8 +1967,8 @@ resourceLimits:
   def testUpdateWorkloadIdentity(self):
     update = self.msgs.ClusterUpdate(
         desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
-            workloadPool='new-workload-pool'))
-    self._TestUpdate(update=update, flags='--workload-pool=new-workload-pool ')
+            workloadPool='foobar.svc.id.goog'))
+    self._TestUpdate(update=update, flags='--workload-pool=foobar.svc.id.goog ')
 
   @parameterized.parameters(
       ('--no-enable-shielded-nodes', False),
@@ -1966,6 +1995,29 @@ resourceLimits:
             desiredLoggingService='some.logging.service'),
         flags='--monitoring-service=some.monitoring.service '
         '--logging-service=some.logging.service')
+
+  @parameterized.parameters('rapid', 'regular', 'stable', 'None')
+  def testUpdateReleaseChannel(self, channel):
+    channels = {
+        'rapid': self.messages.ReleaseChannel.ChannelValueValuesEnum.RAPID,
+        'regular': self.messages.ReleaseChannel.ChannelValueValuesEnum.REGULAR,
+        'stable': self.messages.ReleaseChannel.ChannelValueValuesEnum.STABLE,
+        'None': self.messages.ReleaseChannel.ChannelValueValuesEnum.UNSPECIFIED,
+    }
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredReleaseChannel=self.messages.ReleaseChannel(
+                channel=channels[channel])),
+        flags='--release-channel={rc}'.format(rc=channel))
+
+  @parameterized.parameters('invalid', 'Rapid', 'RAPID', 'Regular', 'REGULAR',
+                            'Stable', 'STABLE', 'none', 'NONE')
+  def testUpdateReleaseChannelInvalidChannelError(self, channel_name):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                'Invalid choice'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update test-cluster --release-channel={0}'.format(channel_name))
 
 
 # TODO(b/64575339): switch to use parameterized testing.
@@ -2353,11 +2405,15 @@ resourceLimits:
     self.AssertErrContains('auth must be one of MTLS_PERMISSIVE or '
                            'MTLS_STRICT')
 
-  def testUpdateWorkloadIdentityLegacy(self):
+  def testUpdateWorkloadIdentityConfigIdentityProvider(self):
     update = self.msgs.ClusterUpdate(
         desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
-            identityNamespace='new-idns'))
-    self._TestUpdate(update=update, flags='--identity-namespace=new-idns ')
+            identityProvider='https://gkehub.googleapis.com/projects/test/locations/global/memberships/new-test'
+        ))
+    self._TestUpdate(
+        update=update,
+        flags='--identity-provider=https://gkehub.googleapis.com/projects/test/locations/global/memberships/new-test '
+    )
 
   def testEnableDatabaseEncryption(self):
     update = self.msgs.ClusterUpdate(
@@ -2459,6 +2515,135 @@ resourceLimits:
         self.msgs.ClusterUpdate(desiredEnableGvnic=True),
         flags='--enable-gvnic')
 
+  def testApiserverLogs(self):
+    config = self.msgs.MasterSignalsConfig(logEnabledComponents=[
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.APISERVER,
+    ])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMaster=master),
+        flags='--master-logs APISERVER')
+
+  def testSchedulerLogs(self):
+    config = self.msgs.MasterSignalsConfig(logEnabledComponents=[
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.SCHEDULER,
+    ])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMaster=master),
+        flags='--master-logs SCHEDULER')
+
+  def testControllerManagerLogs(self):
+    config = self.msgs.MasterSignalsConfig(logEnabledComponents=[
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.CONTROLLER_MANAGER,
+    ])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMaster=master),
+        flags='--master-logs CONTROLLER_MANAGER')
+
+  def testAddonManagerLogs(self):
+    config = self.msgs.MasterSignalsConfig(logEnabledComponents=[
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.ADDON_MANAGER,
+    ])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMaster=master),
+        flags='--master-logs ADDON_MANAGER')
+
+  def testAllMasterLogs(self):
+    config = self.msgs.MasterSignalsConfig(logEnabledComponents=[
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.APISERVER,
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.SCHEDULER,
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.CONTROLLER_MANAGER,
+        self.msgs.MasterSignalsConfig
+        .LogEnabledComponentsValueListEntryValuesEnum.ADDON_MANAGER,
+    ])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMaster=master),
+        flags='--master-logs APISERVER,CONTROLLER_MANAGER,SCHEDULER,ADDON_MANAGER'
+    )
+
+  def testDisableMasterLogs(self):
+    config = self.msgs.MasterSignalsConfig(logEnabledComponents=[])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMaster=master), flags='--no-master-logs')
+
+  @parameterized.parameters(
+      ('--enable-master-metrics', True),
+      ('--no-enable-master-metrics', False),
+  )
+  def testEnableMasterMetrics(self, flags, enabled):
+    config = self.msgs.MasterSignalsConfig(
+        enableMetrics=enabled,
+        logEnabledComponents=[
+            self.msgs.MasterSignalsConfig
+            .LogEnabledComponentsValueListEntryValuesEnum.COMPONENT_UNSPECIFIED,
+        ])
+    master = self.msgs.Master(signalsConfig=config)
+    self._TestUpdate(self.msgs.ClusterUpdate(desiredMaster=master), flags=flags)
+
+  @parameterized.parameters('rapid', 'regular', 'stable', 'None')
+  def testUpdateReleaseChannel(self, channel):
+    channels = {
+        'rapid': self.messages.ReleaseChannel.ChannelValueValuesEnum.RAPID,
+        'regular': self.messages.ReleaseChannel.ChannelValueValuesEnum.REGULAR,
+        'stable': self.messages.ReleaseChannel.ChannelValueValuesEnum.STABLE,
+        'None': self.messages.ReleaseChannel.ChannelValueValuesEnum.UNSPECIFIED,
+    }
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredReleaseChannel=self.messages.ReleaseChannel(
+                channel=channels[channel])),
+        flags='--release-channel={rc}'.format(rc=channel))
+
+  @parameterized.parameters('invalid', 'Rapid', 'RAPID', 'Regular', 'REGULAR',
+                            'Stable', 'STABLE', 'none', 'NONE')
+  def testUpdateReleaseChannelInvalidChannelError(self, channel_name):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                'Invalid choice'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update test-cluster --release-channel={0}'.format(channel_name))
+
+  @parameterized.parameters(('ENABLED', 'topic'), ('DISABLED', 'topic'),
+                            ('DISABLED', None))
+  def testUpdateNotificationConfig(self, pubsub, topic):
+    enable = pubsub == 'ENABLED'
+    pubsub_msg = self.msgs.PubSub(enabled=enable, topic=topic)
+    nc = self._MakeNotificationConfigFlagDict(pubsub, topic)
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredNotificationConfig=self.msgs.NotificationConfig(
+                pubsub=pubsub_msg)),
+        flags='--notification-config={nc} '.format(nc=nc))
+
+  @parameterized.parameters(
+      ('foo', 'topic', exceptions.InvalidArgumentException,
+       r'invalid \[pubsub\] value'),
+      ('ENABLED', None, exceptions.InvalidArgumentException,
+       r'when \[pubsub\] is ENABLED, \[pubsub-topic\] must not be empty'),
+      (None, 'topic', cli_test_base.MockArgumentError,
+       r'Key \[pubsub\] required'))
+  def testUpdateInvalidNotificationConfig(self, pubsub, topic, want_excp,
+                                          want_err):
+    nc = self._MakeNotificationConfigFlagDict(pubsub, topic)
+    if pubsub is not None:
+      self.ExpectGetCluster(self._RunningCluster(name=self.CLUSTER_NAME))
+    with self.assertRaisesRegex(want_excp, want_err):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update {name}'
+          ' --notification-config={nc}'.format(name=self.CLUSTER_NAME, nc=nc))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
@@ -2525,6 +2710,35 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
             enabled=enabled))
     self._TestUpdate(update=update, flags=flags)
 
+  def testUpdateAddonsCloudRun(self):
+    unspecified = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_UNSPECIFIED
+    internal = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
+    external = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False, loadBalancerType=unspecified))),
+        flags='--update-addons CloudRun=ENABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=True, loadBalancerType=unspecified))),
+        flags='--update-addons CloudRun=DISABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=internal))),
+        flags='--update-addons CloudRun=ENABLED '
+        '--cloud-run-config load-balancer-type='
+        'INTERNAL')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=external))),
+        flags='--update-addons CloudRun=ENABLED --cloud-run-config load-balancer-type=EXTERNAL')
+
   def testUpdateAddonsApplicationManager(self):
     # test disabling ApplicationManager
     self._TestUpdate(
@@ -2588,6 +2802,27 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
     self._TestUpdate(
         self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
         flags=flags)
+
+  @parameterized.parameters('disabled', 'outbound-only', 'bidirectional')
+  def testUpdatePrivateIPv6AccessType(self, access_type):
+    types = {
+        'disabled':
+            self.messages.ClusterUpdate
+            .DesiredPrivateIpv6GoogleAccessValueValuesEnum
+            .PRIVATE_IPV6_GOOGLE_ACCESS_DISABLED,
+        'outbound-only':
+            self.messages.ClusterUpdate
+            .DesiredPrivateIpv6GoogleAccessValueValuesEnum
+            .PRIVATE_IPV6_GOOGLE_ACCESS_TO_GOOGLE,
+        'bidirectional':
+            self.messages.ClusterUpdate
+            .DesiredPrivateIpv6GoogleAccessValueValuesEnum
+            .PRIVATE_IPV6_GOOGLE_ACCESS_BIDIRECTIONAL
+    }
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredPrivateIpv6GoogleAccess=types[access_type]),
+        flags='--private-ipv6-google-access-type={0}'.format(access_type))
 
 
 if __name__ == '__main__':

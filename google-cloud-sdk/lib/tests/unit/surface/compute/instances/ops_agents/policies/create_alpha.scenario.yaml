@@ -1,0 +1,481 @@
+title: ops-agents policies create
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-my-guest-policy --project my-project --os-types=short-name=centos,version=7 --description="A test policy to install agents" --agent-rules="type=logging,version=1.*.*,enable-autoupgrade=true,package-state=installed;type=metrics,version=6.*.*,enable-autoupgrade=false,package-state=installed" --instances=zones/us-central1-a/instances/test-instance-1,zones/us-central1-a/instances/test-instance-2 --group-labels="env=prod,product=myproduct;env=staging,product=myproduct" --zones="us-central1-a,us-central1-b"
+  - stdout: |
+      agent_rules:
+      - enable_autoupgrade: true
+        package_state: installed
+        type: logging
+        version: 1.*.*
+      - enable_autoupgrade: false
+        package_state: installed
+        type: metrics
+        version: 6.*.*
+      assignment:
+        group_labels:
+        - env: prod
+          product: myproduct
+        - env: staging
+          product: myproduct
+        instances:
+        - zones/us-central1-a/instances/test-instance-1
+        - zones/us-central1-a/instances/test-instance-2
+        os_types:
+        - short_name: centos
+          version: '7'
+        zones:
+        - us-central1-a
+        - us-central1-b
+      create_time: '2020-06-16T23:15:32.089Z'
+      description: A test policy to install agents
+      etag: 40d39e5c-bfde-49b4-b312-c081e5cebe84
+      id: projects/my-project/guestPolicies/ops-agents-my-guest-policy
+      update_time: '2020-06-16T23:15:32.089Z'
+- execute:
+  - command: |
+      compute instances ops-agents policies create
+  - stderr: .*argument POLICY_ID --agent-rules --os-types\:\ Must be specified..*$
+  - error: '1: argument POLICY_ID --agent-rules --os-types: Must be specified.'
+- execute:
+  - command: |
+      compute instances ops-agents policies create test-policy
+  - stderr: .*argument POLICY_ID\:\ Bad value \[test-policy\]\:\ POLICY_ID must start
+      with \[ops-agents-\]..*$
+  - error: '1: argument POLICY_ID: Bad value [test-policy]: POLICY_ID must start with
+      [ops-agents-].'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=not-a-list-of-maps --os-types=short-name=centos,version=7
+  - stderr: .*argument --agent-rules\:\ Bad syntax for dict arg\:\ \[not-a-list-of-maps\]..*$
+  - error: '1: argument --agent-rules: Bad syntax for dict arg: [not-a-list-of-maps].
+      Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
+      on providing list or dictionary flag values with special characters.'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=not-allowed-key=some-value --os-types=short-name=centos,version=7
+  - stderr: .*argument --agent-rules\:\ valid keys are \[enable-autoupgrade, package-state,
+      type, version\]\;\ received\:\ not-allowed-key..*$
+  - error: '1: argument --agent-rules: valid keys are [enable-autoupgrade, package-state,
+      type, version]; received: not-allowed-key'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=version=1.2.3 --os-types=short-name=centos,version=7
+  - stderr: .*argument --agent-rules\:\ Key \[type\] required in dict arg but not
+      provided..*$
+  - error: '1: argument --agent-rules: Key [type] required in dict arg but not provided'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=not-supported-type --os-types=short-name=centos,version=7
+  - stderr: .*argument --agent-rules\:\ Invalid value \[not-supported-type\] from
+      field \[type\], expected one of \[logging, metrics\]..*$
+  - error: '1: argument --agent-rules: Invalid value [not-supported-type] from field
+      [type], expected one of [logging, metrics].'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,package-state=not-supported-state --os-types=short-name=centos,version=7
+  - stderr: .*argument --agent-rules\:\ Invalid value \[not-supported-state\] from
+      field \[package-state\], expected one of \[installed, removed\]..*$
+  - error: '1: argument --agent-rules: Invalid value [not-supported-state] from field
+      [package-state], expected one of [installed, removed].'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,enable-autoupgrade=not-a-boolean --os-types=short-name=centos,version=7
+  - stderr: .*argument --agent-rules\:\ Invalid flag value \[not-a-boolean\], expected
+      one of \[true, yes, false, no\].*$
+  - error: '1: argument --agent-rules: Invalid flag value [not-a-boolean], expected
+      one of [true, yes, false, no]'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --group-labels=not-a-list-of-maps --os-types=short-name=centos,version=7
+  - stderr: .*argument --group-labels\:\ Bad syntax for dict arg\:\ \[not-a-list-of-maps\]..*$
+  - error: '1: argument --group-labels: Bad syntax for dict arg: [not-a-list-of-maps].
+      Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
+      on providing list or dictionary flag values with special characters.'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=not-a-list-of-maps
+  - stderr: .*argument --os-types\:\ Bad syntax for dict arg\:\ \[not-a-list-of-maps\]..*$
+  - error: '1: argument --os-types: Bad syntax for dict arg: [not-a-list-of-maps].
+      Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
+      on providing list or dictionary flag values with special characters.'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=version=7
+  - stderr: .*argument --os-types\:\ Key \[short-name\] required in dict arg but not
+      provided.*$
+  - error: '1: argument --os-types: Key [short-name] required in dict arg but not
+      provided'
+- execute:
+  - command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=short-name=centos
+  - stderr: .*argument --os-types\:\ Key \[version\] required in dict arg but not
+      provided.*$
+  - error: '1: argument --os-types: Key [version] required in dict arg but not provided'
+actions:
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-my-guest-policy --project my-project --os-types=short-name=centos,version=7 --description="A test policy to install agents" --agent-rules="type=logging,version=1.*.*,enable-autoupgrade=true,package-state=installed;type=metrics,version=6.*.*,enable-autoupgrade=false,package-state=installed" --instances=zones/us-central1-a/instances/test-instance-1,zones/us-central1-a/instances/test-instance-2 --group-labels="env=prod,product=myproduct;env=staging,product=myproduct" --zones="us-central1-a,us-central1-b"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/v1beta/projects/my-project/guestPolicies?alt=json&guestPolicyId=ops-agents-my-guest-policy
+          method: POST
+          headers: {}
+          body:
+            json:
+              assignment:
+                groupLabels:
+                - labels:
+                    env: prod
+                    product: myproduct
+                - labels:
+                    env: staging
+                    product: myproduct
+                instances:
+                - zones/us-central1-a/instances/test-instance-1
+                - zones/us-central1-a/instances/test-instance-2
+                osTypes:
+                - osShortName: centos
+                  osVersion: '7'
+                zones:
+                - us-central1-a
+                - us-central1-b
+              description: '{"type": "ops-agents", "description": "A test policy to
+                install agents", "agentRules": [{"enableAutoupgrade": true, "packageState":
+                "installed", "type": "logging", "version": "1.*.*"},{"enableAutoupgrade":
+                false, "packageState": "installed", "type": "metrics", "version":
+                "6.*.*"}]}'
+              packageRepositories:
+              - yum:
+                  baseUrl: https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64-1
+                  displayName: Google Cloud Logging Agent Repository
+                  gpgKeys:
+                  - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+                  - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+                  id: google-cloud-logging
+              - yum:
+                  baseUrl: https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el7-x86_64-6
+                  displayName: Google Cloud Monitoring Agent Repository
+                  gpgKeys:
+                  - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+                  - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+                  id: google-cloud-monitoring
+              packages:
+              - desiredState: UPDATED
+                name: google-fluentd
+              - desiredState: UPDATED
+                name: google-fluentd-catch-all-config
+              - desiredState: UPDATED
+                name: google-fluentd-start-service
+              - desiredState: INSTALLED
+                name: stackdriver-agent
+              - desiredState: INSTALLED
+                name: stackdriver-agent-start-service
+              recipes:
+              - desiredState: UPDATED
+                installSteps:
+                - scriptRun:
+                    script: |-
+                      #!/bin/bash -e
+                      sudo rm /etc/yum.repos.d/google-cloud-logging.repo || true; find /var/cache/yum -name '*google-cloud-logging*' | xargs sudo rm -rf || true
+                      for i in {1..5}; do
+                        if (sudo yum remove -y google-fluentd || true; sudo yum install -y 'google-fluentd-1.*'; sudo yum install -y google-fluentd-catch-all-config; sudo service google-fluentd start); then
+                          break
+                        fi
+                        sleep 1m
+                      done
+                name: set-google-fluentd-version-0
+                version: '0'
+              - desiredState: UPDATED
+                installSteps:
+                - scriptRun:
+                    script: |-
+                      #!/bin/bash -e
+                      sudo rm /etc/yum.repos.d/google-cloud-monitoring.repo || true; find /var/cache/yum -name '*google-cloud-monitoring*' | xargs sudo rm -rf || true
+                      for i in {1..5}; do
+                        if (sudo yum remove -y stackdriver-agent || true; sudo yum install -y 'stackdriver-agent-6.*'; sudo service stackdriver-agent start); then
+                          break
+                        fi
+                        sleep 1m
+                      done
+                name: set-stackdriver-agent-version-0
+                version: '0'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "assignment": {
+                "groupLabels": [
+                  {
+                    "labels": {
+                      "env": "prod",
+                      "product": "myproduct"
+                    }
+                  },
+                  {
+                    "labels": {
+                      "env": "staging",
+                      "product": "myproduct"
+                    }
+                  }
+                ],
+                "instances": [
+                  "zones/us-central1-a/instances/test-instance-1",
+                  "zones/us-central1-a/instances/test-instance-2"
+                ],
+                "osTypes": [
+                  {
+                    "osShortName": "centos",
+                    "osVersion": "7"
+                  }
+                ],
+                "zones": [
+                  "us-central1-a",
+                  "us-central1-b"
+                ]
+              },
+              "description": "{\"type\": \"ops-agents\", \"description\": \"A test policy to install agents\", \"agentRules\": [{\"enableAutoupgrade\": true, \"packageState\": \"installed\", \"type\": \"logging\", \"version\": \"1.*.*\"},{\"enableAutoupgrade\": false, \"packageState\": \"installed\", \"type\": \"metrics\", \"version\": \"6.*.*\"}]}",
+              "packageRepositories": [
+                {
+                  "yum": {
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64-1",
+                    "displayName": "Google Cloud Logging Agent Repository",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ],
+                    "id": "google-cloud-logging"
+                  }
+                },
+                {
+                  "yum": {
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el7-x86_64-6",
+                    "displayName": "Google Cloud Monitoring Agent Repository",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ],
+                    "id": "google-cloud-monitoring"
+                  }
+                }
+              ],
+              "packages": [
+                {
+                  "desiredState": "UPDATED",
+                  "name": "google-fluentd"
+                },
+                {
+                  "desiredState": "UPDATED",
+                  "name": "google-fluentd-catch-all-config"
+                },
+                {
+                  "desiredState": "UPDATED",
+                  "name": "google-fluentd-start-service"
+                },
+                {
+                  "desiredState": "INSTALLED",
+                  "name": "stackdriver-agent"
+                },
+                {
+                  "desiredState": "INSTALLED",
+                  "name": "stackdriver-agent-start-service"
+                }
+              ],
+              "recipes": [
+                {
+                  "desiredState": "UPDATED",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-logging.repo || true; find /var/cache/yum -name '*google-cloud-logging*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y google-fluentd || true; sudo yum install -y 'google-fluentd-1.*'; sudo yum install -y google-fluentd-catch-all-config; sudo service google-fluentd start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "name": "set-google-fluentd-version-0",
+                  "version": "0"
+                },
+                {
+                  "desiredState": "UPDATED",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-monitoring.repo || true; find /var/cache/yum -name '*google-cloud-monitoring*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y stackdriver-agent || true; sudo yum install -y 'stackdriver-agent-6.*'; sudo service stackdriver-agent start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "name": "set-stackdriver-agent-version-0",
+                  "version": "0"
+                }
+              ],
+              "createTime": "2020-06-16T23:15:32.089Z",
+              "etag": "40d39e5c-bfde-49b4-b312-c081e5cebe84",
+              "name": "projects/my-project/guestPolicies/ops-agents-my-guest-policy",
+              "updateTime": "2020-06-16T23:15:32.089Z"
+            }
+    - expect_stdout: |
+        agent_rules:
+        - enable_autoupgrade: true
+          package_state: installed
+          type: logging
+          version: 1.*.*
+        - enable_autoupgrade: false
+          package_state: installed
+          type: metrics
+          version: 6.*.*
+        assignment:
+          group_labels:
+          - env: prod
+            product: myproduct
+          - env: staging
+            product: myproduct
+          instances:
+          - zones/us-central1-a/instances/test-instance-1
+          - zones/us-central1-a/instances/test-instance-2
+          os_types:
+          - short_name: centos
+            version: '7'
+          zones:
+          - us-central1-a
+          - us-central1-b
+        create_time: '2020-06-16T23:15:32.089Z'
+        description: A test policy to install agents
+        etag: 40d39e5c-bfde-49b4-b312-c081e5cebe84
+        id: projects/my-project/guestPolicies/ops-agents-my-guest-policy
+        update_time: '2020-06-16T23:15:32.089Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute instances ops-agents policies create
+    events:
+    - expect_stderr:
+        matches: .*argument POLICY_ID --agent-rules --os-types\:\ Must be specified..*
+    - expect_exit:
+        code: 1
+        message: 'argument POLICY_ID --agent-rules --os-types: Must be specified.'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create test-policy
+    events:
+    - expect_stderr:
+        matches: .*argument POLICY_ID\:\ Bad value \[test-policy\]\:\ POLICY_ID must
+          start with \[ops-agents-\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument POLICY_ID: Bad value [test-policy]: POLICY_ID must start
+          with [ops-agents-].'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=not-a-list-of-maps --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --agent-rules\:\ Bad syntax for dict arg\:\ \[not-a-list-of-maps\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: Bad syntax for dict arg: [not-a-list-of-maps].
+          Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
+          on providing list or dictionary flag values with special characters.'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=not-allowed-key=some-value --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --agent-rules\:\ valid keys are \[enable-autoupgrade,
+          package-state, type, version\]\;\ received\:\ not-allowed-key..*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: valid keys are [enable-autoupgrade, package-state,
+          type, version]; received: not-allowed-key'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=version=1.2.3 --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --agent-rules\:\ Key \[type\] required in dict arg but
+          not provided..*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: Key [type] required in dict arg but not
+          provided'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=not-supported-type --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --agent-rules\:\ Invalid value \[not-supported-type\]
+          from field \[type\], expected one of \[logging, metrics\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: Invalid value [not-supported-type] from
+          field [type], expected one of [logging, metrics].'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,package-state=not-supported-state --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --agent-rules\:\ Invalid value \[not-supported-state\]
+          from field \[package-state\], expected one of \[installed, removed\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: Invalid value [not-supported-state] from
+          field [package-state], expected one of [installed, removed].'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,enable-autoupgrade=not-a-boolean --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --agent-rules\:\ Invalid flag value \[not-a-boolean\],
+          expected one of \[true, yes, false, no\].*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: Invalid flag value [not-a-boolean], expected
+          one of [true, yes, false, no]'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --group-labels=not-a-list-of-maps --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --group-labels\:\ Bad syntax for dict arg\:\ \[not-a-list-of-maps\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument --group-labels: Bad syntax for dict arg: [not-a-list-of-maps].
+          Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
+          on providing list or dictionary flag values with special characters.'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=not-a-list-of-maps
+    events:
+    - expect_stderr:
+        matches: .*argument --os-types\:\ Bad syntax for dict arg\:\ \[not-a-list-of-maps\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument --os-types: Bad syntax for dict arg: [not-a-list-of-maps].
+          Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
+          on providing list or dictionary flag values with special characters.'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=version=7
+    events:
+    - expect_stderr:
+        matches: .*argument --os-types\:\ Key \[short-name\] required in dict arg
+          but not provided.*
+    - expect_exit:
+        code: 1
+        message: 'argument --os-types: Key [short-name] required in dict arg but not
+          provided'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=short-name=centos
+    events:
+    - expect_stderr:
+        matches: .*argument --os-types\:\ Key \[version\] required in dict arg but
+          not provided.*
+    - expect_exit:
+        code: 1
+        message: 'argument --os-types: Key [version] required in dict arg but not
+          provided'

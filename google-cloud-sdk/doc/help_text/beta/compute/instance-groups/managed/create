@@ -14,8 +14,8 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute instance-groups managed create creates a Google
-    Compute Engine managed instance group.
+    (BETA) gcloud beta compute instance-groups managed create creates a Compute
+    Engine managed instance group.
 
     For example, running:
 

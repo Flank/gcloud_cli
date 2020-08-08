@@ -1,11 +1,11 @@
 NAME
-    gcloud alpha compute instance-templates create-with-container - creates
-        Google Compute Engine virtual machine instance template running Docker
-        images
+    gcloud alpha compute instance-templates create-with-container - creates a
+        Compute Engine a virtual machine instance template that runs a Docker
+        container
 
 SYNOPSIS
     gcloud alpha compute instance-templates create-with-container NAME
-        [--no-boot-disk-auto-delete]
+        [--accelerator=[count=COUNT],[type=TYPE]] [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
         [--can-ip-forward] [--container-arg=CONTAINER_ARG]
@@ -48,15 +48,13 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-templates create-with-container
-    creates a Google Compute Engine virtual machine instance template that runs
-    a container image. For example:
+    creates a Compute Engine virtual machine instance template that runs a
+    container image. To create an instance template named 'instance-template-1'
+    that runs the 'busybox' image, run:
 
         $ gcloud alpha compute instance-templates create-with-container \
             instance-template-1              \
             --container-image=gcr.io/google-containers/busybox
-
-    creates an instance template that runs the 'busybox' image. The created
-    instance template will have the name 'instance-template-1'
 
     For more examples, refer to the EXAMPLES section below.
 
@@ -65,6 +63,19 @@ POSITIONAL ARGUMENTS
         Name of the instance template to create.
 
 FLAGS
+     --accelerator=[count=COUNT],[type=TYPE]
+        Attaches accelerators (e.g. GPUs) to the instances.
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            Number of accelerators to attach to each instance. The default
+            value is 1.
+
      --boot-disk-auto-delete
         Automatically delete boot disks when their instances are deleted.
         Enabled by default, use --no-boot-disk-auto-delete to disable.
@@ -81,8 +92,8 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB. Limit boot disk size to 2TB to account for MBR
-        partition table limitations.
+        multiple of 1 GB. Limit boot disk size to 2 TB to account for MBR
+        partition table limitations. Default size unit is GB.
 
      --boot-disk-type=BOOT_DISK_TYPE
         The type of the boot disk. This option can only be specified if a new
@@ -246,6 +257,7 @@ FLAGS
             references will be resolved. It is best practice to define
             image-project. A full list of available projects can be generated
             by running gcloud projects list.
+
             + If specifying one of our public images, image-project must be
               provided.
             + If there are several of the same image-family value in multiple
@@ -280,6 +292,12 @@ FLAGS
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
             is yes.
+
+         multi-writer
+            If yes, create the disk in multi-writer mode so that it can be
+            attached with read-write access to multiple VMs. Can only be used
+            with zonal SSD persistent disks. Disks in multi-writer mode do not
+            support resize and snapshot operations. The default value is no.
 
      --description=DESCRIPTION
         Specifies a textual description for the instance template.
@@ -670,6 +688,7 @@ FLAGS
                                    https://www.googleapis.com/auth/trace.append
             logging-write          https://www.googleapis.com/auth/logging.write
             monitoring             https://www.googleapis.com/auth/monitoring
+            monitoring-read        https://www.googleapis.com/auth/monitoring.read
             monitoring-write       https://www.googleapis.com/auth/monitoring.write
             pubsub                 https://www.googleapis.com/auth/pubsub
             service-control        https://www.googleapis.com/auth/servicecontrol
@@ -699,10 +718,9 @@ FLAGS
           tokens can be accessed through the instance metadata server and are
           used to authenticate applications on the instance. The account can be
           set using an email address corresponding to the required service
-          account. You can explicitly specify the Compute Engine default
-          service account using the 'default' alias.
+          account.
 
-          If not provided, the instance will get project's default service
+          If not provided, the instance will use the project's default service
           account.
 
        --no-service-account

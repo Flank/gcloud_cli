@@ -11,7 +11,7 @@ gcloud alpha data\-catalog search \- search Cloud Data Catalog for resources tha
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha data\-catalog search\fR \fIQUERY\fR (\fB\-\-include\-gcp\-public\-datasets\fR\ \fB\-\-include\-organization\-ids\fR=[\fIORGANIZATION\fR,...]\ \fB\-\-include\-project\-ids\fR=[\fIPROJECT\fR,...]) [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-order\-by\fR=\fIORDER_BY\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha data\-catalog search\fR \fIQUERY\fR (\fB\-\-include\-gcp\-public\-datasets\fR\ \fB\-\-include\-organization\-ids\fR=[\fIORGANIZATION\fR,...]\ \fB\-\-include\-project\-ids\fR=[\fIPROJECT\fR,...]\ \fB\-\-restricted\-locations\fR=[\fILOCATION\fR,...]) [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-order\-by\fR=\fIORDER_BY\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,6 +52,10 @@ List of Cloud Organization IDs to include in the search.
 .TP 2m
 \fB\-\-include\-project\-ids\fR=[\fIPROJECT\fR,...]
 List of Cloud Project IDs to include in the search.
+
+.TP 2m
+\fB\-\-restricted\-locations\fR=[\fILOCATION\fR,...]
+List of locations to search within.
 
 
 .RE

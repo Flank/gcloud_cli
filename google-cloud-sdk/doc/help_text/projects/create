@@ -16,8 +16,9 @@ POSITIONAL ARGUMENTS
      [PROJECT_ID]
         ID for the project you want to create.
 
-        Project IDs must start with a lowercase letter and can have lowercase
-        ASCII letters, digits or hyphens. Project IDs must be between 6 and 30
+        Project IDs are immutable and can be set only during project creation.
+        They must start with a lowercase letter and can have lowercase ASCII
+        letters, digits or hyphens. Project IDs must be between 6 and 30
         characters.
 
 FLAGS
@@ -76,7 +77,8 @@ SEE ALSO
     creating or deleting projects from the Google Cloud Platform Console.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
         $ gcloud alpha projects create
+        $ gcloud beta projects create
 

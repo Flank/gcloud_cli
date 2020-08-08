@@ -9,6 +9,11 @@ SYNOPSIS
           | --remove-asset-names=[ASSET-NAMES,...]]
         [--add-asset-types=[ASSET-TYPES,...] | --clear-asset-types
           | --remove-asset-types=[ASSET-TYPES,...]]
+        [--clear-condition-description
+          | --condition-description=CONDITION_DESCRIPTION]
+        [--clear-condition-expression
+          | --condition-expression=CONDITION_EXPRESSION]
+        [--clear-condition-title | --condition-title=CONDITION_TITLE]
         [--clear-content-type | --content-type=CONTENT_TYPE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -33,7 +38,7 @@ REQUIRED FLAGS
        --project=PROJECT_ID
           project of the feed.
 
-          The Google Cloud Platform project name to use for this invocation. If
+          The Google Cloud Platform project ID to use for this invocation. If
           omitted, then the current project is assumed; the current project can
           be listed using gcloud config list --format='text(core.project)' and
           can be set using gcloud config set project PROJECTID.
@@ -75,6 +80,33 @@ OPTIONAL FLAGS
 
        --remove-asset-types=[ASSET-TYPES,...]
           Remove the given values from the current assetTypes.
+
+     At most one of these may be specified:
+
+       --clear-condition-description
+          Clear any existing condition description setting on the feed.
+          Condition description will be empty.
+
+       --condition-description=CONDITION_DESCRIPTION
+          Condition description to overwrite the existing one.
+
+     At most one of these may be specified:
+
+       --clear-condition-expression
+          Clear any existing condition expression setting on the feed. No
+          condition will be applied to feed.
+
+       --condition-expression=CONDITION_EXPRESSION
+          Condition expression to overwrite the existing one.
+
+     At most one of these may be specified:
+
+       --clear-condition-title
+          Clear any existing condition title setting on the feed. Condition
+          title will be empty.
+
+       --condition-title=CONDITION_TITLE
+          Condition title to overwrite the existing one.
 
      At most one of these may be specified:
 

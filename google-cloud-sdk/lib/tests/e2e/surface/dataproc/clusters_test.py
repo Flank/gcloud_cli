@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import os
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
@@ -44,6 +45,16 @@ class ClustersIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     self.DoTestGetSetIAMPolicy()
 
     self.DeleteCluster()
+
+  def testExportImport(self):
+    """Test that a cluster can be exported and then imported."""
+    self.CreateClusterWithRetries()
+    yaml_file = os.path.join(self.temp_path, 'cluster.yaml')
+    self.RunDataproc('clusters export {} --destination {}'.format(
+        self.cluster_name, yaml_file))
+    self.RunDataproc('clusters import {} --source {}'.format(
+        self.additional_cluster_name, yaml_file))
+    # Clusters are deleted in TearDown method of base class.
 
   def DoTestClusterUpdate(self):
     result = self.RunDataproc(

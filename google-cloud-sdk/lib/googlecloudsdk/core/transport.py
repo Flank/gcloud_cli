@@ -21,9 +21,12 @@ from __future__ import unicode_literals
 import abc
 import platform
 import re
+import time
 import uuid
 
 from googlecloudsdk.core import config
+from googlecloudsdk.core import log
+from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
@@ -31,12 +34,10 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import platforms
 
 import six
+from six.moves import urllib
 from six.moves import zip  # pylint: disable=redefined-builtin
 
-# Alternative spellings of User-Agent header key that may appear in requests.
-_NORMALIZED_USER_AGENT = b'user-agent'
-
-ENCODING = None if six.PY2 else 'utf8'
+ENCODING = None if six.PY2 else 'utf-8'
 
 TOKEN_URIS = [
     'https://accounts.google.com/o/oauth2/token',
@@ -141,6 +142,10 @@ class RequestWrapper(six.with_metaclass(abc.ABCMeta, object)):
   request is executed. Finally, all response handlers are executed in order,
   getting passed both the http response as well as the result from their
   corresponding request handler.
+
+  Attributes:
+    request_class: Class used to represent a generic HTTP request.
+    response_class: Class used to represent a generic HTTP request.
   """
   request_class = Request
   response_class = Response
@@ -161,6 +166,47 @@ class RequestWrapper(six.with_metaclass(abc.ABCMeta, object)):
       orig_request: The original unwrapped request method.
     """
 
+  def WrapWithDefaults(self, http_client, response_encoding):
+    """Wraps request with user-agent, and trace reporting.
+
+    Args:
+      http_client: The original http client to be wrapped.
+      response_encoding: str, the encoding to use to decode the response.
+
+    Returns:
+      http, The same http object but with the request method wrapped.
+    """
+    gcloud_ua = MakeUserAgentString(
+        properties.VALUES.metrics.command_name.Get())
+    handlers = [
+        Handler(RecordStartTime(), ReportDuration()),
+        # TODO(b/160008076): The CLOUDSDK_USER_AGENT prefix may already be
+        # provided by the upper stack before the plan of b/160008076 is
+        # finished. The transport will not duplicate this string if this is the
+        # case. Update MaybePrependToHeader() to PrependToHeader() in the step 4
+        # of b/160008076.
+        # More details in the 'Plan of record' section of b/160008076.
+        Handler(MaybePrependToHeader('user-agent', config.CLOUDSDK_USER_AGENT)),
+        Handler(AppendToHeader('user-agent', gcloud_ua))
+    ]
+
+    trace_value = GetTraceValue()
+    if trace_value:
+      handlers.append(Handler(AddQueryParam('trace', trace_value)))
+
+    request_reason = properties.VALUES.core.request_reason.Get()
+    if request_reason:
+      handlers.append(
+          Handler(SetHeader('X-Goog-Request-Reason', request_reason)))
+
+    # Do this one last so that it sees the effects of the other modifiers.
+    if properties.VALUES.core.log_http.GetBool():
+      redact_token = properties.VALUES.core.log_http_redact_token.GetBool()
+      handlers.append(Handler(LogRequest(redact_token), LogResponse()))
+
+    return self.WrapRequest(
+        http_client, handlers, response_encoding=response_encoding)
+
   def WrapRequest(self,
                   http_client,
                   handlers,
@@ -176,7 +222,7 @@ class RequestWrapper(six.with_metaclass(abc.ABCMeta, object)):
       exc_handler: f(e), A function that takes an exception and handles it. It
         should also throw an exception if you don't want it to be swallowed.
       exc_type: The type of exception that should be caught and given to the
-        handler.
+        handler. It could be a tuple to catch more than one exception type.
       response_encoding: str, the encoding to use to decode the response.
 
     Returns:
@@ -255,10 +301,241 @@ class Handler(object):
 
 def _EncodeHeader(header, value):
   if isinstance(header, six.text_type):
-    header = header.encode('utf8')
+    header = header.encode('utf-8')
   if isinstance(value, six.text_type):
-    value = value.encode('utf8')
+    value = value.encode('utf-8')
   return header, value
+
+
+def MaybePrependToHeader(header, value):
+  """Prepends the given value if the existing header does not start with it.
+
+  Args:
+    header: str, The name of the header to prepend to.
+    value: str, The value to prepend to the existing header value.
+
+  Returns:
+    A function that can be used in a Handler.request.
+  """
+  header, value = _EncodeHeader(header, value)
+
+  def _MaybePrependToHeader(request):
+    """Maybe prepends a value to a header on a request."""
+    headers = request.headers
+    current_value = b''
+    for hdr, v in six.iteritems(headers):
+      if hdr.lower() == header.lower():
+        current_value = v
+        del headers[hdr]
+        break
+
+    if not current_value.startswith(value):
+      current_value = (value + b' ' + current_value).strip()
+    headers[header] = current_value
+
+  return _MaybePrependToHeader
+
+
+def AppendToHeader(header, value):
+  """Appends the given value to the existing value in the http request.
+
+  Args:
+    header: str, The name of the header to append to.
+    value: str, The value to append to the existing header value.
+
+  Returns:
+    A function that can be used in a Handler.request.
+  """
+  header, value = _EncodeHeader(header, value)
+
+  def _AppendToHeader(request):
+    """Appends a value to a header on a request."""
+    headers = request.headers
+    current_value = b''
+    for hdr, v in six.iteritems(headers):
+      if hdr.lower() == header.lower():
+        current_value = v
+        del headers[hdr]
+        break
+
+    headers[header] = ((current_value + b' ' +
+                        value).strip() if current_value else value)
+
+  return _AppendToHeader
+
+
+def SetHeader(header, value):
+  """Sets the given header value in the http request.
+
+  Args:
+    header: str, The name of the header to set to.
+    value: str, The new value of the header.
+
+  Returns:
+    A function that can be used in a Handler.request.
+  """
+  header, value = _EncodeHeader(header, value)
+
+  def _SetHeader(request):
+    """Sets a header on a request."""
+    headers = request.headers
+    for hdr in six.iterkeys(headers):
+      if hdr.lower() == header.lower():
+        del headers[hdr]
+        break
+
+    headers[header] = value
+
+  return _SetHeader
+
+
+def AddQueryParam(param, value):
+  """Adds the given query parameter to the http request.
+
+  Args:
+    param: str, The name of the parameter.
+    value: str, The value of the parameter.
+
+  Returns:
+    A function that can be used in a Handler.request.
+  """
+
+  def _AddQueryParam(request):
+    """Sets a query parameter on a request."""
+    url_parts = urllib.parse.urlsplit(request.uri)
+    query_params = urllib.parse.parse_qs(url_parts.query)
+    query_params[param] = value
+    # Need to do this to convert a SplitResult into a list so it can be
+    # modified.
+    url_parts = list(url_parts)
+    # pylint:disable=redundant-keyword-arg, this is valid syntax for this lib
+    url_parts[3] = urllib.parse.urlencode(query_params, doseq=True)
+
+    # pylint:disable=too-many-function-args, This is just bogus.
+    new_url = urllib.parse.urlunsplit(url_parts)
+    request.uri = new_url
+
+  return _AddQueryParam
+
+
+def LogRequest(redact_token=True):
+  """Logs the contents of the http request.
+
+  Args:
+    redact_token: bool, True to redact auth tokens.
+
+  Returns:
+    A function that can be used in a Handler.request.
+  """
+
+  def _LogRequest(request):
+    """Logs a request."""
+    uri = request.uri
+    method = request.method
+    headers = request.headers
+    body = request.body or ''
+
+    # If set, these prevent the printing of the http body and replace it with
+    # the reason the body is not being printed.
+    redact_req_body_reason = None
+    redact_resp_body_reason = None
+
+    if redact_token and IsTokenUri(uri):
+      redact_req_body_reason = (
+          'Contains oauth token. Set log_http_redact_token property to false '
+          'to print the body of this request.')
+      redact_resp_body_reason = (
+          'Contains oauth token. Set log_http_redact_token property to false '
+          'to print the body of this response.')
+
+    log.status.Print('=======================')
+    log.status.Print('==== request start ====')
+    log.status.Print('uri: {uri}'.format(uri=uri))
+    log.status.Print('method: {method}'.format(method=method))
+    log.status.Print('== headers start ==')
+    for h, v in sorted(six.iteritems(headers)):
+      if redact_token and (h == b'Authorization' or
+                           h == b'x-goog-iam-authorization-token'):
+        v = '--- Token Redacted ---'
+      log.status.Print('{0}: {1}'.format(h, v))
+    log.status.Print('== headers end ==')
+    log.status.Print('== body start ==')
+    if redact_req_body_reason is None:
+      log.status.Print(body)
+    else:
+      log.status.Print('Body redacted: {}'.format(redact_req_body_reason))
+    log.status.Print('== body end ==')
+    log.status.Print('==== request end ====')
+
+    return {
+        'start_time': time.time(),
+        'redact_resp_body_reason': redact_resp_body_reason,
+    }
+
+  return _LogRequest
+
+
+def LogResponse():
+  """Logs the contents of the http response.
+
+  Returns:
+    A function that can be used in a Handler.response.
+  """
+
+  def _LogResponse(response, data):
+    """Logs a response."""
+    redact_resp_body_reason = data['redact_resp_body_reason']
+    time_taken = time.time() - data['start_time']
+    log.status.Print('---- response start ----')
+    log.status.Print('status: {0}'.format(response.status_code))
+    log.status.Print('-- headers start --')
+    for h, v in sorted(six.iteritems(response.headers)):
+      log.status.Print('{0}: {1}'.format(h, v))
+    log.status.Print('-- headers end --')
+    log.status.Print('-- body start --')
+    if redact_resp_body_reason is None:
+      log.status.Print(response.body)
+    else:
+      log.status.Print('Body redacted: {}'.format(redact_resp_body_reason))
+    log.status.Print('-- body end --')
+    log.status.Print(
+        'total round trip time (request+response): {0:.3f} secs'.format(
+            time_taken))
+    log.status.Print('---- response end ----')
+    log.status.Print('----------------------')
+
+  return _LogResponse
+
+
+def RecordStartTime():
+  """Records the time at which the request was started.
+
+  Returns:
+    A function that can be used in a Handler.request.
+  """
+
+  def _RecordStartTime(request):
+    """Records the start time of a request."""
+    del request  # Unused.
+    return {'start_time': time.time()}
+
+  return _RecordStartTime
+
+
+def ReportDuration():
+  """Reports the duration of response to the metrics module.
+
+  Returns:
+    A function that can be used in a Handler.response.
+  """
+
+  def _ReportDuration(response, data):
+    """Records the duration of a request."""
+    del response  # Unused.
+    duration = time.time() - data['start_time']
+    metrics.RPCDuration(duration)
+
+  return _ReportDuration
 
 
 def MakeUserAgentString(cmd_path=None):

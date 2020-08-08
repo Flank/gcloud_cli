@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute interconnects attachments describe - describe a Google
-        Compute Engine interconnect attachment
+    gcloud beta compute interconnects attachments describe - describe a Compute
+        Engine interconnect attachment
 
 SYNOPSIS
     gcloud beta compute interconnects attachments describe NAME
@@ -8,8 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute interconnects attachments describe displays all
-    data associated with Google Compute Engine interconnect attachment in a
-    project.
+    data associated with Compute Engine interconnect attachment in a project.
 
 POSITIONAL ARGUMENTS
      NAME

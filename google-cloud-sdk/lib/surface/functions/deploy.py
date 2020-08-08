@@ -135,13 +135,16 @@ def _Run(args,
     if args.IsSpecified('runtime'):
       function.runtime = args.runtime
       updated_fields.append('runtime')
-      if args.runtime in ['nodejs6']:
+      if args.runtime in ['nodejs6', 'nodejs8']:
         log.warning(
-            'The Node.js 6 runtime is deprecated on Cloud Functions. '
-            'Please migrate to Node.js 8 (--runtime=nodejs8) or Node.js 10 '
-            '(--runtime=nodejs10). '
-            'See https://cloud.google.com/functions/docs/migrating/nodejs-runtimes'
-        )
+            ('The {version} runtime is deprecated on Cloud Functions. '
+             'Please migrate to Node.js 10 '
+             '(--runtime=nodejs10). '
+             'See https://cloud.google.com/functions/docs/migrating/'
+             'nodejs-runtimes'
+             ).format(version='Node.js 6'
+                      if args.runtime == 'nodejs6' else 'Node.js 8')
+            )
     elif is_new_function:
       raise exceptions.RequiredArgumentException(
           'runtime', 'Flag `--runtime` is required for new functions.')
@@ -204,8 +207,7 @@ def _Run(args,
       function.sourceUploadUrl):
     updated_fields.extend(
         source_util.SetFunctionSourceProps(function, function_ref, args.source,
-                                           args.stage_bucket, args.ignore_file,
-                                           update_date=True))
+                                           args.stage_bucket, args.ignore_file))
 
   # Apply label args to function
   if labels_util.SetFunctionLabels(function, args.update_labels,
@@ -219,7 +221,8 @@ def _Run(args,
   deny_all_users_invoke = flags.ShouldDenyAllUsersInvoke(args)
 
   if is_new_function:
-    if (not ensure_all_users_invoke and not deny_all_users_invoke and
+    if (function.httpsTrigger and not ensure_all_users_invoke and
+        not deny_all_users_invoke and
         api_util.CanAddFunctionIamPolicyBinding(_GetProject(args))):
       ensure_all_users_invoke = console_io.PromptContinue(
           prompt_string=(
@@ -228,7 +231,8 @@ def _Run(args,
           default=False)
 
     op = api_util.CreateFunction(function, function_ref.Parent().RelativeName())
-    if (not ensure_all_users_invoke and not deny_all_users_invoke):
+    if (function.httpsTrigger and not ensure_all_users_invoke and
+        not deny_all_users_invoke):
       template = ('Function created with limited-access IAM policy. '
                   'To enable unauthorized access consider "%s"')
       log.warning(template % _CreateBindPolicyCommand(args.NAME, args.region))
@@ -293,8 +297,11 @@ def _Run(args,
         log_stackdriver_url[0] = False
 
   if op:
+    try_set_invoker = None
+    if function.httpsTrigger:
+      try_set_invoker = TryToSetInvokerPermission
     api_util.WaitForFunctionUpdateOperation(
-        op, try_set_invoker=TryToSetInvokerPermission,
+        op, try_set_invoker=try_set_invoker,
         on_every_poll=[TryToLogStackdriverURL])
   return api_util.GetFunction(function.name)
 
@@ -352,9 +359,10 @@ class DeployBeta(base.Command):
   def Args(parser):
     """Register flags for this command."""
     Deploy.Args(parser)
+    flags.AddBuildWorkerPoolMutexGroup(parser)
 
   def Run(self, args):
-    return _Run(args, track=self.ReleaseTrack())
+    return _Run(args, track=self.ReleaseTrack(), enable_build_worker_pool=True)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -368,7 +376,22 @@ class DeployAlpha(base.Command):
     flags.AddBuildWorkerPoolMutexGroup(parser)
 
   def Run(self, args):
-    return _Run(
-        args,
-        track=self.ReleaseTrack(),
-        enable_build_worker_pool=True)
+    return _Run(args, track=self.ReleaseTrack(), enable_build_worker_pool=True)
+
+
+DETAILED_HELP = {
+    'EXAMPLES':
+        """\
+        To deploy a function that is triggered by write events on the document
+        ``/messages/{pushId}'', run:
+
+          $ {command} my_function --runtime=python37 --trigger-event=providers/cloud.firestore/eventTypes/document.write --trigger-resource=projects/project_id/databases/(default)/documents/messages/{pushId}
+
+        See https://cloud.google.com/functions/docs/calling for more details
+        of using other types of resource as triggers.
+        """
+}
+
+Deploy.detailed_help = DETAILED_HELP
+DeployBeta.detailed_help = DETAILED_HELP
+DeployAlpha.detailed_help = DETAILED_HELP

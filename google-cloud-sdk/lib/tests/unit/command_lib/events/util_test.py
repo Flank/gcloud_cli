@@ -139,7 +139,7 @@ class UtilTest(base.EventsBase):
         'source-for-my-trigger',
         params={'namespacesId': 'source-namespace'},
         collection='run.namespaces.cloudpubsubsources',
-        api_version='v1alpha1')
+        api_version=self.api_version)
     self.assertEqual(
         (expected, self.source_crds[0]),
         util.GetSourceRefAndCrdForTrigger(self.trigger, self.source_crds))

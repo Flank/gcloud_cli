@@ -3,7 +3,8 @@ NAME
         Cloud Data Catalog
 
 SYNOPSIS
-    gcloud data-catalog tag-templates fields COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud data-catalog tag-templates fields GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Manage tag template fields in Cloud Data Catalog.
@@ -15,6 +16,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     enum-values
+        Manage tag template enum values in Cloud Data Catalog.
 
 COMMANDS
     COMMAND is one of the following:

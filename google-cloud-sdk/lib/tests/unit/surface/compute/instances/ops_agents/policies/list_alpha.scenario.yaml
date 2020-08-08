@@ -1,0 +1,303 @@
+title: compute instances ops-agents policies describe
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances ops-agents policies list
+  - stdout: |
+      ID                                 DESCRIPTION                        CREATE_TIME               UPDATE_TIME
+      ops-agents-test-monitoring-policy  A test policy to install agent...  2020-06-16T23:15:32.089Z  2020-06-16T23:15:32.089Z
+- execute:
+  - command: compute instances ops-agents policies list
+  - stderr: |
+      WARNING: Encountered a malformed policy. The Ops Agents policy [projects/my-project/guestPolicies/ops-agents-test-monitoring-policy] may have been modified directly by the OS Config guest policy API / gcloud commands. If so, please delete and re-create with the Ops Agents policy gcloud commands. If not, this may be an internal error.
+  - stdout: |
+      ID                                 DESCRIPTION  CREATE_TIME               UPDATE_TIME
+      ops-agents-test-monitoring-policy  <MALFORMED>  2020-06-16T23:15:32.089Z  2020-06-16T23:15:32.089Z
+actions:
+- define_reference:
+    reference: osconfig-api-version
+    track_values:
+      ALPHA: v1beta
+- execute_command:
+    command: compute instances ops-agents policies list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "guestPolicies": [
+                {
+                  "assignment": {
+                    "groupLabels": [
+                      {
+                        "labels": {
+                          "env": "prod",
+                          "product": "myproduct"
+                        }
+                      },
+                      {
+                        "labels": {
+                          "env": "staging",
+                          "product": "myproduct"
+                        }
+                      }
+                    ],
+                    "instances": [
+                      "zones/us-central1-a/instances/test-instance-1",
+                      "zones/us-central1-a/instances/test-instance-2"
+                    ],
+                    "osTypes": [
+                      {
+                        "osArchitecture": "x86_64",
+                        "osShortName": "centos",
+                        "osVersion": "7"
+                      }
+                    ],
+                    "zones": [
+                      "us-central1-a",
+                      "us-central1-b"
+                    ]
+                  },
+                  "description": "{\"type\": \"ops-agents\", \"description\": \"A test policy to install agents\", \"agentRules\": [{\"enableAutoupgrade\": true, \"packageState\": \"installed\", \"type\": \"logging\", \"version\": \"1.x.x\"},{\"enableAutoupgrade\": false, \"packageState\": \"installed\", \"type\": \"metrics\", \"version\": \"6.x.x\"}]}",
+                  "packageRepositories": [
+                    {
+                      "yum": {
+                        "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64",
+                        "displayName": "Google Cloud Logging Agent Repository",
+                        "gpgKeys": [
+                          "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                          "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                        ],
+                        "id": "google-cloud-logging"
+                      }
+                    },
+                    {
+                      "yum": {
+                        "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el7-x86_64-all",
+                        "displayName": "Google Cloud Monitoring Agent Repository",
+                        "gpgKeys": [
+                          "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                          "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                        ],
+                        "id": "google-cloud-monitoring"
+                      }
+                    }
+                  ],
+                  "packages": [
+                    {
+                      "desiredState": "UPDATED",
+                      "name": "google-fluentd"
+                    },
+                    {
+                      "desiredState": "UPDATED",
+                      "name": "google-fluentd-catch-all-config"
+                    },
+                    {
+                      "desiredState": "UPDATED",
+                      "name": "google-fluentd-start-service"
+                    },
+                    {
+                      "desiredState": "INSTALLED",
+                      "name": "stackdriver-agent"
+                    },
+                    {
+                      "desiredState": "INSTALLED",
+                      "name": "stackdriver-agent-start-service"
+                    }
+                  ],
+                  "recipes": [
+                    {
+                      "desiredState": "UPDATED",
+                      "installSteps": [
+                        {
+                          "scriptRun": {
+                            "script": "#!/bin/bash\nsleep 5m\nsudo yum remove google-fluentd\nsudo yum install -y 'google-fluentd-1.*'"
+                          }
+                        }
+                      ],
+                      "name": "set-google-fluentd-version"
+                    },
+                    {
+                      "desiredState": "UPDATED",
+                      "installSteps": [
+                        {
+                          "scriptRun": {
+                            "script": "#!/bin/bash\nsleep 5m\nsudo yum remove stackdriver-agent\nsudo yum install -y 'stackdriver-agent-6.*'"
+                          }
+                        }
+                      ],
+                      "name": "set-stackdriver-agent-version"
+                    }
+                  ],
+                  "createTime": "2020-06-16T23:15:32.089Z",
+                  "etag": "40d39e5c-bfde-49b4-b312-c081e5cebe84",
+                  "name": "projects/my-project/guestPolicies/ops-agents-test-monitoring-policy",
+                  "updateTime": "2020-06-16T23:15:32.089Z"
+                }
+                ],
+                "nextPageToken": "1234"
+              }
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies?alt=json&pageToken=1234
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {}
+    - expect_stdout: |
+        ID                                 DESCRIPTION                        CREATE_TIME               UPDATE_TIME
+        ops-agents-test-monitoring-policy  A test policy to install agent...  2020-06-16T23:15:32.089Z  2020-06-16T23:15:32.089Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances ops-agents policies list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "guestPolicies": [
+                {
+                  "assignment": {
+                    "groupLabels": [
+                      {
+                        "labels": {
+                          "env": "prod",
+                          "product": "myproduct"
+                        }
+                      },
+                      {
+                        "labels": {
+                          "env": "staging",
+                          "product": "myproduct"
+                        }
+                      }
+                    ],
+                    "instances": [
+                      "zones/us-central1-a/instances/test-instance-1",
+                      "zones/us-central1-a/instances/test-instance-2"
+                    ],
+                    "osTypes": [
+                      {
+                        "osArchitecture": "x86_64",
+                        "osShortName": "centos",
+                        "osVersion": "7"
+                      }
+                    ],
+                    "zones": [
+                      "us-central1-a",
+                      "us-central1-b"
+                    ]
+                  },
+                  "description": "{\"type\": \"ops-agents\", \"description\": \"A test policy to install agents\", \"agentRules\": [{\"enableAutoupgrade\": true, \"type\": \"logging\", \"version\": \"1.x.x\"},{\"enableAutoupgrade\": false, \"packageState\": \"installed\", \"type\": \"metrics\", \"version\": \"6.x.x\"}]}",
+                  "packageRepositories": [
+                    {
+                      "yum": {
+                        "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64",
+                        "displayName": "Google Cloud Logging Agent Repository",
+                        "gpgKeys": [
+                          "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                          "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                        ],
+                        "id": "google-cloud-logging"
+                      }
+                    },
+                    {
+                      "yum": {
+                        "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el7-x86_64-all",
+                        "displayName": "Google Cloud Monitoring Agent Repository",
+                        "gpgKeys": [
+                          "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                          "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                        ],
+                        "id": "google-cloud-monitoring"
+                      }
+                    }
+                  ],
+                  "packages": [
+                    {
+                      "desiredState": "UPDATED",
+                      "name": "google-fluentd"
+                    },
+                    {
+                      "desiredState": "UPDATED",
+                      "name": "google-fluentd-catch-all-config"
+                    },
+                    {
+                      "desiredState": "UPDATED",
+                      "name": "google-fluentd-start-service"
+                    },
+                    {
+                      "desiredState": "INSTALLED",
+                      "name": "stackdriver-agent"
+                    },
+                    {
+                      "desiredState": "INSTALLED",
+                      "name": "stackdriver-agent-start-service"
+                    }
+                  ],
+                  "recipes": [
+                    {
+                      "desiredState": "UPDATED",
+                      "installSteps": [
+                        {
+                          "scriptRun": {
+                            "script": "#!/bin/bash\nsleep 5m\nsudo yum remove google-fluentd\nsudo yum install -y 'google-fluentd-1.*'"
+                          }
+                        }
+                      ],
+                      "name": "set-google-fluentd-version"
+                    },
+                    {
+                      "desiredState": "UPDATED",
+                      "installSteps": [
+                        {
+                          "scriptRun": {
+                            "script": "#!/bin/bash\nsleep 5m\nsudo yum remove stackdriver-agent\nsudo yum install -y 'stackdriver-agent-6.*'"
+                          }
+                        }
+                      ],
+                      "name": "set-stackdriver-agent-version"
+                    }
+                  ],
+                  "createTime": "2020-06-16T23:15:32.089Z",
+                  "etag": "40d39e5c-bfde-49b4-b312-c081e5cebe84",
+                  "name": "projects/my-project/guestPolicies/ops-agents-test-monitoring-policy",
+                  "updateTime": "2020-06-16T23:15:32.089Z"
+                }
+                ],
+                "nextPageToken": "1234"
+              }
+    - expect_stderr: |
+        WARNING: Encountered a malformed policy. The Ops Agents policy [projects/my-project/guestPolicies/ops-agents-test-monitoring-policy] may have been modified directly by the OS Config guest policy API / gcloud commands. If so, please delete and re-create with the Ops Agents policy gcloud commands. If not, this may be an internal error.
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies?alt=json&pageToken=1234
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {}
+    - expect_stdout: |
+        ID                                 DESCRIPTION  CREATE_TIME               UPDATE_TIME
+        ops-agents-test-monitoring-policy  <MALFORMED>  2020-06-16T23:15:32.089Z  2020-06-16T23:15:32.089Z
+    - expect_exit:
+        code: 0

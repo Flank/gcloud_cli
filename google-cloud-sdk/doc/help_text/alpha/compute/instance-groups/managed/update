@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instance-groups managed update - update Google Compute
-        Engine managed instance groups
+    gcloud alpha compute instance-groups managed update - update Compute Engine
+        managed instance groups
 
 SYNOPSIS
     gcloud alpha compute instance-groups managed update NAME
@@ -14,7 +14,7 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update Google Compute Engine managed instance groups.
+    (ALPHA) Update Compute Engine managed instance groups.
 
     gcloud alpha compute instance-groups managed update allows you to specify
     or modify the StatefulPolicy and AutoHealingPolicy for an existing managed

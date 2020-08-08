@@ -7,7 +7,7 @@ summary:
       asset feeds update gcloud_feed --project=cai-playground --add-asset-names="id1","id2"
       --content-type=resource --add-asset-types="cloudresourcemanager.googleapis.com/Organization"
       --pubsub-topic=projects/cai-playground/topics/gcloud_topic
-  - stdout: |-
+  - stdout: |
       assetNames:
       - id1
       - id2
@@ -23,7 +23,7 @@ summary:
       asset feeds update gcloud_feed --project=cai-playground --remove-asset-names="id1","id2"
       --content-type=resource --remove-asset-types="cloudresourcemanager.googleapis.com/Organization"
       --pubsub-topic=projects/cai-playground/topics/gcloud_topic
-  - stdout: |-
+  - stdout: |
       contentType: RESOURCE
       feedOutputConfig:
         pubsubDestination:
@@ -34,7 +34,43 @@ summary:
       asset feeds update gcloud_feed --project=cai-playground --clear-asset-names
       --content-type=resource --clear-asset-types
       --pubsub-topic=projects/cai-playground/topics/gcloud_topic
-  - stdout: |-
+  - stdout: |
+      contentType: RESOURCE
+      feedOutputConfig:
+        pubsubDestination:
+          topic: projects/cai-playground/topics/gcloud_topic
+      name: projects/846710131186/feeds/gcloud_feed
+- execute:
+  - command: |-
+      asset feeds update gcloud_feed --project=cai-playground
+      --condition-expression="new expression" --condition-title="new title"
+      --condition-description="new description"
+  - stdout: |
+      assetNames:
+      - id1
+      - id2
+      assetTypes:
+      - cloudresourcemanager.googleapis.com/Organization
+      condition:
+        description: new description
+        expression: new expression
+        title: new title
+      contentType: RESOURCE
+      feedOutputConfig:
+        pubsubDestination:
+          topic: projects/cai-playground/topics/gcloud_topic
+      name: projects/846710131186/feeds/gcloud_feed
+- execute:
+  - command: |-
+      asset feeds update gcloud_feed --project=cai-playground
+      --clear-condition-expression --clear-condition-title --clear-condition-description
+  - stdout: |
+      assetNames:
+      - id1
+      - id2
+      assetTypes:
+      - cloudresourcemanager.googleapis.com/Organization
+      condition: {}
       contentType: RESOURCE
       feedOutputConfig:
         pubsubDestination:
@@ -346,6 +382,211 @@ actions:
               }
             }
     - expect_stdout: |
+        contentType: RESOURCE
+        feedOutputConfig:
+          pubsubDestination:
+            topic: projects/cai-playground/topics/gcloud_topic
+        name: projects/846710131186/feeds/gcloud_feed
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |-
+      asset feeds update gcloud_feed --project=cai-playground
+      --condition-expression="new expression" --condition-title="new title"
+      --condition-description="new description"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cai-playground?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "846710131186"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/846710131186/feeds/gcloud_feed?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/846710131186/feeds/gcloud_feed",
+              "assetNames": [
+                "id1",
+                "id2"
+              ],
+              "assetTypes": [
+                "cloudresourcemanager.googleapis.com/Organization"
+              ],
+              "contentType": "RESOURCE",
+              "feedOutputConfig": {
+                "pubsubDestination": {
+                  "topic": "projects/cai-playground/topics/gcloud_topic"
+                }
+              },
+              "condition": {
+                "description": "old description",
+                "expression": "old expression",
+                "title": "old title"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/846710131186/feeds/gcloud_feed?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              feed:
+                condition:
+                  description: new description
+                  expression: new expression
+                  title: new title
+                contentType: CONTENT_TYPE_UNSPECIFIED
+                feedOutputConfig:
+                  pubsubDestination: {}
+              updateMask: condition.expression,condition.title,condition.description
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/846710131186/feeds/gcloud_feed",
+              "assetNames": [
+                "id1",
+                "id2"
+              ],
+              "assetTypes": [
+                "cloudresourcemanager.googleapis.com/Organization"
+              ],
+              "contentType": "RESOURCE",
+              "feedOutputConfig": {
+                "pubsubDestination": {
+                  "topic": "projects/cai-playground/topics/gcloud_topic"
+                }
+              },
+              "condition": {
+                "description": "new description",
+                "expression": "new expression",
+                "title": "new title"
+              }
+            }
+    - expect_stdout: |
+        assetNames:
+        - id1
+        - id2
+        assetTypes:
+        - cloudresourcemanager.googleapis.com/Organization
+        condition:
+          description: new description
+          expression: new expression
+          title: new title
+        contentType: RESOURCE
+        feedOutputConfig:
+          pubsubDestination:
+            topic: projects/cai-playground/topics/gcloud_topic
+        name: projects/846710131186/feeds/gcloud_feed
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |-
+      asset feeds update gcloud_feed --project=cai-playground
+      --clear-condition-expression --clear-condition-title --clear-condition-description
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cai-playground?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "846710131186"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/846710131186/feeds/gcloud_feed?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/846710131186/feeds/gcloud_feed",
+              "assetNames": [
+                "id1",
+                "id2"
+              ],
+              "assetTypes": [
+                "cloudresourcemanager.googleapis.com/Organization"
+              ],
+              "contentType": "RESOURCE",
+              "feedOutputConfig": {
+                "pubsubDestination": {
+                  "topic": "projects/cai-playground/topics/gcloud_topic"
+                }
+              },
+              "condition": {
+                "description": "old description",
+                "expression": "old expression",
+                "title": "old title"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/846710131186/feeds/gcloud_feed?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              feed:
+                condition: {}
+                contentType: CONTENT_TYPE_UNSPECIFIED
+                feedOutputConfig:
+                  pubsubDestination: {}
+              updateMask: condition.expression,condition.title,condition.description
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/846710131186/feeds/gcloud_feed",
+              "assetNames": [
+                "id1",
+                "id2"
+              ],
+              "assetTypes": [
+                "cloudresourcemanager.googleapis.com/Organization"
+              ],
+              "contentType": "RESOURCE",
+              "feedOutputConfig": {
+                "pubsubDestination": {
+                  "topic": "projects/cai-playground/topics/gcloud_topic"
+                }
+              },
+              "condition": {}
+            }
+    - expect_stdout: |
+        assetNames:
+        - id1
+        - id2
+        assetTypes:
+        - cloudresourcemanager.googleapis.com/Organization
+        condition: {}
         contentType: RESOURCE
         feedOutputConfig:
           pubsubDestination:

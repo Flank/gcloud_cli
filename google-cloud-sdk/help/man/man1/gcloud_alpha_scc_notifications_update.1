@@ -11,7 +11,7 @@ gcloud alpha scc notifications update \- update a Cloud Security Command Center 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scc notifications update\fR \fINOTIFICATION_CONFIG_ID\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scc notifications update\fR \fINOTIFICATION_CONFIG_ID\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-filter\fR=\fIFILTER\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,6 +39,11 @@ The ID of the notification config. Formatted as
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 The text that will be used to describe a notification configuration.
+
+.TP 2m
+\fB\-\-filter\fR=\fIFILTER\fR
+The filter string which will applied to events of findings of a notification
+configuration.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
@@ -76,46 +81,60 @@ https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
 
 .SH "EXAMPLES"
 
-Update all mutable fields in my\-config (description + pubsub topic):
+Update all mutable fields in \f5\fImy\-config\fR\fR (description + pubsub topic
++ filter):
 
-$ gcloud alpha scc notifications update my\-config \e.RS 2m
-\-\-organization=123456 \-\-description "New description" \e
-\-\-pubsub_topic "projects/22222/topics/newtopic"
-
+.RS 2m
+$ gcloud alpha scc notifications update my\-config \e
+    \-\-organization=123456 \-\-description "New description" \e
+    \-\-pubsub_topic "projects/22222/topics/newtopic"
 .RE
 
-$ gcloud alpha scc notifications update \e.RS 2m
-organizations/123456/notificationConfigs/my\-config \e
-\-\-description "New description" \e
-\-\-pubsub_topic "projects/22222/topics/newtopic"
-
+.RS 2m
+$ gcloud alpha scc notifications update \e
+    organizations/123456/notificationConfigs/my\-config \e
+    \-\-description "New description" \e
+    \-\-pubsub_topic "projects/22222/topics/newtopic"
 .RE
 
 Update my\-config's description
 
-$ gcloud alpha scc notifications update my\-config \e.RS 2m
-\-\-organization=123456 \-\-description "New description"
-
+.RS 2m
+$ gcloud alpha scc notifications update my\-config \e
+    \-\-organization=123456 \-\-description "New description"
 .RE
 
-$ gcloud alpha scc notifications update \e.RS 2m
-organizations/123456/notificationConfigs/my\-config \e
-\-\-description "New description"
-
+.RS 2m
+$ gcloud alpha scc notifications update \e
+    organizations/123456/notificationConfigs/my\-config \e
+    \-\-description "New description"
 .RE
 
 Update my\-config's pubsub\-topic
 
-$ gcloud alpha scc notifications update my\-config \e.RS 2m
-\-\-organization=123456 \e
-\-\-pubsub_topic "projects/22222/topics/newtopic"
-
+.RS 2m
+$ gcloud alpha scc notifications update my\-config \e
+    \-\-organization=123456 \e
+    \-\-pubsub_topic "projects/22222/topics/newtopic"
 .RE
 
-$ gcloud alpha scc notifications update \e.RS 2m
-organizations/123456/notificationConfigs/my\-config \e
-\-\-pubsub_topic "projects/22222/topics/newtopic"
+.RS 2m
+$ gcloud alpha scc notifications update \e
+    organizations/123456/notificationConfigs/my\-config \e
+    \-\-pubsub_topic "projects/22222/topics/newtopic"
+.RE
 
+Update my\-config's filter
+
+.RS 2m
+$ gcloud alpha scc notifications update my\-config \e
+    \-\-organization=123456 \-\-filter='state = \e"ACTIVE\e"'
+.RE
+
+.RS 2m
+$ gcloud alpha scc notifications update \e
+    organizations/123456/notificationConfigs/my\-config \e
+    \-\-filter='state = \e"ACTIVE\e"'
 .RE
 
 

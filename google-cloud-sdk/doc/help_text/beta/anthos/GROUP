@@ -27,6 +27,12 @@ COMMANDS
      apply
         (BETA) Apply configuration changes for Anthos infrastructure.
 
+     create-login-config
+        (BETA) Generates a login configuration file.
+
+     export
+        (BETA) Export current configuration of an Anthos cluster.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

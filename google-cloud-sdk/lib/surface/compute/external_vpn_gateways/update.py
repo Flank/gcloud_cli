@@ -34,9 +34,9 @@ _EXTERNAL_VPN_GATEWAY_ARG = (
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
                     base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
-  r"""Update a Google Compute Engine external VPN gateway.
+  r"""Update a Compute Engine external VPN gateway.
 
-  *{command}* updates labels for a Google Compute Engine external VPN gateway.
+  *{command}* updates labels for a Compute Engine external VPN gateway.
   For example:
 
     $ {command} example-gateway \
@@ -51,7 +51,7 @@ class Update(base.UpdateCommand):
 
   To list existing labels
 
-    $ {parent_command} describe example-gateway --format='default(labels)'
+    $ {parent_command} describe example-gateway --format="default(labels)"
 
   """
 

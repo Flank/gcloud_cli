@@ -29,12 +29,10 @@ GROUPS
     GROUP is one of the following:
 
      managed
-        (BETA) Read and manipulate Google Compute Engine managed instance
-        groups.
+        (BETA) Read and manipulate Compute Engine managed instance groups.
 
      unmanaged
-        (BETA) Read and manipulate Google Compute Engine unmanaged instance
-        group.
+        (BETA) Read and manipulate Compute Engine unmanaged instance group.
 
 COMMANDS
     COMMAND is one of the following:

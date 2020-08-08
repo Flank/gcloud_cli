@@ -55,7 +55,7 @@ GROUPS
         List, create, delete and update External VPN Gateways.
 
      firewall-rules
-        List, create, update, and delete Google Compute Engine firewall rules.
+        List, create, update, and delete Compute Engine firewall rules.
 
      forwarding-rules
         Read and manipulate traffic forwarding rules to network load balancers.
@@ -85,7 +85,7 @@ GROUPS
         Read and manipulate Compute Engine interconnects.
 
      machine-types
-        Read Google Compute Engine virtual machine types.
+        Read Compute Engine virtual machine types.
 
      network-endpoint-groups
         Read and manipulate Compute Engine network endpoint groups.
@@ -140,6 +140,9 @@ GROUPS
 
      ssl-policies
         List, create, delete and update Compute Engine SSL policies.
+
+     target-grpc-proxies
+        Manage Google Compute Engine target gRPC proxy resources.
 
      target-http-proxies
         List, create, and delete target HTTP proxies.

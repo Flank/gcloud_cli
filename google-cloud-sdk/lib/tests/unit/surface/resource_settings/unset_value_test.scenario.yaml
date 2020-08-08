@@ -1,0 +1,49 @@
+title: ResourceSettings - Unset value test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: resource-settings unset-value gcp-basicBooleanSetting --project=project-123
+  - stdout: |
+      {}
+- execute:
+  - command: resource-settings unset-value gcp-basicBooleanSetting
+  - stderr: |
+      ERROR: (gcloud.alpha.resource-settings.unset-value) Exactly one of (--folder | --organization | --project) must be specified.
+      Usage: gcloud alpha resource-settings unset-value SETTING_NAME (--folder=FOLDER_ID | --organization=ORGANIZATION_ID | --project=PROJECT_ID) [optional flags]
+        optional flags may be  --folder | --help | --organization | --project
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha resource-settings unset-value --help
+  - error: '1: Exactly one of (--folder | --organization | --project) must be specified.'
+actions:
+- execute_command:
+    command: resource-settings unset-value gcp-basicBooleanSetting --project=project-123
+    events:
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/projects/project-123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: resource-settings unset-value gcp-basicBooleanSetting
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.resource-settings.unset-value) Exactly one of (--folder | --organization | --project) must be specified.
+        Usage: gcloud alpha resource-settings unset-value SETTING_NAME (--folder=FOLDER_ID | --organization=ORGANIZATION_ID | --project=PROJECT_ID) [optional flags]
+          optional flags may be  --folder | --help | --organization | --project
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha resource-settings unset-value --help
+    - expect_exit:
+        code: 1
+        message: |-
+          Exactly one of (--folder | --organization | --project) must be specified.

@@ -317,6 +317,7 @@ class APIAdapterTests(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     properties.VALUES.api_endpoint_overrides.container.Set(self.TEST_ENDPOINT)
     properties.VALUES.api_endpoint_overrides.compute.Set(self.TEST_ENDPOINT)
     mock_http = mock.Mock()
+    mock_http.redirect_codes = []
     self.StartPatch('googlecloudsdk.core.credentials.http.Http',
                     return_value=mock_http)
     mock_http.request.return_value = ({'status': 503}, '')
@@ -344,6 +345,7 @@ class APIAdapterTests(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         'CheckResponse',
         autospec=True)
     mock_http = mock.Mock()
+    mock_http.redirect_codes = []
     self.StartPatch('googlecloudsdk.core.credentials.http.Http',
                     return_value=mock_http)
     for status in [500, 404, 403]:

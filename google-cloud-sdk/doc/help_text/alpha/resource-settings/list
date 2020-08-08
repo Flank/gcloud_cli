@@ -9,7 +9,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Get a resource setting
+    (ALPHA) List all available resource settings
 
 REQUIRED FLAGS
      Resource that is associated with the resource settings. Exactly one of
@@ -68,9 +68,8 @@ EXAMPLES
         $ gcloud alpha resource-settings list --project=foo-project
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

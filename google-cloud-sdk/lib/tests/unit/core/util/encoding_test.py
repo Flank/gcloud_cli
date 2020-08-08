@@ -31,7 +31,7 @@ _ASCII = 'Unicode'
 _CP500 = _ASCII.encode('cp500')
 _ISO_8859_1 = b'\xdc\xf1\xee\xe7\xf2\xd0\xe9'  # ÜñîçòÐé
 _UNICODE = 'Ṳᾔḯ¢◎ⅾℯ'
-_UTF8 = _UNICODE.encode('utf8')
+_UTF8 = _UNICODE.encode('utf-8')
 
 
 class DecodeTest(test_case.Base):
@@ -74,13 +74,13 @@ class DecodeTest(test_case.Base):
     self.assertEqual(expected, actual)
 
   def testDecodeUtf8(self):
-    expected = _UTF8.decode('utf8')
+    expected = _UTF8.decode('utf-8')
     actual = encoding.Decode(_UTF8)
     self.assertEqual(expected, actual)
 
   def testDecodeUtf8AttrKwarg(self):
     expected = _ISO_8859_1.decode('iso-8859-1')
-    actual = encoding.Decode(_ISO_8859_1, encoding='utf8')
+    actual = encoding.Decode(_ISO_8859_1, encoding='utf-8')
     self.assertEqual(expected, actual)
 
 
@@ -127,7 +127,7 @@ class EncodingGetSetEncodedValueTests(test_case.Base):
     self.assertEqual('', actual)
 
   def testSetEncodedValueUnicode(self):
-    self.StartObjectPatch(sys, 'getfilesystemencoding').return_value = 'utf8'
+    self.StartObjectPatch(sys, 'getfilesystemencoding').return_value = 'utf-8'
     d = {}
     self.assertEqual(d, {})
     value = 'Ṳᾔḯ¢◎ⅾℯ'

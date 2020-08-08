@@ -3,12 +3,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha run deploy [[SERVICE] --namespace=NAMESPACE]
-        [--args=[ARG,...]] [--async] [--clear-vpc-connector]
-        [--command=[COMMAND,...]] [--concurrency=CONCURRENCY] [--cpu=CPU]
-        [--image=IMAGE] [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
+        [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
+        [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
         [--min-instances=MIN_INSTANCES] [--platform=PLATFORM] [--port=PORT]
-        [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT] [--no-traffic]
-        [--vpc-connector=VPC_CONNECTOR]
+        [--service-account=SERVICE_ACCOUNT] [--tag=TAG] [--timeout=TIMEOUT]
+        [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
@@ -18,7 +18,9 @@ SYNOPSIS
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
           | --set-secrets=[KEY=VALUE,...]
           | --remove-secrets=[KEY,...] --update-secrets=[KEY=VALUE,...]]
-        [--[no-]allow-unauthenticated --revision-suffix=REVISION_SUFFIX
+        [--[no-]allow-unauthenticated --clear-vpc-connector
+          --revision-suffix=REVISION_SUFFIX --vpc-connector=VPC_CONNECTOR
+          --vpc-egress=VPC_EGRESS
           --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
           | --clear-cloudsql-instances
           | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
@@ -52,17 +54,14 @@ FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
-     --clear-vpc-connector
-        Remove the VPC connector for this Service.
-
      --command=[COMMAND,...]
         Entrypoint for the container image. If not specified, the container
         image's default Entrypoint is run. To reset this field to its default,
         pass an empty string.
 
      --concurrency=CONCURRENCY
-        Set the number of concurrent requests allowed per container instance. A
-        concurrency of 0 or unspecified indicates any number of concurrent
+        Set the maximum number of concurrent requests allowed per container
+        instance. If concurrency is unspecified, any number of concurrent
         requests are allowed. To unset this field, provide the special value
         default.
 
@@ -108,7 +107,7 @@ FLAGS
         this field, pass the special value "default".
 
      --service-account=SERVICE_ACCOUNT
-        The service account associated with the revision of the service. The
+        Service account associated with the revision of the service. The
         service account represents the identity of the running revision, and
         determines what permissions the revision has. For the managed platform,
         this is the email address of an IAM service account. For the
@@ -116,6 +115,9 @@ FLAGS
         Kubernetes service account in the same namespace as the service. If not
         provided, the revision will use the default service account of the
         project, or default Kubernetes namespace service account respectively.
+
+     --tag=TAG
+        Traffic tag to assign to the newly created revision.
 
      --timeout=TIMEOUT
         Set the maximum request execution time (timeout). It is specified as a
@@ -130,9 +132,6 @@ FLAGS
         that the revision being deployed will not receive traffic. After a
         deployment with this flag the LATEST revision will not receive traffic
         on future deployments.
-
-     --vpc-connector=VPC_CONNECTOR
-        Set a VPC connector for this Service.
 
      At most one of these may be specified:
 
@@ -269,11 +268,28 @@ FLAGS
           --allow-unauthenticated to enable and --no-allow-unauthenticated to
           disable.
 
+       --clear-vpc-connector
+          Remove the VPC connector for this Service.
+
        --revision-suffix=REVISION_SUFFIX
           Specify the suffix of the revision name. Revision names always start
           with the service name automatically. For example, specifying
           [--revision-suffix=v1] for a service named 'helloworld', would lead
           to a revision named 'helloworld-v1'.
+
+       --vpc-connector=VPC_CONNECTOR
+          Set a VPC connector for this Service.
+
+       --vpc-egress=VPC_EGRESS
+          The outbound traffic to send through the VPC connector for this
+          Service. This Service must have a VPC connector to set VPC egress.
+          VPC_EGRESS must be one of:
+
+           all
+              Sends all outbound traffic through the VPC connector.
+           private-ranges-only
+              Default option. Sends outbound traffic to private IP addresses
+              defined by RFC1918 through the VPC connector.
 
        These flags modify the Cloud SQL instances this Service connects to. You
        can specify a name of a Cloud SQL instance if it's in the same project

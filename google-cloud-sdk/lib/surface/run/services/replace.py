@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.util import messages as messages_util
 from googlecloudsdk.calliope import arg_parsers
@@ -28,6 +29,7 @@ from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import flags
+from googlecloudsdk.command_lib.run import messages_util as run_messages_util
 from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import serverless_operations
@@ -37,7 +39,6 @@ from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import progress_tracker
-from surface.run import deploy
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
@@ -122,7 +123,10 @@ class Replace(base.Command):
           collection='run.namespaces.services')
       original_service = client.GetService(service_ref)
 
-      pretty_print.Info(deploy.GetStartDeployMessage(conn_context, service_ref))
+      pretty_print.Info(
+          run_messages_util.GetStartDeployMessage(
+              conn_context, service_ref,
+              operation='Applying new configuration'))
 
       deployment_stages = stages.ServiceStages()
       header = (
@@ -141,8 +145,11 @@ class Replace(base.Command):
             for_replace=True)
       if args.async_:
         pretty_print.Success(
-            'Service [{{bold}}{serv}{{reset}}] is deploying '
+            'New configuration for [{{bold}}{serv}{{reset}}] is being applied '
             'asynchronously.'.format(serv=service_ref.servicesId))
       else:
-        pretty_print.Success(deploy.GetSuccessMessageForSynchronousDeploy(
-            client, service_ref))
+        serv = client.GetService(service_ref)
+        pretty_print.Success('New configuration has been applied to service '
+                             '[{{bold}}{serv}{{reset}}].\n'
+                             'URL: {{bold}}{url}{{reset}}'.format(
+                                 serv=service_ref.Name(), url=serv.domain))

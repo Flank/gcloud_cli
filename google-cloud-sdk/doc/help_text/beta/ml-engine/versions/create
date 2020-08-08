@@ -32,9 +32,8 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --accelerator=[count=COUNT],[type=TYPE]
         Manage the accelerator config for GPU serving. When deploying a model
-        with the new Alpha Google Compute Engine Machine Types, a GPU
-        accelerator may also be selected. Accelerator config for version
-        creation is currently available in us-central1 only.
+        with Compute Engine Machine Types, a GPU accelerator may also be
+        selected.
 
          type
             The type of the accelerator. Choices are 'nvidia-tesla-k80',
@@ -43,7 +42,9 @@ OPTIONAL FLAGS
 
          count
             The number of accelerators to attach to each machine running the
-            job.
+            job. This is usually 1; scaling parameters are configured using
+            manualScaling or autoScaling flags.
+
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
@@ -105,7 +106,7 @@ OPTIONAL FLAGS
      --machine-type=MACHINE_TYPE
         Type of machine on which to serve the model. Currently only applies to
         online prediction. For available machine types, see
-        https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#machine-types.
+        https://cloud.google.com/ai-platform/prediction/docs/machine-types-online-prediction#available_machine_types.
 
      --num-integral-steps=NUM_INTEGRAL_STEPS; default=50
         Number of integral steps for Integrated Gradients. Only valid when

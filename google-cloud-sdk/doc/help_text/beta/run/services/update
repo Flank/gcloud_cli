@@ -4,15 +4,21 @@ NAME
 
 SYNOPSIS
     gcloud beta run services update [[SERVICE] --namespace=NAMESPACE]
-        [--args=[ARG,...]] [--async] [--clear-vpc-connector]
-        [--command=[COMMAND,...]] [--concurrency=CONCURRENCY] [--cpu=CPU]
-        [--max-instances=MAX_INSTANCES] [--memory=MEMORY] [--platform=PLATFORM]
-        [--port=PORT] [--timeout=TIMEOUT] [--no-traffic]
-        [--vpc-connector=VPC_CONNECTOR]
+        [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
+        [--memory=MEMORY] [--platform=PLATFORM] [--port=PORT]
+        [--service-account=SERVICE_ACCOUNT] [--tag=TAG] [--timeout=TIMEOUT]
+        [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
+        [--clear-vpc-connector --revision-suffix=REVISION_SUFFIX
+          --vpc-connector=VPC_CONNECTOR
+          --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+          | --clear-cloudsql-instances
+          | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+          | --set-cloudsql-instances=[CLOUDSQL-INSTANCES,...]]
         [--connectivity=CONNECTIVITY
           --min-instances=MIN_INSTANCES --[no-]use-http2 --clear-config-maps
           | --set-config-maps=[KEY=VALUE,...] | --remove-config-maps=[KEY,...]
@@ -21,13 +27,7 @@ SYNOPSIS
           | --remove-secrets=[KEY,...] --update-secrets=[KEY=VALUE,...]]
         [--region=REGION
           | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
-          | --context=CONTEXT --kubeconfig=KUBECONFIG]
-        [--revision-suffix=REVISION_SUFFIX --service-account=SERVICE_ACCOUNT
-          --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
-          | --clear-cloudsql-instances
-          | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
-          | --set-cloudsql-instances=[CLOUDSQL-INSTANCES,...]]
-        [GCLOUD_WIDE_FLAG ...]
+          | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Update Cloud Run environment variables and other configuration
@@ -55,17 +55,14 @@ FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
-     --clear-vpc-connector
-        Remove the VPC connector for this Service.
-
      --command=[COMMAND,...]
         Entrypoint for the container image. If not specified, the container
         image's default Entrypoint is run. To reset this field to its default,
         pass an empty string.
 
      --concurrency=CONCURRENCY
-        Set the number of concurrent requests allowed per container instance. A
-        concurrency of 0 or unspecified indicates any number of concurrent
+        Set the maximum number of concurrent requests allowed per container
+        instance. If concurrency is unspecified, any number of concurrent
         requests are allowed. To unset this field, provide the special value
         default.
 
@@ -102,6 +99,19 @@ FLAGS
         variable. Must be a number between 1 and 65535, inclusive. To unset
         this field, pass the special value "default".
 
+     --service-account=SERVICE_ACCOUNT
+        Service account associated with the revision of the service. The
+        service account represents the identity of the running revision, and
+        determines what permissions the revision has. For the managed platform,
+        this is the email address of an IAM service account. For the
+        Kubernetes-based platforms (gke, kubernetes), this is the name of a
+        Kubernetes service account in the same namespace as the service. If not
+        provided, the revision will use the default service account of the
+        project, or default Kubernetes namespace service account respectively.
+
+     --tag=TAG
+        Traffic tag to assign to the newly created revision.
+
      --timeout=TIMEOUT
         Set the maximum request execution time (timeout). It is specified as a
         duration; for example, "10m5s" is ten minutes, and five seconds. If you
@@ -115,9 +125,6 @@ FLAGS
         that the revision being deployed will not receive traffic. After a
         deployment with this flag the LATEST revision will not receive traffic
         on future deployments.
-
-     --vpc-connector=VPC_CONNECTOR
-        Set a VPC connector for this Service.
 
      At most one of these may be specified:
 
@@ -167,6 +174,40 @@ FLAGS
        --update-labels=[KEY=VALUE,...]
           List of label KEY=VALUE pairs to update. If a label exists its value
           is modified, otherwise a new label is created.
+
+     Only applicable if connecting to Cloud Run (fully managed). Specify
+     --platform=managed to use:
+
+       --clear-vpc-connector
+          Remove the VPC connector for this Service.
+
+       --revision-suffix=REVISION_SUFFIX
+          Specify the suffix of the revision name. Revision names always start
+          with the service name automatically. For example, specifying
+          [--revision-suffix=v1] for a service named 'helloworld', would lead
+          to a revision named 'helloworld-v1'.
+
+       --vpc-connector=VPC_CONNECTOR
+          Set a VPC connector for this Service.
+
+       These flags modify the Cloud SQL instances this Service connects to. You
+       can specify a name of a Cloud SQL instance if it's in the same project
+       and region as your Cloud Run service; otherwise specify
+       <project>:<region>:<instance> for the instance. At most one of these may
+       be specified:
+
+         --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+            Append the given values to the current Cloud SQL instances.
+
+         --clear-cloudsql-instances
+            Empty the current Cloud SQL instances.
+
+         --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+            Remove the given values from the current Cloud SQL instances.
+
+         --set-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+            Completely replace the current Cloud SQL instances with the given
+            values.
 
      Only applicable if connecting to Cloud Run for Anthos deployed on Google
      Cloud or Cloud Run for Anthos deployed on VMware. Specify --platform=gke
@@ -291,41 +332,6 @@ FLAGS
             the colon- or semicolon-delimited list of paths specified by
             $KUBECONFIG will be used. If $KUBECONFIG is unset, this defaults to
             ~/.kube/config.
-
-     Only applicable if connecting to Cloud Run (fully managed). Specify
-     --platform=managed to use:
-
-       --revision-suffix=REVISION_SUFFIX
-          Specify the suffix of the revision name. Revision names always start
-          with the service name automatically. For example, specifying
-          [--revision-suffix=v1] for a service named 'helloworld', would lead
-          to a revision named 'helloworld-v1'.
-
-       --service-account=SERVICE_ACCOUNT
-          Email address of the IAM service account associated with the revision
-          of the service. The service account represents the identity of the
-          running revision, and determines what permissions the revision has.
-          If not provided, the revision will use the project's default service
-          account.
-
-       These flags modify the Cloud SQL instances this Service connects to. You
-       can specify a name of a Cloud SQL instance if it's in the same project
-       and region as your Cloud Run service; otherwise specify
-       <project>:<region>:<instance> for the instance. At most one of these may
-       be specified:
-
-         --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
-            Append the given values to the current Cloud SQL instances.
-
-         --clear-cloudsql-instances
-            Empty the current Cloud SQL instances.
-
-         --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
-            Remove the given values from the current Cloud SQL instances.
-
-         --set-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
-            Completely replace the current Cloud SQL instances with the given
-            values.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

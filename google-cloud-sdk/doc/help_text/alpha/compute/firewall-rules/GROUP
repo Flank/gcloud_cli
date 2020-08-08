@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute firewall-rules - list, create, update, and delete
-        Google Compute Engine firewall rules
+        Compute Engine firewall rules
 
 SYNOPSIS
     gcloud alpha compute firewall-rules COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -26,16 +26,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine firewall rule.
+        (ALPHA) Create a Compute Engine firewall rule.
 
      delete
-        (ALPHA) Delete Google Compute Engine firewall rules.
+        (ALPHA) Delete Compute Engine firewall rules.
 
      describe
-        (ALPHA) Describe a Google Compute Engine firewall rule.
+        (ALPHA) Describe a Compute Engine firewall rule.
 
      list
-        (ALPHA) List Google Compute Engine firewall rules.
+        (ALPHA) List Compute Engine firewall rules.
 
      update
         (ALPHA) Update a firewall rule.

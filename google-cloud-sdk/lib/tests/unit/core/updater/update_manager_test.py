@@ -436,10 +436,10 @@ and bugs fixed.  The latest full release notes can be viewed at:
     install_state = local_state.InstallationState(self.sdk_root_path)
 
     # initial install
-    # Use 'bundled-python' to test for warning message
+    # Use bundled python component to test for warning message
     component_tuples = [
-        ('a', 1, ['bundled-python']),
-        ('bundled-python', 1, []),
+        ('a', 1, [update_manager.BUNDLED_PYTHON_COMPONENT]),
+        (update_manager.BUNDLED_PYTHON_COMPONENT, 1, []),
         ('c', 1, [])]
     snapshot, paths1 = (
         self.CreateSnapshotFromComponentsGenerateTars(1, component_tuples))
@@ -447,15 +447,17 @@ and bugs fixed.  The latest full release notes can be viewed at:
     manager = update_manager.UpdateManager(self.sdk_root_path, url)
     manager.Update(['a'])
     self.CheckPathsExist(paths1['a'], exists=True)
-    self.CheckPathsExist(paths1['bundled-python'], exists=True)
+    self.CheckPathsExist(paths1[update_manager.BUNDLED_PYTHON_COMPONENT],
+                         exists=True)
     self.CheckPathsExist(paths1['c'], exists=False)
-    self.assertEqual(set(['a', 'bundled-python']),
+    self.assertEqual(set(['a', update_manager.BUNDLED_PYTHON_COMPONENT]),
                      set(install_state.InstalledComponents().keys()))
     manager.Update(['a', 'c'])
     self.CheckPathsExist(paths1['a'], exists=True)
-    self.CheckPathsExist(paths1['bundled-python'], exists=True)
+    self.CheckPathsExist(paths1[update_manager.BUNDLED_PYTHON_COMPONENT],
+                         exists=True)
     self.CheckPathsExist(paths1['c'], exists=True)
-    self.assertEqual(set(['a', 'bundled-python', 'c']),
+    self.assertEqual(set(['a', update_manager.BUNDLED_PYTHON_COMPONENT, 'c']),
                      set(install_state.InstalledComponents().keys()))
 
     # uninstall
@@ -465,16 +467,18 @@ and bugs fixed.  The latest full release notes can be viewed at:
     self.assertTrue(self.restart_bundled_mock.called)
     self.assertTrue(self.postprocess_mock.called)
     self.CheckPathsExist(paths1['a'], exists=True)
-    self.CheckPathsExist(paths1['bundled-python'], exists=True)
+    self.CheckPathsExist(paths1[update_manager.BUNDLED_PYTHON_COMPONENT],
+                         exists=True)
     self.CheckPathsExist(paths1['c'], exists=False)
-    self.assertEqual(set(['a', 'bundled-python']),
+    self.assertEqual(set(['a', update_manager.BUNDLED_PYTHON_COMPONENT]),
                      set(install_state.InstalledComponents().keys()))
     self.restart_bundled_mock.reset_mock()
-    manager.Remove(['bundled-python'])
+    manager.Remove([update_manager.BUNDLED_PYTHON_COMPONENT])
     self.assertTrue(self.restart_bundled_mock.called)
     self.AssertErrContains('bundled installation of Python')
     self.CheckPathsExist(paths1['a'], exists=False)
-    self.CheckPathsExist(paths1['bundled-python'], exists=False)
+    self.CheckPathsExist(paths1[update_manager.BUNDLED_PYTHON_COMPONENT],
+                         exists=False)
     self.CheckPathsExist(paths1['c'], exists=False)
     self.assertEqual([], list(install_state.InstalledComponents().keys()))
 
@@ -553,7 +557,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
     self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
-    component_tuples1 = [('bundled-python', 1, [])]
+    component_tuples1 = [(update_manager.BUNDLED_PYTHON_COMPONENT, 1, [])]
     snapshot1, paths1 = (
         self.CreateSnapshotFromComponentsGenerateTars(1, component_tuples1))
     file1 = self.CreateTempSnapshotFileFromSnapshot(snapshot1)
@@ -567,17 +571,19 @@ and bugs fixed.  The latest full release notes can be viewed at:
 
     # Initial install, make sure snapshot 1 components are present.
     manager = update_manager.UpdateManager(self.sdk_root_path, url1)
-    manager.Update(['bundled-python'])
+    manager.Update([update_manager.BUNDLED_PYTHON_COMPONENT])
     self.AssertErrNotContains('bundled installation of Python')
-    self.CheckPathsExist(paths1['bundled-python'], exists=True)
-    self.assertEqual(set(['bundled-python']),
+    self.CheckPathsExist(paths1[update_manager.BUNDLED_PYTHON_COMPONENT],
+                         exists=True)
+    self.assertEqual(set([update_manager.BUNDLED_PYTHON_COMPONENT]),
                      set(install_state.InstalledComponents().keys()))
 
     # Update, make sure snapshot 2 components are present.
     manager = update_manager.UpdateManager(self.sdk_root_path, url2)
-    manager.Update(['bundled-python'])
+    manager.Update([update_manager.BUNDLED_PYTHON_COMPONENT])
     self.AssertErrContains('bundled installation of Python')
-    self.CheckPathsExist(paths1['bundled-python'], exists=False)
+    self.CheckPathsExist(paths1[update_manager.BUNDLED_PYTHON_COMPONENT],
+                         exists=False)
     self.assertEqual(set(),
                      set(install_state.InstalledComponents().keys()))
 
@@ -1207,14 +1213,14 @@ project = cloudsdktest
          path_dir,
          platform_dir
         ))
-    self.assertEqual(set(), manager.FindAllOldToolsOnPath(path=path))
+    self.assertEqual(set(), manager.FindAllOtherToolsOnPath(path=path))
     self.assertEqual(set(), manager.FindAllDuplicateToolsOnPath(path=path))
 
-    # Add a component that has an old version on the $PATH.
+    # Add a component that has an other version on the $PATH.
     manager.Update(['b'])
     self.assertEqual(
         set([os.path.realpath(os.path.join(path_dir, 'b-1.py'))]),
-        manager.FindAllOldToolsOnPath(path=path))
+        manager.FindAllOtherToolsOnPath(path=path))
     self.assertEqual(set(), manager.FindAllDuplicateToolsOnPath(path=path))
 
     # Add a component that has a duplicate version on the $PATH inside the SDK
@@ -1222,7 +1228,7 @@ project = cloudsdktest
     manager.Update(['a'])
     self.assertEqual(
         set([os.path.realpath(os.path.join(path_dir, 'b-1.py'))]),
-        manager.FindAllOldToolsOnPath(path=path))
+        manager.FindAllOtherToolsOnPath(path=path))
     self.assertEqual(
         set([os.path.realpath(os.path.join(platform_dir, 'a-1.py'))]),
         manager.FindAllDuplicateToolsOnPath(path=path))

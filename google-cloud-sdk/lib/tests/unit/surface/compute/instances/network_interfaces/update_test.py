@@ -33,17 +33,21 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
                                  cli_test_base.CliTestBase):
   """Base class for testing instance update network interface command."""
 
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api = 'v1'
+
   def SetUp(self):
     self.apitools_client = api_mock.Client(
-        core_apis.GetClientClass('compute', 'v1'),
-        real_client=core_apis.GetClientInstance('compute', 'v1', no_http=True))
+        core_apis.GetClientClass('compute', self.api),
+        real_client=core_apis.GetClientInstance(
+            'compute', self.api, no_http=True))
     self.apitools_client.Mock()
     self.addCleanup(self.apitools_client.Unmock)
     self.messages = self.apitools_client.MESSAGES_MODULE
 
     self.resources = resources.Registry()
-    self.resources.RegisterApiByName('compute', 'v1')
-    self.track = calliope_base.ReleaseTrack.GA
+    self.resources.RegisterApiByName('compute', self.api)
     self.service = self.apitools_client.instances
     self.zone_operations = self.apitools_client.zoneOperations
 
@@ -212,6 +216,145 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
       self.Run('compute instances network-interfaces update instance-1 '
                '--zone atlanta --network-interface not-a-nic '
                '--aliases "10.128.1.0/24;r1:/32"')
+
+
+class AlphaUpdateNetworkInterfaceTest(UpdateNetworkInterfaceTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api = 'alpha'
+
+  def _GetNetworkUrl(self, name, project=None):
+    return 'https://compute.googleapis.com/compute/{api}/projects/{project}/global/networks/{network}'.format(
+        api=self.api, project=project or self.Project(), network=name)
+
+  def _GetSubnetworkUrl(self, name, project=None):
+    return 'https://compute.googleapis.com/compute/{api}/projects/{project}/regions/atlanta/subnetworks/{subnetwork}'.format(
+        api=self.api, project=project or self.Project(), subnetwork=name)
+
+  def testNetworkMigrationAllParams(self):
+    instance, instance_ref = self._GetInstance('instance-1', zone='atlanta-a')
+    operation, operation_ref = self._GetOperation(instance_ref)
+    request = self.messages.ComputeInstancesUpdateNetworkInterfaceRequest(
+        instance='instance-1',
+        networkInterfaceResource=self.messages.NetworkInterface(
+            aliasIpRanges=[
+                self.messages.AliasIpRange(
+                    ipCidrRange='10.128.1.0/24',
+                    subnetworkRangeName=None,
+                ),
+                self.messages.AliasIpRange(
+                    ipCidrRange='/32',
+                    subnetworkRangeName='r1',
+                ),
+            ],
+            network=self._GetNetworkUrl('net1'),
+            subnetwork=self._GetSubnetworkUrl('sub1'),
+            networkIP='10.0.0.2'),
+        project=self.Project(),
+        zone='atlanta-a',
+        networkInterface='nic0')
+
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+    self.service.UpdateNetworkInterface.Expect(request, response=operation)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+
+    self.Run("""
+        compute instances network-interfaces update instance-1 --zone atlanta-a
+        --network=net1
+        --subnetwork=sub1
+        --private-network-ip=10.0.0.2
+        --aliases "10.128.1.0/24;r1:/32"
+        """)
+
+  def testNetworkMigrationNetworkOnly(self):
+    instance, instance_ref = self._GetInstance('instance-1', zone='atlanta-a')
+    operation, operation_ref = self._GetOperation(instance_ref)
+    request = self.messages.ComputeInstancesUpdateNetworkInterfaceRequest(
+        instance='instance-1',
+        networkInterfaceResource=self.messages.NetworkInterface(
+            network=self._GetNetworkUrl('net1')),
+        project=self.Project(),
+        zone='atlanta-a',
+        networkInterface='nic0')
+
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+    self.service.UpdateNetworkInterface.Expect(request, response=operation)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+
+    self.Run("""
+        compute instances network-interfaces update instance-1 --zone atlanta-a
+        --network=net1
+        """)
+
+  def testNetworkMigrationSubnetworkOnly(self):
+    instance, instance_ref = self._GetInstance('instance-1', zone='atlanta-a')
+    operation, operation_ref = self._GetOperation(instance_ref)
+    request = self.messages.ComputeInstancesUpdateNetworkInterfaceRequest(
+        instance='instance-1',
+        networkInterfaceResource=self.messages.NetworkInterface(
+            subnetwork=self._GetSubnetworkUrl('sub1')),
+        project=self.Project(),
+        zone='atlanta-a',
+        networkInterface='nic0')
+
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+    self.service.UpdateNetworkInterface.Expect(request, response=operation)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+
+    self.Run("""
+        compute instances network-interfaces update instance-1 --zone atlanta-a
+        --subnetwork=sub1
+        """)
+
+  def testNetworkMigrationNoIp(self):
+    instance, instance_ref = self._GetInstance('instance-1', zone='atlanta-a')
+    operation, operation_ref = self._GetOperation(instance_ref)
+    request = self.messages.ComputeInstancesUpdateNetworkInterfaceRequest(
+        instance='instance-1',
+        networkInterfaceResource=self.messages.NetworkInterface(
+            network=self._GetNetworkUrl('net1'),
+            subnetwork=self._GetSubnetworkUrl('sub1')),
+        project=self.Project(),
+        zone='atlanta-a',
+        networkInterface='nic0')
+
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+    self.service.UpdateNetworkInterface.Expect(request, response=operation)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+
+    self.Run("""
+        compute instances network-interfaces update instance-1 --zone atlanta-a
+        --network=net1
+        --subnetwork=sub1
+        """)
+
+  def testNetworkMigrationCrossProject(self):
+    instance, instance_ref = self._GetInstance('instance-1', zone='atlanta-a')
+    operation, operation_ref = self._GetOperation(instance_ref)
+    request = self.messages.ComputeInstancesUpdateNetworkInterfaceRequest(
+        instance='instance-1',
+        networkInterfaceResource=self.messages.NetworkInterface(
+            network=self._GetNetworkUrl('net1', 'other-project'),
+            subnetwork=self._GetSubnetworkUrl('sub1', 'other-project')),
+        project=self.Project(),
+        zone='atlanta-a',
+        networkInterface='nic0')
+
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+    self.service.UpdateNetworkInterface.Expect(request, response=operation)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
+    self._ExpectInstanceGetRequest(instance, instance_ref)
+
+    self.Run("""
+        compute instances network-interfaces update instance-1 --zone atlanta-a
+        --network=projects/other-project/global/networks/net1
+        --subnetwork=projects/other-project/regions/atlanta/subnetworks/sub1
+        """)
 
 
 if __name__ == '__main__':

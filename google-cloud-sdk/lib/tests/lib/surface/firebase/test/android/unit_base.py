@@ -51,8 +51,10 @@ ALL_TEST_RUN_ARGS = {
     calliope_base.ReleaseTrack.GA:
         ALL_GA_TEST_RUN_ARGS,
     calliope_base.ReleaseTrack.BETA:
-        ALL_GA_TEST_RUN_ARGS +
-        ['client_details', 'num_uniform_shards', 'test_targets_for_shard']
+        ALL_GA_TEST_RUN_ARGS + [
+            'client_details', 'num_uniform_shards', 'test_targets_for_shard',
+            'grant_permissions'
+        ]
 }
 
 

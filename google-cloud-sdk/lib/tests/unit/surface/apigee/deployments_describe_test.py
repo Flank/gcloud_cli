@@ -115,12 +115,24 @@ class DeploymentsDescribeTest(base.ApigeeSurfaceTest):
     self.AssertErrContains("revision: '2'")
     self.AssertErrContains("revision: '3'")
 
-  def testWithNoMatchingRevision(self):
+  def testWithNoMatchingImplicitRevision(self):
     self._AddOrganizationListResponse()
     self._AddListResponse([])
 
     with self.assertRaises(errors.EntityNotFoundError):
       self.RunApigee("deployments describe --format=json --project=my-project "
                      "--environment=test --api=demo")
+
+    self.AssertErrContains("deployment")
+
+  def testWithNoMatchingExplicitRevision(self):
+    self._AddOrganizationListResponse()
+    url = ("https://apigee.googleapis.com/v1/organizations/my-org/environments/"
+           "test/apis/demo/revisions/2/deployments")
+    self.AddHTTPResponse(url, status=404, body=json.dumps({}))
+
+    with self.assertRaises(errors.EntityNotFoundError):
+      self.RunApigee("deployments describe --format=json --project=my-project "
+                     "--environment=test --api=demo 2")
 
     self.AssertErrContains("deployment")

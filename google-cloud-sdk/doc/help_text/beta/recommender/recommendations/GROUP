@@ -26,18 +26,13 @@ COMMANDS
         (BETA) Lists recommendations for a Cloud project.
 
      mark-claimed
-        (BETA) Mark the Recommendation State as CLAIMED. Can only be performed
-        on recommendations in CLAIMED or ACTIVE state.
+        (BETA) Mark a recommendation's state as CLAIMED.
 
      mark-failed
-        (BETA) Mark a recommendation's state as FAILED. mark-failed can be
-        applied to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED
-        state.
+        (BETA) Mark a recommendation's state as FAILED.
 
      mark-succeeded
-        (BETA) Mark a recommendation's state as SUCCEEDED. mark-succeeded can
-        be applied to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED
-        state.
+        (BETA) Mark a recommendation's state as SUCCEEDED.
 
 NOTES
     This command is currently in BETA and may change without notice. These

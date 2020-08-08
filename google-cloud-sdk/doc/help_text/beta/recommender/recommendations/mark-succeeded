@@ -1,7 +1,6 @@
 NAME
     gcloud beta recommender recommendations mark-succeeded - mark a
-        recommendation's state as SUCCEEDED. mark-succeeded can be applied to
-        recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state
+        recommendation's state as SUCCEEDED
 
 SYNOPSIS
     gcloud beta recommender recommendations mark-succeeded
@@ -9,8 +8,8 @@ SYNOPSIS
         --etag=ETAG [--state-metadata=KEY=VALUE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Mark a recommendation's state as SUCCEEDED. mark-succeeded can be
-    applied to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state.
+    (BETA) Mark a recommendation's state as SUCCEEDED. Can be applied to
+    recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state.
 
 POSITIONAL ARGUMENTS
      Recommendation resource - The Cloud Recommendation to mark as succeeded.

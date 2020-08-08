@@ -107,7 +107,8 @@ class Create(base.CreateCommand):
           instance_configs_messages.CallApplyUpdatesToInstances)(
               holder=holder,
               igm_ref=igm_ref,
-              instances=[six.text_type(instance_ref)])
+              instances=[six.text_type(instance_ref)],
+              minimal_action=args.instance_update_minimal_action)
       return waiter.WaitFor(operation_poller, apply_operation_ref,
                             'Applying updates to instances.')
 
@@ -121,7 +122,7 @@ Create.detailed_help = {
     'DESCRIPTION':
         """\
         *{command}* creates a per-instance config for an instance controlled by
-        a Google Compute Engine managed instance group. An instance with a per
+        a Compute Engine managed instance group. An instance with a per
         instance config preserves the specified metadata and/or disks during
         instance recreation and deletion.
 

@@ -57,9 +57,9 @@ is marked as healthy. The default is 2.
 
 .TP 2m
 \fB\-\-host\fR=\fIHOST\fR
-The value of the host header used in this HTTP health check request. The host
-header is empty by default. When empty, the health check sets the host header to
-the IP address of the backend VM or endpoint.
+The value of the host header used for the health check. If unspecified, Google
+Cloud sets the host header to the IP address of the load balancer's forwarding
+rule.
 
 .TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR; default="NONE"
@@ -162,7 +162,9 @@ If given, use the "serving port" for health checks:
 .RS 2m
 .IP "\(bu" 2m
 When health checking network endpoints in a Network Endpoint Group, use the port
-specified with each endpoint.
+specified with each endpoint. \f5\-\-use\-serving\-port\fR must be used when
+using a Network Endpoint Group as a backend as this flag specifies the
+\f5portSpecification\fR option for a Health Check object.
 .IP "\(bu" 2m
 When health checking other backends, use the port or named port of the backend
 service.

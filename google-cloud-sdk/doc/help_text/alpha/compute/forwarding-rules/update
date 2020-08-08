@@ -109,7 +109,7 @@ EXAMPLES
     To list existing labels, run:
 
         $ gcloud alpha compute forwarding-rules describe example-fr \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

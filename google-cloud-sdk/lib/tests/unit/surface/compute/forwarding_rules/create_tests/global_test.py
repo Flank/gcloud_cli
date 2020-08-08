@@ -31,14 +31,14 @@ class GlobalForwardingRulesCreateTest(
     self.track = calliope_base.ReleaseTrack.GA
     self.api_version = 'v1'
     self.internal_self_managed_target_msg = (
-        r'You must specify either \[--target-http-proxy\] or '
-        r'\[--target-https-proxy\] for an INTERNAL_SELF_MANAGED '
-        r'\[--load-balancing-scheme\].')
+        r'You must specify either \[--target-http-proxy\], '
+        r'\[--target-https-proxy\] or \[--target-grpc-proxy\] for an '
+        r'INTERNAL_SELF_MANAGED \[--load-balancing-scheme\].')
     self.exactly_one_target_msg = (
         'Exactly one of (--backend-service | '
-        '--target-http-proxy | --target-https-proxy | --target-instance | '
-        '--target-pool | --target-ssl-proxy | --target-tcp-proxy | '
-        '--target-vpn-gateway) must be specified.')
+        '--target-grpc-proxy | --target-http-proxy | --target-https-proxy | '
+        '--target-instance | --target-pool | --target-ssl-proxy | '
+        '--target-tcp-proxy | --target-vpn-gateway) must be specified.')
 
   def testGlobalMutuallyExclusiveWithTargetInstance(self):
     with self.AssertRaisesToolExceptionRegexp(
@@ -599,42 +599,6 @@ class GlobalForwardingRulesCreateTest(
         """.format(compute_uri=self.compute_uri))
     self.CheckRequests()
 
-  #  For Beta and GA, --target-grpc-proxy won't be supported
-  def testInternalSelfManagedWithTargetGrpcProxy(self):
-    with self.AssertRaisesArgumentErrorMatches('unrecognized arguments'):
-      self.Run("""
-        compute forwarding-rules create forwarding-rule-1
-          --global
-          --load-balancing-scheme=INTERNAL_SELF_MANAGED
-          --address {compute_uri}/projects/my-project/global/addresses/foo
-          --target-grpc-proxy target-proxy-1
-          --ports 80
-        """.format(compute_uri=self.compute_uri))
-    self.CheckRequests()
-
-
-class GlobalForwardingRulesCreateTestBeta(GlobalForwardingRulesCreateTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
-
-
-class GlobalForwardingRulesCreateTestAlpha(GlobalForwardingRulesCreateTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-    self.internal_self_managed_target_msg = (
-        r'You must specify either \[--target-http-proxy\], '
-        r'\[--target-https-proxy\] or \[--target-grpc-proxy\] for an '
-        r'INTERNAL_SELF_MANAGED \[--load-balancing-scheme\].')
-    self.exactly_one_target_msg = (
-        'Exactly one of (--backend-service | --target-google-apis-bundle | '
-        '--target-grpc-proxy | --target-http-proxy | --target-https-proxy | '
-        '--target-instance | --target-pool | --target-ssl-proxy | '
-        '--target-tcp-proxy | --target-vpn-gateway) must be specified.')
-
   def testInternalSelfManagedWithTargetGrpcProxy(self):
     self.Run("""
         compute forwarding-rules create forwarding-rule-1
@@ -698,6 +662,25 @@ class GlobalForwardingRulesCreateTestAlpha(GlobalForwardingRulesCreateTestBeta):
                   loadBalancingScheme=self.messages.ForwardingRule
                   .LoadBalancingSchemeValueValuesEnum.INTERNAL_SELF_MANAGED),
               project='my-project'))],)
+
+
+class GlobalForwardingRulesCreateTestBeta(GlobalForwardingRulesCreateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class GlobalForwardingRulesCreateTestAlpha(GlobalForwardingRulesCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.exactly_one_target_msg = (
+        'Exactly one of (--backend-service | --target-google-apis-bundle | '
+        '--target-grpc-proxy | --target-http-proxy | --target-https-proxy | '
+        '--target-instance | --target-pool | --target-ssl-proxy | '
+        '--target-tcp-proxy | --target-vpn-gateway) must be specified.')
 
 
 if __name__ == '__main__':

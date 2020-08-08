@@ -21,8 +21,8 @@ gcloud alpha logging sinks create \- creates a sink
 destination. A sink exports all logs that matches \fB\-\-log\-filter\fR flag. An
 empty filter matches all logs. The sink's destination can be a Cloud Storage
 bucket, a BigQuery dataset, or a Cloud Pub/Sub topic. The destination must
-already exist and Stackdriver Logging must have permission to write to it. Log
-entries are exported as soon as the sink is created. See
+already exist and Cloud Logging must have permission to write to it. Log entries
+are exported as soon as the sink is created. See
 https://cloud.google.com/logging/docs/export/configure_export_v2#dest\-auth.
 
 
@@ -127,7 +127,7 @@ Create a sink associated with this organization.
 \fB\-\-project\fR=\fIPROJECT_ID\fR
 Create a sink associated with this project.
 
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.

@@ -11,7 +11,7 @@ gcloud data\-catalog tag\-templates fields update \- update a Cloud Data Catalog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud data\-catalog tag\-templates fields update\fR (\fIFIELD\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-tag\-template\fR=\fITAG_TEMPLATE\fR) [\fB\-\-add\-enum\-values\fR=[\fIADD_ENUM_VALUES\fR,...]] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-required\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud data\-catalog tag\-templates fields update\fR (\fIFIELD\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-tag\-template\fR=\fITAG_TEMPLATE\fR) [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-enum\-values\fR=[\fIENUM_VALUES\fR,...]] [\fB\-\-required\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -57,13 +57,28 @@ Tag template of the tag template field.
 
 .RS 2m
 .TP 2m
-\fB\-\-add\-enum\-values\fR=[\fIADD_ENUM_VALUES\fR,...]
-Comma\-separated list of enum values to add to the tag template field.
-
-.TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 Display name of the tag template field.
 
+.TP 2m
+\fB\-\-enum\-values\fR=[\fIENUM_VALUES\fR,...]
+Comma\-separated list of enum values. The list of enum values passed with this
+flag replaces the existing one in tag template enum field. That means:
+.RS 2m
+.IP "\(em" 2m
+the enum values passed to the flag and not present in tag template enum field
+get created
+.IP "\(em" 2m
+the enum values present in tag template enum field and missing in the list get
+removed
+.IP "\(em" 2m
+the order of the items on the list is preserved
+.RE
+.RE
+.sp
+Enum values can only be removed from optional enum fields for now.
+
+.RS 2m
 .TP 2m
 \fB\-\-required\fR
 Indicates if the tag template field is required. Updating from FALSE (optional)
@@ -100,11 +115,11 @@ $ gcloud data\-catalog tag\-templates fields update FIELD \e
     \-\-display\-name=NAME
 .RE
 
-Add enum values 'A' and 'B' to tag template field:
+Set tag template enum field values to be 'A' and 'B':
 
 .RS 2m
 $ gcloud data\-catalog tag\-templates fields update FIELD \e
-    \-\-add\-enum\-values=A,B
+    \-\-enum\-values=A,B
 .RE
 
 Set a tag template field to be optional:

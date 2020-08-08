@@ -33,7 +33,7 @@ from six.moves import range  # pylint: disable=redefined-builtin
 class FlattenedPrinterTest(resource_printer_test_base.Base):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self._printer = resource_printer.Printer('flattened')
 
   def testEmptyCase(self):
@@ -315,7 +315,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
 class FlattenedPrinterAttributeTest(resource_printer_test_base.Base):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testDefaultPad(self):
     self.Print(style='flattened')

@@ -21,6 +21,9 @@ GROUPS
      app-profiles
         (BETA) Manage Cloud Bigtable app profiles.
 
+     backups
+        (BETA) Manage Cloud Bigtable backups.
+
      clusters
         (BETA) Manage Cloud Bigtable clusters.
 

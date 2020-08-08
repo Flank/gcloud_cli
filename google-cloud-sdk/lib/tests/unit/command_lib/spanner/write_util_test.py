@@ -132,6 +132,24 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
         self._GivenScalarColumn('name', 'BYTES'),
     ], list(table._columns.values()))
 
+  def testTableCreationWithNumericColumns(self):
+    database_ddl_numeric = [
+        'CREATE TABLE numericTable ( id INT64, numeric NUMERIC, arr_numeric '
+        'ARRAY<NUMERIC>) PRIMARY KEY(id)',
+    ]
+    table = util.Table.FromDdl(database_ddl_numeric, 'numericTable')
+
+    self.assertTrue(
+        self._TableCreatedWithExpectedNamesAndPrimaryKeys(
+            table, 'numericTable', ['id']))
+    self.assertEqual(['id', 'numeric', 'arr_numeric'],
+                     list(table._columns.keys()))
+    self.assertEqual([
+        self._GivenScalarColumn('id', 'INT64'),
+        self._GivenScalarColumn('numeric', 'NUMERIC'),
+        self._GivenArrayColumn('arr_numeric', 'NUMERIC'),
+    ], list(table._columns.values()))
+
   def testTableCreationWithKeywordColumn(self):
     database_ddl_bytes = [
         'CREATE TABLE keywordTable (  id INT64,  `by` STRING(MAX),) PRIMARY '
@@ -201,6 +219,28 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
 
     with self.assertRaisesRegex(util.BadTableNameError, error_message):
       util.Table.FromDdl(_DATABASE_DDL, invalid_table_name)
+
+  # TODO(b/143093180): Update test after we support numeric in keys.
+  def testTableWithScalarNumericKeyColumn(self):
+    database_ddl_numeric_key = [
+        'CREATE TABLE numericTable ( id INT64, numeric NUMERIC, arr_numeric '
+        'ARRAY<NUMERIC>) PRIMARY KEY(numeric)',
+    ]
+    error_message = re.escape(
+        'Invalid DDL: Column [numeric] is not a valid primary key type.')
+    with self.assertRaisesRegex(ValueError, error_message):
+      util.Table.FromDdl(database_ddl_numeric_key, 'numericTable')
+
+  # TODO(b/143093180): Update test after we support numeric in keys.
+  def testTableWithArrayNumericKeyColumn(self):
+    database_ddl_numeric_key = [
+        'CREATE TABLE numericTable ( id INT64, numeric NUMERIC, arr_numeric '
+        'ARRAY<NUMERIC>) PRIMARY KEY(arr_numeric)',
+    ]
+    error_message = re.escape(
+        'Invalid DDL: Column [arr_numeric] is not a valid primary key type.')
+    with self.assertRaisesRegex(ValueError, error_message):
+      util.Table.FromDdl(database_ddl_numeric_key, 'numericTable')
 
   def testTableWithValidDataInput(self):
     table = util.Table.FromDdl(_DATABASE_DDL, 'pkTest')
@@ -284,7 +324,7 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
 class JsonConversionTest(base.SpannerTestBase, parameterized.TestCase):
 
   @parameterized.parameters('BOOL', 'BYTES', 'DATE', 'FLOAT64', 'INT64',
-                            'STRING', 'TIMESTAMP')
+                            'STRING', 'TIMESTAMP', 'NUMERIC')
   def testNullValues(self, scalar_type):
     self.assertEquals(
         extra_types.JsonValue(is_null=True),
@@ -333,6 +373,13 @@ class JsonConversionTest(base.SpannerTestBase, parameterized.TestCase):
     self.assertEquals(
         extra_types.JsonValue(string_value=input_value),
         util.ConvertJsonValueForScalarTypes('DATE', input_value))
+
+  @parameterized.parameters('-96283295.412871',
+                            '99999999999999999999999999999.999999999')
+  def testNumericValues(self, input_value):
+    self.assertEqual(
+        extra_types.JsonValue(string_value=input_value),
+        util.ConvertJsonValueForScalarTypes('NUMERIC', input_value))
 
 
 class ValidateArrayInputTest(base.SpannerTestBase, parameterized.TestCase):

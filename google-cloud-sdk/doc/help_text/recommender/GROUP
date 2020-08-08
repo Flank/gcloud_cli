@@ -23,6 +23,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     insights
+        Manage Cloud resource insights.
+
      recommendations
         Manage Cloud resource recommendations.
 

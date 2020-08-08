@@ -45,15 +45,15 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To send all traffic to 'v2' of service 's1', run:
 
-        $ gcloud beta app services set-traffic s1 --splits v2=1
+        $ gcloud beta app services set-traffic s1 --splits=v2=1
 
     To split traffic evenly between 'v1' and 'v2' of service 's1', run:
 
-        $ gcloud beta app services set-traffic s1 --splits v2=.5,v1=.5
+        $ gcloud beta app services set-traffic s1 --splits=v2=.5,v1=.5
 
     To split traffic across all services:
 
-        $ gcloud beta app services set-traffic --splits v2=.5,v1=.5
+        $ gcloud beta app services set-traffic --splits=v2=.5,v1=.5
 
 NOTES
     This command is currently in BETA and may change without notice. This

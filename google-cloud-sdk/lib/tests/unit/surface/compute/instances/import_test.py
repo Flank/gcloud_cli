@@ -27,7 +27,7 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resources import InvalidResourceException
 from tests.lib import test_case
 from tests.lib.surface.compute import ovf_import_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 
 _DEFAULT_TIMEOUT = '7056s'
 
@@ -66,13 +66,14 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
                            errors_to_collect=None,
                            progress_tracker=None,
                            followup_overrides=None,
+                           always_return_operation=None,
                            no_followup=None,
                            http=None,
                            errors=None,
                            batch_url=None,
                            log_result=None,
                            timeout=None):
-      del errors_to_collect, progress_tracker, followup_overrides, no_followup, http, errors, batch_url, log_result, timeout
+      del errors_to_collect, progress_tracker, followup_overrides, no_followup, http, errors, batch_url, log_result, timeout, always_return_operation
 
       # Easier to check type of the request using strings due to different
       # release tracks having different implementations for each request type
@@ -119,9 +120,11 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
                    step,
                    async_flag=False,
                    permissions=None,
-                   timeout='7200s'):
+                   timeout='7200s',
+                   log_location=None):
     self.PrepareDaisyMocks(
-        step, async_flag=async_flag, permissions=permissions, timeout=timeout)
+        step, async_flag=async_flag, permissions=permissions, timeout=timeout,
+        log_location=log_location)
 
   def testCommonCase(self):
     self.PrepareMocks(self.GetOVFImportStep())
@@ -713,6 +716,25 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
                             hostname))
     self.AssertErrContains('Created [https://cloudbuild.googleapis.com/'
                            'v1/projects/my-project/builds/1234]')
+
+  def testLogLocationDir(self):
+    self.doTestLogLocation('gs://foo/bar')
+    self.doTestLogLocation('https://storage.googleapis.com/foo/bar')
+
+  def testLogLocationDirTrailingSlash(self):
+    self.doTestLogLocation('gs://foo/bar/')
+    self.doTestLogLocation('https://storage.googleapis.com/foo/bar/')
+
+  def testLogLocationBucketOnly(self):
+    self.doTestLogLocation('gs://foo')
+    self.doTestLogLocation('https://storage.googleapis.com/foo')
+
+  def doTestLogLocation(self, log_location):
+    self.PrepareMocks(self.GetOVFImportStep(), log_location=log_location)
+    self._RunAndAssertSuccess("""
+               {0} --source-uri {1} --os {2} --log-location {3}
+               """.format(self.instance_name, self.source_uri, self.os,
+                          log_location))
 
 
 class InstanceImportTestBeta(InstanceImportTest):

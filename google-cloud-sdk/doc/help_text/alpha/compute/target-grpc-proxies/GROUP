@@ -28,6 +28,12 @@ COMMANDS
      describe
         (ALPHA) Display detailed information about a target gRPC proxy.
 
+     export
+        (ALPHA) Export a target gRPC proxy.
+
+     import
+        (ALPHA) Import a target gRPC proxy.
+
      list
         (ALPHA) List Google Compute Engine target gRPC proxies.
 
@@ -35,5 +41,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. These variants are also available:
+
+        $ gcloud compute target-grpc-proxies
+        $ gcloud beta compute target-grpc-proxies
 

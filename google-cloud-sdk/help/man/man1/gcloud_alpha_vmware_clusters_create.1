@@ -1,0 +1,137 @@
+
+.TH "GCLOUD_ALPHA_VMWARE_CLUSTERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha vmware clusters create \- create a Cloud VMware cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha vmware clusters create\fR (\fICLUSTER\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-privatecloud\fR=\fIPRIVATECLOUD\fR) \fB\-\-node\-count\fR=\fINODE_COUNT\fR \fB\-\-zone\fR=\fIZONE\fR [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Vmware cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Cluster resource \- cluster. The arguments in this group can be used to specify
+the attributes of this resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [cluster] on the command line with a fully specified name;
+set the property [core/project]; provide the argument [\-\-project] on the
+command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICLUSTER\fR
+ID of the cluster or fully qualified identifier for the cluster. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the privatecloud or cluster.
+
+.TP 2m
+\fB\-\-privatecloud\fR=\fIPRIVATECLOUD\fR
+VMware privatecloud.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-node\-count\fR=\fINODE_COUNT\fR
+Initial number of nodes in the cluster
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone in which to create nodes in the cluster
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a cluster called my\-cluster in example\-privatecloud, location
+us\-central1, with a specified zone (in which nodes are created):
+
+.RS 2m
+$ gcloud alpha vmware clusters create \e
+    /projects/my\-project/locations/us\-central1/privateclouds/\e
+example\-privatecloud/clusters/my\-cluster \-zone=us\-central1\-a \e
+    \-\-node\-count=3
+.RE
+
+Or:
+
+.RS 2m
+$ gcloud alpha vmware clusters create my\-cluster \e
+    \-\-privatecloud=example\-privatecloud \-\-location=us\-central1 \e
+    \-\-project=my\-project \-zone=us\-central1\-a \-\-node\-count=3
+.RE
+
+Or:
+
+.RS 2m
+$ gcloud alpha vmware clusters create my\-cluster \e
+    \-\-privatecloud=example\-privatecloud \-zone=us\-central1\-a \e
+    \-\-node\-count=3
+.RE
+
+
+In the third example, the project and location are taken from gcloud properties
+core/project and vmware/location.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

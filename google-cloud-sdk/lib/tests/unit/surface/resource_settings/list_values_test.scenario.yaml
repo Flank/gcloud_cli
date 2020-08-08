@@ -3,7 +3,7 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: resource-settings list --organization=123
+  - command: resource-settings list-values --organization=123
   - stdout: |
       settingValues:
       - etag: O2VWGxZU01VnAfRU4Mu97w==
@@ -31,11 +31,11 @@ summary:
   - error: '1: Exactly one of (--folder | --organization | --project) must be specified.'
 actions:
 - execute_command:
-    command: resource-settings list --organization=123
+    command: resource-settings list-values --organization=123
     events:
     - api_call:
         expect_request:
-          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings?alt=json
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings:search?alt=json
           method: GET
           body: None
         return_response:

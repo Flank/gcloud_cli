@@ -452,15 +452,16 @@ class KubectlShellingUnitTest(EnvironmentsUnitTest):
     specific statuses.
 
     Args:
-      pods_statuses: list of tuple(str, str), pairs of (pod name, pod status)
-          that will be formatted and output by the callback.
+      pods_statuses: list of GkePodStatus(str, str, str) that will be formatted
+          and output by the callback
       kubectl_namespace: str, namespace scope of the kubectl command
 
     Returns:
       Fake result of 'kubectl get pods' execution with desired pod_statuses.
     """
     output = '\n'.join(
-        '{}\t{}'.format(pod, status) for pod, status in pods_statuses)
+        '\t'.join(pod_status)
+        for pod_status in pods_statuses)
 
     def _GetPodsCallback(args, **kwargs):
       get_pod_args = command_util.AddKubectlNamespace(

@@ -85,11 +85,7 @@ class EnablementTest(e2e_base.WithServiceAuth):
     service = 'compute.googleapis.com'
     self.assertFalse(services_enable_api.IsServiceEnabled(self.project_id,
                                                           service))
-    instance_name = next(self.name_generator)
-    self._Run(
-        'compute instances create --zone=us-east1-d {}'.format(instance_name))
     self._Run('compute instances list')
-    self.AssertOutputContains(instance_name)
     self.assertTrue(services_enable_api.IsServiceEnabled(self.project_id,
                                                          service))
 

@@ -11,7 +11,7 @@ gcloud alpha compute instances network\-interfaces update \- update a Google Com
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances network\-interfaces update\fR \fIINSTANCE_NAME\fR [\fB\-\-aliases\fR=\fIALIASES\fR] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances network\-interfaces update\fR \fIINSTANCE_NAME\fR [\fB\-\-aliases\fR=\fIALIASES\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,6 +52,12 @@ https://cloud.google.com/compute/docs/reference/rest/v1/instances
 The IP alias ranges to allocate for this interface. If there are multiple IP
 alias ranges, they are separated by semicolons.
 
+Can be specified together with \-\-network and/or \-\-subnetwork to choose IP
+alias ranges in the new subnetwork. If unspecified, then old IP alias ranges
+will be allocated in the new subnetwork. If old IP alias ranges are not
+available in the new subnetwork, then other available IP alias ranges of the
+same size will be allocated in the new subnetwork.
+
 For example:
 
 .RS 2m
@@ -59,8 +65,25 @@ For example:
 .RE
 
 .TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Specifies the network this network interface belongs to.
+
+.TP 2m
 \fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR; default="nic0"
 The name of the network interface to update.
+
+.TP 2m
+\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR
+Assign the given RFC1918 IP address to the interface. Can be specified only
+together with \-\-network and/or \-\-subnetwork to choose the IP address in the
+new subnetwork. If unspecified, then the old IP address will be allocated in the
+new subnetwork. If the old IP address is not available in the new subnetwork,
+then another available IP address will be allocated automatically from the new
+subnetwork CIDR range.
+
+.TP 2m
+\fB\-\-subnetwork\fR=\fISUBNETWORK\fR
+Specifies the subnetwork this network interface belongs to.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR

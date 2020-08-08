@@ -26,8 +26,8 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding to the IAM policy of a Google Compute
-        Engine machine image.
+        (BETA) Add IAM policy binding to the IAM policy of a Compute Engine
+        machine image.
 
      create
         (BETA) Create a Compute Engine machine image.
@@ -39,7 +39,7 @@ COMMANDS
         (BETA) Describe a Compute Engine machine image.
 
      get-iam-policy
-        (BETA) Get the IAM policy for a Google Compute Engine machine image.
+        (BETA) Get the IAM policy for a Compute Engine machine image.
 
      import
         (BETA) Create a Compute Engine machine image from virtual appliance in
@@ -53,7 +53,7 @@ COMMANDS
         Engine machine image.
 
      set-iam-policy
-        (BETA) Set the IAM policy for a Google Compute Engine machine image.
+        (BETA) Set the IAM policy for a Compute Engine machine image.
 
 NOTES
     This command is currently in BETA and may change without notice. This

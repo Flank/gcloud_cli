@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_BETA_COMPUTE_TARGET\-GRPC\-PROXIES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute target\-grpc\-proxies describe \- display detailed information about a target gRPC proxy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute target\-grpc\-proxies describe\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute target\-grpc\-proxies describe\fR displays
+all data associated with a Google Compute Engine target gRPC proxy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the target gRPC proxy to describe.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe a global target gRPC proxy, run:
+
+.RS 2m
+$ gcloud beta compute target\-grpc\-proxies describe PROXY_NAME
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute target\-grpc\-proxies describe
+$ gcloud alpha compute target\-grpc\-proxies describe
+.RE
+

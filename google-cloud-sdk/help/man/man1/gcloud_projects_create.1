@@ -30,8 +30,9 @@ created under a parent resource. To do so, use either the \-\-organization or
 [\fIPROJECT_ID\fR]
 ID for the project you want to create.
 
-Project IDs must start with a lowercase letter and can have lowercase ASCII
-letters, digits or hyphens. Project IDs must be between 6 and 30 characters.
+Project IDs are immutable and can be set only during project creation. They must
+start with a lowercase letter and can have lowercase ASCII letters, digits or
+hyphens. Project IDs must be between 6 and 30 characters.
 
 
 .RE
@@ -122,9 +123,10 @@ or deleting projects from the Google Cloud Platform Console.
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
 $ gcloud alpha projects create
+$ gcloud beta projects create
 .RE
 

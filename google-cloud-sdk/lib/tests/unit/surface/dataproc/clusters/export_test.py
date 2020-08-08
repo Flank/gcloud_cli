@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 import copy
 import os
+from apitools.base.py import encoding
 from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
 from googlecloudsdk.calliope.concepts import handlers
@@ -43,12 +44,25 @@ class ClustersExportUnitTestGA(ClustersExportUnitTest):
     self.track = calliope.base.ReleaseTrack.GA
 
   def testExportClustersToStdOut(self):
-    cluster = self.MakeCluster()
+    dataproc = dp.Dataproc(self.track)
+    cluster = self.MakeCluster(
+        properties=encoding.DictToAdditionalPropertyMessage(
+            {
+                'hdfs:dfs.replication':
+                    '3',
+                'hdfs:dfs.namenode.lifeline.rpc-address':
+                    '{}-m:8050'.format(self.CLUSTER_NAME),
+                'hdfs:dfs.namenode.servicerpc-address':
+                    '{}-m:8051'.format(self.CLUSTER_NAME)
+            }, dataproc.messages.SoftwareConfig.PropertiesValue))
 
     # Expected output has cluster-specific info cleared.
     expected_output = copy.deepcopy(cluster)
     expected_output.clusterName = None
     expected_output.projectId = None
+    expected_output.config.softwareConfig.properties = encoding.DictToAdditionalPropertyMessage(
+        {'hdfs:dfs.replication': '3'},
+        dataproc.messages.SoftwareConfig.PropertiesValue)
 
     self.ExpectGetCluster(cluster)
     self.RunDataproc('clusters export {0}'.format(self.CLUSTER_NAME))

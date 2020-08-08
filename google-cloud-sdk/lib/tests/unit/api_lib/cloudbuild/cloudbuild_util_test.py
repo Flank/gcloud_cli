@@ -69,31 +69,22 @@ class FieldMappingTest(sdk_test_base.WithTempCWD):
               input_string, skip=['secretEnv', 'secret_env']), expected)
 
   def testMessageToFieldPaths_EmptyMessage(self):
-    messages = cloudbuild_util.GetMessagesModuleAlpha()
+    messages = cloudbuild_util.GetMessagesModule()
 
     self.assertEqual(
-        len(cloudbuild_util.MessageToFieldPaths(messages.WorkerPool())),
-        0)
+        len(cloudbuild_util.MessageToFieldPaths(messages.Build())), 0)
 
-  def testMessageToFieldPaths_WorkerPool(self):
-    messages = cloudbuild_util.GetMessagesModuleAlpha()
+  def testMessageToFieldPaths_Build(self):
+    messages = cloudbuild_util.GetMessagesModule()
 
-    wp = messages.WorkerPool()
-    wp.name = 'name'
-    wp.networkConfig = messages.NetworkConfig()
-    wp.networkConfig.peeredNetwork = 'network'
-    wp.region = 'region'
-    worker_config = messages.WorkerConfig()
-    worker_config.machineType = 'machine_type'
-    worker_config.diskSizeGb = 100
-    wp.workerConfig = worker_config
+    b = messages.Build()
+    b.projectId = 'projectId'
+    b.options = messages.BuildOptions()
+    b.options.diskSizeGb = 123
 
     self.assertEqual(
-        set(cloudbuild_util.MessageToFieldPaths(wp)),
-        set([
-            'name', 'network_config.peered_network', 'region',
-            'worker_config.machine_type', 'worker_config.disk_size_gb'
-        ]))
+        set(cloudbuild_util.MessageToFieldPaths(b)),
+        set(['project_id', 'options.disk_size_gb']))
 
 
 if __name__ == '__main__':

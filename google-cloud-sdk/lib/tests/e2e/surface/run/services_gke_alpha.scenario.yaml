@@ -33,7 +33,7 @@ summary:
 - execute:
   - command: run services replace service.yaml
   - stderr: |
-      Deploying container to Cloud Run for Anthos service [$$service-name$$] in namespace [default] of cluster [$$cluster$$]
+      Applying new configuration to Cloud Run for Anthos service [$$service-name$$] in namespace [default] of cluster [$$cluster$$]
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
@@ -1305,7 +1305,7 @@ actions:
                 revisionName: $$service-revision-name-2$$
               url: http://$$service-name$$.default.svc.cluster.local
     - expect_stderr: |
-        Deploying container to Cloud Run for Anthos service [$$service-name$$] in namespace [default] of cluster [$$cluster$$]
+        Applying new configuration to Cloud Run for Anthos service [$$service-name$$] in namespace [default] of cluster [$$cluster$$]
     - api_call:
         expect_request:
           uri:
@@ -1602,7 +1602,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name-3$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+        New configuration has been applied to service [$$service-name$$].
+        URL: http://$$service-name$$.default.example.com
     - expect_exit:
         code: 0
 - execute_command:

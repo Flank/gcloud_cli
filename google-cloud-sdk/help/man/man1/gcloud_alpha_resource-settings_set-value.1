@@ -1,0 +1,111 @@
+
+.TH "GCLOUD_ALPHA_RESOURCE\-SETTINGS_SET\-VALUE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha resource\-settings set\-value \- update the value of a resource setting
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha resource\-settings set\-value\fR \fISETTING_NAME\fR \fB\-\-value\-file\fR=\fIvalue\-file\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-etag\fR=\fIetag\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update the value of a resource setting
+
+This first converts the contents of the specified file into a setting object. It
+then fetches the current setting using GetSetting. If it does not exist, the
+setting is created using CreateSetting. If it does, the retrieved setting is
+checked to see if it needs to be updated. If so, the setting is updated using
+UpdateSetting.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISETTING_NAME\fR
+Name of the resource settings. The list of available settings can be found here:
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-value\-file\fR=\fIvalue\-file\fR
+Path to JSON or YAML file that contains the resource setting.
+
+.TP 2m
+
+Resource that is associated with the resource settings. Exactly one of these
+must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Folder ID.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Organization ID.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+Project ID. Overrides the default \fBcore/project\fR property value for this
+command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-etag\fR=\fIetag\fR
+Etag of the resource setting.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To set the setting from the file on the path \f5\fI./sample_path\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha resource\-settings set\-value SETTING_NAME \e
+    \-\-value\-file="./test_input.json"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

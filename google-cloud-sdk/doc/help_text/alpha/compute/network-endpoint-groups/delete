@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute network-endpoint-groups delete - delete a Google
-        Compute Engine network endpoint group
+    gcloud alpha compute network-endpoint-groups delete - delete a Compute
+        Engine network endpoint group
 
 SYNOPSIS
     gcloud alpha compute network-endpoint-groups delete NAME
         [--global | --region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a Google Compute Engine network endpoint group.
+    (ALPHA) Delete a Compute Engine network endpoint group.
 
 POSITIONAL ARGUMENTS
      NAME

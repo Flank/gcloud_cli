@@ -65,6 +65,7 @@ summary:
   - command: |
       domains registrations configure contacts ÜniCode.com. --contact-data-from-file=registrant.yaml --contact-privacy=redacted-contact-data --async
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [xn--nicode-2ya.com].
 - execute:
   - command: |
@@ -501,6 +502,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [xn--nicode-2ya.com].
     - expect_exit:
         code: 0

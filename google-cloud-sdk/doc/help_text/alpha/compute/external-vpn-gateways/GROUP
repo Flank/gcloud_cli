@@ -10,7 +10,7 @@ DESCRIPTION
 
     For more information about external VPN gateways, see the external VPN
     Gateways documentation
-    (https://cloud.google.com/vpn/docs/concepts/key-terms#external-vpn-gateway-definition).
+    (https://cloud.google.com/network-connectivity/docs/vpn/concepts/key-terms#external-vpn-gateway-definition).
 
     See also: External VPN Gateways API
     (https://cloud.google.com/compute/docs/reference/rest/v1/externalVpnGateways).
@@ -27,19 +27,19 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a new Google Compute Engine external VPN gateway.
+        (ALPHA) Create a new Compute Engine external VPN gateway.
 
      delete
-        (ALPHA) Delete a Google Compute Engine external VPN gateway.
+        (ALPHA) Delete a Compute Engine external VPN gateway.
 
      describe
-        (ALPHA) Describe a Google Compute Engine external VPN gateway.
+        (ALPHA) Describe a Compute Engine external VPN gateway.
 
      list
         (ALPHA) List Google Compute Engine external VPN gateways.
 
      update
-        (ALPHA) Update a Google Compute Engine external VPN gateway.
+        (ALPHA) Update a Compute Engine external VPN gateway.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

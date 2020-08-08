@@ -1,0 +1,120 @@
+title: Certificate Manager map delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager maps delete simple-map
+  - prompt:
+    - message: You are about to delete certificate map 'simple-map'
+    - input: y
+  - progress_tracker:
+    - message: Waiting for 'operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47'
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted map [simple-map].
+- execute:
+  - command: |
+      certificate-manager maps delete simple-map --async
+  - prompt:
+    - message: You are about to delete certificate map 'simple-map'
+    - input: y
+  - stderr: |
+      Started 'operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47'
+      Delete in progress for map [simple-map].
+actions:
+- execute_command:
+    command: |
+      certificate-manager maps delete simple-map
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete certificate map 'simple-map'
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/simple-map?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-05-28T22:16:06.908739845Z",
+                "target": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-05-28T22:16:06.908739845Z",
+                "target": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true
+            }
+    - expect_progress_tracker:
+        message: Waiting for 'operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47'
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted map [simple-map].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager maps delete simple-map --async
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete certificate map 'simple-map'
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/simple-map?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-05-28T22:16:06.908739845Z",
+                "target": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Started 'operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47'
+        Delete in progress for map [simple-map].
+    - expect_exit:
+        code: 0

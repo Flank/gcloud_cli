@@ -64,7 +64,7 @@ class CreateSignaturePayloadTest(
               payload_dict['critical']['identity']['docker-reference']),
           docker_manifest_digest=(
               payload_dict['critical']['image']['docker-manifest-digest']),
-      ).encode('utf8')
+      ).encode('utf-8')
     self.AssertOutputBytesEquals(expected_result)
 
   def testBadUrl(self):

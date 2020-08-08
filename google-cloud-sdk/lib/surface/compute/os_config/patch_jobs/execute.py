@@ -87,7 +87,7 @@ def _AddCommonInstanceFilterFlags(mutually_exclusive_group):
 
 
 def _AddTopLevelArguments(parser):
-  """Adds top-level argument flags for the Beta track."""
+  """Adds top-level argument flags for the Beta and GA tracks."""
   instance_filter_group = parser.add_mutually_exclusive_group(
       required=True,
       help='Filters for selecting which instances to patch:',
@@ -126,6 +126,50 @@ def _AddTopLevelArgumentsAlpha(parser):
       patching initially fails. If omitted, the agent uses its default retry
       strategy.""",
   )
+
+
+def _AddPatchRolloutArguments(parser):
+  """Adds top-level patch rollout arguments."""
+  rollout_group = base.ArgumentGroup(
+      mutex=False, help='Rollout configurations for this patch job:')
+  rollout_group.AddArgument(
+      base.ChoiceArgument(
+          '--rollout-mode',
+          help_str='Mode of the rollout.',
+          choices={
+              'zone-by-zone':
+                  """\
+              Patches are applied one zone at a time. The patch job begins in
+              the region with the lowest number of targeted VMs. Within the
+              region, patching begins in the zone with the lowest number of
+              targeted VMs. If multiple regions (or zones within a region) have
+              the same number of targeted VMs, a tie-breaker is achieved by
+              sorting the regions or zones in alphabetical order.""",
+              'concurrent-zones':
+                  'Patches are applied to VMs in all zones at the same time.',
+          },
+      ))
+  disruption_budget_group = base.ArgumentGroup(
+      mutex=True,
+      help="""\
+      Disruption budget for this rollout. A running VM with an active agent is
+      considered disrupted if its patching operation fails anytime between the
+      time the agent is notified until the patch process completes.""")
+  disruption_budget_group.AddArgument(
+      base.Argument(
+          '--rollout-disruption-budget',
+          help='Number of VMs per zone to disrupt at any given moment.',
+      ))
+  disruption_budget_group.AddArgument(
+      base.Argument(
+          '--rollout-disruption-budget-percent',
+          help="""\
+          Percentage of VMs per zone to disrupt at any given moment. The number
+          of VMs calculated from multiplying the percentage by the total number
+          of VMs in a zone is rounded up.""",
+      ))
+  rollout_group.AddArgument(disruption_budget_group)
+  rollout_group.AddToParser(parser)
 
 
 def _AddCommonTopLevelArguments(parser):
@@ -731,8 +775,42 @@ def _CreatePatchInstanceFilter(messages, filter_all, filter_group_labels,
   )
 
 
+def _CreatePatchRollout(args, messages):
+  """Creates a PatchRollout message from input arguments."""
+  if not any([
+      args.rollout_mode, args.rollout_disruption_budget,
+      args.rollout_disruption_budget_percent
+  ]):
+    return None
+
+  if args.rollout_mode and not (args.rollout_disruption_budget or
+                                args.rollout_disruption_budget_percent):
+    raise exceptions.InvalidArgumentException(
+        'rollout-mode',
+        '[rollout-disruption-budget] or [rollout-disruption-budget-percent] '
+        'must also be specified.')
+
+  if args.rollout_disruption_budget and not args.rollout_mode:
+    raise exceptions.InvalidArgumentException(
+        'rollout-disruption-budget', '[rollout-mode] must also be specified.')
+
+  if args.rollout_disruption_budget_percent and not args.rollout_mode:
+    raise exceptions.InvalidArgumentException(
+        'rollout-disruption-budget-percent',
+        '[rollout-mode] must also be specified.')
+
+  rollout_modes = messages.PatchRollout.ModeValueValuesEnum
+  return messages.PatchRollout(
+      mode=arg_utils.ChoiceToEnum(args.rollout_mode, rollout_modes),
+      disruptionBudget=messages.FixedOrPercent(
+          fixed=int(args.rollout_disruption_budget)
+          if args.rollout_disruption_budget else None,
+          percent=int(args.rollout_disruption_budget_percent)
+          if args.rollout_disruption_budget_percent else None))
+
+
 def _CreateExecuteRequest(messages, project, description, dry_run, duration,
-                          patch_config, display_name, filter_all,
+                          patch_config, patch_rollout, display_name, filter_all,
                           filter_group_labels, filter_zones, filter_names,
                           filter_name_prefixes):
   """Creates an ExecuteRequest message for the Beta track."""
@@ -745,22 +823,36 @@ def _CreateExecuteRequest(messages, project, description, dry_run, duration,
       filter_name_prefixes,
   )
 
-  return messages.OsconfigProjectsPatchJobsExecuteRequest(
-      executePatchJobRequest=messages.ExecutePatchJobRequest(
-          description=description,
-          displayName=display_name,
-          dryRun=dry_run,
-          duration=duration,
-          instanceFilter=patch_instance_filter,
-          patchConfig=patch_config,
-      ),
-      parent=osconfig_command_utils.GetProjectUriPath(project))
+  if patch_rollout:
+    return messages.OsconfigProjectsPatchJobsExecuteRequest(
+        executePatchJobRequest=messages.ExecutePatchJobRequest(
+            description=description,
+            displayName=display_name,
+            dryRun=dry_run,
+            duration=duration,
+            instanceFilter=patch_instance_filter,
+            patchConfig=patch_config,
+            rollout=patch_rollout,
+        ),
+        parent=osconfig_command_utils.GetProjectUriPath(project))
+  else:
+    return messages.OsconfigProjectsPatchJobsExecuteRequest(
+        executePatchJobRequest=messages.ExecutePatchJobRequest(
+            description=description,
+            displayName=display_name,
+            dryRun=dry_run,
+            duration=duration,
+            instanceFilter=patch_instance_filter,
+            patchConfig=patch_config,
+        ),
+        parent=osconfig_command_utils.GetProjectUriPath(project))
 
 
 def _CreateExecuteRequestAlpha(messages, project, description, dry_run,
-                               duration, patch_config, display_name, filter_all,
-                               filter_group_labels, filter_zones, filter_names,
-                               filter_name_prefixes, filter_expression):
+                               duration, patch_config, patch_rollout,
+                               display_name, filter_all, filter_group_labels,
+                               filter_zones, filter_names, filter_name_prefixes,
+                               filter_expression):
   """Creates an ExecuteRequest message for the Alpha track."""
   if filter_expression:
     return messages.OsconfigProjectsPatchJobsExecuteRequest(
@@ -771,6 +863,7 @@ def _CreateExecuteRequestAlpha(messages, project, description, dry_run,
             duration=duration,
             filter=filter_expression,
             patchConfig=patch_config,
+            rollout=patch_rollout,
         ),
         parent=osconfig_command_utils.GetProjectUriPath(project))
   elif not any([
@@ -785,13 +878,15 @@ def _CreateExecuteRequestAlpha(messages, project, description, dry_run,
             duration=duration,
             instanceFilter=messages.PatchInstanceFilter(all=True),
             patchConfig=patch_config,
+            rollout=patch_rollout,
         ),
         parent=osconfig_command_utils.GetProjectUriPath(project))
   else:
     return _CreateExecuteRequest(messages, project, description, dry_run,
-                                 duration, patch_config, display_name,
-                                 filter_all, filter_group_labels, filter_zones,
-                                 filter_names, filter_name_prefixes)
+                                 duration, patch_config, patch_rollout,
+                                 display_name, filter_all, filter_group_labels,
+                                 filter_zones, filter_names,
+                                 filter_name_prefixes)
 
 
 def _CreateExecuteResponse(client, messages, request, is_async, command_prefix):
@@ -835,16 +930,15 @@ class Execute(base.Command):
 
   detailed_help = {
       'EXAMPLES':
-      """\
+          """\
       To start a patch job named `my patch job` that patches all instances in the
       current project, run:
 
             $ {command} --display-name="my patch job" --instance-filter-all
 
-      To patch an instance named `my-instance-1` in the `us-east1-b` zone, run:
+      To patch an instance named `instance-1` in the `us-east1-b` zone, run:
 
-            $ {command} --instance-filter-names=\
-            "zones/us-east1-b/instances/my-instance-1"
+            $ {command} --instance-filter-names="zones/us-east1-b/instances/instance-1"
 
       To patch all instances in the `us-central1-b` and `europe-west1-d` zones, run:
 
@@ -858,31 +952,27 @@ class Execute(base.Command):
       To patch all instances where the `env` label is `test` and `app` label is
       `web` or where the `env` label is `staging` and `app` label is `web`, run:
 
-            $ {command} \
-            --instance-filter-group-labels="env=test,app=web" \
-            --instance-filter-group-labels="env=staging,app=web"
+            $ {command} --instance-filter-group-labels="env=test,app=web" --instance-filter-group-labels="env=staging,app=web"
 
       To apply security and critical patches to Windows instances with the prefix
       `windows-` in the instance name, run:
 
-            $ {command} --instance-filter-name-prefixes="windows-" \
-            --windows-classifications=SECURITY,CRITICAL
+            $ {command} --instance-filter-name-prefixes="windows-" --windows-classifications=SECURITY,CRITICAL
 
       To update only `KB4339284` on Windows instances with the prefix `windows-` in
       the instance name, run:
 
-            $ {command} --instance-filter-name-prefixes="windows-" \
-            --windows-exclusive-patches=KB4339284
+            $ {command} --instance-filter-name-prefixes="windows-" --windows-exclusive-patches=KB4339284
 
       To patch all instances in the current project and specify scripts to run
       pre-patch and post-patch, run:
 
-            $ {command} --instance-filter-all \
-            --pre-patch-linux-executable="/bin/my-script" \
-            --pre-patch-linux-success-codes=0,200 \
-            --pre-patch-windows-executable="C:\\Users\\user\\test-script.ps1" \
-            --post-patch-linux-executable="gs://my-bucket/my-linux-script#12345" \
-            --post-patch-windows-executable="gs://my-bucket/my-windows-script#67890"
+            $ {command} --instance-filter-all --pre-patch-linux-executable="/bin/script" --pre-patch-linux-success-codes=0,200 --pre-patch-windows-executable="C:\\Users\\user\\script.ps1" --post-patch-linux-executable="gs://my-bucket/linux-script#123" --post-patch-windows-executable="gs://my-bucket/windows-script#678"
+
+      To patch all instances zone-by-zone with no more than 50 percent of the
+      instances in the same zone disrupted at a given time, run:
+
+            $ {command} --instance-filter-all --rollout-mode=zone-by-zone --rollout-disruption-budget-percent=50
       """
   }
 
@@ -893,6 +983,7 @@ class Execute(base.Command):
     _AddTopLevelArguments(parser)
     _AddCommonTopLevelArguments(parser)
     _AddPatchConfigArguments(parser)
+    _AddPatchRolloutArguments(parser)
 
   def Run(self, args):
     project = properties.VALUES.core.project.GetOrFail()
@@ -903,6 +994,7 @@ class Execute(base.Command):
 
     duration = _GetDuration(args)
     patch_config = _CreatePatchConfig(args, messages)
+    patch_rollout = _CreatePatchRollout(args, messages)
 
     request = _CreateExecuteRequest(
         messages,
@@ -911,6 +1003,7 @@ class Execute(base.Command):
         args.dry_run,
         duration,
         patch_config,
+        patch_rollout,
         args.display_name,
         args.instance_filter_all,
         args.instance_filter_group_labels
@@ -943,10 +1036,9 @@ class ExecuteAlpha(ExecuteBeta):
 
           $ {command} --display-name="my patch job" --instance-filter-all
 
-    To patch an instance named `my-instance-1` in the `us-east1-b` zone, run:
+    To patch an instance named `instance-1` in the `us-east1-b` zone, run:
 
-          $ {command} --instance-filter-names=\
-          "zones/us-east1-b/instances/my-instance-1"
+          $ {command} --instance-filter-names="zones/us-east1-b/instances/instance-1"
 
     To patch all instances in the `us-central1-b` and `europe-west1-d` zones, run:
 
@@ -960,31 +1052,27 @@ class ExecuteAlpha(ExecuteBeta):
     To patch all instances where the `env` label is `test` and `app` label is
     `web` or where the `env` label is `staging` and `app` label is `web`, run:
 
-          $ {command} \
-          --instance-filter-group-labels="env=test,app=web" \
-          --instance-filter-group-labels="env=staging,app=web"
+          $ {command} --instance-filter-group-labels="env=test,app=web" --instance-filter-group-labels="env=staging,app=web"
 
     To apply security and critical patches to Windows instances with the prefix
     `windows-` in the instance name, run:
 
-          $ {command} --instance-filter-name-prefixes="windows-" \
-          --windows-classifications=SECURITY,CRITICAL
+          $ {command} --instance-filter-name-prefixes="windows-" --windows-classifications=SECURITY,CRITICAL
 
     To update only `KB4339284` on Windows instances with the prefix `windows-` in
     the instance name, run:
 
-          $ {command} --instance-filter-name-prefixes="windows-" \
-          --windows-exclusive-patches=KB4339284
+          $ {command} --instance-filter-name-prefixes="windows-" --windows-exclusive-patches=KB4339284
 
     To patch all instances in the current project and specify scripts to run
     pre-patch and post-patch, run:
 
-          $ {command} --instance-filter-all \
-          --pre-patch-linux-executable="/bin/my-script" \
-          --pre-patch-linux-success-codes=0,200 \
-          --pre-patch-windows-executable="C:\\Users\\user\\test-script.ps1" \
-          --post-patch-linux-executable="gs://my-bucket/my-linux-script#12345" \
-          --post-patch-windows-executable="gs://my-bucket/my-windows-script#67890"
+          $ {command} --instance-filter-all --pre-patch-linux-executable="/bin/script" --pre-patch-linux-success-codes=0,200 --pre-patch-windows-executable="C:\\Users\\user\\script.ps1" --post-patch-linux-executable="gs://my-bucket/linux-script#123" --post-patch-windows-executable="gs://my-bucket/windows-script#678"
+
+    To patch all instances zone-by-zone with no more than 50 percent of the
+    instances in the same zone disrupted at a given time, run:
+
+          $ {command} --instance-filter-all --rollout-mode=zone-by-zone --rollout-disruption-budget-percent=50
     """
   }
 
@@ -995,6 +1083,7 @@ class ExecuteAlpha(ExecuteBeta):
     _AddTopLevelArgumentsAlpha(parser)
     _AddCommonTopLevelArguments(parser)
     _AddPatchConfigArguments(parser)
+    _AddPatchRolloutArguments(parser)
 
   def Run(self, args):
     project = properties.VALUES.core.project.GetOrFail()
@@ -1005,6 +1094,7 @@ class ExecuteAlpha(ExecuteBeta):
 
     duration = _GetDuration(args)
     patch_config = _CreatePatchConfig(args, messages)
+    patch_rollout = _CreatePatchRollout(args, messages)
 
     request = _CreateExecuteRequestAlpha(
         messages,
@@ -1013,6 +1103,7 @@ class ExecuteAlpha(ExecuteBeta):
         args.dry_run,
         duration,
         patch_config,
+        patch_rollout,
         args.display_name,
         args.instance_filter_all,
         args.instance_filter_group_labels

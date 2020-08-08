@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import random
 
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 
 import mock
 
@@ -59,6 +59,12 @@ def DefaultImageOf(api_version):
           'global/images/family/debian-10').format(ver=api_version)
 
 
+def DefaultConfidentialVmImageOf(api_version):
+  return ('https://compute.googleapis.com/compute/{ver}/projects/'
+          'ubuntu-os-cloud/global/images/family/ubuntu-1804-lts'.format(
+              ver=api_version))
+
+
 def NvdimmDiskTypeOf(api_version):
   return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/'
           'zones/central2-a/diskTypes/aep-nvdimm').format(ver=api_version)
@@ -87,6 +93,8 @@ class InstancesCreateTestBase(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi(self.api_version)
     self._default_image = DefaultImageOf(self.api_version)
+    self._default_confidential_vm_image = (
+        DefaultConfidentialVmImageOf(self.api_version))
     self._default_machine_type = DefaultMachineTypeOf(self.api_version)
     self._default_network = DefaultNetworkOf(self.api_version)
     self._one_to_one_nat = (

@@ -18,9 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import resources
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.backend_services import test_resources
 
 
 class UpdateTestBase(test_base.BaseTest):
@@ -44,3 +45,46 @@ class UpdateTestBase(test_base.BaseTest):
   def RunUpdate(self, command, use_global=True):
     suffix = ' --global' if use_global else ''
     self.Run('compute backend-services update ' + command + suffix)
+
+
+class BetaUpdateTestBase(test_base.BaseTest):
+  """Test base for the beta backend services update subcommand."""
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+    self._backend_services = test_resources.BACKEND_SERVICES_BETA
+    self._http_backend_services_with_health_check = (
+        test_resources.HTTP_BACKEND_SERVICES_WITH_HEALTH_CHECK_BETA)
+    self._https_backend_services_with_health_check = (
+        test_resources.HTTPS_BACKEND_SERVICES_WITH_HEALTH_CHECK_BETA)
+
+  def RunUpdate(self, command, use_global=True):
+    suffix = ' --global' if use_global else ''
+    self.Run('compute backend-services update ' + command + suffix)
+
+
+class AlphaUpdateTestBase(test_base.BaseTest):
+  """Test base for the alpha backend services update subcommand."""
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+
+    self._backend_services = test_resources.BACKEND_SERVICES_ALPHA
+    self._http_backend_services_with_health_check = (
+        test_resources.HTTP_BACKEND_SERVICES_WITH_HEALTH_CHECK_ALPHA)
+    self._https_backend_services_with_health_check = (
+        test_resources.HTTPS_BACKEND_SERVICES_WITH_HEALTH_CHECK_ALPHA)
+    self._tcp_backend_services_with_health_check = (
+        test_resources.TCP_BACKEND_SERVICES_WITH_HEALTH_CHECK_ALPHA)
+    self._ssl_backend_services_with_health_check = (
+        test_resources.SSL_BACKEND_SERVICES_WITH_HEALTH_CHECK_ALPHA)
+
+  def RunUpdate(self, command, use_global=True):
+    suffix = ' --global' if use_global else ''
+    self.Run('compute backend-services update ' + command + suffix)
+

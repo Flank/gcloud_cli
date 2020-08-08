@@ -1,6 +1,6 @@
 NAME
-    gcloud compute images deprecate - manage deprecation status of Google
-        Compute Engine images
+    gcloud compute images deprecate - manage deprecation status of Compute
+        Engine images
 
 SYNOPSIS
     gcloud compute images deprecate IMAGE_NAME --state=STATE

@@ -363,13 +363,20 @@ def _GetInstalledComponents():
       update_manager.UpdateManager().GetCurrentVersionsInformation())
 
 
+def _IsPythonBundled():
+  # pylint:disable=g-import-not-at-top, We can't do this import unless we are
+  # in bundled mode.
+  from googlecloudsdk.core.updater import update_manager
+  return update_manager.UpdateManager().IsPythonBundled()
+
+
 class Filters(test_case.Filters):
   """Methods for determining when tests run and when they should be skipped."""
 
   _IS_BUNDLED = config.Paths().sdk_root is not None  # Includes GCE VMs
+  _IS_PYTHON_BUNDLED = _IsPythonBundled() if _IS_BUNDLED else False
   _INSTALLED_COMPONENTS = (_GetInstalledComponents() if _IS_BUNDLED else [])
   _IS_ON_GCE = c_gce.Metadata().connected
-
   _DOCKER_IS_PRESENT = os.path.exists('/var/run/docker.pid')
 
   @staticmethod
@@ -442,6 +449,13 @@ class Filters(test_case.Filters):
     return Filters._CannedSkip(
         Filters._skipUnless, Filters._DOCKER_IS_PRESENT, func,
         'Test only runs on machines with Docker')
+
+  @staticmethod
+  def RunOnlyWithBundledPython(reason):
+    """Runs a test only if using bundled Python in a built SDK."""
+    return Filters._CannedSkip(
+        Filters._skipUnless, Filters._IS_PYTHON_BUNDLED, reason,
+        'Test requires bundled Python.')
 
   @staticmethod
   def RequireComponent(*component_ids):
@@ -575,6 +589,10 @@ class WithFakeAuth(SdkBase):
   actually make a real API request.
   """
 
+  def PreSetUp(self):
+    """Set use_google_auth to True to test google auth."""
+    self.use_google_auth = False
+
   def FakeAuthAccount(self):
     """Override this method to change the account that is used for credentials.
 
@@ -607,11 +625,13 @@ class WithFakeAuth(SdkBase):
     """
     return 'user_agent'
 
-  def _FakeAuthCredential(self, use_google_auth):
-    if use_google_auth:
-      return credentials.Credentials(self.FakeAuthAccessToken(),
-                                     'refresh_token', 'id_token', 'token_uri',
-                                     'client_id')
+  def _FakeAuthCredential(self):
+    if self.use_google_auth:
+      creds = credentials.Credentials(self.FakeAuthAccessToken(),
+                                      'refresh_token', 'id_token', 'token_uri',
+                                      'client_id')
+      creds.expiry = self.FakeAuthExpiryTime()
+      return creds
     return client.OAuth2Credentials(
         self.FakeAuthAccessToken(), 'client_id', 'client_secret',
         'refresh_token', self.FakeAuthExpiryTime(), 'token_uri',
@@ -630,8 +650,8 @@ class WithFakeAuth(SdkBase):
                     scopes=None,
                     prevent_refresh=False,
                     allow_account_impersonation=True,
-                    use_google_auth=False):
-        return self._FakeAuthCredential(use_google_auth)
+                    use_google_auth=self.use_google_auth):
+        return self._FakeAuthCredential()
 
       # pylint:enable=unused-argument
 
@@ -649,7 +669,10 @@ class WithFakeAuth(SdkBase):
     properties.VALUES.core.account.Set(self.FakeAuthAccount())
     self._load_mock = self.StartObjectPatch(c_store, 'Load')
     self.FakeAuthSetCredentialsPresent(True)
-    refresh_mock = self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
+    if self.use_google_auth:
+      refresh_mock = self.StartObjectPatch(credentials.Credentials, 'refresh')
+    else:
+      refresh_mock = self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
     refresh_mock.side_effect = ValueError(
         'TESTING ERROR: You are attempting to refresh a fake credential.  '
         'This probably means you are about to use it, and you should not be.')

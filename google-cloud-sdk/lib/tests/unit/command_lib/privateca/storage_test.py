@@ -24,10 +24,12 @@ import uuid
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.privateca import storage
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 
 import mock
 
@@ -38,7 +40,8 @@ def GetCertificateAuthorityRef(relative_name):
       collection='privateca.projects.locations.certificateAuthorities')
 
 
-class StorageUtilsTest(sdk_test_base.WithFakeAuth):
+class StorageUtilsTest(sdk_test_base.WithFakeAuth,
+                       sdk_test_base.WithLogCapture):
 
   _CA_NAME = 'projects/foo/locations/us-west1/certificateAuthorities/my-ca'
 
@@ -70,6 +73,49 @@ class StorageUtilsTest(sdk_test_base.WithFakeAuth):
 
     result = storage.CreateBucketForCertificateAuthority(self.ca_ref)
     self.assertEqual(result, storage_util.BucketReference(expected_bucket_name))
+
+  def testValidateBucketForCaFailsIfNonexistent(self):
+    bucket_name = 'foo'
+    self.client.buckets.Get.Expect(
+        request=self.messages.StorageBucketsGetRequest(
+            bucket=bucket_name,
+            projection=self.messages.StorageBucketsGetRequest
+            .ProjectionValueValuesEnum.full),
+        exception=http_error.MakeHttpError(code=404))
+
+    with self.assertRaisesRegex(exceptions.InvalidArgumentException,
+                                'does not exist'):
+      storage.ValidateBucketForCertificateAuthority(bucket_name)
+
+  def testValidateBucketForCaWithoutPublicAclsPrintsWarning(self):
+    bucket_name = 'foo'
+    self.client.buckets.Get.Expect(
+        request=self.messages.StorageBucketsGetRequest(
+            bucket=bucket_name,
+            projection=self.messages.StorageBucketsGetRequest
+            .ProjectionValueValuesEnum.full),
+        response=self.messages.Bucket())
+
+    self.assertEqual(storage.ValidateBucketForCertificateAuthority(bucket_name),
+                     storage_util.BucketReference(bucket_name))
+    self.AssertLogContains('does not publicly expose new objects by default')
+
+  def testValidateBucketForCaWithPublicAclsPrintsNothing(self):
+    bucket_name = 'foo'
+    self.client.buckets.Get.Expect(
+        request=self.messages.StorageBucketsGetRequest(
+            bucket=bucket_name,
+            projection=self.messages.StorageBucketsGetRequest
+            .ProjectionValueValuesEnum.full),
+        response=self.messages.Bucket(
+            defaultObjectAcl=[
+                self.messages.ObjectAccessControl(
+                    entity='allUsers',
+                    role='READER')]))
+
+    self.assertEqual(storage.ValidateBucketForCertificateAuthority(bucket_name),
+                     storage_util.BucketReference(bucket_name))
+    self.AssertLogEquals('')
 
 
 if __name__ == '__main__':

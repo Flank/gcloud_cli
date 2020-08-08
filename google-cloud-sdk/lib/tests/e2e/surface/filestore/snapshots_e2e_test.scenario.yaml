@@ -1074,7 +1074,8 @@ actions:
     validation_only: true
     events:
     - expect_prompt_continue:
-        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$.
+        message: |-
+          You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$.
           Are you sure?
         user_input: y
     - expect_stderr:
@@ -1108,7 +1109,8 @@ actions:
     validation_only: true
     events:
     - expect_prompt_continue:
-        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$.
+        message: |-
+          You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$.
           Are you sure?
         user_input: y
     - expect_stderr:

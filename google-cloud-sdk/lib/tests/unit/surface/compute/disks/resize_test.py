@@ -23,7 +23,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 
 
 class DisksResizeTestGA(test_base.BaseTest):

@@ -29,7 +29,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 
 API_VERSION = 'v1'
 
@@ -1199,7 +1199,7 @@ class InstanceGroupManagersSetAutoscalingTest(test_base.BaseTest):
         [(self.compute.autoscalers, 'Insert', request)],
     )
 
-  def testInsertAutoscaler_Mode(self):
+  def testInsertAutoscaler_Mode_OnlyUp(self):
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 --mode only-up')
     mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
@@ -1209,6 +1209,29 @@ class InstanceGroupManagersSetAutoscalingTest(test_base.BaseTest):
                 customMetricUtilizations=[],
                 maxNumReplicas=10,
                 mode=mode_cls.ONLY_UP,
+            ),
+            name='group-1-aaaa',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Insert', request)],
+    )
+
+  def testInsertAutoscaler_Mode_OnlyScaleOut(self):
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 --mode only-scale-out')
+    mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
+    request = self.messages.ComputeAutoscalersInsertRequest(
+        autoscaler=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[],
+                maxNumReplicas=10,
+                mode=mode_cls.ONLY_SCALE_OUT,
             ),
             name='group-1-aaaa',
             target=self.managed_instance_group_self_link,
@@ -1317,15 +1340,15 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 '
              '--scale-in-control max-scaled-in-replicas=5,time-window=30')
-    scale_in = self.messages.AutoscalingPolicyScaleDownControl(
-        maxScaledDownReplicas=self.messages.FixedOrPercent(fixed=5),
+    scale_in = self.messages.AutoscalingPolicyScaleInControl(
+        maxScaledInReplicas=self.messages.FixedOrPercent(fixed=5),
         timeWindowSec=30)
     request = self.messages.ComputeAutoscalersInsertRequest(
         autoscaler=self.messages.Autoscaler(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
                 customMetricUtilizations=[],
                 maxNumReplicas=10,
-                scaleDownControl=scale_in),
+                scaleInControl=scale_in),
             name='group-1-aaaa',
             target=self.managed_instance_group_self_link,
         ),
@@ -1345,8 +1368,8 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
         []
     ])
 
-    scale_in = self.messages.AutoscalingPolicyScaleDownControl(
-        maxScaledDownReplicas=self.messages.FixedOrPercent(fixed=5),
+    scale_in = self.messages.AutoscalingPolicyScaleInControl(
+        maxScaledInReplicas=self.messages.FixedOrPercent(fixed=5),
         timeWindowSec=30)
 
     self.Run('compute instance-groups managed set-autoscaling group-1 '
@@ -1367,7 +1390,7 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
                 customMetricUtilizations=[custom_metric_utilization],
                 maxNumReplicas=10,
-                scaleDownControl=scale_in),
+                scaleInControl=scale_in),
             name='autoscaler-1',
             target=self.managed_instance_group_self_link,
         ),

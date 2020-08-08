@@ -57,11 +57,11 @@ EXAMPLES
 
         $ gcloud alpha container images describe \
             gcr.io/myproject/myimage:tag \
-          --format='value(image_summary.digest)'
+          --format="value(image_summary.digest)"
               OR
         $ gcloud alpha container images describe \
             gcr.io/myproject/myimage:tag \
-          --format='value(image_summary.fully_qualified_digest)'
+          --format="value(image_summary.fully_qualified_digest)"
 
     See package vulnerabilities found by the Container Analysis API for the
     specified image:

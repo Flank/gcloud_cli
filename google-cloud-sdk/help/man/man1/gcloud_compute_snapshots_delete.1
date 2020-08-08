@@ -53,6 +53,17 @@ To delete Google Compute Engine snapshots with the names 'snapshot\-1' and
 $ gcloud compute snapshots delete snapshot\-1 snapshot\-2
 .RE
 
+To list all snapshots that were created before a specific date, use the
+\-\-filter flag with the \f5gcloud compute snapshots list\fR command.
+
+.RS 2m
+$ gcloud compute snapshots list \e
+    \-\-filter="creationTimestamp<'2017\-01\-01'"
+.RE
+
+For more information on how to use \-\-filter with the list command, run $
+gcloud topic filters.
+
 
 
 .SH "NOTES"

@@ -589,13 +589,6 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
     self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
     self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
 
-
-class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest,
-                                   parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   @parameterized.parameters((' --enable-message-ordering', True),
                             (' --no-enable-message-ordering', False))
   def testOrderedPullSubscriptionsCreate(self, ordering_flag,

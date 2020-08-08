@@ -269,8 +269,8 @@ class Base(sdk_test_base.SdkBase):
               self._CreateMockService(list_method), 'List', collection,
               list_method)
       ]
-    self.methods_mock = self.StartObjectPatch(registry, 'GetMethods')
-    self.methods_mock.side_effect = lambda n, **kwargs: methods.get(n, [])
+    methods_mock = self.StartObjectPatch(registry, 'GetMethods')
+    methods_mock.side_effect = lambda n, **kwargs: methods.get(n, [])
 
   def _CreateMockService(self, method_info):
     mock_service = mock.MagicMock()

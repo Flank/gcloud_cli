@@ -1,5 +1,5 @@
 NAME
-    gcloud compute interconnects attachments dedicated create - create a Google
+    gcloud compute interconnects attachments dedicated create - create a
         Compute Engine dedicated interconnect attachment
 
 SYNOPSIS

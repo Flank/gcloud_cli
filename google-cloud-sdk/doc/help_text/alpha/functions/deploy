@@ -66,7 +66,7 @@ FLAGS
      --ingress-settings=INGRESS_SETTINGS
         Ingress settings controls what traffic can reach the function.By
         default all will be used. INGRESS_SETTINGS must be one of: all,
-        internal-only.
+        internal-only, internal-and-gclb.
 
      --memory=MEMORY
         Limit on the amount of memory the function can use.
@@ -87,14 +87,15 @@ FLAGS
 
         Choices:
 
-        * nodejs8: Node.js 8
         * nodejs10: Node.js 10
         * nodejs12: Node.js 12
         * python37: Python 3.7
         * python38: Python 3.8
         * go111: Go 1.11
         * go113: Go 1.13
+        * java11: Java 11
         * nodejs6: Node.js 6 (deprecated)
+        * nodejs8: Node.js 8 (deprecated)
 
      --service-account=SERVICE_ACCOUNT
         The email address of the IAM service account associated with the
@@ -113,12 +114,18 @@ FLAGS
         * Reference to source repository or,
         * Local filesystem path (root directory of function source).
 
-    Note that if you do not specify the --source flag:
+    Note that, depending on your runtime type, Cloud Functions will look for
+    files with specific names for deployable functions. For Node.js, these
+    filenames are index.js or function.js. For Python, this is main.py.
 
-      o Current directory will be used for new function deployments.
-      o If the function is previously deployed using a local filesystem path,
-    then function's source code will be updated using the current directory.
-      o If the function is previously deployed using a Google Cloud Storage
+    If you do not specify the --source flag:
+
+      o The current directory will be used for new function deployments.
+      o If the function was previously deployed using a local filesystem
+        path,
+    then the function's source code will be updated using the current
+    directory.
+      o If the function was previously deployed using a Google Cloud Storage
     location or a source repository, then the function's source code will not
     be updated.
 
@@ -196,9 +203,10 @@ FLAGS
        --build-worker-pool=BUILD_WORKER_POOL
           Name of the Cloud Build Custom Worker Pool that should be used to
           build the function. The format of this field is
-          projects/${PROJECT}/workerPools/${WORKERPOOL} where ${PROJECT} is the
-          project id where the worker pool is defined and ${WORKERPOOL} is the
-          short name of the worker pool.
+          projects/${PROJECT}/locations/${LOCATION}/workerPools/${WORKERPOOL}
+          where ${PROJECT} is the project id and ${LOCATION} is the location
+          where the worker pool is defined and ${WORKERPOOL} is the short name
+          of the worker pool.
 
        --clear-build-worker-pool
           Clears the Cloud Build Custom Worker Pool field.
@@ -290,7 +298,10 @@ FLAGS
        --trigger-topic=TRIGGER_TOPIC
           Name of Pub/Sub topic. Every message published in this topic will
           trigger function execution with message contents passed as input
-          data.
+          data. Note that this flag does not accept the format of
+          projects/PROJECT_ID/topics/TOPIC_ID. Use this flag to specify the
+          final element TOPIC_ID. The PROJECT_ID will be read from the active
+          configuration.
 
        --trigger-event=EVENT_TYPE
           Specifies which action should trigger the function. For a list of
@@ -310,6 +321,19 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+EXAMPLES
+    To deploy a function that is triggered by write events on the document
+    /messages/{pushId}, run:
+
+        $ gcloud alpha functions deploy my_function --runtime=python37 \
+            --trigger-event=providers/cloud.firestore/eventTypes/\
+        document.write \
+            --trigger-resource=projects/project_id/databases/(default)/\
+        documents/messages/{pushId}
+
+    See https://cloud.google.com/functions/docs/calling for more details of
+    using other types of resource as triggers.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

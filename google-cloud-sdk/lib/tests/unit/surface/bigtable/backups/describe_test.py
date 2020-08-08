@@ -25,11 +25,11 @@ from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-class DescribeCommandTestAlpha(base.BigtableV2TestBase,
-                               sdk_test_base.WithOutputCapture):
+class DescribeCommandTestGA(base.BigtableV2TestBase,
+                            sdk_test_base.WithOutputCapture):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances_clusters_backups.Get
@@ -72,6 +72,18 @@ class DescribeCommandTestAlpha(base.BigtableV2TestBase,
     cmd = ('bigtable backups describe projects/{0}/instances/theinstance/'
            'clusters/thecluster/backups/thebackup'.format(self.Project()))
     self._RunSuccessTest(cmd)
+
+
+class DescribeCommandTestBeta(DescribeCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DescribeCommandTestAlpha(DescribeCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

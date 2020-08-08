@@ -14,12 +14,12 @@ Uninstalling Google Cloud SDK
 
       o Locate your installation directory by running:
 
-        $ gcloud info --format='value(installation.sdk_root)'
+        $ gcloud info --format="value(installation.sdk_root)"
 
       o Locate your user config directory (typically ~/.config/gcloud on
         MacOS and Linux) by running:
 
-        $ gcloud info --format='value(config.paths.global_config_dir)'
+        $ gcloud info --format="value(config.paths.global_config_dir)"
 
       o Delete both these directories.
 

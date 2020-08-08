@@ -20,6 +20,11 @@ gcloud \- manage Google Cloud Platform resources and developer workflow
 The \fBgcloud\fR CLI manages authentication, local configuration, developer
 workflow, and interactions with the Google Cloud Platform APIs.
 
+For a quick introduction to the gcloud command\-line tool, a list of commonly
+used commands, and a look at how these commands are structured, refer to the
+gcloud command\-line tool cheat sheet,
+https://cloud.google.com/sdk/docs/cheatsheet, or run \f5gcloud cheat\-sheet\fR.
+
 
 
 .SH "GLOBAL FLAGS"
@@ -80,7 +85,7 @@ Display detailed help.
 
 .TP 2m
 \fB\-\-project\fR=\fIPROJECT_ID\fR
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.
@@ -298,7 +303,7 @@ Manage cryptographic keys in the cloud.
 
 .TP 2m
 \fBlogging\fR
-Manage Stackdriver Logging.
+Manage Cloud Logging.
 
 .TP 2m
 \fBml\fR
@@ -389,6 +394,10 @@ gcloud supplementary help.
 \f5\fICOMMAND\fR\fR is one of the following:
 
 .RS 2m
+.TP 2m
+\fBcheat\-sheet\fR
+Display gcloud cheat sheet.
+
 .TP 2m
 \fBdocker\fR
 \fB(DEPRECATED)\fR Enable Docker CLI access to Google Container Registry.

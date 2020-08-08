@@ -173,15 +173,15 @@ And this is the second paragraph of the first inner of the second outer.
 </dd>
 </dl>
 And this should be back to normal text.
-<pre>
-  $ <a href="/sdk/../reference/with/a/command/line">gcloud with a command line</a> EXAMPLE
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/with/a/command/line">gcloud with a command line</a> EXAMPLE</code>
 </pre>
 
 <p>
 and more prose
-<pre>
+<pre class="prettyprint lang-sh">
   # example command.
-  $ echo and more commands
+<code class="devsite-terminal">echo and more commands</code>
 </pre>
 
 <p>
@@ -232,29 +232,27 @@ Markdown command docstring index.
 Inline $ <a href="/sdk/../reference/command-group/sub-sommand">gcloud
 command-group sub-sommand</a> POSITIONAL command examples should become links.
 And example blocks should be monospace with links:
-<pre>
-  $ <a href="/sdk/../reference/group/sub-command/list">gcloud group sub-command list</a> POSITIONAL
-  $ <a href="/sdk/../reference/upper/case/stop/command">gcloud upper case stop command</a> ABC-DEF abc xyz
-  $ <a href="/sdk/../reference/group-a/command">gcloud group-a command</a> example-arg a b c
-  $ <a href="/sdk/../reference/group-b/subgroup-c/command">gcloud group-b subgroup-c command</a> my-arg a b c
-  $ <a href="/sdk/../reference/with/group">gcloud with group</a> sample-arg a b c
-  $ <a href="/sdk/../reference/group/set/property/value/a/b/c">gcloud group set</a> property value a b c
-  $ <a href="/sdk/../reference/group/unset/property/a/b/c">gcloud group unset</a> property a b c
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/group/sub-command/list">gcloud group sub-command list</a> POSITIONAL</code>
+<code class="devsite-terminal"><a href="/sdk/../reference/upper/case/stop/command">gcloud upper case stop command</a> ABC-DEF abc xyz</code>
+<code class="devsite-terminal"><a href="/sdk/../reference/group-a/command">gcloud group-a command</a> example-arg a b c</code>
+<code class="devsite-terminal"><a href="/sdk/../reference/group-b/subgroup-c/command">gcloud group-b subgroup-c command</a> my-arg a b c</code>
+<code class="devsite-terminal"><a href="/sdk/../reference/with/group">gcloud with group</a> sample-arg a b c</code>
+<code class="devsite-terminal"><a href="/sdk/../reference/group/set/property/value/a/b/c">gcloud group set</a> property value a b c</code>
+<code class="devsite-terminal"><a href="/sdk/../reference/group/unset/property/a/b/c">gcloud group unset</a> property a b c</code>
 </pre>
 
 <p>
-Long examples should wrap at 80 characters:
-<pre>
-  $ <a href="/sdk/../reference/group/long-windeded/super-verbose/way/too-long/who-could">gcloud group long-windeded super-verbose way too-long who-could</a> \
-      ever remember-this obscure-command maybe too much of-the \
-      underlying-api IS EXPOSED
+Long examples should scroll horizontally:
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/group/long-windeded/super-verbose/way/too-long/who-could">gcloud group long-windeded super-verbose way too-long who-could</a> ever remember-this obscure-command maybe too much of-the underlying-api IS EXPOSED</code>
 </pre>
 
 <p>
 And how does a multi-line example fare?
-<pre>
-  $ <a href="/sdk/../reference/first/part">gcloud first part</a>
-  $ <a href="/sdk/../reference/second/part">gcloud second part</a>
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/first/part">gcloud first part</a></code>
+<code class="devsite-terminal"><a href="/sdk/../reference/second/part">gcloud second part</a></code>
 </pre>
 
 <p>

@@ -1,0 +1,13 @@
+apiVersion: authentication.gke.io/v2alpha1
+kind: ClientConfig
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.4
+  creationTimestamp: null
+  name: clientconfig-sample
+  namespace: default
+spec:
+  certificateAuthorityData: jsdhfsjdhf298347298374==
+  name: test-cluster
+  server: https://sever.us-east-1.amazonaws.com
+status: {}

@@ -57,9 +57,22 @@ summary:
 - execute:
   - command: |
       game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file invalid_config_overrides.txt  --no-dry-run
-  - stderr: |
-      Update rollout request issued for: [my-deployment]
   - error: '1: Invalid schema: unexpected game server config override(s) format.'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --default-config cfg-version1 --config-overrides-file invalid_yaml.yaml --no-dry-run
+  - error: '1: .*Error parsing config_override file:.*$'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --default-config cfg-version1 --config-overrides-file invalid_config_overrides_unrecognized_fields.yaml --no-dry-run
+  - error: |-
+      1: Invalid schema, the following fields are unrecognized:
+      .bar
+      .foo
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --default-config cfg-version1 --config-overrides-file invalid_config_overrides.yaml --no-dry-run
+  - error: '1: Invalid schema: .*$'
 - execute:
   - command: |
       game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --dry-run
@@ -191,88 +204,6 @@ summary:
         updateTime: '2019-06-17T19:37:58.961626920Z'
 - execute:
   - command: |
-      game servers deployments fetch-state my-deployment
-  - stdout: |
-      clusterState:
-      - cluster: projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
-        fleetDetails:
-        - fleet:
-            agonesSpec: |-
-              {
-                "replicas": 1,
-                "strategy": {},
-                "scheduling": "Packed",
-                "template": {
-                  "metadata": {
-                    "name": "game-server-template-spec-1",
-                    "creationTimestamp": null,
-                    "labels": {
-                      "game-server-template-label-key": "game-server-template-label-1"
-                    },
-                    "annotations": {
-                      "game-server-template-annotation-key": "game-server-template-annotation-1"
-                    }
-                  },
-                  "spec": {
-                    "ports": [
-                      {
-                        "name": "default",
-                        "portPolicy": "Dynamic",
-                        "containerPort": 26000
-                      }
-                    ],
-                    "health": {
-                      "periodSeconds": 10,
-                      "failureThreshold": 10,
-                      "initialDelaySeconds": 60
-                    },
-                    "sdkServer": {},
-                    "template": {
-                      "metadata": {
-                        "name": "pod-template-spec-1",
-                        "creationTimestamp": null,
-                        "labels": {
-                          "gameservices.googleapis.com/fleet": "fleet-my-gsd-my-config",
-                          "gameservices.googleapis.com/gameServerCluster": "my-gsc",
-                          "gameservices.googleapis.com/gameServerClusterLocation": "us-central1",
-                          "gameservices.googleapis.com/gameServerConfig": "my-config",
-                          "gameservices.googleapis.com/gameServerDeployment": "my-gsd",
-                          "gameservices.googleapis.com/managed": "true",
-                          "gameservices.googleapis.com/realm": "my-realm",
-                          "pod-template-label-key": "pod-template-label-1"
-                        },
-                        "annotations": {
-                          "gameservices.googleapis.com/fleetConfig": "ccb11aff-a86c-4f6d-8b07-5286f54f00d3",
-                          "gameservices.googleapis.com/gameServerCluster": "projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
-                          "gameservices.googleapis.com/gameServerClusterUUID": "14f7e3f2-3503-4cf5-9514-720d62cb7caa",
-                          "gameservices.googleapis.com/gameServerConfig": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config",
-                          "gameservices.googleapis.com/gameServerDeployment": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd",
-                          "gameservices.googleapis.com/scalingConfig": "",
-                          "gameservices.googleapis.com/version": "MTU3OTEyOTc3MzkwMjMzNzAwMA==",
-                          "pod-template-annotation-key": "pod-template-annotation-1"
-                        }
-                      },
-                      "spec": {
-                        "containers": [
-                          {
-                            "name": "simple-udp-server",
-                            "image": "gcr.io/agones-images/udp-server:0.14",
-                            "resources": {}
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            fleet: fleet-my-gsd-my-config
-            specSource:
-              gameServerConfigName: projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config
-              name: ccb11aff-a86c-4f6d-8b07-5286f54f00d3
-            status:
-              replicas: '1'
-- execute:
-  - command: |
       game servers deployments update-rollout fake-deployment --location global --config-overrides-file config_overrides.yaml --dry-run
   - stdout: |
       createTime: '2020-02-20T06:01:05.081638883Z'
@@ -297,6 +228,14 @@ summary:
       Updated rollout for: [fake-deployment]
   - stdout: |
       {}
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --clear-config-overrides --no-dry-run --preview-time 1970-01-01T00:00:00Z
+  - error: '1: `--preview-time` is only relevant if `--dry-run` is set to true.'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --no-dry-run
+  - error: '1: Must specify at least one parameter to update.'
 actions:
 - define_reference:
     reference: api-version
@@ -336,6 +275,21 @@ actions:
 - write_file:
     path: invalid_config_overrides.txt
     contents: blah
+- write_file:
+    path: invalid_yaml.yaml
+    contents: |
+      - foo:
+        bar
+- write_file:
+    path: invalid_config_overrides_unrecognized_fields.yaml
+    contents: |
+      - foo: "bar"
+        bar: "foo"
+- write_file:
+    path: invalid_config_overrides.yaml
+    contents: |
+      - configVersion:
+          foo: bar
 - execute_command:
     command: |
       game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --no-dry-run
@@ -575,11 +529,35 @@ actions:
     command: |
       game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file invalid_config_overrides.txt  --no-dry-run
     events:
-    - expect_stderr: |
-        Update rollout request issued for: [my-deployment]
     - expect_exit:
         code: 1
         message: 'Invalid schema: unexpected game server config override(s) format.'
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --default-config cfg-version1 --config-overrides-file invalid_yaml.yaml --no-dry-run
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*Error parsing config_override file:.*
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --default-config cfg-version1 --config-overrides-file invalid_config_overrides_unrecognized_fields.yaml --no-dry-run
+    events:
+    - expect_exit:
+        code: 1
+        message: |-
+          Invalid schema, the following fields are unrecognized:
+          .bar
+          .foo
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --default-config cfg-version1 --config-overrides-file invalid_config_overrides.yaml --no-dry-run
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: 'Invalid schema: .*'
 - execute_command:
     command: |
       game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --dry-run
@@ -1096,124 +1074,6 @@ actions:
           updateTime: '2019-06-17T19:37:58.961626920Z'
     - expect_exit:
         code: 0
-- execute_command:
-    command: |
-      game servers deployments fetch-state my-deployment
-    events:
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment:fetchDeploymentState?alt=json
-          method: POST
-          headers: {}
-          body: |
-            {}
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-               "clusterState": [
-                {
-                  "cluster": "projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
-                  "fleetDetails": [
-                    {
-                      "fleet": {
-                        "fleet": "fleet-my-gsd-my-config",
-                        "agonesSpec": "{\n  \"replicas\": 1,\n  \"strategy\": {},\n  \"scheduling\": \"Packed\",\n  \"template\": {\n    \"metadata\": {\n      \"name\": \"game-server-template-spec-1\",\n      \"creationTimestamp\": null,\n      \"labels\": {\n        \"game-server-template-label-key\": \"game-server-template-label-1\"\n      },\n      \"annotations\": {\n        \"game-server-template-annotation-key\": \"game-server-template-annotation-1\"\n      }\n    },\n    \"spec\": {\n      \"ports\": [\n        {\n          \"name\": \"default\",\n          \"portPolicy\": \"Dynamic\",\n          \"containerPort\": 26000\n        }\n      ],\n      \"health\": {\n        \"periodSeconds\": 10,\n        \"failureThreshold\": 10,\n        \"initialDelaySeconds\": 60\n      },\n      \"sdkServer\": {},\n      \"template\": {\n        \"metadata\": {\n          \"name\": \"pod-template-spec-1\",\n          \"creationTimestamp\": null,\n          \"labels\": {\n            \"gameservices.googleapis.com/fleet\": \"fleet-my-gsd-my-config\",\n            \"gameservices.googleapis.com/gameServerCluster\": \"my-gsc\",\n            \"gameservices.googleapis.com/gameServerClusterLocation\": \"us-central1\",\n            \"gameservices.googleapis.com/gameServerConfig\": \"my-config\",\n            \"gameservices.googleapis.com/gameServerDeployment\": \"my-gsd\",\n            \"gameservices.googleapis.com/managed\": \"true\",\n            \"gameservices.googleapis.com/realm\": \"my-realm\",\n            \"pod-template-label-key\": \"pod-template-label-1\"\n          },\n          \"annotations\": {\n            \"gameservices.googleapis.com/fleetConfig\": \"ccb11aff-a86c-4f6d-8b07-5286f54f00d3\",\n            \"gameservices.googleapis.com/gameServerCluster\": \"projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc\",\n            \"gameservices.googleapis.com/gameServerClusterUUID\": \"14f7e3f2-3503-4cf5-9514-720d62cb7caa\",\n            \"gameservices.googleapis.com/gameServerConfig\": \"projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config\",\n            \"gameservices.googleapis.com/gameServerDeployment\": \"projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd\",\n            \"gameservices.googleapis.com/scalingConfig\": \"\",\n            \"gameservices.googleapis.com/version\": \"MTU3OTEyOTc3MzkwMjMzNzAwMA==\",\n            \"pod-template-annotation-key\": \"pod-template-annotation-1\"\n          }\n        },\n        \"spec\": {\n          \"containers\": [\n            {\n              \"name\": \"simple-udp-server\",\n              \"image\": \"gcr.io/agones-images/udp-server:0.14\",\n              \"resources\": {}\n            }\n          ]\n        }\n      }\n    }\n  }\n}",
-                        "specSource": {
-                          "gameServerConfigName": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config",
-                          "name": "ccb11aff-a86c-4f6d-8b07-5286f54f00d3"
-                        },
-                        "status": {
-                          "replicas": "1"
-                        }
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-    - expect_stdout: |
-        clusterState:
-        - cluster: projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
-          fleetDetails:
-          - fleet:
-              agonesSpec: |-
-                {
-                  "replicas": 1,
-                  "strategy": {},
-                  "scheduling": "Packed",
-                  "template": {
-                    "metadata": {
-                      "name": "game-server-template-spec-1",
-                      "creationTimestamp": null,
-                      "labels": {
-                        "game-server-template-label-key": "game-server-template-label-1"
-                      },
-                      "annotations": {
-                        "game-server-template-annotation-key": "game-server-template-annotation-1"
-                      }
-                    },
-                    "spec": {
-                      "ports": [
-                        {
-                          "name": "default",
-                          "portPolicy": "Dynamic",
-                          "containerPort": 26000
-                        }
-                      ],
-                      "health": {
-                        "periodSeconds": 10,
-                        "failureThreshold": 10,
-                        "initialDelaySeconds": 60
-                      },
-                      "sdkServer": {},
-                      "template": {
-                        "metadata": {
-                          "name": "pod-template-spec-1",
-                          "creationTimestamp": null,
-                          "labels": {
-                            "gameservices.googleapis.com/fleet": "fleet-my-gsd-my-config",
-                            "gameservices.googleapis.com/gameServerCluster": "my-gsc",
-                            "gameservices.googleapis.com/gameServerClusterLocation": "us-central1",
-                            "gameservices.googleapis.com/gameServerConfig": "my-config",
-                            "gameservices.googleapis.com/gameServerDeployment": "my-gsd",
-                            "gameservices.googleapis.com/managed": "true",
-                            "gameservices.googleapis.com/realm": "my-realm",
-                            "pod-template-label-key": "pod-template-label-1"
-                          },
-                          "annotations": {
-                            "gameservices.googleapis.com/fleetConfig": "ccb11aff-a86c-4f6d-8b07-5286f54f00d3",
-                            "gameservices.googleapis.com/gameServerCluster": "projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
-                            "gameservices.googleapis.com/gameServerClusterUUID": "14f7e3f2-3503-4cf5-9514-720d62cb7caa",
-                            "gameservices.googleapis.com/gameServerConfig": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config",
-                            "gameservices.googleapis.com/gameServerDeployment": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd",
-                            "gameservices.googleapis.com/scalingConfig": "",
-                            "gameservices.googleapis.com/version": "MTU3OTEyOTc3MzkwMjMzNzAwMA==",
-                            "pod-template-annotation-key": "pod-template-annotation-1"
-                          }
-                        },
-                        "spec": {
-                          "containers": [
-                            {
-                              "name": "simple-udp-server",
-                              "image": "gcr.io/agones-images/udp-server:0.14",
-                              "resources": {}
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  }
-                }
-              fleet: fleet-my-gsd-my-config
-              specSource:
-                gameServerConfigName: projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config
-                name: ccb11aff-a86c-4f6d-8b07-5286f54f00d3
-              status:
-                replicas: '1'
-    - expect_exit:
-        code: 0
 
 - execute_command:
     command: |
@@ -1224,23 +1084,18 @@ actions:
           uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout:preview?alt=json&updateMask=gameServerConfigOverrides
           method: PATCH
           headers: {}
-          body: |
-            {
-               "game_server_config_overrides": [
-                  {
-                    "realmsSelector": {
-                      "realms": ["realm1", "realm2"]
-                    },
-                    "configVersion": "version2"
-                  },
-                  {
-                    "realmsSelector": {
-                      "realms": ["realm3"]
-                    },
-                    "configVersion": "version3"
-                  }
-               ]
-            }
+          body:
+            json:
+              gameServerConfigOverrides:
+              - configVersion: version2
+                realmsSelector:
+                  realms:
+                  - realm1
+                  - realm2
+              - configVersion: version3
+                realmsSelector:
+                  realms:
+                  - realm4
         return_response:
           headers:
             status: '200'
@@ -1266,7 +1121,6 @@ actions:
         updateTime: '2020-02-20T06:01:05.668149037Z'
     - expect_exit:
         code: 0
-
 - execute_command:
     command: |
       game servers deployments update-rollout fake-deployment --location global --config-overrides-file config_overrides.yaml --no-dry-run
@@ -1348,3 +1202,18 @@ actions:
         {}
     - expect_exit:
         code: 0
+
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --clear-config-overrides --no-dry-run --preview-time 1970-01-01T00:00:00Z
+    events:
+    - expect_exit:
+        code: 1
+        message: '`--preview-time` is only relevant if `--dry-run` is set to true.'
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --no-dry-run
+    events:
+    - expect_exit:
+        code: 1
+        message: Must specify at least one parameter to update.

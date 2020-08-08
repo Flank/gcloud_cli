@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.cloudkms import base as cloudkms_base
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.kms import flags
+from googlecloudsdk.command_lib.kms import resource_args
 
 
 class List(base.ListCommand):
@@ -39,14 +39,14 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    flags.AddLocationFlag(parser, 'keyring')
+    resource_args.AddKmsLocationResourceArgForKMS(parser, True, '--location')
+
     parser.display_info.AddFormat('table(name)')
 
   def Run(self, args):
     client = cloudkms_base.GetClientInstance()
     messages = cloudkms_base.GetMessagesModule()
-
-    location_ref = flags.ParseLocationName(args)
+    location_ref = args.CONCEPTS.location.Parse()
 
     request = messages.CloudkmsProjectsLocationsKeyRingsListRequest(
         parent=location_ref.RelativeName())

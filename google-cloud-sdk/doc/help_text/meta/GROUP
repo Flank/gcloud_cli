@@ -39,6 +39,9 @@ COMMANDS
      debug
         Run an interactive debug console with the Cloud SDK libraries loaded.
 
+     generate-command
+        Generate YAML file to implement given command.
+
      generate-help-docs
         Generate and/or update help document directories.
 

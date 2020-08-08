@@ -107,7 +107,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.UNAUTHORIZED
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
     self.registry_mock.children.side_effect = err
 
     with self.assertRaises(util.UserRecoverableV2Error):
@@ -119,7 +119,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.FORBIDDEN
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
 
     self.registry_mock.children.side_effect = err
 
@@ -132,7 +132,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
 
     self.registry_mock.children.side_effect = err
 

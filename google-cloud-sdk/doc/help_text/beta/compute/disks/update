@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute disks update - update a Google Compute Engine
-        persistent disk
+    gcloud beta compute disks update - update a Compute Engine persistent disk
 
 SYNOPSIS
     gcloud beta compute disks update DISK_NAME
@@ -9,8 +8,8 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute disks update updates a Google Compute Engine
-    persistent disk.
+    (BETA) gcloud beta compute disks update updates a Compute Engine persistent
+    disk.
 
 POSITIONAL ARGUMENTS
      DISK_NAME
@@ -114,7 +113,7 @@ EXAMPLES
     the result:
 
         $ gcloud beta compute disks describe example-disk \
-          --format='default(labels)'
+          --format="default(labels)"
 
 NOTES
     This command is currently in BETA and may change without notice. These

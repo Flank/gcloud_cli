@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud data-catalog tag-templates fields update
         (FIELD : --location=LOCATION --tag-template=TAG_TEMPLATE)
-        [--add-enum-values=[ADD_ENUM_VALUES,...]] [--display-name=DISPLAY_NAME]
+        [--display-name=DISPLAY_NAME] [--enum-values=[ENUM_VALUES,...]]
         [--required] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -32,11 +32,19 @@ POSITIONAL ARGUMENTS
           Tag template of the tag template field.
 
 FLAGS
-     --add-enum-values=[ADD_ENUM_VALUES,...]
-        Comma-separated list of enum values to add to the tag template field.
-
      --display-name=DISPLAY_NAME
         Display name of the tag template field.
+
+     --enum-values=[ENUM_VALUES,...]
+        Comma-separated list of enum values. The list of enum values passed
+        with this flag replaces the existing one in tag template enum field.
+        That means:
+        * the enum values passed to the flag and not present in tag template
+          enum field get created
+        * the enum values present in tag template enum field and missing in
+          the list get removed
+        * the order of the items on the list is preserved
+    Enum values can only be removed from optional enum fields for now.
 
      --required
         Indicates if the tag template field is required. Updating from FALSE
@@ -60,10 +68,10 @@ EXAMPLES
         $ gcloud data-catalog tag-templates fields update FIELD \
             --display-name=NAME
 
-    Add enum values 'A' and 'B' to tag template field:
+    Set tag template enum field values to be 'A' and 'B':
 
         $ gcloud data-catalog tag-templates fields update FIELD \
-            --add-enum-values=A,B
+            --enum-values=A,B
 
     Set a tag template field to be optional:
 

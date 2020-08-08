@@ -1,7 +1,6 @@
 NAME
-    gcloud alpha recommender recommendations mark-claimed - mark the
-        Recommendation State as CLAIMED. Can only be performed on
-        recommendations in CLAIMED or ACTIVE state
+    gcloud alpha recommender recommendations mark-claimed - mark a
+        recommendation's state as CLAIMED
 
 SYNOPSIS
     gcloud alpha recommender recommendations mark-claimed
@@ -9,11 +8,11 @@ SYNOPSIS
         --etag=ETAG [--state-metadata=KEY=VALUE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Mark the Recommendation State as CLAIMED. Users can use this method
-    to. indicate to the Recommender API that they are starting to apply the
-    recommendation themselves. This stops the recommendation content from being
-    updated. mark-claimed can be applied to recommendations in CLAIMED or
-    ACTIVE state.
+    (ALPHA) Mark a recommendation's state as CLAIMED. Can be applied to
+    recommendations in CLAIMED, SUCCEEDED, FAILED, or ACTIVE state. Users can
+    use this method to indicate to the Recommender API that they are starting
+    to apply the recommendation themselves. This stops the recommendation
+    content from being updated.
 
 POSITIONAL ARGUMENTS
      Recommendation resource - The Cloud Recommendation to mark as claimed. The

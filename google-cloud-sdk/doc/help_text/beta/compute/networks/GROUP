@@ -39,22 +39,22 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create a Google Compute Engine network.
+        (BETA) Create a Compute Engine network.
 
      delete
-        (BETA) Delete Google Compute Engine networks.
+        (BETA) Delete Compute Engine networks.
 
      describe
-        (BETA) Describe a Google Compute Engine network.
+        (BETA) Describe a Compute Engine network.
 
      get-effective-firewalls
-        (BETA) Get the effective firewalls of a Google Compute Engine network.
+        (BETA) Get the effective firewalls of a Compute Engine network.
 
      list
         (BETA) List Google Compute Engine networks.
 
      update
-        (BETA) Update a Google Compute Engine network.
+        (BETA) Update a Compute Engine network.
 
 NOTES
     This command is currently in BETA and may change without notice. These

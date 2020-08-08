@@ -25,12 +25,12 @@ from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
-class DeleteCommandTestAlpha(base.BigtableV2TestBase,
-                             resource_completer_test_base.ResourceCompleterBase,
-                             concepts_test_base.ConceptsTestBase):
+class DeleteCommandTestGA(base.BigtableV2TestBase,
+                          resource_completer_test_base.ResourceCompleterBase,
+                          concepts_test_base.ConceptsTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances_clusters_backups.Delete
@@ -44,6 +44,18 @@ class DeleteCommandTestAlpha(base.BigtableV2TestBase,
     self.Run('bigtable backups delete thebackup --instance theinstance '
              '--cluster thecluster')
     self.AssertLogContains('Deleted backup [thebackup]')
+
+
+class DeleteCommandTestBeta(DeleteCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DeleteCommandTestAlpha(DeleteCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -21,6 +21,9 @@ GROUPS
      app-profiles
         (ALPHA) Manage Cloud Bigtable app profiles.
 
+     backups
+        (ALPHA) Manage Cloud Bigtable backups.
+
      clusters
         (ALPHA) Manage Cloud Bigtable clusters.
 

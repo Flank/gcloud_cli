@@ -124,7 +124,7 @@ class Collections(enum.Enum):
   )
   GLOBALORGANIZATIONOPERATIONS = (
       'globalOrganizationOperations',
-      'projects/locations/global/operations/{operation}',
+      'locations/global/operations/{operation}',
       {},
       ['operation'],
       True
@@ -281,7 +281,7 @@ class Collections(enum.Enum):
   )
   ORGANIZATIONSECURITYPOLICIES = (
       'organizationSecurityPolicies',
-      'projects/locations/global/securityPolicies/{securityPolicy}',
+      'locations/global/securityPolicies/{securityPolicy}',
       {},
       ['securityPolicy'],
       True
@@ -363,6 +363,14 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/instanceGroups/{instanceGroup}',
       {},
       ['project', 'region', 'instanceGroup'],
+      True
+  )
+  REGIONNETWORKENDPOINTGROUPS = (
+      'regionNetworkEndpointGroups',
+      'projects/{project}/regions/{region}/networkEndpointGroups/'
+      '{networkEndpointGroup}',
+      {},
+      ['project', 'region', 'networkEndpointGroup'],
       True
   )
   REGIONNOTIFICATIONENDPOINTS = (
@@ -486,6 +494,13 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/subnetworks/{subnetwork}',
       {},
       ['project', 'region', 'subnetwork'],
+      True
+  )
+  TARGETGRPCPROXIES = (
+      'targetGrpcProxies',
+      'projects/{project}/global/targetGrpcProxies/{targetGrpcProxy}',
+      {},
+      ['project', 'targetGrpcProxy'],
       True
   )
   TARGETHTTPPROXIES = (

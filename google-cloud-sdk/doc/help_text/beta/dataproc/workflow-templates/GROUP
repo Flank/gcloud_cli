@@ -53,6 +53,9 @@ COMMANDS
      list
         (BETA) List workflow templates.
 
+     remove-dag-timeout
+        (BETA) Remove DAG timeout from workflow template.
+
      remove-job
         (BETA) Remove a job from workflow template.
 
@@ -61,6 +64,9 @@ COMMANDS
 
      set-cluster-selector
         (BETA) Set cluster selector for the workflow template.
+
+     set-dag-timeout
+        (BETA) Set DAG timeout on workflow template.
 
      set-iam-policy
         (BETA) Set IAM policy for a template.

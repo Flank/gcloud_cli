@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute instance-groups unmanaged - read and manipulate Google
+    gcloud alpha compute instance-groups unmanaged - read and manipulate
         Compute Engine unmanaged instance group
 
 SYNOPSIS
@@ -7,8 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine unmanaged instance
-    groups.
+    (ALPHA) Read and manipulate Compute Engine unmanaged instance groups.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -28,7 +27,7 @@ COMMANDS
         (ALPHA) Create a Compute Engine unmanaged instance group.
 
      delete
-        (ALPHA) Delete Google Compute Engine unmanaged instance groups.
+        (ALPHA) Delete Compute Engine unmanaged instance groups.
 
      describe
         (ALPHA) Describe an instance group.

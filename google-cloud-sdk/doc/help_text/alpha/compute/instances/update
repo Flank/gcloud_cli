@@ -26,9 +26,8 @@ FLAGS
         to enable and --no-deletion-protection to disable.
 
      --[no-]enable-display-device
-        Enable a display device for instances using a Windows image. Use
-        --enable-display-device to enable and --no-enable-display-device to
-        disable.
+        Enable a display device on VM instances. Use --enable-display-device to
+        enable and --no-enable-display-device to disable.
 
      --min-cpu-platform=PLATFORM
         When specified, the VM will be scheduled on host with specified CPU
@@ -162,7 +161,7 @@ EXAMPLES
     the result:
 
         $ gcloud alpha compute instances describe example-disk \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

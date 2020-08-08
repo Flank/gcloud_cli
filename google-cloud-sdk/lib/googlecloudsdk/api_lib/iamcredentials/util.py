@@ -24,11 +24,21 @@ import datetime
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.util import apis_internal
 from googlecloudsdk.api_lib.util import exceptions
+from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core import http as http_core
 from googlecloudsdk.core import resources
+from googlecloudsdk.core import transport
 from googlecloudsdk.core.credentials import http as http_creds
-import googlecloudsdk.core.http as http_core
 from oauth2client import client
-from google.auth import impersonated_credentials as google_auth_impersonated_creds
+from google.auth import exceptions as google_auth_exceptions
+
+
+class Error(core_exceptions.Error):
+  """Exception that are defined by this module."""
+
+
+class ImpersonatedCredGoogleAuthRefreshError(Error):
+  """Exception for google auth impersonated credentials refresh error."""
 
 
 def GenerateAccessToken(service_account_id, scopes):
@@ -40,7 +50,7 @@ def GenerateAccessToken(service_account_id, scopes):
   # pylint: disable=protected-access
   http_client = http_creds.Http(
       enable_resource_quota=False,
-      response_encoding=http_creds.ENCODING,
+      response_encoding=transport.ENCODING,
       allow_account_impersonation=False)
   iam_client = apis_internal._GetClientInstance(
       'iamcredentials', 'v1', http_client=http_client)
@@ -77,7 +87,7 @@ def GenerateIdToken(service_account_id, audience, include_email=False):
   # pylint: disable=protected-access
   http_client = http_creds.Http(
       enable_resource_quota=False,
-      response_encoding=http_creds.ENCODING,
+      response_encoding=transport.ENCODING,
       allow_account_impersonation=False)
   iam_client = apis_internal._GetClientInstance(
       'iamcredentials', 'v1', http_client=http_client)
@@ -117,14 +127,32 @@ class ImpersonationAccessTokenProvider(object):
     # is lost. Here, before passing to google-auth, we refresh
     # source_credentials.
     source_credentials.refresh(request_client)
+    # Import only when necessary to decrease the startup time. Move it to
+    # global once google-auth is ready to replace oauth2client.
+    # pylint: disable=g-import-not-at-top
+    from google.auth import impersonated_credentials as google_auth_impersonated_creds
+    # pylint: enable=g-import-not-at-top
     cred = google_auth_impersonated_creds.Credentials(source_credentials,
                                                       service_account_id,
                                                       scopes)
-    cred.refresh(request_client)
+    try:
+      cred.refresh(request_client)
+    except google_auth_exceptions.RefreshError:
+      raise ImpersonatedCredGoogleAuthRefreshError(
+          'Failed to impersonate [{service_acc}]. Make sure the '
+          'account that\'s trying to impersonate it has access to the service '
+          'account itself and the "roles/iam.serviceAccountTokenCreator" '
+          'role.'.format(service_acc=service_account_id))
     return cred
 
   def GetElevationIdTokenGoogleAuth(self, google_auth_impersonation_credentials,
                                     audience, include_email):
+    """Creates an ID token credentials for impersonated credentials."""
+    # Import only when necessary to decrease the startup time. Move it to
+    # global once google-auth is ready to replace oauth2client.
+    # pylint: disable=g-import-not-at-top
+    from google.auth import impersonated_credentials as google_auth_impersonated_creds
+    # pylint: enable=g-import-not-at-top
     cred = google_auth_impersonated_creds.IDTokenCredentials(
         google_auth_impersonation_credentials,
         target_audience=audience,
@@ -135,6 +163,11 @@ class ImpersonationAccessTokenProvider(object):
 
   @classmethod
   def IsImpersonationCredential(cls, cred):
+    # Import only when necessary to decrease the startup time. Move it to
+    # global once google-auth is ready to replace oauth2client.
+    # pylint: disable=g-import-not-at-top
+    from google.auth import impersonated_credentials as google_auth_impersonated_creds
+    # pylint: enable=g-import-not-at-top
     return isinstance(cred, ImpersonationCredentials) or isinstance(
         cred, google_auth_impersonated_creds.Credentials)
 

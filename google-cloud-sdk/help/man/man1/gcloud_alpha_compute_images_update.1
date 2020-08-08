@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute images update \- update Google Compute Engine images
+gcloud alpha compute images update \- update a Compute Engine image
 
 
 
@@ -18,7 +18,7 @@ gcloud alpha compute images update \- update Google Compute Engine images
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute images update\fR updates labels for a
-Google Compute image.
+Compute Engine image.
 
 
 
@@ -38,12 +38,12 @@ Name of the disk image to update.
 .RS 2m
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-An optional text description for the image being created.
+An optional text description for the image.
 
 .TP 2m
 \fB\-\-family\fR=\fIFAMILY\fR
-Family of the image. When creating an instance or disk, specifying a family will
-cause the latest non\-deprecated image in the family to be used.
+Name of the image family to use. If an image family is specified when you create
+an instance or disk, the latest non\-deprecated image in the family is used.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -124,7 +124,7 @@ To list only the labels when describing a resource, use \-\-format:
 
 .RS 2m
 $ gcloud alpha compute images describe example\-image \e
-    \-\-format='default(labels)'
+    \-\-format="default(labels)"
 .RE
 
 

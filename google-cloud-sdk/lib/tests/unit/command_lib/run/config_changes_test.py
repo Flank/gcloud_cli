@@ -523,6 +523,22 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         ).Adjust(self.resource)
     self.assertDictEqual({}, dict(self.resource.template.annotations))
 
+  def testClearVpcConnectorRemovesEgressSettings(self):
+    self.resource.template.annotations[
+        'run.googleapis.com/vpc-access-connector'] = 'something'
+    self.resource.template.annotations[
+        'run.googleapis.com/vpc-access-egress'] = 'something else'
+    self.resource = config_changes.ClearVpcConnectorChange().Adjust(
+        self.resource)
+    self.assertDictEqual({}, dict(self.resource.template.annotations))
+
+  def testClearVpcConnectorDoesntExistRemovesEgressSettings(self):
+    self.resource.template.annotations[
+        'run.googleapis.com/vpc-access-egress'] = 'something else'
+    self.resource = config_changes.ClearVpcConnectorChange().Adjust(
+        self.resource)
+    self.assertDictEqual({}, dict(self.resource.template.annotations))
+
   def testSetTemplateAnnotationChange(self):
     config_changes.SetTemplateAnnotationChange(
         'k', 'v').Adjust(self.resource)

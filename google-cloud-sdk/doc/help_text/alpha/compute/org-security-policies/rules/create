@@ -7,7 +7,7 @@ SYNOPSIS
         --action=ACTION --security-policy=SECURITY_POLICY
         [--description=DESCRIPTION] [--dest-ip-ranges=[DEST_IP_RANGE,...]]
         [--dest-ports=[DEST_PORTS,...]] [--direction=DIRECTION]
-        [--enable-logging] [--layer4-configs=[LAYER4_CONFIG,...]]
+        [--[no-]enable-logging] [--layer4-configs=[LAYER4_CONFIG,...]]
         [--organization=ORGANIZATION] [--src-ip-ranges=[SRC_IP_RANGE,...]]
         [--target-resources=[TARGET_RESOURCES,...]]
         [--target-service-accounts=[TARGET_SERVICE_ACCOUNTS,...]]
@@ -46,9 +46,10 @@ OPTIONAL FLAGS
         Direction of the traffic the rule is applied. The default is to apply
         on incoming traffic. DIRECTION must be one of: INGRESS, EGRESS.
 
-     --enable-logging
+     --[no-]enable-logging
         Use this flag to enable logging of connections that allowed or denied
-        by this rule.
+        by this rule. Use --enable-logging to enable and --no-enable-logging to
+        disable.
 
      --layer4-configs=[LAYER4_CONFIG,...]
         A list of destination protocols and ports to which the firewall rule

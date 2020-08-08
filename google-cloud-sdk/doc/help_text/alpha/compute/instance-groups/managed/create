@@ -16,7 +16,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-groups managed create creates a
-    Google Compute Engine managed instance group.
+    Compute Engine managed instance group.
 
     For example, running:
 

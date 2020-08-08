@@ -1,12 +1,12 @@
 NAME
-    gcloud compute networks describe - describe a Google Compute Engine network
+    gcloud compute networks describe - describe a Compute Engine network
 
 SYNOPSIS
     gcloud compute networks describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute networks describe displays all data associated with Google
-    Compute Engine network in a project.
+    gcloud compute networks describe displays all data associated with Compute
+    Engine network in a project.
 
 POSITIONAL ARGUMENTS
      NAME

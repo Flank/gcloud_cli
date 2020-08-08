@@ -11,7 +11,7 @@ gcloud beta dataproc workflow\-templates create \- create a workflow template
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataproc workflow\-templates create\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataproc workflow\-templates create\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-dag\-timeout\fR=\fIDAG_TIMEOUT\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,6 +56,12 @@ property value for this command invocation.
 
 .RS 2m
 .TP 2m
+\fB\-\-dag\-timeout\fR=\fIDAG_TIMEOUT\fR
+The duration for which a DAG of jobs can run before being auto\-cancelled, such
+as "10m" or "16h". See $ gcloud topic datetimes for information on duration
+formats.
+
+.TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
 
@@ -81,8 +87,9 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a workflow template named 'my\-workflow\-template' in region
-\'us\-central1' with label params 'key1'='value1' and 'key2'='value2', run:
+To create a workflow template named \f5\fImy\-workflow\-template\fR\fR in region
+\f5\fIus\-central1\fR\fR with label params 'key1'='value1' and 'key2'='value2',
+run:
 
 .RS 2m
 $ gcloud beta dataproc workflow\-templates create \e

@@ -11,7 +11,7 @@ gcloud alpha ai\-platform jobs submit training \- submit an AI Platform training
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ai\-platform jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-tpu\-tf\-version\fR=\fITPU_TF_VERSION\fR] [\fB\-\-use\-chief\-in\-tf\-config\fR=\fIUSE_CHIEF_IN_TF_CONFIG\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud alpha ai\-platform jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-tpu\-tf\-version\fR=\fITPU_TF_VERSION\fR] [\fB\-\-use\-chief\-in\-tf\-config\fR=\fIUSE_CHIEF_IN_TF_CONFIG\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -185,6 +185,17 @@ You must set this value when \f5\-\-scale\-tier\fR is set to \f5CUSTOM\fR.
 .TP 2m
 \fB\-\-module\-name\fR=\fIMODULE_NAME\fR
 Name of the module to run.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The full name of the Google Compute Engine network
+(https://cloud.google.com/vpc/docs) to which the Job is peered with. For
+example, \f5\fIprojects/12345/global/networks/myVPC\fR\fR. The format is of the
+form projects/{project}/global/networks/{network}, where {project} is a project
+number, as in '12345', and {network} is network name. Private services access
+must already have been configured
+(https://cloud.google.com/vpc/docs/configure\-private\-services\-access) for the
+network. If unspecified, the Job is not peered with any network.
 
 .TP 2m
 \fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR

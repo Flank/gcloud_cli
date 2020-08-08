@@ -138,19 +138,21 @@ class StreamingBinaryOperation(
     return ['-a', arg1_val, '-b', six.text_type(arg2_val)]
 
 
-@test_case.Filters.DoNotRunInDebPackage('packaging does not contain test_data')
-@test_case.Filters.DoNotRunInRpmPackage('packaging does not contain test_data')
+@test_case.Filters.DoNotRunInDebPackage('Given test binaries are grte which do '
+                                        'not work on non google machines')
+@test_case.Filters.DoNotRunInRpmPackage('Given test binaries are grte which do '
+                                        'not work on non google machines')
 class BinaryOperationsTests(parameterized.TestCase,
                             sdk_test_base.WithLogCapture):
 
   def SetUp(self):
     """Configure test binary(ies)."""
     if test_case.Filters.IsOnWindows():
-      suffix = 'win_go'
+      suffix = 'windows_go'
     elif test_case.Filters.IsOnMac():
       suffix = 'darwin_go'
     else:
-      suffix = 'ubuntu_go'
+      suffix = 'linux_go'
 
     self.basic_binary = 'basic_' + suffix
     self.sdk_root_path = self.CreateTempDir('cloudsdk')
@@ -209,16 +211,17 @@ class BinaryOperationsTests(parameterized.TestCase,
         self.basic_binary,
         failure_func=binary_operations.NonZeroSuccessFailureHandler)
     command = [
-        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'BAR', '-b',
-        '1'
+        os.path.join(self.scripts_dir, self.basic_binary),
+        '-a', 'EXIT_WITH_ERROR', '-b', '1'
     ]
-    expected_out = 'GOT value for -a BAR\nGOT value for -b 1\n'
+    expected_out = 'GOT value for -a EXIT_WITH_ERROR\nGOT value for -b 1\n'
     expected_err = ''
     expected_status = 1
     expected_failed = False
     expected_result = GetOperationResult(command, expected_out, expected_err,
                                          expected_status, expected_failed)
-    self.assertEqual(expected_result, operation(string_val='BAR', int_val=1))
+    actual_result = operation(string_val='EXIT_WITH_ERROR', int_val=1)
+    self.assertEqual(expected_result, actual_result)
 
   def testBasicOperationFailureResult(self):
     operation = BasicBinaryOperation(self.basic_binary)
@@ -278,11 +281,11 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
   def SetUp(self):
     """Configure test binary(ies)."""
     if test_case.Filters.IsOnWindows():
-      suffix = 'win_go'
+      suffix = 'windows_go'
     elif test_case.Filters.IsOnMac():
       suffix = 'darwin_go'
     else:
-      suffix = 'ubuntu_go'
+      suffix = 'linux_go'
 
     self.basic_binary = 'basic_' + suffix
     self.sdk_root_path = self.CreateTempDir('cloudsdk')
@@ -304,30 +307,36 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
   def testStreamOperationResult_WithCapture(self):
     operation = StreamingBinaryOperation(self.basic_binary, capture_output=True)
     command = [
-        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'foo', '-b',
-        '1'
+        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'LONG_OUTPUT',
+        '-b', '10'
     ]
     context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
-    expected_out = ['GOT value for -a foo', 'GOT value for -b 1']
+    long_output = ['Output value {}'.format(x) for x in range(10)]
+    expected_out = (['GOT value for -a LONG_OUTPUT', 'GOT value for -b 10'] +
+                    long_output)
     expected_err = None
     expected_status = 0
     expected_failed = False
     expected_result = GetOperationResult(command, expected_out, expected_err,
                                          expected_status, expected_failed,
                                          context=context)
-    actual_result = operation(string_val='foo',
-                              int_val=1,
+    actual_result = operation(string_val='LONG_OUTPUT',
+                              int_val=10,
                               env={'FOO': 'bar'},
                               stdin='input',
                               execution_dir='.')
+    for line in expected_out:
+      self.AssertLogContains(line)
+    self.AssertErrEquals('')
     self.assertEqual(expected_result, actual_result)
 
   def testStreamOperationResult_NoCapture(self):
     operation = StreamingBinaryOperation(self.basic_binary,
                                          capture_output=False)
     command = [
-        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'foo', '-b',
-        '1'
+        os.path.join(self.scripts_dir, self.basic_binary), '-a',
+        'LONG_OUTPUT_W_ERRORS',
+        '-b', '100'
     ]
     context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
     expected_out = None
@@ -337,15 +346,20 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
     expected_result = GetOperationResult(command, expected_out, expected_err,
                                          expected_status, expected_failed,
                                          context=context)
-    actual_result = operation(string_val='foo',
-                              int_val=1,
+    actual_result = operation(string_val='LONG_OUTPUT_W_ERRORS',
+                              int_val=100,
                               env={'FOO': 'bar'},
                               stdin='input',
                               execution_dir='.')
     self.assertEqual(expected_result, actual_result)
-    self.AssertLogContains('GOT value for -a foo')
-    self.AssertLogContains('GOT value for -b 1')
-    self.AssertErrEquals('')
+    long_output = ['Output value {}'.format(x) for x in range(10)]
+    expected_log = (['GOT value for -a LONG_OUTPUT_W_ERRORS',
+                     'GOT value for -b 100'] +
+                    long_output)
+    for line in expected_log:
+      self.AssertLogContains(line)
+    self.AssertErrContains(
+        '\n'.join(('StdErr value {}'.format(x) for x in range(100))))
 
   def testStreamingOperationResult_WithNonZeroExit(self):
     # NOTE: MUST USE capture_output=True OR THIS WILL LOG AS A FAILURE
@@ -354,18 +368,18 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
         failure_func=binary_operations.NonZeroSuccessFailureHandler,
         capture_output=True)
     command = [
-        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'BAR', '-b',
-        '1'
+        os.path.join(self.scripts_dir, self.basic_binary), '-a',
+        'EXIT_WITH_ERROR', '-b', '1'
     ]
-    expected_out = ['GOT value for -a BAR', 'GOT value for -b 1']
+    expected_out = ['GOT value for -a EXIT_WITH_ERROR', 'GOT value for -b 1']
     expected_err = None
     expected_status = 1
     expected_failed = False
     expected_result = GetOperationResult(command, expected_out, expected_err,
                                          expected_status, expected_failed)
-    actual_result = operation(string_val='BAR', int_val=1)
+    actual_result = operation(string_val='EXIT_WITH_ERROR', int_val=1)
     self.assertEqual(expected_result, actual_result)
-    self.AssertLogContains('GOT value for -a BAR')
+    self.AssertLogContains('GOT value for -a EXIT_WITH_ERROR')
     self.AssertLogContains('GOT value for -b 1')
     self.AssertErrEquals('')
 

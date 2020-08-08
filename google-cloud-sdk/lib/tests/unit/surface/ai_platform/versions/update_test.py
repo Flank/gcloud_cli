@@ -119,10 +119,6 @@ class UpdateSurfaceTestGA(base.MlGaPlatformTestBase):
              '--update-labels key=value --description Foo'.format(module_name))
     self.AssertErrContains('Updated AI Platform version [myVersion].')
 
-
-@parameterized.parameters('ml-engine', 'ai-platform')
-class UpdateSurfaceTestBeta(base.MlBetaPlatformTestBase, UpdateSurfaceTestGA):
-
   def testUpdateFromConfig(self, module_name):
     yaml_contents = """\
         description: Foo
@@ -207,6 +203,11 @@ class UpdateSurfaceTestBeta(base.MlBetaPlatformTestBase, UpdateSurfaceTestGA):
     self._ExpectPoll()
     self.Run('{} versions update myVersion --model myModel '
              '--config {}'.format(module_name, yaml_path))
+
+
+@parameterized.parameters('ml-engine', 'ai-platform')
+class UpdateSurfaceTestBeta(base.MlBetaPlatformTestBase, UpdateSurfaceTestGA):
+  pass
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')

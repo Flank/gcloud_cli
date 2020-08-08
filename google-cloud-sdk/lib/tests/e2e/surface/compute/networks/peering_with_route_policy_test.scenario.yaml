@@ -104,7 +104,7 @@ summary:
       $$compute-peering-net1$$ --region us-central1 --direction=INCOMING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
       90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
 - execute:
   - command: |
@@ -112,21 +112,21 @@ summary:
       $$compute-peering-net1$$ --region us-central1 --direction=OUTGOING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
 - execute:
   - command: |
       compute networks peerings list-routes $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$ --region us-central1 --direction=INCOMING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
 - execute:
   - command: |
       compute networks peerings list-routes $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$ --region us-central1 --direction=OUTGOING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
       90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
 - execute:
   - command: |
@@ -162,14 +162,14 @@ summary:
       $$compute-peering-net1$$ --region us-central1 --direction=INCOMING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
 - execute:
   - command: |
       compute networks peerings list-routes $$compute-peering-peer1$$ --network
       $$compute-peering-net1$$ --region us-central1 --direction=OUTGOING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
       90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
 - execute:
   - command: |
@@ -177,7 +177,7 @@ summary:
       $$compute-peering-net2$$ --region us-central1 --direction=INCOMING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
       90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
 - execute:
   - command: |
@@ -185,7 +185,7 @@ summary:
       $$compute-peering-net2$$ --region us-central1 --direction=OUTGOING
   - stdout: |
       DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
 - execute:
   - command: |
       compute routes delete $$compute-peering-route1$$ --quiet
@@ -763,7 +763,7 @@ actions:
             - destRange: 10.2.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
             - destRange: 90.2.0.0/16
               type: STATIC_PEERING_ROUTE
@@ -772,7 +772,7 @@ actions:
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
         90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
     - expect_exit:
         code: 0
@@ -799,11 +799,11 @@ actions:
             - destRange: 10.1.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
     - expect_exit:
         code: 0
 - execute_command:
@@ -829,11 +829,11 @@ actions:
             - destRange: 10.1.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
     - expect_exit:
         code: 0
 - execute_command:
@@ -859,7 +859,7 @@ actions:
             - destRange: 10.2.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
             - destRange: 90.2.0.0/16
               type: STATIC_PEERING_ROUTE
@@ -868,7 +868,7 @@ actions:
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
         90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
     - expect_exit:
         code: 0
@@ -1055,11 +1055,11 @@ actions:
             - destRange: 10.2.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
     - expect_exit:
         code: 0
 - execute_command:
@@ -1085,7 +1085,7 @@ actions:
             - destRange: 10.1.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
             - destRange: 90.1.0.0/16
               type: STATIC_PEERING_ROUTE
@@ -1094,7 +1094,7 @@ actions:
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
         90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
     - expect_exit:
         code: 0
@@ -1121,7 +1121,7 @@ actions:
             - destRange: 10.1.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
             - destRange: 90.1.0.0/16
               type: STATIC_PEERING_ROUTE
@@ -1130,7 +1130,7 @@ actions:
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted
         90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
     - expect_exit:
         code: 0
@@ -1157,11 +1157,11 @@ actions:
             - destRange: 10.2.0.0/16
               type: SUBNET_PEERING_ROUTE
               nextHopRegion: us-central1
-              priority: 1000
+              priority: 0
               imported: true
     - expect_stdout: |
         DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
-        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      0         accepted by peer
     - expect_exit:
         code: 0
 - execute_command:

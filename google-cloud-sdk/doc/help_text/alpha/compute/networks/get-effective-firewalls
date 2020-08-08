@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute networks get-effective-firewalls - get the effective
-        firewalls of a Google Compute Engine network
+        firewalls of a Compute Engine network
 
 SYNOPSIS
     gcloud alpha compute networks get-effective-firewalls NAME [NAME ...]

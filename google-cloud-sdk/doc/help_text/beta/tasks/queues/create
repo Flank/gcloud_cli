@@ -21,9 +21,9 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --log-sampling-ratio=LOG_SAMPLING_RATIO
-        Specifies the fraction of operations to write to Stackdriver Logging.
-        This field may contain any value between 0.0 and 1.0, inclusive. 0.0 is
-        the default and means that no operations are logged.
+        Specifies the fraction of operations to write to Cloud Logging. This
+        field may contain any value between 0.0 and 1.0, inclusive. 0.0 is the
+        default and means that no operations are logged.
 
      --max-attempts=MAX_ATTEMPTS
         The maximum number of attempts per task in the queue.

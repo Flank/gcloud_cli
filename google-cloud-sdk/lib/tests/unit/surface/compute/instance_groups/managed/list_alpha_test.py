@@ -24,7 +24,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 import mock
 
 API_VERSION = 'alpha'

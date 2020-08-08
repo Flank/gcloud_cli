@@ -589,6 +589,21 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
         '[include]: Detected cyclic reference to arg group [incl-cycle-a]',
         six.text_type(e.exception))
 
+  # Tests of the grant-permissions arg
+
+  def testGrantPermissions_ValidValueUsed(self):
+    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':grant-permissions.good',
+                                       self.android_args_set)
+    self.assertEqual(args['grant_permissions'], 'none')
+
+  def testGrantPermissions_InvalidValueUsed(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':grant-permissions.bad',
+                                  self.android_args_set)
+
+    self.assertIn('[grant-permissions]: Invalid permissions',
+                  six.text_type(e.exception))
+
 
 def PrepareAndroidArgs(args):
   cat_mgr = catalog_manager.AndroidCatalogManager(fake_args.AndroidCatalog())

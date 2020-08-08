@@ -66,7 +66,7 @@ class FunctionsUtilTest(test_case.TestCase):
 
   def testGetHttpErrorMessageUtf8(self):
     message = _UNICODE_MESSAGE
-    error = _MockHttpException(400, content=message.encode('utf8'))
+    error = _MockHttpException(400, content=message.encode('utf-8'))
     actual = util.GetHttpErrorMessage(error)
     self.assertTrue(message in actual)
 

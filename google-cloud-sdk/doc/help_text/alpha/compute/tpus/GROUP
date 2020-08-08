@@ -27,6 +27,9 @@ GROUPS
      accelerator-types
         (ALPHA) List or Describe Available Cloud TPU accelerator types.
 
+     execution-groups
+        (ALPHA) Provides Ctpu features.
+
      locations
         (ALPHA) List or Describe Available Cloud TPU Locations.
 

@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.protorpclite import messages as _messages
+from apitools.base.py import util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import messages as messages_util
 from tests.lib import subtests
@@ -96,21 +98,21 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
         self.messages.Policy(name='sam'))
 
   def testUnknownField(self):
-    with self.assertRaisesRegexp(messages_util.DecodeError, r'\.foo'):
+    with self.assertRaisesRegex(messages_util.DecodeError, r'\.foo'):
       messages_util.DictToMessageWithErrorCheck({'foo': {
           'bar': 'baz'
       }}, self.messages.Policy)
 
   def testRepeatedField(self):
-    with self.assertRaisesRegexp(messages_util.DecodeError,
-                                 r'\.admissionWhitelistPatterns\[0\]\.foo'):
+    with self.assertRaisesRegex(messages_util.DecodeError,
+                                r'\.admissionWhitelistPatterns\[0\]\.foo'):
       messages_util.DictToMessageWithErrorCheck(
           {'admissionWhitelistPatterns': [{
               'foo': 'bar'
           }]}, self.messages.Policy)
 
   def testMap(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         messages_util.DecodeError,
         r'\.clusterAdmissionRules\[us-east1-b.my-cluster-1\]\.evaluationMode'):
       messages_util.DictToMessageWithErrorCheck(
@@ -123,7 +125,7 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
           }, self.messages.Policy)
 
   def testMultiple_SameMessage(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         messages_util.DecodeError,
         r'\.defaultAdmissionRule\.\{evaluationMode,nonConformanceAction\}'):
       messages_util.DictToMessageWithErrorCheck(
@@ -135,7 +137,7 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
           }, self.messages.Policy)
 
   def testMultiple_DifferentMessages(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         messages_util.DecodeError,
         r'\.clusterAdmissionRules\[cluster-[12]\]\.evaluationMode[\w\W]*'
         r'\.clusterAdmissionRules\[cluster-[12]\]\.evaluationMode'):
@@ -152,7 +154,7 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
           }, self.messages.Policy)
 
   def testTypeMismatch_HeterogeneousRepeated(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         messages_util.DecodeError,
         r'\.admissionWhitelistPatterns\[0\]\.namePatterns'):
       messages_util.DictToMessageWithErrorCheck(
@@ -161,7 +163,7 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
           }]}, self.messages.Policy)
 
   def testTypeMismatch_Scalar(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         messages_util.ScalarTypeMismatchError,
         r'Expected type <(type|class).* for field updateTime, found 1'):
       messages_util.DictToMessageWithErrorCheck({'updateTime': 1},
@@ -178,6 +180,56 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
     with self.assertRaises(AttributeError):
       messages_util.DictToMessageWithErrorCheck(
           {'admissionWhitelistPatterns': [1]}, self.messages.Policy)
+
+
+class AddCustomFieldMappingsTest(test_case.WithContentAssertions):
+
+  # pylint: disable=invalid-name
+  class MessageWithNoCustomMappings(_messages.Message):
+
+    class AnEnum(_messages.Enum):
+      value_one = 1
+      value_two = 2
+
+    str_field = _messages.StringField(1)
+    nestedMessage_intfield = _messages.IntegerField(2)
+    nestedMessage_enumfield = _messages.EnumField('AnEnum', 3)
+    nestedMessage_stringfield = _messages.StringField(4)
+  # pylint: enable=invalid-name
+
+  def SetUp(self):
+    self.mappings = {
+        'nestedMessage_intfield': 'nestedMessage.intfield',
+        'nestedMessage_enumfield': 'nestedMessage.enumfield',
+        'nestedMessage_stringfield': 'nestedMessage.stringfield'
+    }
+
+  def testAddCustomJSONFieldMappings(self):
+    messages_util.AddCustomJSONFieldMappingsToRequest(
+        self.MessageWithNoCustomMappings, self.mappings)
+    self.assertEqual(
+        sorted(self.mappings.keys()),
+        util.MapParamNames(
+            sorted(self.mappings.values()), self.MessageWithNoCustomMappings))
+
+  def testCustomJSONFieldMappings(self):
+    expected_values = {
+        'str_field': 'myname',
+        'nestedMessage.intfield': 1,
+        'nestedMessage.enumfield': 'value_one',
+        'nestedMessage.stringfield': 'a string'
+    }
+    input_params = {
+        'str_field': 'myname',
+        'nestedMessage_intfield': 1,
+        'nestedMessage_enumfield': 'value_one',
+        'nestedMessage_stringfield': 'a string'
+    }
+    messages_util.AddCustomJSONFieldMappingsToRequest(
+        self.MessageWithNoCustomMappings, self.mappings)
+    self.assertCountEqual(
+        expected_values,
+        util.MapRequestParams(input_params, self.MessageWithNoCustomMappings))
 
 
 if __name__ == '__main__':

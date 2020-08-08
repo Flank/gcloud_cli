@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud data-catalog search QUERY
         (--include-gcp-public-datasets
           --include-organization-ids=[ORGANIZATION,...]
-          --include-project-ids=[PROJECT,...]) [--limit=LIMIT]
+          --include-project-ids=[PROJECT,...]
+          --restricted-locations=[LOCATION,...]) [--limit=LIMIT]
         [--order-by=ORDER_BY] [--page-size=PAGE_SIZE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -31,6 +32,9 @@ REQUIRED FLAGS
 
        --include-project-ids=[PROJECT,...]
           List of Cloud Project IDs to include in the search.
+
+       --restricted-locations=[LOCATION,...]
+          List of locations to search within.
 
 LIST COMMAND FLAGS
      --limit=LIMIT

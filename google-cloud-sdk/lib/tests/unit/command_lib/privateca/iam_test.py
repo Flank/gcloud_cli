@@ -87,8 +87,8 @@ class IamUtilsTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     key_ref = GetCryptoKeyRef(self._KMS_KEY_NAME)
     self._ExpectProjectIamCall(
         project_ref,
-        ['privateca.certificateauthorities.create', 'storage.buckets.create'],
-        ['privateca.certificateauthorities.create', 'storage.buckets.create'])
+        ['privateca.certificateAuthorities.create', 'storage.buckets.create'],
+        ['privateca.certificateAuthorities.create', 'storage.buckets.create'])
     self._ExpectKmsIamCall(
         key_ref,
         ['cloudkms.cryptoKeys.setIamPolicy'],
@@ -100,8 +100,8 @@ class IamUtilsTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     key_ref = GetCryptoKeyRef(self._KMS_KEY_NAME)
     self._ExpectProjectIamCall(
         project_ref,
-        ['privateca.certificateauthorities.create', 'storage.buckets.create'],
-        ['privateca.certificateauthorities.create'])
+        ['privateca.certificateAuthorities.create', 'storage.buckets.create'],
+        ['privateca.certificateAuthorities.create'])
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InsufficientPermissionException,
@@ -113,8 +113,8 @@ class IamUtilsTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     key_ref = GetCryptoKeyRef(self._KMS_KEY_NAME)
     self._ExpectProjectIamCall(
         project_ref,
-        ['privateca.certificateauthorities.create', 'storage.buckets.create'],
-        ['privateca.certificateauthorities.create', 'storage.buckets.create'])
+        ['privateca.certificateAuthorities.create', 'storage.buckets.create'],
+        ['privateca.certificateAuthorities.create', 'storage.buckets.create'])
     self._ExpectKmsIamCall(
         key_ref,
         ['cloudkms.cryptoKeys.setIamPolicy'],

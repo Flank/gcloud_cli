@@ -1,11 +1,12 @@
 title: List insights
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 actions:
 - define_reference:
     reference: api-version
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - execute_command:
     command: recommender insights list --project=cloud-sdk-integration-testing --location=global
       --insight-type=google.compute.firewall.Insight

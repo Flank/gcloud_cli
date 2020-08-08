@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute accelerator-types describe - describe Google Compute
-        Engine accelerator types
+    gcloud beta compute accelerator-types describe - describe Compute Engine
+        accelerator types
 
 SYNOPSIS
     gcloud beta compute accelerator-types describe NAME [--zone=ZONE]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute accelerator-types describe displays all data
-    associated with a Google Compute Engine accelerator type.
+    associated with a Compute Engine accelerator type.
 
 POSITIONAL ARGUMENTS
      NAME

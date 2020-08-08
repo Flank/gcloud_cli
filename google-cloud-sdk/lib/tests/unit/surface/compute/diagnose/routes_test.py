@@ -22,7 +22,7 @@ from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.core import log
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 import mock
 
 

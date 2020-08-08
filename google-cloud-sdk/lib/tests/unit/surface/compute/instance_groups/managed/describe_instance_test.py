@@ -23,20 +23,29 @@ from googlecloudsdk.api_lib.compute.instance_groups.managed.instance_configs imp
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 
 
-class InstanceGroupsDescribeInstanceAlphaZonalTest(test_base.BaseTest):
-
-  API_VERSION = 'alpha'
+class InstanceGroupsDescribeInstanceTestBase(test_base.BaseTest):
+  API_VERSION = 'beta'
 
   def SetUp(self):
     self.SelectApi(self.API_VERSION)
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
+    self.endpoint_uri = 'https://compute.googleapis.com/compute/{api_version}/'.format(
+        api_version=self.API_VERSION)
     self.project_uri = '{endpoint_uri}projects/my-project'.format(
         endpoint_uri=self.endpoint_uri)
 
+
+class InstanceGroupsDescribeInstanceBetaZonalTest(
+    InstanceGroupsDescribeInstanceTestBase):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
     managed_instances = test_resources.MakeInstancesInManagedInstanceGroup(
         self.messages, self.API_VERSION)
 
@@ -61,10 +70,7 @@ class InstanceGroupsDescribeInstanceAlphaZonalTest(test_base.BaseTest):
           ]))
 
     self.make_requests.side_effect = iter([
-        [
-            self.messages.InstanceGroupManagersListManagedInstancesResponse(
-                managedInstances=managed_instances),
-        ],
+        managed_instances,
     ])
 
   def testDescribeInstance(self):
@@ -95,10 +101,22 @@ class InstanceGroupsDescribeInstanceAlphaZonalTest(test_base.BaseTest):
           """)
 
 
-class InstanceGroupsDescribeInstanceRegionalTest(
-    InstanceGroupsDescribeInstanceAlphaZonalTest):
+class InstanceGroupsDescribeInstanceAlphaZonalTest(
+    InstanceGroupsDescribeInstanceBetaZonalTest):
 
   API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceGroupsDescribeInstanceBetaRegionalTest(
+    InstanceGroupsDescribeInstanceBetaZonalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDescribeInstance(self):
     self.Run("""
@@ -126,6 +144,15 @@ class InstanceGroupsDescribeInstanceRegionalTest(
             --instance non-existant
             --region central2
           """)
+
+
+class InstanceGroupsDescribeInstanceAlphaRegionalTest(
+    InstanceGroupsDescribeInstanceBetaRegionalTest):
+
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -59,11 +59,11 @@ class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
     self.AssertErrContains('Deleted network endpoint group [my-neg1]')
 
 
-class AlphaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
+class BetaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
   def testRegional(self):
     self.make_requests.side_effect = iter([[
@@ -81,6 +81,13 @@ class AlphaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
               project='my-project',
               region='us-central1'))],)
     self.AssertErrContains('Deleted network endpoint group [my-neg1]')
+
+
+class AlphaNetworkEndpointGroupsDeleteTest(BetaNetworkEndpointGroupsDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

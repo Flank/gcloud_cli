@@ -26,39 +26,37 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add an IAM policy binding to a Google Compute Engine subnetwork.
+        (BETA) Add an IAM policy binding to a Compute Engine subnetwork.
 
      create
         (BETA) Define a subnet for a network in custom subnet mode.
 
      delete
-        (BETA) Delete Google Compute Engine subnetworks.
+        (BETA) Delete Compute Engine subnetworks.
 
      describe
-        (BETA) Describe a Google Compute Engine subnetwork.
+        (BETA) Describe a Compute Engine subnetwork.
 
      expand-ip-range
-        (BETA) Expand the IP range of a Google Compute Engine subnetwork.
+        (BETA) Expand the IP range of a Compute Engine subnetwork.
 
      get-iam-policy
-        (BETA) Get the IAM policy for a Google Compute Engine subnetwork.
+        (BETA) Get the IAM policy for a Compute Engine subnetwork.
 
      list
         (BETA) List Google Compute Engine subnetworks.
 
      list-usable
-        (BETA) List Google Compute Engine subnetworks permitted for use.
+        (BETA) List Compute Engine subnetworks permitted for use.
 
      remove-iam-policy-binding
-        (BETA) Remove an IAM policy binding from a Google Compute Engine
-        subnetwork.
+        (BETA) Remove an IAM policy binding from a Compute Engine subnetwork.
 
      set-iam-policy
-        (BETA) Set the IAM policy for a Google Compute Engine subnetwork.
+        (BETA) Set the IAM policy for a Compute Engine subnetwork.
 
      update
-        (BETA) Updates properties of an existing Google Compute Engine
-        subnetwork.
+        (BETA) Updates properties of an existing Compute Engine subnetwork.
 
 NOTES
     This command is currently in BETA and may change without notice. These

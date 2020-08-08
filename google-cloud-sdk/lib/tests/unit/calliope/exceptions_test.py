@@ -276,16 +276,6 @@ class RaiseExceptionInsteadOfTest(cli_test_base.CliTestBase):
 
       BadFun()
 
-  def testRaiseToolExceptionInsteadOf(self):
-
-    with self.AssertRaisesToolExceptionMatches("something's fishy"):
-
-      @exceptions.RaiseToolExceptionInsteadOf(AttributeError, ValueError)
-      def BadFun():
-        raise ValueError("something's fishy")
-
-      BadFun()
-
   def testRaiseArgumentErrorOutsideOfArgparseNoCrash(self):
     with self.assertRaisesRegex(
         parser_errors.ArgumentError,
@@ -310,6 +300,16 @@ class HandleErrorTest(cli_test_base.CliTestBase):
         'If you want to invoke the command from a project '
         'different from the target resource project, use '
         '`--billing-project` or `billing/quota_project` property.')
+
+  def testAppendMessage_MissingAuthScopes(self):
+    error = http_error.MakeHttpError(
+        403, message='Request had insufficient authentication scopes')
+    with self.AssertRaisesExceptionRegexp(exceptions.HttpException,
+                                          'Permission denied.*'):
+      exceptions.HandleError(error, 'gcloud.asset.export')
+    self.AssertErrContains(
+        'If you are in a compute engine VM, it is likely that the specified '
+        'scopes during VM creation are not enough to run this command.')
 
   def testNotAppendMessage(self):
     error = http_error.MakeHttpError(403)

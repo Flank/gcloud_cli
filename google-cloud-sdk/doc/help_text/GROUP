@@ -14,6 +14,11 @@ DESCRIPTION
     The gcloud CLI manages authentication, local configuration, developer
     workflow, and interactions with the Google Cloud Platform APIs.
 
+    For a quick introduction to the gcloud command-line tool, a list of
+    commonly used commands, and a look at how these commands are structured,
+    refer to the gcloud command-line tool cheat sheet,
+    https://cloud.google.com/sdk/docs/cheatsheet, or run gcloud cheat-sheet.
+
 GLOBAL FLAGS
      --account=ACCOUNT
         Google Cloud Platform user account to use for invocation. Overrides the
@@ -63,7 +68,7 @@ GLOBAL FLAGS
         Display detailed help.
 
      --project=PROJECT_ID
-        The Google Cloud Platform project name to use for this invocation. If
+        The Google Cloud Platform project ID to use for this invocation. If
         omitted, then the current project is assumed; the current project can
         be listed using gcloud config list --format='text(core.project)' and
         can be set using gcloud config set project PROJECTID.
@@ -226,7 +231,7 @@ GROUPS
         Manage cryptographic keys in the cloud.
 
      logging
-        Manage Stackdriver Logging.
+        Manage Cloud Logging.
 
      ml
         Use Google Cloud machine learning capabilities.
@@ -290,6 +295,9 @@ GROUPS
 
 COMMANDS
     COMMAND is one of the following:
+
+     cheat-sheet
+        Display gcloud cheat sheet.
 
      docker
         (DEPRECATED) Enable Docker CLI access to Google Container Registry.

@@ -25,13 +25,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create Google Compute Engine commitments.
+        Create Compute Engine commitments.
 
      describe
-        Describe a Google Compute Engine commitment.
+        Describe a Compute Engine commitment.
 
      list
-        List Google Compute Engine commitments.
+        List Compute Engine commitments.
 
 NOTES
     These variants are also available:

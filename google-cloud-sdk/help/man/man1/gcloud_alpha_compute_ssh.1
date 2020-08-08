@@ -111,17 +111,17 @@ ssh/scp features.
 .TP 2m
 \fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR
 Additional flags to be passed to \fBssh(1)\fR. It is recommended that flags be
-passed using an assignment operator and quotes. This flag will replace
-occurences of \f5\fI%USER%\fR\fR and \f5\fI%INSTANCE%\fR\fR with their
-dereferenced values. Example:
+passed using an assignment operator and quotes. Example:
 
 .RS 2m
 $ gcloud alpha compute ssh example\-instance \-\-zone=us\-central1\-a \e
-    \-\-ssh\-flag="\-vvv" \-\-ssh\-flag="\-L 80:%INSTANCE%:80"
+    \-\-ssh\-flag="\-vvv" \-\-ssh\-flag="\-L 80:localhost:80"
 .RE
 
-is equivalent to passing the flags \f5\fI\-\-vvv\fR\fR and \f5\fI\-L
-80:162.222.181.197:80\fR\fR to \fBssh(1)\fR if the external IP address of
+This flag will replace occurences of \f5\fI%USER%\fR\fR and
+\f5\fI%INSTANCE%\fR\fR with their dereferenced values. For example, passing
+``80:%INSTANCE%:80`` into the flag is equivalent to passing
+\f5\fI80:162.222.181.197:80\fR\fR to \fBssh(1)\fR if the external IP address of
 \'example\-instance' is 162.222.181.197.
 
 If connecting to the instance's external IP, then %INSTANCE% is replaced with
@@ -187,7 +187,11 @@ https://cloud.google.com/compute/docs/instances/connecting\-advanced#sshbetweeni
 
 .TP 2m
 \fB\-\-tunnel\-through\-iap\fR
-Tunnel the ssh connection through the Cloud Identity\-Aware Proxy.
+Tunnel the ssh connection through Cloud Identity\-Aware Proxy for TCP
+forwarding.
+
+To learn more, see the [IAP for TCP forwarding documentation](
+https://cloud.google.com/iap/docs/tcp\-forwarding\-overview).
 
 .RE
 .sp

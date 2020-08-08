@@ -22,18 +22,49 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import store
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from oauth2client import client
+from google.auth import exceptions as google_auth_exceptions
+from google.oauth2 import credentials as google_auth_creds
 
 
-class RefreshTokenTests(sdk_test_base.SdkBase):
+class RefreshTokenGoogleAuthTests(sdk_test_base.SdkBase):
 
   def testActivateAndRetrieve(self):
     self.StartObjectPatch(store, 'Refresh', autospec=True)
 
-    refresh_token.ActivateCredentials('my-account', 'my-refresh-token')
+    creds = refresh_token.ActivateCredentials('my-account', 'my-refresh-token')
+    self.assertIsInstance(creds, google_auth_creds.Credentials)
     self.assertEqual('my-account', properties.VALUES.core.account.Get())
 
     self.assertEqual('my-refresh-token',
                      refresh_token.GetForAccount('my-account'))
+
+  def testGetForAccountException(self):
+    self.StartObjectPatch(
+        store, 'Load', side_effect=google_auth_exceptions.GoogleAuthError())
+    with self.assertRaises(refresh_token.LoadingCredentialsError):
+      refresh_token.GetForAccount('my-account')
+
+
+class RefreshTokenOauth2ClientTests(sdk_test_base.SdkBase):
+
+  def SetUp(self):
+    properties.VALUES.auth.disable_load_google_auth.Set(True)
+
+  def testActivateAndRetrieve(self):
+    self.StartObjectPatch(store, 'Refresh', autospec=True)
+
+    creds = refresh_token.ActivateCredentials('my-account', 'my-refresh-token')
+    self.assertIsInstance(creds, client.OAuth2Credentials)
+    self.assertEqual('my-account', properties.VALUES.core.account.Get())
+
+    self.assertEqual('my-refresh-token',
+                     refresh_token.GetForAccount('my-account'))
+
+  def testGetForAccountException(self):
+    self.StartObjectPatch(store, 'Load', side_effect=client.Error())
+    with self.assertRaises(refresh_token.LoadingCredentialsError):
+      refresh_token.GetForAccount('my-account')
 
 
 if __name__ == '__main__':

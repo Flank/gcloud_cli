@@ -7,7 +7,7 @@ summary:
       domains registrations configure dns example-glue-records-ds-records.com --name-servers=ns-cloud-a1.googledomains.com.,ns-cloud-a2.googledomains.com. --validate-only --disable-dnssec
   - stderr: |
       Glue records will not be cleared. If you want to clear them, use --dns-settings-from-file flag.
-      WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+      WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
   - prompt:
     - message: This operation is not safe.
     - input: y
@@ -77,6 +77,7 @@ summary:
     - message: 'Name server (empty line to finish):  '
     - input: ''
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [example-interactive-name-servers.com].
 - execute:
   - command: |
@@ -99,6 +100,7 @@ summary:
       - cancel
     - input: '3'
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [example-interactive-google-domains.com].
 - execute:
   - command: |
@@ -125,8 +127,8 @@ summary:
 - execute:
   - command: |
       domains registrations configure dns example-dnssec-google-domains.com --disable-dnssec --async
-  - stderr: |
-      Update in progress for registration [example-dnssec-google-domains.com].
+  - error: '1: value for field [operationsId] in collection [domains.projects.locations.operations]
+      is required but was not provided'
 - execute:
   - command: |
       domains registrations configure dns example-dnssec-custom-dns.com --disable-dnssec --validate-only
@@ -134,6 +136,10 @@ summary:
       Glue records will not be cleared. If you want to clear them, use --dns-settings-from-file flag.
   - stderr: |
       The command will not have any effect because validate-only flag is present.
+- execute:
+  - command: |
+      domains registrations configure dns example.com --name-servers=incorrect,not_a_domain.com
+  - error: "1: Invalid name server: 'incorrect'."
 actions:
 - execute_command:
     command: |
@@ -174,7 +180,7 @@ actions:
             }
     - expect_stderr: |
         Glue records will not be cleared. If you want to clear them, use --dns-settings-from-file flag.
-        WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+        WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
     - expect_prompt_continue:
         message: This operation is not safe.
         user_input: y
@@ -188,8 +194,8 @@ actions:
               dnsSettings:
                 customDns:
                   nameServers:
-                  - ns-cloud-a1.googledomains.com.
-                  - ns-cloud-a2.googledomains.com.
+                  - ns-cloud-a1.googledomains.com
+                  - ns-cloud-a2.googledomains.com
               updateMask: dns_provider
               validateOnly: true
         return_response:
@@ -355,7 +361,7 @@ actions:
                 customDns:
                   nameServers:
                   - ns1.com
-                  - ns2.com.
+                  - ns2.com
               updateMask: dns_provider
               validateOnly: false
         return_response:
@@ -374,6 +380,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [example-interactive-name-servers.com].
     - expect_exit:
         code: 0
@@ -433,8 +440,21 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: null
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha2.OperationMetadata",
+                "createTime": "2019-01-14T13:20:39.218508799Z",
+                "target": "projects/fake-project/locations/global/registrations/example-interactive-name-servers.com",
+                "verb": "update",
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [example-interactive-google-domains.com].
     - expect_exit:
         code: 0
@@ -579,10 +599,10 @@ actions:
           headers:
             status: '200'
           body: null
-    - expect_stderr: |
-        Update in progress for registration [example-dnssec-google-domains.com].
     - expect_exit:
-        code: 0
+        code: 1
+        message: value for field [operationsId] in collection [domains.projects.locations.operations]
+          is required but was not provided
 - execute_command:
     command: |
       domains registrations configure dns example-dnssec-custom-dns.com --disable-dnssec --validate-only
@@ -642,3 +662,38 @@ actions:
         The command will not have any effect because validate-only flag is present.
     - expect_exit:
         code: 0
+- execute_command:
+    command: |
+      domains registrations configure dns example.com --name-servers=incorrect,not_a_domain.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example-dnssec-custom-dns.com",
+              "domainName": "example-dnssec-custom-dns.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "dnsSettings": {
+                "customDns": {
+                  "nameServers": ["ns1.com", "ns2.com"],
+                  "dsRecords": [{
+                    "keyTag": 24,
+                    "algorithm": "RSASHA1",
+                    "digestType": "SHA256",
+                    "digest": "2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d"
+                  }]
+                }
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: "Invalid name server: 'incorrect'."

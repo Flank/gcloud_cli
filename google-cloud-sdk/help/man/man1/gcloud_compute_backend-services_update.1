@@ -11,7 +11,7 @@ gcloud compute backend\-services update \- update a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-no\-health\-checks\fR] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-no\-health\-checks\fR] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -100,10 +100,11 @@ network. Cloud CDN is disabled by default. Use \fB\-\-enable\-cdn\fR to enable
 and \fB\-\-no\-enable\-cdn\fR to disable.
 
 .TP 2m
-\fB\-\-enable\-logging\fR
+\fB\-\-[no\-]enable\-logging\fR
 The logging options for the load balancer traffic served by this backend
 service. If logging is enabled, logs will be exported to Stackdriver. Enabled by
-default.
+default. Use \fB\-\-enable\-logging\fR to enable and
+\fB\-\-no\-enable\-logging\fR to disable.
 
 .TP 2m
 \fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR
@@ -183,7 +184,7 @@ If the \f5load\-balancing\-scheme\fR is \f5INTERNAL\fR (internal TCP/UDP load
 balancers), the protocol must be one of: TCP, UDP.
 
 If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_SELF_MANAGED\fR (Traffic
-Director), the protocol must be one of: HTTP, HTTPS, HTTP2.
+Director), the protocol must be one of: HTTP, HTTPS, HTTP2, GRPC.
 
 If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR (internal HTTP(S)
 load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
@@ -198,7 +199,7 @@ The security policy that will be set for this backend service.
 
 .TP 2m
 \fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR
-The type of TCP session affinity to use. Not supported for UDP.
+The type of session affinity to use. Supports both TCP and UDP.
 \fISESSION_AFFINITY\fR must be one of:
 
 .RS 2m

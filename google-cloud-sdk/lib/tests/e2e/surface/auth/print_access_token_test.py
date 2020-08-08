@@ -31,7 +31,7 @@ class PrintAccessTokenTestServiceAccount(e2e_base.WithServiceAuth):
 
   def testPrintAccessToken_Oauth2client(self):
     self.StartObjectPatch(
-        properties.VALUES.auth.disable_google_auth,
+        properties.VALUES.auth.disable_load_google_auth,
         'GetBool',
         return_value=True)
     self.Run('auth print-access-token')
@@ -47,7 +47,7 @@ class PrintAccessTokenTestUserAccount(e2e_base.WithExpiredUserAuth):
 
   def testPrintAccessToken_Oauth2client(self):
     self.StartObjectPatch(
-        properties.VALUES.auth.disable_google_auth,
+        properties.VALUES.auth.disable_load_google_auth,
         'GetBool',
         return_value=True)
     self.assertTrue(self.Run('config get-value account').endswith('@gmail.com'))
@@ -65,7 +65,7 @@ class PrintAccessTokenGceServiceAccount(cli_test_base.CliTestBase):
 
   def testPrintAccessToken_Oauth2client(self):
     self.StartObjectPatch(
-        properties.VALUES.auth.disable_google_auth,
+        properties.VALUES.auth.disable_load_google_auth,
         'GetBool',
         return_value=True)
     with e2e_base.GceServiceAccount() as auth:
@@ -84,7 +84,7 @@ class PrintAccessTokenImpersonation(cli_test_base.CliTestBase):
 
   def testPrintAccessToken_Oauth2client(self):
     self.StartObjectPatch(
-        properties.VALUES.auth.disable_google_auth,
+        properties.VALUES.auth.disable_load_google_auth,
         'GetBool',
         return_value=True)
     with e2e_base.ImpersonationAccountAuth():
@@ -111,7 +111,7 @@ class PrintAccessTokenP12ServiceAccount(cli_test_base.CliTestBase):
     except ImportError:
       raise self.SkipTest('Needs PyOpenSSL installed.')
     self.StartObjectPatch(
-        properties.VALUES.auth.disable_google_auth,
+        properties.VALUES.auth.disable_load_google_auth,
         'GetBool',
         return_value=True)
     with e2e_base.P12ServiceAccountAuth() as auth:

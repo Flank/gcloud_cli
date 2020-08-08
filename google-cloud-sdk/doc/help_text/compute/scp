@@ -117,7 +117,11 @@ FLAGS
           https://cloud.google.com/compute/docs/instances/connecting-advanced#sshbetweeninstances.
 
        --tunnel-through-iap
-          Tunnel the ssh connection through the Cloud Identity-Aware Proxy.
+          Tunnel the ssh connection through Cloud Identity-Aware Proxy for TCP
+          forwarding.
+
+          To learn more, see the [IAP for TCP forwarding documentation](
+          https://cloud.google.com/iap/docs/tcp-forwarding-overview).
 
      At most one of these may be specified:
 

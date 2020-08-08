@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute interconnects delete - delete Google Compute Engine
+    gcloud beta compute interconnects delete - delete Compute Engine
         interconnects
 
 SYNOPSIS
@@ -7,8 +7,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute interconnects delete deletes Google Compute
-    Engine interconnects. Interconnects        can only be deleted when no other resources (e.g.,
+    (BETA) gcloud beta compute interconnects delete deletes Compute Engine
+    interconnects. Interconnects        can only be deleted when no other resources (e.g.,
         InterconnectAttachments) refer to them.
 
 POSITIONAL ARGUMENTS

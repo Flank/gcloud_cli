@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta container node-pools update NAME
         (--node-locations=ZONE,[ZONE,...]
+          | --system-config-from-file=SYSTEM_CONFIG_FROM_FILE
           | --workload-metadata=WORKLOAD_METADATA | --enable-autoprovisioning
           --enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
           | --enable-autorepair --enable-autoupgrade
@@ -35,6 +36,51 @@ REQUIRED FLAGS
 
               $ gcloud beta container node-pools update node-pool-1 \
                   --node-locations=us-central1-a,us-central1-b
+
+       --system-config-from-file=SYSTEM_CONFIG_FROM_FILE
+          Path of the YAML/JSON file that contains the node configuration,
+          including Linux kernel parameters (sysctls) and kubelet configs.
+
+          Example:
+
+              kubeletConfig:
+                cpuManagerPolicy: static
+              linuxConfig:
+                sysctl:
+                  net.core.somaxconn: '2048'
+                  net.ipv4.tcp_rmem: '4096 87380 6291456'
+
+          List of supported kubelet configs in 'kubeletConfig'.
+
+            KEY                VALUE
+            cpuManagerPolicy   either 'static' or 'default'
+            cpuCFSQuota        true or false (enabled by default)
+            cpuCFSQuotaPeriod  interval (e.g., '100ms')
+
+          List of supported sysctls in 'linuxConfig'.
+
+            KEY                                         VALUE
+            net.core.netdev_max_backlog                 Any positive integer,
+                                                        less than 2147483647
+            net.core.rmem_max                           Any positive integer,
+                                                        less than 2147483647
+            net.core.wmem_default                       Any positive integer,
+                                                        less than 2147483647
+            net.core.wmem_max                           Any positive integer,
+                                                        less than 2147483647
+            net.core.optmem_max                         Any positive integer,
+                                                        less than 2147483647
+            net.core.somaxconn                          Must be [128,
+                                                        2147483647]
+            net.ipv4.tcp_rmem                           Any positive integer
+                                                        tuple
+            net.ipv4.tcp_wmem                           Any positive integer
+                                                        tuple
+            net.ipv4.tcp_tw_reuse                       Must be {0, 1}
+
+          Note, updating the system configuration of an existing node pool
+          requires recreation of the nodes which which might cause a
+          disruption.
 
        --workload-metadata=WORKLOAD_METADATA
           Type of metadata server available to pods running in the node pool.

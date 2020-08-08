@@ -14,6 +14,10 @@
 # limitations under the License.
 """Base classes for all gcloud apigee tests."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
 import collections
 import json
 import os
@@ -191,6 +195,61 @@ class WithRunApigee(cli_test_base.CliTestBase):
     """Runs `command` in the most current available apigee surface."""
     # TODO(b/150206546): At GA launch, remove "alpha" here.
     return self.Run("alpha apigee " + command)
+
+
+class WithJSONBodyValidation(e2e_base.WithMockHttp):
+  """Tests that can check the JSON contents of HTTP request bodies."""
+
+  def SetUp(self):
+    self._expected_json_bodies = {}
+
+  def AddHTTPResponse(self, url, *args, **kwargs):
+    if url not in self._expected_json_bodies:
+      self._expected_json_bodies[url] = []
+
+    if "expected_json_body" in kwargs:
+      self._expected_json_bodies[url].append(kwargs["expected_json_body"])
+      del kwargs["expected_json_body"]
+    else:
+      self._expected_json_bodies[url].append(None)
+
+    return super(WithJSONBodyValidation,
+                 self).AddHTTPResponse(url, *args, **kwargs)
+
+  def _request(self, uri, *args, **kwargs):
+    if "?" in uri:
+      cut_uri = uri.split("?", 1)[0]
+    else:
+      cut_uri = uri
+
+    response = super(WithJSONBodyValidation,
+                     self)._request(uri, *args, **kwargs)
+
+    self.assertIn(
+        cut_uri, self._expected_json_bodies,
+        "Unexpected request to %s. Only expected: %s" %
+        (uri, self._expected_json_bodies.keys()))
+    self.assertNotEqual(self._expected_json_bodies[cut_uri], [],
+                        "Unexpected additional request to %s" % uri)
+
+    expected_json_body = self._expected_json_bodies[cut_uri].pop(0)
+    if expected_json_body is not None:
+      body = None
+      if "body" in kwargs:
+        body = kwargs["body"]
+      elif len(args) > 1:
+        body = args[1]
+      self.assertIsNotNone(body, "Expected a body for %s but saw none." % uri)
+      try:
+        actual_body = json.loads(body)
+      except (ValueError, TypeError) as e:
+        self.fail("Body is not valid JSON.\n%s" % e)
+      for mismatch in _JsonDataMismatches(expected_json_body, actual_body):
+        self.fail("Request body mismatch: %s for %s\nExpected: %s\nActual: %s" %
+                  (mismatch.description, mismatch.path or "[root]",
+                   yaml.dump(mismatch.expected), yaml.dump(mismatch.actual)))
+
+    return response
 
 
 class ApigeeServiceAccountTest(ApigeeBaseTest, e2e_base.WithServiceAuth,

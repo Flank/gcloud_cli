@@ -6,7 +6,9 @@ SYNOPSIS
     gcloud auth print-access-token [ACCOUNT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Print an access token for the specified account.
+    Print an access token for the specified account. See RFC6749
+    (https://tools.ietf.org/html/rfc6749) for more information about access
+    tokens.
 
 POSITIONAL ARGUMENTS
      [ACCOUNT]

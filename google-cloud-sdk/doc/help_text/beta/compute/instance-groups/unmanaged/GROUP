@@ -1,13 +1,13 @@
 NAME
-    gcloud beta compute instance-groups unmanaged - read and manipulate Google
-        Compute Engine unmanaged instance group
+    gcloud beta compute instance-groups unmanaged - read and manipulate Compute
+        Engine unmanaged instance group
 
 SYNOPSIS
     gcloud beta compute instance-groups unmanaged COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read and manipulate Google Compute Engine unmanaged instance groups.
+    (BETA) Read and manipulate Compute Engine unmanaged instance groups.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -27,7 +27,7 @@ COMMANDS
         (BETA) Create a Compute Engine unmanaged instance group.
 
      delete
-        (BETA) Delete Google Compute Engine unmanaged instance groups.
+        (BETA) Delete Compute Engine unmanaged instance groups.
 
      describe
         (BETA) Describe an instance group.

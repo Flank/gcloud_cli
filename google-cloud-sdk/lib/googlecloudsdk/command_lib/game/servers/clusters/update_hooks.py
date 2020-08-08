@@ -149,7 +149,6 @@ def ChooseUpdateOrPreviewMethod(unused_instance_ref, args):
   if args.preview_time:
     raise PreviewTimeFieldNotRelevantError(
         '`--preview-time` is only relevant if `--dry-run` is set to true.')
-  log.status.Print('Update request issued for: [{}]'.format(args.cluster))
   log.SetUserOutputEnabled(False)
   return 'patch'
 
@@ -169,7 +168,7 @@ def ChooseCreateOrPreviewMethod(unused_instance_ref, args):
   if args.dry_run:
     log.SetUserOutputEnabled(False)
     if not args.format:
-      args.format = 'json'
+      args.format = 'yaml'
     return 'previewCreate'
   if args.preview_time:
     raise PreviewTimeFieldNotRelevantError(
@@ -194,6 +193,8 @@ def SetUpdateMask(ref, args, request):
   del ref
   update_mask = []
 
+  if args.IsSpecified('description'):
+    update_mask.append('description')
   if (args.IsSpecified('update_labels') or
       args.IsSpecified('remove_labels') or
       args.IsSpecified('clear_labels')):
@@ -204,4 +205,8 @@ def SetUpdateMask(ref, args, request):
         'Must specify at least one parameter to update.')
 
   request.updateMask = ','.join(update_mask)
+  if not args.dry_run:
+    log.SetUserOutputEnabled(args.user_output_enabled != 'false')
+    log.status.Print('Update request issued for: [{}]'.format(args.cluster))
+    log.SetUserOutputEnabled(False)
   return request

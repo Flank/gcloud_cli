@@ -1,0 +1,114 @@
+title: artifacts repositories describe
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: artifacts repositories describe my-repo --project=my-project --location=us
+  - stderr: |
+      Encryption: Google-managed key
+  - stdout: |
+      createTime: '2020-04-21T20:30:40.996826Z'
+      description: test
+      format: MAVEN
+      name: projects/my-project/locations/us/repositories/my-repo
+      updateTime: '2020-04-21T20:30:40.996826Z'
+- execute:
+  - command: artifacts repositories describe my-repo --project=my-project --location=us
+  - stderr: |
+      Encryption: Customer-managed key
+  - stdout: |
+      createTime: '2020-04-21T20:30:40.996826Z'
+      description: test
+      format: MAVEN
+      kmsKeyName: projects/my-project/locations/us/keyRings/my-keyring/cryptoKeys/my-key
+      name: projects/my-project/locations/us/repositories/my-repo
+      updateTime: '2020-04-21T20:30:40.996826Z'
+actions:
+- execute_command:
+    command: artifacts repositories describe my-repo --project=my-project --location=us
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us
+              locationId: us
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us/repositories/my-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/my-project/locations/us/repositories/my-repo",
+              "createTime": "2020-04-21T20:30:40.996826Z",
+              "description": "test",
+              "format": "MAVEN",
+              "updateTime": "2020-04-21T20:30:40.996826Z"
+            }
+    - expect_stderr: |
+        Encryption: Google-managed key
+    - expect_stdout: |
+        createTime: '2020-04-21T20:30:40.996826Z'
+        description: test
+        format: MAVEN
+        name: projects/my-project/locations/us/repositories/my-repo
+        updateTime: '2020-04-21T20:30:40.996826Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories describe my-repo --project=my-project --location=us
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us
+              locationId: us
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us/repositories/my-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/my-project/locations/us/repositories/my-repo",
+              "createTime": "2020-04-21T20:30:40.996826Z",
+              "description": "test",
+              "format": "MAVEN",
+              "updateTime": "2020-04-21T20:30:40.996826Z",
+              "kmsKeyName": "projects/my-project/locations/us/keyRings/my-keyring/cryptoKeys/my-key"
+            }
+    - expect_stderr: |
+        Encryption: Customer-managed key
+    - expect_stdout: |
+        createTime: '2020-04-21T20:30:40.996826Z'
+        description: test
+        format: MAVEN
+        kmsKeyName: projects/my-project/locations/us/keyRings/my-keyring/cryptoKeys/my-key
+        name: projects/my-project/locations/us/repositories/my-repo
+        updateTime: '2020-04-21T20:30:40.996826Z'
+    - expect_exit:
+        code: 0

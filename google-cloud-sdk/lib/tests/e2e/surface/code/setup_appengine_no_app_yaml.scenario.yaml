@@ -1,0 +1,18 @@
+title: "'run code ... --appengine' gives nice error if you use it without a app.yaml\
+  \ file around"
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: code export --appengine
+  - error: "1: Unable to read file [app.yaml]: [Errno 2] No such file or directory:\
+      \ 'app.yaml'"
+actions:
+# (app.yaml deliberately missing)
+- execute_command:
+    command: code export --appengine
+    events:
+    - expect_exit:
+        message: "Unable to read file [app.yaml]: [Errno 2] No such file or directory:\
+          \ 'app.yaml'"
+        code: 1

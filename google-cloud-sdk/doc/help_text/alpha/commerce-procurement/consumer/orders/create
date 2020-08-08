@@ -1,0 +1,78 @@
+NAME
+    gcloud alpha commerce-procurement consumer orders create - creates the
+        order resource from place API
+
+SYNOPSIS
+    gcloud alpha commerce-procurement consumer orders create
+        --billing-account=BILLING_ACCOUNT --display-name=DISPLAY_NAME
+        --provider-id=PROVIDER_ID
+        (--product-request=[KEY=VALUE,...]
+          | --quote-external-name=QUOTE_EXTERNAL_NAME)
+        [--request-id=REQUEST_ID] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates the order resource from place API.
+
+REQUIRED FLAGS
+     Billing account resource - Parent billing account to place order under.
+     This represents a Cloud resource. This must be specified.
+
+       --billing-account=BILLING_ACCOUNT
+          ID of the billing-account or fully qualified identifier for the
+          billing-account.
+
+     --display-name=DISPLAY_NAME
+        Display name of the order.
+
+     --provider-id=PROVIDER_ID
+        Id of the provider for which the order is created.
+
+     Exactly one of these must be specified:
+
+       --product-request=[KEY=VALUE,...]
+          Request about product info to place order against.
+
+       --quote-external-name=QUOTE_EXTERNAL_NAME
+          External name of the quote to place order against.
+
+OPTIONAL FLAGS
+     --request-id=REQUEST_ID
+        Id of the request for idempotency purpose.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To purchase a product based order, you will need to specify product
+    request. For example
+
+        $ gcloud alpha commerce-procurement consumer orders create \
+          --product-request \
+          product-external-name=productId,flavor-external-name=flavorId
+
+    To specify parameters, you should follow the pattern
+    "ParameterName=ParameterType:ParameterValue". For example
+
+        $ gcloud alpha commerce-procurement consumer orders create \
+          --product-request \
+          product-external-name=productId,flavor-external-name=flavorId,\
+        region=str:us-west-1
+
+    To purchase a quote based order, you will need to specify quote external
+    name. For example
+
+        $ gcloud alpha commerce-procurement consumer orders create \
+          --quote-external-name quoteId
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

@@ -38,7 +38,7 @@ COMMANDS
         (ALPHA) List addresses.
 
      update
-        (ALPHA) Update a Google Compute Engine address.
+        (ALPHA) Update a Compute Engine address.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha domains registrations register REGISTRATION
-        [--contact-data-from-file=CONTACT_DATA_FROM_FILE]
+        [--contact-data-from-file=CONTACT_DATA_FILE_NAME]
         [--contact-privacy=CONTACT_PRIVACY] [--validate-only]
         [--cloud-dns-zone=CLOUD_DNS_ZONE | --name-servers=NAME_SERVER,...,[...]
           | --use-google-domains-dns] [--async] [--disable-dnssec]
@@ -12,20 +12,20 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) Create a new Cloud Domains registration resource by registering a
-    new domain. The resource id is equal to the domain name.
+    new domain. The new resource's ID will be equal to the domain name.
 
-    After this command finishes, the resource will be in state
+    After this command executes, the resource will be in state
     REGISTRATION_PENDING. The registration process should complete in less than
-    5 minutes and after that the resource will be in state ACTIVE. In very rare
-    cases this process can take much longer due, for example, to a downtime of
-    the domain registry.
+    5 minutes. After that the resource will be in state ACTIVE. In rare cases
+    this process can take much longer due, for example, to a downtime of the
+    domain registry.
 
-    Also in rare cases the domain may end up in state REGISTRATION_FAILED. In
-    that case delete the registration resource and try again.
+    Also in rare cases, the domain may end up in state REGISTRATION_FAILED. In
+    that case, delete the registration resource and try again.
 
-    When using Cloud DNS Zone or Google Domains name servers the DNS Security
-    (DNSSEC) will be enabled by default (if possible). It can be disabled using
-    --disable-dnssec flag.
+    When using Cloud DNS Zone or Google Domains name servers, DNSSEC will be
+    enabled by default where possible. You can choose to not enable DNSSEC by
+    using the --disable-dnssec flag.
 
 POSITIONAL ARGUMENTS
      Registration resource - The domain name to register. This represents a
@@ -42,16 +42,16 @@ POSITIONAL ARGUMENTS
           registration.
 
 COMMONLY USED FLAGS
-     --contact-data-from-file=CONTACT_DATA_FROM_FILE
-        A YAML file containing the required contact data. It can specify
-        contact data with label 'allContacts' (it means that a single contact
-        will be used for registrant, admin and technical contacts) or separate
-        contact data with labels 'registrantContact', 'adminContact' and
-        'technicalContact'.
+     --contact-data-from-file=CONTACT_DATA_FILE_NAME
+        A YAML file containing the contact data for the domain's three
+        contacts: registrant, admin, and technical.
 
-        If specified, each contact data must contain values for all required
-        fields: email, phoneNumber and postalAddress in
-        google.type.PostalAddress format.
+        The file can either specify a single set of contact data with label
+        'allContacts', or three separate sets of contact data with labels
+        'adminContact' and 'technicalContact'.
+
+        Each contact data must contain values for all required fields: email,
+        phoneNumber and postalAddress in google.type.PostalAddress format.
 
         For more guidance on how to specify postalAddress, please see:
         https://support.google.com/business/answer/6397478
@@ -110,31 +110,36 @@ COMMONLY USED FLAGS
             (proxy) contact info for your domain in the public directory at no
             extra cost. They will forward received messages to you.
          public-contact-data
-            All the data from contact config is publicly available.
+            All the data from contact config is publicly available. To set this
+            value, you must also pass the --notices flag with value
+            public-contact-data-acknowledgement or agree to the notice
+            interactively.
          redacted-contact-data
-            Limited personal info will be available to the public. The actual
-            information redacted depends on the domain. For more information
-            see https://support.google.com/domains/answer/3251242?hl=en.
+            Limited personal information will be available to the public. The
+            actual information redacted depends on the domain. For more
+            information see https://support.google.com/domains/answer/3251242.
 
      --validate-only
         Don't actually create registration. Only validate arguments.
 
-     Set the addresses of authoritative name servers for the given domain. At
-     most one of these may be specified:
+     Set the authoritative name servers for the given domain. At most one of
+     these may be specified:
 
        --cloud-dns-zone=CLOUD_DNS_ZONE
           The name of the Cloud DNS managed-zone to set as the name server for
           the domain. If it's in the same project, you can use short name. If
           not, use the full resource name, e.g.:
           --cloud-dns-zone=projects/example-project/managedZones/example-zone.
-          DNS Security (DNSSEC) is turned on by default (if possible).
+          If the zone is signed, DNSSEC will be enabled by default unless you
+          pass --disable-dnssec.
 
        --name-servers=NAME_SERVER,...,[...]
           List of DNS name servers for the domain.
 
        --use-google-domains-dns
-          Use free name servers provided by Google Domains. DNS Security
-          (DNSSEC) is turned on by default.
+          Use free name servers provided by Google Domains. If the zone is
+          signed, DNSSEC will be enabled by default unless you pass
+          --disable-dnssec.
 
 OTHER FLAGS
      --async
@@ -142,9 +147,8 @@ OTHER FLAGS
         complete.
 
      --disable-dnssec
-        When using Cloud DNS Zone or Google Domains nameservers the DNS
-        Security (DNSSEC) will be enabled for the domain (unless the zone is
-        not signed). Use this flag to disable DNSSEC.
+        Use this flag to disable DNSSEC, or to skip enabling it when switching
+        to a Cloud DNS Zone or Google Domains nameservers.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -169,9 +173,9 @@ OTHER FLAGS
             https://support.google.com/domains/answer/7638036 for details.
 
      --yearly-price=YEARLY_PRICE
-        You have to accept the yearly price of the domain, either in the
+        You must accept the yearly price of the domain, either in the
         interactive flow or using this flag. The expected format is a number
-        followed by a currency code, e.g. "12.00USD". You can get the price
+        followed by a currency code, e.g. "12.00 USD". You can get the price
         using the get-register-parameters command.
 
 GCLOUD WIDE FLAGS

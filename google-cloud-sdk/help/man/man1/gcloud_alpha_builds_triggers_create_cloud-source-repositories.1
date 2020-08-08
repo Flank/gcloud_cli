@@ -11,7 +11,7 @@ gcloud alpha builds triggers create cloud\-source\-repositories \- create a buil
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds triggers create cloud\-source\-repositories\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\fR=\fIREPO\fR\ (\fB\-\-branch\-pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag\-pattern\fR=\fIREGEX\fR)\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile\-dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile\-image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-ignored\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-included\-files\fR=[\fIGLOB\fR,...]]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds triggers create cloud\-source\-repositories\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\fR=\fIREPO\fR\ (\fB\-\-branch\-pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag\-pattern\fR=\fIREGEX\fR)\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile\-dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile\-image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-ignored\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-included\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-name\fR=\fINAME\fR]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,10 +31,8 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-trigger\-config\fR=\fIPATH\fR
-Path to a YAML or JSON file containing the trigger configuration.
-
-For more details, see:
-https://cloud.google.com/cloud\-build/docs/api/reference/rest/v1/projects.triggers
+Path to Build Trigger config file (JSON or YAML format). For more details, see
+https://cloud.google.com/cloud\-build/docs/api/reference/rest/v1/projects.triggers#BuildTrigger
 
 .TP 2m
 
@@ -67,6 +65,10 @@ Glob filter. Changes only affecting ignored files won't trigger builds.
 .TP 2m
 \fB\-\-included\-files\fR=[\fIGLOB\fR,...]
 Glob filter. Changes affecting at least one included file will trigger builds.
+
+.TP 2m
+\fB\-\-name\fR=\fINAME\fR
+Build trigger name.
 
 .TP 2m
 
@@ -194,7 +196,7 @@ To create a push trigger for all branches:
 
 .RS 2m
 $ gcloud alpha builds triggers create cloud\-source\-repositories \e
-    \-\-repo="my\-repo" \-\-branch\-pattern=".*" \e
+    \-\-name="my\-trigger" \-\-repo="my\-repo" \-\-branch\-pattern=".*" \e
     \-\-build\-config="cloudbuild.yaml"
 .RE
 

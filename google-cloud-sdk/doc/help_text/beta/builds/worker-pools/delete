@@ -1,0 +1,33 @@
+NAME
+    gcloud beta builds worker-pools delete - delete a worker pool from Google
+        Cloud Build
+
+SYNOPSIS
+    gcloud beta builds worker-pools delete WORKER_POOL --region=REGION
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Delete a worker pool from Google Cloud Build.
+
+POSITIONAL ARGUMENTS
+     WORKER_POOL
+        The ID of the WorkerPool to delete.
+
+REQUIRED FLAGS
+     --region=REGION
+        The Cloud region where the WorkerPool is.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha builds worker-pools delete
+

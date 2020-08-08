@@ -32,6 +32,9 @@ COMMANDS
      list
         (ALPHA) List VPC Access connectors.
 
+     update
+        (ALPHA) Update a VPC Access connector.
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change

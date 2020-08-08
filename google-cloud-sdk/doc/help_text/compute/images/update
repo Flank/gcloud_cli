@@ -1,12 +1,12 @@
 NAME
-    gcloud compute images update - update a Google Compute Engine image
+    gcloud compute images update - update a Compute Engine image
 
 SYNOPSIS
     gcloud compute images update IMAGE_NAME [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute images update updates labels for a Google Compute image.
+    gcloud compute images update updates labels for a Compute Engine image.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
@@ -65,7 +65,7 @@ EXAMPLES
     To list only the labels when describing a resource, use --format:
 
         $ gcloud compute images describe example-image \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     These variants are also available:

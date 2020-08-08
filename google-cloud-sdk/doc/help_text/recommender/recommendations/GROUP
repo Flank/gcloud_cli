@@ -25,17 +25,13 @@ COMMANDS
         Lists recommendations for a Cloud project.
 
      mark-claimed
-        Mark the Recommendation State as CLAIMED. Can only be performed on
-        recommendations in CLAIMED or ACTIVE state.
+        Mark a recommendation's state as CLAIMED.
 
      mark-failed
-        Mark a recommendation's state as FAILED. mark-failed can be applied to
-        recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state.
+        Mark a recommendation's state as FAILED.
 
      mark-succeeded
-        Mark a recommendation's state as SUCCEEDED. mark-succeeded can be
-        applied to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED
-        state.
+        Mark a recommendation's state as SUCCEEDED.
 
 NOTES
     These variants are also available:

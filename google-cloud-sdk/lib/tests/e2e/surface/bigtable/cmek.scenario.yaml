@@ -1,4 +1,8 @@
 # TODO(b/153734534): After CMEK is enabled in prod infra bt, update this to point to prod anviltop.
+filters:
+  skip:
+    reason: Failed to convert server response to JSON
+    bug: b/158454734
 title: Test
 release_tracks: [ALPHA]
 summary:

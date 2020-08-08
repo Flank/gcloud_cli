@@ -22,12 +22,12 @@ from tests.lib import test_case
 from tests.lib.surface.compute.instances import create_test_base
 
 
-class InstancesCreateWithPrivateIpv6GoogleAccessBeta(
+class InstancesCreateWithPrivateIpv6GoogleAccess(
     create_test_base.InstancesCreateTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def CreateRequestWithPrivateIpv6GoogleAccess(self,
                                                private_ipv6_google_access):
@@ -118,8 +118,16 @@ class InstancesCreateWithPrivateIpv6GoogleAccessBeta(
     )
 
 
+class InstancesCreateWithPrivateIpv6GoogleAccessBeta(
+    InstancesCreateWithPrivateIpv6GoogleAccess):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
 class InstancesCreateWithPrivateIpv6GoogleAccessAlpha(
-    InstancesCreateWithPrivateIpv6GoogleAccessBeta):
+    InstancesCreateWithPrivateIpv6GoogleAccess):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

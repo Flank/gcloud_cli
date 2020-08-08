@@ -61,7 +61,7 @@ EXAMPLES
     using the '--format' flag:
 
         $ gcloud beta compute instances describe test-instance \
-            --format='yaml(name,status,disks)'
+            --format="yaml(name,status,disks)"
 
 NOTES
     This command is currently in BETA and may change without notice. These

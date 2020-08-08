@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute commitments describe - describe a Google Compute
-        Engine commitment
+    gcloud alpha compute commitments describe - describe a Compute Engine
+        commitment
 
 SYNOPSIS
     gcloud alpha compute commitments describe COMMITMENT [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a Google Compute Engine commitment.
+    (ALPHA) Describe a Compute Engine commitment.
 
 POSITIONAL ARGUMENTS
      COMMITMENT

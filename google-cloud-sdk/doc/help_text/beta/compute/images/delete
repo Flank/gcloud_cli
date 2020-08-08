@@ -1,13 +1,13 @@
 NAME
-    gcloud beta compute images delete - delete Google Compute Engine images
+    gcloud beta compute images delete - delete Compute Engine images
 
 SYNOPSIS
     gcloud beta compute images delete IMAGE_NAME [IMAGE_NAME ...]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute images delete deletes one or more Google Compute
-    Engine images.
+    (BETA) gcloud beta compute images delete deletes one or more Compute Engine
+    images.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME [IMAGE_NAME ...]

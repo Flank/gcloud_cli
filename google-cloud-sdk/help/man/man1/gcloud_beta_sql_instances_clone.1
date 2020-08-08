@@ -11,19 +11,25 @@ gcloud beta sql instances clone \- clones a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql instances clone\fR \fISOURCE\fR \fIDESTINATION\fR [\fB\-\-async\fR] [\fB\-\-bin\-log\-file\-name\fR=\fIBIN_LOG_FILE_NAME\fR\ \fB\-\-bin\-log\-position\fR=\fIBIN_LOG_POSITION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql instances clone\fR \fISOURCE\fR \fIDESTINATION\fR [\fB\-\-async\fR] [\fB\-\-point\-in\-time\fR=\fIPOINT_IN_TIME\fR\ |\ \fB\-\-bin\-log\-file\-name\fR=\fIBIN_LOG_FILE_NAME\fR\ \fB\-\-bin\-log\-position\fR=\fIBIN_LOG_POSITION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta sql instances clone\fR creates a clone of the Cloud
-SQL instance. The source and the destination instances must be in the same
-project. Once created, the clone is an independent Cloud SQL instance.
+\fB(BETA)\fR \fBgcloud beta sql instances clone\fR creates a clone of a Cloud
+SQL instance. The clone is an independent copy of the source instance with the
+same data and settings. Source and destination instances must be in the same
+project. An instance can be cloned from its current state, or from an earlier
+point in time.
 
-The binary log coordinates, if specified, act as the point up to which the
-source instance is cloned. If not specified, the source instance is cloned up to
-the most recent binary log coordinates at the time the command is executed.
+For MySQL: The binary log coordinates, if specified, act as the point in time
+the source instance is cloned from. If not specified, the current state of the
+instance is cloned.
+
+For PostgreSQL: The point in time, if specified, defines a past state of the
+instance to clone. If not specified, the current state of the instance is
+cloned.
 
 
 
@@ -51,6 +57,19 @@ Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-point\-in\-time\fR=\fIPOINT_IN_TIME\fR
+Represents the state of an instance at any given point in time inside a
+write\-ahead log file. Enable point\-in\-time recovery on the source instance to
+create a write\-ahead log file. Uses RFC 3339 format in UTC timezone. If
+specified, defines a past state of the instance to clone. For example,
+\'2012\-11\-15T16:19:00.094Z'.
+
+.TP 2m
+
 Binary log coordinates for point\-in\-time recovery.
 
 .RS 2m
@@ -73,6 +92,7 @@ if any of the other arguments in this group are specified.
 
 .RE
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -88,17 +108,26 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To clone a source instance to the most recent binary log coordinates:
+To clone an instance from its current state (most recent binary log
+coordinates):
 
 .RS 2m
 $ gcloud beta sql instances clone instance\-foo instance\-bar
 .RE
 
-To clone at specific binary log coordinates:
+To clone a MySQL instance from an earlier point in time (past binary log
+coordinates):
 
 .RS 2m
 $ gcloud beta sql instances clone instance\-foo instance\-bar \e
     \-\-bin\-log\-file\-name mysql\-bin.000020 \-\-bin\-log\-position 170
+.RE
+
+To clone a PostgreSQL source instance at a specific point in time:
+
+.RS 2m
+$ gcloud beta sql instances clone instance\-foo instance\-bar \e
+    \-\-point\-in\-time '2012\-11\-15T16:19:00.094Z'
 .RE
 
 

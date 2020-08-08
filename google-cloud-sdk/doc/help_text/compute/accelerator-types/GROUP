@@ -25,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        Describe Google Compute Engine accelerator types.
+        Describe Compute Engine accelerator types.
 
      list
         List Google Compute Engine accelerator types.

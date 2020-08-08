@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute machine-images get-iam-policy - get the IAM policy for
-        a Google Compute Engine machine image
+        a Compute Engine machine image
 
 SYNOPSIS
     gcloud alpha compute machine-images get-iam-policy MACHINE_IMAGE

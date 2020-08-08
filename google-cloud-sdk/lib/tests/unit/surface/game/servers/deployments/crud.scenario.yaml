@@ -26,7 +26,7 @@ summary:
       Created deployment [my-deployment].
 - execute:
   - command: |
-      game servers deployments create my-deployment --location global --spec-file spec.json --template-id template-1
+      game servers deployments create my-deployment --location global --description description --labels a=x,b=y
   - stderr: |
       Create request issued for: [my-deployment]
   - progress_tracker:
@@ -35,26 +35,12 @@ summary:
     - status: SUCCESS
   - stderr: |
       Created deployment [my-deployment].
-- execute:
-  - command: |
-      game servers deployments create my-deployment --location global --spec-file spec.yaml --template-id template-1
-  - stderr: |
-      Create request issued for: [my-deployment]
-  - progress_tracker:
-    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
-        to complete
-    - status: SUCCESS
-  - stderr: |
-      Created deployment [my-deployment].
-- execute:
-  - command: |
-      game servers deployments create my-deployment --location global --spec-file invalid_spec.txt --template-id template-1
-  - error: '1: None'
 - execute:
   - command: |
       game servers deployments describe my-deployment --location global
   - stdout: |
       createTime: '2019-06-04T06:00:22.223629990Z'
+      description: My description
       labels:
         a: x
         b: y
@@ -97,20 +83,48 @@ summary:
 - execute:
   - command: |
       game servers deployments update my-deployment --location global --update-labels "key1=val1"
+      --description "new description"
   - stderr: |
       Request issued for: [my-deployment]
   - progress_tracker:
-    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
-        to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Updated deployment [my-deployment].
   - stdout: |
       createTime: '2019-06-19T01:08:49.202077751Z'
+      description: new description
       labels:
         key1: val1
       name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
       updateTime: '2019-06-19T01:23:42.336919018Z'
+- execute:
+  - command: |
+      game servers deployments update my-deployment --clear-labels
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated deployment [my-deployment].
+  - stdout: |
+      labels: {}
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+- execute:
+  - command: |
+      game servers deployments update my-deployment --remove-labels a
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated deployment [my-deployment].
+  - stdout: |
+      labels:
+        b: c
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
 actions:
 - define_reference:
     reference: api-version
@@ -575,6 +589,7 @@ actions:
 - execute_command:
     command: |
       game servers deployments update my-deployment --location global --update-labels "key1=val1"
+      --description "new description"
     events:
     - api_call:
         expect_request:
@@ -593,54 +608,30 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json&updateMask=labels
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json&updateMask=description%2Clabels
           method: PATCH
           headers: {}
-          body:
-            json: {}
-        return_response:
-          headers:
-            status: '200'
           body: |
             {
-              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
-              "done": true
-            }
-        repeatable: true
-    - expect_stderr: |
-        Request issued for: [my-deployment]
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
-                "createTime": "2019-06-19T01:23:42.325431698Z",
-                "endTime": "2019-06-19T01:23:51.099152052Z",
-                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
-                "verb": "update",
-                "requestedCancellation": false,
-                "apiVersion": "$$api-version$$"
-              },
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
-                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
-                "createTime": "2019-06-19T01:08:49.202077751Z",
-                "updateTime": "2019-06-19T01:23:42.336919018Z"
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "description": "new description",
+              "labels": {
+                "key1": "val1"
               }
             }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": false
+            }
+        poll_operation: true
+    - expect_stderr: |
+        Request issued for: [my-deployment]
     - expect_progress_tracker:
-        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
-          to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -655,6 +646,7 @@ actions:
             {
               "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
               "createTime": "2019-06-19T01:08:49.202077751Z",
+              "description": "new description",
               "updateTime": "2019-06-19T01:23:42.336919018Z",
               "labels": {
                 "key1": "val1"
@@ -664,9 +656,144 @@ actions:
         Updated deployment [my-deployment].
     - expect_stdout: |
         createTime: '2019-06-19T01:08:49.202077751Z'
+        description: new description
         labels:
           key1: val1
         name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
         updateTime: '2019-06-19T01:23:42.336919018Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update my-deployment --clear-labels
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "labels": {
+                "a": "b",
+                "b": "c"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+              labels: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": false
+            }
+        poll_operation: true
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "labels": {}
+            }
+    - expect_stderr: |
+        Updated deployment [my-deployment].
+    - expect_stdout: |
+        labels: {}
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update my-deployment --remove-labels a
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "labels": {
+                "a": "b",
+                "b": "c"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+              labels:
+                b: c
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": false
+            }
+        poll_operation: true
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "labels": {
+                "b": "c"
+              }
+            }
+    - expect_stderr: |
+        Updated deployment [my-deployment].
+    - expect_stdout: |
+        labels:
+          b: c
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
     - expect_exit:
         code: 0

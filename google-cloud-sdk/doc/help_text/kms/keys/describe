@@ -2,22 +2,30 @@ NAME
     gcloud kms keys describe - get metadata for a given key
 
 SYNOPSIS
-    gcloud kms keys describe KEY [--keyring=KEYRING] [--location=LOCATION]
+    gcloud kms keys describe (KEY : --keyring=KEYRING --location=LOCATION)
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Returns metadata for the given key.
 
 POSITIONAL ARGUMENTS
-     KEY
-        Name of the key to describe.
+     Key resource - The KMS key resource. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the argument [key] on the command line
+     with a fully specified name; set the property [core/project]. This must be
+     specified.
 
-FLAGS
-     --keyring=KEYRING
-        Key ring of the key.
+       KEY
+          ID of the key or fully qualified identifier for the key. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
 
-     --location=LOCATION
-        Location of the key.
+       --keyring=KEYRING
+          The KMS keyring of the key.
+
+       --location=LOCATION
+          The Cloud location for the key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

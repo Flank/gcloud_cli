@@ -20,7 +20,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe-note
-        (ALPHA) Describe a Google Compute Engine image.
+        (ALPHA) Describe a Compute Engine image.
 
      list
         (ALPHA) List Google occurrences of PACKAGE_VULNERABILITY.

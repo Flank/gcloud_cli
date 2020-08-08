@@ -25,22 +25,22 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding to a Google Compute Engine image.
+        Add IAM policy binding to a Compute Engine image.
 
      add-labels
         Add labels to Google Compute Engine images.
 
      create
-        Create Google Compute Engine images.
+        Create Compute Engine images.
 
      delete
-        Delete Google Compute Engine images.
+        Delete Compute Engine images.
 
      deprecate
-        Manage deprecation status of Google Compute Engine images.
+        Manage deprecation status of Compute Engine images.
 
      describe
-        Describe a Google Compute Engine image.
+        Describe a Compute Engine image.
 
      describe-from-family
         Describe the latest image from an image family.
@@ -49,7 +49,7 @@ COMMANDS
         Export a Compute Engine image.
 
      get-iam-policy
-        Get the IAM policy for a Google Compute Engine image.
+        Get the IAM policy for a Compute Engine image.
 
      import
         Import an image into Compute Engine.
@@ -58,16 +58,16 @@ COMMANDS
         List Google Compute Engine images.
 
      remove-iam-policy-binding
-        Remove IAM policy binding from a Google Compute Engine image.
+        Remove IAM policy binding from a Compute Engine image.
 
      remove-labels
         Remove labels from Google Compute Engine images.
 
      set-iam-policy
-        Set the IAM policy for a Google Compute Engine image.
+        Set the IAM policy for a Compute Engine image.
 
      update
-        Update a Google Compute Engine image.
+        Update a Compute Engine image.
 
 NOTES
     These variants are also available:

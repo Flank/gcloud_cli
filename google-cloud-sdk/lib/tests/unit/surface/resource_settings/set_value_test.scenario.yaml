@@ -5,20 +5,24 @@ summary:
 - execute:
   - command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
       --organization=123
+  - stdout: |
+      name: organizations/123/settings/gcp-basicBooleanSetting/value
+      value:
+        booleanValue: true
 - execute:
   - command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
       --organization=123
   - stdout: |
       name: organizations/123/settings/gcp-basicBooleanSetting/value
       value:
-        boolean_value: false
+        booleanValue: true
 - execute:
   - command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
       --organization=123
   - stdout: |
       name: organizations/123/settings/gcp-basicBooleanSetting/value
       value:
-        boolean_value: false
+        booleanValue: true
 actions:
 - write_file:
     path: test_input.json
@@ -26,7 +30,7 @@ actions:
       {
         "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
         "value": {
-          "boolean_value": false
+          "booleanValue": true
          }
       }
 - execute_command:
@@ -43,39 +47,15 @@ actions:
             status: '200'
           body: |
             {
-              "name": "organizations/123/settings/iam-projectCreatorRoles/value",
-              "value": {
-                "stringSetValue": {
-                  "values": [ "roles/storage.owner", "roles/compute.admin" ]
-                }
-              },
-              "etag": "O2VWGxZU01VnAfRU4Mu97w=="
-            }
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
-      --organization=123
-    events:
-    - api_call:
-        expect_request:
-          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
-          method: GET
-          body: None
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
                 "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
                 "value": {
-                  "boolean_value": false
+                  "booleanValue": true
                 }
             }
     - expect_stdout: |
         name: organizations/123/settings/gcp-basicBooleanSetting/value
         value:
-          boolean_value: false
+          booleanValue: true
     - expect_exit:
         code: 0
 - execute_command:
@@ -97,7 +77,7 @@ actions:
           uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
           method: POST
           body: OrderedDict([(u'n', u'organizations/123/settings/gcp-basicBooleanSetting/value'),
-            (u'value', OrderedDict([(u'boolean_value', False)]))])
+            (u'value', OrderedDict([(u'booleanValue', True)]))])
         return_response:
           headers:
             status: '200'
@@ -105,12 +85,54 @@ actions:
             {
                 "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
                 "value": {
-                  "boolean_value": false
+                  "booleanValue": true
                 }
             }
     - expect_stdout: |
         name: organizations/123/settings/gcp-basicBooleanSetting/value
         value:
-          boolean_value: false
+          booleanValue: true
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: resource-settings set-value gcp-basicBooleanSetting --value-file="test_input.json"
+      --organization=123
+    events:
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+                "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
+                "value": {
+                  "booleanValue": false
+                }
+            }
+    - api_call:
+        expect_request:
+          uri: https://resourcesettings.googleapis.com/v1alpha1/organizations/123/settings/gcp-basicBooleanSetting/value?alt=json
+          method: PATCH
+          body: OrderedDict([(u'n', u'organizations/123/settings/gcp-basicBooleanSetting/value'),
+            (u'value', OrderedDict([(u'booleanValue', True)]))])
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+                "name": "organizations/123/settings/gcp-basicBooleanSetting/value",
+                "value": {
+                  "booleanValue": true
+                }
+            }
+    - expect_stdout: |
+        name: organizations/123/settings/gcp-basicBooleanSetting/value
+        value:
+          booleanValue: true
     - expect_exit:
         code: 0

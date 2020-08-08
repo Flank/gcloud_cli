@@ -36,11 +36,11 @@ EXAMPLES
 
     To start a single version on a single service, run:
 
-        $ gcloud beta app versions start --service servicename v1
+        $ gcloud beta app versions start --service=servicename v1
 
     To start multiple versions in a single service, run:
 
-        $ gcloud beta app versions start --service servicename v1 v2
+        $ gcloud beta app versions start --service=servicename v1 v2
 
 NOTES
     This command is currently in BETA and may change without notice. This

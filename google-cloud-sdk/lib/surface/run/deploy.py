@@ -29,6 +29,7 @@ from googlecloudsdk.command_lib.builds import submit_util
 from googlecloudsdk.command_lib.run import config_changes as config_changes_mod
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import flags
+from googlecloudsdk.command_lib.run import messages_util
 from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import serverless_operations
@@ -46,10 +47,11 @@ def GetAllowUnauth(args, operations, service_ref, service_exists):
   Args:
     args: argparse.Namespace, Command line arguments
     operations: serverless_operations.ServerlessOperations, Serverless client.
-    service_ref: protorpc.messages.Message, A resource reference object
-      for the service See googlecloudsdk.core.resources.Registry.ParseResourceId
-      for details.
+    service_ref: protorpc.messages.Message, A resource reference object for the
+      service See googlecloudsdk.core.resources.Registry.ParseResourceId for
+      details.
     service_exists: True if the service being changed already exists.
+
   Returns:
     allow_unauth value where
      True means to enable unauthenticated acess for the service.
@@ -67,62 +69,17 @@ def GetAllowUnauth(args, operations, service_ref, service_exists):
   return allow_unauth
 
 
-def GetStartDeployMessage(conn_context, service_ref):
-  """Returns a user mesage for starting a deploy.
-
-  Args:
-    conn_context: connection_context.ConnectionInfo, Metadata for the
-      run API client.
-    service_ref: protorpc.messages.Message, A resource reference object
-      for the service See googlecloudsdk.core.resources.Registry.ParseResourceId
-      for details.
-  """
-  msg = ('Deploying container to {operator} service '
-         '[{{bold}}{service}{{reset}}] in {ns_label} [{{bold}}{ns}{{reset}}]')
-  msg += conn_context.location_label
-
-  return msg.format(
-      operator=conn_context.operator,
-      ns_label=conn_context.ns_label,
-      service=service_ref.servicesId,
-      ns=service_ref.namespacesId)
-
-
-def GetSuccessMessageForSynchronousDeploy(operations, service_ref):
-  """Returns a user message for a successful synchronous deploy.
-
-  Args:
-    operations: serverless_operations.ServerlessOperations, A
-      ServerlessOperations instance for fetching the service.
-    service_ref: protorpc.messages.Message, A resource reference object
-      for the service See googlecloudsdk.core.resources.Registry.ParseResourceId
-      for details.
-  """
-  service = operations.GetService(service_ref)
-  latest_ready = service.status.latestReadyRevisionName
-  latest_percent_traffic = service.latest_percent_traffic
-  msg = ('Service [{{bold}}{serv}{{reset}}] '
-         'revision [{{bold}}{rev}{{reset}}] '
-         'has been deployed and is serving '
-         '{{bold}}{latest_percent_traffic}{{reset}} percent of traffic')
-  if latest_percent_traffic:
-    msg += (' at {{bold}}{url}{{reset}}')
-  return msg.format(
-      serv=service_ref.servicesId,
-      rev=latest_ready,
-      url=service.domain,
-      latest_percent_traffic=latest_percent_traffic)
-
-
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Deploy(base.Command):
   """Deploy a container to Cloud Run."""
 
   detailed_help = {
-      'DESCRIPTION': """\
+      'DESCRIPTION':
+          """\
           Deploys container images to Google Cloud Run.
           """,
-      'EXAMPLES': """\
+      'EXAMPLES':
+          """\
           To deploy a container to the service `my-backend` on Cloud Run:
 
               $ {command} my-backend --image=gcr.io/my/image
@@ -145,6 +102,7 @@ class Deploy(base.Command):
     flags.AddAllowUnauthenticatedFlag(managed_group)
     flags.AddCloudSQLFlags(managed_group)
     flags.AddRevisionSuffixArg(managed_group)
+    flags.AddVpcConnectorArg(managed_group)
 
     # Flags specific to connecting to a cluster
     cluster_group = flags.GetClusterArgGroup(parser)
@@ -173,16 +131,13 @@ class Deploy(base.Command):
     flags.AddPortFlag(parser)
     flags.AddCpuFlag(parser)
     flags.AddNoTrafficFlag(parser)
+    flags.AddServiceAccountFlag(parser)
     concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
 
   @staticmethod
   def Args(parser):
     Deploy.CommonArgs(parser)
     flags.AddImageArg(parser)
-
-    # Flags specific to managed CR
-    managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddServiceAccountFlag(managed_group)
 
     # Flags only supported on GKE and Knative
     cluster_group = flags.GetClusterArgGroup(parser)
@@ -199,22 +154,26 @@ class Deploy(base.Command):
     # Build an image from source if source specified.
     if include_build:
       # Create a tag for the image creation
-      if image is None and not args.IsSpecified('config'):
+      if (image is None and not args.IsSpecified('config') and
+          not args.IsSpecified('pack')):
         image = 'gcr.io/{projectID}/cloud-run-source-deploy/{service}:{tag}'.format(
             projectID=properties.VALUES.core.project.Get(required=True),
             service=service_ref.servicesId,
             tag=uuid.uuid4().hex)
+
       messages = cloudbuild_util.GetMessagesModule()
-      build_config = submit_util.CreateBuildConfig(
+      build_config = submit_util.CreateBuildConfigAlpha(
           image, args.no_cache, messages, args.substitutions, args.config,
           args.IsSpecified('source'), False, args.source,
           args.gcs_source_staging_dir, args.ignore_file, args.gcs_log_dir,
-          args.machine_type, args.disk_size)
+          args.machine_type, args.disk_size, args.pack)
+
+      if args.IsSpecified('pack'):
+        image = args.pack[0].get('image')
 
       build, build_op = submit_util.Build(messages, True, build_config, True)
       build_op_ref = resources.REGISTRY.ParseRelativeName(
-          build_op.name, 'cloudbuild.operations'
-      )
+          build_op.name, 'cloudbuild.operations')
       build_log_url = build.logUrl
     # Deploy a container with an image
     conn_context = connection_context.GetConnectionContext(
@@ -229,9 +188,11 @@ class Deploy(base.Command):
       service = operations.GetService(service_ref)
       allow_unauth = GetAllowUnauth(args, operations, service_ref, service)
 
-      pretty_print.Info(GetStartDeployMessage(conn_context, service_ref))
-      has_latest = (service is None or
-                    traffic.LATEST_REVISION_KEY in service.spec_traffic)
+      pretty_print.Info(
+          messages_util.GetStartDeployMessage(conn_context, service_ref))
+      has_latest = (
+          service is None or
+          traffic.LATEST_REVISION_KEY in service.spec_traffic)
       deployment_stages = stages.ServiceStages(
           include_iam_policy_set=allow_unauth is not None,
           include_route=has_latest,
@@ -261,8 +222,9 @@ class Deploy(base.Command):
             'Service [{{bold}}{serv}{{reset}}] is deploying '
             'asynchronously.'.format(serv=service_ref.servicesId))
       else:
-        pretty_print.Success(GetSuccessMessageForSynchronousDeploy(
-            operations, service_ref))
+        pretty_print.Success(
+            messages_util.GetSuccessMessageForSynchronousDeploy(
+                operations, service_ref))
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -272,9 +234,7 @@ class BetaDeploy(Deploy):
   @staticmethod
   def Args(parser):
     Deploy.Args(parser)
-
-    # Flags specific to VPCAccess
-    flags.AddVpcConnectorArg(parser)
+    flags.AddDeployTagFlag(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -286,11 +246,12 @@ class AlphaDeploy(Deploy):
     Deploy.CommonArgs(parser)
 
     # Flags specific to VPCAccess
-    flags.AddVpcConnectorArg(parser)
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddEgressSettingsFlag(managed_group)
 
     # Flags not specific to any platform
     flags.AddMinInstancesFlag(parser)
-    flags.AddServiceAccountFlagAlpha(parser)
+    flags.AddDeployTagFlag(parser)
 
     # Flags inherited from gcloud builds submit
     flags.AddConfigFlags(parser)

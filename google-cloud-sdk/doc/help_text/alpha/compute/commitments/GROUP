@@ -25,16 +25,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create Google Compute Engine commitments.
+        (ALPHA) Create Compute Engine commitments.
 
      create-license
         (ALPHA) Create Compute Engine license-based commitments.
 
      describe
-        (ALPHA) Describe a Google Compute Engine commitment.
+        (ALPHA) Describe a Compute Engine commitment.
 
      list
-        (ALPHA) List Google Compute Engine commitments.
+        (ALPHA) List Compute Engine commitments.
 
      update-reservations
         (ALPHA) Update the resource shape of reservations within the

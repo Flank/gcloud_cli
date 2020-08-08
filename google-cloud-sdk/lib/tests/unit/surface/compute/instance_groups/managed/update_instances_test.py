@@ -22,7 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 from mock import patch
 
 
@@ -208,12 +208,8 @@ class InstanceGroupManagersUpdateInstancesRegionalTest(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi(self.API_VERSION)
     self.make_requests.side_effect = iter([
-        [
-            self.messages.InstanceGroupManagersListManagedInstancesResponse(
-                managedInstances=(
-                    test_resources.MakeInstancesInManagedInstanceGroup(
-                        self.messages, self.API_VERSION)))
-        ],
+        test_resources.MakeInstancesInManagedInstanceGroup(
+            self.messages, self.API_VERSION),
         [],
     ])
     self.template_1_uri = (
@@ -296,21 +292,20 @@ class InstanceGroupManagersUpdateInstancesRegionalTest(test_base.BaseTest):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.make_requests.side_effect = iter(
-        [[
-            self.messages.Region(name='central1'),
-            self.messages.Region(name='central2'),
-        ],
-         [
-             self.messages.Zone(name='central1-a'),
-             self.messages.Zone(name='central1-b'),
-             self.messages.Zone(name='central2-a'),
-         ],
-         [
-             self.messages.InstanceGroupManagersListManagedInstancesResponse(
-                 managedInstances=(
-                     test_resources.MakeInstancesInManagedInstanceGroup(
-                         self.messages, self.API_VERSION)))
-         ], []])
+        [
+            [
+                self.messages.Region(name='central1'),
+                self.messages.Region(name='central2'),
+            ],
+            [
+                self.messages.Zone(name='central1-a'),
+                self.messages.Zone(name='central1-b'),
+                self.messages.Zone(name='central2-a'),
+            ],
+            test_resources.MakeInstancesInManagedInstanceGroup(
+                self.messages, self.API_VERSION),
+            []
+        ])
     self.WriteInput('2\n')
     self.Run("""
         compute instance-groups managed update-instances group-1

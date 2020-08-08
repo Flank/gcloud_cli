@@ -6,8 +6,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute http-health-checks delete deletes one or more Google Compute
-    Engine HTTP health checks.
+    gcloud compute http-health-checks delete deletes one or more Compute Engine
+    HTTP health checks.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

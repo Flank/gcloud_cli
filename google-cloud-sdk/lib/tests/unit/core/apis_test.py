@@ -23,7 +23,6 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
 from googlecloudsdk.api_lib.util import apis_util
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.credentials import http
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from googlecloudsdk.third_party.apis import apis_map
@@ -178,20 +177,6 @@ class ApisTest(sdk_test_base.SdkBase):
     properties.VALUES.api_endpoint_overrides.sql.Set(override)
     client = apis.GetClientInstance('sql', 'v1beta4', no_http=True)
     self.assertEqual(override, client._url)
-
-  def testGetClientWithGoogleAuth(self):
-    # By default, google-auth is not used for authentication.
-    http_mock = self.StartObjectPatch(http, 'Http')
-    apis.GetClientInstance('compute', 'v1')
-    http_mock.assert_called_once_with(
-        response_encoding=http.ENCODING, use_google_auth=False)
-
-    # google-auth will be used for authentication if GetClientInstance method
-    # indicates so.
-    http_mock.reset_mock()
-    apis.GetClientInstance('compute', 'v1', use_google_auth=True)
-    http_mock.assert_called_once_with(
-        response_encoding=http.ENCODING, use_google_auth=True)
 
   def testGetDefaultEndpointForUrl(self):
     url = 'https://sqladmin.googleapis.com/sql/v1beta3/path/to/resource'

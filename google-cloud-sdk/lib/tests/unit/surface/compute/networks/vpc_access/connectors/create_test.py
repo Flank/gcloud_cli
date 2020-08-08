@@ -208,7 +208,9 @@ class ConnectorsCreateTestAlpha(ConnectorsCreateTestGa):
         # Note `name` should not be set as it's read-only.
         id=self.connector_id,
         network=self.network_id,
-        ipCidrRange=self.ip_cidr_range)
+        ipCidrRange=self.ip_cidr_range,
+        minThroughput=self.min_throughput,
+        maxThroughput=self.max_throughput)
 
   def _ExpectCreate(self, connector_to_create, is_async=False):
     operation = self.messages.Operation(name=self.operation_relative_name)

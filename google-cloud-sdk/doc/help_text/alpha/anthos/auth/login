@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha anthos auth login [--cluster=CLUSTER] [--dry-run]
         [--kubeconfig=KUBECONFIG] [--login-config=LOGIN_CONFIG]
-        [--login-config-cert=LOGIN_CONFIG_CERT] [--user=USER]
-        [GCLOUD_WIDE_FLAG ...]
+        [--login-config-cert=LOGIN_CONFIG_CERT] [--set-preferred-auth]
+        [--user=USER] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Authenticate clusters using the Anthos client.
@@ -30,6 +30,9 @@ FLAGS
      --login-config-cert=LOGIN_CONFIG_CERT
         Specifies the CA certificate file to be added to trusted pool for
         making HTTPS connections to a --login-config URL.
+
+     --set-preferred-auth
+        If set, forces update of preferred authentication for given cluster
 
      --user=USER
         If configuring multiple user accounts in the same kubecconfig file, you

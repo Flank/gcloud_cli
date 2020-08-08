@@ -20,6 +20,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import textwrap
+
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.core import log
@@ -75,7 +77,7 @@ def _GetBalancingModes():
   utilization_extra_help = (
       'This is incompatible with --network-endpoint-group.')
   balancing_modes = {
-      'CONNECTION': """\
+      'CONNECTION': textwrap.dedent("""
           Available if the backend service's load balancing scheme is either
           `INTERNAL` or `EXTERNAL`.
           Available if the backend service's protocol is one of `SSL`, `TCP`,
@@ -91,8 +93,8 @@ def _GetBalancingModes():
 
           For backend services where `--load-balancing-scheme` is `INTERNAL`,
           you must omit all of these parameters.
-          """.format(per_rate_flags),
-      'RATE': """\
+          """).format(per_rate_flags),
+      'RATE': textwrap.dedent("""
           Available if the backend service's load balancing scheme is
           `INTERNAL_MANAGED`, `INTERNAL_SELF_MANAGED`, or `EXTERNAL`. Available
           if the backend service's protocol is one of HTTP, HTTPS, or HTTP/2.
@@ -102,20 +104,20 @@ def _GetBalancingModes():
 
           You must specify exactly one of these additional parameters:
           `--max-rate`, `--max-rate-per-instance`, or `--max-rate-per-endpoint`.
-          """.format(utilization_extra_help),
-      'UTILIZATION': """\
+          """).format(utilization_extra_help),
+      'UTILIZATION': textwrap.dedent("""
           Available if the backend service's load balancing scheme is
           `INTERNAL_MANAGED`, `INTERNAL_SELF_MANAGED`, or `EXTERNAL`. Available only
           for managed or unmanaged instance group backends.
 
-          Spreads load based on the CPU utilization of instances in a backend
+          Spreads load based on the backend utilization of instances in a backend
           instance group.
 
           The following additional parameters may be specified:
           `--max-utilization`, `--max-rate`, `--max-rate-per-instance`,
           `--max-connections`, `--max-connections-per-instance`.
           For valid combinations, see `--max-utilization`.
-          """.format(per_connection_flags),
+          """).format(per_connection_flags),
   }
   return balancing_modes
 
@@ -125,7 +127,9 @@ def AddBalancingMode(parser,
                      support_region_neg=False):
   """Adds balancing mode argument to the argparse."""
   help_text = """\
-  Defines the strategy for balancing load.
+  Defines how to measure whether a backend can handle additional traffic or is
+  fully loaded. For more information, see
+  https://cloud.google.com/load-balancing/docs/backend-service#balancing-mode.
   """
   incompatible_types = []
   if support_global_neg:
@@ -137,7 +141,7 @@ def AddBalancingMode(parser,
 
   This cannot be used when the endpoint type of an attached network endpoint
   group is {0}.
-    """.format(' or '.join(incompatible_types))
+    """.format(_JoinTypes(incompatible_types))
   parser.add_argument(
       '--balancing-mode',
       choices=_GetBalancingModes(),
@@ -161,7 +165,7 @@ def AddCapacityLimits(parser,
 
   This cannot be used when the endpoint type of an attached network endpoint
   group is {0}.
-  """.format(' or '.join(
+  """.format(_JoinTypes(
       capacity_incompatible_types)) if capacity_incompatible_types else ''
   capacity_group.add_argument(
       '--max-rate-per-endpoint',
@@ -281,11 +285,14 @@ def AddCapacityScalar(parser,
   help_text = """\
       A setting that applies to all balancing modes. This value is multiplied
       by the balancing mode value to set the current max usage of the instance
-      group. Acceptable values are `0.0` (0%) through `1.0` (100%). Setting this
-      value to `0.0` (0%) drains the backend service. Note that draining a
-      backend service only prevents new connections to instances in the group.
-      All existing connections are allowed to continue until they close by
-      normal means. This cannot be used for internal load balancing.
+      group. You can set the capacity scaler to `0.0` or from `0.1` (10%) to
+      `1.0` (100%). You cannot configure a setting that is larger than `0.0` and
+      smaller than `0.1`. A scale factor of zero (`0.0`) prevents all new
+      connections. You cannot configure a setting of
+      `0.0` when there is only one backend attached to the backend service. Note
+      that draining a backend service only prevents new connections to instances
+      in the group. All existing connections are allowed to continue until they
+      close by normal means. This cannot be used for internal load balancing.
       """
   incompatible_types = []
   if support_global_neg:
@@ -297,7 +304,7 @@ def AddCapacityScalar(parser,
 
     This cannot be used when the endpoint type of an attached network endpoint
     group is {0}.
-    """.format(' or '.join(incompatible_types))
+    """.format(_JoinTypes(incompatible_types))
   parser.add_argument(
       '--capacity-scaler',
       type=arg_parsers.BoundedFloat(lower_bound=0.0, upper_bound=1.0),
@@ -314,3 +321,8 @@ def AddFailover(parser, default):
       Designates whether this is a failover backend. More than one
       failover backend can be configured for a given BackendService.
       Not compatible with the --global flag""")
+
+
+def _JoinTypes(types):
+  return ', or '.join([', '.join(types[:-1]), types[-1]
+                      ]) if len(types) > 2 else ' or '.join(types)

@@ -105,6 +105,21 @@ class WorkflowTemplateCreateUnitTestBeta(WorkflowTemplateCreateUnitTest):
   def PreSetUp(self):
     self.track = calliope.base.ReleaseTrack.BETA
 
+  def testCreateWorkflowTemplateWithDagTimeout(self):
+    dag_timeout = '1h'
+    #   1h = 60m = 3600s
+    dag_timeout_seconds = '3600s'
+    workflow_template = self.MakeWorkflowTemplate(
+        dag_timeout=dag_timeout_seconds)
+    self.assertIsNotNone(workflow_template.dagTimeout)
+    self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template)
+    result = self.RunDataproc(
+        'workflow-templates create {0} --dag-timeout={1}'.format(
+            self.WORKFLOW_TEMPLATE, dag_timeout))
+    self.assertIsNotNone(result.dagTimeout)
+    self.assertEqual(workflow_template.dagTimeout, result.dagTimeout)
+    self.AssertMessagesEqual(workflow_template, result)
+
 
 class WorkflowTemplateCreateUnitTestAlpha(WorkflowTemplateCreateUnitTestBeta):
 

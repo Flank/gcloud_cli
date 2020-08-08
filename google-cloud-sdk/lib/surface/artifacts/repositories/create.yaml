@@ -15,6 +15,11 @@
 
         $ {command} my-repo
 
+      To create repository `my-repo` with a KMS key
+      `projects/my-project/locations/us/keyRings/my-kr/cryptoKeys/my-key`, run:
+
+        $ {command} my-repo --kms-key=projects/my-project/locations/us/keyRings/my-kr/cryptoKeys/my-key
+
   arguments:
     resource:
       spec: !REF googlecloudsdk.command_lib.artifacts.resources:repository_without_property
@@ -30,6 +35,10 @@
       api_field: repository.description
       help_text: |
         Description for the repository.
+    - arg_name: kms-key
+      api_field: repository.kmsKeyName
+      help_text: |
+        Name of the encryption key that's used for encrypting the contents of the repository.
 
   async:
     collection: artifactregistry.projects.locations.operations
@@ -40,3 +49,7 @@
     modify_request_hooks:
     - googlecloudsdk.command_lib.artifacts.util:ValidateLocationHook
     - googlecloudsdk.command_lib.artifacts.util:AppendRepoDataToRequest
+
+  response:
+    modify_response_hooks:
+    - googlecloudsdk.command_lib.artifacts.util:CheckServiceAccountPermission

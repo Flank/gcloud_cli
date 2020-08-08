@@ -11,7 +11,7 @@ gcloud alpha asset list \- list the cloud assets
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha asset list\fR (\fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha asset list\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -34,6 +34,10 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+The ID of the folder which is the root asset.
+
+.TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION_ID\fR
 The ID of the organization which is the root asset.
 
@@ -41,7 +45,7 @@ The ID of the organization which is the root asset.
 \fB\-\-project\fR=\fIPROJECT_ID\fR
 The project which is the root asset.
 
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.
@@ -73,8 +77,7 @@ for supported asset types.
 Asset content type. If not specified, no content but the asset name and type
 will be returned in the feed. To read more see
 https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/overview#asset_content_type.
-\fICONTENT_TYPE\fR must be (currently only one value is supported):
-\fBresource\fR.
+\fICONTENT_TYPE\fR must be one of: \fBresource\fR, \fBiam\-policy\fR.
 
 .TP 2m
 \fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR

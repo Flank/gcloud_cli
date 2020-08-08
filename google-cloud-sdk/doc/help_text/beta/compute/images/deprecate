@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute images deprecate - manage deprecation status of Google
-        Compute Engine images
+    gcloud beta compute images deprecate - manage deprecation status of Compute
+        Engine images
 
 SYNOPSIS
     gcloud beta compute images deprecate IMAGE_NAME --state=STATE

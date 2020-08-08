@@ -21,6 +21,9 @@ GROUPS
      app-profiles
         Manage Cloud Bigtable app profiles.
 
+     backups
+        Manage Cloud Bigtable backups.
+
      clusters
         Manage Cloud Bigtable clusters.
 

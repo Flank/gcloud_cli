@@ -26,7 +26,7 @@ DESCRIPTION
     To list existing labels
 
         $ gcloud compute vpn-gateways describe example-gateway \
-            --format='default(labels)'
+            --format="default(labels)"
 
 POSITIONAL ARGUMENTS
      NAME

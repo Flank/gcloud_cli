@@ -16,10 +16,10 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory\?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2Fdo-not-delete-compute-instances-asset-get-history&contentType=RESOURCE&readTimeWindow.startTime=.*
-          method: GET
+            matches: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory
+          method: POST
           headers: {}
-          body: null
+          body: assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2Fdo-not-delete-compute-instances-asset-get-history&contentType=RESOURCE&readTimeWindow.startTime=.*
         return_response:
           headers:
             cache-control: private

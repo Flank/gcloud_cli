@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute networks subnets list-usable - list Google Compute
-        Engine subnetworks permitted for use
+    gcloud alpha compute networks subnets list-usable - list Compute Engine
+        subnetworks permitted for use
 
 SYNOPSIS
     gcloud alpha compute networks subnets list-usable [--filter=EXPRESSION]
@@ -9,12 +9,12 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute networks subnets list-usable is used to list
-    Google Compute Engine subnetworks in a project that the user has permission
-    to use.
+    Compute Engine subnetworks in a project that the user has permission to
+    use.
 
     By default, usable subnetworks are listed for the default Google Cloud
-    Platform project and user account. These values can be overridden by
-    setting the global flags: --project=PROJECT_ID and/or --account=ACCOUNT.
+    project and user account. These values can be overridden by setting the
+    global flags: --project=PROJECT_ID and/or --account=ACCOUNT.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

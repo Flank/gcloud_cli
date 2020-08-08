@@ -214,12 +214,10 @@ handlers:
 - url: /
   script: home.app
 """
-# pylint: disable=anomalous-backslash-in-string
   SKIP_FILES_DATA = """\
 skip_files:
-- ^.*\.zip$
+- ^.*\\.zip$
 """
-# pylint: enable=anomalous-backslash-in-string
 
   APP_DATA_VM_TRUE = """\
 threadsafe: true
@@ -252,6 +250,13 @@ handlers:
     <enable-jar-classes>false</enable-jar-classes>
   <staging>
 </appengine-web-app>
+"""
+
+  # Content used for testing --appyaml file
+  APP_DATA_CUSTOM_LOCATION_YAML = """\
+runtime: java11
+service: appyamlcustomlocation
+instance_class: F4
 """
 
   # Generated app.yaml from staging

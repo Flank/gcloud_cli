@@ -25,6 +25,9 @@ COMMANDS
      delete
         (BETA) Delete an Artifact Registry repository.
 
+     describe
+        (BETA) Describe an Artifact Registry repository.
+
      get-iam-policy
         (BETA) Get IAM policy for an Artifact Registry repository.
 
@@ -46,6 +49,10 @@ EXAMPLES
     To delete a repository with the name my-repo, run:
 
         $ gcloud beta artifacts repositories delete my-repo
+
+    To describe a repository with the name my-repo, run:
+
+        $ gcloud beta artifacts repositories describe my-repo
 
     To list all Artifact Registry repositories, run:
 

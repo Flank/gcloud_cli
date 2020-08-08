@@ -75,7 +75,8 @@ _FAKE_APP_ENGINE_JSON = {
 
 
 _Cond = collections.namedtuple(
-    '_Cond', ['type', 'status', 'message', 'reason', 'severity'])
+    '_Cond',
+    ['type', 'status', 'message', 'reason', 'severity', 'lastTransitionTime'])
 
 
 class _FakeResource(object):
@@ -121,14 +122,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Condition two goes from Unknown to True, along with Ready
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', '', None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'Unknown', 'Not yet', '', None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'True', None, None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker)
@@ -152,14 +153,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Condition two goes from Unknown to False, along with Ready
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', '', None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'Unknown', 'Not yet', '', None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'False', 'Oops.', '', None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'False', 'Oops.', '', None),
+            _Cond('Ready', 'False', 'Oops.', '', None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'False', 'Oops.', '', None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker)
@@ -184,14 +185,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Make sure condition two doesn't Start until condition One is marked True
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', '', None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'Unknown', 'Not yet', '', None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'True', None, None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker,
@@ -217,14 +218,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Make sure condition two doesn't Start until condition one is marked True
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', '', None),
-            _Cond('one', 'Unknown', 'Not yet', '', None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None, None),
+            _Cond('one', 'Unknown', 'Not yet', '', None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'True', None, None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker,
@@ -249,19 +250,19 @@ class ConditionPollerTest(test_case.TestCase):
     # Because of the dependencies, two should not Start until the second poll.
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', '', None),
-            _Cond('one', 'Unknown', 'Not yet', '', None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None, None),
+            _Cond('one', 'Unknown', 'Not yet', '', None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet.', None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'Unknown', 'Working.', None, None),
+            _Cond('Ready', 'Unknown', 'Not yet.', None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'Unknown', 'Working.', None, None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'True', None, None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker, dependencies={
@@ -289,14 +290,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Ready spends the first round at Unknown while both conditions are True.
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet.', None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'Unknown', 'Not yet.', None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'True', None, None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker)
@@ -326,14 +327,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Make sure condition two starts immediately
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', '', None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'Unknown', 'Not yet', '', None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None, None),
-            _Cond('one', 'True', None, None, None),
-            _Cond('two', 'True', None, None, None),
+            _Cond('Ready', 'True', None, None, None, None),
+            _Cond('one', 'True', None, None, None, None),
+            _Cond('two', 'True', None, None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker,

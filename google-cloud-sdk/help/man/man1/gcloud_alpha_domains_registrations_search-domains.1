@@ -19,6 +19,9 @@ gcloud alpha domains registrations search\-domains \- search for available domai
 
 \fB(ALPHA)\fR Search for available domains relevant to a specified query.
 
+This command uses cached domain name availability information. Use the
+get\-register\-params command to get up\-to\-date availability information.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -26,7 +29,7 @@ gcloud alpha domains registrations search\-domains \- search for available domai
 .RS 2m
 .TP 2m
 \fIDOMAIN_QUERY\fR
-Domains search query.
+Domain search query. May be a domain name or arbitrary search terms.
 
 
 .RE

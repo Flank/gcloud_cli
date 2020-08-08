@@ -1,0 +1,68 @@
+title: network-security client-tls-policies import tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project my-project
+- execute:
+  - command: network-security client-tls-policies import myctls --source='myctls.yaml'
+      --location=global
+  - error: "1: 'NoneType' object has no attribute 'name'"
+actions:
+- write_file:
+    path: myctls.yaml
+    contents: |
+      clientCertificate:
+        localFilepath:
+          certificatePath: cert
+          privateKeyPath: pk
+      description: desc
+      name: myctls
+      serverValidationCa:
+      - caCertPath: cert.pem
+      - grpcEndpoint:
+          targetUri: unix://target
+      sni: sni
+- set_property:
+    core/project: my-project
+- execute_command:
+    command: network-security client-tls-policies import myctls --source='myctls.yaml'
+      --location=global
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://networksecurity.googleapis.com/v1alpha1/projects/my-project/locations/global/clientTlsPolicies/myctls?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+    - expect_exit:
+        code: 1
+        message: "'NoneType' object has no attribute 'name'"
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://networksecurity.googleapis.com/v1alpha1/projects/my-project/locations/global/clientTlsPolicies/myctls?alt=json
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              clientCertificate:
+                localFilepath:
+                  certificatePath: cert
+                  privateKeyPath: pk
+              description: desc
+              name: myctls
+              serverValidationCa:
+              - caCertPath: cert.pem
+              - grpcEndpoint:
+                  targetUri: unix://target
+              sni: sni
+            }
+        return_response:
+          headers:
+            status: '200'
+    - expect_exit:
+        code: 0

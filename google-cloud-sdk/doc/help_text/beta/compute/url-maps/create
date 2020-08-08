@@ -81,15 +81,18 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To create a global URL map with a default service, run:
 
-    $ gcloud beta compute url-maps create URL_MAP_NAME \        --default-service=BACKEND_SERVICE_NAME
+        $ gcloud beta compute url-maps create URL_MAP_NAME \
+            --default-service=BACKEND_SERVICE_NAME
 
     To create a regional URL map with a default service, run:
 
-    $ gcloud beta compute url-maps create URL_MAP_NAME \        --default-service=BACKEND_SERVICE_NAME --region=REGION_NAME
+        $ gcloud beta compute url-maps create URL_MAP_NAME \
+            --default-service=BACKEND_SERVICE_NAME --region=REGION_NAME
 
     To create a global URL map with a default backend bucket, run:
 
-    $ gcloud beta compute url-maps create URL_MAP_NAME \        --default-backend-bucket=BACKEND_BUCKET_NAME
+        $ gcloud beta compute url-maps create URL_MAP_NAME \
+            --default-backend-bucket=BACKEND_BUCKET_NAME
 
 NOTES
     This command is currently in BETA and may change without notice. These

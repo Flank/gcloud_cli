@@ -41,14 +41,12 @@ COMMANDS
         (BETA) Get the update history of assets that overlaps a time window.
 
      search-all-iam-policies
-        (BETA) Searches all IAM policies under a given scope (i.e., an
-        organization, a folder, or a project) with
-        cloudasset.assets.searchAllIamPolicies permission.
+        (BETA) Searches all IAM policies within the specified accessible scope,
+        such as a project, folder or organization.
 
      search-all-resources
-        (BETA) Searches all the resources under a given scope (i.e., an
-        organization, a folder, or a project) with
-        cloudasset.assets.searchAllResources permission.
+        (BETA) Searches all Cloud resources within the specified accessible
+        scope, such as a project, folder or organization.
 
 NOTES
     This command is currently in BETA and may change without notice. These

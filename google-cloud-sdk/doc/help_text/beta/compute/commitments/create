@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute commitments create - create Google Compute Engine
-        commitments
+    gcloud beta compute commitments create - create Compute Engine commitments
 
 SYNOPSIS
     gcloud beta compute commitments create COMMITMENT --plan=PLAN
@@ -16,7 +15,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create Google Compute Engine commitments.
+    (BETA) Create Compute Engine commitments.
 
 POSITIONAL ARGUMENTS
      COMMITMENT
@@ -73,9 +72,9 @@ OPTIONAL FLAGS
 
      --type=TYPE; default="general-purpose"
         Type of commitment. memory-optimized indicates that the commitment is
-        for memory-optimized VMs. TYPE must be one of: compute-optimized,
-        general-purpose, general-purpose-e2, general-purpose-n2,
-        general-purpose-n2d, memory-optimized.
+        for memory-optimized VMs. TYPE must be one of: accelerator-optimized,
+        compute-optimized, general-purpose, general-purpose-e2,
+        general-purpose-n2, general-purpose-n2d, memory-optimized.
 
      Manage the reservations to be created with the commitment. At most one of
      these may be specified:

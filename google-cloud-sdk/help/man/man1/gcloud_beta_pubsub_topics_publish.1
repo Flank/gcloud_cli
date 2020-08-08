@@ -11,7 +11,7 @@ gcloud beta pubsub topics publish \- publishes a message to the specified topic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta pubsub topics publish\fR \fITOPIC\fR [\fIMESSAGE_BODY\fR] [\fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]] [\fB\-\-message\fR=\fIMESSAGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta pubsub topics publish\fR \fITOPIC\fR [\fIMESSAGE_BODY\fR] [\fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]] [\fB\-\-message\fR=\fIMESSAGE\fR] [\fB\-\-ordering\-key\fR=\fIORDERING_KEY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -69,6 +69,11 @@ You can specify up to 100 attributes.
 The body of the message to publish to the given topic name. Information on
 message formatting and size limits can be found at:
 https://cloud.google.com/pubsub/docs/publisher#publish
+
+.TP 2m
+\fB\-\-ordering\-key\fR=\fIORDERING_KEY\fR
+The key for ordering delivery to subscribers. All messages with the same
+ordering key are sent to subscribers in the order that Pub/Sub receives them.
 
 
 .RE

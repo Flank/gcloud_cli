@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for google3.third_party.py.tests.unit.command_lib.privateca.flags."""
+"""Tests for google3.third_party.py.googlecloudsdk.command_lib.privateca.flags."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -34,6 +34,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
 
   def SetUp(self):
     self.parser = util.ArgumentParser()
+    self.messages = privateca_base.GetMessagesModule()
 
   def testPublishCaCertFlag(self):
     flags.AddPublishCaCertFlag(self.parser)
@@ -141,36 +142,6 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     self.assertEqual(args.uri_san,
                      ['https://test1.com/foo?bar=baz', 'spiffe://idns/1/2/3/4'])
 
-  def testSubjectFlagNoCnFailure(self):
-    flags.AddSubjectFlags(self.parser)
-    with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
-                                           'common name'):
-      args = self.parser.parse_args([
-          '--subject',
-          'C=US, ST=Washington, L=Kirkland, O=Google LLC, OU=Cloud, postalCode=98033, streetAddress=6th Ave'
-      ])
-      flags.ParseSubjectFlags(args, is_ca=True)
-
-  def testSubjectFlagNoOrganizationFailure(self):
-    flags.AddSubjectFlags(self.parser)
-    with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
-                                           'organization'):
-      args = self.parser.parse_args([
-          '--subject',
-          'CN=google.com, C=US, ST=Washington, L=Kirkland, OU=Cloud, postalCode=98033, streetAddress=6th Ave'
-      ])
-      flags.ParseSubjectFlags(args, is_ca=True)
-
-  def testSubjectNoNameFailure(self):
-    flags.AddSubjectFlags(self.parser)
-    args = self.parser.parse_args([
-        '--subject',
-        'C=US, ST=Washington, L=Kirkland, O=Google LLC, OU=Cloud, postalCode=98033, streetAddress=6th Ave'
-    ])
-    with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
-                                           'subject'):
-      flags.ParseSubjectFlags(args, is_ca=False)
-
   def testSubjectFlagInvalidKey(self):
     flags.AddSubjectFlags(self.parser)
     with self.AssertRaisesExceptionMatches(
@@ -180,7 +151,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
           '--subject',
           'C=US, CN=something, ST=Washington, LU=Kirkland, O=Google LLC, OU=Cloud, postalCode=98033, streetAddress=6th Ave'
       ])
-      flags.ParseSubjectFlags(args, is_ca=False)
+      flags.ParseSubject(args)
 
   def testSubjectParseAllFields(self):
     flags.AddSubjectFlags(self.parser)
@@ -188,9 +159,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         '--subject',
         'C=US, ST=Washington, L=Kirkland, O=Google LLC, CN=google.com, OU=Cloud, postalCode=98033, streetAddress=6th Ave'
     ])
-    subject_config = flags.ParseSubjectFlags(args, is_ca=False)
-    subject = subject_config.subject
-    common_name = subject_config.commonName
+    common_name, subject = flags.ParseSubject(args)
     self.assertEqual(common_name, 'google.com')
     self.assertEqual(subject.countryCode, 'US')
     self.assertEqual(subject.province, 'Washington')
@@ -204,27 +173,21 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     flags.AddSubjectFlags(self.parser)
     args = self.parser.parse_args(
         ['--subject', 'CN=google.com,C=US,ST=Washington'])
-    subject_config = flags.ParseSubjectFlags(args, is_ca=False)
-    subject = subject_config.subject
-    common_name = subject_config.commonName
+    common_name, subject = flags.ParseSubject(args)
     self.assertEqual(common_name, 'google.com')
     self.assertEqual(subject.countryCode, 'US')
     self.assertEqual(subject.province, 'Washington')
 
     args = self.parser.parse_args(
         ['--subject', 'CN=google.com , C=US,ST=Washington'])
-    subject_config = flags.ParseSubjectFlags(args, is_ca=False)
-    subject = subject_config.subject
-    common_name = subject_config.commonName
+    common_name, subject = flags.ParseSubject(args)
     self.assertEqual(common_name, 'google.com')
     self.assertEqual(subject.countryCode, 'US')
     self.assertEqual(subject.province, 'Washington')
 
     args = self.parser.parse_args(
         ['--subject', 'CN=google.com, C=US, ST=Washington'])
-    subject_config = flags.ParseSubjectFlags(args, is_ca=False)
-    subject = subject_config.subject
-    common_name = subject_config.commonName
+    common_name, subject = flags.ParseSubject(args)
     self.assertEqual(common_name, 'google.com')
     self.assertEqual(subject.countryCode, 'US')
     self.assertEqual(subject.province, 'Washington')
@@ -233,12 +196,40 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     flags.AddSubjectFlags(self.parser)
     args = self.parser.parse_args(
         ['--subject', 'O=Google LLC,CN=google.com,OU=Cloud'])
-    subject_config = flags.ParseSubjectFlags(args, is_ca=False)
-    subject = subject_config.subject
-    common_name = subject_config.commonName
+    common_name, subject = flags.ParseSubject(args)
     self.assertEqual(common_name, 'google.com')
     self.assertEqual(subject.organization, 'Google LLC')
     self.assertEqual(subject.organizationalUnit, 'Cloud')
+
+  def testSubjectFlagNoOrganizationFailure(self):
+    with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
+                                           'organization'):
+      flags.ValidateSubjectConfig(
+          self.messages.SubjectConfig(
+              commonName='google.com',
+              subject=self.messages.Subject(),
+              subjectAltName=self.messages.SubjectAltNames()),
+          is_ca=True)
+
+  def testSubjectNoNameFailure(self):
+    with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
+                                           'subject'):
+      flags.ValidateSubjectConfig(
+          self.messages.SubjectConfig(
+              subject=self.messages.Subject(
+                  countryCode='US', organization='Google LLC'),
+              subjectAltName=self.messages.SubjectAltNames()),
+          is_ca=False)
+
+  def testSubjectFlagNoCnFailure(self):
+    with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
+                                           'common name'):
+      flags.ValidateSubjectConfig(
+          self.messages.SubjectConfig(
+              subject=self.messages.Subject(
+                  countryCode='US', organization='Google LLC'),
+              subjectAltName=self.messages.SubjectAltNames()),
+          is_ca=False)
 
   def testRevocationReasonFlag(self):
     flags.AddRevocationReasonFlag(self.parser)
@@ -316,8 +307,8 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
 
     # We expect the parser to ignore the 'us-central1' hint here since the
     # resource name explicitly specifies 'us-west1'.
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-central1',
-                                                        is_ca=True)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-central1', is_ca=True)
     self.assertEqual(reusable_config_wrapper.reusableConfig, reusable_config_id)
     self.assertEqual(reusable_config_wrapper.reusableConfigValues, None)
 
@@ -329,8 +320,8 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
     args = self.parser.parse_args(['--reusable-config', 'rc1'])
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-central1',
-                                                        is_ca=True)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-central1', is_ca=True)
     self.assertEqual(
         reusable_config_wrapper.reusableConfig,
         'projects/privateca-data/locations/us-central1/reusableConfigs/rc1')
@@ -344,8 +335,8 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
     args = self.parser.parse_args(['--max-chain-length', '1'])
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-west1',
-                                                        is_ca=True)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west1', is_ca=True)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
     self.assertEqual(
@@ -366,8 +357,8 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
     args = self.parser.parse_args([])
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-west1',
-                                                        is_ca=True)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west1', is_ca=True)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
     self.assertEqual(
@@ -386,8 +377,8 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)
     args = self.parser.parse_args(
         ['--no-is-ca-cert', '--max-chain-length', '1'])
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-west1',
-                                                        is_ca=False)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west1', is_ca=False)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, False)
     self.assertEqual(
@@ -408,6 +399,36 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     with self.AssertRaisesExceptionMatches(Exception, 'Invalid value'):
       flags.ParseReusableConfig(args, 'us-west1', is_ca=True)
 
+  def testParseReusableConfigNoResourceAndNoInlineValues(self):
+    concept_parsers.ConceptParser.ForResource(
+        '--reusable-config',
+        resource_args.CreateReusableConfigResourceSpec('CA'),
+        'Reusable config for this CA.',
+        prefixes=True).AddToParser(self.parser)
+    flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
+    args = self.parser.parse_args([])
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west', is_ca=True)
+
+    self.assertIsNone(reusable_config_wrapper.reusableConfig)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
+
+  def testParseReusableConfigNoResourceAndNoInlineCertificateValues(self):
+    concept_parsers.ConceptParser.ForResource(
+        '--reusable-config',
+        resource_args.CreateReusableConfigResourceSpec('CA'),
+        'Reusable config for this CA.',
+        prefixes=True).AddToParser(self.parser)
+    flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)
+    args = self.parser.parse_args([])
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west', is_ca=False)
+
+    self.assertIsNone(reusable_config_wrapper.reusableConfig)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.caOptions.isCa, False)
+
   def testParseReusableConfigInlineValues(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
@@ -419,8 +440,8 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         '--key-usages', 'cert_sign,crl_sign', '--extended-key-usages',
         'server_auth,client_auth', '--max-chain-length', '2'
     ])
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-west1',
-                                                        is_ca=True)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west1', is_ca=True)
     self.assertEqual(reusable_config_wrapper.reusableConfig, None)
     values = reusable_config_wrapper.reusableConfigValues
     self.assertEqual(values.keyUsage.baseKeyUsage.certSign, True)
@@ -454,18 +475,37 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         '--key-usages', 'cert_sign,crl_sign', '--extended-key-usages',
         'server_auth,client_auth', '--no-is-ca-cert'
     ])
-    reusable_config_wrapper = flags.ParseReusableConfig(args, 'us-west1',
-                                                        is_ca=False)
+    reusable_config_wrapper = flags.ParseReusableConfig(
+        args, 'us-west1', is_ca=False)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, False)
 
   def testParseValidityFlag(self):
     flags.AddValidityFlag(self.parser, 'certificate')
-    args = self.parser.parse_args([
-        '--validity', 'P30D'
-    ])
+    args = self.parser.parse_args(['--validity', 'P30D'])
     duration = flags.ParseValidityFlag(args)
     self.assertEqual(duration, '2592000s')
+
+  def testParseValidityFlagDefaultValue(self):
+    flags.AddValidityFlag(self.parser, 'certificate')
+    args = self.parser.parse_args([])
+    duration = flags.ParseValidityFlag(args)
+    self.assertEqual(duration, '315569261s')
+
+  def testParseIssuancePolicy(self):
+    flags.AddCertificateAuthorityIssuancePolicyFlag(self.parser)
+    policy_issuance_path = self.Resource('tests', 'unit', 'surface',
+                                         'privateca', 'test_data',
+                                         'issuance_policy_example_small.yaml')
+    args = self.parser.parse_args(['--issuance-policy', policy_issuance_path])
+    issuance_policy = flags.ParseIssuancePolicy(args)
+    self.assertEqual(issuance_policy.maximumLifetime, '825d')
+
+  def testParseIssuancePolicyMissingIsNone(self):
+    flags.AddCertificateAuthorityIssuancePolicyFlag(self.parser)
+    args = self.parser.parse_args([])
+    issuance_policy = flags.ParseIssuancePolicy(args)
+    self.assertIsNone(issuance_policy)
 
 
 if __name__ == '__main__':

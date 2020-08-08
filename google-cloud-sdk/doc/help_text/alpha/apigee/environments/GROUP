@@ -2,7 +2,7 @@ NAME
     gcloud alpha apigee environments - manage Apigee environments
 
 SYNOPSIS
-    gcloud alpha apigee environments GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha apigee environments COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Apigee environments.
@@ -14,12 +14,6 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
-
-GROUPS
-    GROUP is one of the following:
-
-     deployments
-        (ALPHA) Manage deployments to Apigee environments.
 
 COMMANDS
     COMMAND is one of the following:

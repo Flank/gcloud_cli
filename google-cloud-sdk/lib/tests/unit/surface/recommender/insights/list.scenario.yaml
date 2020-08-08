@@ -1,11 +1,12 @@
 title: List insights
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 actions:
 - define_reference:
     reference: api-version
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - execute_command:
     command: recommender insights list --project=my-project --location=my-location
       --insight-type=my-insight-type
@@ -45,7 +46,7 @@ actions:
               ]
             }
     - expect_stdout: |
-        ID          LOCATION  INSIGHT_TYPE     CATEGORY  STATE   LAST_REFRESH_TIME
-        my-insight  global    my-insight-type  SECURITY  ACTIVE  2019-09-04T17:33:46Z
+        INSIGHT_ID  LOCATION  INSIGHT_TYPE     CATEGORY  INSIGHT_STATE  LAST_REFRESH_TIME
+        my-insight  global    my-insight-type  SECURITY  ACTIVE         2019-09-04T17:33:46Z
     - expect_exit:
         code: 0

@@ -34,7 +34,7 @@ summary:
       $
 - execute:
   - command: |
-      game servers deployments update $$deployment-id-1$$ --location global --update-labels "key1=val1"
+      game servers deployments update $$deployment-id-1$$ --location global --update-labels "key1=val1" --description "new description"
   - stderr: |
       Request issued for: [$$deployment-id-1$$]
   - progress_tracker:
@@ -44,7 +44,7 @@ summary:
       Updated deployment [$$deployment-id-1$$].
   - stdout: |-
       createTime: '$$time-regex$$'
-      description: description
+      description: new description
       etag: .+
       labels:
         a: x
@@ -121,10 +121,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1580851383287-59dc6a524be34-e29dbbf0-84c91680
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1590051724550-5a624c4375f70-c4f0427d-bdf273a0
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-02-04T21:23:03.486359062Z'
+              createTime: '2020-05-21T09:02:04.632046184Z'
               target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
               verb: create
               requestedCancellation: false
@@ -150,12 +150,12 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
-            createTime: '2020-02-04T21:23:03.325651570Z'
-            updateTime: '2020-02-04T21:23:04.075357701Z'
+            createTime: '2020-05-21T09:02:04.583339143Z'
+            updateTime: '2020-05-21T09:02:05.275264088Z'
             labels:
-              a: x
               b: y
-            etag: LODI_fgsseCxAYOQEUzPcB-O3RUrCQYjwmjPAPjezXQ
+              a: x
+            etag: Zsg1t-jbt9jHz1Z9C98bW5Fps__J2Ju3r5nIuRyBtew
             description: description
     - expect_stderr: |
         Created deployment [$$deployment-id-1$$].
@@ -179,12 +179,12 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
-            createTime: '2020-02-04T21:23:03.325651570Z'
-            updateTime: '2020-02-04T21:23:04.075357701Z'
+            createTime: '2020-05-21T09:02:04.583339143Z'
+            updateTime: '2020-05-21T09:02:05.275264088Z'
             labels:
               a: x
               b: y
-            etag: LODI_fgsseCxAYOQEUzPcB-O3RUrCQYjwmjPAPjezXQ
+            etag: Zsg1t-jbt9jHz1Z9C98bW5Fps__J2Ju3r5nIuRyBtew
             description: description
     - expect_stdout:
         matches: |
@@ -211,31 +211,19 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '1340'
+            content-length: '442'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             gameServerDeployments:
-            - name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/deployment-20200203-192015-m1r1
-              createTime: '2020-02-03T19:20:16.137086715Z'
-              updateTime: '2020-02-03T19:20:17.070305520Z'
-              etag: KbcmcB_OwIw0A6XOB2w9HU1kIwr4o7wf-a78QEJVSRg
-            - name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/gsd-1
-              createTime: '2020-01-30T06:55:54.130085280Z'
-              updateTime: '2020-01-30T06:55:54.735874969Z'
-              etag: rB-f_m4OcaApU-DhM_bahkw5V4Jm1GdAe4_bLt5COkE
             - name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
-              createTime: '2020-02-04T21:23:03.325651570Z'
-              updateTime: '2020-02-04T21:23:04.075357701Z'
+              createTime: '2020-05-21T09:02:04.583339143Z'
+              updateTime: '2020-05-21T09:02:05.275264088Z'
               labels:
-                a: x
                 b: y
-              etag: LODI_fgsseCxAYOQEUzPcB-O3RUrCQYjwmjPAPjezXQ
+                a: x
+              etag: Zsg1t-jbt9jHz1Z9C98bW5Fps__J2Ju3r5nIuRyBtew
               description: description
-            - name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/deployment-20200203-192019-r1db
-              createTime: '2020-02-03T19:20:19.561676793Z'
-              updateTime: '2020-02-03T19:20:20.145245368Z'
-              etag: TACYDVatvhRHeCm7eBzjZ6FTmspEQJ2or6TTvAyY-ng
     - expect_stdout:
         matches: |
           NAME\s+LOCATION\s+DESCRIPTION\s+CREATE_TIME\s+UPDATE_TIME\s+LABELS.*
@@ -244,7 +232,8 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers deployments update $$deployment-id-1$$ --location global --update-labels "key1=val1"
+      game servers deployments update $$deployment-id-1$$ --location global
+      --update-labels "key1=val1" --description "new description"
     events:
     - api_call:
         expect_request:
@@ -260,16 +249,16 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
-            createTime: '2020-02-04T21:23:03.325651570Z'
-            updateTime: '2020-02-04T21:23:04.075357701Z'
+            createTime: '2020-05-21T09:02:04.583339143Z'
+            updateTime: '2020-05-21T09:02:05.275264088Z'
             labels:
-              a: x
               b: y
-            etag: LODI_fgsseCxAYOQEUzPcB-O3RUrCQYjwmjPAPjezXQ
+              a: x
+            etag: Zsg1t-jbt9jHz1Z9C98bW5Fps__J2Ju3r5nIuRyBtew
             description: description
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$?alt=json&updateMask=labels
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$?alt=json&updateMask=description%2Clabels
           method: PATCH
           headers: {}
           body:
@@ -281,10 +270,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1580851387364-59dc6a562f565-1e892782-805f545e
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1590051728438-5a624c472b6d3-bc8ab1e5-7feb029a
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-02-04T21:23:07.520019056Z'
+              createTime: '2020-05-21T09:02:08.548881813Z'
               target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
               verb: update
               requestedCancellation: false
@@ -306,25 +295,25 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '381'
+            content-length: '385'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
-            createTime: '2020-02-04T21:23:03.325651570Z'
-            updateTime: '2020-02-04T21:23:07.553571090Z'
+            createTime: '2020-05-21T09:02:04.583339143Z'
+            updateTime: '2020-05-21T09:02:08.586265283Z'
             labels:
-              a: x
               b: y
               key1: val1
-            etag: BW2CxVbQ4zdMs06nchU16h-WHRLgKIagNGJm3IsHpYk
-            description: description
+              a: x
+            etag: DydCGmx3HZcmzPukDZ--cvjFtxU3aUKmQY7JyNlTbcI
+            description: new description
     - expect_stderr: |
         Updated deployment [$$deployment-id-1$$].
     - expect_stdout:
         matches: |
           createTime: '$$time-regex$$'
-          description: description
+          description: new description
           etag: .+
           labels:
             a: x
@@ -353,9 +342,9 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/rollout
-            createTime: '2020-02-04T21:23:03.325651570Z'
-            updateTime: '2020-02-04T21:23:07.553571090Z'
-            etag: BW2CxVbQ4zdMs06nchU16h-WHRLgKIagNGJm3IsHpYk
+            createTime: '2020-05-21T09:02:04.583339143Z'
+            updateTime: '2020-05-21T09:02:08.586265283Z'
+            etag: DydCGmx3HZcmzPukDZ--cvjFtxU3aUKmQY7JyNlTbcI
     - expect_stdout:
         matches: |
           createTime: '$$time-regex$$'
@@ -409,10 +398,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1580851391846-59dc6a5a75752-d18472c9-ca9b4ada
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1590051732289-5a624c4ad7994-ab2b9e16-6cc0ff94
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-02-04T21:23:11.964421020Z'
+              createTime: '2020-05-21T09:02:12.346166119Z'
               target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
               verb: delete
               requestedCancellation: false

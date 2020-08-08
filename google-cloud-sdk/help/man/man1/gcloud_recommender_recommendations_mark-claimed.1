@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud recommender recommendations mark\-claimed \- mark the Recommendation State as CLAIMED. Can only be performed on recommendations in CLAIMED or ACTIVE state
+gcloud recommender recommendations mark\-claimed \- mark a recommendation's state as CLAIMED
 
 
 
@@ -17,10 +17,11 @@ gcloud recommender recommendations mark\-claimed \- mark the Recommendation Stat
 
 .SH "DESCRIPTION"
 
-Mark the Recommendation State as CLAIMED. Users can use this method to. indicate
-to the Recommender API that they are starting to apply the recommendation
-themselves. This stops the recommendation content from being updated.
-mark\-claimed can be applied to recommendations in CLAIMED or ACTIVE state.
+Mark a recommendation's state as CLAIMED. Can be applied to recommendations in
+CLAIMED, SUCCEEDED, FAILED, or ACTIVE state. Users can use this method to
+indicate to the Recommender API that they are starting to apply the
+recommendation themselves. This stops the recommendation content from being
+updated.
 
 
 

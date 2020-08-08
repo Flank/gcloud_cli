@@ -125,13 +125,13 @@ class InstancesCreateShieldedInstanceConfigAlphaTest(
     self.api_version = 'alpha'
 
 
-class InstanceCreateConfidentialInstanceConfigAlphaTest(
+class InstancesCreateConfidentialInstanceConfigBetaTest(
     create_test_base.InstancesCreateTestBase, parameterized.TestCase):
   """Test creation of VM instances with Confidential Instance config."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
   @parameterized.named_parameters(
       ('EnableConfidentialCompute', '--confidential-compute', True),
@@ -140,6 +140,10 @@ class InstanceCreateConfidentialInstanceConfigAlphaTest(
     m = self.messages
     self.Run('compute instances create instance-1 '
              '  --zone central2-a {}'.format(cmd_flag))
+
+    expected_image = self._default_image
+    if enable_confidential_compute:
+      expected_image = self._default_confidential_vm_image
 
     self.CheckRequests(self.zone_get_request, self.project_get_request, [
         (self.compute.instances, 'Insert',
@@ -152,7 +156,7 @@ class InstanceCreateConfidentialInstanceConfigAlphaTest(
                          autoDelete=True,
                          boot=True,
                          initializeParams=m.AttachedDiskInitializeParams(
-                             sourceImage=self._default_image,),
+                             sourceImage=expected_image),
                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
                  ],
@@ -181,6 +185,14 @@ class InstanceCreateConfidentialInstanceConfigAlphaTest(
          ))
     ])
 
+
+class InstancesCreateConfidentialInstanceConfigAlphaTest(
+    InstancesCreateConfidentialInstanceConfigBetaTest):
+  """Test creation of VM instances with Confidential Instance config."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 if __name__ == '__main__':
   test_case.main()

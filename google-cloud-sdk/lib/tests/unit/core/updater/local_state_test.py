@@ -144,7 +144,7 @@ class LocalStateTestsFS(util.Base):
 class LocalStateTests(util.Base, test_case.WithOutputCapture):
 
   def testCompilePython(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     py_file_contents = 'a = 1 + 1'
     to_compile = [
         os.path.join('bin', 'bootstrapping', 'foo.py'),

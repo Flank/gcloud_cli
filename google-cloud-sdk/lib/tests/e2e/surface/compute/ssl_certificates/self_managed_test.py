@@ -57,8 +57,11 @@ class SelfManagedSslCertificateTest(
       self.assertEqual(description, cert.description)
 
       creation_timestamp = time_util.Strptime(cert.creationTimestamp)
-      self.assertLessEqual(self.start_time - 1, creation_timestamp)
-      self.assertGreaterEqual(after + 1, creation_timestamp)
+      # Metastore, TrueTime and server time can be different on different
+      # machines and you should compare timestamp with some accuracy.
+      time_accuracy = 60
+      self.assertLessEqual(self.start_time - time_accuracy, creation_timestamp)
+      self.assertGreaterEqual(after + time_accuracy, creation_timestamp)
 
       expire_time = time_util.Strptime(cert.expireTime)
       self.assertLessEqual(self.start_time + 364*24*3600, expire_time)

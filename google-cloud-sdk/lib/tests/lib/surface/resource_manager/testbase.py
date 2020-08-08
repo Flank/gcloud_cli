@@ -209,7 +209,7 @@ class OrgPoliciesUnitTestBase(cli_test_base.CliTestBase,
     return client
 
   def RunOrgPolicies(self, *command):
-    return self.Run(['beta', 'resource-manager', 'org-policies'] +
+    return self.Run(['resource-manager', 'org-policies'] +
                     list(command))
 
   def ExpectedSetRequest(self, arg, policy):

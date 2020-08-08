@@ -187,24 +187,6 @@ class ManagedInstanceGroupsCreateInstanceBetaZonalTest(
           instance=self.GetInstanceNames(igm_name)[0],
           source=fake_disk_uri))
 
-
-class ManagedInstanceGroupsCreateInstanceBetaRegionalTest(
-    ManagedInstanceGroupsCreateInstanceGARegionalTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-
-class ManagedInstanceGroupsCreateInstanceAlphaZonalTest(
-    e2e_managers_stateful_test_base.ManagedStatefulTestBase):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def SetUp(self):
-    self.prefix = 'mig-update-instances-zonal'
-    self.scope = e2e_test_base.ZONAL
-
   def testCreateAndDescribeInstance(self):
     instance_template = self.CreateInstanceTemplate()
     igm_name = self.CreateInstanceGroupManagerStateful(
@@ -230,6 +212,13 @@ class ManagedInstanceGroupsCreateInstanceAlphaZonalTest(
         instance=new_instance_name))
     self.AssertNewOutputContainsAll([new_instance_name, instance_template],
                                     normalize_space=True)
+
+
+class ManagedInstanceGroupsCreateInstanceBetaRegionalTest(
+    ManagedInstanceGroupsCreateInstanceGARegionalTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

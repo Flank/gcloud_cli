@@ -20,12 +20,14 @@ actions:
           headers: {}
           body: null
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "name": "projects/fake-project/locations/global/endpointConfigSelectors/myecs",
               "type": "SIDECAR_PROXY",
+              "serverTlsPolicy": "mystls",
+              "clientTlsPolicy": "myctls",
+              "authorizationPolicy": "myaz",
               "endpointMatcher": {
                 "metadataLabelMatcher": {
                   "metadataLabelMatchCriteria": "MATCH_ANY",
@@ -41,6 +43,8 @@ actions:
     - expect_file_written:
         path: myecs.yaml
         contents: |
+          authorizationPolicy: myaz
+          clientTlsPolicy: myctls
           endpointMatcher:
             metadataLabelMatcher:
               metadataLabelMatchCriteria: MATCH_ANY
@@ -48,6 +52,7 @@ actions:
               - labelName: app
                 labelValue: test
           name: projects/fake-project/locations/global/endpointConfigSelectors/myecs
+          serverTlsPolicy: mystls
           type: SIDECAR_PROXY
     - expect_stderr: |
         Exported [projects/fake-project/locations/global/endpointConfigSelectors/myecs] to 'myecs.yaml'.

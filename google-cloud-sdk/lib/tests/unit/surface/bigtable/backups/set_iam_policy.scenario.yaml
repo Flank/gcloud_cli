@@ -1,5 +1,5 @@
 title: bigtable backups set-iam-policy scenario test
-release_tracks: [ALPHA]
+release_tracks: [GA, BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

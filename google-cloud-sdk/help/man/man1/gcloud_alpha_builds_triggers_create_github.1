@@ -11,7 +11,7 @@ gcloud alpha builds triggers create github \- create a build trigger for a GitHu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds triggers create github\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\-name\fR=\fIREPO_NAME\fR\ \fB\-\-repo\-owner\fR=\fIREPO_OWNER\fR\ (\fB\-\-branch\-pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag\-pattern\fR=\fIREGEX\fR\ |\ \fB\-\-comment\-control\fR\ \fB\-\-pull\-request\-pattern\fR=\fIREGEX\fR)\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile\-dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile\-image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-ignored\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-included\-files\fR=[\fIGLOB\fR,...]]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds triggers create github\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\-name\fR=\fIREPO_NAME\fR\ \fB\-\-repo\-owner\fR=\fIREPO_OWNER\fR\ (\fB\-\-branch\-pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag\-pattern\fR=\fIREGEX\fR\ |\ [\fB\-\-pull\-request\-pattern\fR=\fIREGEX\fR\ :\ \fB\-\-comment\-control\fR=\fICOMMENT_CONTROL\fR;\ default=CommentControlValueValuesEnum(COMMENTS_ENABLED,\ 1)])\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile\-dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile\-image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-ignored\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-included\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-name\fR=\fINAME\fR]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,7 +31,7 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-trigger\-config\fR=\fIPATH\fR
-Path to a YAML/JSON file for Build Trigger config. See
+Path to Build Trigger config file (JSON or YAML format). For more details, see
 https://cloud.google.com/cloud\-build/docs/api/reference/rest/v1/projects.triggers#BuildTrigger
 
 .TP 2m
@@ -60,6 +60,10 @@ Glob filter. Changes only affecting ignored files won't trigger builds.
 .TP 2m
 \fB\-\-included\-files\fR=[\fIGLOB\fR,...]
 Glob filter. Changes affecting at least one included file will trigger builds.
+
+.TP 2m
+\fB\-\-name\fR=\fINAME\fR
+Build trigger name.
 
 .TP 2m
 
@@ -94,11 +98,6 @@ Pull Request settings
 
 .RS 2m
 .TP 2m
-\fB\-\-comment\-control\fR
-Require a repository collaborator owner to comment '/gcbrun' on a pull request
-before running the build.
-
-.TP 2m
 \fB\-\-pull\-request\-pattern\fR=\fIREGEX\fR
 A regular expression specifying which base git branch to match for pull request
 events.
@@ -108,7 +107,13 @@ trying to merge into) for pull request updates. For example,
 \-\-pull\-request\-pattern=foo will match "foo", "foobar", and "barfoo".
 
 The syntax of the regular expressions accepted is the syntax accepted by RE2 and
-described at https://github.com/google/re2/wiki/Syntax.
+described at https://github.com/google/re2/wiki/Syntax. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-comment\-control\fR=\fICOMMENT_CONTROL\fR; default=CommentControlValueValuesEnum(COMMENTS_ENABLED, 1)
+Require a repository collaborator or owner to comment '/gcbrun' on a pull
+request before running the build.
 
 .RE
 .RE
@@ -209,7 +214,7 @@ Run \fB$ gcloud help\fR for details.
 To create a push trigger for all branches:
 
 .RS 2m
-$ gcloud alpha builds triggers create github \e
+$ gcloud alpha builds triggers create github \-\-name="my\-trigger" \e
     \-\-repo\-owner="GoogleCloudPlatform" \e
     \-\-repo\-name="cloud\-builders" \-\-branch\-pattern=".*" \e
     \-\-build\-config="cloudbuild.yaml"
@@ -218,7 +223,7 @@ $ gcloud alpha builds triggers create github \e
 To create a pull request trigger for master:
 
 .RS 2m
-$ gcloud alpha builds triggers create github \e
+$ gcloud alpha builds triggers create github \-\-name="my\-trigger" \e
     \-\-repo\-owner="GoogleCloudPlatform" \e
     \-\-repo\-name="cloud\-builders" \-\-pull\-request\-pattern="^master$" \e
     \-\-build\-config="cloudbuild.yaml"

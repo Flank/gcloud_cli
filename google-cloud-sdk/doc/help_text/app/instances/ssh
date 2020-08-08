@@ -52,16 +52,16 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To SSH into an App Engine Flexible instance, run:
 
-        $ gcloud app instances ssh --service s1 --version v1 i1
+        $ gcloud app instances ssh --service=s1 --version v1=i1
 
     To SSH into the app container within an instance, run:
 
-        $ gcloud app instances ssh --service s1 --version v1 i1 \
+        $ gcloud app instances ssh --service=s1 --version=v1 i1 \
           --container=gaeapp
 
     To SSH into the app container and run a remote command, run:
 
-        $ gcloud app instances ssh --service s1 --version v1 i1 \
+        $ gcloud app instances ssh --service=s1 --version=v1 i1 \
           --container=gaeapp -- echo hello
 
 NOTES

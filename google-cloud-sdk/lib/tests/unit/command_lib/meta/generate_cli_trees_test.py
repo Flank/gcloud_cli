@@ -1222,7 +1222,7 @@ class ManCommandCollectorTest(calliope_test_base.CalliopeTestBase):
 
   def testManCommandCollectorDecodeOutput(self):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
-    check_out_mock.return_value = _MAN_COMMAND_OUTPUT['unicode'].encode('utf8')
+    check_out_mock.return_value = _MAN_COMMAND_OUTPUT['unicode'].encode('utf-8')
 
     collector = generate_cli_trees._ManCommandCollector('unicode')
     self.assertEqual(_MAN_COMMAND_OUTPUT['unicode'],
@@ -1477,6 +1477,7 @@ class InstalledCliTreesTest(calliope_test_base.CalliopeTestBase):
   def testGsutilCliTreeInstalled(self):
     self._VerifyCliTreeInstalled('gsutil')
 
+  @test_case.Filters.RunOnlyOnPy2('Python 3 does not drop pyc files')
   def testKubectlCliTreeInstalled(self):
     expected = [
         ('bq', 'data/cli/bq.json', True),

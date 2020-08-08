@@ -232,10 +232,17 @@ def GetModeFlag():
   return base.ChoiceArgument(
       '--mode',
       {
-          'on': ('To permit autoscaling to scale up and down (default for '
+          'on': ('Permits autoscaling to scale out and in (default for '
                  'new autoscalers).'),
-          'only-up': 'To permit autoscaling to scale only up and not down.',
-          'off': ('To turn off autoscaling, while keeping the new '
+          'only-scale-out': ('Permits autoscaling to scale only out and '
+                             'not in.'),
+          'only-up': ("""
+              (DEPRECATED) Permits autoscaling to scale only out and not in.
+
+              Value `only-up` is deprecated. Use `--mode only-scale-out`
+              instead.
+          """),
+          'off': ('Turns off autoscaling, while keeping the new '
                   'configuration.')
       },
       help_str="""\
@@ -304,7 +311,11 @@ def AddPredictiveAutoscaling(parser):
           'standard':
               ('Standard predictive autoscaling  predicts the future values of '
                'the scaling metric and then scales a MIG to ensure that new VM '
-               'instances are ready in time to cover the predicted peak.')
+               'instances are ready in time to cover the predicted peak.'),
+          'optimize-availability':
+              ('Predictive autoscaling predicts the future values of the '
+               'scaling metric and scales a MIG in advance to ensure that new '
+               'VM instances are ready in time to cover the predicted peak.')
       },
       help='Indicates which method of prediction is used for CPU utilization metric, if any.'
   )
@@ -825,14 +836,14 @@ def _BuildMode(args, messages, original):
   return ParseModeString(args.mode, messages)
 
 
-def BuildScaleDown(args, messages):
-  """Builds AutoscalingPolicyScaleDownControl.
+def BuildScaleIn(args, messages):
+  """Builds AutoscalingPolicyScaleInControl.
 
   Args:
     args: command line arguments.
     messages: module containing message classes.
   Returns:
-    AutoscalingPolicyScaleDownControl message object.
+    AutoscalingPolicyScaleInControl message object.
 
   if args.IsSpecified('scale_in_control'):
     replicas_arg = args.scale_in_control.get('max-scaled-in-replicas')
@@ -843,8 +854,8 @@ def BuildScaleDown(args, messages):
     else:
       max_replicas = messages.FixedOrPercent(fixed=int(replicas_arg))
 
-    return messages.AutoscalingPolicyScaleDownControl(
-        maxScaledDownReplicas=max_replicas,
+    return messages.AutoscalingPolicyScaleInControl(
+        maxScaledInReplicas=max_replicas,
         timeWindowSec=args.scale_in_control.get('time-window'))
   Raises:
     InvalidArgumentError:  if both max-scaled-in-replicas and
@@ -863,8 +874,8 @@ def BuildScaleDown(args, messages):
     else:
       max_replicas = messages.FixedOrPercent(fixed=int(replicas_arg))
 
-    return messages.AutoscalingPolicyScaleDownControl(
-        maxScaledDownReplicas=max_replicas,
+    return messages.AutoscalingPolicyScaleInControl(
+        maxScaledInReplicas=max_replicas,
         timeWindowSec=args.scale_in_control.get('time-window'))
 
 
@@ -877,7 +888,7 @@ def _BuildAutoscalerPolicy(args, messages, original, scale_in=False,
     messages: module containing message classes.
     original: original autoscaler message.
     scale_in: bool, whether to include the
-      'autoscalingPolicy.scaleDownControl' field in the message.
+      'autoscalingPolicy.scaleInControl' field in the message.
     predictive: bool, whether to inclue the
       `autoscalingPolicy.cpuUtilization.predictiveMethod' field in the message.
   Returns:
@@ -895,7 +906,7 @@ def _BuildAutoscalerPolicy(args, messages, original, scale_in=False,
   }
   policy_dict['mode'] = _BuildMode(args, messages, original)
   if scale_in:
-    policy_dict['scaleDownControl'] = BuildScaleDown(args, messages)
+    policy_dict['scaleInControl'] = BuildScaleIn(args, messages)
 
   return messages.AutoscalingPolicy(
       **dict((key, value) for key, value in six.iteritems(policy_dict)

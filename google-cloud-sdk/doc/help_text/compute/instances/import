@@ -7,8 +7,8 @@ SYNOPSIS
         [--async] [--can-ip-forward] [--deletion-protection]
         [--description=DESCRIPTION] [--no-guest-environment]
         [--hostname=HOSTNAME] [--labels=[KEY=VALUE,...]]
-        [--machine-type=MACHINE_TYPE] [--network=NETWORK]
-        [--network-tier=NETWORK_TIER] [--os=OS]
+        [--log-location=LOG_LOCATION] [--machine-type=MACHINE_TYPE]
+        [--network=NETWORK] [--network-tier=NETWORK_TIER] [--os=OS]
         [--private-network-ip=PRIVATE_NETWORK_IP] [--no-restart-on-failure]
         [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
         [--timeout=TIMEOUT; default="2h"] [--zone=ZONE]
@@ -28,6 +28,8 @@ DESCRIPTION
       o Create a VM instance using OVF metadata and imported disks and boot
         it.
 
+    OVF import tool requires Cloud Build to be enabled. See
+    https://cloud.google.com/compute/docs/import/import-ovf-files#enable-cloud-build
     Virtual machine instances, images and disks in Compute engine and files
     stored on Cloud Storage incur charges. See
     https://cloud.google.com/compute/docs/images/importing-virtual-disks#resource_cleanup.
@@ -76,6 +78,11 @@ OPTIONAL FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --log-location=LOG_LOCATION
+        Directory in Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ is created
+        and used.
 
      --machine-type=MACHINE_TYPE
         Specifies the machine type used for the instances. To get a list of

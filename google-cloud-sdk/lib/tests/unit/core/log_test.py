@@ -78,7 +78,7 @@ class LoggingConfigTest(sdk_test_base.WithOutputCapture):
     if len(log_files) != 1:
       raise ValueError('Found more than one log file')
     contents = io.open(os.path.join(sub_dir, log_files[0]),
-                       encoding='utf8').read()
+                       encoding='utf-8').read()
     return contents
 
   def testBasicSetupInit(self):
@@ -206,12 +206,12 @@ class LoggingConfigTest(sdk_test_base.WithOutputCapture):
     self.StartObjectPatch(time, 'time').return_value = log_time
 
     log.out.write('Ṳᾔḯ¢◎ⅾℯ')
-    log.out.write('XṲᾔḯ¢◎ⅾℯ\n'.encode('utf8'))
+    log.out.write('XṲᾔḯ¢◎ⅾℯ\n'.encode('utf-8'))
     log.out.writelines(['ღυłтḯ℘ʟℯ', 'ʟḯᾔεṧ'])
-    log.out.writelines(['Xღυłтḯ℘ʟℯ'.encode('utf8'), 'Xʟḯᾔεṧ'.encode('utf8')])
+    log.out.writelines(['Xღυłтḯ℘ʟℯ'.encode('utf-8'), 'Xʟḯᾔεṧ'.encode('utf-8')])
     log.Print()
     log.Print('Ṳᾔḯ¢◎ⅾℯ', 'ṧʊ¢кṧ')
-    log.Print('XṲᾔḯ¢◎ⅾℯ'.encode('utf8'), 'Xṧʊ¢кṧ'.encode('utf8'))
+    log.Print('XṲᾔḯ¢◎ⅾℯ'.encode('utf-8'), 'Xṧʊ¢кṧ'.encode('utf-8'))
     log.out.flush()
     self.AssertOutputEquals("""\
 Ṳᾔḯ¢◎ⅾℯXṲᾔḯ¢◎ⅾℯ
@@ -221,13 +221,13 @@ XṲᾔḯ¢◎ⅾℯ Xṧʊ¢кṧ
 """)
 
     log.err.write('Ф')
-    log.err.write('XФ'.encode('utf8'))
+    log.err.write('XФ'.encode('utf-8'))
     log.warning('ღ')
     # Python 3 expects only text strings to be written to the logger. For
     # log.err, we decode the byte strings for you and then reencode them again
     # so the behavior matches. For the root logger, if you give it bytes on
     # Python 3, it prints the repr() of the bytes object.
-    log.warning('Xღ'.encode('utf8'))
+    log.warning('Xღ'.encode('utf-8'))
     self.AssertErrEquals('ФXФWARNING: ღ\nWARNING: Xღ\n')
     file_contents = self.GetLogFileContents()
     self.assertEqual(file_contents, """\
@@ -261,12 +261,12 @@ XṲᾔḯ¢◎ⅾℯ Xṧʊ¢кṧ
     self.StartObjectPatch(time, 'time').return_value = log_time
 
     log.out.write('Ṳᾔḯ¢◎ⅾℯ')
-    log.out.write('XṲᾔḯ¢◎ⅾℯ\n'.encode('utf8'))
+    log.out.write('XṲᾔḯ¢◎ⅾℯ\n'.encode('utf-8'))
     log.out.writelines(['ღυłтḯ℘ʟℯ', 'ʟḯᾔεṧ'])
-    log.out.writelines(['Xღυłтḯ℘ʟℯ'.encode('utf8'), 'Xʟḯᾔεṧ'.encode('utf8')])
+    log.out.writelines(['Xღυłтḯ℘ʟℯ'.encode('utf-8'), 'Xʟḯᾔεṧ'.encode('utf-8')])
     log.Print()
     log.Print('Ṳᾔḯ¢◎ⅾℯ', 'ṧʊ¢кṧ')
-    log.Print('XṲᾔḯ¢◎ⅾℯ'.encode('utf8'), 'Xṧʊ¢кṧ'.encode('utf8'))
+    log.Print('XṲᾔḯ¢◎ⅾℯ'.encode('utf-8'), 'Xṧʊ¢кṧ'.encode('utf-8'))
     log.out.flush()
     # String is safely rendered even for unsupported characters.
     self.AssertOutputEquals("""\
@@ -277,13 +277,13 @@ X??????? X?????
 """)
 
     log.err.write('Ф')
-    log.err.write('XФ'.encode('utf8'))
+    log.err.write('XФ'.encode('utf-8'))
     log.warning('ღ')
     # Python 3 expects only text strings to be written to the logger. For
     # log.err, we decode the byte strings for you and then reencode them again
     # so the behavior matches. For the root logger, if you give it bytes on
     # Python 3, it prints the repr() of the bytes object.
-    log.warning('Xღ'.encode('utf8'))
+    log.warning('Xღ'.encode('utf-8'))
     self.AssertErrEquals('?X?WARNING: ?\nWARNING: X?\n')
     file_contents = self.GetLogFileContents()
     # Log file contents are always utf-8 so all information is retained.
@@ -799,6 +799,10 @@ class LogResourceChangeTest(sdk_test_base.WithOutputCapture):
   def testDeletedAsync(self):
     log.DeletedResource('my-cluster', is_async=True)
     self.AssertErrEquals('Delete in progress for [my-cluster].\n')
+
+  def testDetached(self):
+    log.DetachedResource('mysub')
+    self.AssertErrEquals('Detached [mysub].\n')
 
   def testRestored(self):
     log.RestoredResource('my-cluster')

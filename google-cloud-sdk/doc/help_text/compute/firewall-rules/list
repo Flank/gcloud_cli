@@ -1,6 +1,5 @@
 NAME
-    gcloud compute firewall-rules list - list Google Compute Engine firewall
-        rules
+    gcloud compute firewall-rules list - list Compute Engine firewall rules
 
 SYNOPSIS
     gcloud compute firewall-rules list [NAME ...] [--regexp=REGEXP, -r REGEXP]
@@ -8,8 +7,8 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute firewall-rules list displays all Google Compute Engine
-    firewall rules in a project.
+    gcloud compute firewall-rules list displays all Compute Engine firewall
+    rules in a project.
 
 POSITIONAL ARGUMENTS
      [NAME ...]

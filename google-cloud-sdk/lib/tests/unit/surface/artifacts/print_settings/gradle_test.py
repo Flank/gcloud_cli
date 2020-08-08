@@ -47,7 +47,7 @@ see docs.gradle.org/current/userguide/publishing_maven.html
 ======================================================
 plugins {
   id "maven-publish"
-  id "com.google.cloud.artifactregistry.gradle-plugin" version "2.0.1"
+  id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.0"
 }
 
 publishing {

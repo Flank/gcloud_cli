@@ -27,7 +27,7 @@ from googlecloudsdk.core import exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 
 
 @parameterized.parameters(scope_util.ScopeEnum.REGION,
@@ -177,7 +177,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testUpdateMode(self, scope):
+  def testUpdateModeOnlyUp(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -191,6 +191,25 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.Run('compute instance-groups managed update-autoscaling group-1 '
              '--mode only-up '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testUpdateModeOnlyScaleOut(self, scope):
+    mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    self._ExpectPatchAutoscalers(self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            mode=mode_cls.ONLY_SCALE_OUT
+        )
+    ))
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--mode only-scale-out '
              '{} {}'.format(self.location_flag, self.location))
 
     self.CheckRequests(*self.expected_requests)
@@ -211,8 +230,8 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(
     self._ExpectPatchAutoscalers(self.messages.Autoscaler(
         name='autoscaler-1',
         autoscalingPolicy=self.messages.AutoscalingPolicy(
-            scaleDownControl=self.messages.AutoscalingPolicyScaleDownControl(
-                maxScaledDownReplicas=self.messages.FixedOrPercent(
+            scaleInControl=self.messages.AutoscalingPolicyScaleInControl(
+                maxScaledInReplicas=self.messages.FixedOrPercent(
                     fixed=5
                 ),
                 timeWindowSec=30
@@ -234,8 +253,8 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(
     self._ExpectPatchAutoscalers(self.messages.Autoscaler(
         name='autoscaler-1',
         autoscalingPolicy=self.messages.AutoscalingPolicy(
-            scaleDownControl=self.messages.AutoscalingPolicyScaleDownControl(
-                maxScaledDownReplicas=self.messages.FixedOrPercent(
+            scaleInControl=self.messages.AutoscalingPolicyScaleInControl(
+                maxScaledInReplicas=self.messages.FixedOrPercent(
                     percent=5
                 ),
                 timeWindowSec=30
@@ -257,8 +276,8 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(
     self._ExpectPatchAutoscalers(self.messages.Autoscaler(
         name='autoscaler-1',
         autoscalingPolicy=self.messages.AutoscalingPolicy(
-            scaleDownControl=self.messages.AutoscalingPolicyScaleDownControl(
-                maxScaledDownReplicas=self.messages.FixedOrPercent(
+            scaleInControl=self.messages.AutoscalingPolicyScaleInControl(
+                maxScaledInReplicas=self.messages.FixedOrPercent(
                     percent=5
                 ),
                 timeWindowSec=30
@@ -283,7 +302,7 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(
         self.messages.Autoscaler(
             name='autoscaler-1',
             autoscalingPolicy=self.messages.AutoscalingPolicy(
-                scaleDownControl=None)))
+                scaleInControl=None)))
 
     self.make_requests.side_effect = iter(self.expected_responses)
 

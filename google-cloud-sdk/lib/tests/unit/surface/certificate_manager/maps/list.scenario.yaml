@@ -1,0 +1,180 @@
+title: Certificate Manager map list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager maps list
+  - stdout: |
+      NAME          ENDPOINTS           DESCRIPTION  CREATE_TIME
+      one-more-map  -                                2020-05-26 15:50:42 +00:00
+      simple-map    35.230.234.248:443  some desc    2019-09-23 11:01:01 +00:00
+      many-ips      35.230.235.169:443               2020-04-15 11:51:01 +00:00
+                    35.230.232.177:443
+      one-more      -                   booo         2020-05-27 01:00:49 +00:00
+- execute:
+  - command: |
+      certificate-manager maps list --uri
+  - stdout: |
+      https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/one-more-map
+      https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/simple-map
+      https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/many-ips
+      https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/one-more
+actions:
+- execute_command:
+    command: |
+      certificate-manager maps list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "certificateMaps": [
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/one-more-map",
+                  "createTime": "2020-05-26T15:50:42.767792640Z"
+                },
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                  "createTime": "2019-09-23T11:01:01.747248893Z",
+                  "labels": {
+                    "key": "value"
+                  },
+                  "gclbTargets": [
+                    {
+                      "ipConfig": [
+                        {
+                          "ipAddress": "35.230.234.248",
+                          "port": 443
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "some desc"
+                },
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/many-ips",
+                  "createTime": "2020-04-15T11:51:01.785452919Z",
+                  "gclbTargets": [
+                    {
+                      "ipConfig": [
+                        {
+                          "ipAddress": "35.230.235.169",
+                          "port": 443
+                        }
+                      ]
+                    },
+                    {
+                      "ipConfig": [
+                        {
+                          "ipAddress": "35.230.232.177",
+                          "port": 443
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/one-more",
+                  "createTime": "2020-05-27T01:00:49.331535090Z",
+                  "labels": {
+                    "foo": "bar"
+                  },
+                  "description": "booo"
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME          ENDPOINTS           DESCRIPTION  CREATE_TIME
+        one-more-map  -                                2020-05-26 15:50:42 +00:00
+        simple-map    35.230.234.248:443  some desc    2019-09-23 11:01:01 +00:00
+        many-ips      35.230.235.169:443               2020-04-15 11:51:01 +00:00
+                      35.230.232.177:443
+        one-more      -                   booo         2020-05-27 01:00:49 +00:00
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager maps list --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "certificateMaps": [
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/one-more-map",
+                  "createTime": "2020-05-26T15:50:42.767792640Z"
+                },
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                  "createTime": "2019-09-23T11:01:01.747248893Z",
+                  "labels": {
+                    "key": "value"
+                  },
+                  "gclbTargets": [
+                    {
+                      "ipConfig": [
+                        {
+                          "ipAddress": "35.230.234.248",
+                          "port": 443
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "some desc"
+                },
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/many-ips",
+                  "createTime": "2020-04-15T11:51:01.785452919Z",
+                  "gclbTargets": [
+                    {
+                      "ipConfig": [
+                        {
+                          "ipAddress": "35.230.235.169",
+                          "port": 443
+                        }
+                      ]
+                    },
+                    {
+                      "ipConfig": [
+                        {
+                          "ipAddress": "35.230.232.177",
+                          "port": 443
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "projects/fake-project/locations/global/certificateMaps/one-more",
+                  "createTime": "2020-05-27T01:00:49.331535090Z",
+                  "labels": {
+                    "foo": "bar"
+                  },
+                  "description": "booo"
+                }
+              ]
+            }
+    - expect_stdout: |
+        https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/one-more-map
+        https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/simple-map
+        https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/many-ips
+        https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificateMaps/one-more
+    - expect_exit:
+        code: 0

@@ -24,9 +24,10 @@ import os.path
 from googlecloudsdk.command_lib.code import local
 from googlecloudsdk.command_lib.code import yaml_helper
 from googlecloudsdk.core import yaml
+import six
 
 _SKAFFOLD_TEMPLATE = """
-apiVersion: skaffold/v1
+apiVersion: skaffold/v2beta4
 kind: Config
 build:
   artifacts: []
@@ -53,12 +54,17 @@ class LocalRuntimeFiles(object):
     Returns:
       Text of a kubernetes config file.
     """
+    if self._settings.cpu:
+      cpu_request = min(0.1, self._settings.cpu)
+    else:
+      cpu_request = None
+
     code_generators = [
         local.AppContainerGenerator(self._settings.service_name,
-                                    self._settings.image_name,
+                                    self._settings.image,
                                     self._settings.env_vars,
-                                    self._settings.memory_limit,
-                                    self._settings.cpu_limit)
+                                    self._settings.memory,
+                                    self._settings.cpu, cpu_request)
     ]
 
     credential_generator = None
@@ -91,32 +97,46 @@ class LocalRuntimeFiles(object):
     Returns:
       Text of the skaffold yaml file.
     """
-    skaffold_yaml_text = _SKAFFOLD_TEMPLATE.format(
-        image_name=self._settings.image_name,
-        context_path=self._settings.build_context_directory or
-        os.path.dirname(self._settings.dockerfile) or '.')
-    skaffold_yaml = yaml.load(skaffold_yaml_text)
+    skaffold_yaml = yaml.load(_SKAFFOLD_TEMPLATE)
     manifests = yaml_helper.GetOrCreate(
         skaffold_yaml, ('deploy', 'kubectl', 'manifests'), constructor=list)
     manifests.append(kubernetes_file_path)
-    artifact = {'image': self._settings.image_name}
-    if self._settings.builder:
-      artifact['buildpack'] = {'builder': self._settings.builder}
+    artifact = {'image': self._settings.image}
+    # Need to escape file paths for the yaml encoder. The yaml encoder will
+    # interpret \ as the beginning of an escape character. Windows paths may
+    # have backslashes.
+    artifact['context'] = six.ensure_text(
+        self._settings.context.encode('unicode_escape'))
+
+    if isinstance(self._settings.builder, local.BuildpackBuilder):
+      artifact['buildpack'] = {
+          'builder': self._settings.builder.builder,
+          'env': ['GOOGLE_DEVMODE=1'],
+      }
+      artifact['sync'] = {'auto': {}}
     else:
-      artifact['context'] = (
-          self._settings.build_context_directory or
-          os.path.dirname(self._settings.dockerfile) or '.')
+      artifact['docker'] = {
+          'dockerfile':
+              six.ensure_text(
+                  os.path.relpath(
+                      self._settings.builder.dockerfile,
+                      self._settings.context).encode('unicode_escape'))
+      }
+
     artifacts = yaml_helper.GetOrCreate(
         skaffold_yaml, ('build', 'artifacts'), constructor=list)
     artifacts.append(artifact)
 
     if self._settings.local_port:
-      skaffold_yaml['portForward'] = [{
+      port_forward_config = {
           'resourceType': 'service',
           'resourceName': self._settings.service_name,
           'port': 8080,
           'localPort': self._settings.local_port
-      }]
+      }
+      if self._settings.namespace:
+        port_forward_config['namespace'] = self._settings.namespace
+      skaffold_yaml['portForward'] = [port_forward_config]
 
     return yaml.dump(skaffold_yaml)
 

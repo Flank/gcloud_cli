@@ -68,9 +68,9 @@ def _JoinWithOr(strings):
     return ', '.join(strings[:-1]) + ', or ' + strings[-1]
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
-  """Create a Google Compute Engine network endpoint group."""
+  """Create a Compute Engine network endpoint group."""
 
   detailed_help = DETAILED_HELP
   support_global_scope = True
@@ -78,6 +78,7 @@ class Create(base.CreateCommand):
   support_neg_type = False
   support_hybrid_neg = False
   support_l4ilb_neg = False
+  support_vm_ip_neg = False
 
   @classmethod
   def Args(cls, parser):
@@ -90,7 +91,8 @@ class Create(base.CreateCommand):
         support_global_scope=cls.support_global_scope,
         support_hybrid_neg=cls.support_hybrid_neg,
         support_l4ilb_neg=cls.support_l4ilb_neg,
-        support_regional_scope=cls.support_regional_scope)
+        support_regional_scope=cls.support_regional_scope,
+        support_vm_ip_neg=cls.support_vm_ip_neg)
 
   def Run(self, args):
     """Issues the request necessary for adding the network endpoint group."""
@@ -152,6 +154,8 @@ class Create(base.CreateCommand):
       valid_scopes['non-gcp-private-ip-port'] = ['zonal']
     if self.support_l4ilb_neg:
       valid_scopes['gce-vm-primary-ip'] = ['zonal']
+    if self.support_vm_ip_neg:
+      valid_scopes['gce-vm-ip'] = ['zonal']
 
     valid_scopes_inverted = _Invert(valid_scopes)
 
@@ -188,11 +192,18 @@ class Create(base.CreateCommand):
             '--network', 'Global NEGs cannot specify network.')
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
-  """Create a Google Compute Engine network endpoint group."""
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+  """Create a Compute Engine network endpoint group."""
 
   support_regional_scope = True
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(CreateBeta):
+  """Create a Google Compute Engine network endpoint group."""
+
   support_hybrid_neg = True
   support_l4ilb_neg = True
   support_neg_type = True
+  support_vm_ip_neg = True

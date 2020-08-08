@@ -51,7 +51,41 @@ class UsersListGATest(_BaseUsersListTest, base.SqlMockTestGA):
 
 
 class UsersListBetaTest(_BaseUsersListTest, base.SqlMockTestBeta):
-  pass
+
+  def testList(self):
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
+    self.mocked_client.users.List.Expect(
+        msgs.SqlUsersListRequest(
+            project=self.Project(), instance='my_instance'),
+        msgs.UsersListResponse(items=[
+            msgs.User(
+                project=self.Project(),
+                instance='my_instance',
+                name='postgres',
+                type=self.messages.User.TypeValueValuesEnum
+                .NATIVE),
+            msgs.User(
+                project=self.Project(),
+                instance='my_instance',
+                name='test@google.com',
+                type=self.messages.User.TypeValueValuesEnum
+                .CLOUD_IAM_USER),
+            msgs.User(
+                project=self.Project(),
+                instance='my_instance',
+                name='test-sa@iam',
+                type=self.messages.User.TypeValueValuesEnum
+                .CLOUD_IAM_SERVICE_ACCOUNT),
+        ]))
+    _ = self.Run('sql users list --instance my_instance')
+    self.AssertOutputContains(
+        """\
+NAME             HOST  TYPE
+postgres               NATIVE
+test@google.com        CLOUD_IAM_USER
+test-sa@iam            CLOUD_IAM_SERVICE_ACCOUNT
+""",
+        normalize_space=True)
 
 
 class UsersListAlphaTest(_BaseUsersListTest, base.SqlMockTestAlpha):

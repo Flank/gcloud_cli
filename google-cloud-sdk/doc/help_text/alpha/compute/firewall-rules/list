@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute firewall-rules list - list Google Compute Engine
-        firewall rules
+    gcloud alpha compute firewall-rules list - list Compute Engine firewall
+        rules
 
 SYNOPSIS
     gcloud alpha compute firewall-rules list [NAME ...]
@@ -9,8 +9,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute firewall-rules list displays all Google
-    Compute Engine firewall rules in a project.
+    (ALPHA) gcloud alpha compute firewall-rules list displays all Compute
+    Engine firewall rules in a project.
 
 POSITIONAL ARGUMENTS
      [NAME ...]

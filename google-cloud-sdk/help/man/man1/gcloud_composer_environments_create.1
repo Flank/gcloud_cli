@@ -165,7 +165,8 @@ Version of the image to run in the environment.
 
 .RS 2m
 The image version encapsulates the versions of both Cloud Composer
-and Apache Airflow. Must be of the form `composer\-A.B.C\-airflow\-X.Y[.Z]`.
+and Apache Airflow. Must be of the form
+`composer\-A.B.C[\-D.E]\-airflow\-X.Y[.Z]`.
 .RE
 
 .RS 2m
@@ -190,8 +191,7 @@ Private Clusters
 IPv4 CIDR range to use for the Cloud SQL network. This should have a size of the
 netmask not greater than 24.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .TP 2m
 \fB\-\-enable\-private\-endpoint\fR
@@ -202,8 +202,7 @@ addresses.
 If not specified, the master API endpoint will be accessible by its public IP
 address.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .TP 2m
 \fB\-\-enable\-private\-environment\fR
@@ -218,16 +217,14 @@ Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
 IPv4 CIDR range to use for the cluste master network. This should have a size of
 the netmask between 23 and 28.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .TP 2m
 \fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR
 IPv4 CIDR range to use for the Airflow web server network. This should have a
 size of the netmask between 24 and 29.
 
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
+Cannot be specified unless '\-\-enable\-private\-environment' is also specified.
 
 .RE
 .sp

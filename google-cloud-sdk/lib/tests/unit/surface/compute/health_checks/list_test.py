@@ -25,7 +25,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.health_checks import test_resources
 
 import mock
 
@@ -128,7 +128,30 @@ class HealthChecksListTest(test_base.BaseTest,
             health-check-tcp    TCP
             health-check-ssl    SSL
             health-check-http2  HTTP2
-            """), normalize_space=True)
+            health-check-grpc   GRPC
+            """),
+        normalize_space=True)
+
+  def testTableOutputGrpc(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list health-check-grpc --global --protocol grpc
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                 PROTOCOL PORT    GRPC_SERVICE_NAME
+            health-check-grpc    GRPC     88      gRPC-service
+            """),
+        normalize_space=True)
 
   def testTableOutputHttp(self):
     self.list_json.side_effect = [
@@ -342,6 +365,7 @@ class HealthChecksListTest(test_base.BaseTest,
             '--format=disable',
         ],
         expected_completions=[
+            'health-check-grpc',
             'health-check-http-1',
             'health-check-http-2',
             'health-check-https',
@@ -500,28 +524,6 @@ class HealthChecksListAlphaTest(HealthChecksListBetaTest):
     self._uri_prefix = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
 
     self._Setup()
-
-  def testTableOutputListByNameAndSpecifyProtocol(self):
-    # List a specific health check by name and specify protocol to get
-    # protocol-specific fields.
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS_ALPHA)
-    ]
-    self.Run(self._api + """
-        compute health-checks list health-check-grpc --global --protocol grpc
-        """)
-    self.list_json.assert_called_once_with(
-        requests=[(self._compute_api.healthChecks, 'List',
-                   self.messages.ComputeHealthChecksListRequest(
-                       project='my-project', maxResults=500))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                 PROTOCOL PORT    GRPC_SERVICE_NAME
-            health-check-grpc    GRPC     88      gRPC-service
-            """), normalize_space=True)
 
 
 if __name__ == '__main__':

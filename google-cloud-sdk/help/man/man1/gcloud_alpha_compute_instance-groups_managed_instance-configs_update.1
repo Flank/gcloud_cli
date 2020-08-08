@@ -11,15 +11,15 @@ gcloud alpha compute instance\-groups managed instance\-configs update \- update
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed instance\-configs update\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-remove\-stateful\-metadata\fR=\fIKEY\fR,[\fIKEY\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-no\-update\-instance\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed instance\-configs update\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-instance\-update\-minimal\-action\fR=\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR;\ default="none"] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-remove\-stateful\-metadata\fR=\fIKEY\fR,[\fIKEY\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-no\-update\-instance\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed instance\-configs
-update\fR updates the per instance config of an instance controlled by a Google
-Compute Engine managed instance group. The command lets you change the list of
+update\fR updates the per instance config of an instance controlled by a Compute
+Engine managed instance group. The command lets you change the list of
 instance\-specific stateful resources, that is, the list of resources that are
 preserved during instance restarts and recreations.
 
@@ -54,6 +54,29 @@ URI/name of an existing instance in the managed instance group.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-instance\-update\-minimal\-action\fR=\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR; default="none"
+Perform at least this action on the instance while updating, if
+\f5\-\-update\-instance\fR is set to \f5true\fR.
+\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBnone\fR
+No action
+.TP 2m
+\fBrefresh\fR
+Apply properties that are possible to apply without stopping the instance
+.TP 2m
+\fBreplace\fR
+Delete the instance and create it again
+.TP 2m
+\fBrestart\fR
+Stop the instance and start it again
+.RE
+.sp
+
+
 .TP 2m
 \fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]
 List all device names to remove from the instance's config.

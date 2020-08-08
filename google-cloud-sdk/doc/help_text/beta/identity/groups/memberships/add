@@ -18,7 +18,7 @@ REQUIRED FLAGS
         The email address of the group or user being added to a group.
 
      --organization=ORGANIZATION
-        The organization the Group being created belongs to.
+        The organization of the group the new membership is being added to.
 
 OPTIONAL FLAGS
      --roles=[ROLES,...]

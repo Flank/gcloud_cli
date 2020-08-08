@@ -20,8 +20,11 @@ from __future__ import unicode_literals
 
 import datetime
 import os
+import re
 import sys
 
+from apitools.base.py import list_pager
+from apitools.base.py.exceptions import HttpNotFoundError
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.operations import poller
 from googlecloudsdk.api_lib.util import apis
@@ -52,11 +55,14 @@ class TPUNode(object):
     self.client = apis.GetClientInstance('tpu', self._api_version)
     self.messages = apis.GetMessagesModule('tpu', self._api_version)
 
-  def _CreateDefaultNode(self, accelerator_type, tf_version):
+  def _CreateDefaultNode(
+      self, accelerator_type, tf_version, preemptible, network):
     node = self.messages.Node()
     node.acceleratorType = accelerator_type
-    node.network = ''
+    node.network = network
     node.tensorflowVersion = tf_version
+    node.schedulingConfig = self.messages.SchedulingConfig(
+        preemptible=preemptible)
     return node
 
   def _GetTpuOperationRef(self, operation):
@@ -64,7 +70,8 @@ class TPUNode(object):
     return resources.REGISTRY.ParseRelativeName(
         operation.name, collection='tpu.projects.locations.operations')
 
-  def Create(self, name, accelerator_type, tf_version, zone):
+  def Create(
+      self, name, accelerator_type, tf_version, zone, preemptible, network):
     """Create builds and issues a request to create a TPU node.
 
     Args:
@@ -72,14 +79,21 @@ class TPUNode(object):
       accelerator_type: Slice type of TPU accelerator like 'v2-8', 'v2-32'.
       tf_version: Tensorflow Version like '1.1', '1.5'.
       zone: Zone to create the TPU Node in.
+      preemptible: Boolean argument, to create a Preemptible node.
+      network: The network to create the node in
     Returns:
       A TPU Create response which needs to be polled on.
     """
     project = properties.VALUES.core.project.Get(required=True)
+    parent_ref = resources.REGISTRY.Parse(
+        zone,
+        params={'projectsId': project},
+        collection='tpu.projects.locations')
     request = self.messages.TpuProjectsLocationsNodesCreateRequest(
-        parent='projects/{}/locations/{}'.format(project, zone),
+        parent=parent_ref.RelativeName(),
         nodeId=name,
-        node=self._CreateDefaultNode(accelerator_type, tf_version))
+        node=self._CreateDefaultNode(
+            accelerator_type, tf_version, preemptible, network))
     operation = self.client.projects_locations_nodes.Create(request)
     return self._GetTpuOperationRef(operation)
 
@@ -88,6 +102,234 @@ class TPUNode(object):
         self.client.projects_locations_nodes,
         self.client.projects_locations_operations)
     return waiter.WaitFor(operation_poller, operation_ref, message)
+
+  def WaitForOperationNoResources(self, operation_ref, message):
+    operation_poller = waiter.CloudOperationPollerNoResources(
+        self.client.projects_locations_operations)
+    return waiter.WaitFor(operation_poller, operation_ref, message)
+
+  def Delete(self, name, zone):
+    """Deletes the TPU node with the given name."""
+    project = properties.VALUES.core.project.Get(required=True)
+    fully_qualified_node_name_ref = resources.REGISTRY.Parse(
+        name,
+        params={
+            'locationsId': zone,
+            'projectsId': project
+        },
+        collection='tpu.projects.locations.nodes',
+        )
+    request = self.messages.TpuProjectsLocationsNodesDeleteRequest(
+        name=fully_qualified_node_name_ref.RelativeName())
+    operation = self.client.projects_locations_nodes.Delete(request)
+    return self._GetTpuOperationRef(operation)
+
+  def List(self, zone):
+    """Retrieves all TPU Nodes."""
+    project = properties.VALUES.core.project.Get(required=True)
+    parent_ref = resources.REGISTRY.Parse(
+        zone,
+        params={'projectsId': project},
+        collection='tpu.projects.locations')
+    request = self.messages.TpuProjectsLocationsNodesListRequest(
+        parent=parent_ref.RelativeName())
+    return list_pager.YieldFromList(
+        service=self.client.projects_locations_nodes,
+        request=request,
+        method='List',
+        batch_size_attribute='pageSize',
+        field='nodes'
+        )
+
+  def Get(self, name, zone):
+    """Retrieves the TPU node in the given zone."""
+    project = properties.VALUES.core.project.Get(required=True)
+    fully_qualified_node_name_ref = resources.REGISTRY.Parse(
+        name,
+        params={
+            'locationsId': zone,
+            'projectsId': project
+        },
+        collection='tpu.projects.locations.nodes',
+        )
+    request = self.messages.TpuProjectsLocationsNodesGetRequest(
+        name=fully_qualified_node_name_ref.RelativeName())
+    return self.client.projects_locations_nodes.Get(request)
+
+  def LatestStableTensorflowVersion(self, zone):
+    """Parses available Tensorflow versions to find the most stable version."""
+    project = properties.VALUES.core.project.Get(required=True)
+    parent_ref = resources.REGISTRY.Parse(
+        zone,
+        params={'projectsId': project},
+        collection='tpu.projects.locations')
+    request = self.messages.TpuProjectsLocationsTensorflowVersionsListRequest(
+        parent=parent_ref.RelativeName()
+        )
+    tf_versions = list_pager.YieldFromList(
+        service=self.client.projects_locations_tensorflowVersions,
+        request=request,
+        batch_size_attribute='pageSize',
+        field='tensorflowVersions')
+    parsed_tf_versions = []
+    for tf_version in tf_versions:
+      parsed_tf_versions.append(
+          TensorflowVersionParser.ParseVersion(tf_version.version))
+
+    sorted_tf_versions = sorted(parsed_tf_versions)
+    for version in sorted_tf_versions:
+      if version.is_nightly:
+        raise HttpNotFoundError('No stable release found', None, None)
+
+      if not version.modifier:
+        return version.VersionString()
+
+    raise HttpNotFoundError('No stable release found', None, None)
+
+  def IsRunning(self, node):
+    return node.state == self.messages.Node.StateValueValuesEnum.READY or (
+        node.state == self.messages.Node.StateValueValuesEnum.CREATING and
+        node.ipAddress)
+
+  def NodeName(self, node):
+    pattern = 'projects/(.*)/locations/(.*)/nodes/(.*)'
+    match = re.search(pattern, node.name, re.IGNORECASE)
+    if match:
+      return match.group(3)
+    return ''
+
+
+class ComputePollerNoResources(poller.Poller):
+  """Compute operations poller that does not create a resource."""
+
+  def __init__(self, resource_service, target_ref=None):
+    super(ComputePollerNoResources, self).__init__(
+        resource_service=resource_service, target_ref=target_ref)
+
+  def GetResult(self, operation):
+    """Overrides."""
+    return None
+
+
+class TensorflowVersionParser(object):
+  """Helper to parse tensorflow versions."""
+
+  class ParseError(Exception):
+    """Error raised with input is unabled to be parse as a TF version."""
+
+  class Result(object):
+    """Helper to capture result of parsing the TF version."""
+
+    def __init__(self,
+                 major=0,
+                 minor=0,
+                 patch=0,
+                 is_nightly=False,
+                 modifier=''):
+      self.major = major
+      self.minor = minor
+      self.patch = patch
+      self.is_nightly = is_nightly
+      self.modifier = modifier
+
+    def IsUnknown(self):
+      return self.major == 0 and self.minor == 0 and not self.is_nightly
+
+    def VersionString(self):
+      if self.is_nightly:
+        return 'nightly{}'.format(self.modifier)
+      if self.major == 0 and self.minor == 0:
+        return self.modifier
+      return '{}.{}{}'.format(self.major, self.minor, self.modifier)
+
+    def __hash__(self):
+      return hash(self.major) + hash(self.minor) + hash(self.patch) + hash(
+          self.is_nightly) + hash(self.modifier)
+
+    def __eq__(self, other):
+      return (self.major == other.major and
+              self.minor == other.minor and
+              self.patch == other.patch and
+              self.is_nightly == other.is_nightly and
+              self.modifier == other.modifier)
+
+    def __lt__(self, other):
+      # Both non-nightlies, non-unknowns
+      if not self.is_nightly and not other.is_nightly and not self.IsUnknown(
+      ) and not other.IsUnknown():
+        if self.major != other.major:
+          return self.major > other.major
+        if self.minor != other.minor:
+          return self.minor > other.minor
+        if self.patch != other.patch:
+          return self.patch > other.patch
+        if not self.modifier:
+          return True
+        if not other.modifier:
+          return False
+
+      # Both nightlies
+      if self.is_nightly and other.is_nightly:
+        if not self.modifier:
+          return True
+        if not other.modifier:
+          return False
+
+      # Both unknown versions
+      if self.IsUnknown() and other.IsUnknown():
+        return self.modifier < other.modifier
+
+      # If one is an unknown version, sort after
+      if self.IsUnknown():
+        return False
+      if other.IsUnknown():
+        return True
+
+      if self.is_nightly:
+        return False
+
+      return True
+
+  _VERSION_REGEX = re.compile('^(\\d+)\\.(\\d+)(.*)$')
+  _NIGHTLY_REGEX = re.compile('^nightly(.*)$')
+  _PATCH_NUMBER_REGEX = re.compile('^\\.(\\d+)$')
+
+  @staticmethod
+  def ParseVersion(tf_version):
+    """Helper to parse the tensorflow version into it's subcomponents."""
+    if not tf_version:
+      raise TensorflowVersionParser.ParseError('Bad argument: '
+                                               'tf_version is empty')
+
+    version_match = TensorflowVersionParser._VERSION_REGEX.match(tf_version)
+    nightly_match = TensorflowVersionParser._NIGHTLY_REGEX.match(tf_version)
+
+    if version_match is None and nightly_match is None:
+      return TensorflowVersionParser.Result(modifier=tf_version)
+
+    if version_match is not None and nightly_match is not None:
+      raise TensorflowVersionParser.ParseError(
+          'TF version error: bad version: {}'.format(tf_version))
+    if version_match:
+      major = int(version_match.group(1))
+      minor = int(version_match.group(2))
+      result = TensorflowVersionParser.Result(major=major, minor=minor)
+      if version_match.group(3):
+        patch_match = TensorflowVersionParser._PATCH_NUMBER_REGEX.match(
+            version_match.group(3))
+        if patch_match:
+          matched_patch = int(patch_match.group(1))
+          if matched_patch:
+            result.patch = matched_patch
+        else:
+          result.modifier = version_match.group(3)
+      return result
+
+    if nightly_match:
+      result = TensorflowVersionParser.Result(is_nightly=True)
+      if nightly_match.group(1):
+        result.modifier = nightly_match.group(1)
+      return result
 
 
 class Instance(object):
@@ -98,21 +340,59 @@ class Instance(object):
     self.client = holder.client.apitools_client
     self.messages = holder.client.messages
 
-  def _BuildInstanceSpec(
-      self, name, zone, machine_type, disk_size, preemptible):
+  def _ImageFamilyFromTensorflowVersion(self, tf_version, use_dl_image):
+    """Generates the image family from the tensorflow version."""
+    if tf_version == 'nightly':
+      return 'tf-nightly'
+
+    parsed = TensorflowVersionParser.ParseVersion(tf_version)
+
+    if parsed.modifier:
+      raise TensorflowVersionParser.ParseError('Invalid tensorflow version:{} '
+                                               '(non-empty modifier); please '
+                                               'set the --gce-image '
+                                               'flag'.format(tf_version))
+
+    if use_dl_image:
+      return 'tf-{}-{}-gpu'.format(parsed.major, parsed.minor)
+
+    if parsed.patch:
+      return 'tf-{}-{}-{}'.format(parsed.major, parsed.minor, parsed.patch)
+
+    return 'tf-{}-{}'.format(parsed.major, parsed.minor)
+
+  def ResolveImageFromTensorflowVersion(self, tf_version, project,
+                                        use_dl_image):
+    """Queries GCE to find the right image for the given TF version."""
+    image_family = self._ImageFamilyFromTensorflowVersion(
+        tf_version, use_dl_image)
+    request = self.messages.ComputeImagesGetFromFamilyRequest(
+        family=image_family, project=project)
+    image = self.client.images.GetFromFamily(request)
+    return image and image.selfLink
+
+  def BuildInstanceSpec(self,
+                        name,
+                        zone,
+                        machine_type,
+                        disk_size,
+                        preemptible,
+                        network,
+                        source_image=None):
     """Builds an instance spec to be used for Instance creation."""
 
     disk = self.messages.AttachedDisk(
         boot=True,
         autoDelete=True,
         initializeParams=self.messages.AttachedDiskInitializeParams(
-            sourceImage='projects/ml-images/global/images/debian-10-tf-nightly-v20200403',
+            sourceImage=source_image,
             diskSizeGb=disk_size
         ))
     project_number = p_util.GetProjectNumber(
         properties.VALUES.core.project.Get(required=True))
     network_interface = self.messages.NetworkInterface(
-        network='projects/{}/global/networks/default'.format(project_number),
+        network='projects/{}/global/networks/{}'.format(
+            project_number, network),
         accessConfigs=[self.messages.AccessConfig(
             name='External NAT',
             type=self.messages.AccessConfig.TypeValueValuesEnum.ONE_TO_ONE_NAT)]
@@ -148,20 +428,97 @@ class Instance(object):
     return resources.REGISTRY.Parse(
         operation.selfLink, collection='compute.zoneOperations')
 
-  def Create(self, name, zone, machine_type, disk_size, preemptible):
+  def Create(self, name, zone, machine_type, disk_size, preemptible, gce_image,
+             network):
     """Issue request to create an Instance."""
     request = self.messages.ComputeInstancesInsertRequest(
         project=properties.VALUES.core.project.Get(required=True),
         zone=zone,
-        instance=self._BuildInstanceSpec(
-            name, zone, machine_type, disk_size, preemptible))
+        instance=self.BuildInstanceSpec(
+            name, zone, machine_type, disk_size, preemptible, network,
+            gce_image))
     operation = self.client.instances.Insert(request)
+    return self._GetComputeZoneOperationRef(operation)
+
+  def Stop(self, name, zone):
+    """Issue request to stop the Instance."""
+    project = properties.VALUES.core.project.Get(required=True)
+    request = self.messages.ComputeInstancesStopRequest(
+        instance=name,
+        project=project,
+        zone=zone
+        )
+    operation = self.client.instances.Stop(request)
+    return self._GetComputeZoneOperationRef(operation)
+
+  def Start(self, name, zone):
+    """Issue request to start the Instance."""
+    project = properties.VALUES.core.project.Get(required=True)
+    request = self.messages.ComputeInstancesStartRequest(
+        instance=name,
+        project=project,
+        zone=zone
+        )
+    operation = self.client.instances.Start(request)
     return self._GetComputeZoneOperationRef(operation)
 
   def WaitForOperation(self, operation_ref, message):
     """Wait for Instance operation to complete."""
     operation_poller = poller.Poller(self.client.instances)
     return waiter.WaitFor(operation_poller, operation_ref, message)
+
+  def WaitForOperationNoResources(self, operation_ref, message):
+    operation_poller = ComputePollerNoResources(self.client.instances)
+    return waiter.WaitFor(operation_poller, operation_ref, message)
+
+  def List(self, zone):
+    """Retrieves all Instances created by Execution Group."""
+    project = properties.VALUES.core.project.Get(required=True)
+    request = self.messages.ComputeInstancesListRequest(
+        zone=zone, project=project)
+    instances = list_pager.YieldFromList(
+        service=self.client.instances,
+        request=request,
+        method='List',
+        field='items')
+
+    result_set = []
+    for instance in instances:
+      if self._VMCreatedByExecGroup(instance):
+        result_set.append(instance)
+
+    return result_set
+
+  def Get(self, instance_name, zone):
+    """Retrieves the Instance data."""
+    project = properties.VALUES.core.project.Get(required=True)
+    request = self.messages.ComputeInstancesGetRequest(
+        zone=zone, project=project, instance=instance_name)
+    instance = self.client.instances.Get(request)
+    if self._VMCreatedByExecGroup(instance):
+      return instance
+    raise HttpNotFoundError(
+        'Instance:{} not found'.format(instance_name), None, None)
+
+  def _VMCreatedByExecGroup(self, instance):
+    if instance and instance.labels:
+      for label in instance.labels.additionalProperties:
+        if label.key == 'ctpu':
+          return True
+    return False
+
+  def IsRunning(self, instance):
+    return instance.status == self.messages.Instance.StatusValueValuesEnum.RUNNING
+
+  def Delete(self, name, zone):
+    """Deletes the specified instance in the given zone and project."""
+    request = self.messages.ComputeInstancesDeleteRequest(
+        project=properties.VALUES.core.project.Get(required=True),
+        zone=zone,
+        instance=name
+        )
+    operation = self.client.instances.Delete(request)
+    return self._GetComputeZoneOperationRef(operation)
 
 
 class SSH(object):
@@ -238,11 +595,11 @@ class SSH(object):
     identity_file = ssh_helper.keys.key_file
 
     user, _ = ssh_utils.GetUserAndInstance(args.name)
-    host_keys = self._GetHostKeyFromInstance(
-        args.zone, ssh_helper, instance)
-    options = self._GetSSHOptions(args.name, ssh_helper, instance, host_keys)
-    self._WaitForSSHKeysToPropagate(
-        ssh_helper, remote, identity_file, user, instance, options)
+    host_keys = self._GetHostKeyFromInstance(args.zone, ssh_helper, instance)
+    options = self._GetSSHOptions(args.name, ssh_helper,
+                                  instance, host_keys)
+    self._WaitForSSHKeysToPropagate(ssh_helper, remote, identity_file, user,
+                                    instance, options)
 
     extra_flags = []
     # Ctpu seems to be forwarding some other ports on what

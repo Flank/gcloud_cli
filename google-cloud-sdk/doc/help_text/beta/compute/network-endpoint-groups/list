@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta compute network-endpoint-groups list [NAME ...]
-        [--regexp=REGEXP, -r REGEXP] [--global | --zones=[ZONE,...]]
+        [--regexp=REGEXP, -r REGEXP]
+        [--global | --regions=[REGION,...] | --zones=[ZONE,...]]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
@@ -12,9 +13,10 @@ DESCRIPTION
     (BETA) gcloud beta compute network-endpoint-groups list displays all Google
     Compute Engine network endpoint groups in a project.
 
-    By default, global network endpoint groups and network endpoint groups from
-    all zones are listed. The results can be narrowed down by providing the
-    --global or --zones flag.
+    By default, global network endpoint groups, network endpoint groups from
+    all regions and network endpoint groups from all zones are listed. The
+    results can be narrowed down by providing the --global, --regions or
+    --zones flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -36,6 +38,14 @@ FLAGS
 
        --global
           If provided, only global resources are shown.
+
+       --regions=[REGION,...]
+          (DEPRECATED) If provided, only regional resources are shown. If
+          arguments are provided, only resources from the given regions are
+          shown.
+
+          Flag --regions is deprecated. Use --filter="region:( REGION ... )"
+          instead. For example --filter="region:( europe-west1 europe-west2 )".
 
        --zones=[ZONE,...]
           (DEPRECATED) If provided, only zonal resources are shown. If
@@ -94,6 +104,12 @@ EXAMPLES
     To list all global network endpoint groups in a project, run:
 
         $ gcloud beta compute network-endpoint-groups list --global
+
+    To list all network endpoint groups in the us-central1 and europe-west1
+    regions, given they are regional resources, run:
+
+        $ gcloud beta compute network-endpoint-groups list \
+            --filter="region:( europe-west1 us-central1 )"
 
     To list all network endpoint groups in zones us-central1-b and
     europe-west1-d, given they are zonal resources, run:

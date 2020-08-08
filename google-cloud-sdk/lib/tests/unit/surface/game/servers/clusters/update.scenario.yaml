@@ -1,0 +1,446 @@
+title: Cloud Game Servers clusters update test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm
+      --update-labels=a=x,b=y --description="new description" --no-dry-run
+  - stderr: |
+      Update request issued for: [my-gsc]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated game server cluster: [my-gsc]
+  - stdout: |
+      connectionInfo:
+        gkeClusterReference:
+          cluster: gke-cluster
+        namespace: default
+      createTime: '2020-05-21T09:13:51.961965484Z'
+      description: new description
+      etag: 6PtB_zSbvwlw3DHMSWovJXHaQtcaUuvQKC9Fhz887CI
+      labels:
+        a: x
+        b: y
+      name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+      updateTime: '2020-05-21T09:13:54.677258652Z'
+- execute:
+  - command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm
+      --update-labels=a=z --dry-run --preview-time 1970-01-01T00:00:00Z
+  - stdout: |
+      etag: BC6Lx2IhhqPa71j0TUx4x6uLP04ur-DLTv_Ex-ay_E4
+      targetState:
+        details:
+        - fleetDetails:
+          - fleet:
+              name: fleet-my-gsd-my-cfg
+              specSource:
+                gameServerConfigName: projects/fake-project/locations/global/gameServerDeployments/my-gsd/configs/my-cfg
+                name: f1
+          gameServerClusterName: projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc
+          gameServerDeploymentName: projects/fake-project/locations/global/gameServerDeployments/my-gsd
+- execute:
+  - command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm --no-dry-run
+  - error: '1: Must specify at least one parameter to update.'
+- execute:
+  - command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm --no-dry-run --preview-time 1970-01-01T00:00:00Z
+  - error: '1: `--preview-time` is only relevant if `--dry-run` is set to true.'
+- execute:
+  - command: |
+      game servers clusters update my-gsc --realm my-realm --clear-labels --no-dry-run
+  - stderr: |
+      Update request issued for: [my-gsc]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated game server cluster: [my-gsc]
+  - stdout: |
+      labels: {}
+      name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+- execute:
+  - command: |
+      game servers clusters update my-gsc --realm my-realm --remove-labels a --no-dry-run
+  - stderr: |
+      Update request issued for: [my-gsc]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated game server cluster: [my-gsc]
+  - stdout: |
+      labels:
+        b: c
+      name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
+- execute_command:
+    command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm
+      --update-labels=a=x,b=y --description="new description" --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '547'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+            createTime: '2020-05-21T09:13:51.961965484Z'
+            updateTime: '2020-05-21T09:13:52.378932882Z'
+            labels:
+              a: z
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: gke-cluster
+            etag: pbLM0hYEnv6vFu5KG4v8xjDiFOg2t17T3ZW_9GRv78Y
+    - expect_stderr: |
+        Update request issued for: [my-gsc]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc?alt=json&updateMask=description%2Clabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              connectionInfo:
+                gkeClusterReference:
+                  cluster: gke-cluster
+                namespace: default
+              labels:
+                a: x
+                b: y
+              name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '550'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-east1/operations/operation-1590052434621-5a624ee8a342d-b7c4b445-d625cfa0
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-05-21T09:13:54.633476141Z'
+              target: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+              verb: update
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated game server cluster: [my-gsc]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '597'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+            createTime: '2020-05-21T09:13:51.961965484Z'
+            updateTime: '2020-05-21T09:13:54.677258652Z'
+            labels:
+              b: y
+              a: x
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: gke-cluster
+            etag: 6PtB_zSbvwlw3DHMSWovJXHaQtcaUuvQKC9Fhz887CI
+            description: new description
+    - expect_stdout: |
+        connectionInfo:
+          gkeClusterReference:
+            cluster: gke-cluster
+          namespace: default
+        createTime: '2020-05-21T09:13:51.961965484Z'
+        description: new description
+        etag: 6PtB_zSbvwlw3DHMSWovJXHaQtcaUuvQKC9Fhz887CI
+        labels:
+          a: x
+          b: y
+        name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+        updateTime: '2020-05-21T09:13:54.677258652Z'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm
+      --update-labels=a=z --dry-run --preview-time 1970-01-01T00:00:00Z
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '547'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+            createTime: '2020-05-21T09:13:51.961965484Z'
+            updateTime: '2020-05-21T09:13:52.378932882Z'
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: gke-cluster
+            etag: pbLM0hYEnv6vFu5KG4v8xjDiFOg2t17T3ZW_9GRv78Y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc:previewUpdate?alt=json&previewTime=1970-01-01T00%3A00%3A00Z&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              connectionInfo:
+                gkeClusterReference:
+                  cluster: gke-cluster
+                namespace: default
+              labels:
+                a: z
+              name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            etag: BC6Lx2IhhqPa71j0TUx4x6uLP04ur-DLTv_Ex-ay_E4
+            targetState:
+              details:
+              - gameServerClusterName: projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc
+                gameServerDeploymentName: projects/fake-project/locations/global/gameServerDeployments/my-gsd
+                fleetDetails:
+                - fleet:
+                    name: fleet-my-gsd-my-cfg
+                    specSource:
+                      gameServerConfigName: projects/fake-project/locations/global/gameServerDeployments/my-gsd/configs/my-cfg
+                      name: f1
+    - expect_stdout: |
+        etag: BC6Lx2IhhqPa71j0TUx4x6uLP04ur-DLTv_Ex-ay_E4
+        targetState:
+          details:
+          - fleetDetails:
+            - fleet:
+                name: fleet-my-gsd-my-cfg
+                specSource:
+                  gameServerConfigName: projects/fake-project/locations/global/gameServerDeployments/my-gsd/configs/my-cfg
+                  name: f1
+            gameServerClusterName: projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc
+            gameServerDeploymentName: projects/fake-project/locations/global/gameServerDeployments/my-gsd
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response: null
+    - expect_exit:
+        code: 1
+        message: Must specify at least one parameter to update.
+- execute_command:
+    command: |
+      game servers clusters update my-gsc --location us-central1 --realm my-realm --no-dry-run --preview-time 1970-01-01T00:00:00Z
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response: null
+    - expect_exit:
+        code: 1
+        message: '`--preview-time` is only relevant if `--dry-run` is set to true.'
+- execute_command:
+    command: |
+      game servers clusters update my-gsc --realm my-realm --clear-labels --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '547'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+              "labels": {
+                "a": "b",
+                "b": "c"
+              }
+            }
+    - expect_stderr: |
+        Update request issued for: [my-gsc]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+              "labels": {}
+            }
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '550'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-east1/operations/operation-1590052434621-5a624ee8a342d-b7c4b445-d625cfa0
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated game server cluster: [my-gsc]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '597'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+              "labels": {}
+            }
+    - expect_stdout: |
+        labels: {}
+        name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters update my-gsc --realm my-realm --remove-labels a --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '547'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+              "labels": {
+                "a": "b",
+                "b": "c"
+              }
+            }
+    - expect_stderr: |
+        Update request issued for: [my-gsc]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+              "labels": {
+                "b": "c"
+              }
+            }
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '550'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-east1/operations/operation-1590052434621-5a624ee8a342d-b7c4b445-d625cfa0
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated game server cluster: [my-gsc]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gsc?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '597'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+              "labels": {
+                "b": "c"
+              }
+            }
+    - expect_stdout: |
+        labels:
+          b: c
+        name: projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+    - expect_exit:
+        code: 0

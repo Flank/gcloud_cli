@@ -28,6 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.dns import base
 
 
+@test_case.Filters.skipAlways('Leaking un-deletable resources', 'b/158743635')
 class PolicyTest(base.DnsTest):
 
   def SetUp(self):

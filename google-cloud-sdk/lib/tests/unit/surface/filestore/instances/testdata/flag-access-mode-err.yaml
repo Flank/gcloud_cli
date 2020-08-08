@@ -1,0 +1,14 @@
+---
+"--file-share":
+  capacity: '102400'
+  name: my_vol
+  nfs-export-options:
+  - access-mode: REdAD_WRITE
+    ip-ranges:
+    - 10.11.0.0/24
+    - 10.12.0.0/24
+    squash-mode: NO_ROOT_SQUASH
+  - access-mode: READ_ONLY
+    ip-ranges:
+    - 0.0.0.0/0
+    squash-mode: NO_ROOT_SQUASH

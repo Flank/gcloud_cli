@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute machine-images set-iam-policy - set the IAM policy for
-        a Google Compute Engine machine image
+        a Compute Engine machine image
 
 SYNOPSIS
     gcloud beta compute machine-images set-iam-policy MACHINE_IMAGE POLICY_FILE

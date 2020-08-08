@@ -20,10 +20,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import collections
+import enum
 import os
 import re
 from apitools.base.py import exceptions as apitools_exceptions
-import enum
 
 from googlecloudsdk.api_lib.container import kubeconfig
 from googlecloudsdk.api_lib.run import global_methods
@@ -117,6 +117,26 @@ def AddConfigFlags(parser):
       hidden=True,
       default='cloudbuild.yaml',  # By default, find this in the current dir
       help='The YAML or JSON file to use as the build configuration file.')
+  build_config.add_argument(
+      '--pack',
+      hidden=True,
+      type=arg_parsers.ArgDict(
+          spec={
+              'image': str,
+              'builder': str,
+              'env': str
+          },
+          required_keys=['image']),
+      action='append',
+      help='Uses CNCF buildpack (https://buildpacks.io/) to create image.  '
+      'The "image" key/value must be provided.  The image name must be in the '
+      'gcr.io/*, *.gcr.io, or pkg.dev namespaces. By default '
+      'gcr.io/buildpacks/builder will be used. To specify your own builder '
+      'image use the optional "builder" key/value argument.  To pass '
+      'environment variables to the builder use the optional "env" key/value '
+      'argument where value is a list of key values using '
+      'escaping (https://cloud.google.com/sdk/gcloud/reference/topic/escaping) '
+      'if neccessary.')
 
 
 _ARG_GROUP_HELP_TEXT = ('Only applicable if connecting to {platform_desc}. '
@@ -235,6 +255,12 @@ def AddNoTrafficFlag(parser):
       'traffic on future deployments.')
 
 
+def AddDeployTagFlag(parser):
+  """Add flag to specify a tag for the new revision."""
+  parser.add_argument(
+      '--tag', help='Traffic tag to assign to the newly created revision.')
+
+
 def AddTrafficTagsFlags(parser):
   """Add flags for updating traffic tags for a service."""
   AddMapFlagsNoFile(
@@ -312,7 +338,8 @@ def AddUpdateTrafficFlags(parser, release_track):
       'You can use "LATEST" as a special revision name to always put the given '
       'percentage of traffic on the latest ready revision.')
 
-  if release_track and base.ReleaseTrack.ALPHA == release_track:
+  if release_track and (base.ReleaseTrack.BETA == release_track or
+                        base.ReleaseTrack.ALPHA == release_track):
     group.add_argument(
         '--to-tags',
         metavar='TAG=PERCENTAGE',
@@ -452,8 +479,8 @@ def AddConcurrencyFlag(parser):
       '--concurrency',
       type=arg_parsers.CustomFunctionValidator(
           _ConcurrencyValue, 'must be an integer greater than 0 or "default".'),
-      help='Set the number of concurrent requests allowed per '
-      'container instance. A concurrency of 0 or unspecified indicates '
+      help='Set the maximum number of concurrent requests allowed per '
+      'container instance. If concurrency is unspecified, '
       'any number of concurrent requests are allowed. To unset '
       'this field, provide the special value `default`.')
 
@@ -471,17 +498,7 @@ def AddTimeoutFlag(parser):
 def AddServiceAccountFlag(parser):
   parser.add_argument(
       '--service-account',
-      help='Email address of the IAM service account associated with the '
-      'revision of the service. The service account represents the identity of '
-      'the running revision, and determines what permissions the revision has. '
-      'If not provided, the revision will use the project\'s default service '
-      'account.')
-
-
-def AddServiceAccountFlagAlpha(parser):
-  parser.add_argument(
-      '--service-account',
-      help='The service account associated with the revision of the service. '
+      help='Service account associated with the revision of the service. '
       'The service account represents the identity of '
       'the running revision, and determines what permissions the revision has. '
       'For the {} platform, this is the email address of an IAM '
@@ -533,6 +550,21 @@ def AddVpcConnectorArg(parser):
       '--clear-vpc-connector',
       action='store_true',
       help='Remove the VPC connector for this Service.')
+
+
+def AddEgressSettingsFlag(parser):
+  """Adds a flag for configuring VPC egress for fully-managed."""
+  parser.add_argument(
+      '--vpc-egress',
+      help='The outbound traffic to send through the VPC connector'
+      ' for this Service. This Service must have a VPC connector to set'
+      ' VPC egress.',
+      choices={
+          'private-ranges-only':
+              'Default option. Sends outbound traffic to private IP addresses '
+              'defined by RFC1918 through the VPC connector.',
+          'all': 'Sends all outbound traffic through the VPC connector.'
+      })
 
 
 def AddSecretsFlags(parser):
@@ -597,7 +629,7 @@ def AddLabelsFlags(parser):
 
 
 class _ScaleValue(object):
-  """Type for min/max-instaces flag values."""
+  """Type for min/max-instances flag values."""
 
   def __init__(self, value):
     self.restore_default = value == 'default'
@@ -659,7 +691,7 @@ def AddArgsFlag(parser):
 def _PortValue(value):
   """Returns True if port value is an int within range or 'default'."""
   try:
-    return value == 'default' or (int(value) >= 1 and int(value) <= 65535)
+    return value == 'default' or (1 <= int(value) <= 65535)
   except ValueError:
     return False
 
@@ -780,8 +812,7 @@ def _GetScalingChanges(args):
     else:
       result.append(
           config_changes.SetTemplateAnnotationChange(
-              revision.MIN_SCALE_ANNOTATION,
-              str(scale_value.instance_count)))
+              revision.MIN_SCALE_ANNOTATION, str(scale_value.instance_count)))
   if 'max_instances' in args and args.max_instances is not None:
     scale_value = args.max_instances
     if scale_value.restore_default:
@@ -791,8 +822,7 @@ def _GetScalingChanges(args):
     else:
       result.append(
           config_changes.SetTemplateAnnotationChange(
-              revision.MAX_SCALE_ANNOTATION,
-              str(scale_value.instance_count)))
+              revision.MAX_SCALE_ANNOTATION, str(scale_value.instance_count)))
   return result
 
 
@@ -997,6 +1027,10 @@ def GetConfigurationChanges(args):
     changes.append(config_changes.VpcConnectorChange(args.vpc_connector))
   if 'clear_vpc_connector' in args and args.clear_vpc_connector:
     changes.append(config_changes.ClearVpcConnectorChange())
+  if FlagIsExplicitlySet(args, 'vpc_egress'):
+    changes.append(
+        config_changes.SetTemplateAnnotationChange(
+            revision.EGRESS_SETTINGS_ANNOTATION, args.vpc_egress))
   if 'connectivity' in args and args.connectivity:
     if args.connectivity == 'internal':
       changes.append(config_changes.EndpointVisibilityChange(True))
@@ -1012,6 +1046,9 @@ def GetConfigurationChanges(args):
     changes.append(config_changes.ContainerPortChange(port=args.port))
   if FlagIsExplicitlySet(args, 'use_http2'):
     changes.append(config_changes.ContainerPortChange(use_http2=args.use_http2))
+  if FlagIsExplicitlySet(args, 'tag'):
+    # MUST be after 'revision_suffix' change
+    changes.append(config_changes.TagOnDeployChange(args.tag))
   return changes
 
 
@@ -1175,6 +1212,13 @@ def FlagIsExplicitlySet(args, flag):
 
 def VerifyOnePlatformFlags(args, release_track, product):
   """Raise ConfigurationError if args includes GKE only arguments."""
+
+  if product == Product.EVENTS and release_track != base.ReleaseTrack.ALPHA:
+    raise serverless_exceptions.ConfigurationError(
+        'The flag --platform={} is only compatible with "gcloud alpha events".'
+        ' Please provide an alternative platform value or use "gcloud alpha '
+        'events".'.format(PLATFORM_MANAGED))
+
   error_msg = ('The `{flag}` flag is not supported on the fully managed '
                'version of Cloud Run. Specify `--platform {platform}` or run '
                '`gcloud config set run/platform {platform}` to work with '
@@ -1294,14 +1338,6 @@ def VerifyGKEFlags(args, release_track, product):
         'flag can limit which network a service is available on to reduce '
         'access.')
 
-  if (release_track != base.ReleaseTrack.ALPHA and
-      FlagIsExplicitlySet(args, 'service_account') and product == Product.RUN):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--service-account',
-            platform=PLATFORM_MANAGED,
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
-
   if FlagIsExplicitlySet(args, 'region'):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
@@ -1320,6 +1356,13 @@ def VerifyGKEFlags(args, release_track, product):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
             flag='--clear-vpc-connector',
+            platform=PLATFORM_MANAGED,
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
+
+  if FlagIsExplicitlySet(args, 'vpc_egress'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--vpc-egress',
             platform=PLATFORM_MANAGED,
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
 
@@ -1353,14 +1396,6 @@ def VerifyKubernetesFlags(args, release_track, product):
         'flag can limit which network a service is available on to reduce '
         'access.')
 
-  if (release_track != base.ReleaseTrack.ALPHA and
-      FlagIsExplicitlySet(args, 'service_account') and product == Product.RUN):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--service-account',
-            platform=PLATFORM_MANAGED,
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
-
   if FlagIsExplicitlySet(args, 'region'):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
@@ -1379,6 +1414,13 @@ def VerifyKubernetesFlags(args, release_track, product):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
             flag='--clear-vpc-connector',
+            platform=PLATFORM_MANAGED,
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
+
+  if FlagIsExplicitlySet(args, 'vpc_egress'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--vpc-egress',
             platform=PLATFORM_MANAGED,
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
 
@@ -1494,8 +1536,9 @@ def AddSourceFlag(parser):
       'Google Cloud Storage. If the source is a local directory, this '
       'command skips the files specified in the `--ignore-file`. If '
       '`--ignore-file` is not specified, use`.gcloudignore` file. If a '
-      '`.gitignore` file is present in the local source directory, gcloud '
-      'will use a Git-compatible `.gcloudignore` file that respects your '
-      '.gitignored files. The global `.gitignore` is not respected. For more '
-      'information on `.gcloudignore`, see `gcloud topic gcloudignore`.',
+      '`.gcloudignore` file is absent and a `.gitignore` file is present in '
+      'the local source directory, gcloud will use a generated Git-compatible '
+      '`.gcloudignore` file that respects your .gitignored files. The global '
+      '`.gitignore` is not respected. For more information on `.gcloudignore`, '
+      'see `gcloud topic gcloudignore`.',
   )

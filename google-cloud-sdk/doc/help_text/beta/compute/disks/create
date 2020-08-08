@@ -1,26 +1,26 @@
 NAME
-    gcloud beta compute disks create - create Google Compute Engine persistent
-        disks
+    gcloud beta compute disks create - create Compute Engine persistent disks
 
 SYNOPSIS
     gcloud beta compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
         [--erase-windows-vss-signature]
-        [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
-        [--licenses=[LICENSE,...]]
+        [--guest-os-features=[GUEST_OS_FEATURE,...]] [--interface=INTERFACE]
+        [--labels=[KEY=VALUE,...]] [--licenses=[LICENSE,...]] [--multi-writer]
         [--physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"]
         [--replica-zones=ZONE,ZONE] [--no-require-csek-key-create]
         [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
-          | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
+          | --image-family=IMAGE_FAMILY | --source-disk=SOURCE_DISK
+          | --source-snapshot=SOURCE_SNAPSHOT]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute disks create creates one or more Google Compute
-    Engine persistent disks. When creating virtual machine instances, disks can
-    be attached to the instances through the gcloud compute instances create
+    (BETA) gcloud beta compute disks create creates one or more Compute Engine
+    persistent disks. When creating virtual machine instances, disks can be
+    attached to the instances through the gcloud compute instances create
     command. Disks can also be attached to instances that are already running
     using gcloud compute instances attach-disk.
 
@@ -32,9 +32,14 @@ DESCRIPTION
     gcloud compute images create) and creating a new disk using --image in the
     desired project and/or zone.
 
+    For a comprehensive guide, including details on minimum and maximum disk
+    size, refer to: https://cloud.google.com/compute/docs/disks
+
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]
-        Names of the disks to create.
+        Names of the disks to create. For details on the naming convention for
+        this resource, refer to:
+        https://cloud.google.com/compute/docs/naming-resources
 
 FLAGS
      --csek-key-file=FILE
@@ -63,6 +68,10 @@ FLAGS
         one of: GVNIC, MULTI_IP_SUBNET, SEV_CAPABLE, UEFI_COMPATIBLE,
         VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
+     --interface=INTERFACE
+        Specifies the disk interface to use for attaching this disk. Valid
+        values are SCSI and NVME. The default is SCSI.
+
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -75,6 +84,12 @@ FLAGS
         A list of URIs to license resources. The provided licenses will be
         added onto the created disks to indicate the licensing and billing
         policies.
+
+     --multi-writer
+        Create the disk in multi-writer mode so that it can be attached with
+        read-write access to multiple VMs. Can only be used with zonal SSD
+        persistent disks. Disks in multi-writer mode do not support resize and
+        snapshot operations.
 
      --physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"
         Physical block size of the persistent disk in bytes. Valid values are
@@ -108,8 +123,10 @@ FLAGS
         specified, GB is assumed. For example, 10GB will produce 10 gigabyte
         disks. Disk size must be a multiple of 1 GB. Limit your boot disk size
         to 2TB to account for MBR partition table limitations. If disk size is
-        not specified, the default size of 500GB for standard disks and 100GB
-        for pd-ssd disks will be used.
+        not specified, the default size of 500GB for pd-standard disks, 100GB
+        for pd-balanced disks, and 100GB for pd-ssd disks will be used. For
+        details about disk size limits, refer to:
+        https://cloud.google.com/compute/docs/disks
 
      --type=TYPE
         Specifies the type of disk to create. To get a list of available disk
@@ -147,6 +164,19 @@ FLAGS
           non-deprecated image associated with that family is used. It is best
           practice to use --image-family when the latest version of an image is
           needed.
+
+       --source-disk=SOURCE_DISK
+          Source disk used to create the disks. It is safe to delete a source
+          disk after a disk has been created from the source disk. To get a
+          list of disks in your current project, run gcloud compute disks list.
+          This flag is mutually exclusive with --image and --source-snapshot.
+
+          When using this option, the size of the disks must be at least as
+          large as the source disk size. Use --size to adjust the size of the
+          disks.
+
+          Source disk must be in the same zone/region as the disk to be
+          created.
 
        --source-snapshot=SOURCE_SNAPSHOT
           Source snapshot used to create the disks. It is safe to delete a

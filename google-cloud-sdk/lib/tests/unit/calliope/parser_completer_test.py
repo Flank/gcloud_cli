@@ -34,7 +34,7 @@ from tests.lib import completer_test_base
 from tests.lib import completer_test_completers as test_completers
 from tests.lib.calliope import util as calliope_test_util
 from tests.lib.core import core_completer_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 
 
 class ParserCompleterTest(completer_test_base.CompleterBase):

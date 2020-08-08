@@ -97,7 +97,7 @@ class SpinnerTest(test_case.WithOutputCapture):
 
   def SetUp(self):
     self._spinner = None
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self.spin_marks = (
         console_attr.GetConsoleAttr().GetProgressTrackerSymbols().spin_marks)
 

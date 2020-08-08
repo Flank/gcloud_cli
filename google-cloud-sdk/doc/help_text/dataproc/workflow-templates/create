@@ -46,8 +46,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To create a workflow template named 'my-workflow-template' in region
-    'us-central1' with label params 'key1'='value1' and 'key2'='value2', run:
+    To create a workflow template named my-workflow-template in region
+    us-central1 with label params 'key1'='value1' and 'key2'='value2', run:
 
         $ gcloud dataproc workflow-templates create my-workflow-template \
             --region=us-central1 --labels="key1=value1,key2=value2"

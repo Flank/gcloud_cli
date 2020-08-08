@@ -1,13 +1,12 @@
 NAME
-    gcloud alpha compute images describe - describe a Google Compute Engine
-        image
+    gcloud alpha compute images describe - describe a Compute Engine image
 
 SYNOPSIS
     gcloud alpha compute images describe IMAGE_NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute images describe displays all data associated
-    with a Google Compute Engine image in a project.
+    with a Compute Engine image in a project.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME

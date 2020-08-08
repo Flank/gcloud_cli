@@ -22,6 +22,7 @@ from googlecloudsdk.api_lib.domains import registrations
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.domains import resource_args
 from googlecloudsdk.command_lib.domains import util
+from googlecloudsdk.core import log
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -31,7 +32,8 @@ class GetRegisterParameters(base.DescribeCommand):
   Get parameters needed to register a new domain, including
   price, availability, supported privacy modes and notices.
 
-  This command uses fresh information from the registry.
+  In contrast to the search-domains command, this command returns up-to-date
+  domain name availability information.
 
   ## EXAMPLES
 
@@ -55,4 +57,10 @@ class GetRegisterParameters(base.DescribeCommand):
     location_ref = args.CONCEPTS.location.Parse()
 
     domain = util.NormalizeDomainName(args.domain)
+
+    if domain != args.domain:
+      log.status.Print(
+          'Domain name \'{}\' has been normalized to equivalent \'{}\'.'.format(
+              args.domain, domain))
+
     return client.RetrieveRegisterParameters(location_ref, domain)

@@ -79,7 +79,7 @@ Display detailed help.
 
 .TP 2m
 \fB\-\-project\fR=\fIPROJECT_ID\fR
-The Google Cloud Platform project name to use for this invocation. If omitted,
+The Google Cloud Platform project ID to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
 \f5gcloud config set project PROJECTID\fR.
@@ -216,6 +216,10 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Create and manage builds for Google Cloud Build.
 
 .TP 2m
+\fBcertificate\-manager\fR
+\fB(ALPHA)\fR Manage SSL certificates for your Google Cloud projects.
+
+.TP 2m
 \fBcloud\-shell\fR
 \fB(ALPHA)\fR Manage Google Cloud Shell.
 
@@ -337,7 +341,7 @@ Print user intended output to the console. Overrides the default
 
 .TP 2m
 \fBlogging\fR
-\fB(ALPHA)\fR Manage Stackdriver Logging.
+\fB(ALPHA)\fR Manage Cloud Logging.
 
 .TP 2m
 \fBmemcache\fR
@@ -355,6 +359,10 @@ Print user intended output to the console. Overrides the default
 \fBmonitoring\fR
 \fB(ALPHA)\fR Manage Cloud Monitoring alerting policies, dashboards, and
 notification channels.
+
+.TP 2m
+\fBnetwork\-security\fR
+\fB(ALPHA)\fR Manage Network Security resources.
 
 .TP 2m
 \fBnetwork\-services\fR
@@ -401,6 +409,10 @@ notification channels.
 \fB(ALPHA)\fR Manage Cloud Resources.
 
 .TP 2m
+\fBresource\-settings\fR
+\fB(ALPHA)\fR Create and manage Resource Settings.
+
+.TP 2m
 \fBresources\fR
 \fB(ALPHA)\fR List and search resources accessible from your account.
 
@@ -443,6 +455,10 @@ notification channels.
 .TP 2m
 \fBtrace\fR
 \fB(ALPHA)\fR Manage Stackdriver Trace.
+
+.TP 2m
+\fBvmware\fR
+\fB(ALPHA)\fR Manage Cloud VMware resources.
 
 .TP 2m
 \fBweb\-security\-scanner\fR

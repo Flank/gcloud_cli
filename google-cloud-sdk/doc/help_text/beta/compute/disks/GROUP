@@ -25,25 +25,25 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding to a Google Compute Engine disk.
+        (BETA) Add IAM policy binding to a Compute Engine disk.
 
      add-labels
         (BETA) Add labels to Google Compute Engine persistent disks.
 
      add-resource-policies
-        (BETA) Add resource policies to a Google Compute Engine disk.
+        (BETA) Add resource policies to a Compute Engine disk.
 
      create
-        (BETA) Create Google Compute Engine persistent disks.
+        (BETA) Create Compute Engine persistent disks.
 
      delete
-        (BETA) Delete a Google Compute Engine disk.
+        (BETA) Delete a Compute Engine disk.
 
      describe
-        (BETA) Describe a Google Compute Engine disk.
+        (BETA) Describe a Compute Engine disk.
 
      get-iam-policy
-        (BETA) Get the IAM policy for a Google Compute Engine disk.
+        (BETA) Get the IAM policy for a Compute Engine disk.
 
      list
         (BETA) List Google Compute Engine disks.
@@ -52,25 +52,25 @@ COMMANDS
         (BETA) Move a disk between zones.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding from a Google Compute Engine disk.
+        (BETA) Remove IAM policy binding from a Compute Engine disk.
 
      remove-labels
         (BETA) Remove labels from Google Compute Engine persistent disks.
 
      remove-resource-policies
-        (BETA) Remove resource policies from a Google Compute Engine disk.
+        (BETA) Remove resource policies from a Compute Engine disk.
 
      resize
         (BETA) Resize a disk or disks.
 
      set-iam-policy
-        (BETA) Set the IAM policy for a Google Compute Engine disk.
+        (BETA) Set the IAM policy for a Compute Engine disk.
 
      snapshot
-        (BETA) Create snapshots of Google Compute Engine persistent disks.
+        (BETA) Create snapshots of Compute Engine persistent disks.
 
      update
-        (BETA) Update a Google Compute Engine persistent disk.
+        (BETA) Update a Compute Engine persistent disk.
 
 NOTES
     This command is currently in BETA and may change without notice. These

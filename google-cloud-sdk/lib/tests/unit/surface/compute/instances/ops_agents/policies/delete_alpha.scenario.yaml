@@ -1,0 +1,135 @@
+title: compute instances ops-agents policies delete
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute instances ops-agents policies delete
+  - stderr: .*argument POLICY_ID\:\ Must be specified..*$
+  - error: '1: argument POLICY_ID: Must be specified.'
+- execute:
+  - command: compute instances ops-agents policies delete ops-agents-test-monitoring-policy
+  - stderr: |
+      Deleted [ops-agents-test-monitoring-policy].
+- execute:
+  - command: compute instances ops-agents policies delete ops-agents-absence-policy
+  - error: '1: Ops Agents policy [absence-policy] not found.'
+- execute:
+  - command: compute instances ops-agents policies delete ops-agents-camouflaged-policy
+  - error: '1: Ops Agents policy [ops-agents-camouflaged-policy] not found.'
+actions:
+- define_reference:
+    reference: osconfig-api-version
+    track_values:
+      ALPHA: v1beta
+- execute_command:
+    command: |
+      compute instances ops-agents policies delete
+    events:
+    - expect_stderr:
+        matches: .*argument POLICY_ID\:\ Must be specified..*
+    - expect_exit:
+        code: 1
+        message: 'argument POLICY_ID: Must be specified.'
+- execute_command:
+    command: compute instances ops-agents policies delete ops-agents-test-monitoring-policy
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies/ops-agents-test-monitoring-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "assignment": {
+                "osTypes": [
+                  {
+                    "architecture": "debian",
+                    "shortname": "linux",
+                    "version": 9
+                  }
+                ]
+              },
+              "createTime": "2019-07-16T23:15:32.089Z",
+              "description": "{\"type\": \"ops-agents\", \"description\": \"Ops Agent Test Policy Description.\", \"agentRules\": [{\"type\": \"logging\", \"version\": \"1.*.*\", \"packageState\": \"installed\", \"enableAutoupgrade\": \"false\"}, {\"type\": \"metrics\", \"version\": \"6.*.*\", \"packageState\": \"installed\", \"enableAutoupgrade\": \"true\"}]}",
+              "etag": "40d39e5c-bfde-49b4-b312-c081e5cebe84",
+              "name": "projects/fake-project/guestPolicies/ops-agents-test-monitoring-policy",
+              "packages": {
+                "desiredState": "INSTALLED",
+                "manager": "YUM",
+                "name": "stackdriver-agent"
+              },
+              "packageRepositories": [
+                {
+                  "yum": {
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el7-x86_64",
+                    "displayName": "Google Cloud Monitoring Agent Repository",
+                    "id": "google-cloud-monitoring",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ]
+                  }
+                }
+              ],
+              "updateTime": "2019-07-16T23:15:32.089Z"
+            }
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies/ops-agents-test-monitoring-policy?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+    - expect_stderr: |
+        Deleted [ops-agents-test-monitoring-policy].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances ops-agents policies delete ops-agents-absence-policy
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies/ops-agents-absence-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+    - expect_exit:
+        code: 1
+        message: Ops Agents policy [ops-agents-absence-policy] not found.
+- execute_command:
+    command: compute instances ops-agents policies delete ops-agents-camouflaged-policy
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$osconfig-api-version$$/projects/fake-project/guestPolicies/ops-agents-camouflaged-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "createTime": "2019-07-16T23:15:32.089Z",
+              "description": "Non Ops Agent Policy With oa prefix.",
+              "etag": "40d39e5c-bfde-49b4-b312-c081e5cebe84",
+              "name": "projects/fake-project/guestPolicies/ops-agents-camouflaged-policy",
+              "packages": {
+                "desiredState": "INSTALLED",
+                "name": "google-cloud-sdk"
+              },
+              "updateTime": "2019-07-16T23:15:32.089Z"
+            }
+    - expect_exit:
+        code: 1
+        message: Ops Agents policy [ops-agents-camouflaged-policy] not found.

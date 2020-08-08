@@ -77,7 +77,6 @@ def ChooseUpdateOrPreviewMethod(unused_instance_ref, args):
   if args.preview_time:
     raise PreviewTimeFieldNotRelevantError(
         '`--preview-time` is only relevant if `--dry-run` is set to true.')
-  log.status.Print('Update request issued for: [{}]'.format(args.realm))
   log.SetUserOutputEnabled(False)
   return 'patch'
 
@@ -96,7 +95,8 @@ def SetUpdateMask(ref, args, request):
   """
   del ref
   update_mask = []
-
+  if args.IsSpecified('description'):
+    update_mask.append('description')
   if (args.IsSpecified('update_labels') or
       args.IsSpecified('remove_labels') or
       args.IsSpecified('clear_labels')):
@@ -107,6 +107,9 @@ def SetUpdateMask(ref, args, request):
   if not args.dry_run and not update_mask:
     raise NoFieldsSpecifiedError(
         'Must specify at least one parameter to update.')
-
   request.updateMask = ','.join(update_mask)
+  if not args.dry_run:
+    log.SetUserOutputEnabled(args.user_output_enabled != 'false')
+    log.status.Print('Update request issued for: [{}]'.format(args.realm))
+    log.SetUserOutputEnabled(False)
   return request

@@ -11,7 +11,7 @@ gcloud alpha run deploy \- deploy a container to Cloud Run
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-clear\-vpc\-connector\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -58,10 +58,6 @@ field to its default, pass an empty string.
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
-\fB\-\-clear\-vpc\-connector\fR
-Remove the VPC connector for this Service.
-
-.TP 2m
 \fB\-\-command\fR=[\fICOMMAND\fR,...]
 Entrypoint for the container image. If not specified, the container image's
 default Entrypoint is run. To reset this field to its default, pass an empty
@@ -69,9 +65,9 @@ string.
 
 .TP 2m
 \fB\-\-concurrency\fR=\fICONCURRENCY\fR
-Set the number of concurrent requests allowed per container instance. A
-concurrency of 0 or unspecified indicates any number of concurrent requests are
-allowed. To unset this field, provide the special value \f5default\fR.
+Set the maximum number of concurrent requests allowed per container instance. If
+concurrency is unspecified, any number of concurrent requests are allowed. To
+unset this field, provide the special value \f5default\fR.
 
 .TP 2m
 \fB\-\-cpu\fR=\fICPU\fR
@@ -128,14 +124,17 @@ special value "default".
 
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
-The service account associated with the revision of the service. The service
-account represents the identity of the running revision, and determines what
-permissions the revision has. For the managed platform, this is the email
-address of an IAM service account. For the Kubernetes\-based platforms (gke,
-kubernetes), this is the name of a Kubernetes service account in the same
-namespace as the service. If not provided, the revision will use the default
-service account of the project, or default Kubernetes namespace service account
-respectively.
+Service account associated with the revision of the service. The service account
+represents the identity of the running revision, and determines what permissions
+the revision has. For the managed platform, this is the email address of an IAM
+service account. For the Kubernetes\-based platforms (gke, kubernetes), this is
+the name of a Kubernetes service account in the same namespace as the service.
+If not provided, the revision will use the default service account of the
+project, or default Kubernetes namespace service account respectively.
+
+.TP 2m
+\fB\-\-tag\fR=\fITAG\fR
+Traffic tag to assign to the newly created revision.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
@@ -150,10 +149,6 @@ assigns any traffic assigned to the LATEST revision to the specific revision
 bound to LATEST before the deployment. The effect is that the revision being
 deployed will not receive traffic. After a deployment with this flag the LATEST
 revision will not receive traffic on future deployments.
-
-.TP 2m
-\fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR
-Set a VPC connector for this Service.
 
 .TP 2m
 
@@ -358,11 +353,37 @@ a few moments to take effect. Use \fB\-\-allow\-unauthenticated\fR to enable and
 \fB\-\-no\-allow\-unauthenticated\fR to disable.
 
 .TP 2m
+\fB\-\-clear\-vpc\-connector\fR
+Remove the VPC connector for this Service.
+
+.TP 2m
 \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR
 Specify the suffix of the revision name. Revision names always start with the
 service name automatically. For example, specifying [\-\-revision\-suffix=v1]
 for a service named 'helloworld', would lead to a revision named
 \'helloworld\-v1'.
+
+.TP 2m
+\fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR
+Set a VPC connector for this Service.
+
+.TP 2m
+\fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR
+The outbound traffic to send through the VPC connector for this Service. This
+Service must have a VPC connector to set VPC egress. \fIVPC_EGRESS\fR must be
+one of:
+
+.RS 2m
+.TP 2m
+\fBall\fR
+Sends all outbound traffic through the VPC connector.
+.TP 2m
+\fBprivate\-ranges\-only\fR
+Default option. Sends outbound traffic to private IP addresses defined by
+RFC1918 through the VPC connector.
+.RE
+.sp
+
 
 .TP 2m
 

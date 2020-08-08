@@ -10,7 +10,7 @@ DESCRIPTION
 
     For more information about interconnect locations, see the interconnect
     locations documentation
-    (https://cloud.google.com/interconnect/docs/concepts/colocation-facilities).
+    (https://cloud.google.com//network-connectivity/docs/interconnect/concepts/colocation-facilities).
 
     See also: Interconnect locations API
     (https://cloud.google.com/compute/docs/reference/rest/v1/interconnectLocations).
@@ -27,7 +27,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        Describe a Google Compute Engine interconnect location.
+        Describe a Compute Engine interconnect location.
 
      list
         List Google Compute Engine interconnect locations.

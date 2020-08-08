@@ -3,12 +3,14 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: code export --service-name=blahblah  --image-name=gcr.io/project/blahblah
+  - command: code export --service-name=blahblah  --image=gcr.io/project/blahblah
       --no-skaffold-file
   - write_file: pods_and_services.yaml
 actions:
+- load_resource:
+    path: tests/e2e/surface/code/testdata/hello/Dockerfile
 - execute_command:
-    command: code export --service-name=blahblah  --image-name=gcr.io/project/blahblah
+    command: code export --service-name=blahblah  --image=gcr.io/project/blahblah
       --no-skaffold-file
     events:
     - expect_file_written:

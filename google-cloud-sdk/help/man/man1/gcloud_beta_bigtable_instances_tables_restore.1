@@ -1,0 +1,131 @@
+
+.TH "GCLOUD_BETA_BIGTABLE_INSTANCES_TABLES_RESTORE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta bigtable instances tables restore \- restore a Cloud Bigtable backup to a new table
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta bigtable instances tables restore\fR (\fB\-\-destination\fR=\fIDESTINATION\fR\ :\ \fB\-\-destination\-instance\fR=\fIDESTINATION_INSTANCE\fR) (\fB\-\-source\fR=\fISOURCE\fR\ :\ \fB\-\-source\-cluster\fR=\fISOURCE_CLUSTER\fR\ \fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command restores a Cloud Bigtable backup to a new table in the
+same instance.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Table resource \- The destination to copy to. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-destination] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+ID of the table or fully qualified identifier for the table. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-destination\-instance\fR=\fIDESTINATION_INSTANCE\fR
+The name of the Cloud Bigtable instance.
+
+.RE
+.sp
+.TP 2m
+
+Backup resource \- The source to copy from. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-source] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+ID of the backup or fully qualified identifier for the backup. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-source\-cluster\fR=\fISOURCE_CLUSTER\fR
+The name of the Cloud Bigtable cluster.
+
+.TP 2m
+\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR
+The name of the Cloud Bigtable instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To restore table 'table2' from backup 'backup1', run:
+
+.RS 2m
+$ gcloud beta bigtable instances tables restore \e
+    \-\-source\-instance=instance1 \-\-source\-cluster=cluster1 \e
+    \-\-source=backup1 \-\-destination\-instance=instance1 \e
+    \-\-destination=table2
+.RE
+
+To restore table 'table2' from backup 'backup1' using relative names, run:
+
+.RS 2m
+$ gcloud beta bigtable instances tables restore \e
+    \-\-source=projects/project1/instances/instance1/clusters/\e
+cluster1/backups/backup1 \e
+    \-\-destination=projects/project1/instances/instance1/tables/\e
+table2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud bigtable instances tables restore
+$ gcloud alpha bigtable instances tables restore
+.RE
+

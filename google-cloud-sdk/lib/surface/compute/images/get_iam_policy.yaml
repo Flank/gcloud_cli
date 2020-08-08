@@ -1,8 +1,8 @@
 release_tracks: [ALPHA, BETA, GA]
 help_text:
-  brief: Get the IAM policy for a Google Compute Engine image.
+  brief: Get the IAM policy for a Compute Engine image.
   description: |
-    *{command}* displays the IAM policy associated with a Google
+    *{command}* displays the IAM policy associated with a
     Compute Engine image in a project. If formatted as JSON,
     the output can be edited and used as a policy file for
     set-iam-policy. The output includes an "etag" field
@@ -17,15 +17,13 @@ help_text:
 request:
   collection: compute.images
   use_relative_name: false
+  modify_request_hooks:
+  - googlecloudsdk.command_lib.iam.hooks:UseMaxRequestedPolicyVersion:api_field=optionsRequestedPolicyVersion
   api_version: v1
   BETA:
     api_version: beta
-    modify_request_hooks:
-    - googlecloudsdk.command_lib.iam.hooks:UseMaxRequestedPolicyVersion:api_field=optionsRequestedPolicyVersion
   ALPHA:
     api_version: alpha
-    modify_request_hooks:
-    - googlecloudsdk.command_lib.iam.hooks:UseMaxRequestedPolicyVersion:api_field=optionsRequestedPolicyVersion
 
 arguments:
   resource:

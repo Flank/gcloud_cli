@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instance-groups unmanaged delete - delete Google
-        Compute Engine unmanaged instance groups
+    gcloud alpha compute instance-groups unmanaged delete - delete Compute
+        Engine unmanaged instance groups
 
 SYNOPSIS
     gcloud alpha compute instance-groups unmanaged delete NAME [NAME ...]
@@ -8,9 +8,9 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-groups unmanaged delete deletes one
-    or more Google Compute Engine unmanaged instance groups. This command just
-    deletes the instance group and does not delete the individual virtual
-    machine instances in the instance group. For example:
+    or more Compute Engine unmanaged instance groups. This command just deletes
+    the instance group and does not delete the individual virtual machine
+    instances in the instance group. For example:
 
         $ gcloud alpha compute instance-groups unmanaged delete \
             example-instance-group-1 example-instance-group-2 \

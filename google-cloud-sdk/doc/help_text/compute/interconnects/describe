@@ -1,5 +1,5 @@
 NAME
-    gcloud compute interconnects describe - describe a Google Compute Engine
+    gcloud compute interconnects describe - describe a Compute Engine
         interconnect
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute interconnects describe displays all data associated with
-    Google Compute Engine interconnect in a project.
+    Compute Engine interconnect in a project.
 
 POSITIONAL ARGUMENTS
      NAME

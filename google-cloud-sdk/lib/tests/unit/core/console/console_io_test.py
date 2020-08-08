@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import getpass
 import os
 import subprocess
 import sys
@@ -76,8 +77,16 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
     self.WriteInput(*lines)
     return len(lines)
 
+  def _GetFakeGetPass(self, prompt, result):
+    def fake_getpass(s):
+      sys.stderr.write(s + '\n')
+      return result
+    return fake_getpass
+
   def SetUp(self):
     """Disables prompts."""
+    self.ShowTestOutput()
+    self.mock_getpass = self.StartObjectPatch(getpass, 'getpass')
     properties.VALUES.core.disable_prompts.Set(False)
     properties.VALUES.core.interactive_ux_style.Set(
         properties.VALUES.core.InteractiveUXStyles.NORMAL.name)
@@ -458,6 +467,40 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
     self.assertIn('prompt', self.GetErr())
     self.assertIn('error', self.GetErr())
     self.assertEqual(result, '1234')
+
+  def testPromptNoPrompt(self):
+    properties.VALUES.core.disable_prompts.Set(True)
+    self.assertIsNone(console_io.PromptPassword('PasswordPrompt:'))
+
+  def testPromptPassword(self):
+    self.mock_getpass.side_effect = self._GetFakeGetPass('PasswordPrompt:',
+                                                         'the_passwd')
+    self.SetAnswers('the_passwd')
+    result = console_io.PromptPassword('PasswordPrompt:')
+    self.assertIn('PasswordPrompt', self.GetErr())
+    self.assertEqual(result, 'the_passwd')
+
+  def testPromptPasswordWithValidationAndEncoding(self):
+    self.mock_getpass.side_effect = self._GetFakeGetPass('PasswordPrompt:',
+                                                         'good')
+    self.SetAnswers('bad', 'good')
+
+    mock_iter = iter((False, True))
+    def fake_validator(s):
+      del s
+      return next(mock_iter)
+
+    def fake_encoder(s):
+      return 'ENCODED[{}]'.format(s)
+
+   # fake_validator = Mock()
+    result = console_io.PromptPassword(
+        'PasswordPromptWValidation:',
+        error_message='InvalidPassword',
+        encoder_callable=fake_encoder,
+        validation_callable=fake_validator)
+    self.assertIn('InvalidPassword', self.GetErr())
+    self.assertEqual(result, 'ENCODED[good]')
 
 
 class ProgressBarTests(sdk_test_base.WithOutputCapture):

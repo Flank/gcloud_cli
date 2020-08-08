@@ -285,10 +285,10 @@ class RegionalForwardingRulesCreateTest(
 
   def testWithConflictingContext(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--backend-service | --target-http-proxy | '
-        '--target-https-proxy | --target-instance | --target-pool | '
-        '--target-ssl-proxy | --target-tcp-proxy | --target-vpn-gateway) '
-        'must be specified.'):
+        'Exactly one of (--backend-service | --target-grpc-proxy | '
+        '--target-http-proxy | --target-https-proxy | --target-instance | '
+        '--target-pool | --target-ssl-proxy | --target-tcp-proxy | '
+        '--target-vpn-gateway) must be specified.'):
       self.Run("""
           compute forwarding-rules create forwarding-rule-1
             --region us-central2
@@ -487,9 +487,9 @@ class RegionalForwardingRulesCreateTest(
   def testMutuallyExclusiveTargetInstanceWithTargetVpnGateway(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --target-instance: Exactly one of (--backend-service | '
-        '--target-http-proxy | --target-https-proxy | --target-instance | '
-        '--target-pool | --target-ssl-proxy | --target-tcp-proxy | '
-        '--target-vpn-gateway) must be specified.'):
+        '--target-grpc-proxy | --target-http-proxy | --target-https-proxy | '
+        '--target-instance | --target-pool | --target-ssl-proxy | '
+        '--target-tcp-proxy | --target-vpn-gateway) must be specified.'):
       self.Run("""
           compute forwarding-rules create forwarding-rule-1
             --target-instance target-instance-1

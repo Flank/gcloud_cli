@@ -34,10 +34,7 @@ actions:
 
 - define_reference:
     reference: query-params
-    track_values:
-      GA: alt=json
-      BETA: alt=json&optionsRequestedPolicyVersion=3
-      ALPHA: alt=json&optionsRequestedPolicyVersion=3
+    value: alt=json&optionsRequestedPolicyVersion=3
 
 - execute_command:
     command: compute disks get-iam-policy my-disk --zone=ZONE

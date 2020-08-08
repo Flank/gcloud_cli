@@ -25,8 +25,8 @@ from googlecloudsdk import calliope
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
-from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute.backend_services import backend_services_test_base
+from tests.lib.surface.compute.backend_services import test_resources
 
 
 class BackendServiceExportTest(

@@ -181,11 +181,12 @@ class StartIapTunnelTestGA(test_base.BaseTest, parameterized.TestCase):
     self.assertTrue(self.select_mock.call_count >= 2)  # pylint:disable=g-generic-assert
     self.socket_mock.accept.assert_has_calls([mock.call()])
     self.assertEqual(self.socket_mock.accept.call_count, 1)
+    # Note that other code using socket
+    # (e.g. devshell_test_base.AuthReferenceServer) may also make calls to
+    # this mock.
     self.socket_mock.close.assert_has_calls([mock.call()])
-    self.assertEqual(self.socket_mock.close.call_count, 1)
     self.assertEqual(self.socket_mock2.accept.call_count, 0)
     self.socket_mock2.close.assert_has_calls([mock.call()])
-    self.assertEqual(self.socket_mock2.close.call_count, 1)
 
     # Calls for one connection that was accepted.  Three recv() calls that
     # result in two websocket Send().  The last results in no data and signals

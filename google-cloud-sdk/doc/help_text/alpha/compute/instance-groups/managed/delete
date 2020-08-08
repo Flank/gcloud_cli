@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instance-groups managed delete - delete Google Compute
-        Engine managed instance groups
+    gcloud alpha compute instance-groups managed delete - delete Compute Engine
+        managed instance groups
 
 SYNOPSIS
     gcloud alpha compute instance-groups managed delete NAMES [NAMES ...]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-groups managed delete deletes one or
-    more Google Compute Engine managed instance groups.
+    more Compute Engine managed instance groups.
 
 POSITIONAL ARGUMENTS
      NAMES [NAMES ...]

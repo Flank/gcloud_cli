@@ -48,9 +48,9 @@ FLAGS
         credentials.
 
      --launch-browser
-        Launch a browser for authorization. If not enabled or DISPLAY variable
-        is not set, prints a URL to standard output to be copied. Enabled by
-        default, use --no-launch-browser to disable.
+        Launch a browser for authorization. If not enabled or if it is not
+        possible to launch a browser, prints a URL to standard output to be
+        copied. Enabled by default, use --no-launch-browser to disable.
 
      --update-adc
         Write the obtained credentials to the well-known location for

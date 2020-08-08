@@ -22,6 +22,7 @@ summary:
     - message: You are about to export registration 'xn--nicode-2ya.com'
     - input: y
   - stderr: |
+      Started 'operation-1547476889506-57f6c0a4c148b-c24dcd67-77529218'
       Export in progress for registration [xn--nicode-2ya.com] Note:
       Registration remains valid until expiry. See https://support.google.com/domains/answer/6339340 for information how to access it in Google Domains.
 actions:
@@ -123,6 +124,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547476889506-57f6c0a4c148b-c24dcd67-77529218'
         Export in progress for registration [xn--nicode-2ya.com] Note:
         Registration remains valid until expiry. See https://support.google.com/domains/answer/6339340 for information how to access it in Google Domains.
     - expect_exit:

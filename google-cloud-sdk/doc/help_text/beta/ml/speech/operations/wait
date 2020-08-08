@@ -31,8 +31,9 @@ API REFERENCE
     https://cloud.google.com/speech-to-text/docs/quickstart-protocol
 
 EXAMPLES
-    To wait for the result of operation '12345': $ gcloud beta ml speech
-    operations wait 12345
+    To wait for the result of operation '12345':
+
+        $ gcloud beta ml speech operations wait 12345
 
 NOTES
     This command is currently in BETA and may change without notice. These

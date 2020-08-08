@@ -28,7 +28,7 @@ from tests.lib import sdk_test_base
 
 import mock
 
-CONFIG_HELPER_CMD = 'beta config config-helper'
+CONFIG_HELPER_CMD = 'config config-helper'
 
 
 class ConfigHelperTest(sdk_test_base.WithFakeAuth,
@@ -39,12 +39,17 @@ class ConfigHelperTest(sdk_test_base.WithFakeAuth,
                             return_value=self.temp_path)
     self.refresh_mock = self.StartObjectPatch(store, 'Refresh')
     properties.VALUES.core.project.Set(self.Project())
+    properties.VALUES.auth.disable_load_google_auth.Set(True)
 
   def GetFakeCred(self, token_expiry):
-    cred_mock = mock.MagicMock()
-    cred_mock.token_expiry = token_expiry
-    cred_mock.access_token = self.FakeAuthAccessToken()
-    return cred_mock
+    fake_cred = self._FakeAuthCredential()
+
+    if self.use_google_auth:
+      fake_cred.expiry = token_expiry
+    else:
+      fake_cred.token_expiry = token_expiry
+
+    return fake_cred
 
   def SetMockLoadCreds(self, expiry_time):
     fake_cred = self.GetFakeCred(expiry_time)
@@ -82,11 +87,29 @@ class ConfigHelperTest(sdk_test_base.WithFakeAuth,
       self.assertEqual(self.refresh_mock.called,
                        next(expected_refresh_mock_called))
 
+  def testMinExpiry(self):
+    expiry_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=40)
+    self.SetMockLoadCreds(expiry_time)
+    refresh_mock = self.StartObjectPatch(store, 'RefreshIfExpireWithinWindow')
+
+    cmd = CONFIG_HELPER_CMD + ' --min-expiry=30s'
+    self.Run(cmd)
+    refresh_mock.assert_called_with(mock.ANY, '30')
+
   def testNoCredentials(self):
     self.FakeAuthSetCredentialsPresent(False)
     with self.assertRaisesRegex(store.NoCredentialsForAccountException,
                                 'does not have any valid credentials'):
       self.Run(CONFIG_HELPER_CMD)
+
+
+class ConfigHelperTestGoogleAuth(ConfigHelperTest):
+
+  def PreSetUp(self):
+    self.use_google_auth = True
+
+  def SetUp(self):
+    properties.VALUES.auth.disable_load_google_auth.Set(False)
 
 
 class ConfigHelperTestGCE(sdk_test_base.WithFakeComputeAuth,
@@ -96,6 +119,7 @@ class ConfigHelperTestGCE(sdk_test_base.WithFakeComputeAuth,
     self.StartPropertyPatch(config.Paths, 'sdk_root',
                             return_value=self.temp_path)
     self.refresh_mock = self.StartObjectPatch(store, 'Refresh')
+    properties.VALUES.auth.disable_load_google_auth.Set(True)
 
   def testConfigHelper(self):
     c = named_configs.ConfigurationStore.CreateConfig('foo')
@@ -119,6 +143,12 @@ class ConfigHelperTestGCE(sdk_test_base.WithFakeComputeAuth,
     with self.assertRaisesRegex(store.NoCredentialsForAccountException,
                                 'does not have any valid credentials'):
       self.Run(CONFIG_HELPER_CMD)
+
+
+class ConfigHelperTestGCEGoogleAuth(ConfigHelperTestGCE):
+
+  def SetUp(self):
+    properties.VALUES.auth.disable_load_google_auth.Set(False)
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ gcloud alpha artifacts repositories create \- create an Artifact Registry reposi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha artifacts repositories create\fR (\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-repository\-format\fR=\fIREPOSITORY_FORMAT\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha artifacts repositories create\fR (\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-repository\-format\fR=\fIREPOSITORY_FORMAT\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,8 +67,8 @@ command: gcloud config set artifacts/location.
 .RS 2m
 .TP 2m
 \fB\-\-repository\-format\fR=\fIREPOSITORY_FORMAT\fR
-Format of the repository. \fIREPOSITORY_FORMAT\fR must be one of: \fBdocker\fR,
-\fBformat\-unspecified\fR, \fBmaven\fR, \fBnpm\fR.
+Format of the repository. \fIREPOSITORY_FORMAT\fR must be one of: \fBapt\fR,
+\fBdocker\fR, \fBformat\-unspecified\fR, \fBmaven\fR, \fBnpm\fR.
 
 
 .RE
@@ -84,6 +84,11 @@ Return immediately, without waiting for the operation in progress to complete.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Description for the repository.
+
+.TP 2m
+\fB\-\-kms\-key\fR=\fIKMS_KEY\fR
+Name of the encryption key that's used for encrypting the contents of the
+repository.
 
 
 .RE
@@ -114,6 +119,15 @@ run:
 
 .RS 2m
 $ gcloud alpha artifacts repositories create my\-repo
+.RE
+
+To create repository \f5my\-repo\fR with a KMS key
+\f5projects/my\-project/locations/us/keyRings/my\-kr/cryptoKeys/my\-key\fR, run:
+
+.RS 2m
+$ gcloud alpha artifacts repositories create my\-repo \e
+    \-\-kms\-key=projects/my\-project/locations/us/keyRings/my\-kr/\e
+cryptoKeys/my\-key
 .RE
 
 

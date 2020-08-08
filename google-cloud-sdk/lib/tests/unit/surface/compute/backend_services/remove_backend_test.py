@@ -499,11 +499,11 @@ class RemoveBackendTest(test_base.BaseTest):
     )
 
 
-class RemoveBackendAlphaTest(RemoveBackendTest):
+class RemoveBackendBetaTest(RemoveBackendTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testWithExistingBackendSingleRegionNeg(self):
     messages = self.messages
@@ -547,6 +547,13 @@ class RemoveBackendAlphaTest(RemoveBackendTest):
                   timeoutSec=120),
               project='my-project'))],
     )
+
+
+class RemoveBackendAlphaTest(RemoveBackendBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

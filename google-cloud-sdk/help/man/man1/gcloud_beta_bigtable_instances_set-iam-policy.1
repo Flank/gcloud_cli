@@ -65,17 +65,21 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-The following command will read an IAM policy defined in a JSON file
-\'policy.json' and set it for an instance with identifier 'my\-instance\-id'
+The following command will read an IAM policy defined in a JSON file.RS 2m
+'policy.json' and set it for an instance with identifier 'my\-instance\-id'
+
+.RE
 
 .RS 2m
 $ gcloud beta bigtable instances set\-iam\-policy my\-instance\-id \e
-    policy.json
+policy.json
 .RE
 
 
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
+.RS 2m
+See https://cloud.google.com/iam/docs/managing\-policies for details
+of the policy file format and contents.
+.RE
 
 
 

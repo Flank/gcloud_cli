@@ -23,10 +23,10 @@ import os.path
 import signal
 import subprocess
 import sys
-import tempfile
 
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.code import cross_platform_temp_file
 from googlecloudsdk.command_lib.code import flags
 from googlecloudsdk.command_lib.code import kubernetes
 from googlecloudsdk.command_lib.code import local
@@ -34,19 +34,22 @@ from googlecloudsdk.command_lib.code import local_files
 from googlecloudsdk.command_lib.code import yaml_helper
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files as file_utils
 import six
 
 
-def _EmptyHandler(unused_signum, unused_stack):
-  """Do nothing signal handler."""
-  pass
+# In integration tests SIGINT doesn't generate KeyboardInterrupt. Create a
+# signal handler that forces the generation of KeyboardInterrupt.
+def _KeyboardInterruptHandler(unused_signum, unused_stack):
+  """Raise a KeyboardInterrupt."""
+  raise KeyboardInterrupt()
 
 
 class _SigInterruptedHandler(object):
-  """Context manager to capture CTRL-C and send it to a handler."""
+  """Context manager to capture SIGINT and send it to a handler."""
 
   def __init__(self, handler):
     self._orig_handler = None
@@ -81,60 +84,12 @@ class RuntimeMissingDependencyError(exceptions.Error):
   """A runtime dependency is missing."""
 
 
-class WindowsNamedTempFile(object):
-  """Wrapper around named temporary file for Windows.
-
-  NamedTemporaryFiles cannot be read by other processes on windows because
-  only one process can open a file at a time. This file will be unlinked
-  at the end of the context.
-  """
-
-  def __init__(self, *args, **kwargs):
-    self._args = args
-    self._kwargs = kwargs.copy()
-    self._kwargs['delete'] = False
-    self._f = None
-
-  def __enter__(self):
-    self._f = tempfile.NamedTemporaryFile(*self._args, **self._kwargs)
-    return self._f
-
-  def __exit__(self, exc_type, exc_value, tb):
-    if self._f:
-      try:
-        os.unlink(self._f.name)
-      except OSError:
-        # File already unlinked. No need to clean up.
-        pass
-
-
-@contextlib.contextmanager
-def _NamedTempFile(contents):
-  """Write a named temporary with given contents.
-
-  Args:
-    contents: (str) File contents.
-
-  Yields:
-    The temporary file object.
-  """
-  if os.name == 'nt':
-    with WindowsNamedTempFile(mode='w+t') as f:
-      f.write(contents)
-      f.close()
-      yield f
-  else:
-    with tempfile.NamedTemporaryFile(mode='w+t') as f:
-      f.write(contents)
-      f.flush()
-      yield f
-
-
 @contextlib.contextmanager
 def Skaffold(skaffold_config,
              context_name=None,
              namespace=None,
              env_vars=None,
+             debug=False,
              additional_flags=None):
   """Run skaffold and catch keyboard interrupts to kill the process.
 
@@ -143,6 +98,7 @@ def Skaffold(skaffold_config,
     context_name: Kubernetes context name.
     namespace: Kubernetes namespace name.
     env_vars: Additional environment variables with which to run skaffold.
+    debug: If true, turn on debugging output.
     additional_flags: Extra skaffold flags.
 
   Yields:
@@ -153,12 +109,14 @@ def Skaffold(skaffold_config,
     cmd += ['--kube-context', context_name]
   if namespace:
     cmd += ['--namespace', namespace]
+  if debug:
+    cmd += ['-vdebug']
   if additional_flags:
     cmd += additional_flags
 
   # Supress the current Ctrl-C handler and pass the signal to the child
   # process.
-  with _SigInterruptedHandler(_EmptyHandler):
+  with _SigInterruptedHandler(_KeyboardInterruptHandler):
     # Skaffold needs to be able to run minikube and kind. Those tools
     # may live in the SDK root as installed gcloud components. Place the
     # SDK root in the path for skaffold.
@@ -203,8 +161,14 @@ def _SetImagePush(skaffold_file, shared_docker):
     skaffold_yaml = yaml.load_path(skaffold_file.name)
     local_block = yaml_helper.GetOrCreate(skaffold_yaml, ('build', 'local'))
     local_block['push'] = False
-    with _NamedTempFile(yaml.dump(skaffold_yaml)) as patched_skaffold_file:
+    with cross_platform_temp_file.NamedTempFile(
+        yaml.dump(skaffold_yaml)) as patched_skaffold_file:
       yield patched_skaffold_file
+
+
+def _IsDebug():
+  """Return true if the verbosity is equal to debug."""
+  return properties.VALUES.core.verbosity.Get() == 'debug'
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -262,15 +226,16 @@ class Dev(base.Command):
 
     self._EnsureDockerInstalled()
 
-    with _NamedTempFile(kubernetes_config) as kubernetes_file:
+    with cross_platform_temp_file.NamedTempFile(
+        kubernetes_config) as kubernetes_file:
       skaffold_config = six.ensure_text(
           local_file_generator.SkaffoldConfig(kubernetes_file.name))
-      with _NamedTempFile(skaffold_config) as skaffold_file, \
+      with cross_platform_temp_file.NamedTempFile(skaffold_config) as skaffold_file, \
            self._GetKubernetesEngine(args) as kube_context, \
            self._WithKubeNamespace(args.namespace, kube_context.context_name), \
            _SetImagePush(skaffold_file, kube_context.shared_docker) as patched_skaffold_file, \
            Skaffold(patched_skaffold_file.name, kube_context.context_name,
-                    args.namespace, kube_context.env_vars,
+                    args.namespace, kube_context.env_vars, _IsDebug(),
                     args.additional_skaffold_flags) as skaffold:
         skaffold.wait()
 
@@ -302,7 +267,7 @@ class Dev(base.Command):
         cluster_name = kubernetes.DEFAULT_CLUSTER_NAME
 
       return kubernetes.Minikube(cluster_name, args.stop_cluster,
-                                 args.minikube_vm_driver)
+                                 args.minikube_vm_driver, _IsDebug())
 
     if args.IsSpecified('kube_context'):
       return External()

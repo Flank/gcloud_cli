@@ -69,6 +69,23 @@ DETAILED_HELP = {
         and 'example-instance-3' in the 'us-central1-a' zone, run:
 
           $ {command} example-instance-1 example-instance-2 example-instance-3 --zone=us-central1-a
+
+        To create an instance called 'instance-1' from a source snapshot called
+        'instance-snapshot' in zone 'us-central2-a' and attached regional disk
+        'disk-1', run:
+
+          $ {command} instance-1 --source-snapshot=https://compute.googleapis.com/compute/v1/projects/myproject/global/snapshots/instance-snapshot --zone=central2-a --disk=name=disk1,scope=regional
+
+        To create an instance called instance-1 as a shielded vm with
+        secure boot, virtual trusted platform module (vTPM) enabled and
+        integrity monitoring, run:
+
+          $ {command} instance-1 --zone=central2-a --shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring
+
+        To create an preemptible instance called 'instance-1', run:
+
+          $ {command} instance-1 --machine-type=n1-standard-1 --zone=us-central1-b --preemptible --no-restart-on-failure --maintenance-policy=terminate
+
         """,
 }
 
@@ -82,7 +99,8 @@ def _CommonArgs(parser,
                 supports_location_hint=False,
                 supports_erase_vss=False,
                 snapshot_csek=False,
-                image_csek=False):
+                image_csek=False,
+                support_multi_writer=True):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
@@ -92,7 +110,9 @@ def _CommonArgs(parser,
       enable_snapshots=True,
       resource_policy=enable_resource_policy,
       source_snapshot_csek=snapshot_csek,
-      image_csek=image_csek)
+      image_csek=image_csek,
+      support_boot=True,
+      support_multi_writer=support_multi_writer)
   instances_flags.AddCanIpForwardArgs(parser)
   instances_flags.AddAddressArgs(parser, instances=True)
   instances_flags.AddAcceleratorArgs(parser)
@@ -180,16 +200,17 @@ class Create(base.CreateCommand):
   _deprecate_maintenance_policy = False
   _support_create_disk_snapshots = True
   _support_boot_snapshot_uri = True
-  _support_private_ipv6_google_access = False
 
   @classmethod
   def Args(cls, parser):
-    _CommonArgs(parser, enable_kms=cls._support_kms)
+    _CommonArgs(parser, enable_kms=cls._support_kms, support_multi_writer=False)
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
     instances_flags.AddLocalSsdArgs(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
+    instances_flags.AddPrivateIpv6GoogleAccessArg(
+        parser, utils.COMPUTE_GA_API_VERSION)
 
   def Collection(self):
     return 'compute.instances'
@@ -242,9 +263,16 @@ class Create(base.CreateCommand):
         skip_defaults=skip_defaults,
         support_public_dns=self._support_public_dns)
 
-    create_boot_disk = not instance_utils.UseExistingBootDisk(args.disk or [])
+    confidential_vm = (self._support_confidential_compute and
+                       args.IsSpecified('confidential_compute') and
+                       args.confidential_compute)
+
+    create_boot_disk = not (
+        instance_utils.UseExistingBootDisk((args.disk or []) +
+                                           (args.create_disk or [])))
     image_uri = create_utils.GetImageUri(args, compute_client, create_boot_disk,
-                                         project, resource_parser)
+                                         project, resource_parser,
+                                         confidential_vm)
 
     shielded_instance_config = create_utils.BuildShieldedInstanceConfigMessage(
         messages=compute_client.messages, args=args)
@@ -323,8 +351,7 @@ class Create(base.CreateCommand):
           scheduling=scheduling,
           tags=tags)
 
-      if (self._support_private_ipv6_google_access and
-          args.private_ipv6_google_access_type is not None):
+      if args.private_ipv6_google_access_type is not None:
         instance.privateIpv6GoogleAccess = (
             instances_flags.GetPrivateIpv6GoogleAccessTypeFlagMapper(
                 compute_client.messages).GetEnumForChoice(
@@ -476,13 +503,12 @@ class CreateBeta(Create):
   _support_location_hint = False
   _support_source_snapshot_csek = False
   _support_image_csek = False
-  _support_confidential_compute = False
+  _support_confidential_compute = True
   _support_post_key_revocation_action_type = False
   _support_rsa_encrypted = True
   _deprecate_maintenance_policy = False
   _support_create_disk_snapshots = True
   _support_boot_snapshot_uri = True
-  _support_private_ipv6_google_access = True
 
   def GetSourceMachineImage(self, args, resources):
     """Retrieves the specified source machine image's selflink.
@@ -519,6 +545,7 @@ class CreateBeta(Create):
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
     instances_flags.AddPrivateIpv6GoogleAccessArg(
         parser, utils.COMPUTE_BETA_API_VERSION)
+    instances_flags.AddConfidentialComputeArgs(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -542,7 +569,6 @@ class CreateAlpha(CreateBeta):
   _deprecate_maintenance_policy = True
   _support_create_disk_snapshots = True
   _support_boot_snapshot_uri = True
-  _support_private_ipv6_google_access = True
 
   @classmethod
   def Args(cls, parser):

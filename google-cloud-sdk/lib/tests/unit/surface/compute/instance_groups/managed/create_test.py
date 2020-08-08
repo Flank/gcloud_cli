@@ -25,7 +25,7 @@ from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 
 
 class _InstanceGroupManagersCreateZonalWithAutohealingTestBase(object):

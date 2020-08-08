@@ -30,9 +30,7 @@ class CreateTestAlpha(unit_test_base.SCMUnitTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testCreate(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
-    self.ExpectCreateQuotaOverrideCall(self.mutate_limit_name,
+    self.ExpectUpdateQuotaOverrideCall(self.mutate_limit_name,
                                        self.mutate_metric, self.unit, 666,
                                        self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
@@ -48,9 +46,7 @@ Operation "operations/123" finished successfully.
         normalize_space=True)
 
   def testCreate_force(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
-    self.ExpectCreateQuotaOverrideCall(
+    self.ExpectUpdateQuotaOverrideCall(
         self.mutate_limit_name,
         self.mutate_metric,
         self.unit,
@@ -70,9 +66,7 @@ Operation "operations/123" finished successfully.
         normalize_space=True)
 
   def testCreate_dimensions(self):
-    self.ExpectListQuotaMetricsCall(
-        [self.mutate_quota_metric, self.default_quota_metric])
-    self.ExpectCreateQuotaOverrideCall(
+    self.ExpectUpdateQuotaOverrideCall(
         self.mutate_limit_name,
         self.mutate_metric,
         self.unit,

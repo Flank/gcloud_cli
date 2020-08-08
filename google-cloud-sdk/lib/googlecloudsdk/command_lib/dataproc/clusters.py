@@ -149,6 +149,12 @@ def ArgsForClusterRef(parser,
       dependencies, miscellaneous config files, and job driver console output
       when using this cluster.
       """)
+  parser.add_argument(
+      '--temp-bucket',
+      help="""\
+      The Google Cloud Storage bucket to use by default to to store
+      ephemeral cluster and jobs data, such as Spark and MapReduce history files.
+      """)
 
   netparser = gce_platform_group.add_argument_group(mutex=True)
   netparser.add_argument(
@@ -328,6 +334,13 @@ If you want to enable all scopes use the 'cloud-platform' scope.
                 'Use the `--secondary-worker-boot-disk-type` flag instead.')))
   secondary_worker_boot_disk_type.add_argument(
       '--secondary-worker-boot-disk-type', help=boot_disk_type_detailed_help)
+  parser.add_argument(
+      '--enable-component-gateway',
+      action='store_true',
+      help="""\
+        Enable access to the web UIs of selected components on the cluster
+        through the component gateway.
+        """)
 
   autoscaling_group = parser.add_argument_group()
   flags.AddAutoscalingPolicyResourceArgForCluster(
@@ -548,14 +561,7 @@ def _AddDiskArgsDeprecated(parser):
 
 def BetaArgsForClusterRef(parser):
   """Register beta-only flags for creating a Dataproc cluster."""
-
-  parser.add_argument(
-      '--enable-component-gateway',
-      action='store_true',
-      help="""\
-        Enable access to the web UIs of selected components on the cluster
-        through the component gateway.
-        """)
+  pass
 
 
 def GetClusterConfig(args,
@@ -710,6 +716,7 @@ def GetClusterConfig(args,
 
   cluster_config = dataproc.messages.ClusterConfig(
       configBucket=args.bucket,
+      tempBucket=args.temp_bucket,
       gceClusterConfig=gce_cluster_config,
       masterConfig=dataproc.messages.InstanceGroupConfig(
           numInstances=args.num_masters,
@@ -816,10 +823,9 @@ def GetClusterConfig(args,
             minCpuPlatform=args.worker_min_cpu_platform,
             preemptibility=_GetType(dataproc, args.secondary_worker_type)))
 
-  if beta:
-    if args.enable_component_gateway:
-      cluster_config.endpointConfig = dataproc.messages.EndpointConfig(
-          enableHttpPortAccess=args.enable_component_gateway)
+  if args.enable_component_gateway:
+    cluster_config.endpointConfig = dataproc.messages.EndpointConfig(
+        enableHttpPortAccess=args.enable_component_gateway)
 
   if include_gke_platform_args:
     if args.gke_cluster is not None:
@@ -961,6 +967,34 @@ def DeleteGeneratedLabels(cluster, dataproc):
     else:
       cluster.labels = encoding.DictToAdditionalPropertyMessage(
           labels, dataproc.messages.Cluster.LabelsValue)
+
+
+def DeleteGeneratedProperties(cluster, dataproc):
+  """Filter out Dataproc-generated cluster properties.
+
+  Args:
+    cluster: Cluster to filter
+    dataproc: Dataproc object that contains client, messages, and resources
+  """
+  if (not cluster.config or not cluster.config.softwareConfig or
+      not cluster.config.softwareConfig.properties):
+    return
+  # Filter out Dataproc-generated properties.
+  props = encoding.MessageToPyValue(cluster.config.softwareConfig.properties)
+  # We don't currently have a nice way to tell which properties are
+  # Dataproc-generated, so for now, delete a few properties that we know contain
+  # cluster-specific info.
+  props_to_delete = [
+      'hdfs:dfs.namenode.lifeline.rpc-address',
+      'hdfs:dfs.namenode.servicerpc-address'
+  ]
+  for prop in props_to_delete:
+    del props[prop]
+  if not props:
+    cluster.config.softwareConfig.properties = None
+  else:
+    cluster.config.softwareConfig.properties = encoding.DictToAdditionalPropertyMessage(
+        props, dataproc.messages.SoftwareConfig.PropertiesValue)
 
 
 def AddReservationAffinityGroup(parser, group_text, affinity_text):

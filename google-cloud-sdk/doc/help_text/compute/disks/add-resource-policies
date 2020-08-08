@@ -1,6 +1,6 @@
 NAME
     gcloud compute disks add-resource-policies - add resource policies to a
-        Google Compute Engine disk
+        Compute Engine disk
 
 SYNOPSIS
     gcloud compute disks add-resource-policies DISK_NAME
@@ -8,11 +8,11 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Add resource policies to a Google Compute Engine disk.
+    Add resource policies to a Compute Engine disk.
 
     gcloud compute disks add-resource-policies adds resource policies to a
-    Google Compute Engine disk. These policies define a schedule for taking
-    snapshots and a retention period for these snapshots.
+    Compute Engine disk. These policies define a schedule for taking snapshots
+    and a retention period for these snapshots.
 
     For information on how to create resource policies, see:        $ gcloud beta compute resource-policies create --help
 
@@ -78,8 +78,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command adds two resource policies to a Google Compute Engine
-    disk.
+    The following command adds two resource policies to a Compute Engine disk.
 
         $ gcloud compute disks add-resource-policies my-disk --zone=ZONE \
             --resource-policies=policy-1,policy-2

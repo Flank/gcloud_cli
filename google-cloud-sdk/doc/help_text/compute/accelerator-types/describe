@@ -1,5 +1,5 @@
 NAME
-    gcloud compute accelerator-types describe - describe Google Compute Engine
+    gcloud compute accelerator-types describe - describe Compute Engine
         accelerator types
 
 SYNOPSIS
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute accelerator-types describe displays all data associated with
-    a Google Compute Engine accelerator type.
+    a Compute Engine accelerator type.
 
 POSITIONAL ARGUMENTS
      NAME

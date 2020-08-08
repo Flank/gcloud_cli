@@ -11,7 +11,7 @@ gcloud sql instances patch \- updates the settings of a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql instances patch\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-diff\fR] [\fB\-\-[no\-]enable\-bin\-log\fR] [\fB\-\-[no\-]enable\-database\-replication\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-any\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-[no\-]require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]\ |\ \fB\-\-clear\-gae\-apps\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]\ |\ \fB\-\-clear\-authorized\-networks\fR] [\fB\-\-clear\-database\-flags\fR\ |\ \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-no\-backup\fR\ |\ \fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR\ \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql instances patch\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-diff\fR] [\fB\-\-[no\-]enable\-bin\-log\fR] [\fB\-\-[no\-]enable\-database\-replication\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-any\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-[no\-]require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]\ |\ \fB\-\-clear\-gae\-apps\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]\ |\ \fB\-\-clear\-authorized\-networks\fR] [\fB\-\-clear\-database\-flags\fR\ |\ \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-no\-backup\fR\ |\ \fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR\ \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -93,6 +93,12 @@ and \fB\-\-no\-enable\-bin\-log\fR to disable.
 Enable database replication. Applicable only for read replica instance(s).
 WARNING: Instance will be restarted. Use \fB\-\-enable\-database\-replication\fR
 to enable and \fB\-\-no\-enable\-database\-replication\fR to disable.
+
+.TP 2m
+\fB\-\-enable\-point\-in\-time\-recovery\fR
+Specifies if point\-in\-time recovery (using write\-ahead log archiving) should
+be enabled. If backup configuration is disabled, point\-in\-time recovery must
+be disabled as well.
 
 .TP 2m
 \fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR

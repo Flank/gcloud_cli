@@ -34,21 +34,17 @@ from googlecloudsdk.command_lib.compute.backend_services import flags
 class AddBackend(base.UpdateCommand):
   """Add a backend to a backend service.
 
-  *{command}* is used to add a backend to a backend service. A
-  backend is a group of tasks that can handle requests sent to a
-  backend service. Currently, the group of tasks can be one or
-  more Google Compute Engine virtual machine instances grouped
-  together using an instance group or network endpoint group.
-
-  Traffic is first spread evenly across all virtual machines or
-  network endpoints in the group. When the group is full, traffic
-  is sent to the next nearest group(s) that still have remaining
-  capacity.
+  *{command}* adds a backend to a backend service. A
+  backend is a group of VMs or network endpoints that can handle
+  requests sent to a load balancer.
 
   To modify the parameters of a backend after it has been added
   to the backend service, use
   `gcloud compute backend-services update-backend` or
   `gcloud compute backend-services edit`.
+
+  For more information about the available settings, see
+  https://cloud.google.com/load-balancing/docs/backend-service.
   """
 
   support_global_neg = True
@@ -206,28 +202,25 @@ class AddBackend(base.UpdateCommand):
         [self._GetSetRequest(client, backend_service_ref, new_object)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class AddBackendBeta(AddBackend):
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+class AddBackendAlphaBeta(AddBackend):
   """Add a backend to a backend service.
 
-  *{command}* is used to add a backend to a backend service. A
-  backend is a group of tasks that can handle requests sent to a
-  backend service. Currently, the group of tasks can be one or
-  more Google Compute Engine virtual machine instances grouped
-  together using an instance group or network endpoint group.
-
-  Traffic is first spread evenly across all virtual machines or
-  network endpoints in the group. When the group is full, traffic
-  is sent to the next nearest group(s) that still have remaining
-  capacity.
+  *{command}* adds a backend to a backend service. A
+  backend is a group of VMs or network endpoints that can handle
+  requests sent to a load balancer.
 
   To modify the parameters of a backend after it has been added
   to the backend service, use
   `gcloud compute backend-services update-backend` or
   `gcloud compute backend-services edit`.
+
+  For more information about the available settings, see
+  https://cloud.google.com/load-balancing/docs/backend-service.
   """
 
   support_global_neg = True
+  support_region_neg = True
 
   def _CreateBackendMessage(self, messages, group_uri, balancing_mode, args):
     """Overrides."""
@@ -246,27 +239,3 @@ class AddBackendBeta(AddBackend):
         maxConnectionsPerInstance=args.max_connections_per_instance,
         maxConnectionsPerEndpoint=args.max_connections_per_endpoint,
         failover=args.failover)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AddBackendAlpha(AddBackendBeta):
-  """Add a backend to a backend service.
-
-  *{command}* is used to add a backend to a backend service. A
-  backend is a group of tasks that can handle requests sent to a
-  backend service. Currently, the group of tasks can be one or
-  more Google Compute Engine virtual machine instances grouped
-  together using an instance group or network endpoint group.
-
-  Traffic is first spread evenly across all virtual machines or
-  network endpoints in the group. When the group is full, traffic
-  is sent to the next nearest group(s) that still have remaining
-  capacity.
-
-  To modify the parameters of a backend after it has been added
-  to the backend service, use
-  `gcloud compute backend-services update-backend` or
-  `gcloud compute backend-services edit`.
-  """
-
-  support_region_neg = True

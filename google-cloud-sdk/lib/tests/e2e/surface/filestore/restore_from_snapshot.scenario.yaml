@@ -233,7 +233,8 @@ actions:
     validation_only: true
     events:
     - expect_prompt_continue:
-        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$instance$$.
+        message: |-
+          You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$instance$$.
           Are you sure?
         user_input: y
     - expect_stderr:

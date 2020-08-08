@@ -4,7 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instance-groups managed instance-configs delete NAME
-        --instances=INSTANCE,[INSTANCE,...] [--no-update-instance]
+        --instances=INSTANCE,[INSTANCE,...]
+        [--instance-update-minimal-action=INSTANCE_UPDATE_MINIMAL_ACTION;
+          default="none"] [--no-update-instance]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -25,6 +27,21 @@ REQUIRED FLAGS
         Names of instances to delete instance-configs from.
 
 OPTIONAL FLAGS
+     --instance-update-minimal-action=INSTANCE_UPDATE_MINIMAL_ACTION; default="none"
+        Perform at least this action on the instance while updating, if
+        --update-instance is set to true. INSTANCE_UPDATE_MINIMAL_ACTION must
+        be one of:
+
+         none
+            No action
+         refresh
+            Apply properties that are possible to apply without stopping the
+            instance
+         replace
+            Delete the instance and create it again
+         restart
+            Stop the instance and start it again
+
      --update-instance
         Apply the configuration changes immediately to the instance. If you
         disable this flag, the managed instance group will apply the config

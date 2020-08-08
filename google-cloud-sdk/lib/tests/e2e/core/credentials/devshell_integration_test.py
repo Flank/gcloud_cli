@@ -56,7 +56,8 @@ class ProxiedAuthIntegration(e2e_base.WithServiceAuth):
   def testSimpleGoogleAuthIntegration(self):
     creds = c_store.Load(use_google_auth=True)
     self.assertIsInstance(creds, devshell.DevShellCredentialsGoogleAuth)
-    self.Run('sql flags list')
+    # dns surface is on google-auth
+    self.Run('dns managed-zones list')
 
 
 if __name__ == '__main__':

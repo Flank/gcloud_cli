@@ -27,13 +27,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create a Google Compute Engine network endpoint group.
+        (BETA) Create a Compute Engine network endpoint group.
 
      delete
-        (BETA) Delete a Google Compute Engine network endpoint group.
+        (BETA) Delete a Compute Engine network endpoint group.
 
      describe
-        (BETA) Describe a Google Compute Engine network endpoint group.
+        (BETA) Describe a Compute Engine network endpoint group.
 
      list
         (BETA) List Google Compute Engine network endpoint groups.
@@ -42,7 +42,7 @@ COMMANDS
         (BETA) List network endpoints in a network endpoint group.
 
      update
-        (BETA) Update a Google Compute Engine network endpoint group.
+        (BETA) Update a Compute Engine network endpoint group.
 
 NOTES
     This command is currently in BETA and may change without notice. These

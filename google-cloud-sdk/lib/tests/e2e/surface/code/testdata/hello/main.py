@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Sample app for E2E testing."""
+from __future__ import print_function
+
+import os
+
 import flask
 
 app = flask.Flask(__name__)
@@ -24,4 +28,4 @@ def index():
 
 
 if __name__ == '__main__':
-  app.run('0.0.0.0', port=8080)
+  app.run('0.0.0.0', port=os.environ['PORT'])

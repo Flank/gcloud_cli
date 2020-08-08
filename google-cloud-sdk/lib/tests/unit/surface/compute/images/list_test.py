@@ -53,13 +53,13 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
              project='centos-cloud')),
         (self.compute_v1.images, 'List',
          self.messages.ComputeImagesListRequest(
-             project='coreos-cloud')),
-        (self.compute_v1.images, 'List',
-         self.messages.ComputeImagesListRequest(
              project='cos-cloud')),
         (self.compute_v1.images, 'List',
          self.messages.ComputeImagesListRequest(
              project='debian-cloud')),
+        (self.compute_v1.images, 'List',
+         self.messages.ComputeImagesListRequest(
+             project='fedora-coreos-cloud')),
         (self.compute_v1.images, 'List',
          self.messages.ComputeImagesListRequest(
              project='my-project')),
@@ -188,15 +188,15 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
                   (self.compute_v1.images, 'List',
                    self.messages.ComputeImagesListRequest(
                        filter=r'name eq ".*(^image-.*|centos-.*$).*"',
-                       project='coreos-cloud')),
-                  (self.compute_v1.images, 'List',
-                   self.messages.ComputeImagesListRequest(
-                       filter=r'name eq ".*(^image-.*|centos-.*$).*"',
                        project='cos-cloud')),
                   (self.compute_v1.images, 'List',
                    self.messages.ComputeImagesListRequest(
                        filter=r'name eq ".*(^image-.*|centos-.*$).*"',
                        project='debian-cloud')),
+                  (self.compute_v1.images, 'List',
+                   self.messages.ComputeImagesListRequest(
+                       filter=r'name eq ".*(^image-.*|centos-.*$).*"',
+                       project='fedora-coreos-cloud')),
                   (self.compute_v1.images, 'List',
                    self.messages.ComputeImagesListRequest(
                        filter=r'name eq ".*(^image-.*|centos-.*$).*"',
@@ -365,13 +365,13 @@ class ImagesListBetaTest(test_base.BaseTest):
              project='centos-cloud')),
         (self.compute.images, 'List',
          self.messages.ComputeImagesListRequest(
-             project='coreos-cloud')),
-        (self.compute.images, 'List',
-         self.messages.ComputeImagesListRequest(
              project='cos-cloud')),
         (self.compute.images, 'List',
          self.messages.ComputeImagesListRequest(
              project='debian-cloud')),
+        (self.compute.images, 'List',
+         self.messages.ComputeImagesListRequest(
+             project='fedora-coreos-cloud')),
         (self.compute.images, 'List',
          self.messages.ComputeImagesListRequest(
              project='my-project')),

@@ -108,6 +108,13 @@ class TestAuthUtils(cli_test_base.CliTestBase,
         self.MakeUserAccountCredentialsGoogleAuth()).DumpExtendedADCToFile()
     self.assertEqual(auth_util.GetQuotaProjectFromADC(), 'my project')
 
+  def testIsHostGoogleDomain(self):
+    # IsHostGoogleDomain() should return False if the env var is not set.
+    self.assertIs(auth_util.IsHostGoogleDomain(), False)
+
+    os.environ[auth_util._IS_GOOGLE_DOMAIN_ENV_VAR] = 'true'
+    self.assertIs(auth_util.IsHostGoogleDomain(), True)
+
 
 class TestAdcPermissionValidation(cli_test_base.CliTestBase,
                                   credentials_test_base.CredentialsTestBase):

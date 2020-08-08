@@ -55,6 +55,18 @@ class TableAndMappedTest(test_case.TestCase, parameterized.TestCase):
     column_widths = marker.CalculateColumnWidths(indent_length=2)
     self.assertEqual(column_widths.widths, [6, 2, 0])
 
+  def testWillPrintOutputAtLeastOneNonEmptyRowReturnsTrue(self, constructor):
+    marker = constructor([(), ('a',)])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputAllRowsEmptyReturnsFalse(self, constructor):
+    marker = constructor([(), ()])
+    self.assertFalse(marker.WillPrintOutput())
+
+  def testWillPrintOutputNoRowsReturnsFalse(self, constructor):
+    marker = constructor([])
+    self.assertFalse(marker.WillPrintOutput())
+
   def testPrintBasic(self, constructor):
     marker = constructor([
         ('aa', 'aaa', 'a'),
@@ -184,6 +196,30 @@ class LabeledTest(test_case.TestCase):
     column_widths = labeled.CalculateColumnWidths(indent_length=2)
     self.assertEqual(column_widths.widths, [7, 3, 0])
 
+  def testWillPrintOutputAtLeastOneRowNotFollowedByEmptyReturnsTrue(self):
+    marker = cp.Labeled([(), ('a', 'b')])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputFollowedByEmptyReturnsFalse(self):
+    marker = cp.Labeled([(), ('a',)])
+    self.assertFalse(marker.WillPrintOutput())
+
+  def testWillPrintOutputAllRowsEmptyReturnsFalse(self):
+    marker = cp.Labeled([(), ()])
+    self.assertFalse(marker.WillPrintOutput())
+
+  def testWillPrintOutputNoRowsReturnsFalse(self):
+    marker = cp.Labeled([])
+    self.assertFalse(marker.WillPrintOutput())
+
+  def testWillPrintOutputAtLeastOneMarkerWithOutputReturnsTrue(self):
+    marker = cp.Labeled([(), ('label', cp.Labeled([('a', 'b')]))])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputMarkerWithNoOutputReturnsFalse(self):
+    marker = cp.Labeled([(), ('label', cp.Labeled([('a',)]))])
+    self.assertFalse(marker.WillPrintOutput())
+
   def testPrintIncludesSeparator(self):
     labeled = cp.Labeled([
         ('aa', 'aaa'),
@@ -225,6 +261,38 @@ class LabeledTest(test_case.TestCase):
       self.assertEqual(out.getvalue(), textwrap.dedent("""\
       aa:   aaa
       bbbb: bb
+      ddd:  dd
+      """))
+
+  def testPrintSkipsFollowedByNoOutputMarker(self):
+    labeled = cp.Labeled([
+        ('aa', 'aaa'),
+        ('bbbb', 'bb'),
+        ('cc', cp.Labeled([('c',)])),
+        ('ddd', 'dd'),
+    ])
+    with io.StringIO() as out:
+      labeled.Print(out, 0, cp.ColumnWidths(row=('55555', '333')))
+      self.assertEqual(out.getvalue(), textwrap.dedent("""\
+      aa:   aaa
+      bbbb: bb
+      ddd:  dd
+      """))
+
+  def testPrintIncludesFollowedByMarkerWithOutput(self):
+    labeled = cp.Labeled([
+        ('aa', 'aaa'),
+        ('bbbb', 'bb'),
+        ('cc', cp.Labeled([('e', 'eee')])),
+        ('ddd', 'dd'),
+    ])
+    with io.StringIO() as out:
+      labeled.Print(out, 0, cp.ColumnWidths(row=('55555', '333')))
+      self.assertEqual(out.getvalue(), textwrap.dedent("""\
+      aa:   aaa
+      bbbb: bb
+      cc:
+        e:  eee
       ddd:  dd
       """))
 
@@ -289,7 +357,37 @@ class SectionCalculateColumnWidthsTest(test_case.TestCase):
 
 
 @parameterized.named_parameters(('Lines', cp.Lines), ('Section', cp.Section))
-class LinesAndSectionPrintTest(test_case.TestCase, parameterized.TestCase):
+class LinesAndSectionTest(test_case.TestCase, parameterized.TestCase):
+
+  def testWillPrintOutputNoLinesReturnsFalse(self, constructor):
+    marker = constructor([])
+    self.assertFalse(marker.WillPrintOutput())
+
+  def testWillPrintOutputOnlyMarkersWithNoOutputReturnsFalse(self, constructor):
+    marker = constructor([cp.Labeled([('a',)]), cp.Labeled([('b',)])])
+    self.assertFalse(marker.WillPrintOutput())
+
+  def testWillPrintOutputOnlyMarkersWithOutputReturnsTrue(self, constructor):
+    marker = constructor([cp.Labeled([('a', 'c')]), cp.Labeled([('b', 'd')])])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputPrimitiveAndMarkersWithNoOutputReturnsTrue(
+      self, constructor):
+    marker = constructor(['a', cp.Labeled([('a',)]), cp.Labeled([('b',)])])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputPrimitiveAndMarkersWithOutputReturnsTrue(
+      self, constructor):
+    marker = constructor(['a', cp.Labeled([('a', 'b')])])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputOnlyPrimitivesReturnsTrue(self, constructor):
+    marker = constructor(['a', 'b'])
+    self.assertTrue(marker.WillPrintOutput())
+
+  def testWillPrintOutputOnlyEmptyPrimitivesReturnsTrue(self, constructor):
+    marker = constructor(['', ''])
+    self.assertTrue(marker.WillPrintOutput())
 
   def testPrintWithNonMarkerValues(self, constructor):
     marker = constructor([

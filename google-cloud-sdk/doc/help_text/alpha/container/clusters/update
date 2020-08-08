@@ -16,6 +16,7 @@ SYNOPSIS
           | --enable-network-policy | --enable-pod-security-policy
           | --enable-shielded-nodes | --enable-stackdriver-kubernetes
           | --enable-vertical-pod-autoscaling | --generate-password
+          | --identity-provider=IDENTITY_PROVIDER
           | --maintenance-window=START_TIME | --release-channel=CHANNEL
           | --remove-labels=[KEY,...] | --security-profile=SECURITY_PROFILE
           | --set-password | --start-credential-rotation | --start-ip-rotation
@@ -49,6 +50,7 @@ SYNOPSIS
           --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
+        [--cloud-run-config=[load-balancer-type=EXTERNAL,...]]
         [--istio-config=[auth=MTLS_PERMISSIVE,...]]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
         [--node-pool=NODE_POOL] [--max-nodes=MAX_NODES --min-nodes=MIN_NODES]
@@ -214,6 +216,13 @@ REQUIRED FLAGS
           Ask the server to generate a secure password and use that as the
           basic auth password, keeping the existing username.
 
+       --identity-provider=IDENTITY_PROVIDER
+          Enable 3P identity provider on the cluster.
+
+          Currently, the only accepted identity provider is the identity
+          provider of Hub membership for hub workload pool
+          PROJECT_ID.hub.id.goog.
+
        --maintenance-window=START_TIME
           Set a time of day when you prefer maintenance to start on this
           cluster. For example:
@@ -237,10 +246,9 @@ REQUIRED FLAGS
        --release-channel=CHANNEL
           Subscribe or unsubscribe this cluster to a release channel.
 
-          When a cluster is subscribed to a release channel, GKE maintains both
-          the master version and the node version. Node auto-upgrade defaults
-          to true and cannot be disabled. Updates to version related fields
-          (e.g. --cluster-version) return an error.
+          When a cluster is subscribed to a release channel, Google maintains
+          both the master version and the node version. Node auto-upgrade
+          defaults to true and cannot be disabled.
 
           CHANNEL must be one of:
 
@@ -250,27 +258,21 @@ REQUIRED FLAGS
               channel.
 
            rapid
-              WARNING: 'rapid' is recommended for testing, and not for
-              production workloads. Clusters on 'rapid' are not covered by GKE
-              SLA.
+              'rapid' channel is offered on an early access basis for customers
+              who want to test new releases.
 
-              Clusters subscribed to 'rapid' receive the latest qualified
-              components, before any other channel. 'rapid' is intended for
-              early testers and developers who require new features. New
-              upgrades will occur roughly weekly.
+              WARNING: Versions available in the 'rapid' channel may be subject
+              to unresolved issues with no known workaround and are not subject
+              to any SLAs.
 
            regular
               Clusters subscribed to 'regular' receive versions that are
               considered GA quality. 'regular' is intended for production users
-              who want to take advantage of new features. New upgrades will
-              occur roughly every few weeks.
+              who want to take advantage of new features.
 
            stable
               Clusters subscribed to 'stable' receive versions that are known
-              to be stable and reliable in production. 'stable' is intended for
-              production users who need stability above all else, or for whom
-              frequent upgrades are too risky. New upgrades will occur roughly
-              every few months.
+              to be stable and reliable in production.
 
        --remove-labels=[KEY,...]
           Labels to remove from the Google Cloud resources in use by the
@@ -748,6 +750,16 @@ OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --cloud-run-config=[load-balancer-type=EXTERNAL,...]
+        Configurations for Cloud Run addon, requires --addons=CloudRun for
+        create and --update-addons=CloudRun=ENABLED for update.
+
+         load-balancer-type
+            Optional Type of load-balancer-type EXTERNAL or INTERNAL Example:
+
+                $ gcloud alpha container clusters update example-cluster \
+                    --cloud-run-config=load-balancer-type=INTERNAL
 
      --istio-config=[auth=MTLS_PERMISSIVE,...]
         Configurations for Istio addon, requires --addons contains Istio for

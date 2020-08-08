@@ -1,11 +1,11 @@
 title: pubsub subscriptions create with filter test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 
 actions:
 # create a subscription with a filter string
 - execute_command:
     command: |
-      pubsub subscriptions create subs1 --topic topic1 --filter dummyFilterString
+      pubsub subscriptions create subs1 --topic topic1 --message-filter dummyFilterString
     events:
     - api_call:
         expect_request:
@@ -32,7 +32,7 @@ actions:
 # attempt to create a subscription with empty filter string, assert that error is raised
 - execute_command:
     command: |
-      pubsub subscriptions create subs1 --topic topic1 --filter ""
+      pubsub subscriptions create subs1 --topic topic1 --message-filter ""
     events:
     - expect_exit:
         code: 1
@@ -42,9 +42,9 @@ actions:
 # attempt to create a subscription with --filter but no string, assert that error is raised
 - execute_command:
     command: |
-      pubsub subscriptions create subs1 --topic topic1 --filter
+      pubsub subscriptions create subs1 --topic topic1 --message-filter
     events:
     - expect_stderr:
-        matches: .*argument --filter\:\ expected one argument.*
+        matches: .*argument --message-filter\:\ expected one argument.*
     - expect_exit:
         code: 1

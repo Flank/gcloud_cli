@@ -533,17 +533,6 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -               -        
                clone-instance-7 clone-instance-7a
                """)
 
-
-class InstancesCloneGATest(_BaseInstancesCloneTest, base.SqlMockTestGA):
-  pass
-
-
-class InstancesCloneBetaTest(_BaseInstancesCloneTest, base.SqlMockTestBeta):
-  pass
-
-
-class InstancesCloneAlphaTest(_BaseInstancesCloneTest, base.SqlMockTestAlpha):
-
   def testPostgresCloneTimeFromCmekInstance(self):
     diff = {
         'name':
@@ -748,6 +737,18 @@ clone-instance-7a  POSTGRES_9_6         us-central  D1    -               -     
                --point-in-time 2020-01-22T19:12:11.460Z
                --bin-log-file-name mysql-bin.000007 --bin-log-position 1111
                """)
+
+
+class InstancesCloneGATest(_BaseInstancesCloneTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesCloneBetaTest(_BaseInstancesCloneTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesCloneAlphaTest(_BaseInstancesCloneTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -33,27 +33,8 @@ summary:
 - execute:
   - command: |
       pubsub lite-subscriptions list
-  - error: '1: .*provide the argument \[--zone\] on the command line.*$'
-- set_property: pubsub/lite_zone europe-west1-a
-- execute:
-  - command: |
-      pubsub lite-subscriptions list
-  - stdout: |
-      ---
-      deliveryConfig:
-        deliveryRequirement: DELIVER_IMMEDIATELY
-      name: projects/12345/locations/europe-west1-a/subscriptions/subscription1
-      topic: projects/12345/locations/europe-west1-a/topics/topic1
-      ---
-      deliveryConfig:
-        deliveryRequirement: DELIVER_AFTER_STORED
-      name: projects/12345/locations/europe-west1-a/subscriptions/subscription2
-      topic: projects/12345/locations/europe-west1-a/topics/topic2
-- set_property: 'pubsub/lite_zone '
-- execute:
-  - command: |
-      pubsub lite-subscriptions list
-  - error: '1: .*provide the argument \[--zone\] on the command line.*$'
+  - stderr: 'Is None: False'
+  - error: '1: argument --zone: Must be specified.'
 actions:
 # Set all required flags for list command.
 - execute_command:
@@ -192,86 +173,8 @@ actions:
     command: |
       pubsub lite-subscriptions list
     events:
+    - expect_stderr:
+        is_none: false
     - expect_exit:
         code: 1
-        message:
-          matches: .*provide the argument \[--zone\] on the command line.*
-
-- set_property:
-    pubsub/lite_zone: europe-west1-a
-- execute_command:
-    command: |
-      pubsub lite-subscriptions list
-    events:
-    - api_call:
-        expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
-          method: GET
-          body:
-            json: null
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "projectNumber": "12345",
-              "projectId": "fake-project",
-              "lifecycleState": "ACTIVE",
-              "name": "fake-project",
-              "createTime": "2019-07-19T15:49:12.034Z",
-              "parent": {
-                "type": "folder",
-                "id": "54321"
-              }
-            }
-    - api_call:
-        expect_request:
-          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/europe-west1-a/subscriptions?alt=json
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "subscriptions": [
-                {
-                  "name": "projects/12345/locations/europe-west1-a/subscriptions/subscription1",
-                  "topic": "projects/12345/locations/europe-west1-a/topics/topic1",
-                  "deliveryConfig": {
-                    "deliveryRequirement": "DELIVER_IMMEDIATELY"
-                  }
-                },
-                {
-                  "name": "projects/12345/locations/europe-west1-a/subscriptions/subscription2",
-                  "topic": "projects/12345/locations/europe-west1-a/topics/topic2",
-                  "deliveryConfig": {
-                    "deliveryRequirement": "DELIVER_AFTER_STORED"
-                  }
-                }
-              ]
-            }
-    - expect_stdout: |
-        ---
-        deliveryConfig:
-          deliveryRequirement: DELIVER_IMMEDIATELY
-        name: projects/12345/locations/europe-west1-a/subscriptions/subscription1
-        topic: projects/12345/locations/europe-west1-a/topics/topic1
-        ---
-        deliveryConfig:
-          deliveryRequirement: DELIVER_AFTER_STORED
-        name: projects/12345/locations/europe-west1-a/subscriptions/subscription2
-        topic: projects/12345/locations/europe-west1-a/topics/topic2
-    - expect_exit:
-        code: 0
-
-- set_property:
-    pubsub/lite_zone: ''
-- execute_command:
-    command: |
-      pubsub lite-subscriptions list
-    events:
-    - expect_exit:
-        code: 1
-        message:
-          matches: .*provide the argument \[--zone\] on the command line.*
+        message: 'argument --zone: Must be specified.'

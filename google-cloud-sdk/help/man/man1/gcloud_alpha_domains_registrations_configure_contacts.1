@@ -11,7 +11,7 @@ gcloud alpha domains registrations configure contacts \- configure contact setti
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha domains registrations configure contacts\fR \fIREGISTRATION\fR [\fB\-\-contact\-data\-from\-file\fR=\fICONTACT_DATA_FROM_FILE\fR] [\fB\-\-contact\-privacy\fR=\fICONTACT_PRIVACY\fR] [\fB\-\-validate\-only\fR] [\fB\-\-async\fR] [\fB\-\-notices\fR=[\fINOTICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha domains registrations configure contacts\fR \fIREGISTRATION\fR [\fB\-\-contact\-data\-from\-file\fR=\fICONTACT_DATA_FILE_NAME\fR] [\fB\-\-contact\-privacy\fR=\fICONTACT_PRIVACY\fR] [\fB\-\-validate\-only\fR] [\fB\-\-async\fR] [\fB\-\-notices\fR=[\fINOTICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,11 +20,9 @@ gcloud alpha domains registrations configure contacts \- configure contact setti
 \fB(ALPHA)\fR Configure registration's contact settings: email, phone number,
 postal address and also contact privacy.
 
-In some cases such changes will have to be confirmed via email sent to the
+In some cases such changes have to be confirmed through an email sent to the
 registrant before they take effect. In order to resend the email, execute this
 command again.
-
-This command can only be called on registrations in state ACTIVE or SUSPENDED.
 
 
 
@@ -56,17 +54,19 @@ ID of the registration or fully qualified identifier for the registration.
 
 .RS 2m
 .TP 2m
-\fB\-\-contact\-data\-from\-file\fR=\fICONTACT_DATA_FROM_FILE\fR
-A YAML file containing the required contact data. It can specify contact data
-with label 'allContacts' (it means that a single contact will be used for
-registrant, admin and technical contacts) or separate contact data with labels
-\'registrantContact', 'adminContact' and 'technicalContact'.
+\fB\-\-contact\-data\-from\-file\fR=\fICONTACT_DATA_FILE_NAME\fR
+A YAML file containing the contact data for the domain's three contacts:
+registrant, admin, and technical.
+
+The file can either specify a single set of contact data with label
+\'allContacts', or three separate sets of contact data with labels
+\'adminContact' and 'technicalContact'.
 
 If 'registrantContact', 'adminContact' or 'technicalContact' labels are used
-then only the specified contact is updated.
+then only the specified contacts are updated.
 
-If specified, each contact data must contain values for all required fields:
-email, phoneNumber and postalAddress in google.type.PostalAddress format.
+Each contact data must contain values for all required fields: email,
+phoneNumber and postalAddress in google.type.PostalAddress format.
 
 For more guidance on how to specify postalAddress, please see:
 https://support.google.com/business/answer/6397478
@@ -146,12 +146,14 @@ domain in the public directory at no extra cost. They will forward received
 messages to you.
 .TP 2m
 \fBpublic\-contact\-data\fR
-All the data from contact config is publicly available.
+All the data from contact config is publicly available. To set this value, you
+must also pass the \-\-notices flag with value
+public\-contact\-data\-acknowledgement or agree to the notice interactively.
 .TP 2m
 \fBredacted\-contact\-data\fR
-Limited personal info will be available to the public. The actual information
-redacted depends on the domain. For more information see
-https://support.google.com/domains/answer/3251242?hl=en.
+Limited personal information will be available to the public. The actual
+information redacted depends on the domain. For more information see
+https://support.google.com/domains/answer/3251242.
 .RE
 .sp
 
@@ -218,7 +220,7 @@ $ gcloud alpha domains registrations configure contacts \e
 .RE
 
 To change contact data for \f5\fIexample.com\fR\fR according to information from
-a YAML file \f5\fIcontants.yaml\fR\fR, run:
+a YAML file \f5\fIcontacts.yaml\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha domains registrations configure contacts \e

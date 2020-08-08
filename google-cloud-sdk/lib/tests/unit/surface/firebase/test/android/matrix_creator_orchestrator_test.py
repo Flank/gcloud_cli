@@ -80,7 +80,8 @@ class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
                         db=DEFAULT_BUCKET, ub=UNIQUE_OBJECT_NAME))),
             testSetup=self.testing_msgs.TestSetup(
                 account=self.testing_msgs.Account(
-                    googleAuto=self.testing_msgs.GoogleAuto())),
+                    googleAuto=self.testing_msgs.GoogleAuto()),
+                dontAutograntPermissions=False),
             disableVideoRecording=False,
             disablePerformanceMetrics=False,
             testTimeout='900s'),

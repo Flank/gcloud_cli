@@ -25,7 +25,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.url_maps import test_resources
 import mock
 
 
@@ -84,10 +84,10 @@ class URLMapsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     self.RunList('')
 
     self.list_json.assert_called_once_with(
-        requests=[(self._url_maps_api,
-                   'List',
-                   self.messages.ComputeUrlMapsListRequest(
-                       project='my-project'))],
+        requests=[
+            (self._url_maps_api, 'List',
+             self.messages.ComputeUrlMapsListRequest(project='my-project'))
+        ],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -144,13 +144,13 @@ class RegionURLMapsListTest(test_base.BaseTest,
     self.url_maps = [
         self.messages.UrlMap(
             name='url-map1',
-            defaultService=(
-                self.URI_PREFIX + 'global/backendService/default-service'),
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
             selfLink=self.URI_PREFIX + 'global/url-maps/url-map1'),
         self.messages.UrlMap(
             name='url-map2',
-            defaultService=(
-                self.URI_PREFIX + 'global/backendService/default-service'),
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
             selfLink=self.URI_PREFIX + 'global/url-maps/url-map2')
     ]
     self.region_url_maps = [
@@ -159,15 +159,15 @@ class RegionURLMapsListTest(test_base.BaseTest,
             defaultService=(self.URI_PREFIX +
                             'regions/region-1/backendService/default-service'),
             region='region-1',
-            selfLink=(
-                self.URI_PREFIX + 'regions/region-1/url-maps/region-url-map1')),
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/url-maps/region-url-map1')),
         self.messages.UrlMap(
             name='region-url-map2',
             defaultService=(self.URI_PREFIX +
                             'regions/region-1/backendService/default-service'),
             region='region-2',
-            selfLink=(
-                self.URI_PREFIX + 'regions/region-2/url-maps/region-url-map2'))
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-2/url-maps/region-url-map2'))
     ]
 
   def testGlobalOption(self):
@@ -275,8 +275,8 @@ class RegionURLMapsListTest(test_base.BaseTest,
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
 
   def _getListRequestMessage(self, project):
-    return self.messages.ComputeUrlMapsAggregatedListRequest(project=project,
-            includeAllScopes=True)
+    return self.messages.ComputeUrlMapsAggregatedListRequest(
+        project=project, includeAllScopes=True)
 
 
 class RegionURLMapsListBetaTest(RegionURLMapsListTest):

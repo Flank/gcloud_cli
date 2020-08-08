@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha commerce-procurement consumer orders - a group of subcommands
+        for working with Procurement Consumer orders
+
+SYNOPSIS
+    gcloud alpha commerce-procurement consumer orders COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A group of subcommands for working with Procurement Consumer
+    orders.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) Cancels the order resource from Cancel API.
+
+     create
+        (ALPHA) Creates the order resource from place API.
+
+     describe
+        (ALPHA) Outputs the Order object resulting from the Get API.
+
+     list
+        (ALPHA) Outputs the List of Order object resulting from the List API.
+
+     modify
+        (ALPHA) Modify the order resource from modify API.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

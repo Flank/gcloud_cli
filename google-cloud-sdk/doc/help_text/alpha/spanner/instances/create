@@ -15,7 +15,9 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --config=CONFIG
-        Instance config for the instance.
+        Instance configuration defines the geographic placement and replication
+        of the databases in that instance. Available configurations can be
+        found by running "gcloud spanner instance-configs list"
 
      --description=DESCRIPTION
         Description of the instance.

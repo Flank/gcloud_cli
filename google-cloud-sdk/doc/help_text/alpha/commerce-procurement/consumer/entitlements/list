@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha commerce-procurement consumer entitlements list - outputs the
+        List of Entitlement object resulting from the List API
+
+SYNOPSIS
+    gcloud alpha commerce-procurement consumer entitlements list
+        [--page-token=PAGE_TOKEN] [--page-size=PAGE_SIZE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Outputs the List of Entitlement object resulting from the List API.
+
+FLAGS
+     --page-token=PAGE_TOKEN
+        Token to specify next page in the list.
+
+LIST COMMAND FLAGS
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

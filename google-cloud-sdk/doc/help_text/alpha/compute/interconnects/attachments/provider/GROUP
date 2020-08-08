@@ -11,7 +11,7 @@ DESCRIPTION
 
     For more information about provider interconnect attachments, as configured
     by providers, see the interconnect attachments documentation
-    (https://cloud.google.com/interconnect/docs/how-to/dedicated/creating-vlan-attachments).
+    (https://cloud.google.com//network-connectivity/docs/interconnect/how-to/dedicated/creating-vlan-attachments).
 
     See also: Interconnect attachments API
     (https://cloud.google.com/compute/docs/reference/rest/v1/interconnectAttachments).
@@ -28,11 +28,11 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine partner provider interconnect
+        (ALPHA) Create a Compute Engine partner provider interconnect
         attachment.
 
      update
-        (ALPHA) Update a Google Compute Engine partner provider interconnect
+        (ALPHA) Update a Compute Engine partner provider interconnect
         attachment.
 
 NOTES

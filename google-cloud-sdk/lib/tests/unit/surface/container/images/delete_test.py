@@ -120,7 +120,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.digest_from_name_mock.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.UNAUTHORIZED
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
 
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Delete([_TAG_V1])
@@ -131,7 +131,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.digest_from_name_mock.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
 
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Delete([_TAG_V1])

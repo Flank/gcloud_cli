@@ -223,6 +223,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     master_min_cpu_platform = 'Intel Skylake'
     worker_min_cpu_platform = 'Intel Haswell'
     bucket = 'foo-bucket'
+    temp_bucket = 'foo-temp-bucket'
     num_masters = 3
     num_workers = 7
     num_secondary_workers = 5
@@ -251,6 +252,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         configBucket=bucket,
+        tempBucket=temp_bucket,
         imageVersion=image_version,
         masterMachineTypeUri=master_machine_type,
         workerMachineTypeUri=worker_machine_type,
@@ -300,6 +302,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     command = (
         'clusters --project {project} create {cluster} '
         '--bucket {bucket} '
+        '--temp-bucket {temp_bucket} '
         '--zone {zone} '
         '--num-masters {num_masters} '
         '--num-workers {num_workers} '
@@ -340,6 +343,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
             project=project,
             cluster=cluster_name,
             bucket=bucket,
+            temp_bucket=temp_bucket,
             zone=zone,
             num_masters=num_masters,
             num_workers=num_workers,
@@ -484,6 +488,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
     bucket = 'foo-bucket'
+    temp_bucket = 'foo-temp-bucket'
     cluster_properties = collections.OrderedDict([('core:com.foo', 'foo'),
                                                   ('hdfs:com.bar', 'bar')])
     cluster_metadata = collections.OrderedDict([('key1', 'value1'),
@@ -493,6 +498,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         configBucket=bucket,
+        tempBucket=temp_bucket,
         projectId=project,
         zoneUri=zone,
         labels=labels,
@@ -507,6 +513,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
 
     command = ('clusters --project {project} create {cluster} '
                '--bucket {bucket} '
+               '--temp-bucket {temp_bucket} '
                '--zone {zone} '
                '--labels label1=value1 '
                '--labels label2=value2 '
@@ -517,6 +524,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
                    project=project,
                    cluster=cluster_name,
                    bucket=bucket,
+                   temp_bucket=temp_bucket,
                    zone=zone)
 
     self.ExpectCreateCalls(

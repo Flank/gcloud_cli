@@ -21,11 +21,58 @@ from __future__ import unicode_literals
 
 import json
 
+from apitools.base.py import http_wrapper
+
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.scenario import events
 from tests.lib.scenario import reference_resolver
 from tests.lib.scenario import updates
+
+import httplib2
+from six.moves import http_client as httplib
+
+
+class RequestTest(test_case.TestCase):
+
+  def testFromApitoolsRequest(self):
+    apitools_request = http_wrapper.Request(
+        url='url', http_method='POST', headers={'header': 'val'}, body='test')
+    request = events.Request.FromApitoolsRequest(apitools_request)
+    self.assertEqual(request.uri, apitools_request.url)
+    self.assertEqual(request.method, apitools_request.http_method)
+    self.assertEqual(request.headers, apitools_request.headers)
+    self.assertEqual(request.body, apitools_request.body)
+
+  def testFromRequestArgs(self):
+    request = events.Request.FromRequestArgs(
+        'url', method='POST', body='test', headers={'header': 'val'})
+    self.assertEqual(request.uri, 'url')
+    self.assertEqual(request.method, 'POST')
+    self.assertEqual(request.headers, {'header': 'val'})
+    self.assertEqual(request.body, 'test')
+
+
+class ResponseTest(test_case.TestCase):
+
+  def testFromApitoolsResponse(self):
+    apitools_response = http_wrapper.Response(
+        {'status': httplib.OK, 'header': 'val'}, 'data', 'uri')
+    apitools_headers = dict(apitools_response.info)
+    apitools_headers.pop('status')
+    response = events.Response.FromApitoolsResponse(apitools_response)
+    self.assertEqual(response.status, apitools_response.status_code)
+    self.assertEqual(response.headers, apitools_headers)
+    self.assertEqual(response.body, apitools_response.content)
+
+  def testFromTransportResponse(self):
+    transport_response = (
+        httplib2.Response({'status': httplib.OK, 'header': 'val'}),
+        'test'.encode('utf-8'))
+    response = events.Response.FromTransportResponse(transport_response)
+    self.assertEqual(response.status, httplib.OK)
+    self.assertEqual(response.headers, {'header': 'val'})
+    self.assertEqual(response.body, 'test')
 
 
 class EventsTest(test_case.TestCase, parameterized.TestCase):
@@ -217,16 +264,20 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     e = events.ApiCallEvent.FromData(backing_data)
     self.assertEqual(events.EventType.API_CALL, e.EventType())
     self.assertEqual(updates.Mode.API_REQUESTS, e.UpdateContext()._update_mode)
-    self.assertEqual([], e.Handle('https://example.com', 'GET',
-                                  {b'a': b'b', b'c': b'd'},
-                                  '{"ba": "bb", "bc": "bd"}'))
-    response = e.GetResponsePayload()
-    self.assertEqual(({'e': 'f', 'g': 'h'}, b'response body'), response)
-    headers, body = response[0], response[1]
-    self.assertEqual([], e.HandleResponse(headers, body, None))
+    request = events.Request('https://example.com', 'GET',
+                             {b'a': b'b', b'c': b'd'},
+                             '{"ba": "bb", "bc": "bd"}')
+    self.assertEqual([], e.Handle(request))
+    response = e.GetResponse()
+    self.assertEqual(events.Response(httplib.OK,
+                                     {'e': 'f', 'g': 'h'},
+                                     'response body'), response)
+    self.assertEqual([], e.HandleResponse(response, None))
 
     # Headers and body contain 2 assertions each, plus uri and method.
-    failures = e.Handle('https://foo.com', 'POST', {b'y': b'z'}, '{"be": "bf"}')
+    request = events.Request('https://foo.com', 'POST',
+                             {b'y': b'z'}, '{"be": "bf"}')
+    failures = e.Handle(request)
     self.assertEqual(6, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
@@ -235,7 +286,8 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
          'body': {'json': {}}},
         backing_data['api_call']['expect_request'])
 
-    failures = e.HandleResponse({'e': 'z'}, b'blah', None)
+    failures = e.HandleResponse(
+        events.Response(httplib.OK, {'e': 'z'}, b'blah'), None)
     self.assertEqual(2, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
@@ -243,12 +295,13 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         {'headers': {'e': 'z'}, 'body': {'text': 'blah'}},
         backing_data['api_call']['expect_response'])
 
-    failures = e.UpdateResponsePayload({'e': 'z'}, b'blah')
+    response = events.Response(httplib.OK, {'e': 'z'}, 'blah')
+    failures = e.UpdateResponsePayload(response)
     self.assertEqual(1, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_RESPONSE_PAYLOADS])
     self.assertEqual(
-        {'headers': {'e': 'z'}, 'body': 'blah'},
+        {'headers': {'e': 'z'}, 'body': 'blah', 'status': httplib.OK},
         backing_data['api_call']['return_response'])
 
   def testApiCallEventAddRefExtraction(self):
@@ -270,9 +323,9 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    headers, body = e.GetResponsePayload()
+    response = e.GetResponse()
     failures = e.HandleResponse(
-        headers, body, reference_resolver.ResourceReferenceResolver(),
+        response, reference_resolver.ResourceReferenceResolver(),
         generate_extras=True)
     self.assertEqual(1, len(failures))
     failures[0].Update([updates.Mode.API_REQUESTS])
@@ -281,26 +334,16 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
          'body': {'json': {}}},
         backing_data['api_call']['expect_response'])
 
-  def testRequestExtractRef(self):
-    e = events.HTTPAssertion.ForRequest(
-        {'extract_references': [
-            {'field': 'name', 'reference': 'operation'},
-            {'field': 'name', 'reference': 'operation-base',
-             'modifiers': {'basename': True}}
-        ]})
-
-    rrr = reference_resolver.ResourceReferenceResolver()
-    e.ExtractReferences(rrr, '{"name": "foo/bar/my-op"}')
-    self.assertEqual(rrr._extracted_ids,
-                     {'operation': 'foo/bar/my-op', 'operation-base': 'my-op'})
-
   def testResponseExtractRef(self):
-    e = events.HTTPAssertion.ForResponse(
-        {'extract_references': [
-            {'field': 'name', 'reference': 'operation'},
-            {'field': 'name', 'reference': 'operation-base',
-             'modifiers': {'basename': True}}
-        ]})
+    e = events.ResponseAssertion.FromCallData({
+        'expect_response': {
+            'extract_references': [
+                {'field': 'name', 'reference': 'operation'},
+                {'field': 'name', 'reference': 'operation-base',
+                 'modifiers': {'basename': True}}
+            ],
+        },
+    })
 
     rrr = reference_resolver.ResourceReferenceResolver()
     e.ExtractReferences(rrr, '{"name": "foo/bar/my-op"}')
@@ -330,8 +373,8 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     # not an op creation event.
     rrr = reference_resolver.ResourceReferenceResolver()
     rrr.SetExtractedId('operation', '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5')
-    headers, body = e.GetResponsePayload()
-    failures = e.HandleResponse(headers, body, rrr, generate_extras=True)
+    response = e.GetResponse()
+    failures = e.HandleResponse(response, rrr, generate_extras=True)
     self.assertEqual(2, len(failures))
     failures[0].Update([updates.Mode.API_REQUESTS])
     failures[1].Update([updates.Mode.API_REQUESTS])
@@ -357,9 +400,9 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    headers, body = e.GetResponsePayload()
+    response = e.GetResponse()
     failures = e.HandleResponse(
-        headers, body,
+        response,
         resource_ref_resolver=reference_resolver.ResourceReferenceResolver(),
         generate_extras=True)
     self.assertEqual(1, len(failures))
@@ -388,9 +431,9 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    headers, body = e.GetResponsePayload()
+    response = e.GetResponse()
     failures = e.HandleResponse(
-        headers, body,
+        response,
         resource_ref_resolver=reference_resolver.ResourceReferenceResolver(),
         generate_extras=True)
 
@@ -400,7 +443,7 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
       self.assertTrue(backing_data['api_call']['poll_operation'])
     else:
       self.assertEqual(0, len(failures))
-      self.assertFalse('poll_operation' in backing_data['api_call'])
+      self.assertNotIn('poll_operation', backing_data['api_call'])
 
   def testApiCallPollOperationForcesOperationHandling(self):
     backing_data = {
@@ -418,9 +461,9 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     }
     rrr = reference_resolver.ResourceReferenceResolver()
     e = events.ApiCallEvent.FromData(backing_data)
-    headers, body = e.GetResponsePayload()
+    response = e.GetResponse()
     failures = e.HandleResponse(
-        headers, body,
+        response,
         resource_ref_resolver=rrr,
         generate_extras=True)
 
@@ -443,8 +486,8 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    headers, body = e.GetResponsePayload()
-    self.assertEqual([], e.HandleResponse(headers, body, None))
+    response = e.GetResponse()
+    self.assertEqual([], e.HandleResponse(response, None))
 
   def testApiCallEventOrderedRequestParams(self):
     backing_data = {
@@ -462,15 +505,18 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    self.assertEqual([], e.Handle('https://example.com?a=foo&b=bar&c=foobar',
-                                  'GET', {b'a': b'b', b'c': b'd'},
-                                  '{"ba": "bb", "bc": "bd"}'))
-    self.assertEqual([], e.Handle('https://example.com?b=bar&c=foobar&a=foo',
-                                  'GET', {b'a': b'b', b'c': b'd'},
-                                  '{"ba": "bb", "bc": "bd"}'))
-    self.assertEqual([], e.Handle('https://example.com?c=foobar&b=bar&a=foo',
-                                  'GET', {b'a': b'b', b'c': b'd'},
-                                  '{"ba": "bb", "bc": "bd"}'))
+    request = events.Request('https://example.com?a=foo&b=bar&c=foobar',
+                             'GET', {b'a': b'b', b'c': b'd'},
+                             '{"ba": "bb", "bc": "bd"}')
+    self.assertEqual([], e.Handle(request))
+    request = events.Request('https://example.com?b=bar&c=foobar&a=foo',
+                             'GET', {b'a': b'b', b'c': b'd'},
+                             '{"ba": "bb", "bc": "bd"}')
+    self.assertEqual([], e.Handle(request))
+    request = events.Request('https://example.com?c=foobar&b=bar&a=foo',
+                             'GET', {b'a': b'b', b'c': b'd'},
+                             '{"ba": "bb", "bc": "bd"}')
+    self.assertEqual([], e.Handle(request))
 
   def testApiCallEventComplexAssertions(self):
     backing_data = {
@@ -493,14 +539,17 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     e = events.ApiCallEvent.FromData(backing_data)
     self.assertEqual(events.EventType.API_CALL, e.EventType())
     self.assertEqual(updates.Mode.API_REQUESTS, e.UpdateContext()._update_mode)
-    self.assertEqual([], e.Handle('https://example.com', 'GET',
-                                  {b'a': b'b', b'c': b'd', b'e': b'f'},
-                                  '{"ba": "bb", "bc": "bd"}'))
-    self.assertEqual(({'e': 'f', 'g': 'h'}, b'response body'),
-                     e.GetResponsePayload())
+    request = events.Request('https://example.com', 'GET',
+                             {b'a': b'b', b'c': b'd', b'e': b'f'},
+                             '{"ba": "bb", "bc": "bd"}')
+    self.assertEqual([], e.Handle(request))
+    self.assertEqual(events.Response(
+        httplib.OK, {'e': 'f', 'g': 'h'}, 'response body'), e.GetResponse())
 
     # Headers and body contain 2 assertions each, plus uri and method.
-    failures = e.Handle('https://foo.com', 'POST', {b'y': b'z'}, '{"be": "bf"}')
+    request = events.Request('https://foo.com', 'POST',
+                             {b'y': b'z'}, '{"be": "bf"}')
+    failures = e.Handle(request)
     self.assertEqual(7, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
@@ -561,11 +610,65 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     backing_data['api_call']['expect_request'].update(assertion)
 
     e = events.ApiCallEvent.FromData(backing_data)
-    failures = e.Handle('https://example.com', 'GET', {}, actual)
-    self.assertTrue(has_failures == bool(failures))
+    request = events.Request('https://example.com', 'GET', {}, actual)
+    failures = e.Handle(request)
+    self.assertEqual(bool(failures), has_failures)
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
     self.assertEqual(new, backing_data['api_call']['expect_request']['body'])
+
+  @parameterized.parameters(
+      ({'headers': {'status': '200', 'e': 'f'}},
+       {'headers': {'status': '200', 'e': 'f'}}),
+      ({'headers': {'status': '200', 'e': 'f'}},
+       {'headers': {'status': httplib.OK, 'e': 'f'}}),
+      ({'headers': {'status': '200', 'e': 'f'}},
+       {'status': httplib.OK, 'headers': {'e': 'f'}}),
+
+      ({'headers': {'status': httplib.OK, 'e': 'f'}},
+       {'headers': {'status': '200', 'e': 'f'}}),
+      ({'headers': {'status': httplib.OK, 'e': 'f'}},
+       {'headers': {'status': httplib.OK, 'e': 'f'}}),
+      ({'headers': {'status': httplib.OK, 'e': 'f'}},
+       {'status': httplib.OK, 'headers': {'e': 'f'}}),
+
+      ({'status': httplib.OK, 'headers': {'e': 'f'}},
+       {'headers': {'status': '200', 'e': 'f'}}),
+      ({'status': httplib.OK, 'headers': {'e': 'f'}},
+       {'headers': {'status': httplib.OK, 'e': 'f'}}),
+      ({'status': httplib.OK, 'headers': {'e': 'f'}},
+       {'status': httplib.OK, 'headers': {'e': 'f'}}),
+
+  )
+  def testApiCallResponseAssertions(self, return_response, expect_response):
+    return_response['body'] = 'response body'
+    expect_response['body'] = {'text': {'matches': 'res.*'}}
+    backing_data = {
+        'api_call': {
+            'expect_request': {
+                'uri': {'equals': 'https://example.com'},
+                'method': 'GET',
+                'headers': {'a': 'b'},
+                'body': {'json': {'ba': 'bb'}},
+            },
+            'return_response': return_response,
+            'expect_response': expect_response
+        }
+    }
+    e = events.ApiCallEvent.FromData(backing_data)
+    self.assertEqual(events.EventType.API_CALL, e.EventType())
+    self.assertEqual(updates.Mode.API_REQUESTS, e.UpdateContext()._update_mode)
+    request = events.Request('https://example.com', 'GET',
+                             {b'a': b'b'},
+                             '{"ba": "bb"}')
+    request_failures = e.Handle(request)
+    self.assertEqual([], request_failures)
+    response = e.GetResponse()
+    self.assertEqual(events.Response(httplib.OK,
+                                     {'e': 'f'},
+                                     'response body'), response)
+    response_failures = e.HandleResponse(response, None)
+    self.assertEqual([], response_failures)
 
   def testComplexAssertionUpdates(self):
     backing_data = {
@@ -583,8 +686,9 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    failures = e.Handle('https://foo.com', 'POST',
-                        {b'a': b'b', b'c': b' ', b'e': b'1',}, 'asdf')
+    request = events.Request('https://foo.com', 'POST',
+                             {b'a': b'b', b'c': b' ', b'e': b'1',}, 'asdf')
+    failures = e.Handle(request)
     self.assertEqual(6, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
@@ -595,9 +699,11 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
 
   def testApiCallEventMissing(self):
     e = events.ApiCallEvent.ForMissing(('line', 'col'))
-    self.assertEqual(({'status': '200'}, b''), e.GetResponsePayload())
+    self.assertEqual(events.Response(httplib.OK, {}, ''), e.GetResponse())
 
-    failures = e.Handle('https://foo.com', 'POST', {b'y': b'z'}, '{"be": "bf"}')
+    request = events.Request('https://foo.com', 'POST', {b'y': b'z'},
+                             '{"be": "bf"}')
+    failures = e.Handle(request)
     self.assertEqual(4, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
@@ -608,9 +714,10 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
 
   def testApiCallEventMissingText(self):
     e = events.ApiCallEvent.ForMissing(('line', 'col'))
-    self.assertEqual(({'status': '200'}, b''), e.GetResponsePayload())
+    self.assertEqual(events.Response(httplib.OK, {}, ''), e.GetResponse())
 
-    failures = e.Handle('https://foo.com', 'POST', {b'y': b'z'}, 'asdf')
+    request = events.Request('https://foo.com', 'POST', {b'y': b'z'}, 'asdf')
+    failures = e.Handle(request)
     self.assertEqual(4, len(failures))
     for f in failures:
       f.Update([updates.Mode.API_REQUESTS])
@@ -636,15 +743,16 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    failures = e.UpdateResponsePayload(
-        headers={'status': '200'},
-        body=json.dumps({'status': 'RUNNING',
-                         'progress': '0',
-                         'bad_field': 'asdf'}).encode('utf8'))
+    response = events.Response(
+        httplib.OK, {}, json.dumps({
+            'status': 'RUNNING', 'progress': '0', 'bad_field': 'asdf'
+        }))
+    failures = e.UpdateResponsePayload(response)
     self.assertEqual(1, len(failures))
     failures[0].Update([updates.Mode.API_RESPONSE_PAYLOADS])
     self.assertEqual(
-        {'headers': {'status': '200'},
+        {'status': httplib.OK,
+         'headers': {},
          'body': {'status': 'RUNNING', 'progress': '0'},
          'omit_fields': ['bad_field']},
         e.UpdateContext().BackingData()['api_call']['return_response'])

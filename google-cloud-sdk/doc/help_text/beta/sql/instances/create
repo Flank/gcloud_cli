@@ -7,9 +7,10 @@ SYNOPSIS
         [--authorized-networks=NETWORK,[NETWORK,...]]
         [--availability-type=AVAILABILITY_TYPE] [--no-backup]
         [--backup-location=BACKUP_LOCATION]
-        [--backup-start-time=BACKUP_START_TIME] [--cpu=CPU]
-        [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
+        [--backup-start-time=BACKUP_START_TIME] [--collation=COLLATION]
+        [--cpu=CPU] [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
         [--database-version=DATABASE_VERSION] [--enable-bin-log]
+        [--enable-point-in-time-recovery]
         [--failover-replica-name=FAILOVER_REPLICA_NAME]
         [--labels=[KEY=VALUE,...]]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
@@ -90,6 +91,10 @@ FLAGS
         Start time of daily backups, specified in the 24 hour format - HH:MM,
         in the UTC timezone.
 
+     --collation=COLLATION
+        Cloud SQL server-level collation setting, which specifies the set of
+        rules for comparing characters in a character set.
+
      --cpu=CPU
         Whole number value indicating how many cores are desired in the
         machine. Both --cpu and --memory must be specified if a custom machine
@@ -111,6 +116,11 @@ FLAGS
      --enable-bin-log
         Specified if binary log should be enabled. If backup configuration is
         disabled, binary log must be disabled as well.
+
+     --enable-point-in-time-recovery
+        Specifies if point-in-time recovery (using write-ahead log archiving)
+        should be enabled. If backup configuration is disabled, point-in-time
+        recovery must be disabled as well.
 
      --failover-replica-name=FAILOVER_REPLICA_NAME
         Also create a failover replica with the specified name.

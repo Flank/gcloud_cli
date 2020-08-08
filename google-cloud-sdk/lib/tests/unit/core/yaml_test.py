@@ -172,6 +172,37 @@ class YAMLTest(test_case.Base):
     self.assertIsInstance(data['dict'], dict)
     self.assertIsInstance(data['list'], list)
 
+  def testAllJJSONSerialization(self):
+    expected = """\
+name: Doc1
+boolean: false
+dict:
+ xyz: 012
+ abc: 897
+integer: 123
+list:
+- a
+- b
+- c
+- d
+---
+ name: Doc2
+ dict:
+   xyz: 789
+   abc: 456
+ integer: 456
+ list:
+ - e
+ - f
+ - g
+ - h
+"""
+    data = list(yaml.load_all(expected, round_trip=True))
+    self.assertEqual(len(data), 2)
+    json_out = yaml.dump_all_round_trip(data)
+    data_after = list(yaml.load_all(json_out, round_trip=True))
+    self.assertCountEqual(data, data_after)
+
 
 if __name__ == '__main__':
   test_case.main()

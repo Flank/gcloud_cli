@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) Creates a user in a given instance with specified username, host,
-    and password.
+    type, and password.
 
 POSITIONAL ARGUMENTS
      USERNAME

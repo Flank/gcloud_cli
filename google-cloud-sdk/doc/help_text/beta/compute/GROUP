@@ -55,8 +55,7 @@ GROUPS
         (BETA) List, create, delete and update External VPN Gateways.
 
      firewall-rules
-        (BETA) List, create, update, and delete Google Compute Engine firewall
-        rules.
+        (BETA) List, create, update, and delete Compute Engine firewall rules.
 
      forwarding-rules
         (BETA) Read and manipulate traffic forwarding rules to network load
@@ -92,7 +91,7 @@ GROUPS
         (BETA) Read and manage Compute Engine machine image resources.
 
      machine-types
-        (BETA) Read Google Compute Engine virtual machine types.
+        (BETA) Read Compute Engine virtual machine types.
 
      network-endpoint-groups
         (BETA) Read and manipulate Compute Engine network endpoint groups.
@@ -150,6 +149,9 @@ GROUPS
 
      ssl-policies
         (BETA) List, create, delete and update Compute Engine SSL policies.
+
+     target-grpc-proxies
+        (BETA) Manage Google Compute Engine target gRPC proxy resources.
 
      target-http-proxies
         (BETA) List, create, and delete target HTTP proxies.

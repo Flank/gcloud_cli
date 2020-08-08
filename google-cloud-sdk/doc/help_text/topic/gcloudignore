@@ -26,6 +26,13 @@ DESCRIPTION
 
         $ gcloud config set gcloudignore/enabled false
 
+    The default .gcloudignore file, which can be overriden with --ignore-file,
+    is as follows:
+
+        .gcloudignore
+        .git
+        .gitignore
+
 SYNTAX
     The syntax of .gcloudignore borrows heavily from that of .gitignore; see
     https://git-scm.com/docs/gitignore or man gitignore for a full reference.

@@ -29,7 +29,7 @@ summary:
   - label: Describe a group.
   - command: identity groups describe $$group-name$$@novitas-gae.bigr.name --format=text(createTime,description,displayName,groupKey,labels,name,parent,updateTime)
   - stdout: |
-      createTime:                                                  $$update-time$$
+      createTime:                                                  $$create-time$$
       description:                                                 Group for engineering discussions
       displayName:                                                 Engineer Discuss
       groupKey.id:                                                 $$group-name$$@novitas-gae.bigr.name
@@ -187,7 +187,7 @@ actions:
             text:
               is_none: false
     - expect_stdout: |
-        createTime:                                                  $$update-time$$
+        createTime:                                                  $$create-time$$
         description:                                                 Group for engineering discussions
         displayName:                                                 Engineer Discuss
         groupKey.id:                                                 $$group-name$$@novitas-gae.bigr.name

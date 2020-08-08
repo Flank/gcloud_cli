@@ -24,6 +24,9 @@ COMMANDS
      delete
         (ALPHA) Deletes one or more reCAPTCHA Keys.
 
+     describe
+        (ALPHA) Describes reCAPTCHA Key.
+
      list
         (ALPHA) Lists reCAPTCHA Keys.
 

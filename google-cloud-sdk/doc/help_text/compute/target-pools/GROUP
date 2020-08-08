@@ -26,7 +26,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-health-checks
-        Add an HTTP health check to a target pool.
+        Add a legacy HTTP health check to a target pool.
 
      add-instances
         Add instances to a target pool.

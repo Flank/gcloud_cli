@@ -17,19 +17,16 @@ gcloud alpha compute backend\-services add\-backend \- add a backend to a backen
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute backend\-services add\-backend\fR is used
-to add a backend to a backend service. A backend is a group of tasks that can
-handle requests sent to a backend service. Currently, the group of tasks can be
-one or more Google Compute Engine virtual machine instances grouped together
-using an instance group or network endpoint group.
-
-Traffic is first spread evenly across all virtual machines or network endpoints
-in the group. When the group is full, traffic is sent to the next nearest
-group(s) that still have remaining capacity.
+\fB(ALPHA)\fR \fBgcloud alpha compute backend\-services add\-backend\fR adds a
+backend to a backend service. A backend is a group of VMs or network endpoints
+that can handle requests sent to a load balancer.
 
 To modify the parameters of a backend after it has been added to the backend
 service, use \f5gcloud compute backend\-services update\-backend\fR or \f5gcloud
 compute backend\-services edit\fR.
+
+For more information about the available settings, see
+https://cloud.google.com/load\-balancing/docs/backend\-service.
 
 
 
@@ -213,10 +210,12 @@ Alternatively, the zone can be stored in the environment variable
 .RS 2m
 .TP 2m
 \fB\-\-balancing\-mode\fR=\fIBALANCING_MODE\fR
-Defines the strategy for balancing load.
+Defines how to measure whether a backend can handle additional traffic or is
+fully loaded. For more information, see
+https://cloud.google.com/load\-balancing/docs/backend\-service#balancing\-mode.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT or SERVERLESS.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 \fIBALANCING_MODE\fR must be one of:
 
@@ -227,54 +226,44 @@ Available if the backend service's load balancing scheme is either
 \f5INTERNAL\fR or \f5EXTERNAL\fR. Available if the backend service's protocol is
 one of \f5SSL\fR, \f5TCP\fR, or \f5UDP\fR.
 
-.RS 2m
-Spreads load based on how many concurrent connections the backend
-can handle.
-.RE
+Spreads load based on how many concurrent connections the backend can handle.
 
-.RS 2m
-For backend services with \-\-load\-balancing\-scheme `EXTERNAL`, you
-must specify exactly one of these additional parameters:
-`\-\-max\-connections`, `\-\-max\-connections\-per\-instance`, or
-`\-\-max\-connections\-per\-endpoint`.
-.RE
+For backend services with \-\-load\-balancing\-scheme \f5EXTERNAL\fR, you must
+specify exactly one of these additional parameters: \f5\-\-max\-connections\fR,
+\f5\-\-max\-connections\-per\-instance\fR, or
+\f5\-\-max\-connections\-per\-endpoint\fR.
 
-.RS 2m
-For backend services where `\-\-load\-balancing\-scheme` is `INTERNAL`,
+For backend services where \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL\fR,
 you must omit all of these parameters.
-.RE
+
 .TP 2m
 \fBRATE\fR
 Available if the backend service's load balancing scheme is
 \f5INTERNAL_MANAGED\fR, \f5INTERNAL_SELF_MANAGED\fR, or \f5EXTERNAL\fR.
 Available if the backend service's protocol is one of HTTP, HTTPS, or HTTP/2.
 
-.RS 2m
-Spreads load based on how many HTTP requests per second (RPS) the
-backend can handle.
-.RE
+Spreads load based on how many HTTP requests per second (RPS) the backend can
+handle.
 
-.RS 2m
 You must specify exactly one of these additional parameters:
-`\-\-max\-rate`, `\-\-max\-rate\-per\-instance`, or `\-\-max\-rate\-per\-endpoint`.
-.RE
+\f5\-\-max\-rate\fR, \f5\-\-max\-rate\-per\-instance\fR, or
+\f5\-\-max\-rate\-per\-endpoint\fR.
+
 .TP 2m
 \fBUTILIZATION\fR
 Available if the backend service's load balancing scheme is
 \f5INTERNAL_MANAGED\fR, \f5INTERNAL_SELF_MANAGED\fR, or \f5EXTERNAL\fR.
 Available only for managed or unmanaged instance group backends.
 
-.RS 2m
-Spreads load based on the CPU utilization of instances in a backend
-instance group.
-.RE
+Spreads load based on the backend utilization of instances in a backend instance
+group.
 
-.RS 2m
 The following additional parameters may be specified:
-`\-\-max\-utilization`, `\-\-max\-rate`, `\-\-max\-rate\-per\-instance`,
-`\-\-max\-connections`, `\-\-max\-connections\-per\-instance`.
-For valid combinations, see `\-\-max\-utilization`.
-.RE
+\f5\-\-max\-utilization\fR, \f5\-\-max\-rate\fR,
+\f5\-\-max\-rate\-per\-instance\fR, \f5\-\-max\-connections\fR,
+\f5\-\-max\-connections\-per\-instance\fR. For valid combinations, see
+\f5\-\-max\-utilization\fR.
+
 .RE
 .sp
 
@@ -282,15 +271,18 @@ For valid combinations, see `\-\-max\-utilization`.
 .TP 2m
 \fB\-\-capacity\-scaler\fR=\fICAPACITY_SCALER\fR
 A setting that applies to all balancing modes. This value is multiplied by the
-balancing mode value to set the current max usage of the instance group.
-Acceptable values are \f50.0\fR (0%) through \f51.0\fR (100%). Setting this
-value to \f50.0\fR (0%) drains the backend service. Note that draining a backend
-service only prevents new connections to instances in the group. All existing
-connections are allowed to continue until they close by normal means. This
-cannot be used for internal load balancing.
+balancing mode value to set the current max usage of the instance group. You can
+set the capacity scaler to \f50.0\fR or from \f50.1\fR (10%) to \f51.0\fR
+(100%). You cannot configure a setting that is larger than \f50.0\fR and smaller
+than \f50.1\fR. A scale factor of zero (\f50.0\fR) prevents all new connections.
+You cannot configure a setting of \f50.0\fR when there is only one backend
+attached to the backend service. Note that draining a backend service only
+prevents new connections to instances in the group. All existing connections are
+allowed to continue until they close by normal means. This cannot be used for
+internal load balancing.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT or SERVERLESS.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -390,7 +382,7 @@ endpoint group and instance group backends (except for regional managed instance
 groups).
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT or SERVERLESS.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR
@@ -402,7 +394,7 @@ number of endpoints in the network endpoint group, then dividing by the number
 of healthy endpoints.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT or SERVERLESS.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR
@@ -421,7 +413,7 @@ regional managed instance groups). Must not be defined if the backend is a
 managed instance group using load balancing\-based autoscaling.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT or SERVERLESS.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR
@@ -432,7 +424,7 @@ calculated by multiplying \f5MAX_RATE_PER_ENDPOINT\fR by the number of endpoints
 in the network endpoint group, then dividing by the number of healthy endpoints.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT or SERVERLESS.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR

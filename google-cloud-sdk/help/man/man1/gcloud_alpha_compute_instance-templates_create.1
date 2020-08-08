@@ -11,16 +11,15 @@ gcloud alpha compute instance\-templates create \- create a Compute Engine virtu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-templates create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-confidential\-compute\fR] [\fB\-\-configure\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR] [\fB\-\-source\-instance\-zone\fR=\fISOURCE_INSTANCE_ZONE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-mesh\fR=[\fImode\fR=\fIMODE\fR],[\fIworkload\-ports\fR=\fIWORKLOAD\-PORTS\fR]\ \fB\-\-mesh\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]\ \fB\-\-mesh\-proxy\-config\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-templates create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-confidential\-compute\fR] [\fB\-\-configure\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR] [\fB\-\-source\-instance\-zone\fR=\fISOURCE_INSTANCE_ZONE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fB\-\-service\-proxy\fR=[\fIenabled\fR],[\fIaccess\-log\fR=\fIACCESS\-LOG\fR],[\fInetwork\fR=\fINETWORK\fR],[\fIproxy\-port\fR=\fIPROXY\-PORT\fR],[\fIserving\-ports\fR=\fISERVING\-PORTS\fR],[\fItracing\fR=\fITRACING\fR]\ \fB\-\-service\-proxy\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instance\-templates create\fR facilitates
-the creation of Google Compute Engine virtual machine instance templates.
-Instance templates are global resources, and can be used to create instances in
-any zone.
+the creation of Compute Engine virtual machine instance templates. Instance
+templates are global resources, and can be used to create instances in any zone.
 
 
 
@@ -74,7 +73,8 @@ must be a whole number followed by a size unit of \f5\fIKB\fR\fR for kilobyte,
 \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for
 terabyte. For example, \f5\fI10GB\fR\fR will produce a 10 gigabyte disk. The
 minimum size a boot disk can have is 10 GB. Disk size must be a multiple of 1
-GB. Limit boot disk size to 2TB to account for MBR partition table limitations.
+GB. Limit boot disk size to 2 TB to account for MBR partition table limitations.
+Default size unit is \f5\fIGB\fR\fR.
 
 .TP 2m
 \fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR
@@ -165,6 +165,7 @@ version of an image is needed.
 The Google Cloud project against which all image and image family references
 will be resolved. It is best practice to define image\-project. A full list of
 available projects can be generated by running \f5gcloud projects list\fR.
+
 .RS 2m
 .IP "\(bu" 2m
 If specifying one of our public images, image\-project must be provided.
@@ -203,29 +204,44 @@ instance is deleted. However, if the disk is later detached from the instance,
 this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .TP 2m
+\fBboot\fR
+If \f5\fIyes\fR\fR, indicates that this is a boot disk. The instance will use
+the first partition of the disk for its root file system. The default value for
+this is \f5\fIno\fR\fR.
+
+.TP 2m
 \fBkms\-key\fR
-Fully qualified Cloud KMS cryptokey name that will protect the disk. This can
-either be the fully qualified path or the name. The fully qualified Cloud KMS
-cryptokey name format is:
+Fully qualified Cloud KMS cryptokey name that will protect the disk.
+
+This can either be the fully qualified path or the name.
+
+The fully qualified Cloud KMS cryptokey name format is:
 \f5\fIprojects/<kms\-project>/locations/<kms\-location>/keyRings/<kms\-keyring>/
-cryptoKeys/<key\-name>\fR\fR. If the value is not fully qualified then
-kms\-location, kms\-keyring, and optionally kms\-project are required. See
-https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
-more details.
+cryptoKeys/<key\-name>\fR\fR.
+
+If the value is not fully qualified then kms\-location, kms\-keyring, and
+optionally kms\-project are required.
+
+See https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption
+for more details.
 
 .TP 2m
 \fBkms\-project\fR
-Project that contains the Cloud KMS cryptokey that will protect the disk. If the
-project is not specified then the project where the disk is being created will
-be used. If this flag is set then key\-location, kms\-keyring, and kms\-key are
-required. See
-https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
-more details.
+Project that contains the Cloud KMS cryptokey that will protect the disk.
+
+If the project is not specified then the project where the disk is being created
+will be used.
+
+If this flag is set then key\-location, kms\-keyring, and kms\-key are required.
+
+See https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption
+for more details.
 
 .TP 2m
 \fBkms\-location\fR
-Location of the Cloud KMS cryptokey to be used for protecting the disk. All
-Cloud KMS cryptokeys are reside in a 'location'. To get a list of possible
+Location of the Cloud KMS cryptokey to be used for protecting the disk.
+
+All Cloud KMS cryptokeys are reside in a 'location'. To get a list of possible
 locations run 'gcloud kms locations list'. If this flag is set then kms\-keyring
 and kms\-key are required. See
 https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
@@ -234,20 +250,24 @@ more details.
 .TP 2m
 \fBkms\-keyring\fR
 The keyring which contains the Cloud KMS cryptokey that will protect the disk.
-If this flag is set then kms\-location and kms\-key are required. See
-https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
-more details.
+
+If this flag is set then kms\-location and kms\-key are required.
+
+See https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption
+for more details.
 
 .TP 2m
 \fBdisk\-resource\-policy\fR
 Resource policy that will be applied to created disk. You can provide full or
 partial URL. For more details see
+
 .RS 2m
 .IP "\(bu" 2m
 https://cloud.google.com/sdk/gcloud/reference/beta/compute/resource\-policies/
 .RS 2m
 .IP "\(bu" 2m
 https://cloud.google.com/compute/docs/disks/scheduled\-snapshots
+
 .RE
 .RE
 .RE
@@ -255,6 +275,13 @@ https://cloud.google.com/compute/docs/disks/scheduled\-snapshots
 .sp
 
 .RS 2m
+.TP 2m
+\fBmulti\-writer\fR
+If \f5\fIyes\fR\fR, create the disk in multi\-writer mode so that it can be
+attached with read\-write access to multiple VMs. Can only be used with zonal
+SSD persistent disks. Disks in multi\-writer mode do not support resize and
+snapshot operations. The default value is \f5\fIno\fR\fR.
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Specifies a textual description for the instance template.
@@ -783,36 +810,6 @@ The instances should be terminated.
 .RE
 .sp
 .TP 2m
-\fB\-\-mesh\fR=[\fImode\fR=\fIMODE\fR],[\fIworkload\-ports\fR=\fIWORKLOAD\-PORTS\fR]
-Enables mesh and specifies mesh\-level configuration. "cloud\-platform" scope
-will be enabled to allow connection to Traffic Director API. Therefore
-\-\-no\-scopes flag should not be present.
-
-.RS 2m
-.TP 2m
-\fBmode\fR
-If ON, the mesh software will be installed on the instance when created. It will
-be configured to work with TrafficDirector. Allowed values of the flags are: ON
-and OFF for Alpha.
-
-.TP 2m
-\fBworkload\-ports\fR
-List of the ports inside quotes ("), separated by ';', on which the customer's
-workload is running. Used to intercept the incoming traffic to the workload. If
-not provided, no incoming traffic is intercepted.
-
-.RE
-.sp
-.TP 2m
-\fB\-\-mesh\-labels\fR=[\fIKEY\fR=\fIVALUE\fR, ...,...]
-Specifies the mesh\-level labels as key\-value pairs.
-
-.TP 2m
-\fB\-\-mesh\-proxy\-config\fR=[\fIKEY\fR=\fIVALUE\fR, ...,...]
-Specifies per\-proxy configuration as key\-value pairs. See all options at
-http://cloud/traffic\-director/docs/traffic\-director\-per\-proxy\-config
-
-.TP 2m
 
 Sole Tenancy. At most one of these may be specified:
 
@@ -909,6 +906,7 @@ gke-default	https://www.googleapis.com/auth/devstorage.read_only
 	https://www.googleapis.com/auth/trace.append
 logging-write	https://www.googleapis.com/auth/logging.write
 monitoring	https://www.googleapis.com/auth/monitoring
+monitoring-read	https://www.googleapis.com/auth/monitoring.read
 monitoring-write	https://www.googleapis.com/auth/monitoring.write
 pubsub	https://www.googleapis.com/auth/pubsub
 service-control	https://www.googleapis.com/auth/servicecontrol
@@ -945,17 +943,82 @@ At most one of these may be specified:
 A service account is an identity attached to the instance. Its access tokens can
 be accessed through the instance metadata server and are used to authenticate
 applications on the instance. The account can be set using an email address
-corresponding to the required service account. You can explicitly specify the
-Compute Engine default service account using the 'default' alias.
+corresponding to the required service account.
 
-If not provided, the instance will get project's default service account.
+If not provided, the instance will use the project's default service account.
+
 
 .TP 2m
 \fB\-\-no\-service\-account\fR
 Create instance without service account
 
+.RE
+.sp
+.TP 2m
+\fB\-\-service\-proxy\fR=[\fIenabled\fR],[\fIaccess\-log\fR=\fIACCESS\-LOG\fR],[\fInetwork\fR=\fINETWORK\fR],[\fIproxy\-port\fR=\fIPROXY\-PORT\fR],[\fIserving\-ports\fR=\fISERVING\-PORTS\fR],[\fItracing\fR=\fITRACING\fR]
+Controls whether the Traffic Director service proxy (Envoy) and agent are
+installed and configured on the VM. "cloud\-platform" scope will be enabled to
+allow connections to the Traffic Director API. Do not use the \-\-no\-scopes
+flag.
+
+.RS 2m
+.TP 2m
+\fBenabled\fR
+If specified, the service\-proxy software will be installed when the instance is
+created. The instance is configured to work with Traffic Director.
+
+.TP 2m
+\fBserving\-ports\fR
+Semi\-colon\-separated (;) list of the ports, specified inside quotation marks
+("), on which the customer's application/workload is serving.
+
+For example:
+
+.RS 2m
+\-\-serving\-ports="80;8080"
+.RE
+
+The service proxy will intercept inbound traffic, then forward it to the
+specified serving port(s) on localhost. If not provided, no incoming traffic is
+intercepted.
+
+.TP 2m
+\fBproxy\-port\fR
+The port on which the service proxy listens. The VM intercepts traffic and
+redirects it to this port to be handled by the service proxy. If omitted, the
+default value is '15001'.
+
+.TP 2m
+\fBtracing\fR
+Enables the service proxy to generate distributed tracing information. If set to
+ON, the service proxy's control plane generates a configuration that enables
+request ID\-based tracing. For more information, refer to the
+\f5generate_request_id\fR documentation for the Envoy proxy. Allowed values are
+\f5ON\fR and \f5OFF\fR.
+
+.TP 2m
+\fBaccess\-log\fR
+The filepath for access logs sent to the service proxy by the control plane. All
+incoming and outgoing requests are recorded in this file. For more information,
+refer to the file access log documentation for the Envoy proxy.
+
+.TP 2m
+\fBnetwork\fR
+The name of a valid VPC network. The Google Cloud Platform VPC network used by
+the service proxy's control plane to generate dynamic configuration for the
+service proxy.
 
 .RE
+.sp
+.TP 2m
+\fB\-\-service\-proxy\-labels\fR=[\fIKEY\fR=\fIVALUE\fR, ...,...]
+Labels that you can apply to your service proxy. These will be reflected in your
+Envoy proxy's bootstrap metadata. These can be any \f5key=value\fR pairs that
+you want to set as proxy metadata (for example, for use with config filtering).
+You might use these flags for application and version labels: \f5app=review\fR
+and/or \f5version=canary\fR.
+
+
 .RE
 .sp
 

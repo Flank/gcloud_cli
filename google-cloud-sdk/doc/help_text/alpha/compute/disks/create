@@ -1,32 +1,29 @@
 NAME
-    gcloud alpha compute disks create - create Google Compute Engine persistent
-        disks
+    gcloud alpha compute disks create - create Compute Engine persistent disks
 
 SYNOPSIS
     gcloud alpha compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
         [--erase-windows-vss-signature]
-        [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
-        [--licenses=[LICENSE,...]] [--multi-writer]
+        [--guest-os-features=[GUEST_OS_FEATURE,...]] [--interface=INTERFACE]
+        [--labels=[KEY=VALUE,...]] [--licenses=[LICENSE,...]] [--multi-writer]
         [--physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"]
         [--replica-zones=ZONE,ZONE] [--no-require-csek-key-create]
         [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-disk=SOURCE_DISK
-          | --source-snapshot=SOURCE_SNAPSHOT
           | --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
-          --source-in-place-snapshot-region=SOURCE_IN_PLACE_SNAPSHOT_REGION
-          | --source-in-place-snapshot-zone=SOURCE_IN_PLACE_SNAPSHOT_ZONE]
+          | --source-snapshot=SOURCE_SNAPSHOT]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute disks create creates one or more Google
-    Compute Engine persistent disks. When creating virtual machine instances,
-    disks can be attached to the instances through the gcloud compute instances
-    create command. Disks can also be attached to instances that are already
-    running using gcloud compute instances attach-disk.
+    (ALPHA) gcloud alpha compute disks create creates one or more Compute
+    Engine persistent disks. When creating virtual machine instances, disks can
+    be attached to the instances through the gcloud compute instances create
+    command. Disks can also be attached to instances that are already running
+    using gcloud compute instances attach-disk.
 
     Disks are zonal resources, so they reside in a particular zone for their
     entire lifetime. The contents of a disk can be moved to a different zone by
@@ -36,9 +33,14 @@ DESCRIPTION
     gcloud compute images create) and creating a new disk using --image in the
     desired project and/or zone.
 
+    For a comprehensive guide, including details on minimum and maximum disk
+    size, refer to: https://cloud.google.com/compute/docs/disks
+
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]
-        Names of the disks to create.
+        Names of the disks to create. For details on the naming convention for
+        this resource, refer to:
+        https://cloud.google.com/compute/docs/naming-resources
 
 FLAGS
      --csek-key-file=FILE
@@ -67,6 +69,10 @@ FLAGS
         one of: BARE_METAL_LINUX_COMPATIBLE, GVNIC, MULTI_IP_SUBNET,
         SEV_CAPABLE, UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
+     --interface=INTERFACE
+        Specifies the disk interface to use for attaching this disk. Valid
+        values are SCSI and NVME. The default is SCSI.
+
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -81,11 +87,10 @@ FLAGS
         policies.
 
      --multi-writer
-        Create the disk in shared mode so that it can be attached with
-        read-write access to multiple VMs. Available only for zonal disks.
-        Cannot be used with regional disks. Shared disk is exposed only as an
-        NVMe device. Shared PD does not yet support resize and snapshot
-        operations.
+        Create the disk in multi-writer mode so that it can be attached with
+        read-write access to multiple VMs. Can only be used with zonal SSD
+        persistent disks. Disks in multi-writer mode do not support resize and
+        snapshot operations.
 
      --physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"
         Physical block size of the persistent disk in bytes. Valid values are
@@ -119,8 +124,10 @@ FLAGS
         specified, GB is assumed. For example, 10GB will produce 10 gigabyte
         disks. Disk size must be a multiple of 1 GB. Limit your boot disk size
         to 2TB to account for MBR partition table limitations. If disk size is
-        not specified, the default size of 500GB for standard disks and 100GB
-        for pd-ssd disks will be used.
+        not specified, the default size of 500GB for pd-standard disks, 100GB
+        for pd-balanced disks, and 100GB for pd-ssd disks will be used. For
+        details about disk size limits, refer to:
+        https://cloud.google.com/compute/docs/disks
 
      --type=TYPE
         Specifies the type of disk to create. To get a list of available disk
@@ -172,6 +179,9 @@ FLAGS
           Source disk must be in the same zone/region as the disk to be
           created.
 
+       --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
+          Source in place snapshot used to create the disks.
+
        --source-snapshot=SOURCE_SNAPSHOT
           Source snapshot used to create the disks. It is safe to delete a
           snapshot after a disk has been created from the snapshot. In such
@@ -184,22 +194,6 @@ FLAGS
           When using this option, the size of the disks must be at least as
           large as the snapshot size. Use --size to adjust the size of the
           disks.
-
-       Source in place snapshot options
-
-         --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
-            Source in place snapshot used to create the disks.
-
-         At most one of these may be specified:
-
-           --source-in-place-snapshot-region=SOURCE_IN_PLACE_SNAPSHOT_REGION
-              Region of the source in place snapshot to operate on. Overrides
-              the default compute/region property value for this command
-              invocation.
-
-           --source-in-place-snapshot-zone=SOURCE_IN_PLACE_SNAPSHOT_ZONE
-              Zone of the source in place snapshot to operate on. Overrides the
-              default compute/zone property value for this command invocation.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to

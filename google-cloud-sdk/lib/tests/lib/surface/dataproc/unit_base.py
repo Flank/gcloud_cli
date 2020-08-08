@@ -249,6 +249,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
             'clusterConfig',
             self.messages.ClusterConfig(
                 configBucket=kwargs.get('configBucket', None),
+                tempBucket=kwargs.get('tempBucket', None),
                 gceClusterConfig=kwargs.get(
                     'gceClusterConfig',
                     self.messages.GceClusterConfig(
@@ -441,7 +442,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                            template_id=None,
                            labels=None,
                            update_time=None,
-                           jobs=None):
+                           jobs=None,
+                           dag_timeout=None):
     template_name = name if name else self.WorkflowTemplateName(region=region)
     template_id = template_id if template_id else self.WORKFLOW_TEMPLATE
     if not jobs:
@@ -456,14 +458,25 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                   key=key, value=value) for key, value in six.iteritems(labels)
           ])
 
-    return self.messages.WorkflowTemplate(
-        id=template_id,
-        name=template_name,
-        labels=labels_values,
-        createTime=create_time,
-        updateTime=update_time,
-        version=version,
-        jobs=jobs)
+    if self.api_version == _BETA_API_VERSION:
+      return self.messages.WorkflowTemplate(
+          id=template_id,
+          name=template_name,
+          labels=labels_values,
+          createTime=create_time,
+          updateTime=update_time,
+          version=version,
+          jobs=jobs,
+          dagTimeout=dag_timeout)
+    else:
+      return self.messages.WorkflowTemplate(
+          id=template_id,
+          name=template_name,
+          labels=labels_values,
+          createTime=create_time,
+          updateTime=update_time,
+          version=version,
+          jobs=jobs)
 
   def ExpectGetWorkflowTemplate(self,
                                 name=None,

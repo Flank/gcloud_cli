@@ -19,10 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import contextlib
-import logging
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.util import retry
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
 
@@ -32,26 +32,40 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
 
   SUBNET_RANGE = '10.33.0.0/16'
 
-  def SetupCommon(self):
-    self.network_name = self._GetResourceName()
-    self.subnetwork_name = self._GetResourceName()
-
-    self.Run('compute networks create {0} --subnet-mode=custom'
-             .format(self.network_name))
-    self.Run('compute networks subnets create {0} --network {1} '
-             '--region {2} --range {3}'.format(self.subnetwork_name,
-                                               self.network_name, self.region,
-                                               self.SUBNET_RANGE))
-
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
     self.registry = resources.REGISTRY.Clone()
     self.registry.RegisterApiByName('compute', 'v1')
-    self.SetupCommon()
 
   def _GetResourceName(self):
     return next(e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-neg-test'))
+
+  @contextlib.contextmanager
+  def _CreateNetwork(self):
+    network_name = self._GetResourceName()
+    try:
+      self.Run('compute networks create {0}'
+               ' --subnet-mode=custom'.format(network_name))
+      yield network_name
+    finally:
+      retry.RetryOnException(self.Run, max_retrials=3, sleep_ms=1000)(
+          'compute networks delete {} -q'.format(network_name))
+
+  @contextlib.contextmanager
+  def _CreateSubnet(self, network_name):
+    subnetwork_name = self._GetResourceName()
+    try:
+      self.Run('compute networks subnets create {0}'
+               ' --network {1}'
+               ' --region {2}'
+               ' --range {3}'.format(subnetwork_name, network_name,
+                                     self.region, self.SUBNET_RANGE))
+      yield subnetwork_name
+    finally:
+      retry.RetryOnException(self.Run, max_retrials=3, sleep_ms=1000)(
+          'compute networks subnets delete {0} --region {1} -q'.format(
+              subnetwork_name, self.region))
 
   @contextlib.contextmanager
   def _CreateInstance(self, network_name, subnetwork_name):
@@ -104,14 +118,40 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
       self.Run('compute network-endpoint-groups delete {0} --zone {1} '
                '--quiet'.format(neg_name, self.zone))
 
+  @contextlib.contextmanager
+  def _CreateBackendServiceForRegionalNeg(self):
+    backend_name = self._GetResourceName()
+    try:
+      self.Run(
+          'compute backend-services create {0} --global'.format(backend_name))
+      yield backend_name
+    finally:
+      self.Run('compute backend-services delete {0} --global '
+               '--quiet'.format(backend_name))
+
+  @contextlib.contextmanager
+  def _CreateRegionalNetworkEndpointGroup(self):
+    neg_name = self._GetResourceName()
+    try:
+      self.Run('compute network-endpoint-groups create {0} --region {1} '
+               '--network-endpoint-type=SERVERLESS --app-engine-service=default'
+               .format(neg_name, self.region))
+      self.Run('compute network-endpoint-groups list')
+      self.AssertNewOutputContains(neg_name)
+      yield neg_name
+    finally:
+      self.Run('compute network-endpoint-groups delete {0} --region {1} '
+               '--quiet'.format(neg_name, self.region))
+
   def testNetworkEndpointGroups(self):
     health_check_name = self._GetResourceName()
-    with self._CreateHealthCheck(health_check_name), \
-         self._CreateNetworkEndpointGroup(
-             self.network_name, self.subnetwork_name) as neg_name, \
+    with self._CreateNetwork() as network_name, \
+        self._CreateSubnet(network_name) as subnetwork_name, \
+        self._CreateHealthCheck(health_check_name), \
+         self._CreateNetworkEndpointGroup(network_name, subnetwork_name
+                                          ) as neg_name, \
          self._CreateBackendService(health_check_name) as backend_name, \
-         self._CreateInstance(
-             self.network_name, self.subnetwork_name) as instance_name:
+         self._CreateInstance(network_name, subnetwork_name) as instance_name:
       self.Run('compute network-endpoint-groups update {0} --zone={1} '
                '--add-endpoint instance={2},port=80'.format(
                    neg_name, self.zone, instance_name))
@@ -137,22 +177,44 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
           backend_name))
       self.AssertNewOutputNotContains(neg_name)
 
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    self.CleanUpResource(
-        self.subnetwork_name, 'networks subnets', scope=e2e_test_base.REGIONAL)
-    self.CleanUpResource(
-        self.network_name, 'networks', scope=e2e_test_base.GLOBAL)
+
+class NetworkEndpointGroupsBetaTest(NetworkEndpointGroupsTest):
+  """Network endpoint groups alpha tests."""
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.registry = resources.REGISTRY.Clone()
+    self.registry.RegisterApiByName('compute', 'beta')
+
+  def testRegionalNetworkEndpointGroups(self):
+    with self._CreateRegionalNetworkEndpointGroup() as neg_name, \
+        self._CreateBackendServiceForRegionalNeg() as backend_name:
+
+      self.Run('compute backend-services add-backend {0} --global '
+               '--network-endpoint-group {1} '
+               '--network-endpoint-group-region {2}'.format(
+                   backend_name, neg_name, self.region))
+
+      self.Run(
+          'compute backend-services describe {0} --global'.format(backend_name))
+      self.AssertNewOutputContains(neg_name)
+
+      self.Run('compute backend-services remove-backend {0} --global '
+               '--network-endpoint-group {1} '
+               '--network-endpoint-group-region {2}'.format(
+                   backend_name, neg_name, self.region))
+      self.Run(
+          'compute backend-services describe {0} --global'.format(backend_name))
+      self.AssertNewOutputNotContains(neg_name)
 
 
-class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsTest):
+class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsBetaTest):
   """Network endpoint groups alpha tests."""
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.registry = resources.REGISTRY.Clone()
     self.registry.RegisterApiByName('compute', 'alpha')
-    self.SetupCommon()
 
   @contextlib.contextmanager
   def _CreateHealthCheck(self, health_check_name):
@@ -176,7 +238,6 @@ class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsTest):
     finally:
       self.Run('compute backend-services delete {0} --global '
                '--quiet'.format(backend_name))
-
 
 if __name__ == '__main__':
   e2e_test_base.main()

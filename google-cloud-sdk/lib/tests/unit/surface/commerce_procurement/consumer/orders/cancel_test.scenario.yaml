@@ -1,0 +1,31 @@
+title: commerce procurement consumer order cancel scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      commerce-procurement consumer orders cancel orderId --billing-account billingAccountId
+  - stdout: |
+      name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL_ORDER-operationId
+actions:
+- execute_command:
+    command: |
+      commerce-procurement consumer orders cancel orderId --billing-account billingAccountId
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/billingAccountId/orders/orderId:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/billingAccountId/orders/orderId/operations/CANCEL_ORDER-operationId"
+            }
+    - expect_stdout: |
+        name: billingAccounts/billingAccountId/orders/orderId/operations/CANCEL_ORDER-operationId
+    - expect_exit:
+        code: 0

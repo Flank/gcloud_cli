@@ -1,6 +1,6 @@
 NAME
-    gcloud compute external-vpn-gateways delete - delete a Google Compute
-        Engine external VPN gateway
+    gcloud compute external-vpn-gateways delete - delete a Compute Engine
+        external VPN gateway
 
 SYNOPSIS
     gcloud compute external-vpn-gateways delete NAME [NAME ...]
@@ -8,10 +8,10 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute external-vpn-gateways delete is used to delete all data
-    associated with a Google Compute Engine external VPN gateway in a project.
+    associated with a Compute Engine external VPN gateway in a project.
 
-    An external VPN gateway provides the information to Google Cloud Platform
-    about your on-premises side or another Cloud provider's VPN gateway.
+    An external VPN gateway provides the information to Google Cloud about your
+    on-premises side or another Cloud provider's VPN gateway.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

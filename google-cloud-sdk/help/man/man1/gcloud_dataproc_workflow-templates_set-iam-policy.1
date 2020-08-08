@@ -74,17 +74,21 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-The following command will read an IAM policy defined in a JSON file
-\'policy.json' and set it for a template with identifier 'example\-template'
+The following command will read an IAM policy defined in a JSON file.RS 2m
+'policy.json' and set it for a template with identifier 'example\-template'
+
+.RE
 
 .RS 2m
 $ gcloud dataproc workflow\-templates set\-iam\-policy \e
-    example\-template policy.json
+example\-template policy.json
 .RE
 
 
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
+.RS 2m
+See https://cloud.google.com/iam/docs/managing\-policies for details
+of the policy file format and contents.
+.RE
 
 
 

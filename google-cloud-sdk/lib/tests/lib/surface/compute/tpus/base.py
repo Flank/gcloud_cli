@@ -31,24 +31,27 @@ from six.moves import range
 
 class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for all TPU unit tests."""
-  API_VERSION = 'v1'
+  api_version = 'v1'
 
   def _SetTrack(self, track):
     self.track = track
 
+  def _SetApiVersion(self, version):
+    self.api_version = version
+
   def SetUp(self):
     """Creates mock client and adds Unmock on cleanup."""
-    self.messages = core_apis.GetMessagesModule('tpu', self.API_VERSION)
-    self.mock_client = mock.Client(
-        core_apis.GetClientClass('tpu', self.API_VERSION),
+    self.tpu_messages = core_apis.GetMessagesModule('tpu', self.api_version)
+    self.mock_tpu_client = mock.Client(
+        core_apis.GetClientClass('tpu', self.api_version),
         real_client=core_apis.GetClientInstance(
-            'tpu', TpuUnitTestBase.API_VERSION, no_http=True))
-    self.mock_client.Mock()
-    self.addCleanup(self.mock_client.Unmock)
+            'tpu', self.api_version, no_http=True))
+    self.mock_tpu_client.Mock()
+    self.addCleanup(self.mock_tpu_client.Unmock)
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def GetReadyState(self):
-    return self.messages.Node.StateValueValuesEnum.READY
+    return self.tpu_messages.Node.StateValueValuesEnum.READY
 
   def GetTestTPU(self,
                  name,
@@ -62,7 +65,7 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                  accelerator_type='v2-8',
                  preemptible=False
                 ):
-    return self.messages.Node(
+    return self.tpu_messages.Node(
         name=name,
         cidrBlock=cidr,
         description=description,
@@ -74,8 +77,8 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         port=port,
         acceleratorType=accelerator_type,
         networkEndpoints=self._GetNetworkEndpoints(cidr, port, 2),
-        schedulingConfig=self.messages.SchedulingConfig(preemptible=preemptible)
-    )
+        schedulingConfig=self.tpu_messages.SchedulingConfig(
+            preemptible=preemptible))
 
   def _GetNetworkEndpoints(self, base_range, port, count):
     base_ip, _ = base_range.split('/')
@@ -85,22 +88,22 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       octets[3] += 1
       ip = '.'.join(str(v) for v in octets)
       results.append(
-          self.messages.NetworkEndpoint(ipAddress=ip, port=int(port)))
+          self.tpu_messages.NetworkEndpoint(ipAddress=ip, port=int(port)))
     return results
 
   def GetTestLocation(self, name='us-east1'):
-    return self.messages.Location(
+    return self.tpu_messages.Location(
         name=name,
         locationId='projects/{}/locations/{}'.format(self.Project(), name))
 
   def GetTestTFVersion(self, version='1.6'):
-    return self.messages.TensorFlowVersion(
+    return self.tpu_messages.TensorFlowVersion(
         version=version,
         name=('projects/{project}/locations/{zone}/tensorflowVersions/{version}'
               .format(project=self.Project(), zone=self.zone, version=version)))
 
   def GetTestAccType(self, acc_type='v2-8'):
-    return self.messages.AcceleratorType(
+    return self.tpu_messages.AcceleratorType(
         type=acc_type,
         name=('projects/{project}/locations/{zone}/acceleratorTypes/{acc_type}'
               .format(project=self.Project(), zone=self.zone,
@@ -113,11 +116,11 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       is_done=True,
       response_value=None):
 
-    operation = self.messages.Operation(name=op_name, done=is_done)
+    operation = self.tpu_messages.Operation(name=op_name, done=is_done)
     if error_json:
       is_done = True
       operation.error = apitools_encoding.PyValueToMessage(
-          self.messages.Status,
+          self.tpu_messages.Status,
           error_json)
 
     if response_value:
@@ -138,8 +141,8 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         collection='tpu.projects.locations.operations')
     for _ in range(poll_count):
       op_polling_response = self.GetOperationResponse(op_name, is_done=False)
-      self.mock_client.projects_locations_operations.Get.Expect(
-          self.messages.TpuProjectsLocationsOperationsGetRequest(
+      self.mock_tpu_client.projects_locations_operations.Get.Expect(
+          self.tpu_messages.TpuProjectsLocationsOperationsGetRequest(
               name=op_ref.RelativeName()),
           op_polling_response
       )
@@ -148,9 +151,14 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                                                  is_done=True,
                                                  error_json=error_json)
 
-    self.mock_client.projects_locations_operations.Get.Expect(
-        self.messages.TpuProjectsLocationsOperationsGetRequest(
+    self.mock_tpu_client.projects_locations_operations.Get.Expect(
+        self.tpu_messages.TpuProjectsLocationsOperationsGetRequest(
             name=op_ref.RelativeName()),
         op_done_response
     )
     return op_done_response
+
+
+class TpuUnitTestBaseAlpha(TpuUnitTestBase):
+  """Base class for all TPU unit tests against Alpha API."""
+  api_version = 'v1alpha1'

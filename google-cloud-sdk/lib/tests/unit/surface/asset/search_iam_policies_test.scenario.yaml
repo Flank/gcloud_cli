@@ -1,5 +1,5 @@
 title: surface unit test for asset search-iam-policies
-release_tracks: [ALPHA, BETA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: core/project proj-foo
@@ -37,27 +37,22 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
-      ALPHA: v1p1alpha1
       BETA: v1p1beta1
 - define_reference:
     reference: scope-params-number
     track_values:
-      ALPHA: ''
       BETA: '--scope "projects/123"'
 - define_reference:
     reference: scope-params-id
     track_values:
-      ALPHA: ''
       BETA: '--scope "projects/proj-foo"'
 - define_reference:
     reference: scope-url-number
     track_values:
-      ALPHA: ''
       BETA: '&scope=projects%2F123'
 - define_reference:
     reference: scope-url-id
     track_values:
-      ALPHA: ''
       BETA: '&scope=projects%2Fproj-foo'
 - execute_command:
     # Search with --scope specified with project number.

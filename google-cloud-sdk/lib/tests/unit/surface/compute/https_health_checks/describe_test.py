@@ -22,7 +22,7 @@ import textwrap
 
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.health_checks import test_resources
 
 
 class HttpsHealthChecksDescribeTest(test_base.BaseTest,

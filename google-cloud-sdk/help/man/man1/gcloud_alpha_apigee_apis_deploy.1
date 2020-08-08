@@ -11,7 +11,7 @@ gcloud alpha apigee apis deploy \- deploys an Apigee API proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha apigee apis deploy\fR [[\fIREVISION\fR]\ \fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-override\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha apigee apis deploy\fR [[\fIREVISION\fR]\ \fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-basepath\fR=\fIBASEPATH\fR] [\fB\-\-override\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,6 +65,11 @@ The Apigee organization of the proxy and environment.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-basepath\fR=\fIBASEPATH\fR
+Base path where the API proxy revision should be deployed. Defaults to \f5/\fR
+if not provided.
+
 .TP 2m
 \fB\-\-override\fR
 Whether to force the deployment of the new revision over the currently deployed

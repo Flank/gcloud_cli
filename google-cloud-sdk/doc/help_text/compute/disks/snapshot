@@ -1,5 +1,5 @@
 NAME
-    gcloud compute disks snapshot - create snapshots of Google Compute Engine
+    gcloud compute disks snapshot - create snapshots of Compute Engine
         persistent disks
 
 SYNOPSIS
@@ -23,6 +23,10 @@ DESCRIPTION
     gcloud compute disks snapshot waits until the operation returns a status of
     READY or FAILED, or reaches the maximum timeout, and returns the last known
     details of the snapshot.
+
+    Note: To create snapshots, the following IAM permissions are necessary
+    compute.disks.createSnapshot, compute.snapshots.create,
+    compute.snapshots.get, and compute.zoneOperations.get.
 
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]

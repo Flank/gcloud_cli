@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ from tests.lib.core.resource import resource_printer_test_base
 class ValueAttributeTest(resource_printer_test_base.Base):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testDefaultNames(self):
     self.Print(style='value', fields='(name)', count=6)

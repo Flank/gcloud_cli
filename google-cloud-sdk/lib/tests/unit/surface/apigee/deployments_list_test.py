@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import json
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.calliope.concepts import handlers
 from tests.lib.surface.apigee import base
 
@@ -63,68 +64,68 @@ class DeploymentsListTest(base.ApigeeSurfaceTest):
 
   def testWithoutOrganization(self):
     with self.assertRaises(handlers.ParseError):
-      self.RunApigee("organizations deployments list --format=json")
+      self.RunApigee("deployments list --format=json")
     self.AssertErrContains(
-        "ORGANIZATION", "Must prompt user for an organization name if "
+        "--organization", "Must prompt user for an organization name if "
         "organization and product are unknown.")
 
   def testOrganizationOnly(self):
     expected_output = self._AddListResponse("test-org")
-    self.RunApigee("organizations deployments list test-org --format=json")
+    self.RunApigee("deployments list --organization=test-org --format=json")
     self.AssertJsonOutputMatches(expected_output,
                                  "Must return a complete list of deployments.")
 
   def testEnvironmentsWithoutOrganization(self):
     with self.assertRaises(handlers.ParseError):
-      self.RunApigee("environments deployments list prod --format=json")
+      self.RunApigee("deployments list --environment=prod --format=json")
     self.AssertErrContains(
         "--organization", "Must prompt user for an organization name if "
         "organization and product are unknown.")
 
-  def testWithoutEnvironment(self):
-    # Test harness may raise an error here for mismatch with surface spec.
-    with self.assertRaises(Exception):
-      self.RunApigee("environments deployments list --organization=test-org")
-    self.AssertErrContains(
-        "ENVIRONMENT",
-        "Must prompt user for an environment name if none was provided.")
-
   def testEnvironments(self):
     expected_output = self._AddListResponse("test-org", "staging")
-    self.RunApigee("environments deployments list staging "
+    self.RunApigee("deployments list --environment=staging "
                    "--organization=test-org --format=json")
     self.AssertJsonOutputMatches(expected_output,
                                  "Must return a complete list of deployments.")
 
   def testWithoutAPI(self):
-    with self.assertRaises(handlers.ParseError):
-      self.RunApigee("apis deployments list --organization=test-org "
+    with self.assertRaises(exceptions.RequiredArgumentException):
+      self.RunApigee("deployments list --organization=test-org "
                      "--environment=test --revision=1")
     self.AssertErrContains(
-        "--api", "Must prompt user for an API proxy if none was provided.")
+        "--api", "Must require an API proxy if revision was provided.")
 
   def testAllRevision(self):
     expected = self._AddListResponse("test-org", env="test", api="demo")
-    self.RunApigee("apis deployments list --organization=test-org "
+    self.RunApigee("deployments list --organization=test-org "
                    "--environment=test --api=demo --format=json")
     self.AssertJsonOutputMatches(expected, "Must return multiple revisions.")
 
+  def testNothingDeployed(self):
+    self.AddHTTPResponse(("https://apigee.googleapis.com/v1/"
+                          "organizations/test-org/apis/demo/deployments"),
+                         body=json.dumps({}))
+    self.RunApigee("deployments list --organization=test-org --api=demo "
+                   "--format=json")
+    self.AssertJsonOutputMatches([], "Must properly handle empty response.")
+
   def testAllEnvironment(self):
     expected = self._AddListResponse("test-org", api="demo", revision="2")
-    self.RunApigee("apis deployments list --organization=test-org --api=demo "
+    self.RunApigee("deployments list --organization=test-org --api=demo "
                    "--revision=2 --format=json")
     self.AssertJsonOutputMatches(expected, "Must return multiple environments.")
 
   def testAPIOnly(self):
     expected_output = self._AddListResponse("test-org", api="demo")
-    self.RunApigee("apis deployments list --organization=test-org --api=demo "
+    self.RunApigee("deployments list --organization=test-org --api=demo "
                    "--format=json")
     self.AssertJsonOutputMatches(
         expected_output, "Must return multiple environments and revisions.")
 
   def testFullIdentifier(self):
     expected = self._AddListResponse("test-org", "staging", "demo", "2")
-    self.RunApigee("apis deployments list --organization=test-org --api=demo "
+    self.RunApigee("deployments list --organization=test-org --api=demo "
                    "--revision=2 --environment=staging --format=json")
     self.AssertJsonOutputMatches(expected,
                                  "Must return just the matching deployment.")
@@ -135,7 +136,7 @@ class DeploymentsListTest(base.ApigeeSurfaceTest):
         "organizations/test-org/environments/test/deployments",
         status=200,
         body=json.dumps([]))
-    self.RunApigee("environments deployments list test "
+    self.RunApigee("deployments list --environment=test "
                    "--organization=test-org --format=json")
     self.AssertJsonOutputMatches(
         [], "Must return an empty array when there's no deployments to list.")
@@ -147,8 +148,8 @@ class DeploymentsListTest(base.ApigeeSurfaceTest):
         status=200,
         body=json.dumps({}))
 
-    self.RunApigee("apis deployments list --api=demo "
-                   "--organization=test-org --format=json")
+    self.RunApigee(
+        "deployments list --api=demo --organization=test-org --format=json")
     self.AssertJsonOutputMatches(
         [], "Must return an empty array when there's no deployments to list.")
 
@@ -158,7 +159,7 @@ class DeploymentsListTest(base.ApigeeSurfaceTest):
         "environments/test/apis/demo/revisions/2/deployments",
         status=404)
 
-    self.RunApigee("apis deployments list --environment=test --api=demo "
+    self.RunApigee("deployments list --environment=test --api=demo "
                    "--organization=test-org --revision=2 --format=json")
     self.AssertJsonOutputMatches(
         [], "Must return an empty array when there's no deployments to list.")

@@ -1,0 +1,155 @@
+
+.TH "GCLOUD_ALPHA_CERTIFICATE\-MANAGER_CERTIFICATES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha certificate\-manager certificates update \- update a certificate
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha certificate\-manager certificates update\fR \fICERTIFICATE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-certificate\-file\fR=\fICERTIFICATE_FILE\fR\ \fB\-\-private\-key\-file\fR=\fIPRIVATE_KEY_FILE\fR] [\fB\-\-async\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command updates existing certificate.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Certificate resource \- The certificate to update. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[certificate] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project]. To
+set the [location] attribute: provide the argument [certificate] on the command
+line with a fully specified name; location is always global. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE\fR
+ID of the certificate or fully qualified identifier for the certificate.
+
+
+.RE
+.RE
+.sp
+
+.SH "COMMONLY USED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Text description of a certificate.
+
+.TP 2m
+
+Arguments to configure self\-managed certificate data.
+
+.RS 2m
+.TP 2m
+\fB\-\-certificate\-file\fR=\fICERTIFICATE_FILE\fR
+The certificate data in PEM\-encoded form. This flag must be specified if any of
+the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-private\-key\-file\fR=\fIPRIVATE_KEY_FILE\fR
+The private key data in PEM\-encoded form. This flag must be specified if any of
+the other arguments in this group are specified.
+
+
+.RE
+.RE
+.sp
+
+.SH "OTHER FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha certificate\-manager certificates update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha certificate\-manager certificates update \e
+  \-\-clear\-labels \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a certificate with name simple\-cert, run:
+
+.RS 2m
+$ gcloud alpha certificate\-manager certificates update simple\-cert \e
+    \-\-description="desc" \-\-update\-labels="key=value"
+    \-\-certificate\-file=cert.pem \-\-private\-key\-file=key.pem
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

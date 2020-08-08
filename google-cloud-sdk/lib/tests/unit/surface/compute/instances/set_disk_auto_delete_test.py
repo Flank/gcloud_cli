@@ -35,11 +35,20 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
                 messages.AttachedDisk(
                     deviceName='device-1',
                     source=('https://compute.googleapis.com/compute/v1/projects/'
-                            'my-project/zones/us-central1-a/disks/disk-1')),
+                            'my-project/zones/us-central1-a/disks/disk-1'),
+                    autoDelete=False),
                 messages.AttachedDisk(
                     deviceName='device-2',
                     source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/us-central1-a/disks/disk-2')),
+                messages.AttachedDisk(
+                    deviceName='device-3',
+                    source=('projects/my-project/regions/us-central1/disks/'
+                            'disk-2')),
+                messages.AttachedDisk(
+                    deviceName='device-4',
+                    source=('projects/my-project/zones/us-central1-a/disks/'
+                            'disk-4')),
             ])],
 
         [],
@@ -77,7 +86,7 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
         compute instances set-disk-auto-delete
           instance-1
           --zone us-central1-a
-          --device-name device-1
+          --device-name device-2
           --no-auto-delete
         """)
 
@@ -95,19 +104,40 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
               instance='instance-1',
               project='my-project',
               zone='us-central1-a',
-              deviceName='device-1',
+              deviceName='device-2',
               autoDelete=False))],
+    )
+
+  def testWithDeviceNameThatExistsNoChange(self):
+    self.Run("""
+        compute instances set-disk-auto-delete
+          instance-1
+          --zone us-central1-a
+          --device-name device-1
+          --no-auto-delete
+        """)
+
+    self.AssertErrContains(
+        'No change requested; skipping update for [instance-1].')
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a'))],
     )
 
   def testWithDeviceNameThatDoesNotExist(self):
     with self.AssertRaisesToolExceptionRegexp(
-        r'No disk with device name \[device-3\] is attached to instance '
+        r'No disk with device name \[device-na\] is attached to instance '
         r'\[instance-1\] in zone \[us-central1-a\].'):
       self.Run("""
         compute instances set-disk-auto-delete
           instance-1
           --auto-delete
-          --device-name device-3
+          --device-name device-na
           --zone us-central1-a
         """)
 
@@ -138,17 +168,133 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
               autoDelete=True))],
     )
 
+  def testWithDiskThatExistsNoChange(self):
+    self.Run("""
+        compute instances set-disk-auto-delete
+          instance-1
+          --zone us-central1-a
+          --disk disk-1
+          --no-auto-delete
+        """)
+
+    self.AssertErrContains(
+        'No change requested; skipping update for [instance-1].')
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
   def testWithDiskThatDoesNotExist(self):
     with self.AssertRaisesToolExceptionRegexp(
-        r'Disk \[disk-3\] is not attached to instance \[instance-1\] in zone '
+        r'Disk \[disk-na\] is not attached to instance \[instance-1\] in zone '
         r'\[us-central1-a\].'):
       self.Run("""
         compute instances set-disk-auto-delete
           instance-1
           --auto-delete
-          --disk disk-3
+          --disk disk-na
           --zone us-central1-a
         """)
+
+  def testWithAmbiguousDisk(self):
+    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
+                    return_value=True)
+    self.WriteInput('1\n')
+    self.Run("""
+        compute instances set-disk-auto-delete
+          instance-1
+          --auto-delete
+          --disk disk-2
+          --zone us-central1-a
+        """)
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a'))],
+
+        [(self.compute_v1.instances,
+          'SetDiskAutoDelete',
+          messages.ComputeInstancesSetDiskAutoDeleteRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a',
+              deviceName='device-2',
+              autoDelete=True))],
+    )
+
+  def testWithAmbiguousDiskNoSelection(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Found multiple disks matching \[disk-2\] attached to instance '
+        r'\[instance-1\] in zone \[us-central1-a\].'):
+      self.Run("""
+          compute instances set-disk-auto-delete
+            instance-1
+            --auto-delete
+            --disk disk-2
+            --zone us-central1-a
+          """)
+
+  def testWithRegionalDisk(self):
+    self.Run("""
+        compute instances set-disk-auto-delete
+          instance-1
+          --auto-delete
+          --disk https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/disks/disk-2
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a'))],
+
+        [(self.compute_v1.instances,
+          'SetDiskAutoDelete',
+          messages.ComputeInstancesSetDiskAutoDeleteRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a',
+              deviceName='device-3',
+              autoDelete=True))],
+    )
+
+  def testWithPartialRegionalDisk(self):
+    self.Run("""
+        compute instances set-disk-auto-delete
+          instance-1
+          --auto-delete
+          --disk disk-4
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a'))],
+
+        [(self.compute_v1.instances,
+          'SetDiskAutoDelete',
+          messages.ComputeInstancesSetDiskAutoDeleteRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='us-central1-a',
+              deviceName='device-4',
+              autoDelete=True))],
+    )
 
   def testUriSupport(self):
     self.Run("""

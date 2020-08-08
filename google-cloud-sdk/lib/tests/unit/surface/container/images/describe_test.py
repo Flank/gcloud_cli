@@ -68,7 +68,7 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     mock_get_digest_from_name.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
     test_image = 'gcr.io/foo/goodimage:latest'
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Describe(test_image)
@@ -79,7 +79,7 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     mock_get_digest_from_name.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.FORBIDDEN
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
     test_image = 'gcr.io/foo/goodimage:latest'
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Describe(test_image)

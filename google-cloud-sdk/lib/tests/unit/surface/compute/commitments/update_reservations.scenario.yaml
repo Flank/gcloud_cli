@@ -9,9 +9,11 @@ summary:
       Updated [http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-central1/instances/a1].
 - execute:
   - command: |
-      compute commitments update-reservations my-commitment --region=us-central1 --reservation=my-reservation
-      --reservation-zone=res-zone --require-specific-reservation --vm-count=1 --min-cpu-platform="Intel Haswell"
-      --machine-type=n1-standard-1 --accelerator count=1,type=nvidia-tesla-k80 --local-ssd interface=scsi,size=375
+      compute commitments update-reservations my-commitment --region=us-central1 --source-reservation
+      reservation=my-reservation,reservation-zone=fake-zone,require-specific-reservation=True,vm-count=1,min-cpu-platform="Intel Haswell",machine-type=n1-standard-1
+      --source-accelerator count=1,type=nvidia-tesla-k80 --source-local-ssd interface=scsi,size=375 --source-local-ssd interface=nvme,size=375
+      --dest-reservation reservation=another-reservation,reservation-zone=fake-zone,require-specific-reservation=True,vm-count=1,min-cpu-platform="Intel Haswell",machine-type=n1-standard-1
+      --dest-accelerator count=1,type=nvidia-tesla-k80 --dest-local-ssd interface=scsi,size=375 --dest-local-ssd interface=nvme,size=375
   - stderr: |
       Updated [http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-central1/instances/a1].
 actions:
@@ -140,9 +142,11 @@ actions:
         code: 0
 - execute_command:
     command: |
-      compute commitments update-reservations my-commitment --region=us-central1 --reservation=my-reservation
-      --reservation-zone=res-zone --require-specific-reservation --vm-count=1 --min-cpu-platform="Intel Haswell"
-      --machine-type=n1-standard-1 --accelerator count=1,type=nvidia-tesla-k80 --local-ssd interface=scsi,size=375
+      compute commitments update-reservations my-commitment --region=us-central1 --source-reservation
+      reservation=my-reservation,reservation-zone=fake-zone,require-specific-reservation=True,vm-count=1,min-cpu-platform="Intel Haswell",machine-type=n1-standard-1
+      --source-accelerator count=1,type=nvidia-tesla-k80 --source-local-ssd interface=scsi,size=375 --source-local-ssd interface=nvme,size=375
+      --dest-reservation reservation=another-reservation,reservation-zone=fake-zone,require-specific-reservation=True,vm-count=1,min-cpu-platform="Intel Haswell",machine-type=n1-standard-1
+      --dest-accelerator count=1,type=nvidia-tesla-k80 --dest-local-ssd interface=scsi,size=375 --dest-local-ssd interface=nvme,size=375
     events:
     - api_call:
         expect_request:
@@ -162,10 +166,28 @@ actions:
                     localSsds:
                     - diskSizeGb: '375'
                       interface: SCSI
+                    - diskSizeGb: '375'
+                      interface: NVME
                     machineType: n1-standard-1
                     minCpuPlatform: Intel Haswell
                 specificReservationRequired: true
-                zone: res-zone
+                zone: fake-zone
+              - name: another-reservation
+                specificReservation:
+                  count: '1'
+                  instanceProperties:
+                    guestAccelerators:
+                    - acceleratorCount: 1
+                      acceleratorType: nvidia-tesla-k80
+                    localSsds:
+                    - diskSizeGb: '375'
+                      interface: SCSI
+                    - diskSizeGb: '375'
+                      interface: NVME
+                    machineType: n1-standard-1
+                    minCpuPlatform: Intel Haswell
+                specificReservationRequired: true
+                zone: fake-zone
         return_response:
           headers:
             status: '200'

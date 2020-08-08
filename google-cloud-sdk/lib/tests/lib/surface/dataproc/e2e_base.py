@@ -37,6 +37,16 @@ def ShouldRetryCreateCluster(
   return issubclass(exception_type, exceptions.OperationError)
 
 
+def ShouldRetryDeleteCluster(exception_type, exception, unused_tb,
+                             unused_state):
+  """Determines if we should retry deleting a cluster."""
+  if not issubclass(exception_type, core_exceptions.HttpException):
+    return True
+  error_code = exception.error.response['status']
+  # Do not retry on not found errors.
+  return error_code != '404'
+
+
 class DataprocIntegrationTestBase(
     base.DataprocTestBase, e2e_base.WithServiceAuth):
   r"""Base class for all integration Dataproc tests.
@@ -82,13 +92,19 @@ class DataprocIntegrationTestBase(
     name_generator = e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-dataproc-test')
     self.cluster_name = next(name_generator)
+    self.additional_cluster_name = next(name_generator)
     self.autoscaling_policy_id = next(name_generator)
     self.another_autoscaling_policy_id = next(name_generator)
 
   def TearDown(self):
     """Tears down the cluster."""
     try:
-      self.DeleteCluster()
+      self.DeleteCluster(cluster_name=self.cluster_name)
+    except (core_exceptions.HttpException, exceptions.Error):
+      # Deletion is validated in clusters_test.py. This is only a failsafe.
+      pass
+    try:
+      self.DeleteCluster(cluster_name=self.additional_cluster_name)
     except (core_exceptions.HttpException, exceptions.Error):
       # Deletion is validated in clusters_test.py. This is only a failsafe.
       pass
@@ -134,10 +150,13 @@ class DataprocIntegrationTestBase(
         kwargs={'args': args},
         should_retry_if=ShouldRetryCreateCluster)
 
-  @sdk_test_base.Retry(why='Deletion flakiness b/24265292')
-  def DeleteCluster(self):
-    result = self.RunDataproc(
-        'clusters delete {0} -q'.format(self.cluster_name))
+  @sdk_test_base.Retry(
+      why='Deletion flakiness b/24265292',
+      should_retry_if=ShouldRetryDeleteCluster)
+  def DeleteCluster(self, cluster_name=None):
+    if not cluster_name:
+      cluster_name = self.cluster_name
+    result = self.RunDataproc('clusters delete {0} -q'.format(cluster_name))
     self.assertTrue(result.done)
     self.assertIsNone(result.error)
 

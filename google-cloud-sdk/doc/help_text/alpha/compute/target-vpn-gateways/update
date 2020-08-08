@@ -26,7 +26,7 @@ DESCRIPTION
     To list existing labels
 
         $ gcloud alpha compute target-vpn-gateways describe \
-            example-gateway --format='default(labels)'
+            example-gateway --format="default(labels)"
 
 POSITIONAL ARGUMENTS
      NAME

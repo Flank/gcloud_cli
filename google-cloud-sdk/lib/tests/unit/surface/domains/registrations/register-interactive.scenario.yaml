@@ -328,8 +328,8 @@ actions:
                 dnsSettings:
                   customDns:
                     nameServers:
-                    - ns-cloud-a1.googledomains.com.
-                    - ns-cloud-a2.googledomains.com.
+                    - ns-cloud-a1.googledomains.com
+                    - ns-cloud-a2.googledomains.com
                 domainName: example.app
               yearlyPrice:
                 currencyCode: USD

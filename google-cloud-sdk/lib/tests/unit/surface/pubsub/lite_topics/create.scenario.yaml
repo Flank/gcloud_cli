@@ -1,6 +1,8 @@
 title: pubsub lite-topics create scenario test
 release_tracks: [ALPHA, BETA]
-
+# Disabiling trailing spaces rule since the linter sees an extra space in string below that is
+# required for tests to pass
+# yamllint disable rule:trailing-spaces
 actions:
 # Set all required flags for create command.
 - execute_command:
@@ -172,88 +174,6 @@ actions:
     - expect_exit:
         code: 0
 
-# Missing zone arg should fail.
-- execute_command:
-    command: |
-      pubsub lite-topics create topic1 --partitions 1 --per-partition-bytes 30GiB
-    events:
-    - expect_exit:
-        code: 1
-        message:
-          matches: .*provide the argument \[--zone\] on the command line.*
-
-# Set pubsub/lite_zone property and omit --zone flag.
-- set_property:
-    pubsub/lite_zone: 'europe-west1-a'
-- execute_command:
-    command: |
-      pubsub lite-topics create topic1 --partitions 2 --scale 2 --per-partition-bytes 40GiB --message-retention-period 2w
-    events:
-    - api_call:
-        expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
-          method: GET
-          body:
-            json:
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "projectNumber": "12345",
-              "projectId": "fake-project",
-              "lifecycleState": "ACTIVE",
-              "name": "fake-project",
-              "createTime": "2019-07-19T15:49:12.034Z",
-              "parent": {
-                "type": "folder",
-                "id": "54321"
-              }
-            }
-    - api_call:
-        expect_request:
-          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/europe-west1-a/topics?alt=json&topicId=topic1
-          method: POST
-          body:
-            json:
-              partitionConfig:
-                count: '2'
-                scale: 2
-              retentionConfig:
-                perPartitionBytes: '42949672960'
-                period: '1209600s'
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "name": "projects/12345/locations/europe-west1-a/topics/topic1",
-              "partitionConfig": {
-                "count": "2",
-                "scale": 2
-              },
-              "retentionConfig": {
-                "perPartitionBytes": "42949672960",
-                "period": "1209600s"
-              }
-            }
-    - expect_stderr: |
-        Created [topic1].
-    - expect_exit:
-        code: 0
-
-# Empty zone arg should fail.
-- set_property:
-    pubsub/lite_zone: ""
-- execute_command:
-    command: |
-      pubsub lite-topics create topic1 --partitions 1 --per-partition-bytes 30GiB
-    events:
-    - expect_exit:
-        code: 1
-        message:
-          matches: .*provide the argument \[--zone\] on the command line.*
-
 # Missing topic arg should fail.
 - execute_command:
     command: |
@@ -263,3 +183,16 @@ actions:
         matches: ERROR.*TOPIC. Must be specified.*
     - expect_exit:
         code: 1
+
+# Missing zone arg should fail.
+- execute_command:
+    command: |
+      pubsub lite-topics create topic1 --partitions 1 --per-partition-bytes 30GiB
+    events:
+    - expect_exit:
+        code: 1
+        message: |-
+          Error parsing [zone].
+          The [location] resource is not properly specified.
+          Failed to find attribute [zone]. The attribute can be set in the following ways: 
+          - provide the argument [--zone] on the command line

@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute firewall-rules create - create a Google Compute Engine
+    gcloud alpha compute firewall-rules create - create a Compute Engine
         firewall rule
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         (--action=ACTION | --allow=PROTOCOL[:PORT[-PORT]],[...])
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
-        [--direction=DIRECTION] [--disabled] [--enable-logging]
+        [--direction=DIRECTION] [--disabled] [--[no-]enable-logging]
         [--logging-metadata=LOGGING_METADATA]
         [--network=NETWORK; default="default"] [--priority=PRIORITY]
         [--rules=PROTOCOL[:PORT[-PORT]],[...]]
@@ -98,7 +98,7 @@ OPTIONAL FLAGS
 
         Firewall rules are enabled by default.
 
-     --enable-logging
+     --[no-]enable-logging
         Enable logging for the firewall rule. Logs will be exported to
         StackDriver. Firewall logging is disabled by default. To enable logging
         for an existing rule, run:
@@ -109,6 +109,8 @@ OPTIONAL FLAGS
 
             $ gcloud alpha compute firewall-rules create MY-RULE \
                 --no-enable-logging
+
+        Use --enable-logging to enable and --no-enable-logging to disable.
 
      --logging-metadata=LOGGING_METADATA
         Configures whether metadata fields should be added to the reported

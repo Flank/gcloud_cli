@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute interconnects describe - describe a Google Compute
-        Engine interconnect
+    gcloud alpha compute interconnects describe - describe a Compute Engine
+        interconnect
 
 SYNOPSIS
     gcloud alpha compute interconnects describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute interconnects describe displays all data
-    associated with Google Compute Engine interconnect in a project.
+    associated with Compute Engine interconnect in a project.
 
 POSITIONAL ARGUMENTS
      NAME

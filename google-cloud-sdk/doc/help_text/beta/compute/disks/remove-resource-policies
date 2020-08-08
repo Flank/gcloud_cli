@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute disks remove-resource-policies - remove resource
-        policies from a Google Compute Engine disk
+        policies from a Compute Engine disk
 
 SYNOPSIS
     gcloud beta compute disks remove-resource-policies DISK_NAME
@@ -8,10 +8,10 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove resource policies from a Google Compute Engine disk.
+    (BETA) Remove resource policies from a Compute Engine disk.
 
     gcloud beta compute disks remove-resource-policies removes resource
-    policies from a Google Compute Engine disk.
+    policies from a Compute Engine disk.
 
 POSITIONAL ARGUMENTS
      DISK_NAME
@@ -75,8 +75,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command removes one resource policy from a Google Compute
-    Engine disk.
+    The following command removes one resource policy from a Compute Engine
+    disk.
 
         $ gcloud beta compute disks remove-resource-policies my-disk \
             --zone=ZONE --resource-policies=POLICY

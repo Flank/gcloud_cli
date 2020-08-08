@@ -23,7 +23,7 @@ import textwrap
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.network_endpoint_groups import test_resources
 
 
 class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
@@ -89,20 +89,9 @@ class BetaNetworkEndpointGroupsDescribeTest(NetworkEndpointGroupsDescribeTest):
     self.SelectApi('beta')
     self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_BETA[
         0]
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_BETA[
+        0]
     self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA[
-        0]
-
-
-class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA[
-        0]
-    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA[
-        0]
-    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA[
         0]
 
   def testRegionalCase(self):
@@ -132,6 +121,20 @@ class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
             selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
             size: 0
         """.format(api=self.api)))
+
+
+class AlphaNetworkEndpointGroupsDescribeTest(
+    BetaNetworkEndpointGroupsDescribeTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA[
+        0]
+    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA[
+        0]
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA[
+        0]
 
 
 if __name__ == '__main__':

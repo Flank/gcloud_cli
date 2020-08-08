@@ -289,13 +289,6 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
               region='us-central1',
               project='my-project'))],)
 
-
-class SubnetsCreateTestBeta(SubnetsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   def testCreateWithPrivateIpv6GoogleAccessDisable(self):
     """Test creating a subnet with DISABLE_GOOGLE_ACCESS private ipv6 access."""
     self.Run("""
@@ -366,6 +359,13 @@ class SubnetsCreateTestBeta(SubnetsCreateTest):
                       .ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE)),
               region='us-central1',
               project='my-project'))],)
+
+
+class SubnetsCreateTestBeta(SubnetsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
 
 class SubnetsCreateTestAlpha(SubnetsCreateTest):
@@ -403,166 +403,6 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
              region='us-central1',
              project='my-project'))
     ],)
-
-  def testCreateWithPrivateV6AccessEnabled(self):
-    """Test creating a subnet with --enable-private-v6-access."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1 --enable-private-ipv6-access
-        """)
-
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  enablePrivateV6Access=True),
-              region='us-central1',
-              project='my-project'))],)
-
-  def testCreateWithPrivateV6AccessDisabled(self):
-    """Test creating a subnet with --no-enable-private-ipv6-access."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1 --no-enable-private-ipv6-access
-        """)
-
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  enablePrivateV6Access=False),
-              region='us-central1',
-              project='my-project'))],)
-
-  def testCreateWithPrivateIpv6GoogleAccessDisable(self):
-    """Test creating a subnet with DISABLE_GOOGLE_ACCESS private ipv6 access."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1
-        --private-ipv6-google-access-type disable
-        """)
-
-    self.CheckRequests([
-        (self.compute.subnetworks, 'Insert',
-         self.messages.ComputeSubnetworksInsertRequest(
-             subnetwork=self.messages.Subnetwork(
-                 name='my-subnet',
-                 network=self.compute_uri +
-                 '/projects/my-project/global/networks/my-network',
-                 ipCidrRange='10.240.0.0/16',
-                 privateIpGoogleAccess=False,
-                 privateIpv6GoogleAccess=(self.messages.Subnetwork.
-                                          PrivateIpv6GoogleAccessValueValuesEnum
-                                          .DISABLE_GOOGLE_ACCESS)),
-             region='us-central1',
-             project='my-project'))
-    ],)
-
-  def testCreateWithPrivateIpv6GoogleAccessEnableOutbound(self):
-    """Test creating a subnet with ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE private ipv6 access."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1
-        --private-ipv6-google-access-type enable-outbound-vm-access
-        """)
-
-    self.CheckRequests([(
-        self.compute.subnetworks, 'Insert',
-        self.messages.ComputeSubnetworksInsertRequest(
-            subnetwork=self.messages.Subnetwork(
-                name='my-subnet',
-                network=self.compute_uri +
-                '/projects/my-project/global/networks/my-network',
-                ipCidrRange='10.240.0.0/16',
-                privateIpGoogleAccess=False,
-                privateIpv6GoogleAccess=(self.messages.Subnetwork
-                                         .PrivateIpv6GoogleAccessValueValuesEnum
-                                         .ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE)),
-            region='us-central1',
-            project='my-project'))],)
-
-  def testCreateWithPrivateIpv6GoogleAccessEnableBidirectional(self):
-    """Test creating a subnet with ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE private ipv6 access."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1
-        --private-ipv6-google-access-type enable-bidirectional-access
-        """)
-
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  privateIpv6GoogleAccess=(
-                      self.messages.Subnetwork
-                      .PrivateIpv6GoogleAccessValueValuesEnum
-                      .ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE)),
-              region='us-central1',
-              project='my-project'))],)
-
-  def testCreateWithPrivateIpv6GoogleAccessEnableOutboundWithServiceAccounts(
-      self):
-    """Test creating a subnet with ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS private ipv6 access."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1
-        --private-ipv6-google-access-type enable-outbound-vm-access-for-service-accounts
-        """)
-
-    self.CheckRequests([
-        (self.compute.subnetworks, 'Insert',
-         self.messages.ComputeSubnetworksInsertRequest(
-             subnetwork=self.messages.Subnetwork(
-                 name='my-subnet',
-                 network=self.compute_uri +
-                 '/projects/my-project/global/networks/my-network',
-                 ipCidrRange='10.240.0.0/16',
-                 privateIpGoogleAccess=False,
-                 privateIpv6GoogleAccess=(
-                     self.messages.Subnetwork
-                     .PrivateIpv6GoogleAccessValueValuesEnum.
-                     ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS)),
-             region='us-central1',
-             project='my-project'))
-    ],)
-
-  def testCreateWithPrivateIpv6GoogleAccessServiceAccounts(self):
-    """Test creating a subnet with private ipv6 access service accounts."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1
-        --private-ipv6-google-access-service-accounts src1@google.com,src2@google.com
-        """)
-
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  privateIpv6GoogleAccessServiceAccounts=[
-                      'src1@google.com', 'src2@google.com'
-                  ]),
-              region='us-central1',
-              project='my-project'))],)
 
 
 class SubnetsCreateAggregateRangesAlphaTest(test_base.BaseTest):

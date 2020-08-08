@@ -26,9 +26,17 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     bulk
+        (ALPHA) Manipulate multiple Compute Engine virtual machines with single
+        command executions.
+
      network-interfaces
         (ALPHA) Read and manipulate Compute Engine VM instance network
         interfaces.
+
+     ops-agents
+        (ALPHA) Manage Operation Suite (Ops) agents for Compute Engine VM
+        instances.
 
      os-inventory
         (ALPHA) Read Compute Engine OS Inventory Data and Related Resources.

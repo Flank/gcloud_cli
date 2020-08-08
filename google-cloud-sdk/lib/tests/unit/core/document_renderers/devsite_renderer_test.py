@@ -544,6 +544,8 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <p>
         See <code><a href="/sdk/gcloud/reference">gcloud</a></code> for an overview of
         everything.
+        <p>
+        See <code>gcloud meta foo --help</code> for the plot of Inception.
 
         </dl>
         </body>
@@ -595,14 +597,14 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <dt>DESCRIPTION</dt>
         <dd class="sectionbody">
         The basic format of a YAML argument file is:
-        <pre>
+        <pre class="prettyprint lang-sh">
           arg-group1:
             arg1: value1  # a comment
             arg2: value2
             &hellip;
         </pre>
 
-        <pre>
+        <pre class="prettyprint lang-sh">
           # Another comment
           arg-group2:
             arg3: value3
@@ -611,7 +613,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
 
         <p>
         and pretty printed as yaml:
-        <pre class="prettyprint">
+        <pre class="prettyprint lang-sh">
           arg-group1:
             arg1: value1  # a comment
             arg2: value2
@@ -625,14 +627,14 @@ class DevSiteMarkdownTests(test_base.Markdown):
 
         <p>
         List arguments may be specified within square brackets:
-        <pre>
+        <pre class="prettyprint lang-sh">
           device-ids: [Nexus5, Nexus6, Nexus9]
         </pre>
 
         <p>
         or by using the alternate YAML list notation with one dash per list item with an
         unindented code block:
-        <pre>
+        <pre class="prettyprint lang-sh">
           device-ids:
             - Nexus5
             - Nexus6
@@ -657,7 +659,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <p>
         If a list argument only contains a single value, you may omit the square
         brackets:
-        <pre>
+        <pre class="prettyprint lang-sh">
           device-ids: Nexus9
         </pre>
 
@@ -725,34 +727,34 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <dt>DESCRIPTION</dt>
         <dd class="sectionbody">
         The basic example is:
-        <pre>
+        <pre class="prettyprint lang-sh">
           # Run first:
           gcloud foo bar
         </pre>
 
-        <pre>
+        <pre class="prettyprint lang-sh">
           # Run last:
           gcloud bar foo
         </pre>
 
         <p>
         However, in non-leap year months with a blue moon:
-        <pre>
+        <pre class="prettyprint lang-sh">
           # Run first:
           gcloud bar foo
         </pre>
 
-        <pre>
+        <pre class="prettyprint lang-sh">
           # Run last:
           gcloud foo bar
         </pre>
 
-        <pre>
+        <pre class="prettyprint lang-sh">
           # Run again
           gcloud foo foo
         </pre>
 
-        <pre>
+        <pre class="prettyprint lang-sh">
           device-ids: [Nexus5, Nexus6, Nexus9]
         </pre>
 
@@ -1013,7 +1015,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
        """)
     self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('devsite', markdown, expected, title='New Title')
-
 
 if __name__ == '__main__':
   test_base.main()

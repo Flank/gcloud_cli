@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute addresses update - update a Google Compute Engine
-        address
+    gcloud beta compute addresses update - update a Compute Engine address
 
 SYNOPSIS
     gcloud beta compute addresses update NAME [--update-labels=[KEY=VALUE,...]]
@@ -8,8 +7,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute addresses update updates labels for a Google
-    Compute Engine address.
+    (BETA) gcloud beta compute addresses update updates labels for a Compute
+    Engine address.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -77,7 +76,7 @@ EXAMPLES
     To list existing labels for address 'example-address', run:
 
         $ gcloud beta compute addresses describe example-address \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in BETA and may change without notice. This

@@ -314,6 +314,14 @@ class Collections(enum.Enum):
       ['project', 'region', 'disk'],
       True
   )
+  REGIONHEALTHCHECKSERVICES = (
+      'regionHealthCheckServices',
+      'projects/{project}/regions/{region}/healthCheckServices/'
+      '{healthCheckService}',
+      {},
+      ['project', 'region', 'healthCheckService'],
+      True
+  )
   REGIONHEALTHCHECKS = (
       'regionHealthChecks',
       'projects/{project}/regions/{region}/healthChecks/{healthCheck}',
@@ -334,6 +342,22 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/instanceGroups/{instanceGroup}',
       {},
       ['project', 'region', 'instanceGroup'],
+      True
+  )
+  REGIONNETWORKENDPOINTGROUPS = (
+      'regionNetworkEndpointGroups',
+      'projects/{project}/regions/{region}/networkEndpointGroups/'
+      '{networkEndpointGroup}',
+      {},
+      ['project', 'region', 'networkEndpointGroup'],
+      True
+  )
+  REGIONNOTIFICATIONENDPOINTS = (
+      'regionNotificationEndpoints',
+      'projects/{project}/regions/{region}/notificationEndpoints/'
+      '{notificationEndpoint}',
+      {},
+      ['project', 'region', 'notificationEndpoint'],
       True
   )
   REGIONOPERATIONS = (
@@ -449,6 +473,13 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/subnetworks/{subnetwork}',
       {},
       ['project', 'region', 'subnetwork'],
+      True
+  )
+  TARGETGRPCPROXIES = (
+      'targetGrpcProxies',
+      'projects/{project}/global/targetGrpcProxies/{targetGrpcProxy}',
+      {},
+      ['project', 'targetGrpcProxy'],
       True
   )
   TARGETHTTPPROXIES = (

@@ -373,6 +373,55 @@ class GetBucketLocationForFileTest(e2e_base.WithMockHttp):
       client.GetBucketLocationForFile(self._FILE_PATH)
 
 
+class GetBucketTest(e2e_base.WithMockHttp):
+
+  _BUCKET_NAME = 'testbucket'
+
+  def SetUp(self):
+    self.mocked_storage_v1 = api_mock.Client(
+        core_apis.GetClientClass('storage', 'v1'))
+    self.mocked_storage_v1.Mock()
+    self.addCleanup(self.mocked_storage_v1.Unmock)
+    self.storage_v1_messages = core_apis.GetMessagesModule('storage', 'v1')
+
+  def testReturnsExistingBucket(self):
+    """Gets a bucket that exists."""
+    existing_bucket = self.storage_v1_messages.Bucket(id=self._BUCKET_NAME)
+    self.mocked_storage_v1.buckets.Get.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        response=existing_bucket)
+    client = storage_api.StorageClient()
+    bucket = client.GetBucket(self._BUCKET_NAME)
+    self.assertEqual(bucket, existing_bucket)
+
+  def testAcceptsFullProjection(self):
+    """Gets a bucket with 'full' projection mode."""
+    existing_bucket = self.storage_v1_messages.Bucket(id=self._BUCKET_NAME)
+    self.mocked_storage_v1.buckets.Get.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME,
+            projection=self.storage_v1_messages.StorageBucketsGetRequest
+            .ProjectionValueValuesEnum.full),
+        response=existing_bucket)
+    client = storage_api.StorageClient()
+    bucket = client.GetBucket(
+        self._BUCKET_NAME, self.storage_v1_messages.StorageBucketsGetRequest
+        .ProjectionValueValuesEnum.full)
+    self.assertEqual(bucket, existing_bucket)
+
+  def testErrorForNonexistentBucket(self):
+    """Raises an error for a nonexistent bucket."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    client = storage_api.StorageClient()
+
+    with self.assertRaises(storage_api.BucketNotFoundError):
+      client.GetBucket(self._BUCKET_NAME)
+
+
 class CreateBucketIfNotExistsTest(e2e_base.WithMockHttp):
 
   _BUCKET_NAME = 'testbucket'

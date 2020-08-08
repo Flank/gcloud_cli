@@ -15,6 +15,7 @@ summary:
   - command: |
       domains registrations update ÜniCode.com. --update-labels="foo=bar" --remove-labels=old --async
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [xn--nicode-2ya.com].
 - execute:
   - command: |
@@ -22,6 +23,9 @@ summary:
   - error: |-
       1: Specify labels to update.
       Run `gcloud help alpha domains registrations configure` to see how to change management, DNS or contact settings.
+- execute:
+  - command: |
+      domains registrations update foo.com --remove-labels=not-found --async
 actions:
 - execute_command:
     command: |
@@ -164,6 +168,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [xn--nicode-2ya.com].
     - expect_exit:
         code: 0
@@ -176,3 +181,29 @@ actions:
         message: |-
           Specify labels to update.
           Run `gcloud help alpha domains registrations configure` to see how to change management, DNS or contact settings.
+- execute_command:
+    command: |
+      domains registrations update foo.com --remove-labels=not-found --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/foo.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/exported.com",
+              "domainName": "exported.com",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "EXPORTED",
+              "labels": {
+                "foo": "bar"
+              }
+            }
+    - expect_exit:
+        code: 0

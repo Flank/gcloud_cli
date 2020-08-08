@@ -1,0 +1,48 @@
+title: ai-platform explain scenario test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ai-platform explain --model m --version v --json-request=request.json
+      --region europe-west4
+  - stderr: |
+      Using endpoint [https://europe-west4-ml.googleapis.com/]
+  - stdout: |
+      {
+        "json": {
+          "predictions": []
+        }
+      }
+actions:
+- write_file:
+    path: request.json
+    contents: |
+      {"instances": []}
+- execute_command:
+    command: ai-platform explain --model m --version v --json-request=request.json
+      --region europe-west4
+    events:
+    - expect_stderr: |
+        Using endpoint [https://europe-west4-ml.googleapis.com/]
+    - api_call:
+        expect_request:
+          uri: https://europe-west4-ml.googleapis.com/v1/projects/fake-project/models/m/versions/v:explain
+          method: POST
+          headers: {}
+          body:
+            json:
+              instances: []
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              predictions: []
+    - expect_stdout: |
+        {
+          "json": {
+            "predictions": []
+          }
+        }
+    - expect_exit:
+        code: 0

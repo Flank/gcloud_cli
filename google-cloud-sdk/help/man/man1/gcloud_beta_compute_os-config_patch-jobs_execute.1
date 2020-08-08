@@ -11,7 +11,7 @@ gcloud beta compute os\-config patch\-jobs execute \- execute an OS patch on the
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute os\-config patch\-jobs execute\fR (\fB\-\-instance\-filter\-all\fR\ |\ \fB\-\-instance\-filter\-group\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-instance\-filter\-name\-prefixes\fR=[\fIINSTANCE_FILTER_NAME_PREFIXES\fR,...]\ \fB\-\-instance\-filter\-names\fR=[\fIINSTANCE_FILTER_NAMES\fR,...]\ \fB\-\-instance\-filter\-zones\fR=[\fIINSTANCE_FILTER_ZONES\fR,...]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-apt\-dist\fR\ \fB\-\-apt\-excludes\fR=[\fIAPT_EXCLUDES\fR,...]\ |\ \fB\-\-apt\-exclusive\-packages\fR=[\fIAPT_EXCLUSIVE_PACKAGES\fR,...]] [\fB\-\-post\-patch\-linux\-executable\fR=\fIPOST_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-post\-patch\-linux\-success\-codes\fR=[\fIPOST_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-post\-patch\-windows\-success\-codes\fR=[\fIPOST_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-linux\-executable\fR=\fIPRE_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-pre\-patch\-linux\-success\-codes\fR=[\fIPRE_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-pre\-patch\-windows\-success\-codes\fR=[\fIPRE_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-windows\-exclusive\-patches\fR=[\fIWINDOWS_EXCLUSIVE_PATCHES\fR,...]\ |\ \fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-exclusive\-packages\fR=[\fIYUM_EXCLUSIVE_PACKAGES\fR,...]\ |\ \fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fB\-\-zypper\-exclusive\-patches\fR=[\fIZYPPER_EXCLUSIVE_PATCHES\fR,...]\ |\ \fB\-\-zypper\-categories\fR=[\fIZYPPER_CATEGORIES\fR,...]\ \fB\-\-zypper\-severities\fR=[\fIZYPPER_SEVERITIES\fR,...]\ \fB\-\-zypper\-with\-optional\fR\ \fB\-\-zypper\-with\-update\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute os\-config patch\-jobs execute\fR (\fB\-\-instance\-filter\-all\fR\ |\ \fB\-\-instance\-filter\-group\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-instance\-filter\-name\-prefixes\fR=[\fIINSTANCE_FILTER_NAME_PREFIXES\fR,...]\ \fB\-\-instance\-filter\-names\fR=[\fIINSTANCE_FILTER_NAMES\fR,...]\ \fB\-\-instance\-filter\-zones\fR=[\fIINSTANCE_FILTER_ZONES\fR,...]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-apt\-dist\fR\ \fB\-\-apt\-excludes\fR=[\fIAPT_EXCLUDES\fR,...]\ |\ \fB\-\-apt\-exclusive\-packages\fR=[\fIAPT_EXCLUSIVE_PACKAGES\fR,...]] [\fB\-\-post\-patch\-linux\-executable\fR=\fIPOST_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-post\-patch\-linux\-success\-codes\fR=[\fIPOST_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-post\-patch\-windows\-success\-codes\fR=[\fIPOST_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-linux\-executable\fR=\fIPRE_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-pre\-patch\-linux\-success\-codes\fR=[\fIPRE_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-pre\-patch\-windows\-success\-codes\fR=[\fIPRE_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-rollout\-mode\fR=\fIROLLOUT_MODE\fR\ \fB\-\-rollout\-disruption\-budget\fR=\fIROLLOUT_DISRUPTION_BUDGET\fR\ |\ \fB\-\-rollout\-disruption\-budget\-percent\fR=\fIROLLOUT_DISRUPTION_BUDGET_PERCENT\fR] [\fB\-\-windows\-exclusive\-patches\fR=[\fIWINDOWS_EXCLUSIVE_PATCHES\fR,...]\ |\ \fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-exclusive\-packages\fR=[\fIYUM_EXCLUSIVE_PACKAGES\fR,...]\ |\ \fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fB\-\-zypper\-exclusive\-patches\fR=[\fIZYPPER_EXCLUSIVE_PATCHES\fR,...]\ |\ \fB\-\-zypper\-categories\fR=[\fIZYPPER_CATEGORIES\fR,...]\ \fB\-\-zypper\-severities\fR=[\fIZYPPER_SEVERITIES\fR,...]\ \fB\-\-zypper\-with\-optional\fR\ \fB\-\-zypper\-with\-update\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -248,6 +248,51 @@ run. The default exit code for success is 0.
 .sp
 .TP 2m
 
+Rollout configurations for this patch job:
+
+.RS 2m
+.TP 2m
+\fB\-\-rollout\-mode\fR=\fIROLLOUT_MODE\fR
+Mode of the rollout. \fIROLLOUT_MODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBconcurrent\-zones\fR
+Patches are applied to VMs in all zones at the same time.
+.TP 2m
+\fBzone\-by\-zone\fR
+Patches are applied one zone at a time. The patch job begins in the region with
+the lowest number of targeted VMs. Within the region, patching begins in the
+zone with the lowest number of targeted VMs. If multiple regions (or zones
+within a region) have the same number of targeted VMs, a tie\-breaker is
+achieved by sorting the regions or zones in alphabetical order.
+.RE
+.sp
+
+
+.TP 2m
+
+Disruption budget for this rollout. A running VM with an active agent is
+considered disrupted if its patching operation fails anytime between the time
+the agent is notified until the patch process completes. At most one of these
+may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-rollout\-disruption\-budget\fR=\fIROLLOUT_DISRUPTION_BUDGET\fR
+Number of VMs per zone to disrupt at any given moment.
+
+.TP 2m
+\fB\-\-rollout\-disruption\-budget\-percent\fR=\fIROLLOUT_DISRUPTION_BUDGET_PERCENT\fR
+Percentage of VMs per zone to disrupt at any given moment. The number of VMs
+calculated from multiplying the percentage by the total number of VMs in a zone
+is rounded up.
+
+.RE
+.RE
+.sp
+.TP 2m
+
 Settings for machines running Windows: At most one of these may be specified:
 
 .RS 2m
@@ -374,13 +419,12 @@ $ gcloud beta compute os\-config patch\-jobs execute \e
 \-\-display\-name="my patch job" \-\-instance\-filter\-all
 .RE
 
-To patch an instance named \f5my\-instance\-1\fR in the \f5us\-east1\-b\fR zone,
+To patch an instance named \f5instance\-1\fR in the \f5us\-east1\-b\fR zone,
 run:
 
 .RS 2m
 $ gcloud beta compute os\-config patch\-jobs execute \e
-\-\-instance\-filter\-names=            \e
-"zones/us\-east1\-b/instances/my\-instance\-1"
+\-\-instance\-filter\-names="zones/us\-east1\-b/instances/instance\-1"
 .RE
 
 To patch all instances in the \f5us\-central1\-b\fR and \f5europe\-west1\-d\fR
@@ -404,8 +448,8 @@ label is \f5web\fR or where the \f5env\fR label is \f5staging\fR and \f5app\fR
 label is \f5web\fR, run:
 
 .RS 2m
-$ gcloud beta compute os\-config patch\-jobs execute             \e
-\-\-instance\-filter\-group\-labels="env=test,app=web"             \e
+$ gcloud beta compute os\-config patch\-jobs execute \e
+\-\-instance\-filter\-group\-labels="env=test,app=web" \e
 \-\-instance\-filter\-group\-labels="env=staging,app=web"
 .RE
 
@@ -414,7 +458,7 @@ To apply security and critical patches to Windows instances with the prefix
 
 .RS 2m
 $ gcloud beta compute os\-config patch\-jobs execute \e
-\-\-instance\-filter\-name\-prefixes="windows\-"             \e
+\-\-instance\-filter\-name\-prefixes="windows\-" \e
 \-\-windows\-classifications=SECURITY,CRITICAL
 .RE
 
@@ -423,7 +467,7 @@ To update only \f5KB4339284\fR on Windows instances with the prefix
 
 .RS 2m
 $ gcloud beta compute os\-config patch\-jobs execute \e
-\-\-instance\-filter\-name\-prefixes="windows\-"             \e
+\-\-instance\-filter\-name\-prefixes="windows\-" \e
 \-\-windows\-exclusive\-patches=KB4339284
 .RE
 
@@ -432,15 +476,21 @@ pre\-patch and post\-patch, run:
 
 .RS 2m
 $ gcloud beta compute os\-config patch\-jobs execute \e
-\-\-instance\-filter\-all             \e
-\-\-pre\-patch\-linux\-executable="/bin/my\-script"             \e
-\-\-pre\-patch\-linux\-success\-codes=0,200             \e
-\-\-pre\-patch\-windows\-executable="C:\eUsers\euser\etest\-script.ps1" \e
-            \e
-\-\-post\-patch\-linux\-executable="gs://my\-bucket/my\-linux\-script#12\e
-345"             \e
-    \-\-post\-patch\-windows\-executable="gs://my\-bucket/my\-windows\-scrip\e
-t#67890"
+\-\-instance\-filter\-all \e
+\-\-pre\-patch\-linux\-executable="/bin/script" \e
+\-\-pre\-patch\-linux\-success\-codes=0,200 \e
+\-\-pre\-patch\-windows\-executable="C:\eUsers\euser\escript.ps1" \e
+\-\-post\-patch\-linux\-executable="gs://my\-bucket/linux\-script#123" \e
+\-\-post\-patch\-windows\-executable="gs://my\-bucket/windows\-script#678"
+.RE
+
+To patch all instances zone\-by\-zone with no more than 50 percent of the
+instances in the same zone disrupted at a given time, run:
+
+.RS 2m
+$ gcloud beta compute os\-config patch\-jobs execute \e
+\-\-instance\-filter\-all \-\-rollout\-mode=zone\-by\-zone \e
+\-\-rollout\-disruption\-budget\-percent=50
 .RE
 
 

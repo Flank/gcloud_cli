@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud beta dataproc workflow-templates create (TEMPLATE : --region=REGION)
-        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+        [--dag-timeout=DAG_TIMEOUT] [--labels=[KEY=VALUE,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create a workflow template.
@@ -29,6 +30,11 @@ POSITIONAL ARGUMENTS
           dataproc/region property value for this command invocation.
 
 FLAGS
+     --dag-timeout=DAG_TIMEOUT
+        The duration for which a DAG of jobs can run before being
+        auto-cancelled, such as "10m" or "16h". See $ gcloud topic datetimes
+        for information on duration formats.
+
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -46,8 +52,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To create a workflow template named 'my-workflow-template' in region
-    'us-central1' with label params 'key1'='value1' and 'key2'='value2', run:
+    To create a workflow template named my-workflow-template in region
+    us-central1 with label params 'key1'='value1' and 'key2'='value2', run:
 
         $ gcloud beta dataproc workflow-templates create \
             my-workflow-template --region=us-central1 \

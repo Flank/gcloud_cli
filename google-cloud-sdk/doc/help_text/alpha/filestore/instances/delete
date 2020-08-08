@@ -46,8 +46,7 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To delete a Cloud Filestore instance named NAME in us-central1-c:
 
-        $ gcloud alpha filestore instances delete NAME \
-            --location=us-central1-c
+        $ gcloud alpha filestore instances delete NAME --zone=us-central1-c
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

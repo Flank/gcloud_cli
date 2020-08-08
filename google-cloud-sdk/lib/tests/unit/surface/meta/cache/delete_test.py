@@ -28,7 +28,7 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 from six.moves import range
 
 

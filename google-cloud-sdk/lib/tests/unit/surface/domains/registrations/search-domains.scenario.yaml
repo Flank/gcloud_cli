@@ -18,15 +18,21 @@ summary:
   - command: |
       domains registrations search-domains ÜniCode
   - stdout: |
-      DOMAIN              AVAILABILITY  YEARLY_PRICE  NOTICES
-      unicode.com         UNAVAILABLE
-      xn--nicode-2ya.com  AVAILABLE     12.00 USD
+      DOMAIN       AVAILABILITY  YEARLY_PRICE  NOTICES
+      unicode.com  UNAVAILABLE
+      ?nicode.com  AVAILABLE     12.00 USD
 - execute:
   - command: |
       domains registrations search-domains registry-down.com
   - stdout: |
       DOMAIN             AVAILABILITY  YEARLY_PRICE  NOTICES
       registry-down.net  UNKNOWN
+- execute:
+  - command: |
+      domains registrations search-domains nothing
+  - stdout: |+
+      DOMAIN  AVAILABILITY  YEARLY_PRICE  NOTICES
+
 actions:
 - execute_command:
     command: |
@@ -158,9 +164,9 @@ actions:
             }
 
     - expect_stdout: |
-        DOMAIN              AVAILABILITY  YEARLY_PRICE  NOTICES
-        unicode.com         UNAVAILABLE
-        xn--nicode-2ya.com  AVAILABLE     12.00 USD
+        DOMAIN       AVAILABILITY  YEARLY_PRICE  NOTICES
+        unicode.com  UNAVAILABLE
+        ?nicode.com  AVAILABLE     12.00 USD
     - expect_exit:
         code: 0
 - execute_command:
@@ -189,5 +195,29 @@ actions:
     - expect_stdout: |
         DOMAIN             AVAILABILITY  YEARLY_PRICE  NOTICES
         registry-down.net  UNKNOWN
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations search-domains nothing
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations:searchDomains?alt=json&query=nothing
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registerParameters": [
+              ]
+            }
+
+    - expect_stdout: |+
+        DOMAIN  AVAILABILITY  YEARLY_PRICE  NOTICES
+
     - expect_exit:
         code: 0

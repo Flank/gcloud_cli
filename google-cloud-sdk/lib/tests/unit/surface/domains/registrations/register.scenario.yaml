@@ -23,6 +23,7 @@ summary:
   - command: |
       domains registrations register example.com --contact-data-from-file=registrantAdminTechnical.yaml --name-servers=ns1.com,ns2.com --contact-privacy=redacted-contact-data --yearly-price=12USD --labels=foo=bar --async --disable-dnssec
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Create in progress for registration [example.com] Note:
       The domain is not yet registered.
       Wait until the registration resource changes state to ACTIVE.
@@ -30,7 +31,7 @@ summary:
   - command: |
       domains registrations register example.com --contact-data-from-file=allContacts.yaml --use-google-domains-dns --yearly-price=12.00USD
   - prompt:
-    - message: The only supported contant privacy is private-contact-data.
+    - message: The only supported contact privacy is private-contact-data.
     - input: n
   - error: '1: Providing Contact Privacy is required.'
 - execute:
@@ -445,6 +446,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Create in progress for registration [example.com] Note:
         The domain is not yet registered.
         Wait until the registration resource changes state to ACTIVE.
@@ -478,7 +480,7 @@ actions:
               }
             }
     - expect_prompt_continue:
-        message: The only supported contant privacy is private-contact-data.
+        message: The only supported contact privacy is private-contact-data.
         user_input: n
     - expect_exit:
         code: 1

@@ -29,8 +29,9 @@ API REFERENCE
     https://cloud.google.com/speech-to-text/docs/quickstart-protocol
 
 EXAMPLES
-    To fetch details for the operation '12345': $ gcloud beta ml speech
-    operations describe 12345
+    To fetch details for the operation '12345':
+
+        $ gcloud beta ml speech operations describe 12345
 
 NOTES
     This command is currently in BETA and may change without notice. These

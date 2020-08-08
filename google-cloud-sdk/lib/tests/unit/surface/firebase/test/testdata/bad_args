@@ -87,3 +87,5 @@ test-targets-for-shard.wrong-delimiter:
 num-uniform-shards.string:
   num-uniform-shards: two
 
+grant-permissions.bad:
+  grant-permissions: 'camera'

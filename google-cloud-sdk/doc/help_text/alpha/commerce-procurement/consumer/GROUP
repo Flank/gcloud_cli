@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha commerce-procurement consumer - a group of subcommands for
+        working with Procurement Consumer resources
+
+SYNOPSIS
+    gcloud alpha commerce-procurement consumer GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A group of subcommands for working with Procurement Consumer
+    resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     accounts
+        (ALPHA) A group of subcommands for working with Procurement Consumer
+        accounts.
+
+     entitlements
+        (ALPHA) A group of subcommands for working with Procurement Consumer
+        entitlements.
+
+     free-trials
+        (ALPHA) A group of subcommands for working with Procurement Consumer
+        free trials.
+
+     operations
+        (ALPHA) A group of subcommands for working with Procurement Consumer
+        operations.
+
+     orders
+        (ALPHA) A group of subcommands for working with Procurement Consumer
+        orders.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

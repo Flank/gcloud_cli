@@ -2,19 +2,27 @@ NAME
     gcloud alpha kms keyrings describe - get metadata for a keyring
 
 SYNOPSIS
-    gcloud alpha kms keyrings describe KEYRING [--location=LOCATION]
+    gcloud alpha kms keyrings describe (KEYRING : --location=LOCATION)
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Returns metadata for the given keyring.
 
 POSITIONAL ARGUMENTS
-     KEYRING
-        Name of the key ring to describe.
+     Keyring resource - The KMS keyring resource. The arguments in this group
+     can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [keyring] on
+     the command line with a fully specified name; set the property
+     [core/project]. This must be specified.
 
-FLAGS
-     --location=LOCATION
-        Location of the keyring.
+       KEYRING
+          ID of the keyring or fully qualified identifier for the keyring. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --location=LOCATION
+          The Cloud location for the keyring.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

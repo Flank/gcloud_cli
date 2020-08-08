@@ -91,7 +91,7 @@ class Run(base.Command):
       args: argparse.Namespace, An object that contains the values for the
         arguments specified in the .Args() method.
     """
-    prompting_subcommands = ['delete_dag']
+    prompting_subcommands = ['delete_dag', 'backfill']
     if args.subcommand in prompting_subcommands and set(
         args.cmd_args).isdisjoint({'-y', '--yes'}):
       args.cmd_args.append('--yes')
@@ -150,7 +150,7 @@ class Run(base.Command):
 
         command_util.RunKubectlCommand(
             command_util.AddKubectlNamespace(kubectl_ns, kubectl_args),
-            out_func=log.status.Print)
+            out_func=log.out.Print)
       except command_util.KubectlError as e:
         raise self.ConvertKubectlError(e, env_obj)
 

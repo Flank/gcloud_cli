@@ -18,11 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.command_lib.anthos import anthoscli_backend
 from tests.lib import test_case
 from tests.lib.surface.anthos import test_base as anthos_test_base
 
 
 class LoginTest(anthos_test_base.AuthUnitTestBase):
+
+  def SetUp(self):
+    self.StartObjectPatch(anthoscli_backend,
+                          'GetPreferredAuthForCluster',
+                          return_value=('oidc1', None, None))
 
   def testLoginWithDefaults(self):
     self.Run('anthos auth login  --cluster my-test-cluster '
@@ -56,7 +62,7 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
   def testLoginExplicit(self):
     self.Run('anthos auth login  --cluster my-test-cluster '
              '--login-config my-login-config.yaml --login-config-cert mycert '
-             '--kubeconfig my-kube.yaml --user testuser')
+             '--kubeconfig my-kube.yaml --user testuser --set-preferred-auth')
     self.AssertValidBinaryCall(
         env={'COBRA_SILENCE_USAGE': 'true', 'GCLOUD_AUTH_PLUGIN': 'true'},
         command_args=[

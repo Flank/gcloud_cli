@@ -114,7 +114,49 @@ class UsersCreateGATest(_BaseUsersCreateTest, base.SqlMockTestGA):
 
 
 class UsersCreateBetaTest(_BaseUsersCreateTest, base.SqlMockTestBeta):
-  pass
+
+  def testCreateIamUser(self):
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
+    self.mocked_client.users.Insert.Expect(
+        msgs.User(
+            kind='sql#user',
+            project=self.Project(),
+            instance='my_instance',
+            name='test@google.com',
+            type=self.messages.User.TypeValueValuesEnum.CLOUD_IAM_USER),
+        msgs.Operation(name='op_name'))
+    self.mocked_client.operations.Get.Expect(
+        msgs.SqlOperationsGetRequest(
+            operation='op_name', project=self.Project()),
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
+    self.Run('sql users create --instance my_instance '
+             'test@google.com --type CLOUD_IAM_USER')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating Cloud SQL user')
+    self.AssertErrContains('Created user [test@google.com].')
+
+  def testCreateIamServiceAccount(self):
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
+    self.mocked_client.users.Insert.Expect(
+        msgs.User(
+            kind='sql#user',
+            project=self.Project(),
+            instance='my_instance',
+            name='sa@iam',
+            type=self.messages.User.TypeValueValuesEnum
+            .CLOUD_IAM_SERVICE_ACCOUNT),
+        msgs.Operation(name='op_name'))
+    self.mocked_client.operations.Get.Expect(
+        msgs.SqlOperationsGetRequest(
+            operation='op_name', project=self.Project()),
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
+    self.Run('sql users create --instance my_instance '
+             'sa@iam --type CLOUD_IAM_SERVICE_ACCOUNT')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating Cloud SQL user')
+    self.AssertErrContains('Created user [sa@iam].')
 
 
 class UsersCreateAlphaTest(_BaseUsersCreateTest, base.SqlMockTestAlpha):

@@ -96,5 +96,11 @@ class ActivateRefreshTokenTest(cli_test_base.CliTestBase):
     self.assertFalse(refresh_mock.called)
 
 
+class ActivateRefreshTokenOauth2ClientTest(ActivateRefreshTokenTest):
+
+  def SetUp(self):
+    properties.VALUES.auth.disable_load_google_auth.Set(True)
+
+
 if __name__ == '__main__':
   test_case.main()

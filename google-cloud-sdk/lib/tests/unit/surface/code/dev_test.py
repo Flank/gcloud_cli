@@ -35,7 +35,10 @@ import mock
 
 class DevTest(test_case.TestCase):
 
-  COMMON_ARGS = ['--service-name=fakeservice', '--image-name=fakeimage']
+  COMMON_ARGS = [
+      '--service-name=fakeservice', '--image=fakeimage',
+      '--builder=myfakebuilder'
+  ]
 
   def SetUp(self):
     self.StartObjectPatch(dev, 'Skaffold')
@@ -181,3 +184,11 @@ class SkaffoldTest(test_case.TestCase):
       _, _, kwargs = popen.mock_calls[0]
       self.assertEqual(kwargs['env']['A'], 'B')
       self.assertEqual(kwargs['env']['C'], 'D')
+
+  def testDebug(self):
+    with mock.patch.object(subprocess, 'Popen') as popen:
+      with dev.Skaffold('./skaffold.yaml', debug=True):
+        pass
+
+      _, args, _ = popen.mock_calls[0]
+      self.assertIn('-vdebug', args[0])

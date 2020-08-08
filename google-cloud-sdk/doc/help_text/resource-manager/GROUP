@@ -22,6 +22,9 @@ GROUPS
      folders
         Manage Cloud Folders.
 
+     org-policies
+        Manage Org Policies.
+
 NOTES
     These variants are also available:
 

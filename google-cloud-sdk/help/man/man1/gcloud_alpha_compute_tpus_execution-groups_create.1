@@ -1,0 +1,147 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_TPUS_EXECUTION\-GROUPS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute tpus execution\-groups create \- create Google Compute TPUs along with VMs
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute tpus execution\-groups create\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="250GB"] [\fB\-\-dry\-run\fR] [\fB\-\-forward\-ports\fR] [\fB\-\-gce\-image\fR=\fIGCE_IMAGE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-1"] [\fB\-\-name\fR=\fINAME\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-preemptible\fR] [\fB\-\-preemptible\-vm\fR] [\fB\-\-tf\-version\fR=\fITF_VERSION\fR] [\fB\-\-use\-dl\-images\fR] [\fB\-\-vm\-only\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create Google Compute TPUs along with VMs.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="v2\-8"
+TPU accelerator type for the TPU. If not specified, this defaults to
+\f5v2\-8\fR.
+
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR; default="250GB"
+Configures the root volume size of your Compute Engine VM (in GB). The minimum
+size is 20GB and the maximum is 500GB. Specified value must be an integer
+multiple of Gigabytes.
+
+.TP 2m
+\fB\-\-dry\-run\fR
+Do not make changes; print only what would have happened.
+
+.TP 2m
+\fB\-\-forward\-ports\fR
+Automatically forward useful ports from the Compute Engine VM to your local
+machine. The ports forwarded are: 6006 (tensorboard), 8888 (jupyter notebooks),
+8470 (TPU port), 8466 (TPU profiler port).
+
+Enabled by default, use \fB\-\-no\-forward\-ports\fR to disable.
+
+.TP 2m
+\fB\-\-gce\-image\fR=\fIGCE_IMAGE\fR
+Override the automatically chosen Compute Engine Image. Use this flag when
+you're using your own custom images instead of the provided ones with TensorFlow
+pre\-installed.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR; default="n1\-standard\-1"
+Specifies the machine type used for the Compute Engine VM. To get a list of
+available machine types, run 'gcloud compute machine\-types list'. If
+unspecified, the default type is n1\-standard\-1.
+
+.TP 2m
+\fB\-\-name\fR=\fINAME\fR
+Override the name to use for VMs and TPUs (defaults to your username).
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR; default="default"
+Specifies the network the Cloud TPU and associated VM should be created in. If
+unspecified, the network "default" is picked.
+
+.TP 2m
+\fB\-\-preemptible\fR
+Create a preemptible Cloud TPU, instead of a normal (non\-preemptible) Cloud
+TPU. A preemptible Cloud TPU costs less per hour, but the Cloud TPU service can
+stop/terminate the node at any time.
+
+.TP 2m
+\fB\-\-preemptible\-vm\fR
+Create a preemptible Compute Engine VM, instead of a normal (non\-preemptible)
+VM. A preemptible VM costs less per hour, but the Compute Engine service can
+terminate the instance at any time.
+
+.TP 2m
+\fB\-\-tf\-version\fR=\fITF_VERSION\fR
+Set the version of TensorFlow to use when creating the Compute Engine VM and the
+Cloud TPU. (It defaults to auto\-selecting the latest stable release.)
+
+.TP 2m
+\fB\-\-use\-dl\-images\fR
+Use Deep Learning VM Images (see docs \-
+https://cloud.google.com/deep\-learning\-vm/) instead of TPU\-specific machine
+images. Defaults to TPU\-specific images.
+
+.TP 2m
+\fB\-\-vm\-only\fR
+Do not allocate a TPU, only allocate a VM (useful if you're not ready to run on
+a TPU yet).
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the tpu to create. If not specified and the \f5\fIcompute/zone\fR\fR
+property isn't set, you may be prompted to select a zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

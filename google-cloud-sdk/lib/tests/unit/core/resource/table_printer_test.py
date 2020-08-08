@@ -444,7 +444,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         """))
 
   def testWrapUnicodeData(self):
-    self.SetUpPrinter('table(name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table(name, description:wrap)', encoding='utf-8')
     for resource in [
         {'name': 'my-instance-a-0',
          # string length is 82 but display width 62, should not need wrapping.
@@ -468,7 +468,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20)))
 
   def testWrapBoxUnicodeData(self):
-    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf-8')
     for resource in [
         {'name': 'my-instance-a-0',
          # display width is 57, length is 77, should not need wrapping.
@@ -502,7 +502,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
     return rendered_text.getvalue().splitlines()[0].lstrip()
 
   def testWrapWithCtrlSeqUtf(self):
-    self.SetUpPrinter('table(name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table(name, description:wrap)', encoding='utf-8')
     # First sentence will be 68 chars but display width is 62 without
     # "control sequences". Wrapping should start after first sentence because
     # max width of this column is 62.
@@ -520,7 +520,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
                    self._printer._console_attr.GetFontCode(bold=False))))
 
   def testWrapWithCtrlSeqBox(self):
-    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf-8')
     # First sentence will be 63 chars but display width is 57 without
     # "control sequences". Wrapping should begin after first sentence because
     # max width of this column is 57.
@@ -541,7 +541,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
                    self._printer._console_attr.GetFontCode(bold=False))))
 
   def testWrapWithCtrlSeqEnjambed(self):
-    self.SetUpPrinter('table(name:wrap, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table(name:wrap, description:wrap)', encoding='utf-8')
     # The max width of this column is 39, so the bold text will wrap around.
     desc = ('Lorem ipsum dolor sit amet, *consectetur adipiscing elit*')
     for resource in [{'name': 'my-loooooooooooooooooong-instance-name',
@@ -557,7 +557,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
 
   def testWrapWithCtrlSeqEnjambedBox(self):
     self.SetUpPrinter('table[box](name:wrap, description:wrap)',
-                      encoding='utf8')
+                      encoding='utf-8')
     # The max width of this column is 36, so the bold text will wrap around.
     desc = ('Lorem ipsum dolor sit *amet, consectetur adipiscing*')
     for resource in [{'name': self._RenderAsMarkdown(desc),
@@ -575,7 +575,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
                    self._printer._console_attr.GetFontCode(bold=False))))
 
   def testNewlinesDontContributeToWidth(self):
-    self.SetUpPrinter('table(name:wrap, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table(name:wrap, description:wrap)', encoding='utf-8')
     # The max width of this column is 39, so the bold text will wrap around.
     desc = ('Lorem ipsum dolor sit amet, *consectetur adipiscing elit*')
     for resource in [{'name': 'my-instance-a-0\ntwo-lines',
@@ -590,7 +590,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
                    self._printer._console_attr.GetFontCode())))
 
   def testWrapUtf8Data(self):
-    self.SetUpPrinter('table(name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table(name, description:wrap)', encoding='utf-8')
     for resource in [
         {'name': 'my-instance-a-0',
          # string length is 82 but display width 62, should not need wrapping.
@@ -614,7 +614,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20)))
 
   def testWrapBoxUtf8Data(self):
-    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf-8')
     for resource in [
         {'name': 'my-instance-a-0',
          # display width is 57, length is 77, should not need wrapping.
@@ -639,7 +639,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20)))
 
   def testWrapUnicodeName(self):
-    self.SetUpPrinter('table(name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table(name, description:wrap)', encoding='utf-8')
     for resource in [
         {'name': 'Ṁöë{}'.format(
             (_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20),  # 20 0-width chars
@@ -663,7 +663,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20)))
 
   def testWrapBoxUnicodeName(self):
-    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf8')
+    self.SetUpPrinter('table[box](name, description:wrap)', encoding='utf-8')
     for resource in [
         {'name': 'Ṁöë{}'.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20),
          'description': ('Lorem ipsum dolor sit amet, consectetur '
@@ -688,7 +688,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
 
   def testWrapAllBoxUnicodeName(self):
     self.SetUpPrinter('table[all-box](name, description:wrap)',
-                      encoding='utf8')
+                      encoding='utf-8')
     for resource in [
         {'name': 'Ṁöë{}'.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20),
          'description': ('Lorem ipsum dolor sit amet, consectetur '
@@ -889,7 +889,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         '{}'.format('車' * 15))  # display width 90, string length 75
     self.SetUpPrinter(
         'table[title="{0}"](name, description:wrap)'.format(long_title),
-        encoding='utf8')
+        encoding='utf-8')
     for resource in [
         {'name': 'my-instance-a-0',
          'description': ('Lorem ipsum dolor sit amet, consectetur '
@@ -915,7 +915,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         '車車車車車車車車車車車車車車車')  # display width 90, string length 75
     self.SetUpPrinter(
         'table[box, title="{}"](name, description:wrap)'.format(long_title),
-        encoding='utf8')
+        encoding='utf-8')
     for resource in [
         {'name': 'my-instance-a-0',
          'description': ('Lorem ipsum dolor sit amet, consectetur '
@@ -1129,7 +1129,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
   def testWrapWithColor(self):
     self.SetUpPrinter(
         'table(name, description.color(red="Lorem"|"Sed"):wrap)',
-        encoding='utf8')
+        encoding='utf-8')
     # Mock out colorizing
     def FakeColorize(string, color, _, **unused_kwargs):
       return '<{color}>{string}</{color}>'.format(color=color, string=string)
@@ -1159,7 +1159,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
   def testWrapBoxWithColor(self):
     self.SetUpPrinter(
         'table[box](name, description.color(red="Lorem"|"Sed"):wrap)',
-        encoding='utf8')
+        encoding='utf-8')
     # Mock colorizing, with hackery to replace 'justify' param
     def FakeColorize(string, color, _, **unused_kwargs):
       return '<{color}>{string}{spaces}</{color}>'.format(
@@ -1212,7 +1212,7 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
 
   def testWrapLongWhitespaceWithColor(self):
     self.SetUpPrinter(
-        'table(name, description.color(red="Lorem"):wrap)', encoding='utf8')
+        'table(name, description.color(red="Lorem"):wrap)', encoding='utf-8')
     # Mock out colorizing
     def FakeColorize(string, color, _, **unused_kwargs):
       return '<{color}>{string}</{color}>'.format(color=color, string=string)
@@ -1542,7 +1542,7 @@ my-instance-az-1  x       Lorem ipsum dolor sit amet, consectetur adipiscing eli
 # pylint: enable=line-too-long
 
   def testTablePrinterVariableWidthMultiLine(self):
-    self.SetUpPrinter('table[box](head, data:wrap, tail)', encoding='utf8')
+    self.SetUpPrinter('table[box](head, data:wrap, tail)', encoding='utf-8')
     for resource in self.multiline_width_resource:
       self._printer.AddRecord(resource)
     self._printer.Finish()
@@ -1560,7 +1560,7 @@ my-instance-az-1  x       Lorem ipsum dolor sit amet, consectetur adipiscing eli
     """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 64)))
 
   def testTablePrinterVariableWidthMultiLineAllBox(self):
-    self.SetUpPrinter('table[all-box](head, data:wrap, tail)', encoding='utf8')
+    self.SetUpPrinter('table[all-box](head, data:wrap, tail)', encoding='utf-8')
     for resource in self.multiline_width_resource:
       self._printer.AddRecord(resource)
     self._printer.Finish()
@@ -1580,7 +1580,7 @@ my-instance-az-1  x       Lorem ipsum dolor sit amet, consectetur adipiscing eli
     """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 64)))
 
   def testTablePrinterVariableWidthMultiLineNoBox(self):
-    self.SetUpPrinter('table(head, data:wrap, tail)', encoding='utf8')
+    self.SetUpPrinter('table(head, data:wrap, tail)', encoding='utf-8')
     for resource in self.multiline_width_resource:
       self._printer.AddRecord(resource)
     self._printer.Finish()
@@ -2040,7 +2040,7 @@ class TablePrinterFormatSortTest(resource_printer_test_base.Base):
 class TablePrinterAttributeTest(resource_printer_test_base.Base):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testTableEmptyTitle(self):
     self.Print(attributes='[title="Four Three Stooges"]', count=0)
@@ -2325,7 +2325,7 @@ class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
         """))
 
   def testTableUtf8Box(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self.Print(attributes='[box]')
     self.AssertOutputEquals(textwrap.dedent("""\
         ┌───────┬────────────────────────────────────────────────┬─────────┐
@@ -2339,7 +2339,7 @@ class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
         """))
 
   def testTableUtf8AllBox(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self.Print(attributes='[all-box]')
     self.AssertOutputEquals(textwrap.dedent("""\
         ┌───────┬────────────────────────────────────────────────┬─────────┐
@@ -2388,7 +2388,7 @@ class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
 
   def testMultipleStreamedResourceCaseBoxUtf8PageFlagSmall(self):
     """Make sure the intermediate corners are correct."""
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     printer = resource_printer.Printer(
         'table[box,title=Kinds]'
         '(name:sort=102, metadata.kind)')

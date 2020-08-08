@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute networks subnets update - updates properties of an
-        existing Google Compute Engine subnetwork
+        existing Compute Engine subnetwork
 
 SYNOPSIS
     gcloud beta compute networks subnets update NAME
@@ -17,7 +17,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Updates properties of an existing Google Compute Engine subnetwork.
+    (BETA) Updates properties of an existing Compute Engine subnetwork.
 
 POSITIONAL ARGUMENTS
      NAME

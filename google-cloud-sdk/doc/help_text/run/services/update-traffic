@@ -1,5 +1,5 @@
 NAME
-    gcloud run services update-traffic - adjust the trafic assignments for a
+    gcloud run services update-traffic - adjust the traffic assignments for a
         Cloud Run service
 
 SYNOPSIS
@@ -12,7 +12,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Adjust the trafic assignments for a Cloud Run service.
+    Adjust the traffic assignments for a Cloud Run service.
 
 POSITIONAL ARGUMENTS
      Service resource - Service to update the configuration of. The arguments

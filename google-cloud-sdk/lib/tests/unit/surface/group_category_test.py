@@ -67,11 +67,18 @@ class GroupWalker(walker.Walker):
     super(GroupWalker, self).__init__(cli)
 
   def Visit(self, node, parent, is_group):
+
+    def GetNonHiddenGroupCount(vertex):
+      return len([
+          group for group in vertex.groups
+          if not vertex.groups[group].IsHidden()
+      ])
+
     if not parent:
       return node
     enforce_category = False
     if is_group:
-      if len(parent.groups) > CHILD_THRESHOLD:
+      if GetNonHiddenGroupCount(parent) > CHILD_THRESHOLD:
         enforce_category = True
       for _, group in six.iteritems(parent.groups):
         enforce_category = True if group.category else enforce_category

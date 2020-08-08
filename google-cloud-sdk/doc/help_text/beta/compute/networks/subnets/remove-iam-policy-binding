@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute networks subnets remove-iam-policy-binding - remove an
-        IAM policy binding from a Google Compute Engine subnetwork
+        IAM policy binding from a Compute Engine subnetwork
 
 SYNOPSIS
     gcloud beta compute networks subnets remove-iam-policy-binding
@@ -8,8 +8,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove an IAM policy binding from a Google Compute Engine
-    subnetwork.
+    (BETA) Remove an IAM policy binding from a Compute Engine subnetwork.
 
 POSITIONAL ARGUMENTS
      Subnetwork resource - The subnetwork for which to remove the IAM policy

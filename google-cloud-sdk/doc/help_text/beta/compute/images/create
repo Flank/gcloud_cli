@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute images create - create Google Compute Engine images
+    gcloud beta compute images create - create Compute Engine images
 
 SYNOPSIS
     gcloud beta compute images create IMAGE_NAME

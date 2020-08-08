@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute interconnects attachments provider update - update a
-        Google Compute Engine partner provider interconnect attachment
+        Compute Engine partner provider interconnect attachment
 
 SYNOPSIS
     gcloud alpha compute interconnects attachments provider update NAME

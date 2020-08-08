@@ -33,6 +33,7 @@ import tempfile
 
 from googlecloudsdk.api_lib.auth import service_account as auth_service_account
 from googlecloudsdk.api_lib.iamcredentials import util as iamcred_util
+from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -55,7 +56,10 @@ def main():
 
 class WithCoreModules(cli_test_base.CliTestBase):
   """A base class for gcloud tests that need the core module directories."""
-  pass
+
+  # TODO(b/147255499): Remove after all surfaces are on google-auth.
+  def SetUp(self):
+    properties.VALUES.auth.google_auth_allowed.Set(True)
 
 
 IGNORE = object()
@@ -248,6 +252,13 @@ class WithServiceAuth(WithServiceAccountFile):
 
   def PreSetUp(self):
     self.requires_refresh_token = False
+    self.disable_activate_service_account_google_auth = False
+
+    # TODO(b/157745076): Activating service account via google-auth is enabled
+    # only for Googlers at the moment. We need to mock IsHostGoogleDomain() to
+    # to return True so that google-auth will invoked in the tests.
+    # Remove this mock once it is enabled for everyone.
+    self.StartObjectPatch(auth_util, 'IsHostGoogleDomain', return_value=True)
 
   def SetUp(self):
     """Runs the auth command."""
@@ -255,6 +266,13 @@ class WithServiceAuth(WithServiceAccountFile):
       raise RuntimeError('Credentials are not configured. Use '
                          'CLOUD_SDK_TEST_CONFIG env variable to point '
                          'to integration test config.')
+
+    # Configures whether to execute the service account activation against
+    # google-auth or oauth2client.
+    self.Run('--no-user-output-enabled '
+             'config set auth/disable_activate_service_account_google_auth ' +
+             str(self.disable_activate_service_account_google_auth))
+
     if self.requires_refresh_token:
       self.Run(
           '--no-user-output-enabled '
@@ -365,6 +383,12 @@ class ImpersonationAccountAuth(object):
     self._orig_project = None
     self._orig_impersonate_provider = None
 
+  def Account(self):
+    return self._account
+
+  def ImpersonationServiceAccount(self):
+    return self._service_account_email
+
   def __enter__(self):
     self._orig_account = properties.VALUES.core.account.Get()
     self._orig_project = properties.VALUES.core.project.Get()
@@ -462,12 +486,16 @@ class GceServiceAccount(object):
     if not c_gce.Metadata().connected:
       raise GceNotConnectedError('Not connected')
     self._check_gce_metadata = None
+    self._project = _TEST_CONFIG['property_overrides'].get('project', None)
 
   def Account(self):
     return c_gce.Metadata().DefaultAccount()
 
   def Project(self):
     return c_gce.Metadata().Project()
+
+  def OverridingProject(self):
+    return self._project
 
   @property
   def credentials(self):

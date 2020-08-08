@@ -27,6 +27,12 @@ COMMANDS
      apply
         (ALPHA) Apply configuration changes for Anthos infrastructure.
 
+     create-login-config
+        (ALPHA) Generates a login configuration file.
+
+     export
+        (ALPHA) Export current configuration of an Anthos cluster.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

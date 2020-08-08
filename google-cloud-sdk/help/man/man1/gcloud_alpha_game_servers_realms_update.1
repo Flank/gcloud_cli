@@ -11,7 +11,7 @@ gcloud alpha game servers realms update \- update a Realm
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha game servers realms update\fR (\fIREALM\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-dry\-run\fR [\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha game servers realms update\fR (\fIREALM\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-dry\-run\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -92,6 +92,10 @@ Validate the changes, but do not execute it.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description for the realm.
+
 .TP 2m
 \fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR
 This attribute is only relevant for preview (\-\-dry\-run). It is used to

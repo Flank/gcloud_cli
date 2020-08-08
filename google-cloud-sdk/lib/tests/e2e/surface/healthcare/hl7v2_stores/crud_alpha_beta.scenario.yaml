@@ -118,6 +118,8 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
+            storageOptions:
+              defaultBlobStorageClass: STANDARD
     - expect_stderr: |
         Created dataset [$$test-dataset$$].
     - expect_exit:

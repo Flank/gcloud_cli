@@ -84,7 +84,7 @@ FLAGS
         --no-enable-database-replication to disable.
 
      --enable-point-in-time-recovery
-        Specified if point-in-time recovery (using write-ahead log archiving)
+        Specifies if point-in-time recovery (using write-ahead log archiving)
         should be enabled. If backup configuration is disabled, point-in-time
         recovery must be disabled as well.
 

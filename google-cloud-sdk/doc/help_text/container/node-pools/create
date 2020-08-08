@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud container node-pools create NAME
-        [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
+        [--accelerator=[type=TYPE,[count=COUNT],...]]
+        [--boot-disk-kms-key=BOOT_DISK_KMS_KEY] [--cluster=CLUSTER]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE]
         [--enable-autoprovisioning] [--enable-autorepair]
         [--no-enable-autoupgrade] [--image-type=IMAGE_TYPE]
@@ -50,6 +51,14 @@ FLAGS
          count
             (Optional) The number of accelerators to attach to the instances.
             The default value is 1.
+
+     --boot-disk-kms-key=BOOT_DISK_KMS_KEY
+        The Customer Managed Encryption Key used to encrypt the boot disk
+        attached to each node in the node pool. This should be of the form
+        projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+        For more information about protecting resources with Cloud KMS Keys
+        please see:
+        https://cloud.google.com/compute/docs/disks/customer-managed-encryption
 
      --cluster=CLUSTER
         The cluster to add the node pool to. Overrides the default
@@ -416,6 +425,7 @@ FLAGS
                                      https://www.googleapis.com/auth/trace.append
               logging-write          https://www.googleapis.com/auth/logging.write
               monitoring             https://www.googleapis.com/auth/monitoring
+              monitoring-read        https://www.googleapis.com/auth/monitoring.read
               monitoring-write       https://www.googleapis.com/auth/monitoring.write
               pubsub                 https://www.googleapis.com/auth/pubsub
               service-control        https://www.googleapis.com/auth/servicecontrol

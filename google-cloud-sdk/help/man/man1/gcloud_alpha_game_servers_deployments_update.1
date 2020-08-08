@@ -11,7 +11,7 @@ gcloud alpha game servers deployments update \- update a Deployment
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha game servers deployments update\fR (\fIDEPLOYMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha game servers deployments update\fR (\fIDEPLOYMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,9 +22,18 @@ gcloud alpha game servers deployments update \- update a Deployment
 
 .SH "EXAMPLES"
 
+To update description for Game Server Deployment 'my\-deployment' in project
+\'my\-project', and location in 'global'(deployments only support the default
+\'global' location) run:
+
+.RS 2m
+$ gcloud alpha game servers deployments update my\-deployment \e
+    \-\-project=my\-project \-\-location=global \e
+    \-\-description="New description"
+.RE
+
 To update labels for Game Server Deployment 'my\-deployment' in project
-\'my\-project' and location in 'global'(deployments only support the 'global'
-location) run:
+\'my\-project' run:
 
 .RS 2m
 $ gcloud alpha game servers deployments update my\-deployment \e
@@ -68,6 +77,10 @@ Google Cloud location.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description for the game server deployment.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]

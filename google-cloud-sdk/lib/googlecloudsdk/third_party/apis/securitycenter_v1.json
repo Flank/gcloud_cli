@@ -435,7 +435,7 @@
     },
     "AuditConfig": {
       "id": "AuditConfig",
-      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
+      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\",\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\"\n            },\n            {\n              \"log_type\": \"ADMIN_READ\"\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\",\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\"\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
       "type": "object",
       "properties": {
         "service": {
@@ -453,7 +453,7 @@
     },
     "AuditLogConfig": {
       "id": "AuditLogConfig",
-      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
+      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\"\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
       "type": "object",
       "properties": {
         "logType": {
@@ -534,7 +534,7 @@
       "type": "object",
       "properties": {
         "filter": {
-          "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"update_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"update_time = 1560208038000\"\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"create_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"create_time = 1560208038000\"\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_display_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_parent_display_name: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_project_display_name: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"resource_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-resource_properties.my_property : \\\"\\\"\"",
+          "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    `update_time = \"2019-06-10T16:07:18-07:00\"`\n    `update_time = 1560208038000`\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    `create_time = \"2019-06-10T16:07:18-07:00\"`\n    `create_time = 1560208038000`\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_display_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_parent_display_name: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_project_display_name: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: `resource_properties.my_property : \"\"`\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: `-resource_properties.my_property : \"\"`",
           "type": "string"
         },
         "groupBy": {
@@ -615,7 +615,7 @@
       "type": "object",
       "properties": {
         "filter": {
-          "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* parent: `=`, `:`\n* resource_name: `=`, `:`\n* state: `=`, `:`\n* category: `=`, `:`\n* external_uri: `=`, `:`\n* event_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"event_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"event_time = 1560208038000\"\n\n* security_marks.marks: `=`, `:`\n* source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"source_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-source_properties.my_property : \\\"\\\"\"",
+          "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* parent: `=`, `:`\n* resource_name: `=`, `:`\n* state: `=`, `:`\n* category: `=`, `:`\n* external_uri: `=`, `:`\n* event_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    `event_time = \"2019-06-10T16:07:18-07:00\"`\n    `event_time = 1560208038000`\n\n* security_marks.marks: `=`, `:`\n* source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: `source_properties.my_property : \"\"`\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: `-source_properties.my_property : \"\"`",
           "type": "string"
         },
         "groupBy": {
@@ -1060,6 +1060,37 @@
         "finding": {
           "description": "If it's a Finding based notification config, this field will be\npopulated.",
           "$ref": "Finding"
+        },
+        "resource": {
+          "description": "The Cloud resource tied to this notification's Finding.",
+          "$ref": "GoogleCloudSecuritycenterV1Resource"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1Resource": {
+      "id": "GoogleCloudSecuritycenterV1Resource",
+      "description": "\nInformation related to the Google Cloud resource.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The full resource name of the resource. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "project": {
+          "description": "The full resource name of project that the resource belongs to.",
+          "type": "string"
+        },
+        "projectDisplayName": {
+          "description": "\nThe human readable name of project that the resource belongs to.",
+          "type": "string"
+        },
+        "parent": {
+          "description": "The full resource name of resource's parent.",
+          "type": "string"
+        },
+        "parentDisplayName": {
+          "description": "\nThe human readable name of resource's parent.",
+          "type": "string"
         }
       }
     },
@@ -1107,6 +1138,10 @@
         "temporalAsset": {
           "description": "If it's an asset based notification config, this field will be\npopulated.",
           "$ref": "GoogleCloudSecuritycenterV1p1beta1TemporalAsset"
+        },
+        "resource": {
+          "description": "The Cloud resource tied to the notification.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1Resource"
         }
       }
     },
@@ -1310,6 +1345,33 @@
         }
       }
     },
+    "GoogleCloudSecuritycenterV1p1beta1Resource": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1Resource",
+      "description": "\nInformation related to the Google Cloud resource.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The full resource name of the resource. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "project": {
+          "description": "The full resource name of project that the resource belongs to.",
+          "type": "string"
+        },
+        "projectDisplayName": {
+          "description": "\nThe human readable name of project that the resource belongs to.",
+          "type": "string"
+        },
+        "parent": {
+          "description": "The full resource name of resource's parent.",
+          "type": "string"
+        },
+        "parentDisplayName": {
+          "description": "\nThe human readable name of resource's parent.",
+          "type": "string"
+        }
+      }
+    },
     "GoogleCloudSecuritycenterV1p1beta1RunAssetDiscoveryResponse": {
       "id": "GoogleCloudSecuritycenterV1p1beta1RunAssetDiscoveryResponse",
       "description": "Response of asset discovery run",
@@ -1381,7 +1443,7 @@
               "type": "string"
             },
             "updateMask": {
-              "description": "The FieldMask to use when updating the settings resource.\n\n If empty all mutable fields will be updated.",
+              "description": "The FieldMask to use when updating the settings resource.\n\nIf empty all mutable fields will be updated.",
               "location": "query",
               "type": "string",
               "format": "google-fieldmask"
@@ -1813,7 +1875,7 @@
                       "type": "string"
                     },
                     "filter": {
-                      "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\nname: `=`\nparent: `=`, `:`\nresource_name: `=`, `:`\nstate: `=`, `:`\ncategory: `=`, `:`\nexternal_uri: `=`, `:`\nevent_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"event_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"event_time = 1560208038000\"\n\nsecurity_marks.marks: `=`, `:`\nsource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"source_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-source_properties.my_property : \\\"\\\"\"",
+                      "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\nname: `=`\nparent: `=`, `:`\nresource_name: `=`, `:`\nstate: `=`, `:`\ncategory: `=`, `:`\nexternal_uri: `=`, `:`\nevent_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    `event_time = \"2019-06-10T16:07:18-07:00\"`\n    `event_time = 1560208038000`\n\nsecurity_marks.marks: `=`, `:`\nsource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: `source_properties.my_property : \"\"`\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: `-source_properties.my_property : \"\"`",
                       "location": "query",
                       "type": "string"
                     },
@@ -1835,7 +1897,7 @@
                       "format": "google-duration"
                     },
                     "fieldMask": {
-                      "description": "Optional. A field mask to specify the Finding fields to be listed in the response.\nAn empty field mask will list all fields.",
+                      "description": "A field mask to specify the Finding fields to be listed in the response.\nAn empty field mask will list all fields.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -2122,7 +2184,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "\nUpdates a notification config."
+              "description": "\nUpdates a notification config. The following update\nfields are allowed: description, pubsub_topic, streaming_config.filter"
             }
           }
         },
@@ -2170,7 +2232,7 @@
                   "type": "string"
                 },
                 "filter": {
-                  "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following are the allowed field and operator combinations:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"update_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"update_time = 1560208038000\"\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"create_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"create_time = 1560208038000\"\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_display_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_parent_display_name: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_project_display_name: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"resource_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-resource_properties.my_property : \\\"\\\"\"",
+                  "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following are the allowed field and operator combinations:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    `update_time = \"2019-06-10T16:07:18-07:00\"`\n    `update_time = 1560208038000`\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    `create_time = \"2019-06-10T16:07:18-07:00\"`\n    `create_time = 1560208038000`\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_display_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_parent_display_name: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_project_display_name: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: `resource_properties.my_property : \"\"`\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: `-resource_properties.my_property : \"\"`",
                   "location": "query",
                   "type": "string"
                 },
@@ -2192,7 +2254,7 @@
                   "format": "google-duration"
                 },
                 "fieldMask": {
-                  "description": "Optional. A field mask to specify the ListAssetsResult fields to be listed in the\nresponse.\nAn empty field mask will list all fields.",
+                  "description": "A field mask to specify the ListAssetsResult fields to be listed in the\nresponse.\nAn empty field mask will list all fields.",
                   "location": "query",
                   "type": "string",
                   "format": "google-fieldmask"

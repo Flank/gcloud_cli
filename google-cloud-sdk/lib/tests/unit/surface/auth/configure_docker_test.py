@@ -63,6 +63,17 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      config_info.contents)
 
+  def testConfigureSuccessWithAR(self):
+    self._WriteTestDockerConfig('{}')
+    self.WriteInput('Y\n')
+    self.Run('auth configure-docker --include-artifact-registry')
+    self.AssertErrContains('Docker configuration file updated.')
+    self.AssertErrContains(self.test_config.replace('\\', '\\\\'))
+    config_info = cred_utils.Configuration.ReadFromDisk()
+    self.assertEqual(
+        cred_utils.GetGcloudCredentialHelperConfig(None, True),
+        config_info.contents)
+
   def testConfigureSuccessWithServerSpecified(self):
     self.WriteInput('Y\n')
     self.Run('auth configure-docker us-west1-docker.pkg.dev')

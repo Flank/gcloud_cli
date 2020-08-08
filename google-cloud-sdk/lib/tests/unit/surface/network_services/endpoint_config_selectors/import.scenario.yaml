@@ -19,6 +19,9 @@ actions:
                 metadataLabels:
                         - labelName: "app"
                           labelValue: "test"
+      serverTlsPolicy: mystls
+      clientTlsPolicy: myctls
+      authorizationPolicy: myaz
 - set_property:
     core/project: my-project
 - execute_command:
@@ -33,8 +36,7 @@ actions:
           headers: {}
           body: null
         return_response:
-          headers:
-            status: '404'
+          headers: {}
     - expect_exit:
         code: 1
         message: "'NoneType' object has no attribute 'name'"
@@ -54,9 +56,11 @@ actions:
                   metadataLabels:
                   - labelName: "app"
                     labelValue: "test"
+              serverTlsPolicy: mystls
+              clientTlsPolicy: myctls
+              authorizationPolicy: myaz
             }
         return_response:
-          headers:
-            status: '200'
+          headers: {}
     - expect_exit:
         code: 0

@@ -235,11 +235,10 @@ Learn more about regional endpoints and see a list of available regions:
 """
 
 
-def GetRegionArg(hidden=True):
+def GetRegionArg():
   """Adds --region flag to determine endpoint for models and versions."""
   return base.Argument(
       '--region',
-      hidden=hidden,
       # TODO(b/144662044) Add more regions.
       choices=['asia-east1', 'europe-west4', 'us-central1'],
       help=_REGION_FLAG_HELPTEXT)
@@ -249,6 +248,19 @@ SERVICE_ACCOUNT = base.Argument(
     '--service-account',
     required=False,
     help='Specifies the service account for resource access control.')
+
+NETWORK = base.Argument(
+    '--network',
+    help="""\
+The full name of the Google Compute Engine
+network (https://cloud.google.com/vpc/docs) to which the Job
+is peered with. For example, ``projects/12345/global/networks/myVPC''. The
+format is of the form projects/{project}/global/networks/{network}, where
+{project} is a project number, as in '12345', and {network} is network name.
+Private services access must already have been configured
+(https://cloud.google.com/vpc/docs/configure-private-services-access)
+for the network. If unspecified, the Job is not peered with any network.
+""")
 
 
 def GetModuleNameFlag(required=True):
@@ -590,15 +602,15 @@ def GetAcceleratorFlag():
               'count': int,
           }, required_keys=['type', 'count']),
       help="""\
-Manage the accelerator config for GPU serving. When deploying a model with the
-new Alpha Google Compute Engine Machine Types, a GPU accelerator may also
-be selected. Accelerator config for version creation is currently available
-in us-central1 only.
+Manage the accelerator config for GPU serving. When deploying a model with
+Compute Engine Machine Types, a GPU accelerator may also
+be selected.
 
 *type*::: The type of the accelerator. Choices are {}.
 
 *count*::: The number of accelerators to attach to each machine running the job.
-""".format(', '.join(
+ This is usually 1; scaling parameters are configured using `manualScaling` or
+`autoScaling` flags.""".format(', '.join(
     ["'{}'".format(c) for c in _OP_ACCELERATOR_TYPE_MAPPER.choices])))
 
 
@@ -876,5 +888,62 @@ def AddMachineTypeFlagToParser(parser):
       '--machine-type',
       help="""\
 Type of machine on which to serve the model. Currently only applies to online prediction. For available machine types,
-see https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#machine-types.
+see https://cloud.google.com/ai-platform/prediction/docs/machine-types-online-prediction#available_machine_types.
 """).AddToParser(parser)
+
+
+def AddContainerFlags(parser):
+  """Adds flags related to custom containers to the specified parser."""
+  container_group = parser.add_argument_group(
+      help='Configure the container to be deployed.')
+  container_group.add_argument(
+      '--image',
+      help="""\
+Name of the container image to deploy (e.g. gcr.io/myproject/server:latest).
+""")
+  container_group.add_argument(
+      '--command',
+      type=arg_parsers.ArgList(),
+      metavar='COMMAND',
+      action=arg_parsers.UpdateAction,
+      help="""\
+Entrypoint for the container image. If not specified, the container
+image's default Entrypoint is run.
+""")
+  container_group.add_argument(
+      '--args',
+      metavar='ARG',
+      type=arg_parsers.ArgList(),
+      action=arg_parsers.UpdateAction,
+      help="""\
+Comma-separated arguments passed to the command run by the container
+image. If not specified and no '--command' is provided, the container
+image's default Cmd is used.
+""")
+  container_group.add_argument(
+      '--env-vars',
+      metavar='KEY=VALUE',
+      type=arg_parsers.ArgDict(),
+      action=arg_parsers.UpdateAction,
+      help='List of key-value pairs to set as environment variables.'
+  )
+  container_group.add_argument(
+      '--ports',
+      metavar='ARG',
+      type=arg_parsers.ArgList(element_type=arg_parsers.BoundedInt(1, 65535)),
+      action=arg_parsers.UpdateAction,
+      help="""\
+Container ports to receive requests at. Must be a number between 1 and 65535,
+inclusive.
+""")
+  route_group = container_group.add_argument_group(
+      help='Flags to control the paths that requests and health checks are '
+      'sent to.')
+  route_group.add_argument(
+      '--predict-route',
+      help='HTTP path to send prediction requests to inside the container.'
+  )
+  route_group.add_argument(
+      '--health-route',
+      help='HTTP path to send health checks to inside the container.'
+  )

@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute forwarding-rules create NAME
         (--backend-service=BACKEND_SERVICE
+          | --target-grpc-proxy=TARGET_GRPC_PROXY
           | --target-http-proxy=TARGET_HTTP_PROXY
           | --target-https-proxy=TARGET_HTTPS_PROXY
           | --target-instance=TARGET_INSTANCE | --target-pool=TARGET_POOL
@@ -65,8 +66,8 @@ DESCRIPTION
 
     When creating a forwarding rule, exactly one of --target-instance,
     --target-pool, --target-http-proxy, --target-https-proxy,
-    --target-ssl-proxy, --target-tcp-proxy, --target-vpn-gateway or
-    --backend-service must be specified.
+    --target-grpc-proxy, --target-ssl-proxy, --target-tcp-proxy,
+    --target-vpn-gateway or --backend-service must be specified.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -77,6 +78,9 @@ REQUIRED FLAGS
 
        --backend-service=BACKEND_SERVICE
           Target backend service that receives the traffic.
+
+       --target-grpc-proxy=TARGET_GRPC_PROXY
+          Target gRPC proxy that receives the traffic.
 
        --target-http-proxy=TARGET_HTTP_PROXY
           Target HTTP proxy that receives the traffic. Acceptable values for
@@ -170,7 +174,7 @@ OPTIONAL FLAGS
             --target-https-proxy.
          INTERNAL_SELF_MANAGED
             Traffic director load balancing or forwarding, used with
-            --target-http-proxy, --target-https-proxy.
+            --target-http-proxy, --target-https-proxy, --target-grpc-proxy.
 
      --network=NETWORK
         (Only for --load-balancing-scheme=INTERNAL or

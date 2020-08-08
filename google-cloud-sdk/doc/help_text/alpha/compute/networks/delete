@@ -1,14 +1,13 @@
 NAME
-    gcloud alpha compute networks delete - delete Google Compute Engine
-        networks
+    gcloud alpha compute networks delete - delete Compute Engine networks
 
 SYNOPSIS
     gcloud alpha compute networks delete NAME [NAME ...] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute networks delete deletes one or more Google
-    Compute Engine networks. Networks can only be deleted when no other
-    resources (e.g., virtual machine instances) refer to them.
+    (ALPHA) gcloud alpha compute networks delete deletes one or more Compute
+    Engine networks. Networks can only be deleted when no other resources
+    (e.g., virtual machine instances) refer to them.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

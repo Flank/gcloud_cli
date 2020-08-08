@@ -41,9 +41,9 @@ class EnableApiServiceUsageTest(unit_test_base.SUUnitTestBase):
     self.ExpectEnableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 0)
 
-    enable_api.EnableService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+    enable_api.EnableService(self.PROJECT_NAME, self.DEFAULT_SERVICE)
     self.AssertErrContains("""\
-Enabling service [service-name.googleapis.com] on project [fake-project]...
+Enabling service [example.googleapis.com] on project [fake-project]...
 Operation "operations/abc.0000000000" finished successfully.
 """)
 
@@ -51,30 +51,28 @@ Operation "operations/abc.0000000000" finished successfully.
     """Test EnableService."""
     self.ExpectEnableApiCall(self.OPERATION_NAME, done=True)
 
-    enable_api.EnableService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+    enable_api.EnableService(self.PROJECT_NAME, self.DEFAULT_SERVICE)
     self.AssertErrContains("""\
-Enabling service [service-name.googleapis.com] on project [fake-project]...
+Enabling service [example.googleapis.com] on project [fake-project]...
 """)
 
   def testIsServiceEnabled_True(self):
     """Test IsServiceEnabled when result is True."""
     service = self._NewServiceConfig(
-        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=True)
+        self.PROJECT_NAME, self.DEFAULT_SERVICE, enabled=True)
     self.ExpectGetService(service)
 
     self.assertTrue(
-        enable_api.IsServiceEnabled(self.PROJECT_NAME,
-                                    self.DEFAULT_SERVICE_NAME))
+        enable_api.IsServiceEnabled(self.PROJECT_NAME, self.DEFAULT_SERVICE))
 
   def testIsServiceEnabled_False(self):
     """Test IsServiceEnabled when result is False."""
     service = self._NewServiceConfig(
-        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=False)
+        self.PROJECT_NAME, self.DEFAULT_SERVICE, enabled=False)
     self.ExpectGetService(service)
 
     self.assertFalse(
-        enable_api.IsServiceEnabled(self.PROJECT_NAME,
-                                    self.DEFAULT_SERVICE_NAME))
+        enable_api.IsServiceEnabled(self.PROJECT_NAME, self.DEFAULT_SERVICE))
 
   def testIsServiceEnabled_PermissionsError(self):
     """Test IsServiceEnabled raises PermissionsError when expected."""
@@ -84,7 +82,7 @@ Enabling service [service-name.googleapis.com] on project [fake-project]...
 
     with self.assertRaisesRegex(exceptions.GetServicePermissionDeniedException,
                                 r'Something.'):
-      enable_api.IsServiceEnabled(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+      enable_api.IsServiceEnabled(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
   def testIsServiceEnabled_OtherError(self):
     """Test IsServiceEnabled raises HttpError when expected."""
@@ -94,32 +92,28 @@ Enabling service [service-name.googleapis.com] on project [fake-project]...
 
     with self.assertRaisesRegex(apitools_exceptions.HttpError,
                                 r'Something else.'):
-      enable_api.IsServiceEnabled(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+      enable_api.IsServiceEnabled(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
   def testEnableServiceIfDisabled_AlreadyEnabled(self):
     """Test EnableServiceIfDisabled runs successfully if already enabled."""
     service = self._NewServiceConfig(
-        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=True)
+        self.PROJECT_NAME, self.DEFAULT_SERVICE, enabled=True)
     self.ExpectGetService(service)
 
-    enable_api.EnableServiceIfDisabled(self.PROJECT_NAME,
-                                       self.DEFAULT_SERVICE_NAME)
+    enable_api.EnableServiceIfDisabled(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
   def testEnableServiceIfDisabled_NotYetEnabled_Success(self):
     """Test EnableServiceifDisabled enables service if not yet enabled."""
-    service = self._NewServiceConfig(self.PROJECT_NAME,
-                                     self.DEFAULT_SERVICE_NAME)
+    service = self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE)
     self.ExpectGetService(service)
     self.ExpectEnableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    enable_api.EnableServiceIfDisabled(self.PROJECT_NAME,
-                                       self.DEFAULT_SERVICE_NAME)
+    enable_api.EnableServiceIfDisabled(self.PROJECT_NAME, self.DEFAULT_SERVICE)
 
   def testEnableServiceIfDisabled_NotYetEnabled_EventualFailure(self):
     """Test EnableServiceIfDisabled raises if operation fails."""
-    service = self._NewServiceConfig(self.PROJECT_NAME,
-                                     self.DEFAULT_SERVICE_NAME)
+    service = self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE)
     self.ExpectGetService(service)
     self.ExpectEnableApiCall(self.OPERATION_NAME)
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
@@ -127,7 +121,7 @@ Enabling service [service-name.googleapis.com] on project [fake-project]...
 
     with self.assertRaises(exceptions.OperationErrorException):
       enable_api.EnableServiceIfDisabled(self.PROJECT_NAME,
-                                         self.DEFAULT_SERVICE_NAME)
+                                         self.DEFAULT_SERVICE)
 
 
 class ResourceQuotaTests(sdk_test_base.WithFakeAuth):

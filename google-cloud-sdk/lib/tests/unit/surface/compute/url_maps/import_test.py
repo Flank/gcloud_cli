@@ -26,10 +26,10 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.apitools import http_error
-from tests.lib.surface.compute import url_maps_test_base
+from tests.lib.surface.compute.url_maps import test_base
 
 
-class UrlMapsImportTest(url_maps_test_base.UrlMapsTestBase):
+class UrlMapsImportTest(test_base.UrlMapsTestBase):
 
   def PreSetUp(self):
     # TODO(b/135125441): Use SelectApi() instead.

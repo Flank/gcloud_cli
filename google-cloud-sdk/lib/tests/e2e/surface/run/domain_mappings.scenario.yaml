@@ -137,7 +137,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '1967'
+            content-length: '1972'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -147,8 +147,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 67fa7ef6-b4c4-476e-837d-c0497c95a08b
+              resourceVersion: AAWpPOyl/FQ
               generation: 1
               labels:
                 cloud.googleapis.com/location: $$region$$
@@ -157,23 +157,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:06:56.986196Z'
             spec:
               template:
                 metadata:
-                  name: service-name-20191112-003437-a6an-00001-cik
+                  name: service-name-20200629-180645-6032-00001-tic
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                    autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -190,7 +190,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2896'
+            content-length: '2933'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -200,8 +200,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 67fa7ef6-b4c4-476e-837d-c0497c95a08b
+              resourceVersion: AAWpPO1Qrsg
               generation: 1
               labels:
                 cloud.googleapis.com/location: $$region$$
@@ -210,23 +210,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:06:56.986196Z'
             spec:
               template:
                 metadata:
-                  name: service-name-20191112-003437-a6an-00001-cik
+                  name: service-name-20200629-180645-6032-00001-tic
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                    autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -238,18 +238,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:34:59.005Z'
+                lastTransitionTime: '2020-06-29T18:07:08.173Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:34:58.780Z'
+                lastTransitionTime: '2020-06-29T18:07:07.954Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:34:59.179Z'
-              latestReadyRevisionName: service-name-20191112-003437-a6an-00001-cik
-              latestCreatedRevisionName: service-name-20191112-003437-a6an-00001-cik
+                lastTransitionTime: '2020-06-29T18:07:08.173Z'
+              latestReadyRevisionName: service-name-20200629-180645-6032-00001-tic
+              latestCreatedRevisionName: service-name-20200629-180645-6032-00001-tic
               traffic:
-              - revisionName: service-name-20191112-003437-a6an-00001-cik
+              - revisionName: service-name-20200629-180645-6032-00001-tic
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -267,7 +268,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2896'
+            content-length: '2933'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -277,8 +278,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 67fa7ef6-b4c4-476e-837d-c0497c95a08b
+              resourceVersion: AAWpPO1Qrsg
               generation: 1
               labels:
                 cloud.googleapis.com/location: $$region$$
@@ -287,23 +288,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:06:56.986196Z'
             spec:
               template:
                 metadata:
-                  name: service-name-20191112-003437-a6an-00001-cik
+                  name: service-name-20200629-180645-6032-00001-tic
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                    autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -315,18 +316,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:34:59.005Z'
+                lastTransitionTime: '2020-06-29T18:07:08.173Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:34:58.780Z'
+                lastTransitionTime: '2020-06-29T18:07:07.954Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:34:59.179Z'
-              latestReadyRevisionName: service-name-20191112-003437-a6an-00001-cik
-              latestCreatedRevisionName: service-name-20191112-003437-a6an-00001-cik
+                lastTransitionTime: '2020-06-29T18:07:08.173Z'
+              latestReadyRevisionName: service-name-20200629-180645-6032-00001-tic
+              latestCreatedRevisionName: service-name-20200629-180645-6032-00001-tic
               traffic:
-              - revisionName: service-name-20191112-003437-a6an-00001-cik
+              - revisionName: service-name-20200629-180645-6032-00001-tic
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -391,10 +393,10 @@ actions:
               name: $$subdomain$$.$$domain-name$$
               namespace: '462803083913'
               selfLink: /apis/domains.cloudrun.com/v1/namespaces/462803083913/domainmappings/$$subdomain$$.$$domain-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: e952d288-8bab-4d9d-802e-86543727816c
+              resourceVersion: AAWpPO2KBo4
               generation: 1
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:07:11.931022Z'
               labels:
                 cloud.googleapis.com/location: $$region$$
               annotations:
@@ -422,12 +424,12 @@ actions:
               name: $$subdomain$$.$$domain-name$$
               namespace: '462803083913'
               selfLink: /apis/domains.cloudrun.com/v1/namespaces/462803083913/domainmappings/$$subdomain$$.$$domain-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: e952d288-8bab-4d9d-802e-86543727816c
+              resourceVersion: AAWpPO2uhjg
               generation: 1
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:07:11.931022Z'
               labels:
-                run.googleapis.com/overrideAt: '2019-11-12T00:35:02.981Z'
+                run.googleapis.com/overrideAt: '2020-06-29T18:07:13.177Z'
                 cloud.googleapis.com/location: $$region$$
               annotations:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
@@ -441,19 +443,19 @@ actions:
                 reason: CertificatePending
                 message: Waiting for certificate provisioning. You must configure
                   your DNS records for certificate issuance to begin.
-                lastTransitionTime: '2019-11-12T00:35:04.785Z'
+                lastTransitionTime: '2020-06-29T18:07:14.323Z'
               - type: CertificateProvisioned
                 status: Unknown
-                lastTransitionTime: '2019-11-12T00:35:01.599Z'
+                lastTransitionTime: '2020-06-29T18:07:11.991Z'
               - type: DomainRoutable
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:35:03.655Z'
+                lastTransitionTime: '2020-06-29T18:07:14.121Z'
               - type: Retry
                 status: 'True'
                 reason: WaitingForOperation
-                message: System will retry after 0:01:00 from lastTransitionTime for
+                message: System will retry after 0:01:01 from lastTransitionTime for
                   attempt 1.
-                lastTransitionTime: '2019-11-12T00:35:04.785Z'
+                lastTransitionTime: '2020-06-29T18:07:14.323Z'
                 severity: Info
               observedGeneration: 1
               resourceRecords:
@@ -497,12 +499,12 @@ actions:
               name: $$subdomain$$.$$domain-name$$
               namespace: '462803083913'
               selfLink: /apis/domains.cloudrun.com/v1/namespaces/462803083913/domainmappings/$$subdomain$$.$$domain-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: e952d288-8bab-4d9d-802e-86543727816c
+              resourceVersion: AAWpPO2uhjg
               generation: 1
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:07:11.931022Z'
               labels:
-                run.googleapis.com/overrideAt: '2019-11-12T00:35:02.981Z'
+                run.googleapis.com/overrideAt: '2020-06-29T18:07:13.177Z'
                 cloud.googleapis.com/location: $$region$$
               annotations:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
@@ -516,19 +518,19 @@ actions:
                 reason: CertificatePending
                 message: Waiting for certificate provisioning. You must configure
                   your DNS records for certificate issuance to begin.
-                lastTransitionTime: '2019-11-12T00:35:04.785Z'
+                lastTransitionTime: '2020-06-29T18:07:14.323Z'
               - type: CertificateProvisioned
                 status: Unknown
-                lastTransitionTime: '2019-11-12T00:35:01.599Z'
+                lastTransitionTime: '2020-06-29T18:07:11.991Z'
               - type: DomainRoutable
                 status: 'True'
-                lastTransitionTime: '2019-11-12T00:35:03.655Z'
+                lastTransitionTime: '2020-06-29T18:07:14.121Z'
               - type: Retry
                 status: 'True'
                 reason: WaitingForOperation
-                message: System will retry after 0:01:00 from lastTransitionTime for
+                message: System will retry after 0:01:01 from lastTransitionTime for
                   attempt 1.
-                lastTransitionTime: '2019-11-12T00:35:04.785Z'
+                lastTransitionTime: '2020-06-29T18:07:14.323Z'
                 severity: Info
               observedGeneration: 1
               resourceRecords:
@@ -570,7 +572,7 @@ actions:
               name: $$subdomain$$.$$domain-name$$
               group: v1
               kind: domain_mapping
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              uid: e952d288-8bab-4d9d-802e-86543727816c
     - expect_stderr: |
         Mappings to [$$subdomain$$.$$domain-name$$] now have been deleted.
     - expect_exit:
@@ -598,7 +600,7 @@ actions:
               name: $$service-name$$
               group: v1
               kind: service
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              uid: 67fa7ef6-b4c4-476e-837d-c0497c95a08b
     - expect_stderr: |
         Deleted service [$$service-name$$].
     - expect_exit:

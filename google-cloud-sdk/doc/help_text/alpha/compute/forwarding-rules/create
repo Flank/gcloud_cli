@@ -67,8 +67,8 @@ DESCRIPTION
 
     When creating a forwarding rule, exactly one of --target-instance,
     --target-pool, --target-http-proxy, --target-https-proxy,
-    --target-ssl-proxy, --target-tcp-proxy, --target-vpn-gateway,
-    --target-google-apis-bundle or --backend-service must be specified.
+    --target-grpc-proxy, --target-ssl-proxy, --target-tcp-proxy,
+    --target-vpn-gateway or --backend-service must be specified.
 
 POSITIONAL ARGUMENTS
      NAME

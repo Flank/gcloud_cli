@@ -1,0 +1,51 @@
+NAME
+    gcloud alpha apigee developers describe - describe an Apigee developer
+
+SYNOPSIS
+    gcloud alpha apigee developers describe
+        (DEVELOPER : --organization=ORGANIZATION) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe an Apigee developer.
+
+    gcloud alpha apigee developers describe retrieves the developer's details,
+    including the developer's name, email address, apps, and other information.
+
+POSITIONAL ARGUMENTS
+     Developer resource - The developer to be described. The arguments in this
+     group can be used to specify the attributes of this resource. This must be
+     specified.
+
+       DEVELOPER
+          ID of the developer or fully qualified identifier for the developer.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --organization=ORGANIZATION
+          The organization for the developer.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To describe a developer for the active Cloud Platform project whose email
+    address is larry@example.com, run:
+
+        $ gcloud alpha apigee developers describe larry@example.com
+
+    To describe that developer in the Apigee organization my-org, run:
+
+        $ gcloud alpha apigee developers describe --organization=my-org \
+          larry@example.com
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

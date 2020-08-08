@@ -19,6 +19,7 @@ SYNOPSIS
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible]
+        [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--private-network-ip=PRIVATE_NETWORK_IP] [--region=REGION]
         [--no-restart-on-failure] [--shielded-integrity-monitoring]
         [--shielded-secure-boot] [--shielded-vtpm]
@@ -42,7 +43,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-templates create facilitates the creation of Google
+    gcloud compute instance-templates create facilitates the creation of
     Compute Engine virtual machine instance templates. Instance templates are
     global resources, and can be used to create instances in any zone.
 
@@ -80,8 +81,8 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB. Limit boot disk size to 2TB to account for MBR
-        partition table limitations.
+        multiple of 1 GB. Limit boot disk size to 2 TB to account for MBR
+        partition table limitations. Default size unit is GB.
 
      --boot-disk-type=BOOT_DISK_TYPE
         The type of the boot disk. This option can only be specified if a new
@@ -154,6 +155,7 @@ FLAGS
             references will be resolved. It is best practice to define
             image-project. A full list of available projects can be generated
             by running gcloud projects list.
+
             + If specifying one of our public images, image-project must be
               provided.
             + If there are several of the same image-family value in multiple
@@ -185,37 +187,59 @@ FLAGS
             the instance, this option won't apply. The default value for this
             is yes.
 
+         boot
+            If yes, indicates that this is a boot disk. The instance will use
+            the first partition of the disk for its root file system. The
+            default value for this is no.
+
          kms-key
             Fully qualified Cloud KMS cryptokey name that will protect the
-            disk. This can either be the fully qualified path or the name. The
-            fully qualified Cloud KMS cryptokey name format is:
+            disk.
+
+            This can either be the fully qualified path or the name.
+
+            The fully qualified Cloud KMS cryptokey name format is:
             projects/<kms-project>/locations/<kms-location>/keyRings/<kms-keyring>/
-            cryptoKeys/<key-name>. If the value is not fully qualified then
-            kms-location, kms-keyring, and optionally kms-project are required.
+            cryptoKeys/<key-name>.
+
+            If the value is not fully qualified then kms-location, kms-keyring,
+            and optionally kms-project are required.
+
             See
             https://cloud.google.com/compute/docs/disks/customer-managed-encryption
             for more details.
 
          kms-project
             Project that contains the Cloud KMS cryptokey that will protect the
-            disk. If the project is not specified then the project where the
-            disk is being created will be used. If this flag is set then
-            key-location, kms-keyring, and kms-key are required. See
+            disk.
+
+            If the project is not specified then the project where the disk is
+            being created will be used.
+
+            If this flag is set then key-location, kms-keyring, and kms-key are
+            required.
+
+            See
             https://cloud.google.com/compute/docs/disks/customer-managed-encryption
             for more details.
 
          kms-location
             Location of the Cloud KMS cryptokey to be used for protecting the
-            disk. All Cloud KMS cryptokeys are reside in a 'location'. To get a
-            list of possible locations run 'gcloud kms locations list'. If this
-            flag is set then kms-keyring and kms-key are required. See
+            disk.
+
+            All Cloud KMS cryptokeys are reside in a 'location'. To get a list
+            of possible locations run 'gcloud kms locations list'. If this flag
+            is set then kms-keyring and kms-key are required. See
             https://cloud.google.com/compute/docs/disks/customer-managed-encryption
             for more details.
 
          kms-keyring
             The keyring which contains the Cloud KMS cryptokey that will
-            protect the disk. If this flag is set then kms-location and kms-key
-            are required. See
+            protect the disk.
+
+            If this flag is set then kms-location and kms-key are required.
+
+            See
             https://cloud.google.com/compute/docs/disks/customer-managed-encryption
             for more details.
 
@@ -403,6 +427,12 @@ FLAGS
         may be preempted to free up resources for standard VM instances, and
         will only be able to run for a limited amount of time. Preemptible
         instances can not be restarted and will not migrate.
+
+     --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+        The private IPv6 Google access type for the VM.
+        PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of:
+        enable-bidirectional-access, enable-outbound-vm-access,
+        inherit-subnetwork.
 
      --private-network-ip=PRIVATE_NETWORK_IP
         Specifies the RFC1918 IP to assign to the instance. The IP should be in
@@ -653,6 +683,7 @@ FLAGS
                                    https://www.googleapis.com/auth/trace.append
             logging-write          https://www.googleapis.com/auth/logging.write
             monitoring             https://www.googleapis.com/auth/monitoring
+            monitoring-read        https://www.googleapis.com/auth/monitoring.read
             monitoring-write       https://www.googleapis.com/auth/monitoring.write
             pubsub                 https://www.googleapis.com/auth/pubsub
             service-control        https://www.googleapis.com/auth/servicecontrol
@@ -682,10 +713,9 @@ FLAGS
           tokens can be accessed through the instance metadata server and are
           used to authenticate applications on the instance. The account can be
           set using an email address corresponding to the required service
-          account. You can explicitly specify the Compute Engine default
-          service account using the 'default' alias.
+          account.
 
-          If not provided, the instance will get project's default service
+          If not provided, the instance will use the project's default service
           account.
 
        --no-service-account

@@ -3,8 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha game servers realms update (REALM : --location=LOCATION)
-        --dry-run [--preview-time=PREVIEW_TIME] [--time-zone=TIME_ZONE]
-        [--update-labels=[KEY=VALUE,...]]
+        --dry-run [--description=DESCRIPTION] [--preview-time=PREVIEW_TIME]
+        [--time-zone=TIME_ZONE] [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -54,6 +54,9 @@ REQUIRED FLAGS
         Validate the changes, but do not execute it.
 
 OPTIONAL FLAGS
+     --description=DESCRIPTION
+        Description for the realm.
+
      --preview-time=PREVIEW_TIME
         This attribute is only relevant for preview (--dry-run). It is used to
         validate the state for a future time.

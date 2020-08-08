@@ -1,0 +1,77 @@
+title: commerce procurement consumer free trial list scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      commerce-procurement consumer free-trials list --page-size 1 --page-token random --filter "provider=providers/providerId AND product_external_name=productId"
+  - stdout: |
+      ---
+      freeTrials:
+      - credit:
+          creationDate: '2020-07-08T19:38:53.280199Z'
+          endTime: '2020-08-07T19:38:51.959Z'
+          remainingAmount:
+            currencyCode: USD
+            units: '3000'
+          startTime: '2020-07-08T07:00:00Z'
+          value:
+            currencyCode: USD
+            units: '3000'
+        name: projects/projectNumber/freeTrials/freeTrialId
+        productExternalName: productId
+        provider: providers/providerId
+actions:
+- execute_command:
+    command: |
+      commerce-procurement consumer free-trials list --page-size 1 --page-token random --filter "provider=providers/providerId AND product_external_name=productId"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/projects/fake-project/freeTrials?alt=json&filter=provider%3Dproviders%2FproviderId+AND+product_external_name%3DproductId&pageSize=1&pageToken=random
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "freeTrials": [
+                {
+                  "name": "projects/projectNumber/freeTrials/freeTrialId",
+                  "provider": "providers/providerId",
+                  "productExternalName": "productId",
+                  "credit": {
+                    "value": {
+                      "currencyCode": "USD",
+                      "units": "3000"
+                    },
+                    "remainingAmount": {
+                      "currencyCode": "USD",
+                      "units": "3000"
+                    },
+                    "creationDate": "2020-07-08T19:38:53.280199Z",
+                    "startTime": "2020-07-08T07:00:00Z",
+                    "endTime": "2020-08-07T19:38:51.959Z"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        freeTrials:
+        - credit:
+            creationDate: '2020-07-08T19:38:53.280199Z'
+            endTime: '2020-08-07T19:38:51.959Z'
+            remainingAmount:
+              currencyCode: USD
+              units: '3000'
+            startTime: '2020-07-08T07:00:00Z'
+            value:
+              currencyCode: USD
+              units: '3000'
+          name: projects/projectNumber/freeTrials/freeTrialId
+          productExternalName: productId
+          provider: providers/providerId
+    - expect_exit:
+        code: 0

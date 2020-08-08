@@ -15,37 +15,25 @@
         "kubectl-windows-x86_64"
       ],
       "details": {
-        "description": "Provides kubectl executable.",
+        "description": "Provides kubectl executables.",
         "display_name": "kubectl"
       },
       "id": "kubectl",
       "is_configuration": false,
       "is_hidden": false,
       "is_required": false,
-      "platform": {
-        "architectures": [
-          "x86",
-          "x86_64"
-        ],
-        "operating_systems": [
-          "CYGWIN",
-          "LINUX",
-          "MACOSX",
-          "MSYS",
-          "WINDOWS"
-        ]
-      },
+      "platform": {},
       "version": {
-        "build_number": 20200521210153,
-        "version_string": "2020.05.21"
+        "build_number": 20200724144507,
+        "version_string": "1.15.11"
       }
     }
   ],
-  "revision": 20200521210153,
+  "revision": 20200724144507,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "294.0.0"
+  "version": "303.0.0"
 }

@@ -1,6 +1,6 @@
 NAME
     gcloud compute instance-templates get-iam-policy - get the IAM policy for a
-        Google Compute Engine instance template
+        Compute Engine instance template
 
 SYNOPSIS
     gcloud compute instance-templates get-iam-policy INSTANCE_TEMPLATE
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute instance-templates get-iam-policy displays the IAM policy
-    associated with a Google Compute Engine instance template in a project. If
+    associated with a Compute Engine instance template in a project. If
     formatted as JSON, the output can be edited and used as a policy file for
     set-iam-policy. The output includes an "etag" field identifying the version
     emitted and allowing detection of concurrent policy updates; see $ {parent}

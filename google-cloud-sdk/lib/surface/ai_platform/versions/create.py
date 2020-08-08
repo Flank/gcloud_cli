@@ -37,11 +37,11 @@ DETAILED_HELP = {
 }
 
 
-def _AddCreateArgs(parser, hide_region_arg=True):
+def _AddCreateArgs(parser):
   """Add common arguments for `versions create` command."""
   flags.GetModelName(positional=False, required=True).AddToParser(parser)
   flags.GetDescriptionFlag('version').AddToParser(parser)
-  flags.GetRegionArg(hidden=hide_region_arg).AddToParser(parser)
+  flags.GetRegionArg().AddToParser(parser)
   flags.VERSION_NAME.AddToParser(parser)
   base.Argument(
       '--origin',
@@ -95,6 +95,8 @@ def _AddCreateArgs(parser, hide_region_arg=True):
   labels_util.AddCreateLabelsFlags(parser)
   flags.FRAMEWORK_MAPPER.choice_arg.AddToParser(parser)
   flags.AddPythonVersionFlag(parser, 'when creating the version')
+  flags.AddMachineTypeFlagToParser(parser)
+  flags.GetAcceleratorFlag().AddToParser(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -118,6 +120,7 @@ class CreateGA(base.CreateCommand):
       client = versions_api.VersionsClient()
       labels = versions_util.ParseCreateLabels(client, args)
       framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
+      accelerator = flags.ParseAcceleratorFlag(args.accelerator)
       return versions_util.Create(
           client,
           operations.OperationsClient(),
@@ -130,8 +133,10 @@ class CreateGA(base.CreateCommand):
           asyncronous=args.async_,
           description=args.description,
           labels=labels,
+          machine_type=args.machine_type,
           framework=framework,
-          python_version=args.python_version)
+          python_version=args.python_version,
+          accelerator_config=accelerator)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -146,11 +151,9 @@ class CreateBeta(CreateGA):
 
   @staticmethod
   def Args(parser):
-    _AddCreateArgs(parser, hide_region_arg=False)
+    _AddCreateArgs(parser)
     flags.SERVICE_ACCOUNT.AddToParser(parser)
-    flags.AddMachineTypeFlagToParser(parser)
     flags.AddUserCodeArgs(parser)
-    flags.GetAcceleratorFlag().AddToParser(parser)
     flags.AddExplainabilityFlags(parser)
 
   def Run(self, args):
@@ -193,6 +196,11 @@ class CreateAlpha(CreateBeta):
   https://cloud.google.com/ml-engine/docs/how-tos/managing-models-jobs
   """
 
+  @staticmethod
+  def Args(parser):
+    CreateBeta.Args(parser)
+    flags.AddContainerFlags(parser)
+
   def Run(self, args):
     with endpoint_util.MlEndpointOverrides(region=args.region):
       client = versions_api.VersionsClient()
@@ -220,4 +228,12 @@ class CreateAlpha(CreateBeta):
           accelerator_config=accelerator,
           explanation_method=args.explanation_method,
           num_integral_steps=args.num_integral_steps,
-          num_paths=args.num_paths)
+          num_paths=args.num_paths,
+          image=args.image,
+          command=args.command,
+          container_args=args.args,
+          env_vars=args.env_vars,
+          ports=args.ports,
+          predict_route=args.predict_route,
+          health_route=args.health_route,
+          containers_hidden=False)

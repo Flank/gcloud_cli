@@ -6,8 +6,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute forwarding-rules delete deletes one or more Google Compute
-    Engine forwarding rules.
+    gcloud compute forwarding-rules delete deletes one or more Compute Engine
+    forwarding rules.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.anthos import anthoscli_backend
 from googlecloudsdk.command_lib.util.anthos import binary_operations as bin_ops
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
@@ -35,6 +36,9 @@ class GracefulFailureTest(sdk_test_base.WithFakeAuth,
   def SetUp(self):
     self.StartObjectPatch(
         files, 'FindExecutableOnPath', return_value=None)
+    self.StartObjectPatch(anthoscli_backend,
+                          'GetPreferredAuthForCluster',
+                          return_value='oidc1')
 
   def testAuthPlugin(self):
     with self.assertRaisesRegex(bin_ops.MissingExecutableException,
@@ -49,17 +53,17 @@ class GracefulFailureTestBeta(GracefulFailureTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
+  def testAnthosCliPlugin(self):
+    with self.assertRaisesRegex(bin_ops.MissingExecutableException,
+                                r'Could not locate anthos executable '
+                                r'\[anthoscli\] on the system PATH.'):
+      self.Run('anthos apply . ')
+
 
 class GracefulFailureTestAlpha(GracefulFailureTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testAnthosCliPlugin(self):
-    with self.assertRaisesRegex(bin_ops.MissingExecutableException,
-                                r'Could not locate anthos executable '
-                                r'\[anthoscli\] on the system PATH.'):
-      self.Run('anthos packages describe . ')
 
 
 if __name__ == '__main__':

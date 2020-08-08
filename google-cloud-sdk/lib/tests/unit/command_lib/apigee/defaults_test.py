@@ -81,4 +81,3 @@ class DefaultsTest(base.ApigeeSurfaceTest):
         "organizations/my-project/environments",
         body=json.dumps(["test"]))
     self.RunApigee("environments list --project=new-project")
-    self.AssertErrContains("conflicting organizations")

@@ -377,24 +377,18 @@ class InstanceTemplatesCreateTestBeta(InstanceTemplatesCreateTest,
     self.Run(
         'compute instance-templates create template-1 '
         '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
-        'image-project=debian-cloud,description=testDescription,'
-        'disk-resource-policy='
+        'image-project=debian-cloud,description=testDescription,boot=yes,'
+        'multi-writer=yes,disk-resource-policy='
         'https://compute.googleapis.com/compute/projects/'
         'cloudsdktest/regions/central2-a/resourcePolicies/testpolicy')
 
     template = self._MakeInstanceTemplate(disks=[
         m.AttachedDisk(
-            autoDelete=True,
+            autoDelete=False,
             boot=True,
             initializeParams=m.AttachedDiskInitializeParams(
-                sourceImage=self._default_image,),
-            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-        m.AttachedDisk(
-            autoDelete=False,
-            boot=False,
-            initializeParams=m.AttachedDiskInitializeParams(
                 diskName='disk-1',
+                multiWriter=True,
                 description='testDescription',
                 diskSizeGb=10,
                 sourceImage=(self.compute_uri +
@@ -412,7 +406,6 @@ class InstanceTemplatesCreateTestBeta(InstanceTemplatesCreateTest,
     ])
 
     self.CheckRequests(
-        self.get_default_image_requests,
         [(self.compute.instanceTemplates, 'Insert',
           m.ComputeInstanceTemplatesInsertRequest(
               instanceTemplate=template,

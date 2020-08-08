@@ -664,7 +664,7 @@ class MultilineConsoleOutputTest(test_case.WithOutputCapture):
 
   def testMessageContainsAnsiCodes(self):
     self.StartEnvPatch({'TERM': 'screen'})
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self.console_size = self.SetConsoleSize(20)
     message = ('This is a line constructed from \x1b[31;1mcolorized\x1b[39;0m '
                'parts and long enough to be split into \x1b[34;1m'

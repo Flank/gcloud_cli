@@ -89,7 +89,7 @@ that lack tags:
 .RS 2m
 $ gcloud container images list\-tags \e
     [HOSTNAME]/[PROJECT\-ID]/[IMAGE]              \e
-    \-\-filter='\-tags:*'  \-\-format='get(digest)' \-\-limit=$BIG_NUMBER
+    \-\-filter='\-tags:*'  \-\-format="get(digest)" \-\-limit=$BIG_NUMBER
 .RE
 
 Then, delete these tagless images without prompting by running:

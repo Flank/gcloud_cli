@@ -30,6 +30,9 @@ COMMANDS
      describe
         (BETA) Describes a Cloud Pub/Sub topic.
 
+     detach-subscription
+        (BETA) Detaches one or more Cloud Pub/Sub subscriptions.
+
      get-iam-policy
         (BETA) Get the IAM policy for a Cloud Pub/Sub Topic.
 

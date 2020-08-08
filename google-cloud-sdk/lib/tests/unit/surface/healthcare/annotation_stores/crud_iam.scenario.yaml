@@ -1,5 +1,5 @@
 title: annotation-stores crud test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -34,13 +34,18 @@ summary:
   - stderr: |
       Deleted annotationStore [my-store].
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: healthcare annotation-stores create my-store --location us-central1 --dataset
       my-dataset
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores?alt=json&annotationStoreId=my-store
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores?alt=json&annotationStoreId=my-store
           method: POST
           headers: {}
           body: null
@@ -59,7 +64,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
           method: GET
           headers: {}
           body: null
@@ -85,7 +90,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
           method: PATCH
           headers: {}
           body: null
@@ -108,7 +113,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -132,7 +137,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
           method: DELETE
           headers: {}
           body: null

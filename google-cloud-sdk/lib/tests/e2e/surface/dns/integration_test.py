@@ -87,6 +87,11 @@ name: {0}
 nameServers:
 """.format(self.test_zone.name))
 
+  def testDescribeThrowsErrorForDot(self):
+    with self.AssertRaisesToolExceptionMatches(
+        'Invalid value for [describe]: .'):
+      self.Run('dns managed-zones describe {0}'.format('.'))
+
 
 class RecordSetsTest(ManagedZonesTest):
 

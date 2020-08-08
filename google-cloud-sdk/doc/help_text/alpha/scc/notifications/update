@@ -4,8 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha scc notifications update NOTIFICATION_CONFIG_ID
-        [--description=DESCRIPTION] [--organization=ORGANIZATION]
-        [--pubsub-topic=PUBSUB_TOPIC] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--filter=FILTER]
+        [--organization=ORGANIZATION] [--pubsub-topic=PUBSUB_TOPIC]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Update a Cloud Security Command Center notification config.
@@ -18,6 +19,10 @@ POSITIONAL ARGUMENTS
 FLAGS
      --description=DESCRIPTION
         The text that will be used to describe a notification configuration.
+
+     --filter=FILTER
+        The filter string which will applied to events of findings of a
+        notification configuration.
 
      --organization=ORGANIZATION
         The organization where the notification config resides. Formatted as
@@ -42,29 +47,45 @@ API REFERENCE
     https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
 
 EXAMPLES
-    Update all mutable fields in my-config (description + pubsub topic):
+    Update all mutable fields in my-config (description + pubsub topic +
+    filter):
 
-    $ gcloud alpha scc notifications update my-config \        --organization=123456 --description "New description" \
-        --pubsub_topic "projects/22222/topics/newtopic"
+        $ gcloud alpha scc notifications update my-config \
+            --organization=123456 --description "New description" \
+            --pubsub_topic "projects/22222/topics/newtopic"
 
-    $ gcloud alpha scc notifications update \        organizations/123456/notificationConfigs/my-config \
-        --description "New description" \
-        --pubsub_topic "projects/22222/topics/newtopic"
+        $ gcloud alpha scc notifications update \
+            organizations/123456/notificationConfigs/my-config \
+            --description "New description" \
+            --pubsub_topic "projects/22222/topics/newtopic"
 
     Update my-config's description
 
-    $ gcloud alpha scc notifications update my-config \        --organization=123456 --description "New description"
+        $ gcloud alpha scc notifications update my-config \
+            --organization=123456 --description "New description"
 
-    $ gcloud alpha scc notifications update \        organizations/123456/notificationConfigs/my-config \
-        --description "New description"
+        $ gcloud alpha scc notifications update \
+            organizations/123456/notificationConfigs/my-config \
+            --description "New description"
 
     Update my-config's pubsub-topic
 
-    $ gcloud alpha scc notifications update my-config \        --organization=123456 \
-        --pubsub_topic "projects/22222/topics/newtopic"
+        $ gcloud alpha scc notifications update my-config \
+            --organization=123456 \
+            --pubsub_topic "projects/22222/topics/newtopic"
 
-    $ gcloud alpha scc notifications update \        organizations/123456/notificationConfigs/my-config \
-        --pubsub_topic "projects/22222/topics/newtopic"
+        $ gcloud alpha scc notifications update \
+            organizations/123456/notificationConfigs/my-config \
+            --pubsub_topic "projects/22222/topics/newtopic"
+
+    Update my-config's filter
+
+        $ gcloud alpha scc notifications update my-config \
+            --organization=123456 --filter='state = \"ACTIVE\"'
+
+        $ gcloud alpha scc notifications update \
+            organizations/123456/notificationConfigs/my-config \
+            --filter='state = \"ACTIVE\"'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

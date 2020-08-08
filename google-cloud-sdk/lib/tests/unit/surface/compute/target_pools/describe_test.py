@@ -23,7 +23,7 @@ import textwrap
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.load_balancing import test_resources
 
 messages = core_apis.GetMessagesModule('compute', 'v1')
 

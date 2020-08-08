@@ -4,10 +4,13 @@ NAME
 SYNOPSIS
     gcloud alpha billing budgets update
         (BUDGET : --billing-account=BILLING_ACCOUNT)
-        [--all-updates-rule-pubsub-topic=ALL_UPDATES_RULE_PUBSUB_TOPIC]
+        [--all-updates-rule-monitoring-notification-channels=[ALL_UPDATES_RULE_MONITORING_NOTIFICATION_CHANNELS,
+          ...]] [--all-updates-rule-pubsub-topic=ALL_UPDATES_RULE_PUBSUB_TOPIC]
         [--credit-types-treatment=CREDIT_TYPES_TREATMENT]
-        [--display-name=DISPLAY_NAME] [--filter-projects=[FILTER_PROJECTS,...]]
+        [--display-name=DISPLAY_NAME] [--filter-labels=FILTER_LABELS]
+        [--filter-projects=[FILTER_PROJECTS,...]]
         [--filter-services=[FILTER_SERVICES,...]]
+        [--filter-subaccounts=[FILTER_SUBACCOUNTS,...]]
         [--budget-amount=BUDGET_AMOUNT | --last-period-amount]
         [--threshold-rules-from-file=THRESHOLD_RULES_FROM_FILE
           | --add-threshold-rule=ADD_THRESHOLD_RULE --clear-threshold-rules]
@@ -30,9 +33,19 @@ POSITIONAL ARGUMENTS
           The billing account.
 
 FLAGS
+     --all-updates-rule-monitoring-notification-channels=[ALL_UPDATES_RULE_MONITORING_NOTIFICATION_CHANNELS,...]
+        Targets to send notifications to when a threshold is exceeded. This is
+        in addition to default recipients who have billing account roles. The
+        value is the full REST resource name of a monitoring notification
+        channel in the form
+        projects/{project_id}/notificationChannels/{channel_id}. A maximum of 5
+        channels is allowed. See
+        https://cloud.google.com/billing/docs/how-to/budgets-notification-recipients
+        for more details.
+
      --all-updates-rule-pubsub-topic=ALL_UPDATES_RULE_PUBSUB_TOPIC
-        The name of the Cloud Pub/Sub topic where budget related messages will
-        be published, in the form projects/{project_id}/topics/{topic_id}.
+        Name of the Cloud Pub/Sub topic where budget related messages will be
+        published, in the form projects/{project_id}/topics/{topic_id}.
 
      --credit-types-treatment=CREDIT_TYPES_TREATMENT
         Whether to include all the credit types when calculating the actual
@@ -45,17 +58,31 @@ FLAGS
         User data for display name in UI. Must be less than or equal to 60
         characters.
 
+     --filter-labels=FILTER_LABELS
+        Single label and value pair specifying that usage from only this set of
+        labeled resources should be included in the budget. Currently, multiple
+        entries or multiple values per entry are not allowed. If omitted, the
+        report will include all labeled and unlabeled usage.
+
      --filter-projects=[FILTER_PROJECTS,...]
-        A set of projects in the form projects/{project_id}, specifying that
+        Set of projects in the form projects/{project_id}, specifying that
         usage from only this set of projects should be included in the budget.
         If omitted, all projects will be included.
 
      --filter-services=[FILTER_SERVICES,...]
-        A set of services of the form services/{service_id}, specifying that
+        Set of services of the form services/{service_id}, specifying that
         usage from only this set of services should be included in the budget.
         If omitted, the report will include usage for all services. The service
         names are available through the Catalog API:
         https://cloud.google.com/billing/v1/how-tos/catalog-api.
+
+     --filter-subaccounts=[FILTER_SUBACCOUNTS,...]
+        Set of subaccounts of the form billingAccounts/{account_id}, specifying
+        that usage from only this set of subaccounts should be included in the
+        budget. If a subaccount is set to the name of the parent account, usage
+        from the parent account will be included. If omitted, the report will
+        include usage from the parent account and all subaccounts, if they
+        exist.
 
      At most one of these may be specified:
 
@@ -83,7 +110,7 @@ FLAGS
           Integer between 0 and 100 above which an alert is sent.
 
        basis
-          type of basis used to determine if spend has passed the threshold.
+          Type of basis used to determine if spend has passed the threshold.
           Must be one of: 'current-spend' or 'forecasted-spend'. Behavior
           defaults to 'current-spend' if not set.
 

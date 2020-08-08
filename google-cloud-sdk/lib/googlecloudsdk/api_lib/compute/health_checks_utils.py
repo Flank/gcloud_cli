@@ -139,9 +139,9 @@ def AddHttpRelatedCreationArgs(parser):
   parser.add_argument(
       '--host',
       help="""\
-      The value of the host header used in this HTTP health check request.
-      The host header is empty by default. When empty, the health check sets
-      the host header to the IP address of the backend VM or endpoint.
+      The value of the host header used for the health check. If unspecified,
+      Google Cloud sets the host header to the IP address of the load balancer's
+      forwarding rule.
       """)
 
   parser.add_argument(
@@ -540,6 +540,9 @@ def _AddUseServingPortFlag(parser, use_port_name=True):
 
         - When health checking network endpoints in a Network Endpoint
           Group, use the port specified with each endpoint.
+          `--use-serving-port` must be used when using a Network Endpoint Group
+          as a backend as this flag specifies the `portSpecification` option for
+          a Health Check object.
         - When health checking other backends, use the port%s of
           the backend service.""" % (' or named port' if use_port_name else ''))
 

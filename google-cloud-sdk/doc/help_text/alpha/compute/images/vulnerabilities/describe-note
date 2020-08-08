@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute images vulnerabilities describe-note - describe a
-        Google Compute Engine image
+        Compute Engine image
 
 SYNOPSIS
     gcloud alpha compute images vulnerabilities describe-note NOTE_NAME
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute images vulnerabilities describe-note displays
-    all data associated with a Google Compute Engine image in a project.
+    all data associated with a Compute Engine image in a project.
 
 POSITIONAL ARGUMENTS
      NOTE_NAME

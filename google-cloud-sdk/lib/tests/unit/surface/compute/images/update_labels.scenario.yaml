@@ -1,5 +1,5 @@
 title: compute images update labels scenario
-release_tracks: [BETA, GA]
+release_tracks: [GA]  # This test can be deleted when the new features are GA.
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

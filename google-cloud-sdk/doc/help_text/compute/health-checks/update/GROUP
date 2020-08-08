@@ -19,6 +19,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     grpc
+        Update a gRPC health check.
+
      http
         Update a HTTP health check.
 

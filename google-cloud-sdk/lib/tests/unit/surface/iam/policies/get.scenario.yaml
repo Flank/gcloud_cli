@@ -1,0 +1,104 @@
+title: iam policies get scenario tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam policies get my-deny-policy --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%123
+      --kind=denypolicies
+  - stdout: |
+      description: second deny policy
+      etag: MTg0NDI1OTcyNzY1NjIzMzM2OTY=
+      kind: DenyPolicy
+      name: policies/cloudresourcemanager.googleapis.com%2Fprojects%2F123/denypolicies/my-deny-policy
+      rules:
+      - denyRule:
+          deniedPermissions:
+          - storage.buckets.create
+          deniedPrincipals:
+          - principalSet://goog/public:all
+- execute:
+  - command: iam policies get wrong-policy-id --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%123
+  - stderr: |
+      ERROR: (gcloud.alpha.iam.policies.get) argument --kind: Must be specified.
+      Usage: gcloud alpha iam policies get POLICY_ID --attachment-point=ATTACHMENT_POINT --kind=KIND [optional flags]
+        optional flags may be  --help
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha iam policies get --help
+  - error: '1: argument --kind: Must be specified.'
+- execute:
+  - command: iam policies get wrong-policy-id --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%123
+      --kind=denypolicies
+  - error: |
+      1: HTTPError 404: NOT_FOUND: Policy (policies/cloudresourcemanager.googleapis.com%2Fprojects%2F636535176907/denypolicies/wrong-policy-id) does not exist
+actions:
+- execute_command:
+    command: iam policies get my-deny-policy --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%123
+      --kind=denypolicies
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v2alpha1/policies/cloudresourcemanager.googleapis.com%252Fprojects%25123/denypolicies/my-deny-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body:
+            description: second deny policy
+            etag: MTg0NDI1OTcyNzY1NjIzMzM2OTY=
+            kind: DenyPolicy
+            name: policies/cloudresourcemanager.googleapis.com%2Fprojects%2F123/denypolicies/my-deny-policy
+            rules:
+            - denyRule:
+                deniedPermissions:
+                - storage.buckets.create
+                deniedPrincipals:
+                - principalSet://goog/public:all
+    - expect_stdout: |
+        description: second deny policy
+        etag: MTg0NDI1OTcyNzY1NjIzMzM2OTY=
+        kind: DenyPolicy
+        name: policies/cloudresourcemanager.googleapis.com%2Fprojects%2F123/denypolicies/my-deny-policy
+        rules:
+        - denyRule:
+            deniedPermissions:
+            - storage.buckets.create
+            deniedPrincipals:
+            - principalSet://goog/public:all
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iam policies get wrong-policy-id --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%123
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.iam.policies.get) argument --kind: Must be specified.
+        Usage: gcloud alpha iam policies get POLICY_ID --attachment-point=ATTACHMENT_POINT --kind=KIND [optional flags]
+          optional flags may be  --help
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha iam policies get --help
+    - expect_exit:
+        code: 1
+        message: 'argument --kind: Must be specified.'
+- execute_command:
+    command: iam policies get wrong-policy-id --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%123
+      --kind=denypolicies
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v2alpha1/policies/cloudresourcemanager.googleapis.com%252Fprojects%25123/denypolicies/wrong-policy-id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 404
+          headers: {}
+          body: |
+            NOT_FOUND: Policy (policies/cloudresourcemanager.googleapis.com%2Fprojects%2F636535176907/denypolicies/wrong-policy-id) does not exist
+    - expect_exit:
+        code: 1
+        message: |
+          HTTPError 404: NOT_FOUND: Policy (policies/cloudresourcemanager.googleapis.com%2Fprojects%2F636535176907/denypolicies/wrong-policy-id) does not exist

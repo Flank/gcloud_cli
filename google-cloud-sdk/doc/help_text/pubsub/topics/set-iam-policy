@@ -31,13 +31,12 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command will read an IAM policy defined in a JSON file
-    'policy.json' and set it for a topic with identifier 'my-topic'
+    The following command will read an IAM policy defined in a JSON file        'policy.json' and set it for a topic with identifier 'my-topic'
 
         $ gcloud pubsub topics set-iam-policy my-topic policy.json
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of the
-    policy file format and contents.
+        See https://cloud.google.com/iam/docs/managing-policies for details
+        of the policy file format and contents.
 
 NOTES
     These variants are also available:

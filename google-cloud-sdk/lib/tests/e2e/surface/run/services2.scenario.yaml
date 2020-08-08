@@ -106,7 +106,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '1970'
+            content-length: '1975'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -116,8 +116,8 @@ actions:
               name: $$service-name2$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name2$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 21cc295b-e9ad-4465-8308-4c330e9f8dfb
+              resourceVersion: AAWpPPKgc/4
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -126,23 +126,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2020-06-29T18:08:37.286910Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name2$$-00001-sed
+                  name: $$service-name2$$-00001-loz
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                    autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -184,7 +184,7 @@ actions:
             status: '200'
           body:
             version: 1
-            etag: BwWXQW2dr7c=
+            etag: BwWpPPKs1rg=
             bindings:
             - role: roles/run.invoker
               members:
@@ -216,7 +216,7 @@ actions:
               name: $$service-name2$$
               group: v1
               kind: service
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              uid: 21cc295b-e9ad-4465-8308-4c330e9f8dfb
     - expect_stderr: |
         Deleted service [$$service-name2$$].
     - expect_exit:

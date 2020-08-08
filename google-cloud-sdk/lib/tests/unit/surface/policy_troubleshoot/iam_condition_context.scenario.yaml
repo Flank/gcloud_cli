@@ -1,0 +1,174 @@
+title: policytroubleshoot iam condition context scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: policy-troubleshoot iam 'my-resource' --principal-email 'user@foo.com'
+      --permission 'storage.getIAMPolicy' --resource-name 'compute' --resource-service
+      'compute.googleapis.com' --resource-type 'compute/vms' --destination-ip '192.2.2.2'
+      --destination-port 8080 --request-time '2021-01-01T00:00:00Z'
+  - stdout: |
+      access: DENIED
+      policies:
+      - access: DENIED
+        explainedPolicies:
+        - access: DENIED
+          condition:
+            description: descr
+            expression: (resource.name == 'resource.name.test') && (resource.type == 'resource.type.test')
+            title: title
+          conditionExplanation:
+            evaluationStates:
+            - end: 39
+              start: 0
+              value:
+                boolValue: false
+            - end: 82
+              start: 75
+              value:
+                boolValue: false
+            value:
+              boolValue: false
+          permissionInRole: EXCLUDED
+          principalInMembers:
+            user:newowner@gmail.com: INCLUDED
+            user@foo.com: EXCLUDED
+          role: roles/owner
+        fullResourceName: my-resource
+        policy:
+          bindings:
+          - condition:
+              description: descr
+              expression: (resource.name == 'resource.name.test') && (resource.type == 'resource.type.test')
+              title: title
+            members:
+            - user@foo.com
+            - newowner@gmail.com
+            role: roles/owner
+          etag: etag
+          version: 1
+actions:
+# troubleshoot iam policy with a condition context
+- execute_command:
+    command: policy-troubleshoot iam 'my-resource' --principal-email 'user@foo.com'
+      --permission 'storage.getIAMPolicy' --resource-name 'compute' --resource-service
+      'compute.googleapis.com' --resource-type 'compute/vms' --destination-ip '192.2.2.2'
+      --destination-port 8080 --request-time '2021-01-01T00:00:00Z'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://policytroubleshooter.googleapis.com/v2alpha1/iam:troubleshoot?alt=json
+          method: POST
+          body:
+            json:
+              accessTuple:
+                conditionContext:
+                  destination:
+                    ip: 192.2.2.2
+                    port: '8080'
+                  request:
+                    receiveTime: '2021-01-01T00:00:00Z'
+                  resource:
+                    name: compute
+                    service: compute.googleapis.com
+                    type: compute/vms
+                fullResourceName: my-resource
+                permission: storage.getIAMPolicy
+                principal: user@foo.com
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "access": "DENIED",
+              "policies": [{
+                   "access": "DENIED",
+                   "fullResourceName": "my-resource",
+                   "policy": {
+                     "version": 1,
+                      "etag": "etag",
+                      "bindings": [{
+                        "role": "roles/owner",
+                        "members": ["user@foo.com","newowner@gmail.com"],
+                        "condition": {
+                          "expression": "(resource.name == 'resource.name.test') && (resource.type == 'resource.type.test')",
+                          "title": "title",
+                          "description": "descr"
+                          }
+                      }]
+                   },
+                   "explainedPolicies": [{
+                      "access": "DENIED",
+                      "role": "roles/owner",
+                      "permissionInRole": "EXCLUDED",
+                      "principalInMembers": {
+                          "user@foo.com": "EXCLUDED",
+                          "user:newowner@gmail.com": "INCLUDED"
+                      },
+                      "condition": {
+                          "expression": "(resource.name == 'resource.name.test') && (resource.type == 'resource.type.test')",
+                          "title": "title",
+                          "description": "descr"
+                      },
+                      "conditionExplanation": {
+                        "value": {
+                          "boolValue": false
+                        },
+                        "evaluationStates": [
+                          {
+                            "start": 0,
+                            "end": 39,
+                            "value": { "boolValue": false }
+                          },
+                          {
+                            "start": 75,
+                            "end": 82,
+                            "value": { "boolValue": false }
+                          }
+                        ]
+                      }
+                   }]
+              }]
+            }
+    - expect_stdout: |
+        access: DENIED
+        policies:
+        - access: DENIED
+          explainedPolicies:
+          - access: DENIED
+            condition:
+              description: descr
+              expression: (resource.name == 'resource.name.test') && (resource.type == 'resource.type.test')
+              title: title
+            conditionExplanation:
+              evaluationStates:
+              - end: 39
+                start: 0
+                value:
+                  boolValue: false
+              - end: 82
+                start: 75
+                value:
+                  boolValue: false
+              value:
+                boolValue: false
+            permissionInRole: EXCLUDED
+            principalInMembers:
+              user:newowner@gmail.com: INCLUDED
+              user@foo.com: EXCLUDED
+            role: roles/owner
+          fullResourceName: my-resource
+          policy:
+            bindings:
+            - condition:
+                description: descr
+                expression: (resource.name == 'resource.name.test') && (resource.type == 'resource.type.test')
+                title: title
+              members:
+              - user@foo.com
+              - newowner@gmail.com
+              role: roles/owner
+            etag: etag
+            version: 1
+    - expect_exit:
+        code: 0

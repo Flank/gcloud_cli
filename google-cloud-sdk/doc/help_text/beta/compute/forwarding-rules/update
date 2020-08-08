@@ -105,7 +105,7 @@ EXAMPLES
     To list existing labels, run:
 
         $ gcloud beta compute forwarding-rules describe example-fr \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in BETA and may change without notice. These

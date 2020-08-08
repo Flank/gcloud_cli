@@ -396,7 +396,7 @@ class LabelsTest(InstancesUpdateUnitTestBase):
     # Removing a non-existent label should silently have no effect.
     new_labels = {'b': '2'}
     self._SetUpExpectations(
-        original_labels, new_labels, expected_update_mask='')
+        original_labels, new_labels, expected_update_mask='labels')
 
     actual_instance = self.Run('redis instances update {} --region {}'
                                ' --remove-labels a'.format(

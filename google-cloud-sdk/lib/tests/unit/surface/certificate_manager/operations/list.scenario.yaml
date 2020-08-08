@@ -1,0 +1,194 @@
+title: Certificate Manager operation list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager operations list
+  - stdout: |
+      END_TIME                    ID                                                       TARGET        DONE
+                                  operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47  simple-map    False
+      2020-06-24 22:45:22 +00:00  operation-1593038721655-5a8dc3b1e2357-4a125698-c4b00353  cert-entry    True
+      2020-06-26 01:11:00 +00:00  operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e  simple-entry  True
+- execute:
+  - command: |
+      certificate-manager operations list --uri
+  - stdout: |
+      https://certificatemanager.googleapis.com/v1alpha1/projects/ccm-breakit/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+      https://certificatemanager.googleapis.com/v1alpha1/projects/ccm-breakit/locations/global/operations/operation-1593038721655-5a8dc3b1e2357-4a125698-c4b00353
+      https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47
+actions:
+- execute_command:
+    command: |
+      certificate-manager operations list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/ccm-breakit/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                    "createTime": "2020-06-26T01:11:00.591836958Z",
+                    "endTime": "2020-06-26T01:11:00.891516932Z",
+                    "target": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                    "verb": "create",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha1"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry",
+                    "name": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                    "createTime": "2020-06-26T01:11:00.502671715Z",
+                    "updateTime": "2020-06-26T01:11:00.502671715Z",
+                    "certificates": [
+                      "projects/307841421122/locations/global/certificates/simple-cert",
+                      "projects/307841421122/locations/global/certificates/another-cert"
+                    ],
+                    "state": "PENDING",
+                    "matcher": "PRIMARY"
+                  }
+                },
+                {
+                  "name": "projects/ccm-breakit/locations/global/operations/operation-1593038721655-5a8dc3b1e2357-4a125698-c4b00353",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                    "createTime": "2020-06-24T22:45:22.004049998Z",
+                    "endTime": "2020-06-24T22:45:22.370274885Z",
+                    "target": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/cert-entry",
+                    "verb": "create",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha1"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry",
+                    "name": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/cert-entry",
+                    "createTime": "2020-06-24T22:45:21.915664798Z",
+                    "updateTime": "2020-06-24T22:45:21.915664798Z",
+                    "hostname": "example.com",
+                    "certificates": [
+                      "projects/307841421122/locations/global/certificates/simple-cert"
+                    ],
+                    "state": "PENDING",
+                    "description": "some descr"
+                  }
+                },
+                    {
+                      "name": "projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47",
+                      "metadata": {
+                        "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                        "createTime": "2020-05-28T22:35:32.983979022Z",
+                        "target": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                        "verb": "create",
+                        "requestedCancellation": false,
+                        "apiVersion": "v1alpha1"
+                      },
+                      "done": false
+                    }
+              ]
+            }
+    - expect_stdout: |
+        END_TIME                    ID                                                       TARGET        DONE
+                                    operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47  simple-map    False
+        2020-06-24 22:45:22 +00:00  operation-1593038721655-5a8dc3b1e2357-4a125698-c4b00353  cert-entry    True
+        2020-06-26 01:11:00 +00:00  operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e  simple-entry  True
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager operations list --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/ccm-breakit/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                    "createTime": "2020-06-26T01:11:00.591836958Z",
+                    "endTime": "2020-06-26T01:11:00.891516932Z",
+                    "target": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                    "verb": "create",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha1"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry",
+                    "name": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/simple-entry",
+                    "createTime": "2020-06-26T01:11:00.502671715Z",
+                    "updateTime": "2020-06-26T01:11:00.502671715Z",
+                    "certificates": [
+                      "projects/307841421122/locations/global/certificates/simple-cert",
+                      "projects/307841421122/locations/global/certificates/another-cert"
+                    ],
+                    "state": "PENDING",
+                    "matcher": "PRIMARY"
+                  }
+                },
+                {
+                  "name": "projects/ccm-breakit/locations/global/operations/operation-1593038721655-5a8dc3b1e2357-4a125698-c4b00353",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                    "createTime": "2020-06-24T22:45:22.004049998Z",
+                    "endTime": "2020-06-24T22:45:22.370274885Z",
+                    "target": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/cert-entry",
+                    "verb": "create",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha1"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.CertificateMapEntry",
+                    "name": "projects/ccm-breakit/locations/global/certificateMaps/simple-map/certificateMapEntries/cert-entry",
+                    "createTime": "2020-06-24T22:45:21.915664798Z",
+                    "updateTime": "2020-06-24T22:45:21.915664798Z",
+                    "hostname": "example.com",
+                    "certificates": [
+                      "projects/307841421122/locations/global/certificates/simple-cert"
+                    ],
+                    "state": "PENDING",
+                    "description": "some descr"
+                  }
+                },
+                    {
+                      "name": "projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47",
+                      "metadata": {
+                        "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                        "createTime": "2020-05-28T22:35:32.983979022Z",
+                        "target": "projects/fake-project/locations/global/certificateMaps/simple-map",
+                        "verb": "create",
+                        "requestedCancellation": false,
+                        "apiVersion": "v1alpha1"
+                      },
+                      "done": false
+                    }
+              ]
+            }
+    - expect_stdout: |
+        https://certificatemanager.googleapis.com/v1alpha1/projects/ccm-breakit/locations/global/operations/operation-1593133860233-5a8f261d1a0ff-e0b197c3-82c45d3e
+        https://certificatemanager.googleapis.com/v1alpha1/projects/ccm-breakit/locations/global/operations/operation-1593038721655-5a8dc3b1e2357-4a125698-c4b00353
+        https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1590704166895-5a6bcaccf812f-10576160-7b3d5c47
+    - expect_exit:
+        code: 0

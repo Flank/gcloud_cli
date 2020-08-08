@@ -403,6 +403,29 @@ class TextMarkdownTests(test_base.Markdown):
         """)
     self.Run('text', markdown, expected)
 
+  def testUnindentedExampleIndented(self):
+    markdown = textwrap.dedent("""\
+    ## EXAMPLES
+    To foo the command run:
+
+    $ gcloud markdown markdown-command list --foo
+
+    To bar the parent command run:
+
+        $ gcloud markdown --bar list
+    """)
+    expected = textwrap.dedent("""\
+    EXAMPLES
+        To foo the command run:
+
+            $ gcloud markdown markdown-command list --foo
+
+        To bar the parent command run:
+
+            $ gcloud markdown --bar list
+    """)
+    self.Run('text', markdown, expected)
+
   def testTextExampleBlock(self):
     markdown = self.EXAMPLE_BLOCK_MARKDOWN
     expected = textwrap.dedent("""\

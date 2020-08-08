@@ -36,11 +36,11 @@ EXAMPLES
 
     To stop a single version on a single service, run:
 
-        $ gcloud app versions stop --service servicename v1
+        $ gcloud app versions stop --service=servicename v1
 
     To stop multiple versions in a single service, run:
 
-        $ gcloud app versions stop --service servicename v1 v2
+        $ gcloud app versions stop --service=servicename v1 v2
 
     Note that that last example may be more simply written using the services
     stop command (see its documentation for details).

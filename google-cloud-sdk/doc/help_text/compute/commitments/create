@@ -1,6 +1,5 @@
 NAME
-    gcloud compute commitments create - create Google Compute Engine
-        commitments
+    gcloud compute commitments create - create Compute Engine commitments
 
 SYNOPSIS
     gcloud compute commitments create COMMITMENT --plan=PLAN
@@ -15,7 +14,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create Google Compute Engine commitments.
+    Create Compute Engine commitments.
 
 POSITIONAL ARGUMENTS
      COMMITMENT

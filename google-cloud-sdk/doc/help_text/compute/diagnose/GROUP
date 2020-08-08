@@ -20,7 +20,7 @@ COMMANDS
     COMMAND is one of the following:
 
      routes
-        Routes to/from Google Compute Engine virtual machine instances.
+        Routes to/from Compute Engine virtual machine instances.
 
 NOTES
     These variants are also available:

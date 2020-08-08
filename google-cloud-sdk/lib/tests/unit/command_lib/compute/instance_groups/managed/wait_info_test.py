@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.compute.instance_groups.managed import wait_info
 from tests.lib import test_case
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 
 
 class WaitInfoTest(test_case.TestCase):

@@ -610,6 +610,8 @@ class Markdown(DocumentRendererTestBase):
       See `link:gcloud/markdown[gcloud markdown]` for an overview of markdown.
 
       See `link:gcloud[gcloud]` for an overview of everything.
+
+      See `gcloud meta foo --help` for the plot of Inception.
       """)
 
   LINK_MARKDOWN = textwrap.dedent("""\
@@ -792,7 +794,7 @@ class UTF8(Markdown):
     os.environ['LC_ALL'] = 'en_US.UTF-8'
     os.environ['TERM'] = term
     fin = io.StringIO(markdown)
-    console_attr.GetConsoleAttr(reset=True, encoding='utf8')
+    console_attr.GetConsoleAttr(reset=True, encoding='utf-8')
     try:
       e = None
       render_document.RenderDocument(style=style, fin=fin, out=log.out)

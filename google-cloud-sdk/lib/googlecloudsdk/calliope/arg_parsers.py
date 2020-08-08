@@ -804,7 +804,7 @@ class ArgList(ArgType):
   ALT_DELIM_CHAR = '^'
 
   def __init__(self, element_type=None, min_length=0, max_length=None,
-               choices=None):
+               choices=None, custom_delim_char=None):
     """Initialize an ArgList.
 
     Args:
@@ -813,6 +813,7 @@ class ArgList(ArgType):
       max_length: int, The maximum size of the list.
       choices: [element_type], a list of valid possibilities for elements. If
           None, then no constraints are imposed.
+      custom_delim_char: char, A customized delimiter character.
 
     Returns:
       (str)->[str], A function to parse the list of values in the argument.
@@ -839,6 +840,8 @@ class ArgList(ArgType):
     self.min_length = min_length
     self.max_length = max_length
 
+    self.custom_delim_char = custom_delim_char
+
   def __call__(self, arg_value):  # pylint:disable=missing-docstring
 
     if isinstance(arg_value, list):
@@ -847,7 +850,7 @@ class ArgList(ArgType):
       raise ArgumentTypeError('Invalid type [{}] for flag value [{}]'.format(
           type(arg_value).__name__, arg_value))
     else:
-      delim = self.DEFAULT_DELIM_CHAR
+      delim = self.custom_delim_char or self.DEFAULT_DELIM_CHAR
       if (arg_value.startswith(self.ALT_DELIM_CHAR) and
           self.ALT_DELIM_CHAR in arg_value[1:]):
         delim, arg_value = arg_value[1:].split(self.ALT_DELIM_CHAR, 1)
@@ -898,7 +901,8 @@ class ArgList(ArgType):
     """
     del is_custom_metavar  # Unused in GetUsageMsg
 
-    required = ','.join([metavar] * self.min_length)
+    delim_char = self.custom_delim_char or self.DEFAULT_DELIM_CHAR
+    required = delim_char.join([metavar] * self.min_length)
 
     if self.max_length:
       num_optional = self.max_length - self.min_length
@@ -911,22 +915,22 @@ class ArgList(ArgType):
     elif num_optional == 1:
       optional = '[{}]'.format(metavar)
     elif num_optional == 2:
-      optional = '[{0},[{0}]]'.format(metavar)
+      optional = '[{0}{1}[{0}]]'.format(metavar, delim_char)
     else:
-      optional = '[{0},...]'.format(metavar)
+      optional = '[{}{}...]'.format(metavar, delim_char)
 
-    msg = ','.join([x for x in [required, optional] if x])
+    msg = delim_char.join([x for x in [required, optional] if x])
 
     if len(msg) < self._MAX_METAVAR_LENGTH:
       return msg
 
     # With long metavars, only put it in once.
     if self.min_length == 0:
-      return '[{},...]'.format(metavar)
+      return '[{}{}...]'.format(metavar, delim_char)
     if self.min_length == 1:
-      return '{},[...]'.format(metavar)
+      return '{}{}[...]'.format(metavar, delim_char)
     else:
-      return '{},...,[...]'.format(metavar)
+      return '{0}{1}...{1}[...]'.format(metavar, delim_char)
 
 
 class ArgDict(ArgList):

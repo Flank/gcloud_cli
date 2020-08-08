@@ -6,7 +6,7 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute disks resize resizes a Google Compute Engine disk(s).
+    gcloud compute disks resize resizes a Compute Engine disk(s).
 
     Only increasing disk size is supported. Disks can be resized regardless of
     whether they are attached.

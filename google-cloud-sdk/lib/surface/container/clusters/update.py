@@ -164,6 +164,7 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
                 api_adapter.DASHBOARD: _ParseAddonDisabled,
                 api_adapter.NETWORK_POLICY: _ParseAddonDisabled,
                 api_adapter.CLOUDRUN: _ParseAddonDisabled,
+                api_adapter.NODELOCALDNS: _ParseAddonDisabled,
             }),
         dest='disable_addons',
         metavar='ADDON=ENABLED|DISABLED',
@@ -172,12 +173,14 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {ingress}=ENABLED|DISABLED
 {dashboard}=ENABLED|DISABLED
 {network_policy}=ENABLED|DISABLED
-{cloudrun}=ENABLED|DISABLED""".format(
+{cloudrun}=ENABLED|DISABLED
+{nodelocaldns}=ENABLED|DISABLED""".format(
     hpa=api_adapter.HPA,
     ingress=api_adapter.INGRESS,
     dashboard=api_adapter.DASHBOARD,
     network_policy=api_adapter.NETWORK_POLICY,
     cloudrun=api_adapter.CLOUDRUN,
+    nodelocaldns=api_adapter.NODELOCALDNS,
     ))
 
   mutex_group.add_argument(
@@ -275,6 +278,7 @@ class Update(base.UpdateCommand):
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
     flags.AddResourceUsageExportFlags(group, is_update=True)
+    flags.AddReleaseChannelFlag(group, is_update=True, hidden=False)
     flags.AddWorkloadIdentityFlags(group)
     flags.AddWorkloadIdentityUpdateFlags(group)
     flags.AddDatabaseEncryptionFlag(group)
@@ -293,6 +297,16 @@ class Update(base.UpdateCommand):
         args.enable_resource_consumption_metering
     opts.enable_intra_node_visibility = args.enable_intra_node_visibility
     opts.enable_shielded_nodes = args.enable_shielded_nodes
+    opts.release_channel = args.release_channel
+    if args.disable_addons and api_adapter.NODELOCALDNS in args.disable_addons:
+      # NodeLocalDNS is being enabled or disabled
+      console_io.PromptContinue(
+          message='Enabling/Disabling NodeLocal DNSCache causes a re-creation '
+          'of all cluster nodes at versions 1.15 or above. '
+          'This operation is long-running and will block other '
+          'operations on the cluster (including delete) until it has run '
+          'to completion.',
+          cancel_on_no=True)
     return opts
 
   def Run(self, args):
@@ -549,6 +563,7 @@ class UpdateBeta(Update):
     flags.AddMonitoringServiceFlag(group_logging_monitoring)
     flags.AddEnableStackdriverKubernetesFlag(group)
     flags.AddEnableLoggingMonitoringSystemOnlyFlag(group)
+    flags.AddEnableMasterSignalsFlags(group)
     flags.AddMasterAuthorizedNetworksFlags(
         parser, enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -569,7 +584,7 @@ class UpdateBeta(Update):
     flags.AddResourceUsageExportFlags(group, is_update=True)
     flags.AddIstioConfigFlag(parser)
     flags.AddEnableIntraNodeVisibilityFlag(group)
-    flags.AddWorkloadIdentityFlags(group, use_workload_pool=False)
+    flags.AddWorkloadIdentityFlags(group, use_identity_provider=True)
     flags.AddWorkloadIdentityUpdateFlags(group)
     flags.AddDatabaseEncryptionFlag(group)
     flags.AddDisableDatabaseEncryptionFlag(group)
@@ -579,8 +594,11 @@ class UpdateBeta(Update):
     flags.AddMasterGlobalAccessFlag(group)
     flags.AddEnableGvnicFlag(group)
     flags.AddDisableDefaultSnatFlag(group, for_cluster_create=False)
+    flags.AddNotificationConfigFlag(group, hidden=True)
+    flags.AddPrivateIpv6GoogleAccessTypeFlag('v1beta1', group, hidden=True)
 
   def ParseUpdateOptions(self, args, locations):
+    flags.ValidateNotificationConfigFlag(args)
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
     opts.enable_pod_security_policy = args.enable_pod_security_policy
     opts.istio_config = args.istio_config
@@ -613,12 +631,15 @@ class UpdateBeta(Update):
 
     opts.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
     opts.enable_logging_monitoring_system_only = args.enable_logging_monitoring_system_only
+    opts.master_logs = args.master_logs
+    opts.no_master_logs = args.no_master_logs
+    opts.enable_master_metrics = args.enable_master_metrics
     opts.release_channel = args.release_channel
     opts.autoscaling_profile = args.autoscaling_profile
 
     # Top-level update options are automatically forced to be
     # mutually-exclusive, so we don't need special handling for these two.
-    opts.identity_namespace = args.identity_namespace
+    opts.identity_provider = args.identity_provider
     opts.enable_shielded_nodes = args.enable_shielded_nodes
     opts.enable_tpu = args.enable_tpu
     opts.tpu_ipv4_cidr = args.tpu_ipv4_cidr
@@ -626,6 +647,8 @@ class UpdateBeta(Update):
     opts.enable_master_global_access = args.enable_master_global_access
     opts.enable_gvnic = args.enable_gvnic
     opts.disable_default_snat = args.disable_default_snat
+    opts.notification_config = args.notification_config
+    opts.private_ipv6_google_access_type = args.private_ipv6_google_access_type
 
     return opts
 
@@ -648,6 +671,7 @@ class UpdateAlpha(Update):
     flags.AddMonitoringServiceFlag(group_logging_monitoring)
     flags.AddEnableStackdriverKubernetesFlag(group)
     flags.AddEnableLoggingMonitoringSystemOnlyFlag(group)
+    flags.AddEnableMasterSignalsFlags(group)
     flags.AddMasterAuthorizedNetworksFlags(
         parser, enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -668,8 +692,9 @@ class UpdateAlpha(Update):
     flags.AddVerticalPodAutoscalingFlag(group)
     flags.AddSecurityProfileForUpdateFlag(group)
     flags.AddIstioConfigFlag(parser)
+    flags.AddCloudRunConfigFlag(parser)
     flags.AddEnableIntraNodeVisibilityFlag(group)
-    flags.AddWorkloadIdentityFlags(group, use_workload_pool=False)
+    flags.AddWorkloadIdentityFlags(group, use_identity_provider=True)
     flags.AddWorkloadIdentityUpdateFlags(group)
     flags.AddDisableDefaultSnatFlag(group, for_cluster_create=False)
     flags.AddDatabaseEncryptionFlag(group)
@@ -680,8 +705,11 @@ class UpdateAlpha(Update):
     flags.AddTpuFlags(group, enable_tpu_service_networking=True)
     flags.AddMasterGlobalAccessFlag(group)
     flags.AddEnableGvnicFlag(group)
+    flags.AddNotificationConfigFlag(group, hidden=True)
+    flags.AddPrivateIpv6GoogleAccessTypeFlag('v1alpha1', group, hidden=True)
 
   def ParseUpdateOptions(self, args, locations):
+    flags.ValidateNotificationConfigFlag(args)
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
     opts.autoscaling_profile = args.autoscaling_profile
     opts.enable_pod_security_policy = args.enable_pod_security_policy
@@ -690,10 +718,13 @@ class UpdateAlpha(Update):
         args.clear_resource_usage_bigquery_dataset
     opts.security_profile = args.security_profile
     opts.istio_config = args.istio_config
+    opts.cloud_run_config = args.cloud_run_config
     opts.enable_intra_node_visibility = args.enable_intra_node_visibility
     opts.enable_network_egress_metering = args.enable_network_egress_metering
     opts.enable_resource_consumption_metering = args.enable_resource_consumption_metering
     flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
+    flags.ValidateCloudRunConfigUpdateArgs(args.cloud_run_config,
+                                           args.disable_addons)
     if args.disable_addons and api_adapter.NODELOCALDNS in args.disable_addons:
       # NodeLocalDNS is being enabled or disabled
       console_io.PromptContinue(
@@ -715,6 +746,9 @@ class UpdateAlpha(Update):
             cancel_on_no=True)
     opts.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
     opts.enable_logging_monitoring_system_only = args.enable_logging_monitoring_system_only
+    opts.no_master_logs = args.no_master_logs
+    opts.master_logs = args.master_logs
+    opts.enable_master_metrics = args.enable_master_metrics
     opts.release_channel = args.release_channel
     opts.enable_tpu = args.enable_tpu
     opts.tpu_ipv4_cidr = args.tpu_ipv4_cidr
@@ -722,11 +756,13 @@ class UpdateAlpha(Update):
 
     # Top-level update options are automatically forced to be
     # mutually-exclusive, so we don't need special handling for these two.
-    opts.identity_namespace = args.identity_namespace
+    opts.identity_provider = args.identity_provider
     opts.enable_shielded_nodes = args.enable_shielded_nodes
     opts.disable_default_snat = args.disable_default_snat
     opts.enable_cost_management = args.enable_cost_management
     opts.enable_master_global_access = args.enable_master_global_access
     opts.enable_gvnic = args.enable_gvnic
+    opts.notification_config = args.notification_config
+    opts.private_ipv6_google_access_type = args.private_ipv6_google_access_type
 
     return opts

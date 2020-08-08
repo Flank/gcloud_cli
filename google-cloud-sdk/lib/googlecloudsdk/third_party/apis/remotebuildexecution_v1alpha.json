@@ -353,7 +353,7 @@
           "format": "int64"
         },
         "vmImage": {
-          "description": "Output only. The name of the image used by each VM.",
+          "description": "The name of the image used by each VM.",
           "type": "string"
         }
       }
@@ -1113,6 +1113,7 @@
             "The bot failed to download the inputs.",
             "Unknown error.",
             "The bot failed to upload the outputs.",
+            "The bot tried to upload files having a total size that is too large.",
             "The bot failed to login to docker.",
             "The bot failed to pull docker image.",
             "The bot failed to check docker images.",
@@ -1136,7 +1137,8 @@
             "Docker incompatible operating system error.",
             "Docker failed to create OCI runtime because of file not found.",
             "Docker failed to create OCI runtime because of permission denied.",
-            "Docker failed to create process because of file not found."
+            "Docker failed to create process because of file not found.",
+            "Docker failed to run containers with CreateComputeSystem error that\ninvolves an incorrect parameter (more specific version of\nDOCKER_CREATE_COMPUTE_SYSTEM_ERROR that is user-caused)."
           ],
           "type": "string",
           "enum": [
@@ -1152,6 +1154,7 @@
             "DOWNLOAD_INPUTS_ERROR",
             "UNKNOWN",
             "UPLOAD_OUTPUTS_ERROR",
+            "UPLOAD_OUTPUTS_BYTES_LIMIT_EXCEEDED",
             "DOCKER_LOGIN_ERROR",
             "DOCKER_IMAGE_PULL_ERROR",
             "DOCKER_IMAGE_EXIST_ERROR",
@@ -1175,7 +1178,8 @@
             "DOCKER_INCOMPATIBLE_OS_ERROR",
             "DOCKER_CREATE_RUNTIME_FILE_NOT_FOUND",
             "DOCKER_CREATE_RUNTIME_PERMISSION_DENIED",
-            "DOCKER_CREATE_PROCESS_FILE_NOT_FOUND"
+            "DOCKER_CREATE_PROCESS_FILE_NOT_FOUND",
+            "DOCKER_CREATE_COMPUTE_SYSTEM_INCORRECT_PARAMETER_ERROR"
           ]
         },
         "message": {

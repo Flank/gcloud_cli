@@ -19,6 +19,11 @@ gcloud sql connect \- connects to a Cloud SQL instance
 
 Connects to a Cloud SQL instance.
 
+NOTE: If you're connecting from an IPv6 address, or are constrained by certain
+organization policies (restrictPublicIP, restrictAuthorizedNetworks), consider
+running the beta version of this command to avoid error by connecting through
+the Cloud SQL proxy: \fBgcloud beta sql connect\fR
+
 
 
 .SH "POSITIONAL ARGUMENTS"

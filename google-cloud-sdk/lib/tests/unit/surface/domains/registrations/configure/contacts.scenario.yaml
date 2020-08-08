@@ -19,7 +19,8 @@ summary:
   - stderr: |
       Updated registration [example.com] Note:
       The contact settings are currently pending.
-      In order to finalize the update you need to confirm the change using an email sent to the registrant.
+      In order to finalize the update you need to confirm the change.
+      An email with instructions has been sent to the registrant.
 - execute:
   - command: |
       domains registrations configure contacts example-same-contacts.com --contact-privacy=public-contact-data --validate-only
@@ -56,6 +57,7 @@ summary:
     - prompt_string: Do you want to enter it interactively
     - input: n
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [example-same-contacts.com].
 - execute:
   - command: |
@@ -111,6 +113,15 @@ summary:
       domains registrations configure contacts exported.com
   - error: "1: The registration resource must be in state ACTIVE or SUSPENDED, not\
       \ 'EXPORTED'."
+- execute:
+  - command: |
+      domains registrations configure contacts only-public.co.uk
+  - prompt:
+    - message: Contact data not provided using the --contact-data-from-file flag.
+    - prompt_string: Do you want to enter it interactively
+    - input: n
+  - stderr: |
+      Your current contact privacy is PUBLIC_CONTACT_DATA. It cannot be changed.
 actions:
 - execute_command:
     command: |
@@ -343,7 +354,8 @@ actions:
     - expect_stderr: |
         Updated registration [example.com] Note:
         The contact settings are currently pending.
-        In order to finalize the update you need to confirm the change using an email sent to the registrant.
+        In order to finalize the update you need to confirm the change.
+        An email with instructions has been sent to the registrant.
     - expect_exit:
         code: 0
 - execute_command:
@@ -570,6 +582,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [example-same-contacts.com].
     - expect_exit:
         code: 0
@@ -711,3 +724,84 @@ actions:
         code: 1
         message: |-
           The registration resource must be in state ACTIVE or SUSPENDED, not 'EXPORTED'.
+- execute_command:
+    command: |
+      domains registrations configure contacts only-public.co.uk
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/only-public.co.uk?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/only-public.co.uk",
+              "domainName": "only-public.co.uk",
+              "createTime": "2019-01-11T14:09:08.068037639Z",
+              "expireTime": "2020-01-11T14:09:12Z",
+              "state": "ACTIVE",
+              "supportedPrivacy": ["PUBLIC_CONTACT_DATA"],
+              "contactSettings": {
+                "privacy": "PUBLIC_CONTACT_DATA",
+                "registrantContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "registrant@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "adminContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "admin@google.com",
+                  "phoneNumber": "+1.1234567890"
+                },
+                "technicalContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "technical@google.com",
+                  "phoneNumber": "+1.1234567890"
+                }
+              }
+            }
+    - expect_prompt_continue:
+        message: Contact data not provided using the --contact-data-from-file flag.
+        prompt_string: Do you want to enter it interactively
+        user_input: n
+    - expect_stderr: |
+        Your current contact privacy is PUBLIC_CONTACT_DATA. It cannot be changed.
+    - expect_exit:
+        code: 0

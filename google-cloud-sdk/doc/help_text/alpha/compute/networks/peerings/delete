@@ -1,14 +1,14 @@
 NAME
-    gcloud alpha compute networks peerings delete - delete a Google Compute
-        Engine network peering
+    gcloud alpha compute networks peerings delete - delete a Compute Engine
+        network peering
 
 SYNOPSIS
     gcloud alpha compute networks peerings delete NAME --network=NETWORK
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute networks peerings delete deletes a Google
-    Compute Engine network peering.
+    (ALPHA) gcloud alpha compute networks peerings delete deletes a Compute
+    Engine network peering.
 
 POSITIONAL ARGUMENTS
      NAME

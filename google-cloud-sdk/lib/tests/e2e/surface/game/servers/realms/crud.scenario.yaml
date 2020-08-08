@@ -26,19 +26,12 @@ summary:
   - command: |
       game servers realms describe $$realm-id-1$$ --location $$location$$
   - stdout: |-
-      createTime: '$$time-regex$$'
-      description: description
-      etag: .+
-      labels:
-        a: x
-        b: y
-      name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-      timeZone: UTC
-      updateTime: '$$time-regex$$'
+      .*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$.*
       $
 - execute:
   - command: |
-      game servers realms update $$realm-id-1$$ --location $$location$$ --time-zone EST --no-dry-run
+      game servers realms update $$realm-id-1$$ --location $$location$$ --time-zone EST
+      --update-labels "key1=val1" --description "new description" --no-dry-run
   - stderr: |
       Update request issued for: [$$realm-id-1$$]
   - progress_tracker:
@@ -47,22 +40,12 @@ summary:
   - stderr: |
       Updated realm: [$$realm-id-1$$]
   - stdout: |-
-      createTime: '$$time-regex$$'
-      description: description
-      etag: .+
-      labels:
-        a: x
-        b: y
-      name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-      timeZone: EST
-      updateTime: '$$time-regex$$'
+      .*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$.*
       $
 - execute:
   - command: |
       game servers realms list --location $$location$$
-  - stdout: |
-      NAME                          LOCATION      DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     TIME_ZONE  LABELS
-      $$realm-id-1$$  $$location$$  description  2020-03-02T21:00:01.317945106Z  2020-03-02T21:00:01.591014262Z  EST        {u'a': u'x', u'b': u'y'}
+  - stdout: .*$$realm-id-1$$.*$
 - execute:
   - command: |
       game servers realms delete $$realm-id-1$$ --location $$location$$
@@ -124,10 +107,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1583182798711-59fe57854e929-a5137a87-a16d02cb
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1590082400000-5a62be89d9b6b-5a3e85aa-d3017591
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-03-02T20:59:58.798775062Z'
+              createTime: '2020-05-21T17:33:20.099883034Z'
               target: projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$
               verb: create
               requestedCancellation: false
@@ -153,13 +136,13 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$
-            createTime: '2020-03-02T20:59:58.745532296Z'
-            updateTime: '2020-03-02T20:59:59.044892061Z'
+            createTime: '2020-05-21T17:33:20.034718484Z'
+            updateTime: '2020-05-21T17:33:20.458313209Z'
             labels:
               c: x
               d: y
             timeZone: EST
-            etag: jWWihMxOHDvw6Tbza9drnoFpDhKz1h0Mf7YL23bwevM
+            etag: WoSCt63KaEQhcwnD0lNe7vLsKNRR7LNewFQGK-KHdgU
     - expect_stderr: |
         Created realm [$$realm-id-global$$].
     - expect_exit:
@@ -179,14 +162,14 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '516'
+            content-length: '508'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583182801267-59fe5787be96b-f0749f89-47a7891c
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1590082402497-5a62be8c3b581-ce151b4c-4d678e2d
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-03-02T21:00:01.321399619Z'
+              createTime: '2020-05-21T17:33:22.536935493Z'
               target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
               verb: create
               requestedCancellation: false
@@ -207,18 +190,18 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '370'
+            content-length: '366'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-            createTime: '2020-03-02T21:00:01.317945106Z'
-            updateTime: '2020-03-02T21:00:01.591014262Z'
+            createTime: '2020-05-21T17:33:22.532094643Z'
+            updateTime: '2020-05-21T17:33:22.706796654Z'
             labels:
               a: x
               b: y
             timeZone: UTC
-            etag: D4PjQ14LscO6MDsOxq3OCO1ORZjzvUdw1xZexlsdu4o
+            etag: 47rQIcgFUI2jVXy9g6ReuFmaZP6SrlE0nyi6oCHLl3k
             description: description
     - expect_stderr: |
         Created realm [$$realm-id-1$$].
@@ -237,18 +220,18 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '370'
+            content-length: '366'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-            createTime: '2020-03-02T21:00:01.317945106Z'
-            updateTime: '2020-03-02T21:00:01.591014262Z'
+            createTime: '2020-05-21T17:33:22.532094643Z'
+            updateTime: '2020-05-21T17:33:22.706796654Z'
             labels:
               a: x
               b: y
             timeZone: UTC
-            etag: D4PjQ14LscO6MDsOxq3OCO1ORZjzvUdw1xZexlsdu4o
+            etag: 47rQIcgFUI2jVXy9g6ReuFmaZP6SrlE0nyi6oCHLl3k
             description: description
     - expect_stdout:
         matches: |
@@ -257,7 +240,8 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers realms update $$realm-id-1$$ --location $$location$$ --time-zone EST --no-dry-run
+      game servers realms update $$realm-id-1$$ --location $$location$$ --time-zone EST
+      --update-labels "key1=val1" --description "new description" --no-dry-run
     events:
     - api_call:
         expect_request:
@@ -268,29 +252,29 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '370'
+            content-length: '366'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-            createTime: '2020-03-02T21:00:01.317945106Z'
-            updateTime: '2020-03-02T21:00:01.591014262Z'
+            createTime: '2020-05-21T17:33:22.532094643Z'
+            updateTime: '2020-05-21T17:33:22.706796654Z'
             labels:
               a: x
               b: y
             timeZone: UTC
-            etag: D4PjQ14LscO6MDsOxq3OCO1ORZjzvUdw1xZexlsdu4o
+            etag: 47rQIcgFUI2jVXy9g6ReuFmaZP6SrlE0nyi6oCHLl3k
             description: description
     - expect_stderr: |
         Update request issued for: [$$realm-id-1$$]
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json&updateMask=timeZone
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json&updateMask=description%2Clabels%2CtimeZone
           method: PATCH
           headers: {}
           body:
             json:
-              description: description
+              description: new description
               labels:
                 a: x
                 b: y
@@ -299,14 +283,14 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '516'
+            content-length: '508'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583182805028-59fe578b54d0a-a8194226-504f356b
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1590082405673-5a62be8f42964-86805b6f-bedea2a4
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-03-02T21:00:05.040684719Z'
+              createTime: '2020-05-21T17:33:25.688701135Z'
               target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
               verb: update
               requestedCancellation: false
@@ -327,19 +311,20 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '370'
+            content-length: '390'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-            createTime: '2020-03-02T21:00:01.317945106Z'
-            updateTime: '2020-03-02T21:00:01.591014262Z'
+            createTime: '2020-05-21T17:33:22.532094643Z'
+            updateTime: '2020-05-21T17:33:25.691428329Z'
             labels:
+              key1: val1
               a: x
               b: y
             timeZone: EST
-            etag: 7IpbZD0ToZwKJRk48d_4fQnEnfhMQHenOqB5-7zZeNQ
-            description: description
+            etag: 1a_u_pWQsNFdu-nL5XULSzi-929xQI5xK_EVe5do4yc
+            description: new description
     - expect_stdout:
         matches: |
           .*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$.*
@@ -358,20 +343,21 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '440'
+            content-length: '464'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             realms:
             - name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
-              createTime: '2020-03-02T21:00:01.317945106Z'
-              updateTime: '2020-03-02T21:00:01.591014262Z'
+              createTime: '2020-05-21T17:33:22.532094643Z'
+              updateTime: '2020-05-21T17:33:25.691428329Z'
               labels:
-                b: y
+                key1: val1
                 a: x
+                b: y
               timeZone: EST
-              etag: 7IpbZD0ToZwKJRk48d_4fQnEnfhMQHenOqB5-7zZeNQ
-              description: description
+              etag: 1a_u_pWQsNFdu-nL5XULSzi-929xQI5xK_EVe5do4yc
+              description: new description
     - expect_stdout:
         matches: .*$$realm-id-1$$.*
     - expect_exit:
@@ -393,14 +379,14 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '516'
+            content-length: '508'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583182808190-59fe578e58e7d-2fd24bbb-99f023df
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1590082408508-5a62be91f6c32-9348ec44-6f7ebd2e
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-03-02T21:00:08.244869694Z'
+              createTime: '2020-05-21T17:33:28.547257946Z'
               target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
               verb: delete
               requestedCancellation: false
@@ -437,10 +423,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1583182810211-59fe579046638-de40df78-76a342cb
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1590082410483-5a62be93d8d44-f29a46b4-833ff2ae
             metadata:
               '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
-              createTime: '2020-03-02T21:00:10.322630508Z'
+              createTime: '2020-05-21T17:33:30.571079214Z'
               target: projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$
               verb: delete
               requestedCancellation: false

@@ -51,7 +51,7 @@ REQUIRED FLAGS
 
           See the following for more information:
 
-              $ gcloud alpha compute sole-tenancy node-types
+              $ gcloud beta compute sole-tenancy node-types list
 
 OPTIONAL FLAGS
      --cpu-overcommit-type=CPU_OVERCOMMIT_TYPE

@@ -15,6 +15,12 @@ gcloud alpha services api\-keys update \- update an API key's metadata
 
 
 
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update an API key's metadata.
+
+
+
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -107,54 +113,60 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To remove all restrictions of the key: $ gcloud alpha services api\-keys update
-\e.RS 2m
-projects/myproject/keys/my\-key\-id \-\-clear\-restrictions
+To remove all restrictions of the key:
 
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id \-\-clear\-restrictions
 .RE
 
-To update display name and set allowed ips as server key restrictions: $ gcloud
-alpha services api\-keys update \e.RS 2m
-projects/myproject/keys/my\-key\-id \e
-\-\-display\-name="test name" \e
-\-\-allowed\-ips=2620:15c:2c4:203:2776:1f90:6b3b:217,104.133.8.78
+To update display name and set allowed ips as server key restrictions:
 
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id \-\-display\-name="test name" \e
+    \-\-allowed\-ips=2620:15c:2c4:203:2776:1f90:6b3b:217,104.133.8.78
 .RE
 
-To update key's allowed referrers restriction: $ gcloud alpha services api\-keys
-update \e.RS 2m
-projects/myproject/keys/my\-key\-id \e
-\-\-allowed\-referrers="https://www.example.com/*,http://sub.example.com/*"
+To update key's allowed referrers restriction:
 
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id \e
+    \-\-allowed\-referrers="https://www.example.com/*,http://sub.exampl\e
+e.com/*"
 .RE
 
-To update key's allowed ios app bundle ids: $ gcloud alpha services api\-keys
-update \e.RS 2m
-projects/myproject/keys/my\-key\-id \-\-allowed\-bundle\-ids=my.app
+To update key's allowed ios app bundle ids:
 
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id \-\-allowed\-bundle\-ids=my.app
 .RE
 
-To update key's allowed android application: $ gcloud alpha services api\-keys
-update \e.RS 2m
-projects/myproject/keys/my\-key\-id \e
-\-\-allowed\-application=sha1_fingerprint=foo1,package_name=bar1 \e
-\-\-allowed\-application=sha1_fingerprint=foo2,package_name=bar2
+To update key's allowed android application:
 
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id \e
+    \-\-allowed\-application=sha1_fingerprint=foo1,package_name=bar1 \e
+    \-\-allowed\-application=sha1_fingerprint=foo2,package_name=bar2
 .RE
 
-To update keys' allowed api target with multiple services: $ gcloud alpha
-services api\-keys update \e.RS 2m
-projects/myproject/keys/my\-key\-id \e
-\-\-api\-target=service=bar.service.com \e
-\-\-api\-target=service=foo.service.com
+To update keys' allowed api target with multiple services:
 
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id \e
+    \-\-api\-target=service=bar.service.com \e
+    \-\-api\-target=service=foo.service.com
 .RE
 
 To update keys' allowed api target with service and method:
 
-$ gcloud alpha services api\-keys update \e.RS 2m
-projects/myproject/keys/my\-key\-id  \-\-flags\-file=my\-flags.yaml
-
+.RS 2m
+$ gcloud alpha services api\-keys update \e
+    projects/myproject/keys/my\-key\-id  \-\-flags\-file=my\-flags.yaml
 .RE
 
 .RS 2m

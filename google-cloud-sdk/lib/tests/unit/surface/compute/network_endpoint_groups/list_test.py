@@ -25,7 +25,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.network_endpoint_groups import test_resources
 import mock
 
 
@@ -260,16 +260,7 @@ class BetaNetworkEndpointGroupsListTest(NetworkEndpointGroupsListTest):
     self.api_version = 'beta'
     self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_BETA
     self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA
-
-
-class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA
-    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA
-    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_BETA
 
   def testTableOutput(self):
     command = 'compute network-endpoint-groups list'
@@ -293,8 +284,8 @@ class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
     command = 'compute network-endpoint-groups list --uri --regions region-1'
     return_value = self.region_neg_test_resource
     output = ("""\
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
-    """)
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+    """.format(api=self.api))
 
     self.RequestOneRegion(command, return_value, output)
 
@@ -303,9 +294,9 @@ class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
                '--regions region-1,region-2')
     return_value = self.region_neg_test_resource
     output = ("""\
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-2/networkEndpointGroups/my-app-engine-neg
-    """)
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-2/networkEndpointGroups/my-app-engine-neg
+    """.format(api=self.api))
 
     self.RequestTwoRegions(command, return_value, output)
 
@@ -335,29 +326,29 @@ class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
         """
     return_value = self.zonal_neg_test_resource + self.global_neg_test_resource + self.region_neg_test_resource
     output = """\
-        https://compute.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
-        https://compute.googleapis.com/compute/alpha/projects/my-project/global/networkEndpointGroups/my-global-neg
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
-        """
+        https://compute.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/global/networkEndpointGroups/my-global-neg
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+        """.format(api=self.api)
 
     self.RequestAggregate(command, return_value, output)
 
   def testPositionalArgsWithUris(self):
     command = """
         compute network-endpoint-groups list
-          https://compute.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
-          https://compute.googleapis.com/compute/alpha/projects/my-project/global/networkEndpointGroups/my-global-neg
-          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+          https://compute.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
+          https://compute.googleapis.com/compute/{api}/projects/my-project/global/networkEndpointGroups/my-global-neg
+          https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
           --uri
-        """
-    return_value = test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA\
-                   + test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA\
-                   + test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA
+        """.format(api=self.api)
+    return_value = self.zonal_neg_test_resource \
+                   + self.global_neg_test_resource \
+                   + self.region_neg_test_resource
     output = """\
-        https://compute.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
-        https://compute.googleapis.com/compute/alpha/projects/my-project/global/networkEndpointGroups/my-global-neg
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
-        """
+        https://compute.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/global/networkEndpointGroups/my-global-neg
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+        """.format(api=self.api)
 
     self.RequestAggregate(command, return_value, output)
 
@@ -368,11 +359,11 @@ class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
           --global
           --uri
         """
-    return_value = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA
+    return_value = self.global_neg_test_resource
     output = """\
-        https://compute.googleapis.com/compute/alpha/projects/my-project/global/networkEndpointGroups/my-global-neg
-        https://compute.googleapis.com/compute/alpha/projects/my-project/global/networkEndpointGroups/my-global-neg-fqdn
-        """
+        https://compute.googleapis.com/compute/{api}/projects/my-project/global/networkEndpointGroups/my-global-neg
+        https://compute.googleapis.com/compute/{api}/projects/my-project/global/networkEndpointGroups/my-global-neg-fqdn
+        """.format(api=self.api)
 
     self.RequestOnlyGlobal(command, return_value, output)
 
@@ -384,11 +375,11 @@ class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
           --regions region-1,region-2
           --uri
         """
-    return_value = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA
+    return_value = self.region_neg_test_resource
     output = """\
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
-        https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-2/networkEndpointGroups/my-app-engine-neg
-    """
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-2/networkEndpointGroups/my-app-engine-neg
+    """.format(api=self.api)
 
     self.RequestTwoRegions(command, return_value, output)
 
@@ -428,6 +419,16 @@ class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
   def _getListRequestMessage(self, project):
     return self.messages.ComputeNetworkEndpointGroupsAggregatedListRequest(
         project=project, includeAllScopes=True)
+
+
+class AlphaNetworkEndpointGroupsListTest(BetaNetworkEndpointGroupsListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA
+    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA
 
 
 if __name__ == '__main__':

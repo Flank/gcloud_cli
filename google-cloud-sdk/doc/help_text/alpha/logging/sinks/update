@@ -17,7 +17,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) Changes the [destination] or --log-filter associated with a sink.
-    The new destination must already exist and Stackdriver Logging must have
+    The new destination must already exist and Cloud Logging must have
     permission to write to it. Log entries are exported to the new destination
     immediately.
 
@@ -113,7 +113,7 @@ FLAGS
        --project=PROJECT_ID
           Update a sink associated with this project.
 
-          The Google Cloud Platform project name to use for this invocation. If
+          The Google Cloud Platform project ID to use for this invocation. If
           omitted, then the current project is assumed; the current project can
           be listed using gcloud config list --format='text(core.project)' and
           can be set using gcloud config set project PROJECTID.

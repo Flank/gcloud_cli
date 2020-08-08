@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute disks set-iam-policy - set the IAM policy for a Google
+    gcloud alpha compute disks set-iam-policy - set the IAM policy for a
         Compute Engine disk
 
 SYNOPSIS

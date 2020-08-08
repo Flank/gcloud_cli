@@ -318,7 +318,7 @@
           "$ref": "Environment"
         },
         "steps": {
-          "description": "Exactly one of step or steps_location should be specified.\n\nThe top-level steps that constitute the entire job.",
+          "description": "Exactly one of step or steps_location should be specified.\n\nThe top-level steps that constitute the entire job. Only retrieved with\nJOB_VIEW_ALL.",
           "type": "array",
           "items": {
             "$ref": "Step"
@@ -2192,6 +2192,13 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "launchOptions": {
+          "description": "Launch options for this flex template job. This is a common set of options\nacross languages and templates. This should not be used to pass job\nparameters.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -3337,6 +3344,10 @@
         "hotKeyDetection": {
           "description": "A hot key is a symptom of poor data distribution in which there are enough\nelements mapped to a single key to impact pipeline performance. When\npresent, this field includes metadata associated with any hot key.",
           "$ref": "HotKeyDetection"
+        },
+        "completeWorkStatus": {
+          "description": "If set, a request to complete the work item with the given status. This\nwill not be set to OK, unless supported by the specific kind of WorkItem.\nIt can be used for the backend to indicate a WorkItem must terminate, e.g.,\nfor aborting work.",
+          "$ref": "Status"
         },
         "suggestedStopPosition": {
           "description": "Obsolete, always empty.",
@@ -5108,7 +5119,7 @@
                 "https://www.googleapis.com/auth/compute.readonly",
                 "https://www.googleapis.com/auth/userinfo.email"
               ],
-              "description": "List the jobs of a project.\n\nTo list the jobs of a project in a region, we recommend using\n`projects.locations.jobs.get` with a [regional endpoint]\n(https:\/\/cloud.google.com\/dataflow\/docs\/concepts\/regional-endpoints). To\nlist the all jobs across all regions, use `projects.jobs.aggregated`. Using\n`projects.jobs.list` is not recommended, as you can only get the list of\njobs that are running in `us-central1`."
+              "description": "List the jobs of a project.\n\nTo list the jobs of a project in a region, we recommend using\n`projects.locations.jobs.list` with a [regional endpoint]\n(https:\/\/cloud.google.com\/dataflow\/docs\/concepts\/regional-endpoints). To\nlist the all jobs across all regions, use `projects.jobs.aggregated`. Using\n`projects.jobs.list` is not recommended, as you can only get the list of\njobs that are running in `us-central1`."
             },
             "aggregated": {
               "id": "dataflow.projects.jobs.aggregated",
@@ -6234,7 +6245,7 @@
                     "https://www.googleapis.com/auth/compute.readonly",
                     "https://www.googleapis.com/auth/userinfo.email"
                   ],
-                  "description": "List the jobs of a project.\n\nTo list the jobs of a project in a region, we recommend using\n`projects.locations.jobs.get` with a [regional endpoint]\n(https:\/\/cloud.google.com\/dataflow\/docs\/concepts\/regional-endpoints). To\nlist the all jobs across all regions, use `projects.jobs.aggregated`. Using\n`projects.jobs.list` is not recommended, as you can only get the list of\njobs that are running in `us-central1`."
+                  "description": "List the jobs of a project.\n\nTo list the jobs of a project in a region, we recommend using\n`projects.locations.jobs.list` with a [regional endpoint]\n(https:\/\/cloud.google.com\/dataflow\/docs\/concepts\/regional-endpoints). To\nlist the all jobs across all regions, use `projects.jobs.aggregated`. Using\n`projects.jobs.list` is not recommended, as you can only get the list of\njobs that are running in `us-central1`."
                 },
                 "snapshot": {
                   "id": "dataflow.projects.locations.jobs.snapshot",

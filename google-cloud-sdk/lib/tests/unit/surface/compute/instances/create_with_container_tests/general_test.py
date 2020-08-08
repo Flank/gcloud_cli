@@ -807,12 +807,12 @@ class InstancesCreateWithContainerTest(
   def testCreateMetadataKeyConflict(self):
     with self.AssertRaisesExceptionMatches(
         containers_utils.InvalidMetadataKeyException,
-        'Metadata key "user-data" is not allowed when '
+        'Metadata key "google-container-manifest" is not allowed when '
         'running containerized VM'):
       self.Run("""
           compute instances create-with-container instance-1
             --zone central2-a
-            --metadata user-data=somedata
+            --metadata google-container-manifest=somedata
             --container-image=gcr.io/my-docker/test-image
           """)
 
@@ -952,7 +952,7 @@ class InstancesCreateWithContainerTest(
     self.AssertErrEquals('WARNING: This container deployment mechanism '
                          'requires a Container-Optimized OS image in order to '
                          'work. Select an image from a cos-cloud project '
-                         '(cost-stable, cos-beta, cos-dev image families).\n')
+                         '(cos-stable, cos-beta, cos-dev image families).\n')
 
 
 class InstancesCreateWithContainerTestBeta(InstancesCreateWithContainerTest):

@@ -1,6 +1,6 @@
 NAME
-    gcloud compute disks set-iam-policy - set the IAM policy for a Google
-        Compute Engine disk
+    gcloud compute disks set-iam-policy - set the IAM policy for a Compute
+        Engine disk
 
 SYNOPSIS
     gcloud compute disks set-iam-policy (DISK : --zone=ZONE) POLICY_FILE

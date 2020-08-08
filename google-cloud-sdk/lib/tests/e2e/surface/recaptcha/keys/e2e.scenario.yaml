@@ -10,6 +10,25 @@ summary:
       Created [$$site-key$$].
 - execute:
   - command: |
+      recaptcha keys describe $$site-key$$
+  - stdout: |-
+      createTime: .*
+      displayName: testKey
+      labels:
+        cleanup: $$recaptcha-key-test$$
+        foo: bar
+      name: projects/462803083913/keys/$$site-key$$
+      sharedSecret: .*
+      webSettings:
+        allowAllDomains: false
+        allowAmpTraffic: false
+        allowedDomains:
+        - google.com
+        challengeSecurityPreference: BALANCE
+        integrationType: CHECKBOX
+      $
+- execute:
+  - command: |
       recaptcha keys update $$site-key$$ --labels=foo=baz,cleanup=$$recaptcha-key-test$$ --allow-amp-traffic --security-preference=usability
       --display-name updated-key --web --domains=google.com --security-preference=usability --format 'value(name)'
   - stderr: |
@@ -137,11 +156,10 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '420'
+            content-length: '442'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LcSl-QUAAAAAF-GU3G67FIgAFWGxrrZ2Qb6jfFV
+            name: projects/462803083913/keys/6LfQ5LMZAAAAABYaOg4S1cU3_rc9N9sqmGxbPNue
             displayName: testKey
             webSettings:
               allowAllDomains: false
@@ -153,8 +171,59 @@ actions:
             labels:
               cleanup: $$recaptcha-key-test$$
               foo: bar
+            sharedSecret: ''
+          status: 200
     - expect_stderr: |
         Created [$$site-key$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys describe $$site-key$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys/$$site-key$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: projects/462803083913/keys/6LfQ5LMZAAAAABYaOg4S1cU3_rc9N9sqmGxbPNue
+            displayName: testKey
+            webSettings:
+              allowAllDomains: false
+              allowedDomains:
+              - google.com
+              allowAmpTraffic: false
+              integrationType: CHECKBOX
+              challengeSecurityPreference: BALANCE
+            labels:
+              cleanup: $$recaptcha-key-test$$
+              foo: bar
+            sharedSecret: 6LfQ5LMZAAAAAHxhF59fqjRFu75idpdAHxRrDaJE
+            createTime: '2020-07-21T13:56:32Z'
+    - expect_stdout:
+        matches: |
+          createTime: .*
+          displayName: testKey
+          labels:
+            cleanup: $$recaptcha-key-test$$
+            foo: bar
+          name: projects/462803083913/keys/$$site-key$$
+          sharedSecret: .*
+          webSettings:
+            allowAllDomains: false
+            allowAmpTraffic: false
+            allowedDomains:
+            - google.com
+            challengeSecurityPreference: BALANCE
+            integrationType: CHECKBOX
     - expect_exit:
         code: 0
 - execute_command:
@@ -182,11 +251,10 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '466'
+            content-length: '528'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LcSl-QUAAAAAF-GU3G67FIgAFWGxrrZ2Qb6jfFV
+            name: projects/462803083913/keys/6LfQ5LMZAAAAABYaOg4S1cU3_rc9N9sqmGxbPNue
             displayName: updated-key
             webSettings:
               allowAllDomains: false
@@ -198,7 +266,9 @@ actions:
             labels:
               foo: baz
               cleanup: $$recaptcha-key-test$$
-            createTime: '2020-03-27T17:59:21Z'
+            sharedSecret: 6LfQ5LMZAAAAAHxhF59fqjRFu75idpdAHxRrDaJE
+            createTime: '2020-07-21T13:56:32Z'
+          status: 200
     - expect_stderr: |
         Updated key [$$site-key$$].
     - expect_stdout: |
@@ -218,12 +288,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '982'
+            content-length: '647'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
             keys:
-            - name: projects/462803083913/keys/6LcSl-QUAAAAAF-GU3G67FIgAFWGxrrZ2Qb6jfFV
+            - name: projects/462803083913/keys/6LfQ5LMZAAAAABYaOg4S1cU3_rc9N9sqmGxbPNue
               displayName: updated-key
               webSettings:
                 allowAllDomains: false
@@ -235,17 +304,10 @@ actions:
               labels:
                 foo: baz
                 cleanup: $$recaptcha-key-test$$
-              createTime: '2020-03-27T17:59:21Z'
-            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
-              displayName: updated-key
-              iosSettings:
-                allowedBundleIds:
-                - com.userguard.google.test
-              labels:
-                foo: baz
-                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
-              createTime: '2020-03-27T17:42:53Z'
+              sharedSecret: 6LfQ5LMZAAAAAHxhF59fqjRFu75idpdAHxRrDaJE
+              createTime: '2020-07-21T13:56:32Z'
             nextPageToken: ''
+          status: 200
     - expect_stdout: |
         SITE_KEY                                  DISPLAY_NAME
         $$site-key$$  updated-key
@@ -311,21 +373,12 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '443'
+            content-length: '40'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            keys:
-            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
-              displayName: updated-key
-              iosSettings:
-                allowedBundleIds:
-                - com.userguard.google.test
-              labels:
-                foo: baz
-                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
-              createTime: '2020-03-27T17:42:53Z'
+            keys: []
             nextPageToken: ''
+          status: 200
     - expect_stderr: |
         Listed 0 items.
     - expect_exit:
@@ -363,18 +416,19 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '293'
+            content-length: '315'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LdslOQUAAAAAC0VWIlYr0YyYRXALg7UrG__y3BJ
+            name: projects/462803083913/keys/6LeVJLMZAAAAAGFaL_UiD81T0kx7DqclXzxJSuJx
             displayName: testKeyiOS
             iosSettings:
               allowedBundleIds:
               - com.test.google
             labels:
-              cleanup: $$recaptcha-key-test-ios$$
               foo: bar
+              cleanup: $$recaptcha-key-test-ios$$
+            sharedSecret: ''
+          status: 200
     - expect_stderr: |
         Created [$$site-key-ios$$].
     - expect_exit:
@@ -400,11 +454,10 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '344'
+            content-length: '406'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LdslOQUAAAAAC0VWIlYr0YyYRXALg7UrG__y3BJ
+            name: projects/462803083913/keys/6LeVJLMZAAAAAGFaL_UiD81T0kx7DqclXzxJSuJx
             displayName: updated-key
             iosSettings:
               allowedBundleIds:
@@ -412,7 +465,9 @@ actions:
             labels:
               cleanup: $$recaptcha-key-test-ios$$
               foo: baz
-            createTime: '2020-03-27T17:59:23Z'
+            sharedSecret: 6LeVJLMZAAAAAJcOnVHelIclLKTyvbRvqCbWw_3w
+            createTime: '2020-07-21T13:56:34Z'
+          status: 200
     - expect_stderr: |
         Updated key [$$site-key-ios$$].
     - expect_exit:
@@ -430,12 +485,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '844'
+            content-length: '509'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
             keys:
-            - name: projects/462803083913/keys/6LdslOQUAAAAAC0VWIlYr0YyYRXALg7UrG__y3BJ
+            - name: projects/462803083913/keys/6LeVJLMZAAAAAGFaL_UiD81T0kx7DqclXzxJSuJx
               displayName: updated-key
               iosSettings:
                 allowedBundleIds:
@@ -443,17 +497,10 @@ actions:
               labels:
                 cleanup: $$recaptcha-key-test-ios$$
                 foo: baz
-              createTime: '2020-03-27T17:59:23Z'
-            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
-              displayName: updated-key
-              iosSettings:
-                allowedBundleIds:
-                - com.userguard.google.test
-              labels:
-                foo: baz
-                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
-              createTime: '2020-03-27T17:42:53Z'
+              sharedSecret: 6LeVJLMZAAAAAJcOnVHelIclLKTyvbRvqCbWw_3w
+              createTime: '2020-07-21T13:56:34Z'
             nextPageToken: ''
+          status: 200
     - expect_stdout: |
         SITE_KEY                                  DISPLAY_NAME
         $$site-key-ios$$  updated-key
@@ -519,21 +566,12 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '443'
+            content-length: '40'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            keys:
-            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
-              displayName: updated-key
-              iosSettings:
-                allowedBundleIds:
-                - com.userguard.google.test
-              labels:
-                foo: baz
-                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
-              createTime: '2020-03-27T17:42:53Z'
+            keys: []
             nextPageToken: ''
+          status: 200
     - expect_stderr: |
         Listed 0 items.
     - expect_exit:
@@ -571,11 +609,10 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '308'
+            content-length: '330'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LdtlOQUAAAAAGZrD6Nbvf3rLlFlO6tw_0V_MEhi
+            name: projects/462803083913/keys/6Lc0O7MZAAAAAOrJhj9huBaCcTov88H4QmtzYL35
             displayName: testKeyAndroid
             androidSettings:
               allowedPackageNames:
@@ -583,6 +620,8 @@ actions:
             labels:
               cleanup: $$recaptcha-key-test-android$$
               foo: bar
+            sharedSecret: ''
+          status: 200
     - expect_stderr: |
         Created [$$site-key-android$$].
     - expect_exit:
@@ -608,19 +647,20 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '351'
+            content-length: '413'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LdtlOQUAAAAAGZrD6Nbvf3rLlFlO6tw_0V_MEhi
+            name: projects/462803083913/keys/6Lc0O7MZAAAAAOrJhj9huBaCcTov88H4QmtzYL35
             displayName: WaitingForLove
             androidSettings:
               allowedPackageNames:
               - com.userguard.test
             labels:
-              foo: baz
               cleanup: $$recaptcha-key-test-android$$
-            createTime: '2020-03-27T17:59:24Z'
+              foo: baz
+            sharedSecret: 6Lc0O7MZAAAAAOZH9J4PcPoqo38U0cM9CfHciPlt
+            createTime: '2020-07-21T13:56:37Z'
+          status: 200
     - expect_stderr: |
         Updated key [$$site-key-android$$].
     - expect_exit:
@@ -638,12 +678,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '851'
+            content-length: '516'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
             keys:
-            - name: projects/462803083913/keys/6LdtlOQUAAAAAGZrD6Nbvf3rLlFlO6tw_0V_MEhi
+            - name: projects/462803083913/keys/6Lc0O7MZAAAAAOrJhj9huBaCcTov88H4QmtzYL35
               displayName: WaitingForLove
               androidSettings:
                 allowedPackageNames:
@@ -651,17 +690,10 @@ actions:
               labels:
                 cleanup: $$recaptcha-key-test-android$$
                 foo: baz
-              createTime: '2020-03-27T17:59:24Z'
-            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
-              displayName: updated-key
-              iosSettings:
-                allowedBundleIds:
-                - com.userguard.google.test
-              labels:
-                foo: baz
-                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
-              createTime: '2020-03-27T17:42:53Z'
+              sharedSecret: 6Lc0O7MZAAAAAOZH9J4PcPoqo38U0cM9CfHciPlt
+              createTime: '2020-07-21T13:56:37Z'
             nextPageToken: ''
+          status: 200
     - expect_stdout: |
         SITE_KEY                                  DISPLAY_NAME
         $$site-key-android$$  WaitingForLove
@@ -690,21 +722,12 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '443'
+            content-length: '40'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            keys:
-            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
-              displayName: updated-key
-              iosSettings:
-                allowedBundleIds:
-                - com.userguard.google.test
-              labels:
-                foo: baz
-                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
-              createTime: '2020-03-27T17:42:53Z'
+            keys: []
             nextPageToken: ''
+          status: 200
     - expect_stderr: |
         Listed 0 items.
     - expect_exit:
@@ -743,11 +766,10 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '437'
+            content-length: '459'
             content-type: application/json; charset=UTF-8
-            status: '200'
           body:
-            name: projects/462803083913/keys/6LcGmeQUAAAAANlkwlr4QW7Qa1lIVy4LmTLdmofJ
+            name: projects/462803083913/keys/6LeECbQZAAAAAAeD_WRPIgj1-kubmTVvivxH3QAw
             displayName: testKey
             webSettings:
               allowAllDomains: true
@@ -756,8 +778,10 @@ actions:
               integrationType: SCORE
               challengeSecurityPreference: CHALLENGE_SECURITY_PREFERENCE_UNSPECIFIED
             labels:
-              foo: bar
               cleanup: $$recaptcha-key-test-all-domains$$
+              foo: bar
+            sharedSecret: ''
+          status: 200
     - expect_stderr: |
         Created [$$site-key-all-domains$$].
     - expect_exit:

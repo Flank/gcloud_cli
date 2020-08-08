@@ -62,7 +62,7 @@ GLOBAL FLAGS
         Display detailed help.
 
      --project=PROJECT_ID
-        The Google Cloud Platform project name to use for this invocation. If
+        The Google Cloud Platform project ID to use for this invocation. If
         omitted, then the current project is assumed; the current project can
         be listed using gcloud config list --format='text(core.project)' and
         can be set using gcloud config set project PROJECTID.
@@ -164,6 +164,9 @@ GROUPS
      builds
         (ALPHA) Create and manage builds for Google Cloud Build.
 
+     certificate-manager
+        (ALPHA) Manage SSL certificates for your Google Cloud projects.
+
      cloud-shell
         (ALPHA) Manage Google Cloud Shell.
 
@@ -257,7 +260,7 @@ GROUPS
         (ALPHA) Manage Cloud Life Sciences resources.
 
      logging
-        (ALPHA) Manage Stackdriver Logging.
+        (ALPHA) Manage Cloud Logging.
 
      memcache
         (ALPHA) Manage Cloud Memorystore Memcached resources.
@@ -271,6 +274,9 @@ GROUPS
      monitoring
         (ALPHA) Manage Cloud Monitoring alerting policies, dashboards, and
         notification channels.
+
+     network-security
+        (ALPHA) Manage Network Security resources.
 
      network-services
         (ALPHA) Manage Network Services resources.
@@ -305,6 +311,9 @@ GROUPS
      resource-manager
         (ALPHA) Manage Cloud Resources.
 
+     resource-settings
+        (ALPHA) Create and manage Resource Settings.
+
      resources
         (ALPHA) List and search resources accessible from your account.
 
@@ -337,6 +346,9 @@ GROUPS
 
      trace
         (ALPHA) Manage Stackdriver Trace.
+
+     vmware
+        (ALPHA) Manage Cloud VMware resources.
 
      web-security-scanner
         (ALPHA) Manage Cloud Web Security Scanner resources.

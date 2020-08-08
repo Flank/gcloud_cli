@@ -1,0 +1,234 @@
+title: Tests for certificate map lifecycle
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: certificate-manager maps create $$simple-map$$ --description="some-description"
+      --labels="key=value"
+  - progress_tracker:
+    - message: Waiting for '$$operation-basename$$' to complete
+    - status: SUCCESS
+  - stderr: |
+      Created certificate map [$$simple-map$$].
+- execute:
+  - command: certificate-manager maps describe $$simple-map$$ --format=text(description,labels,name)
+  - stdout: |
+      description: some-description
+      labels.key:  value
+      name:        projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+- execute:
+  - command: certificate-manager maps update $$simple-map$$ --description="new-description"
+      --update-labels="key2=value2"
+  - progress_tracker:
+    - message: Waiting for '$$operation-basename$$' to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated certificate map [$$simple-map$$].
+- execute:
+  - command: certificate-manager maps describe $$simple-map$$ --format=text(description,labels,name)
+  - stdout: |
+      description: new-description
+      labels.key:  value
+      labels.key2: value2
+      name:        projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+- execute:
+  - command: certificate-manager maps delete $$simple-map$$
+  - prompt:
+    - message: You are about to delete certificate map '$$simple-map$$'
+    - input: y
+  - progress_tracker:
+    - message: Waiting for '$$operation-basename$$' to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted map [$$simple-map$$].
+actions:
+
+- generate_resource_id:
+    reference: simple-map
+    prefix: simple-map
+
+- execute_command:
+    command: certificate-manager maps create $$simple-map$$ --description="some-description"
+      --labels="key=value"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/certificateMaps?alt=json&certificateMapId=$$simple-map$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: some-description
+              labels:
+                key: value
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '532'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1591664082873-5a79c2c42ecd5-d16b92d4-b61b440f
+            metadata:
+              '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+              createTime: '2020-06-09T00:54:43.061992290Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+              verb: create
+              requestedCancellation: false
+              apiVersion: v1alpha1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for '$$operation-basename$$' to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created certificate map [$$simple-map$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: certificate-manager maps describe $$simple-map$$ --format=text(description,labels,name)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '245'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+            createTime: '2020-06-09T00:54:42.964701989Z'
+            labels:
+              key: value
+            description: some-description
+    - expect_stdout: |
+        description: some-description
+        labels.key:  value
+        name:        projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: certificate-manager maps update $$simple-map$$ --description="new-description"
+      --update-labels="key2=value2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '245'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+            createTime: '2020-06-09T00:54:42.964701989Z'
+            labels:
+              key: value
+            description: some-description
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$?alt=json&updateMask=labels%2Cdescription
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: new-description
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '532'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1591664085522-5a79c2c6b585e-890f4df0-b58c82fc
+            metadata:
+              '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+              createTime: '2020-06-09T00:54:45.565010110Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+              verb: update
+              requestedCancellation: false
+              apiVersion: v1alpha1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for '$$operation-basename$$' to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated certificate map [$$simple-map$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: certificate-manager maps describe $$simple-map$$ --format=text(description,labels,name)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '266'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+            createTime: '2020-06-09T00:54:42.964701989Z'
+            labels:
+              key: value
+              key2: value2
+            description: new-description
+    - expect_stdout: |
+        description: new-description
+        labels.key:  value
+        labels.key2: value2
+        name:        projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: certificate-manager maps delete $$simple-map$$
+    cleanup_for: simple-map
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete certificate map '$$simple-map$$'
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '532'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1591664087776-5a79c2c8dbe9b-a7f95b08-b0881b1e
+            metadata:
+              '@type': type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata
+              createTime: '2020-06-09T00:54:47.817545917Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/certificateMaps/$$simple-map$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: v1alpha1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for '$$operation-basename$$' to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted map [$$simple-map$$].
+    - expect_exit:
+        code: 0

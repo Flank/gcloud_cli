@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute interconnects attachments dedicated update - update a
-        Google Compute Engine dedicated interconnect attachment
+        Compute Engine dedicated interconnect attachment
 
 SYNOPSIS
     gcloud beta compute interconnects attachments dedicated update NAME

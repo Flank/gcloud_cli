@@ -38,7 +38,14 @@ DEPRECATION_FORMAT_STR = (
 
 
 def AddAckIdFlag(parser, action, add_deprecated=False):
-  help_text = 'One or more ACK_ID to {}'.format(action)
+  """Adds parsing and help text for ack_id flag."""
+
+  help_text = (
+      'One or more ACK_ID to {} An ACK_ID is a [string that is returned to '
+      'subscribers](https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.ReceivedMessage).'
+      ' along with the message. The ACK_ID is different from the [message '
+      'ID](https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.PubsubMessage).'
+  ).format(action)
   if add_deprecated:
     parser.add_argument(
         'ack_id', nargs='*', help=help_text,
@@ -243,17 +250,17 @@ def AddSubscriptionSettingsFlags(parser,
         '--enable-message-ordering',
         action='store_true',
         default=None,
-        help="""Whether or not to receive messages with the same ordering key in
-            order. If true, messages with the same ordering key will by sent to
-            subscribers in the order in which they were received by Cloud
-            Pub/Sub.""")
+        help="""Whether to receive messages with the same ordering key in order.
+            If set, messages with the same ordering key are sent to subscribers
+            in the order that Pub/Sub receives them.""")
   if support_filtering and not is_update:
     parser.add_argument(
-        '--filter',
+        '--message-filter',
         type=str,
-        help="""A non-empty string written in the Cloud Pub/Sub filter
-            language. This feature is part of an invitation-only alpha
-            release.""")
+        help="""Expression to filter messages. If set, Pub/Sub only delivers the
+        messages that match the filter. The expression must be a non-empty
+        string in the [Pub/Sub filtering
+        language](https://cloud.google.com/pubsub/docs/filtering).""")
   current_group = parser
   if is_update:
     mutual_exclusive_group = current_group.add_mutually_exclusive_group()
@@ -362,9 +369,9 @@ def AddPublishMessageFlags(parser,
   if support_message_ordering:
     parser.add_argument(
         '--ordering-key',
-        help="""The key to use for ordering delivery to subscribers. All
-            messages with the same key will be sent to subcribers in the order
-            in which they were received by Cloud Pub/Sub.""")
+        help="""The key for ordering delivery to subscribers. All messages with
+            the same ordering key are sent to subscribers in the order that
+            Pub/Sub receives them.""")
 
 
 def ParseMessageBody(args):
@@ -406,11 +413,11 @@ def ValidateFilterString(args):
   Raises:
     InvalidArgumentException: if filter string is empty.
   """
-  if args.filter is not None and not args.filter:
+  if args.message_filter is not None and not args.message_filter:
     raise exceptions.InvalidArgumentException(
-        '--filter',
+        '--message-filter',
         'Filter string must be non-empty. If you do not want a filter, ' +
-        'do not set the --filter argument.')
+        'do not set the --message-filter argument.')
 
 
 def ValidateDeadLetterPolicy(args):

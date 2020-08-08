@@ -11,7 +11,7 @@ gcloud beta compute machine\-images import \- create a Compute Engine machine im
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute machine\-images import\fR \fIIMAGE\fR \fB\-\-source\-uri\fR=\fISOURCE_URI\fR [\fB\-\-async\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-os\fR=\fIOS\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute machine\-images import\fR \fIIMAGE\fR \fB\-\-source\-uri\fR=\fISOURCE_URI\fR [\fB\-\-async\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-os\fR=\fIOS\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,9 +25,9 @@ Importing OVF involves:
 .IP "\(bu" 2m
 Unpacking OVF package (if in OVA format) to Cloud Storage.
 .IP "\(bu" 2m
-Import disks from OVF to Google Compute Engine.
+Import disks from OVF to Compute Engine.
 .IP "\(bu" 2m
-Translate the boot disk to make it bootable in Google Compute Engine.
+Translate the boot disk to make it bootable in Compute Engine.
 .IP "\(bu" 2m
 Create a machine image using OVF metadata and imported disks.
 .RE
@@ -96,6 +96,11 @@ Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
+
+.TP 2m
+\fB\-\-log\-location\fR=\fILOG_LOCATION\fR
+Directory in Cloud Storage to hold build logs. If not set, \f5gs://<project
+num>.cloudbuild\-logs.googleusercontent.com/\fR is created and used.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR

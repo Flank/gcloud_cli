@@ -39,7 +39,8 @@ EXAMPLES
     The following command reads an IAM policy defined in a JSON file
     policy.json and sets it for a project with the ID example-project-id-1:
 
-    $ gcloud alpha projects set-iam-policy example-project-id-1 \        policy.json
+        $ gcloud alpha projects set-iam-policy example-project-id-1 \
+            policy.json
 
     See https://cloud.google.com/iam/docs/managing-policies for details of the
     policy file format and contents.

@@ -6,7 +6,10 @@ SYNOPSIS
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List all zones where Filestore API is available.
+    (ALPHA) List all zones where Filestore API is available. The listed zones
+    only apply for Basic instances. High Scale is only available in a more
+    restricted set of zones. For details, please see
+    https://cloud.google.com/filestore/docs/regions.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

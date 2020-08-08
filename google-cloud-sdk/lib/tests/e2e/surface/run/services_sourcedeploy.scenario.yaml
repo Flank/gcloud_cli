@@ -244,7 +244,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2016'
+            content-length: '2017'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -254,8 +254,8 @@ actions:
               name: $$service-name3$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name3$$
-              uid: d21d2f70-0481-489f-b7f5-a6633de73df8
-              resourceVersion: AAWiWQ63FRk
+              uid: 9afeb2a8-5231-4ad2-a7d9-b49606d8e6bc
+              resourceVersion: AAWpPPSHOnM
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -264,23 +264,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/cloud-sdk-integration-testing/helloworld-python
-              creationTimestamp: '2020-04-03T01:44:26.221849Z'
+              creationTimestamp: '2020-06-29T18:09:09.188211Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name3$$-00001-yep
+                  name: $$service-name3$$-00001-xus
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/cloud-sdk-integration-testing/helloworld-python
                     autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/cloud-sdk-integration-testing/helloworld-python
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -323,7 +323,7 @@ actions:
             status: '200'
           body:
             version: 1
-            etag: BwWiWQ7DLvs=
+            etag: BwWpPPSYRPA=
             bindings:
             - role: roles/run.invoker
               members:
@@ -337,7 +337,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2982'
+            content-length: '2983'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -347,8 +347,8 @@ actions:
               name: $$service-name3$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name3$$
-              uid: d21d2f70-0481-489f-b7f5-a6633de73df8
-              resourceVersion: AAWiWQ8jf5g
+              uid: 9afeb2a8-5231-4ad2-a7d9-b49606d8e6bc
+              resourceVersion: AAWpPPVAPOg
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -357,23 +357,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/cloud-sdk-integration-testing/helloworld-python
-              creationTimestamp: '2020-04-03T01:44:26.221849Z'
+              creationTimestamp: '2020-06-29T18:09:09.188211Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name3$$-00001-yep
+                  name: $$service-name3$$-00001-xus
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/cloud-sdk-integration-testing/helloworld-python
                     autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/cloud-sdk-integration-testing/helloworld-python
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -385,17 +385,17 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2020-04-03T01:44:33.327Z'
+                lastTransitionTime: '2020-06-29T18:09:21.313Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2020-04-03T01:44:32.974Z'
+                lastTransitionTime: '2020-06-29T18:09:21.040Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2020-04-03T01:44:33.327Z'
-              latestReadyRevisionName: $$service-name3$$-00001-yep
-              latestCreatedRevisionName: $$service-name3$$-00001-yep
+                lastTransitionTime: '2020-06-29T18:09:21.313Z'
+              latestReadyRevisionName: $$service-name3$$-00001-xus
+              latestCreatedRevisionName: $$service-name3$$-00001-xus
               traffic:
-              - revisionName: $$service-name3$$-00001-yep
+              - revisionName: $$service-name3$$-00001-xus
                 percent: 100
                 latestRevision: true
               url: https://$$service-name3$$-ixwc4imo7a-uc.a.run.app
@@ -415,7 +415,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2982'
+            content-length: '2983'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -425,8 +425,8 @@ actions:
               name: $$service-name3$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name3$$
-              uid: d21d2f70-0481-489f-b7f5-a6633de73df8
-              resourceVersion: AAWiWQ8jf5g
+              uid: 9afeb2a8-5231-4ad2-a7d9-b49606d8e6bc
+              resourceVersion: AAWpPPVAPOg
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -435,23 +435,23 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/cloud-sdk-integration-testing/helloworld-python
-              creationTimestamp: '2020-04-03T01:44:26.221849Z'
+              creationTimestamp: '2020-06-29T18:09:09.188211Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name3$$-00001-yep
+                  name: $$service-name3$$-00001-xus
                   annotations:
                     run.googleapis.com/client-name: gcloud
                     client.knative.dev/user-image: gcr.io/cloud-sdk-integration-testing/helloworld-python
                     autoscaling.knative.dev/maxScale: '1000'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
+                  timeoutSeconds: 300
                   containers:
                   - image: gcr.io/cloud-sdk-integration-testing/helloworld-python
                     resources:
                       limits:
-                        memory: 256M
+                        memory: 256Mi
                         cpu: 1000m
                     ports:
                     - containerPort: 8080
@@ -463,17 +463,17 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2020-04-03T01:44:33.327Z'
+                lastTransitionTime: '2020-06-29T18:09:21.313Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2020-04-03T01:44:32.974Z'
+                lastTransitionTime: '2020-06-29T18:09:21.040Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2020-04-03T01:44:33.327Z'
-              latestReadyRevisionName: $$service-name3$$-00001-yep
-              latestCreatedRevisionName: $$service-name3$$-00001-yep
+                lastTransitionTime: '2020-06-29T18:09:21.313Z'
+              latestReadyRevisionName: $$service-name3$$-00001-xus
+              latestCreatedRevisionName: $$service-name3$$-00001-xus
               traffic:
-              - revisionName: $$service-name3$$-00001-yep
+              - revisionName: $$service-name3$$-00001-xus
                 percent: 100
                 latestRevision: true
               url: https://$$service-name3$$-ixwc4imo7a-uc.a.run.app
@@ -513,7 +513,7 @@ actions:
               name: $$service-name3$$
               group: v1
               kind: service
-              uid: 12ca7a1f-fda5-43b8-9857-0597b17da9c6
+              uid: 9afeb2a8-5231-4ad2-a7d9-b49606d8e6bc
     - expect_stderr: |
         Deleted service [$$service-name3$$].
     - expect_exit:

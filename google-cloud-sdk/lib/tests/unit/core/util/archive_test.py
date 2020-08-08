@@ -29,10 +29,10 @@ from tests.lib import test_case
 
 class ArchiveTest(test_case.TestCase):
 
-  def _MakeZip(self, src_dir, update_date=False):
+  def _MakeZip(self, src_dir):
     with files.TemporaryDirectory() as dst_dir:
       zip_file = os.path.join(dst_dir, 'arch.zip')
-      archive.MakeZipFromDir(zip_file, src_dir, update_date=update_date)
+      archive.MakeZipFromDir(zip_file, src_dir)
       zf = zipfile.ZipFile(zip_file)
       try:
         self.assertIsNone(zf.testzip())
@@ -127,7 +127,7 @@ class ArchiveTest(test_case.TestCase):
         pass
       with open(os.path.join(full_dir, 'sample2.txt'), 'a') as f:
         f.write('Hello')
-      name_list = self._MakeZip(src_dir, update_date=True)
+      name_list = self._MakeZip(src_dir)
       self.assertEqual(os.path.getmtime(os.path.join(src_dir, 'sample.txt')),
                        289955080)
       self.assertEqual(os.path.getmtime(os.path.join(src_dir, 'empty_dir')),

@@ -115,7 +115,7 @@ COMMANDS
         settings.
 
      update-traffic
-        (BETA) Adjust the trafic assignments for a Cloud Run service.
+        (BETA) Adjust the traffic assignments for a Cloud Run service.
 
 EXAMPLES
     To list your deployed services, run:

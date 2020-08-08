@@ -95,7 +95,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   def testUntag_Registry403(self):
     response = httplib2.Response({'status': 403, 'body': 'some body'})
     exception = docker_http.V2DiagnosticException(
-        response, 'some content'.encode('utf8'))
+        response, 'some content'.encode('utf-8'))
     self.mock_delete.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.Untag([_TAG_V1])
@@ -104,7 +104,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   def testUntag_Registry404(self):
     response = httplib2.Response({'status': 404, 'body': 'some body'})
     exception = docker_http.V2DiagnosticException(
-        response, 'some content'.encode('utf8'))
+        response, 'some content'.encode('utf-8'))
     self.mock_delete.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.Untag([_TAG_V1])

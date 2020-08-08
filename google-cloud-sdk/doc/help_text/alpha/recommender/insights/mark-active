@@ -1,6 +1,6 @@
 NAME
     gcloud alpha recommender insights mark-active - mark an insight's state as
-        ACTIVE. Can be applied to insights in DISMISSED state
+        ACTIVE
 
 SYNOPSIS
     gcloud alpha recommender insights mark-active

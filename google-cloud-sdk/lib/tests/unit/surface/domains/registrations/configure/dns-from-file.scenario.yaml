@@ -6,7 +6,7 @@ summary:
   - command: |
       domains registrations configure dns example-ds-records.com --dns-settings-from-file=customNameServers.yaml
   - stderr: |
-      WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+      WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
   - prompt:
     - message: This operation is not safe.
     - input: y
@@ -25,19 +25,21 @@ summary:
   - command: |
       domains registrations configure dns example-ns-not-changed.com --dns-settings-from-file=googleDomainsNameServers.yaml --async
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [example-ns-not-changed.com].
 - execute:
   - command: |
       domains registrations configure dns example-ds-records.com --dns-settings-from-file=customNSGlueRecordsDsRecords.yaml  --unsafe-dns-update --async --quiet
   - stderr: |
-      WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+      WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [example-ds-records.com].
 - execute:
   - command: |
       domains registrations configure dns example-ds-records.com --dns-settings-from-file=customNSGlueRecordsDsRecords.yaml
   - stderr: |
-      WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+      WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
   - prompt:
     - message: This operation is not safe.
     - input: n
@@ -143,7 +145,7 @@ actions:
               }
             }
     - expect_stderr: |
-        WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+        WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
     - expect_prompt_continue:
         message: This operation is not safe.
         user_input: y
@@ -329,6 +331,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [example-ns-not-changed.com].
     - expect_exit:
         code: 0
@@ -366,7 +369,7 @@ actions:
               }
             }
     - expect_stderr: |
-        WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+        WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
     - api_call:
         expect_request:
           uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example-ds-records.com:configureDnsSettings?alt=json
@@ -413,6 +416,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [example-ds-records.com].
     - expect_exit:
         code: 0
@@ -450,7 +454,7 @@ actions:
               }
             }
     - expect_stderr: |
-        WARNING: Name servers should not be changed if Ds records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
+        WARNING: Name servers should not be changed if DS records are present. Disable DNSSEC first and wait 24 hours before you change name servers. Otherwise your domain may stop serving.
     - expect_prompt_continue:
         message: This operation is not safe.
         user_input: n

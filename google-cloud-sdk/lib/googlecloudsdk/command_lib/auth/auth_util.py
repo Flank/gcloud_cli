@@ -33,6 +33,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import creds as c_creds
 from googlecloudsdk.core.credentials import store as c_store
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 
 from oauth2client import client
@@ -40,6 +41,7 @@ from oauth2client import service_account
 from oauth2client.contrib import gce as oauth2client_gce
 
 
+_IS_GOOGLE_DOMAIN_ENV_VAR = 'CLOUDSDK_GOOGLE_AUTH_IS_GOOGLE_DOMAIN'
 SERVICEUSAGE_PERMISSION = 'serviceusage.services.use'
 
 ACCOUNT_TABLE_FORMAT = ("""\
@@ -75,12 +77,24 @@ def AllAccounts():
 
 def IsGceAccountCredentials(cred):
   """Checks if the credential is a Compute Engine service account credential."""
-  return isinstance(cred, oauth2client_gce.AppAssertionCredentials)
+  # Import only when necessary to decrease the startup time. Move it to
+  # global once google-auth is ready to replace oauth2client.
+  # pylint: disable=g-import-not-at-top
+  import google.auth.compute_engine as google_auth_gce
+
+  return (isinstance(cred, oauth2client_gce.AppAssertionCredentials) or
+          isinstance(cred, google_auth_gce.credentials.Credentials))
 
 
 def IsServiceAccountCredential(cred):
   """Checks if the credential is a service account credential."""
-  return isinstance(cred, service_account.ServiceAccountCredentials)
+  # Import only when necessary to decrease the startup time. Move it to
+  # global once google-auth is ready to replace oauth2client.
+  # pylint: disable=g-import-not-at-top
+  import google.oauth2.service_account as google_auth_service_account
+
+  return (isinstance(cred, service_account.ServiceAccountCredentials) or
+          isinstance(cred, google_auth_service_account.Credentials))
 
 
 def IsImpersonationCredential(cred):
@@ -211,6 +225,14 @@ def LogQuotaProjectDisabled():
       '\nQuota project is disabled. You might receive a "quota exceeded" or '
       '"API not enabled" error. Run $ gcloud auth application-default '
       'set-quota-project to add a quota project.')
+
+
+# TODO(b/150405706): For rolling out risky changes of google-auth migration
+# to Googlers first. Remove this function once the migration is done.
+def IsHostGoogleDomain():
+  """Whether the host on which gcloud runs is on Google domain."""
+  return encoding.GetEncodedValue(os.environ,
+                                  _IS_GOOGLE_DOMAIN_ENV_VAR) == 'true'
 
 
 def DumpADC(credentials, quota_project_disabled=False):

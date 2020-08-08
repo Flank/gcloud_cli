@@ -31,6 +31,11 @@ EXAMPLES
 
         $ gcloud beta emulators datastore env-init --data-dir=DATA-DIR
 
+    You can use this command to set env vars in a bash script by adding the
+    below line in the script.
+
+        eval $(gcloud beta emulators datastore env-init --data-dir=DATA-DIR)
+
 NOTES
     This command is currently in BETA and may change without notice. This
     variant is also available:

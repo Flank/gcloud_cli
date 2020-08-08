@@ -1,14 +1,14 @@
 NAME
-    gcloud compute instance-groups managed delete - delete Google Compute
-        Engine managed instance groups
+    gcloud compute instance-groups managed delete - delete Compute Engine
+        managed instance groups
 
 SYNOPSIS
     gcloud compute instance-groups managed delete NAMES [NAMES ...]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-groups managed delete deletes one or more Google
-    Compute Engine managed instance groups.
+    gcloud compute instance-groups managed delete deletes one or more Compute
+    Engine managed instance groups.
 
 POSITIONAL ARGUMENTS
      NAMES [NAMES ...]

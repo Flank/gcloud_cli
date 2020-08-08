@@ -1,0 +1,341 @@
+title: Certificate Manager certificate update test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager certificates update simple-cert --description="new description" --update-labels="foo=new_bar,new_key=value" --certificate-file=cert.pem --private-key-file=key.pem
+  - progress_tracker:
+    - message: Waiting for 'operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429'
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated certificate [simple-cert].
+- execute:
+  - command: |
+      certificate-manager certificates update simple-cert --description="new description" --update-labels="foo=new_bar,new_key=value" --certificate-file=cert.pem --private-key-file=key.pem --async
+  - stderr: |
+      Started 'operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429'
+      Update in progress for certificate [simple-cert].
+- execute:
+  - command: |
+      certificate-manager certificates update simple-cert --remove-labels="foo" --async
+  - stderr: |
+      Started 'operation-1592438180941-5a850681a0de3-c6c8f7de-727009d7'
+      Update in progress for certificate [simple-cert].
+- execute:
+  - command: |
+      certificate-manager certificates update simple-cert --clear-labels --async
+  - stderr: |
+      Started 'operation-1592438180941-5a850681a0de3-c6c8f7de-727009d7'
+      Update in progress for certificate [simple-cert].
+- execute:
+  - command: |
+      certificate-manager certificates update simple-cert --certificate-file=cert.pem
+  - stderr: |
+      ERROR: (gcloud.alpha.certificate-manager.certificates.update) argument --private-key-file: Must be specified.
+      Usage: gcloud alpha certificate-manager certificates update CERTIFICATE [optional flags]
+        optional flags may be  --async | --certificate-file | --clear-labels |
+                               --description | --help | --private-key-file |
+                               --remove-labels | --update-labels
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha certificate-manager certificates update --help
+  - error: '1: argument --private-key-file: Must be specified.'
+actions:
+- load_resource:
+    path: tests/unit/surface/certificate_manager/test_data/cert.pem
+- load_resource:
+    path: tests/unit/surface/certificate_manager/test_data/key.pem
+- execute_command:
+    command: |
+      certificate-manager certificates update simple-cert --description="new description" --update-labels="foo=new_bar,new_key=value" --certificate-file=cert.pem --private-key-file=key.pem
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/certificates/simple-cert",
+              "createTime": "2020-06-17T23:00:17.750921742Z",
+              "updateTime": "2020-06-17T23:00:18.604906978Z",
+              "subjectAlternativeNames": [
+                "gcloud-test-2.example.com",
+                "gcloud-test-1.example.com"
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json&updateMask=self_managed_cert_data%2Clabels%2Cdescription
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: new description
+              labels:
+                foo: new_bar
+                new_key: value
+              selfManagedCertData:
+                certificatePem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURHVENDQWdHZ0F3SUJBZ0lVREVRczhRUmN5SmZRSUtUZk02c0h3cDgxb1VZd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0pERWlNQ0FHQTFVRUF3d1paMk5zYjNWa0xYUmxjM1F0TVM1bGVHRnRjR3hsTG1OdmJUQWVGdzB5TURBMgpNVFl3TVRRek16QmFGdzB6TURBek1UWXdNVFF6TXpCYU1DUXhJakFnQmdOVkJBTU1HV2RqYkc5MVpDMTBaWE4wCkxURXVaWGhoYlhCc1pTNWpiMjB3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRFAKTWVLMlgvYmk3MUhEVC9sSTdKajFCamM2Rkxja2poOVNNNGpPM0c4WUVJMFQ2V3BFVVp0eFFZcHNtYmN2WDVTKwpqelVrQ2tleTBiRDZKazV0ZytxRVdxL3NWbWx2RGE5a0xNMXpaL2tKY1B2aVNhaHZUTXBTNTJCVEFPYURFV2JXCk5xc1FhK2tpY0luUytnNFZUaHVlcElEUjBqbTRWZGJKS3VWajJZOTQyczdWT3Q4bHBuWDlZazU2VmNGVTQ2RDkKTTVqTnRDSUhoNW5QdDRVNHdWTHdkei82bkpyVkJGeWM3aXhaa1FzK2tMZmROUzNQbkhoK3Vra0ZIajl6S1JTaAp6ZUpyRGx0QytUeUdDZjNKTFVEWnFOODdjUWZUM2t1V28wb1JoY0I3eHRiOEgvSVJSTllhalozK1VNY3lVTy9lCmE2dkhPOUh3Ni8vNDhNb0xIcFJuQWdNQkFBR2pRekJCTUQ4R0ExVWRFUVE0TURhQ0dXZGpiRzkxWkMxMFpYTjAKTFRJdVpYaGhiWEJzWlM1amIyMkNHV2RqYkc5MVpDMTBaWE4wTFRFdVpYaGhiWEJzWlM1amIyMHdEUVlKS29aSQpodmNOQVFFTEJRQURnZ0VCQUo4S0dJdGt3T1FqdzlTU3BGMXZoQWdtOEF6V0JoYm1IWGpOckxjRU41WWx2Ymx1ClQrQitrcERDV2RaK0llV2Q0SUhoMmYzRlVQOU1nWkdTeE1RdVo5OWQ5Q0ZSejhOM3ZvSWtDalE3NGQ0R1VrUlMKMUdQOG1ZMHN4N20yQWlLaGdvdjZYY2VDSGt1RmQvcTBaU0w3aHhPU2xqUUFCQThYNUU5ejA2cHIzZkhiQWxGSwpmanhzMzVJSmZXcVpxTEZ4RXA1S09hWisybW4zZlBjb1FhOW9EZnM3cGtpekgvOWJtK2dHcldwSUs1WnBXZEorCkpOZnE4dExPS29ObHpUS0pYWDl3eklnVERqMGIzUWFMUElreWZQWkczVHdhSVROc0FiNmVjU2RDVkZMaVRPVzAKeWpOSjJRV1A5ZTRKby84Y0R0SUI4S0JpaVRBQkVIWEtRams1dTBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+                privateKeyPem: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV3QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktvd2dnU21BZ0VBQW9JQkFRRFBNZUsyWC9iaTcxSEQKVC9sSTdKajFCamM2Rkxja2poOVNNNGpPM0c4WUVJMFQ2V3BFVVp0eFFZcHNtYmN2WDVTK2p6VWtDa2V5MGJENgpKazV0ZytxRVdxL3NWbWx2RGE5a0xNMXpaL2tKY1B2aVNhaHZUTXBTNTJCVEFPYURFV2JXTnFzUWEra2ljSW5TCitnNFZUaHVlcElEUjBqbTRWZGJKS3VWajJZOTQyczdWT3Q4bHBuWDlZazU2VmNGVTQ2RDlNNWpOdENJSGg1blAKdDRVNHdWTHdkei82bkpyVkJGeWM3aXhaa1FzK2tMZmROUzNQbkhoK3Vra0ZIajl6S1JTaHplSnJEbHRDK1R5RwpDZjNKTFVEWnFOODdjUWZUM2t1V28wb1JoY0I3eHRiOEgvSVJSTllhalozK1VNY3lVTy9lYTZ2SE85SHc2Ly80CjhNb0xIcFJuQWdNQkFBRUNnZ0VCQUpKeGp1MGFQTlMvRkFvNUQxZmtxbU9jcGhJdUxCZnhQK0FJdnF4L0R5SnkKS0ZTbmlNMks1SlFUSC9TTVhQWmwxeXNzNndGekpxUVVJOE5hcWRvci8raldkRHRXQkNWVEJlR0c3UnVocEZwdworZ2RCeW9RSVFZU0JOd3JUdXhsdWhrSG4xOWErZnNReHlLaE94djkxK24yUmhkOUhlRFo2clZuNE1MUDNSTG5FCm9CVTZOMDR5bXpUaE5CQitNQldnQlQwOHE5ZklwKzM5M1NQendhNFdJSmZLZEZQTkxzSDU5NDhVY2kzMnN6RDIKelVpYzB2THhrNW9KU1hXckppRDNCMVFPc1F6NnoxTVY2SFp4cTJKUTFvcmdNVjBjOElnM0lIa2VPN05OL0RiQQpwVFNybjRIc0VLVFJLLzFCZ1RTYTNyWlc1cjhMdnJnSk1rZDhyaWo1ZmlrQ2dZRUE1czUyd3lkVVJYK1dCaURCCjFOZDJHdVoxbjRqRnZpU2hCQWF1R0RHM2IraTR3ZlZyRUJKV3A1UWdvMk9EVjRMdGlhOFIrdStmUUMvb241QnkKU1puWjhkczlQYzhCOG5yUHMvNTRxSG12Q2x5SDdBYUdlVzI0bDNrWVI2eHp4d2VwajJjbXVFVFFaU0xKdXBXTQpCY3cxUnYrSGxRa3FIcUZueWF2NWRuV29MUnNDZ1lFQTVjK2hhbVhUSE9iNm0zandyM2lpdVYwYU5TR2xkT0NRCmFFVFJXc0hiYU5OTkxGUldmdU5xRjFZdjMvTElUQ3ZBU0Vrc1c5czZVR2FVSkZ6NXdTM2pXK2QzRGRQb09CZTQKL2JoaVJsYkNZL0VJL0RKbVlnQ29ZZ21xVHNyUlRlRlE5YVhIOFpMSDlQZU9Zc2orOHRRZ2JXbnV2bVkwSjZYWAozSnhCMkNNT3BxVUNnWUVBNVBpK2FTeUROYzgxRGk5Qkc5NEVsUHM4aFdBeWpFZmFWUndyYW1Vb0RpVlo1VkdMClBRNTBXUnRpcGJUN2Y3MnIyWU9NMnQwTnA2ZmZweXl0dE1ha3FJTlBaaG9QWEhicHh5OFVsRTdqait2c0RBTU4KTlRuY2ZxanJwVzg0REtOVlc2YUJpeHo1Z052YU5QaFhTUWtsY2FIZTU4T0h2WXR5WTJmd3U4eE5ZekVDZ1lFQQo0Ylk4WTdQKzFiUkhEOHlKR003emcvdmRjYkhLUURFUHBGbHpCaURBendRNkYvLzl0RUxJUUlOMklnN2lpMjJ0ClBWSWhMMWJ5djJVQXUzWldGMVpxcUNsKzFTWDhQcHVPSmlTaTRWTDFPaFBUTDJDUkRsQjNFVk5NNG5aeGZIeUEKZDhTTHpNak5lOXhwREwwOUttTU9ObWlGQkp4OVBUTzJBQWU0NUFBS3M4RUNnWUVBaDc1OGFzVG1pS1hnNTBTawpuUHMzMCtKTHRhME54NHJ1R0hxNUd6ZTBWcXBQWjdzdHBzNGg2ek94ZSsxblNRSnFsWmp3dG1tWWVtRFErK1BSCnc1eFRTZkVyVWNXT0dzdmZ2Z2Z6VlFmZi8wUlZvSU40OUZZVW9CRHV3L0FHWVF4QmZQM3VmOVgvbUIvcHlOdS8KdkZsVlRmMTl6UzNlZHNEdEtZZFJzSXNZVGN3PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T23:46:59.276694309Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T23:46:59.276694309Z",
+                "endTime": "2020-06-17T23:47:00.470122276Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.Certificate",
+                "name": "projects/fake-project/locations/global/certificates/simple-cert",
+                "createTime": "2020-06-17T23:00:17.750921742Z",
+                "updateTime": "2020-06-17T23:46:59.279546765Z",
+                "labels": {
+                  "foo": "new_bar",
+                  "new_key": "value"
+                },
+                "subjectAlternativeNames": [
+                  "gcloud-test-2.example.com",
+                  "gcloud-test-1.example.com"
+                ],
+                "description": "new description"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for 'operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429'
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated certificate [simple-cert].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager certificates update simple-cert --description="new description" --update-labels="foo=new_bar,new_key=value" --certificate-file=cert.pem --private-key-file=key.pem --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/certificates/simple-cert",
+              "createTime": "2020-06-17T23:00:17.750921742Z",
+              "updateTime": "2020-06-17T23:00:18.604906978Z",
+              "subjectAlternativeNames": [
+                "gcloud-test-2.example.com",
+                "gcloud-test-1.example.com"
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json&updateMask=self_managed_cert_data%2Clabels%2Cdescription
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: new description
+              labels:
+                foo: new_bar
+                new_key: value
+              selfManagedCertData:
+                certificatePem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURHVENDQWdHZ0F3SUJBZ0lVREVRczhRUmN5SmZRSUtUZk02c0h3cDgxb1VZd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0pERWlNQ0FHQTFVRUF3d1paMk5zYjNWa0xYUmxjM1F0TVM1bGVHRnRjR3hsTG1OdmJUQWVGdzB5TURBMgpNVFl3TVRRek16QmFGdzB6TURBek1UWXdNVFF6TXpCYU1DUXhJakFnQmdOVkJBTU1HV2RqYkc5MVpDMTBaWE4wCkxURXVaWGhoYlhCc1pTNWpiMjB3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRFAKTWVLMlgvYmk3MUhEVC9sSTdKajFCamM2Rkxja2poOVNNNGpPM0c4WUVJMFQ2V3BFVVp0eFFZcHNtYmN2WDVTKwpqelVrQ2tleTBiRDZKazV0ZytxRVdxL3NWbWx2RGE5a0xNMXpaL2tKY1B2aVNhaHZUTXBTNTJCVEFPYURFV2JXCk5xc1FhK2tpY0luUytnNFZUaHVlcElEUjBqbTRWZGJKS3VWajJZOTQyczdWT3Q4bHBuWDlZazU2VmNGVTQ2RDkKTTVqTnRDSUhoNW5QdDRVNHdWTHdkei82bkpyVkJGeWM3aXhaa1FzK2tMZmROUzNQbkhoK3Vra0ZIajl6S1JTaAp6ZUpyRGx0QytUeUdDZjNKTFVEWnFOODdjUWZUM2t1V28wb1JoY0I3eHRiOEgvSVJSTllhalozK1VNY3lVTy9lCmE2dkhPOUh3Ni8vNDhNb0xIcFJuQWdNQkFBR2pRekJCTUQ4R0ExVWRFUVE0TURhQ0dXZGpiRzkxWkMxMFpYTjAKTFRJdVpYaGhiWEJzWlM1amIyMkNHV2RqYkc5MVpDMTBaWE4wTFRFdVpYaGhiWEJzWlM1amIyMHdEUVlKS29aSQpodmNOQVFFTEJRQURnZ0VCQUo4S0dJdGt3T1FqdzlTU3BGMXZoQWdtOEF6V0JoYm1IWGpOckxjRU41WWx2Ymx1ClQrQitrcERDV2RaK0llV2Q0SUhoMmYzRlVQOU1nWkdTeE1RdVo5OWQ5Q0ZSejhOM3ZvSWtDalE3NGQ0R1VrUlMKMUdQOG1ZMHN4N20yQWlLaGdvdjZYY2VDSGt1RmQvcTBaU0w3aHhPU2xqUUFCQThYNUU5ejA2cHIzZkhiQWxGSwpmanhzMzVJSmZXcVpxTEZ4RXA1S09hWisybW4zZlBjb1FhOW9EZnM3cGtpekgvOWJtK2dHcldwSUs1WnBXZEorCkpOZnE4dExPS29ObHpUS0pYWDl3eklnVERqMGIzUWFMUElreWZQWkczVHdhSVROc0FiNmVjU2RDVkZMaVRPVzAKeWpOSjJRV1A5ZTRKby84Y0R0SUI4S0JpaVRBQkVIWEtRams1dTBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+                privateKeyPem: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV3QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktvd2dnU21BZ0VBQW9JQkFRRFBNZUsyWC9iaTcxSEQKVC9sSTdKajFCamM2Rkxja2poOVNNNGpPM0c4WUVJMFQ2V3BFVVp0eFFZcHNtYmN2WDVTK2p6VWtDa2V5MGJENgpKazV0ZytxRVdxL3NWbWx2RGE5a0xNMXpaL2tKY1B2aVNhaHZUTXBTNTJCVEFPYURFV2JXTnFzUWEra2ljSW5TCitnNFZUaHVlcElEUjBqbTRWZGJKS3VWajJZOTQyczdWT3Q4bHBuWDlZazU2VmNGVTQ2RDlNNWpOdENJSGg1blAKdDRVNHdWTHdkei82bkpyVkJGeWM3aXhaa1FzK2tMZmROUzNQbkhoK3Vra0ZIajl6S1JTaHplSnJEbHRDK1R5RwpDZjNKTFVEWnFOODdjUWZUM2t1V28wb1JoY0I3eHRiOEgvSVJSTllhalozK1VNY3lVTy9lYTZ2SE85SHc2Ly80CjhNb0xIcFJuQWdNQkFBRUNnZ0VCQUpKeGp1MGFQTlMvRkFvNUQxZmtxbU9jcGhJdUxCZnhQK0FJdnF4L0R5SnkKS0ZTbmlNMks1SlFUSC9TTVhQWmwxeXNzNndGekpxUVVJOE5hcWRvci8raldkRHRXQkNWVEJlR0c3UnVocEZwdworZ2RCeW9RSVFZU0JOd3JUdXhsdWhrSG4xOWErZnNReHlLaE94djkxK24yUmhkOUhlRFo2clZuNE1MUDNSTG5FCm9CVTZOMDR5bXpUaE5CQitNQldnQlQwOHE5ZklwKzM5M1NQendhNFdJSmZLZEZQTkxzSDU5NDhVY2kzMnN6RDIKelVpYzB2THhrNW9KU1hXckppRDNCMVFPc1F6NnoxTVY2SFp4cTJKUTFvcmdNVjBjOElnM0lIa2VPN05OL0RiQQpwVFNybjRIc0VLVFJLLzFCZ1RTYTNyWlc1cjhMdnJnSk1rZDhyaWo1ZmlrQ2dZRUE1czUyd3lkVVJYK1dCaURCCjFOZDJHdVoxbjRqRnZpU2hCQWF1R0RHM2IraTR3ZlZyRUJKV3A1UWdvMk9EVjRMdGlhOFIrdStmUUMvb241QnkKU1puWjhkczlQYzhCOG5yUHMvNTRxSG12Q2x5SDdBYUdlVzI0bDNrWVI2eHp4d2VwajJjbXVFVFFaU0xKdXBXTQpCY3cxUnYrSGxRa3FIcUZueWF2NWRuV29MUnNDZ1lFQTVjK2hhbVhUSE9iNm0zandyM2lpdVYwYU5TR2xkT0NRCmFFVFJXc0hiYU5OTkxGUldmdU5xRjFZdjMvTElUQ3ZBU0Vrc1c5czZVR2FVSkZ6NXdTM2pXK2QzRGRQb09CZTQKL2JoaVJsYkNZL0VJL0RKbVlnQ29ZZ21xVHNyUlRlRlE5YVhIOFpMSDlQZU9Zc2orOHRRZ2JXbnV2bVkwSjZYWAozSnhCMkNNT3BxVUNnWUVBNVBpK2FTeUROYzgxRGk5Qkc5NEVsUHM4aFdBeWpFZmFWUndyYW1Vb0RpVlo1VkdMClBRNTBXUnRpcGJUN2Y3MnIyWU9NMnQwTnA2ZmZweXl0dE1ha3FJTlBaaG9QWEhicHh5OFVsRTdqait2c0RBTU4KTlRuY2ZxanJwVzg0REtOVlc2YUJpeHo1Z052YU5QaFhTUWtsY2FIZTU4T0h2WXR5WTJmd3U4eE5ZekVDZ1lFQQo0Ylk4WTdQKzFiUkhEOHlKR003emcvdmRjYkhLUURFUHBGbHpCaURBendRNkYvLzl0RUxJUUlOMklnN2lpMjJ0ClBWSWhMMWJ5djJVQXUzWldGMVpxcUNsKzFTWDhQcHVPSmlTaTRWTDFPaFBUTDJDUkRsQjNFVk5NNG5aeGZIeUEKZDhTTHpNak5lOXhwREwwOUttTU9ObWlGQkp4OVBUTzJBQWU0NUFBS3M4RUNnWUVBaDc1OGFzVG1pS1hnNTBTawpuUHMzMCtKTHRhME54NHJ1R0hxNUd6ZTBWcXBQWjdzdHBzNGg2ek94ZSsxblNRSnFsWmp3dG1tWWVtRFErK1BSCnc1eFRTZkVyVWNXT0dzdmZ2Z2Z6VlFmZi8wUlZvSU40OUZZVW9CRHV3L0FHWVF4QmZQM3VmOVgvbUIvcHlOdS8KdkZsVlRmMTl6UzNlZHNEdEtZZFJzSXNZVGN3PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T23:46:59.276694309Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Started 'operation-1592437619092-5a850469ceb76-eebbc9c2-66f15429'
+        Update in progress for certificate [simple-cert].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager certificates update simple-cert --remove-labels="foo" --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/certificates/simple-cert",
+              "createTime": "2020-06-17T23:00:17.750921742Z",
+              "updateTime": "2020-06-17T23:46:59.279546765Z",
+              "labels": {
+                "foo": "new_bar",
+                "new_key": "value"
+              },
+              "subjectAlternativeNames": [
+                "gcloud-test-2.example.com",
+                "gcloud-test-1.example.com"
+              ],
+              "description": "new description"
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              labels:
+                new_key: value
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592438180941-5a850681a0de3-c6c8f7de-727009d7",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T23:56:21.111137831Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Started 'operation-1592438180941-5a850681a0de3-c6c8f7de-727009d7'
+        Update in progress for certificate [simple-cert].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager certificates update simple-cert --clear-labels --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/certificates/simple-cert",
+              "createTime": "2020-06-17T23:00:17.750921742Z",
+              "updateTime": "2020-06-17T23:46:59.279546765Z",
+              "labels": {
+                "foo": "new_bar",
+                "new_key": "value"
+              },
+              "subjectAlternativeNames": [
+                "gcloud-test-2.example.com",
+                "gcloud-test-1.example.com"
+              ],
+              "description": "new description"
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              labels: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592438180941-5a850681a0de3-c6c8f7de-727009d7",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T23:56:21.111137831Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Started 'operation-1592438180941-5a850681a0de3-c6c8f7de-727009d7'
+        Update in progress for certificate [simple-cert].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager certificates update simple-cert --certificate-file=cert.pem
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.certificate-manager.certificates.update) argument --private-key-file: Must be specified.
+        Usage: gcloud alpha certificate-manager certificates update CERTIFICATE [optional flags]
+          optional flags may be  --async | --certificate-file | --clear-labels |
+                                 --description | --help | --private-key-file |
+                                 --remove-labels | --update-labels
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha certificate-manager certificates update --help
+    - expect_exit:
+        code: 1
+        message: 'argument --private-key-file: Must be specified.'

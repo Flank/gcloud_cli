@@ -11,7 +11,7 @@ gcloud compute forwarding\-rules set\-target \- modify a forwarding rule to dire
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute forwarding\-rules set\-target\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-target\-http\-proxy\fR\ |\ \fB\-\-target\-http\-proxy\-region\fR=\fITARGET_HTTP_PROXY_REGION\fR] [\fB\-\-global\-target\-https\-proxy\fR\ |\ \fB\-\-target\-https\-proxy\-region\fR=\fITARGET_HTTPS_PROXY_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute forwarding\-rules set\-target\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-grpc\-proxy\fR=\fITARGET_GRPC_PROXY\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-target\-http\-proxy\fR\ |\ \fB\-\-target\-http\-proxy\-region\fR=\fITARGET_HTTP_PROXY_REGION\fR] [\fB\-\-global\-target\-https\-proxy\fR\ |\ \fB\-\-target\-https\-proxy\-region\fR=\fITARGET_HTTPS_PROXY_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,8 +54,9 @@ https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts.
 .RS 2m
 When creating a forwarding rule, exactly one of  `_\-\-target\-instance_`,
 `_\-\-target\-pool_`, `_\-\-target\-http\-proxy_`, `_\-\-target\-https\-proxy_`,
-`_\-\-target\-ssl\-proxy_`, `_\-\-target\-tcp\-proxy_` or
-`_\-\-target\-vpn\-gateway_` must be specified.
+`_\-\-target\-grpc\-proxy_`, `_\-\-target\-ssl\-proxy_`,
+`_\-\-target\-tcp\-proxy_` or `_\-\-target\-vpn\-gateway_`
+must be specified.
 .RE
 
 
@@ -82,6 +83,10 @@ Exactly one of these must be specified:
 .TP 2m
 \fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR
 Target backend service that receives the traffic.
+
+.TP 2m
+\fB\-\-target\-grpc\-proxy\fR=\fITARGET_GRPC_PROXY\fR
+Target gRPC proxy that receives the traffic.
 
 .TP 2m
 \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR
@@ -173,7 +178,7 @@ Internal HTTP(S) Load Balancing, used with \-\-target\-http\-proxy,
 .TP 2m
 \fBINTERNAL_SELF_MANAGED\fR
 Traffic director load balancing or forwarding, used with
-\-\-target\-http\-proxy, \-\-target\-https\-proxy.
+\-\-target\-http\-proxy, \-\-target\-https\-proxy, \-\-target\-grpc\-proxy.
 .RE
 .sp
 

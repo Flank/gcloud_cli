@@ -45,10 +45,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1/projects/test-project:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=RESOURCE&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1/projects/test-project:batchGetAssetsHistory
+          method: POST
           headers: {}
-          body: null
+          body: 'assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=RESOURCE&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z'
         return_response:
           headers:
             status: '200'
@@ -102,10 +102,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=IAM_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory
+          method: POST
           headers: {}
-          body: null
+          body: 'assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=IAM_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z'
         return_response:
           headers:
             status: '200'
@@ -158,10 +158,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project&contentType=ORG_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory
+          method: POST
           headers: {}
-          body: null
+          body: 'assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project&contentType=ORG_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z'
         return_response:
           headers:
             status: '200'
@@ -196,10 +196,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Forganizations%2Ftest-organization&contentType=ACCESS_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory
+          method: POST
           headers: {}
-          body: null
+          body: 'assetNames=%2F%2Fcompute.googleapis.com%2Forganizations%2Ftest-organization&contentType=ACCESS_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z'
         return_response:
           headers:
             status: '200'

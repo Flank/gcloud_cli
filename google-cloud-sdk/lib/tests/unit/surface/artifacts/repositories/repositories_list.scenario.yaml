@@ -6,10 +6,10 @@ summary:
   - command: artifacts repositories list --location=us-west1
   - stderr: ^Listing items under project fake-project..*$
   - stdout: |2+
-                                        ARTIFACT_REGISTRY
-      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
-      gcloud-repo2  MAVEN   test         us-west1  2019-05-17T15:30:40  2019-05-17T15:30:40
-      gcloud-repo3  NPM                  us-west1  2019-05-20T14:36:22  2019-05-20T14:36:22
+                                                   ARTIFACT_REGISTRY
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  ENCRYPTION            CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test         us-west1  Customer-managed key  2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                  us-west1  Google-managed key    2019-05-20T14:36:22  2019-05-20T14:36:22
 
 - execute:
   - command: artifacts repositories list --limit=1 --format=json --location=us-west1
@@ -34,6 +34,7 @@ summary:
             {
               "createTime": "2019-04-11T17:07:58.828698Z",
               "format": "MAVEN",
+              "kmsKeyName": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key",
               "name": "projects/fake-project/locations/us-west1/repositories/mvn-repo",
               "updateTime": "2019-04-11T17:07:58.828698Z"
             }
@@ -47,10 +48,10 @@ summary:
   - stderr: .*To perform actions on the Container Registry repositories listed below
       please use.*$
   - stdout: |2
-                                        ARTIFACT_REGISTRY
-      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
-      gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
-      gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+                                                   ARTIFACT_REGISTRY
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  ENCRYPTION            CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test         us        Google-managed key    2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                  us        Customer-managed key  2019-05-20T14:36:22  2019-05-20T14:36:22
 
                 CONTAINER_REGISTRY
       HOSTNAME            LOCATION
@@ -61,10 +62,10 @@ summary:
   - stderr: .*To perform actions on the Container Registry repositories listed below
       please use.*$
   - stdout: |2
-                                        ARTIFACT_REGISTRY
-      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
-      gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
-      gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+                                                   ARTIFACT_REGISTRY
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  ENCRYPTION            CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test         us        Google-managed key    2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                  us        Customer-managed key  2019-05-20T14:36:22  2019-05-20T14:36:22
 
                 CONTAINER_REGISTRY
       HOSTNAME            LOCATION
@@ -105,15 +106,16 @@ actions:
               description: test
               updateTime: '2019-05-17T22:30:40.996826Z'
               createTime: '2019-05-17T22:30:40.996826Z'
+              kmsKeyName: projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
             - name: projects/fake-project/locations/us-west1/repositories/gcloud-repo3
               format: NPM
               updateTime: '2019-05-20T21:36:22.491339Z'
               createTime: '2019-05-20T21:36:22.491339Z'
     - expect_stdout: |2+
-                                          ARTIFACT_REGISTRY
-        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
-        gcloud-repo2  MAVEN   test         us-west1  2019-05-17T15:30:40  2019-05-17T15:30:40
-        gcloud-repo3  NPM                  us-west1  2019-05-20T14:36:22  2019-05-20T14:36:22
+                                                     ARTIFACT_REGISTRY
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  ENCRYPTION            CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test         us-west1  Customer-managed key  2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                  us-west1  Google-managed key    2019-05-20T14:36:22  2019-05-20T14:36:22
 
     - expect_exit:
         code: 0
@@ -161,6 +163,7 @@ actions:
               format: MAVEN
               updateTime: '2019-04-11T17:07:58.828698Z'
               createTime: '2019-04-11T17:07:58.828698Z'
+              kmsKeyName: projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
     - expect_stdout: |
         [
           {
@@ -181,6 +184,7 @@ actions:
               {
                 "createTime": "2019-04-11T17:07:58.828698Z",
                 "format": "MAVEN",
+                "kmsKeyName": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key",
                 "name": "projects/fake-project/locations/us-west1/repositories/mvn-repo",
                 "updateTime": "2019-04-11T17:07:58.828698Z"
               }
@@ -228,6 +232,7 @@ actions:
               format: NPM
               updateTime: '2019-05-20T21:36:22.491339Z'
               createTime: '2019-05-20T21:36:22.491339Z'
+              kmsKeyName: projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
     - api_call:
         expect_request:
           uri: https://storage.googleapis.com/storage/v1/b/us.artifacts.fake-project.appspot.com/iam/testPermissions?alt=json&permissions=storage.objects.list&userProject=fake-project
@@ -245,10 +250,10 @@ actions:
         matches: .*To perform actions on the Container Registry repositories listed
           below please use.*
     - expect_stdout: |2
-                                          ARTIFACT_REGISTRY
-        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
-        gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
-        gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+                                                     ARTIFACT_REGISTRY
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  ENCRYPTION            CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test         us        Google-managed key    2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                  us        Customer-managed key  2019-05-20T14:36:22  2019-05-20T14:36:22
 
                   CONTAINER_REGISTRY
         HOSTNAME            LOCATION
@@ -293,6 +298,7 @@ actions:
               format: NPM
               updateTime: '2019-05-20T21:36:22.491339Z'
               createTime: '2019-05-20T21:36:22.491339Z'
+              kmsKeyName: projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
     - api_call:
         expect_request:
           uri: https://storage.googleapis.com/storage/v1/b/us.artifacts.my-project.my-domain.com.a.appspot.com/iam/testPermissions?alt=json&permissions=storage.objects.list&userProject=my-domain.com%3Amy-project
@@ -310,10 +316,10 @@ actions:
         matches: .*To perform actions on the Container Registry repositories listed
           below please use.*
     - expect_stdout: |2
-                                          ARTIFACT_REGISTRY
-        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
-        gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
-        gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+                                                     ARTIFACT_REGISTRY
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  ENCRYPTION            CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test         us        Google-managed key    2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                  us        Customer-managed key  2019-05-20T14:36:22  2019-05-20T14:36:22
 
                   CONTAINER_REGISTRY
         HOSTNAME            LOCATION

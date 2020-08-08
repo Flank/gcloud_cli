@@ -45,8 +45,8 @@ class ListTestGA(unit_test_base.SUUnitTestBase):
     self.AssertOutputEquals(
         """\
 NAME TITLE
+example.googleapis.com
 service-name-1.googleapis.com
-service-name.googleapis.com
 """,
         normalize_space=True)
 

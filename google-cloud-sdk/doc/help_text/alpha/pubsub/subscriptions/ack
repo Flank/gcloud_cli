@@ -28,13 +28,21 @@ POSITIONAL ARGUMENTS
           subscription.
 
      [ACK_ID ...]
-        (DEPRECATED) One or more ACK_ID to acknowledge.
+        (DEPRECATED) One or more ACK_ID to acknowledge. An ACK_ID is a string
+        that is returned to subscribers
+        (https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.ReceivedMessage).
+        along with the message. The ACK_ID is different from the message ID
+        (https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.PubsubMessage).
 
         Positional argument ACK_ID is deprecated. Please use --ack-ids instead.
 
 FLAGS
      --ack-ids=[ACK_ID,...]
-        One or more ACK_ID to acknowledge.
+        One or more ACK_ID to acknowledge. An ACK_ID is a string that is
+        returned to subscribers
+        (https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.ReceivedMessage).
+        along with the message. The ACK_ID is different from the message ID
+        (https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.PubsubMessage).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

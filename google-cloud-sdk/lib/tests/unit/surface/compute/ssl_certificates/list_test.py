@@ -38,7 +38,7 @@ class SslCertificatesListTest(test_base.BaseTest,
 
   def SetUp(self):
     self.SelectApi(self._api)
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)

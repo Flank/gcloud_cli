@@ -70,6 +70,8 @@ class SetupTest(e2e_base.WithServiceAuth, e2e_base.WithServiceAccountFile):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.account_name_generator = e2e_utils.GetResourceNameGenerator(
         prefix='dev')
+    self.docker_file = self.Resource('tests', 'e2e', 'surface', 'code',
+                                     'testdata', 'hello', 'Dockerfile')
 
   def SetUp(self):
     account_name = next(self.account_name_generator)
@@ -109,10 +111,11 @@ class SetupTest(e2e_base.WithServiceAuth, e2e_base.WithServiceAccountFile):
     pod_and_services_path = os.path.join(_LOCAL_DEVELOPMENT_DIR,
                                          'pods_and_services.yaml')
     with refresh_token as auth, local_credential_variable as _:
-      command = ('code export --project {0} --kubernetes-file={1} '
-                 '--skaffold-file={2} --service-account={3}').format(
-                     auth.Project(), pod_and_services_path, _SKAFFOLD_FILE_PATH,
-                     self.local_account_email)
+      command = (
+          'code export --project {0} --kubernetes-file={1} '
+          '--skaffold-file={2} --service-account={3} --dockerfile={4}').format(
+              auth.Project(), pod_and_services_path, _SKAFFOLD_FILE_PATH,
+              self.local_account_email, self.docker_file)
       self.Run(command)
       self.WriteInput('y')
 

@@ -53,18 +53,6 @@ actions:
       GA: v1
       BETA: beta
       ALPHA: alpha
-- define_reference:
-    reference: query-params
-    track_values:
-      GA: alt=json
-      BETA: alt=json&optionsRequestedPolicyVersion=3
-      ALPHA: alt=json&optionsRequestedPolicyVersion=3
-- define_reference:
-    reference: policy-version
-    track_values:
-      GA: '1'
-      BETA: '3'
-      ALPHA: '3'
 - write_file:
     path: policy.json
     contents: |
@@ -82,7 +70,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           headers: {}
           body: null
@@ -101,7 +89,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           headers: {}
           body: null
@@ -148,7 +136,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           headers: {}
           body: null
@@ -178,7 +166,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           headers: {}
           body: null
@@ -199,7 +187,7 @@ actions:
           headers: {}
           body:
             text: |-
-              {"policy": {"etag": "BwWLivG1FbE=", "version": $$policy-version$$}}
+              {"policy": {"etag": "BwWLivG1FbE=", "version": 3}}
         return_response:
           headers:
             status: '200'

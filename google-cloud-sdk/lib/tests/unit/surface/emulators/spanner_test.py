@@ -19,6 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.emulators import spanner_util
 from googlecloudsdk.command_lib.emulators import util
 from googlecloudsdk.core.util import platforms
@@ -39,8 +41,11 @@ def _IsRunningOnLinux():
   return current_os is platforms.OperatingSystem.LINUX
 
 
-class SpannerStartTest(cli_test_base.CliTestBase):
+class SpannerStartTestBeta(cli_test_base.CliTestBase):
   """Tests for commands and side-effects."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     """Patches mocks into the modules under test."""
@@ -73,7 +78,7 @@ class SpannerStartTest(cli_test_base.CliTestBase):
     ]
 
   def testRun_WithNoArgs(self):
-    self.Run('beta emulators spanner start')
+    self.Run('emulators spanner start')
     if _IsRunningOnLinux():
       self.exec_mock.assert_called_with(
           self._ExpectedNativeCommand('localhost', '9010', '9020'))
@@ -85,8 +90,7 @@ class SpannerStartTest(cli_test_base.CliTestBase):
 
   def testRun_WithHostPort(self):
     self.Run(
-        'beta emulators spanner start --host-port=1.2.3.4:1111 --rest-port 1234'
-    )
+        'emulators spanner start --host-port=1.2.3.4:1111 --rest-port 1234')
     if _IsRunningOnLinux():
       self.exec_mock.assert_called_with(
           self._ExpectedNativeCommand('1.2.3.4', '1111', '1234'))
@@ -94,8 +98,22 @@ class SpannerStartTest(cli_test_base.CliTestBase):
       self.exec_mock.assert_called_with(
           self._ExpectedDockerCommand('1.2.3.4', '1111', '1234'))
 
+  def testRun_WithUseDocker(self):
+    self.Run('emulators spanner start --use-docker=true')
+    self.exec_mock.assert_called_with(
+        self._ExpectedDockerCommand('127.0.0.1', '9010', '9020'))
 
-class SpannerEnvInitTest(cli_test_base.CliTestBase):
+
+class SpannerStartTestAlpha(SpannerStartTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class SpannerEnvInitTestBeta(cli_test_base.CliTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.read_yaml_mock = mock.MagicMock()
@@ -108,13 +126,19 @@ class SpannerEnvInitTest(cli_test_base.CliTestBase):
                           }
 
   def testRun(self):
-    result = self.Run('beta emulators spanner env-init')
+    result = self.Run('emulators spanner env-init')
     self.assertEqual({'foo': 'bar', 'quotme': 'xyzzy this'}, result)
     self.read_yaml_mock.assert_called_with(spanner_util.GetDataDir())
     if _IsRunningOnWindows():
       self.AssertOutputEquals("set foo=bar\nset quotme='xyzzy this'\n")
     else:
       self.AssertOutputEquals("export foo=bar\nexport quotme='xyzzy this'\n")
+
+
+class SpannerEnvInitTestAlpha(SpannerEnvInitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

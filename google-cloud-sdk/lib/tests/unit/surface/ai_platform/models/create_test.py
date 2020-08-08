@@ -84,6 +84,16 @@ class CreateSurfaceTestGA(base.MlGaPlatformTestBase):
     self._ExpectModel(regions=['europe-west4'])
     self.Run(
         '{} models create myModel --region europe-west4'.format(module_name))
+    self.AssertErrContains(
+        'Using endpoint [https://europe-west4-ml.googleapis.com/]')
+
+  def testConflictingRegionFlag(self, module_name):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --region: At most one of --region | --regions '
+        'may be specified'):
+      self.Run(
+          '{} models create myModel --region regionA --regions regionB'
+          .format(module_name))
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')
@@ -93,14 +103,6 @@ class CreateSurfaceTestBeta(base.MlBetaPlatformTestBase, CreateSurfaceTestGA):
     self._ExpectModel(online_prediction_console_logging=True)
     self.Run('{} models create myModel --enable-console-logging'.format(
         module_name))
-
-  def testConflictingRegionFlag(self, module_name):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --region: At most one of --region | --regions '
-        'may be specified'):
-      self.Run(
-          '{} models create myModel --region regionA --regions regionB'
-          .format(module_name))
 
 
 class CreateSurfaceTestAlpha(base.MlAlphaPlatformTestBase,

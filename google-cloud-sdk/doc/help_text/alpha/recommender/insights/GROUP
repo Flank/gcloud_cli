@@ -25,22 +25,20 @@ COMMANDS
         (ALPHA) List insights for a Cloud project.
 
      mark-accepted
-        (ALPHA) Mark an insight's state as ACCEPTED. Can be applied to insights
-        in ACTIVE or ACCEPTED state.
+        (ALPHA) Mark an insight's state as ACCEPTED.
 
      mark-active
-        (ALPHA) Mark an insight's state as ACTIVE. Can be applied to insights
-        in DISMISSED state.
+        (ALPHA) Mark an insight's state as ACTIVE.
 
      mark-dismissed
-        (ALPHA) Mark an insight's state as DISMISSED. Can be applied to
-        insights in ACTIVE state.
+        (ALPHA) Mark an insight's state as DISMISSED.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud recommender insights
         $ gcloud beta recommender insights
 

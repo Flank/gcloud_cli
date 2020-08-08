@@ -25,7 +25,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_templates import test_resources
 
 import mock
 
@@ -56,10 +56,10 @@ class InstancesListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME                MACHINE_TYPE     PREEMPTIBLE CREATION_TIMESTAMP
-            instance-template-1 n1-standard-1                2013-09-06T17:54:10.636-07:00
-            instance-template-2 n1-highmem-1                 2013-10-06T17:54:10.636-07:00
-            instance-template-3 custom (6 vCPU, 16.75 GiB)  2013-11-06T17:54:10.636-07:00
+            NAME                MACHINE_TYPE     PREEMPTIBLE    CREATION_TIMESTAMP
+            instance-template-1 n1-standard-1                   2013-09-06T17:54:10.636-07:00
+            instance-template-2 n1-highmem-1                    2013-10-06T17:54:10.636-07:00
+            instance-template-3 custom (n2, 6 vCPU, 16.75 GiB)  2013-11-06T17:54:10.636-07:00
             """), normalize_space=True)
 
   def testInstanceTemplatesCompleter(self):

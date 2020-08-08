@@ -1,5 +1,5 @@
 title: A gadget for creating GKE cluster with knative addon. Should not be run in presubmit. The cluster name has been whitelisted as a static e2e resource (see cl/218372416).
-release_tracks: [ALPHA]
+release_tracks: [GA]
 
 filters:
   skipAlways:  # used as a tool for cluster creation
@@ -15,7 +15,7 @@ actions:
 
 - execute_command:
     command: container clusters create do-not-delete-gke-knative-test-cluster
-      --addons=Istio,CloudRun,HttpLoadBalancing
+      --addons=CloudRun,HttpLoadBalancing
       --machine-type=n1-standard-2 --enable-autoscaling --min-nodes=1 --max-nodes=10
       --cluster-version=latest --scopes=cloud-platform,logging-write,monitoring-write,pubsub
       --enable-stackdriver-kubernetes --zone=us-central1-a -q

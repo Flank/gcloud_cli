@@ -1282,6 +1282,31 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
                            '--web-server-allow-all', '--web-server-allow-ip',
                            'ip_range=192.168.35.0/28', self.TEST_ENVIRONMENT_ID)
 
+  def testCloudSqlMachineType(self):
+    """Test specifying Cloud SQL machine type."""
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=self.messages.NodeConfig(
+            diskSizeGb=self.DEFAULT_DISK_SIZE_GB),
+        databaseConfig=self.messages
+        .DatabaseConfig(machineType='db-n1-standard-2'))
+
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--async', '--cloud-sql-machine-type',
+                                     'db-n1-standard-2',
+                                     self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+
 
 class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
 

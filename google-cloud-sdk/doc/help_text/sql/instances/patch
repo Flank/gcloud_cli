@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud sql instances patch INSTANCE [--activation-policy=ACTIVATION_POLICY]
         [--[no-]assign-ip] [--async] [--availability-type=AVAILABILITY_TYPE]
         [--cpu=CPU] [--diff] [--[no-]enable-bin-log]
-        [--[no-]enable-database-replication] [--follow-gae-app=FOLLOW_GAE_APP]
+        [--[no-]enable-database-replication] [--enable-point-in-time-recovery]
+        [--follow-gae-app=FOLLOW_GAE_APP]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
         [--maintenance-window-any]
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
@@ -77,6 +78,11 @@ FLAGS
         instance(s). WARNING: Instance will be restarted. Use
         --enable-database-replication to enable and
         --no-enable-database-replication to disable.
+
+     --enable-point-in-time-recovery
+        Specifies if point-in-time recovery (using write-ahead log archiving)
+        should be enabled. If backup configuration is disabled, point-in-time
+        recovery must be disabled as well.
 
      --follow-gae-app=FOLLOW_GAE_APP
         First Generation instances only. The App Engine app this instance

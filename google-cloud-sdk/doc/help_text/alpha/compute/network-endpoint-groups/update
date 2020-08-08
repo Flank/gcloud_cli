@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute network-endpoint-groups update - update a Google
-        Compute Engine network endpoint group
+    gcloud alpha compute network-endpoint-groups update - update a Compute
+        Engine network endpoint group
 
 SYNOPSIS
     gcloud alpha compute network-endpoint-groups update NAME
@@ -10,7 +10,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update a Google Compute Engine network endpoint group.
+    (ALPHA) Update a Compute Engine network endpoint group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -24,7 +24,7 @@ REQUIRED FLAGS
           The network endpoint to add to the network endpoint group. Keys used
           depend on the endpoint type of the NEG.
 
-          GCE_VM_IP_PORT
+          gce-vm-ip-port
 
               *instance* - Name of instance in same zone as the network endpoint
               group.
@@ -43,7 +43,7 @@ REQUIRED FLAGS
 
               *port* - Required endpoint port unless NEG default port is set.
 
-          INTERNET_IP_PORT
+          internet-ip-port
 
               *ip* - Required IP address of the endpoint to attach. Must be
               publicly routable.
@@ -53,7 +53,7 @@ REQUIRED FLAGS
               well known port for the backend protocol will be used instead
               (80 for http, 443 for https).
 
-          INTERNET_FQDN_PORT
+          internet-fqdn-port
 
               *fqdn* - Required fully qualified domain name to use to look up an
               external endpoint. Must be resolvable to a public IP address via
@@ -64,7 +64,7 @@ REQUIRED FLAGS
               well known port for the backend protocol will be used instead
               (80 for http, 443 for https or http2).
 
-          NON_GCP_PRIVATE_IP_PORT
+          non-gcp-private-ip-port
 
               *ip* - Required IP address of the network endpoint to attach. The
               IP address must belong to a VM not in Google Compute Engine and
@@ -73,7 +73,7 @@ REQUIRED FLAGS
               *port* - Required port of the network endpoint to attach unless
               NEG default port is set.
 
-          GCE_VM_PRIMARY_IP
+          gce-vm-primary-ip
 
               *instance* - Required instance name in same zone as the network
               endpoint group.
@@ -86,11 +86,25 @@ REQUIRED FLAGS
               *ip* - Required IP address of the network endpoint to attach. The
               IP address must be the primary IP of a VM's network interface.
 
+          gce-vm-ip
+
+              *instance* - Required instance name in same zone as the network
+              endpoint group.
+
+              The VM instance must belong to the network / subnetwork
+              associated with the network endpoint group. If the VM instance
+              is deleted, then any network endpoint group that has a reference
+              to it is updated.
+
+              *ip* - Optional IP address of the network endpoint to attach. The
+              IP address must be the IP of a VM's network interface. If not
+              specified, primary NIC address will be used.
+
        --remove-endpoint=[fqdn=FQDN],[instance=INSTANCE],[ip=IP],[port=PORT]
           The network endpoint to detach from the network endpoint group. Keys
           used depend on the endpoint type of the NEG.
 
-          GCE_VM_IP_PORT
+          gce-vm-ip-port
 
               *instance* - Required name of instance whose endpoint(s) to
               detach. If IP address is unset then all endpoints for the
@@ -101,14 +115,14 @@ REQUIRED FLAGS
 
               *port* - Optional port of the network endpoint to detach.
 
-          INTERNET_IP_PORT
+          internet-ip-port
 
               *ip* - Required IP address of the network endpoint to detach.
 
               *port* - Optional port of the network endpoint to detach if the
               endpoint has a port specified.
 
-          INTERNET_FQDN_PORT
+          internet-fqdn-port
 
               *fqdn* - Required fully qualified domain name of the endpoint to
               detach.
@@ -116,14 +130,14 @@ REQUIRED FLAGS
               *port* - Optional port of the network endpoint to detach if the
               endpoint has a port specified.
 
-          NON_GCP_PRIVATE_IP_PORT
+          non-gcp-private-ip-port
 
               *ip* - Required IP address of the network endpoint to detach.
 
               *port* - Required port of the network endpoint to detach unless
               NEG default port is set.
 
-          GCE_VM_PRIMARY_IP
+          gce-vm-primary-ip
 
               *instance* - Required name of instance whose endpoint(s) to
               detach. If IP address is unset then all endpoints for the
@@ -131,6 +145,16 @@ REQUIRED FLAGS
 
               *ip* - Required IP address of the network endpoint to attach. The
               IP address must be the primary IP of a VM's network interface.
+
+          gce-vm-ip
+
+              *instance* - Required name of instance whose endpoint(s) to
+              detach. If IP address is unset then all endpoints for the
+              instance in the NEG will be detached.
+
+              *ip* - Optional IP address of the network endpoint to attach. The
+              IP address must be the IP of a VM's network interface. If not
+              specified, primary NIC address will be used.
 
 OPTIONAL FLAGS
      At most one of these may be specified:

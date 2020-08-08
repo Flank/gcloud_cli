@@ -40,96 +40,81 @@ Name of the network endpoint group to operate on.
 The default port to use if the port number is not specified in the network
 endpoint.
 
-If this flag isn't specified for a NEG with endpoint type \f5GCE_VM_IP_PORT\fR
-or \f5NON_GCP_PRIVATE_IP_PORT\fR, then every network endpoint in the network
-endpoint group must have a port specified. For a NEG with endpoint type
-\f5INTERNET_IP_PORT\fR and \f5INTERNET_FQDN_PORT\fR. If the default port is not
-specified the well known port for your backend protocol will be used (80 for
-http, 443 for https).
+If this flag isn't specified for a NEG with endpoint type
+\f5gce\-vm\-ip\-port\fR or \f5non\-gcp\-private\-ip\-port\fR, then every network
+endpoint in the network endpoint group must have a port specified. For a NEG
+with endpoint type \f5internet\-ip\-port\fR and \f5internet\-fqdn\-port\fR. If
+the default port is not specified the well known port for your backend protocol
+will be used (80 for http, 443 for https).
 
-This flag is not supported for NEGs with endpoint type \f5SERVERLESS\fR.
+This flag is not supported for NEGs with endpoint type \f5serverless\fR.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
 Name of the network in which the NEG is created. \f5default\fR project network
 is used if unspecified.
 
-This is only supported for NEGs with endpoint type \f5GCE_VM_IP_PORT\fR or
-\f5NON_GCP_PRIVATE_IP_PORT\fR or \f5GCE_VM_PRIMARY_IP\fR.
+This is only supported for NEGs with endpoint type \f5gce\-vm\-ip\-port\fR,
+\f5non\-gcp\-private\-ip\-port\fR, \f5gce\-vm\-primary\-ip\fR, or
+\f5gce\-vm\-ip\fR.
 
 .TP 2m
 \fB\-\-network\-endpoint\-type\fR=\fINETWORK_ENDPOINT_TYPE\fR; default="gce\-vm\-ip\-port"
 Determines the spec of endpoints attached to this group.
 
 .RS 2m
-.IP "\(em" 2m
-\f5GCE_VM_IP_PORT\fR
+.TP 2m
+\fBgce\-vm\-ip\-port\fR
+Endpoint IP address must belong to a VM in Google Compute Engine (either the
+primary IP or as part of an aliased IP range). The \f5\-\-default\-port\fR must
+be specified or every network endpoint in the network endpoint group must have a
+port specified.
 
-.RS 2m
-Endpoint IP address must belong to a VM in Google Compute Engine
-(either the primary IP or as part of an aliased IP range).
-The `\-\-default\-port` must be specified or every network endpoint
-in the network endpoint group must have a port specified.
-.RE
-
-.IP "\(em" 2m
-\f5INTERNET_IP_PORT\fR
-
-.RS 2m
-Endpoint IP address must be publicly routable address. The default
-port will be used if specified. If the default port is not
-specified, the well known port for your backend protocol will be
-used as the default port (80 for http,  443 for https).
-.RE
-
-.IP "\(em" 2m
-\f5INTERNET_FQDN_PORT\fR
-
-.RS 2m
-Endpoint FQDN must be resolvable to a public IP address via public
-DNS. The default port will be used if specified. If the default
-port is not specified, the well known port for your backend
-protocol will be used as the default port (80 for http, 443 for
+.TP 2m
+\fBinternet\-ip\-port\fR
+Endpoint IP address must be publicly routable address. The default port will be
+used if specified. If the default port is not specified, the well known port for
+your backend protocol will be used as the default port (80 for http, 443 for
 https).
-.RE
 
-.IP "\(em" 2m
-\f5NON_GCP_PRIVATE_IP_PORT\fR
+.TP 2m
+\fBinternet\-fqdn\-port\fR
+Endpoint FQDN must be resolvable to a public IP address via public DNS. The
+default port will be used if specified. If the default port is not specified,
+the well known port for your backend protocol will be used as the default port
+(80 for http, 443 for https).
 
-.RS 2m
-Endpoint IP address must belong to a VM not in Google Compute
-Engine and must be routable using a cloud router over VPN or an
-Interconnect. In this case the NEG must be zonal. The
-`\-\-default\-port` must be specified or every network endpoint in
-the network endpoint group must have a port specified.
-.RE
+.TP 2m
+\fBnon\-gcp\-private\-ip\-port\fR
+Endpoint IP address must belong to a VM not in Google Compute Engine and must be
+routable using a cloud router over VPN or an Interconnect. In this case the NEG
+must be zonal. The \f5\-\-default\-port\fR must be specified or every network
+endpoint in the network endpoint group must have a port specified.
 
-.IP "\(em" 2m
-\f5GCE_VM_PRIMARY_IP\fR
+.TP 2m
+\fBgce\-vm\-primary\-ip\fR
+Endpoint IP address must be the primary IP of a VM's primary network interface
+in Google Compute Engine.
 
-.RS 2m
-Endpoint IP address must be the primary IP of a VM's primary
-network interface in Google Compute Engine.
-.RE
+.TP 2m
+\fBserverless\fR
+The network endpoint is handled by specified serverless infrastructure, such as
+Cloud Run, App Engine, or Cloud Function. Default port, network, and subnet are
+not effective for serverless endpoints.
 
-.IP "\(em" 2m
-\f5SERVERLESS\fR
+.TP 2m
+\fBgce\-vm\-ip\fR
+Endpoint must be the IP address of a VM's network interface in Google Compute
+Engine. Instance reference is required. IP is optional, primary NIC address will
+be used if no IP specified. Port must not be specified.
 
-.RS 2m
-The network endpoint is handled by specified serverless
-infrastructure, such as Cloud Run, App Engine, or Cloud Function.
-Default port, network, and subnet are not effective for SERVERLESS
-endpoints.
-.RE
-
-.RE
-.RE
-.sp
 \fINETWORK_ENDPOINT_TYPE\fR must be one of: \fBgce\-vm\-ip\-port\fR,
 \fBinternet\-ip\-port\fR, \fBinternet\-fqdn\-port\fR,
-\fBnon\-gcp\-private\-ip\-port\fR, \fBgce\-vm\-primary\-ip\fR, \fBserverless\fR.
+\fBnon\-gcp\-private\-ip\-port\fR, \fBgce\-vm\-primary\-ip\fR, \fBserverless\fR,
+\fBgce\-vm\-ip\fR.
 
-.RS 2m
+.RE
+.sp
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
 Name of the subnet to which all network endpoints belong.
@@ -137,13 +122,13 @@ Name of the subnet to which all network endpoints belong.
 If not specified, network endpoints may belong to any subnetwork in the region
 where the network endpoint group is created.
 
-This is only supported for NEGs with endpoint type \f5GCE_VM_IP_PORT\fR or
-\f5GCE_VM_PRIMARY_IP\fR.
+This is only supported for NEGs with endpoint type \f5gce\-vm\-ip\-port\fR,
+\f5gce\-vm\-primary\-ip\fR, or \f5gce\-vm\-ip\fR.
 
 .TP 2m
 
 The serverless routing configurations are only valid when endpoint type of the
-network endpoint group is \f5SERVERLESS\fR. At most one of these may be
+network endpoint group is \f5serverless\fR. At most one of these may be
 specified:
 
 .RS 2m

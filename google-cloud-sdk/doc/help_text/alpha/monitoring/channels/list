@@ -24,7 +24,7 @@ EXAMPLES
         $ gcloud alpha monitoring channels list \
           --filter='type="email"' \
           --sort-by=labels.email_address \
-          --format='value(labels.email_address)'
+          --format="value(labels.email_address)"
 
 FLAGS
      --type=TYPE

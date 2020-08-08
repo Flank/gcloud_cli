@@ -26,11 +26,11 @@ from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
-class RestoreTestAlpha(base.BigtableV2TestBase,
-                       waiter_test_base.CloudOperationsBase):
+class RestoreTestGA(base.BigtableV2TestBase,
+                    waiter_test_base.CloudOperationsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances_tables.Restore
@@ -91,6 +91,18 @@ class RestoreTestAlpha(base.BigtableV2TestBase,
              '--destination newtable')
 
     self.AssertErrContains('Creating bigtable table newtable')
+
+
+class RestoreTestBeta(RestoreTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RestoreTestAlpha(RestoreTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -86,6 +86,8 @@ FLAGS
             Redis 3.2 compatibility
          redis_4_0
             Redis 4.0 compatibility
+         redis_5_0
+            Redis 5.0 compatibility
 
      --reserved-ip-range=RESERVED_IP_RANGE
         The CIDR range of internal addresses that are reserved for this

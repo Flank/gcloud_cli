@@ -24,6 +24,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
+from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import oauth2client
@@ -76,14 +77,31 @@ class GCEIntegrationTest(cli_test_base.CliTestBase):
         cred, oauth2client.contrib.gce.AppAssertionCredentials)
     self.assertIsNotNone(cred.access_token)
     self.assertFalse(cred.access_token_expired)
+    self.assertIsNotNone(cred.id_tokenb64)
 
     cred = store.AcquireFromGCE(use_google_auth=True)
     self.assertIsInstance(cred, google_auth_gce.Credentials)
     self.assertIsNotNone(cred.token)
     self.assertFalse(cred.expired)
+    self.assertIsNotNone(cred._id_token)
+    self.assertIsNotNone(cred.id_tokenb64)
 
-    token = gce.Metadata().GetIdToken('foo')
-    self.assertIsNotNone(token)
+
+class GCEIntegrationTestGCPServices(cli_test_base.CliTestBase):
+
+  @sdk_test_base.Filters.RunOnlyOnGCE
+  def testGoogleAuth(self):
+    with e2e_base.GceServiceAccount() as auth:
+      # dns surface is on google-auth
+      self.Run('dns managed-zones list --project {} --account={}'.format(
+          auth.Project(), auth.Account()))
+
+  # TODO(b/147255499): remove this test after everything is on google-auth.
+  @sdk_test_base.Filters.RunOnlyOnGCE
+  def testOauth2client(self):
+    with e2e_base.GceServiceAccount() as auth:
+      self.Run('compute instances list --project {} --account={}'.format(
+          auth.Project(), auth.Account()))
 
 
 if __name__ == '__main__':

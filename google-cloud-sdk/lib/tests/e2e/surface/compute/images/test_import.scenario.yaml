@@ -23,7 +23,7 @@ summary:
       status: READY
 - execute:
   - command: compute images import $$import-image$$ --source-image $$image$$ --custom-workflow
-      dummy.wf.json --timeout 20s --quiet
+      dummy.wf.json --timeout 30s --quiet
   - stderr: |-
       .*WARNING: Importing image\. This may take up to 2 hours.*
       .*Created.*
@@ -100,7 +100,7 @@ actions:
         code: 0
 - execute_command:
     command: compute images import $$import-image$$ --source-image $$image$$ --custom-workflow
-      dummy.wf.json --timeout 20s --quiet
+      dummy.wf.json --timeout 30s --quiet
     validation_only: true
     events:
     - expect_stderr:

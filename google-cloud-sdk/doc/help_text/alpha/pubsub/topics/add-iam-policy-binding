@@ -45,23 +45,21 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --condition=[KEY=VALUE,...]
-          Condition of the binding to be added. When condition is explicitly
-          specified as None (e.g. --condition=None), a binding without a
-          condition is added. When --condition is specified and is not a None
-          condition, --role cannot be a primitive role. Primitive roles are
-          roles/editor, roles/owner, and roles/viewer.
+          The condition of the binding to be added. When the condition is
+          explicitly specified as None (--condition=None), a binding without a
+          condition is added. When the condition is specified and is not None,
+          --role cannot be a primitive role. Primitive roles are roles/editor,
+          roles/owner, and roles/viewer.
 
        expression
           (Required) Expression of the condition which evaluates to True or
           False. This uses a subset of Common Expression Language syntax.
 
        title
-          (Required) Title for the expression, i.e. a short string describing
-          its purpose.
+          (Required) A short string describing the purpose of the expression.
 
        description
-          (Optional) Description for the expression. This is a longer text
-          which describes the expression.
+          (Optional) Additional description for the expression.
 
           NOTE: An unsatisfied condition will not allow access via this
           binding.

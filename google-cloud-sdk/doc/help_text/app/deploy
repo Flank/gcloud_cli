@@ -3,7 +3,7 @@ NAME
         to App Engine
 
 SYNOPSIS
-    gcloud app deploy [DEPLOYABLES ...] [--bucket=BUCKET]
+    gcloud app deploy [DEPLOYABLES ...] [--appyaml=APPYAML] [--bucket=BUCKET]
         [--ignore-file=IGNORE_FILE] [--image-url=IMAGE_URL] [--no-promote]
         [--no-stop-previous-version] [--version=VERSION, -v VERSION]
         [GCLOUD_WIDE_FLAG ...]
@@ -21,11 +21,12 @@ DESCRIPTION
     appengine-web.xml file inside the WEB-INF directory. gcloud app deploy
     skips files specified in the .gcloudignore file (see gcloud topic
     gcloudignore for more information). For Java11 Standard, you can either use
-    the yaml file, or a Maven pom.xml or, if the application is a single
-    self-contained jar, you can give the path to the jar and a simple service
-    configuration will be generated. You can deploy Java11 Maven source
-    projects by specifying the location of your project's pom.xml file, and it
-    will be built and deployed using App Engine Buildpacks.
+    the yaml file, a Maven pom.xml, or a Gradle build.gradle. Alternatively, if
+    the application is a single self-contained jar, you can give the path to
+    the jar and a simple service configuration will be generated. You can
+    deploy Java11 Maven source projects by specifying the location of your
+    project's pom.xml file, and it will be built and deployed using App Engine
+    Buildpacks.
 
 POSITIONAL ARGUMENTS
      [DEPLOYABLES ...]
@@ -35,6 +36,10 @@ POSITIONAL ARGUMENTS
         files (such as app.yaml) in the current directory.
 
 FLAGS
+     --appyaml=APPYAML
+        Deploy with a specific app.yaml that will replace the one defined in
+        the DEPLOYABLE.
+
      --bucket=BUCKET
         The Google Cloud Storage bucket used to stage files associated with the
         deployment. If this argument is not specified, the application's
@@ -94,6 +99,10 @@ EXAMPLES
     To deploy an App Engine Standard Java11 Maven source project, run:
 
         $ gcloud app deploy ~/my_app/pom.xml
+
+    To deploy an App Engine Standard Java11 Gradle source project, run:
+
+        $ gcloud app deploy ~/my_app/build.gradle
 
     By default, the service is deployed the current project configured via:
 

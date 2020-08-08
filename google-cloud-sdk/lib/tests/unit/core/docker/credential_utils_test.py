@@ -31,8 +31,11 @@ from tests.lib import sdk_test_base
 _EMPTY_JSON_OBJECT_STRING = '{}'
 _INVALID_CRED_VERSION = '1.10'
 _TEST_REGISTRIES = ['gcr.io', 'us.gcr.io', 'xyz.gcr.io']
+_TEST_AR_REGISTRIES = ['us-docker.pkg.dev', 'foo-docker.pkg.dev']
 _TEST_MAPPINGS = collections.OrderedDict(
     (x, 'gcloud') for x in _TEST_REGISTRIES)
+_TEST_MAPPINGS_WITH_AR = collections.OrderedDict(
+    (x, 'gcloud') for x in _TEST_REGISTRIES + _TEST_AR_REGISTRIES)
 _TEST_CRED_HELPERS_CONTENT_DICT = {
     cred_utils.CREDENTIAL_HELPER_KEY: _TEST_MAPPINGS
 }
@@ -47,10 +50,8 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
     self.test_dir = self.CreateTempDir('config')
     self.test_config = os.path.join(self.test_dir, 'config.json')
     self.test_version = '1.13'
-    self.StartObjectPatch(
-        cred_utils,
-        'DefaultAuthenticatedRegistries',
-        return_value=_TEST_REGISTRIES)
+    self.StartObjectPatch(cred_utils, 'DefaultAuthenticatedRegistries',
+                          self._DefaultAuthenticatedRegistries)
     self.StartObjectPatch(
         client_lib,
         'GetDockerConfigPath',
@@ -71,6 +72,12 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
     """Builds Test Configuration object from json_str."""
     return cred_utils.Configuration.FromJson(json_str, self.test_config)
 
+  def _DefaultAuthenticatedRegistries(self, include_artifact_registry=False):
+    if include_artifact_registry:
+      return _TEST_REGISTRIES + _TEST_AR_REGISTRIES
+    else:
+      return _TEST_REGISTRIES
+
   def testGetGcloudCredentialHelperConfig(self):
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      _TEST_CRED_HELPERS_CONTENT_DICT)
@@ -80,6 +87,12 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
         _TEST_MAPPINGS,
         cred_utils.BuildOrderedCredentialHelperRegistries(
             cred_utils.DefaultAuthenticatedRegistries()))
+
+  def testDefaultAuthenticatedRegistriesIncludingAR(self):
+    self.assertEqual(
+        _TEST_MAPPINGS_WITH_AR,
+        cred_utils.BuildOrderedCredentialHelperRegistries(
+            cred_utils.DefaultAuthenticatedRegistries(True)))
 
   def testGetRegisteredCredentialHelpers(self):
     docker_info = self._GetFakeConfiguration(_TEST_CRED_HELPERS_CONTENT_STRING)

@@ -6,7 +6,7 @@ SYNOPSIS
     gcloud alpha domains registrations configure dns REGISTRATION
         [--validate-only]
         [--cloud-dns-zone=CLOUD_DNS_ZONE
-          | --dns-settings-from-file=DNS_SETTINGS_FROM_FILE
+          | --dns-settings-from-file=DNS_SETTINGS_FILE_NAME
           | --name-servers=NAME_SERVER,...,[...] | --use-google-domains-dns]
         [--async] [--disable-dnssec] [--unsafe-dns-update]
         [GCLOUD_WIDE_FLAG ...]
@@ -15,13 +15,11 @@ DESCRIPTION
     (ALPHA) Configure DNS settings of a Cloud Domains registration.
 
     In most cases, this command is used for changing the authoritative name
-    servers for the given domain. However, advanced options are available.
+    servers and DNSSEC options for the given domain. However, advanced options
+    like glue records are available.
 
-    This command can only be called on registrations in state ACTIVE or
-    SUSPENDED.
-
-    When using Cloud DNS Zone or Google Domains name servers the DNS Security
-    (DNSSEC) will be enabled by default (if possible). It can be disabled using
+    When using Cloud DNS Zone or Google Domains name servers, DNSSEC will be
+    enabled by default where possible. You can disable it using the
     --disable-dnssec flag.
 
 POSITIONAL ARGUMENTS
@@ -43,21 +41,28 @@ COMMONLY USED FLAGS
         Don't actually configure DNS settings of the registration. Only
         validate arguments.
 
-     Set the addresses of authoritative name servers for the given domain. At
-     most one of these may be specified:
+     Set the authoritative name servers for the given domain.
+
+     Warning: Do not change name servers if ds_records is non-empty. Clear
+     ds_records first by calling this command with the --disable-dnssec flag,
+     and wait 24 hours before changing name servers. Otherwise your domain may
+     stop serving.
+
+     At most one of these may be specified:
 
        --cloud-dns-zone=CLOUD_DNS_ZONE
           The name of the Cloud DNS managed-zone to set as the name server for
           the domain. If it's in the same project, you can use short name. If
           not, use the full resource name, e.g.:
           --cloud-dns-zone=projects/example-project/managedZones/example-zone.
-          DNS Security (DNSSEC) is turned on by default (if possible).
+          If the zone is signed, DNSSEC will be enabled by default unless you
+          pass --disable-dnssec.
 
-       --dns-settings-from-file=DNS_SETTINGS_FROM_FILE
+       --dns-settings-from-file=DNS_SETTINGS_FILE_NAME
           A YAML file containing the required DNS settings. If specified, its
           content will replace the values currently used in the registration
-          resource. It means, that if the file is missing some of the
-          dns_settings field, they will be cleared.
+          resource. If the file is missing some of the dns_settings fields,
+          those fields will be cleared.
 
           Examples of file contents:
 
@@ -85,16 +90,13 @@ COMMONLY USED FLAGS
                   digestType: SHA256
                   digest: 2e1cfa82bf35c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d
 
-          Warning: Do not change name servers if ds_records is non-empty. Clear
-          ds_records first and wait 24 hours before changing name servers.
-          Otherwise your domain may stop serving.
-
        --name-servers=NAME_SERVER,...,[...]
           List of DNS name servers for the domain.
 
        --use-google-domains-dns
-          Use free name servers provided by Google Domains. DNS Security
-          (DNSSEC) is turned on by default.
+          Use free name servers provided by Google Domains. If the zone is
+          signed, DNSSEC will be enabled by default unless you pass
+          --disable-dnssec.
 
 OTHER FLAGS
      --async
@@ -102,9 +104,8 @@ OTHER FLAGS
         complete.
 
      --disable-dnssec
-        When using Cloud DNS Zone or Google Domains nameservers the DNS
-        Security (DNSSEC) will be enabled for the domain (unless the zone is
-        not signed). Use this flag to disable DNSSEC.
+        Use this flag to disable DNSSEC, or to skip enabling it when switching
+        to a Cloud DNS Zone or Google Domains nameservers.
 
      --unsafe-dns-update
         Use this flag to allow DNS changes that may make your domain stop
@@ -137,7 +138,7 @@ EXAMPLES
         $ gcloud alpha domains registrations configure dns example.com \
             --dns-settings-from-file=dns_settings.yaml
 
-    To disable DNS Security (DNSSEC), run:
+    To disable DNSSEC, run:
 
         $ gcloud alpha domains registrations configure dns example.com \
             --disable-dnssec

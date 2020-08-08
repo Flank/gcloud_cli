@@ -41,10 +41,9 @@ config configurations activate\fR to switch between them.
 \fISECTION\fR/\fIPROPERTY\fR
 Property to be set. Note that SECTION/ is optional while referring to properties
 in the core section, i.e., using either \f5core/project\fR or \f5project\fR is a
-valid way of setting a project, while using section names is essential for
-setting specific properties like \f5compute/region\fR. Consult the Cloud SDK
-properties page for a comprehensive list of properties:
-https://cloud.google.com/sdk/docs/properties
+valid way of setting a project. Using section names is required for setting
+other properties like \f5compute/region\fR. Consult the Available Properties
+section below for a comprehensive list of properties.
 
 .TP 2m
 \fIVALUE\fR
@@ -754,19 +753,6 @@ Username to use when connecting, if the proxy requires authentication.
 .RE
 .sp
 .TP 2m
-\fIpubsub\fR
-
-.RS 2m
-.TP 2m
-\fBlite_zone\fR
-Default zone to use when working with zonal Pub/Sub Lite resources. When a
-\f5\-\-zone\fR flag is required but not provided, the command will fall back to
-this value, if set.
-
-
-.RE
-.sp
-.TP 2m
 \fIredis\fR
 
 .RS 2m
@@ -860,12 +846,25 @@ If True, gcloud will not prompt you to take periodic usage experience surveys.
 
 
 .RE
+.sp
+.TP 2m
+\fIvmware\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud VMware resources. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value, if set.
+
+
+.RE
 .RE
 .sp
 
 .SH "EXAMPLES"
 
-To set the project \f5property\fR in the core section, run:
+To set the \f5project\fR property in the core section, run:
 
 .RS 2m
 $ gcloud alpha config set project myProject

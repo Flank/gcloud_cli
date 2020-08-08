@@ -56,7 +56,6 @@ The zone of the instance.
 \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR]
 File share configuration for an instance. Specifying both \f5name\fR and
 \f5capacity\fR is required.
-
 .RS 2m
 .TP 2m
 \fBcapacity\fR
@@ -64,24 +63,20 @@ The desired size of the volume. The capacity must be a whole number followed by
 a size unit such as \f5\fITB\fR\fR for terabyte. If no size unit is specified,
 GB is assumed. The minimum size for a standard instance is 1TB. The minimum size
 for a premium instance is 2.5TB.
-
 .TP 2m
 \fBname\fR
 The desired logical name of the volume.
-
 .RE
 .sp
 .TP 2m
 \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR]
 Network configuration for a Cloud Filestore instance. Specifying
 \f5reserved\-ip\-range\fR is optional.
-
 .RS 2m
 .TP 2m
 \fBname\fR
 The name of the Google Compute Engine VPC network to which the instance is
 connected.
-
 .TP 2m
 \fBreserved\-ip\-range\fR
 A /29 CIDR block in one of the internal IP address ranges
@@ -90,7 +85,6 @@ of IP addresses reserved for this instance. For example, 10.0.0.0/29 or
 192.168.0.0/29. The range you specify can't overlap with either existing subnets
 or assigned IP address ranges for other Cloud Filestore instances in the
 selected VPC network.
-
 
 
 .RE
@@ -159,9 +153,10 @@ The following command creates a Cloud Filestore instance named NAME with a
 single volume.
 
 .RS 2m
-$ gcloud filestore instances create NAME \-\-description=DESCRIPTION \e
-    \-\-tier=TIER \-\-file\-share=name=VOLUME_NAME,capacity=CAPACITY \e
-    \-\-network=name=NETWORK_NAME,reserved\-ip\-range=RESERVED\-IP\-RANGE
+$ gcloud filestore instances create NAME   \e
+    \-\-description=DESCRIPTION \-\-tier=TIER   \e
+    \-\-file\-share=name=VOLUME_NAME,capacity=CAPACITY   \e
+    \-\-network=name=NETWORK_NAME,reserved\-ip\-range=RESERVED_IP_RANGE
 .RE
 
 

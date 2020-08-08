@@ -178,6 +178,7 @@ definitions:
         expect_response:
           additionalProperties: false
           properties:
+            status:  {type: number}
 
             headers: {$ref: "#/definitions/value_types/dict"}
 
@@ -225,6 +226,8 @@ definitions:
             omit_fields:
               type: array
               items: {type: string}
+
+            status:  {type: number}
 
             headers:
               patternProperties:

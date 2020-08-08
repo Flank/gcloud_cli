@@ -80,11 +80,11 @@ Run \fB$ gcloud help\fR for details.
 To run a job from the flex template, run:
 
 .RS 2m
-$ gcloud beta dataflow flex\-template run my\-job               \e
-    \-\-template\-file\-gcs\-location=gs://flex\-template\-path           \e
-        \-\-region=europe\-west1               \e
-    \-\-parameters=input="gs://input",output="gs://output\-path",     \e
-             max_num_workers=5
+$ gcloud beta dataflow flex\-template run my\-job \e
+    \-\-template\-file\-gcs\-location=gs://flex\-template\-path \e
+    \-\-region=europe\-west1 \e
+    \-\-parameters=input="gs://input",output="gs://output\-path",\e
+max_num_workers=5
 .RE
 
 

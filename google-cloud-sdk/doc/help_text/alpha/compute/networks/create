@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute networks create - create a Google Compute Engine
-        network
+    gcloud alpha compute networks create - create a Compute Engine network
 
 SYNOPSIS
     gcloud alpha compute networks create NAME

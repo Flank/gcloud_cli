@@ -1,0 +1,123 @@
+
+.TH "GCLOUD_ALPHA_BIGTABLE_BACKUPS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bigtable backups update \- update a backup, only supported for the following fields: \-\-expiration\-date and \-\-retention\-period
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bigtable backups update\fR (\fIBACKUP\fR\ :\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-instance\fR=\fIINSTANCE\fR) (\fB\-\-expiration\-date\fR=\fIEXPIRATION_DATE\fR\ |\ \fB\-\-retention\-period\fR=\fIRETENTION_PERIOD\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a backup, only supported for the following fields:
+\-\-expiration\-date and \-\-retention\-period.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Backup resource \- Cloud Bigtable backup to update. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [backup] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIBACKUP\fR
+ID of the backup or fully qualified identifier for the backup. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+The name of the Cloud Bigtable cluster.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The name of the Cloud Bigtable instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-expiration\-date\fR=\fIEXPIRATION_DATE\fR
+Absolute expiration time of the backup, must be at least 6 hours and at most 30
+days from the time the request is received. See \f5$ gcloud topic datetimes\fR
+for information on date/time formats.
+
+.TP 2m
+\fB\-\-retention\-period\fR=\fIRETENTION_PERIOD\fR
+Retention period of the backup relative from now, must be at least 6 hours and
+at most 30 days from backup creation time. See \f5$ gcloud topic datetimes\fR
+for information on duration formats. See \f5$ gcloud bigtable backups
+describe\fR for creation time.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbigtableadmin/v2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/bigtable/
+
+
+
+.SH "EXAMPLES"
+
+To update the expire time of backup 'BACKUP_NAME' to 7 days from now, run:
+
+.RS 2m
+$ gcloud alpha bigtable backups update BACKUP_NAME \e
+    \-\-instance=INSTANCE_NAME \-\-cluster=CLUSTER_NAME
+\-\-retention\-period=7d
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud bigtable backups update
+$ gcloud beta bigtable backups update
+.RE
+

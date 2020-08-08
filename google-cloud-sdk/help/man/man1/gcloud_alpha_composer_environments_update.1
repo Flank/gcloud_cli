@@ -11,7 +11,7 @@ gcloud alpha composer environments update \- update properties of a Cloud Compos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-cloud\-sql\-machine\-type\fR=\fICLOUD_SQL_MACHINE_TYPE\fR\ |\ \fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -58,6 +58,10 @@ The update type. Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-cloud\-sql\-machine\-type\fR=\fICLOUD_SQL_MACHINE_TYPE\fR
+Cloud SQL machine type used by the Airflow database.
+
+.TP 2m
 \fB\-\-node\-count\fR=\fINODE_COUNT\fR
 The new number of nodes running the environment. Must be >= 3.
 
@@ -81,7 +85,7 @@ stored.
 Upgrade the environment to a later version in\-place.
 
 The image version encapsulates the versions of both Cloud Composer and Apache
-Airflow. Must be of the form \f5composer\-A.B.C\-airflow\-X.Y[.Z]\fR.
+Airflow. Must be of the form \f5composer\-A.B.C[\-D.E]\-airflow\-X.Y[.Z]\fR.
 
 The Cloud Composer and Airflow versions are semantic versions. \f5latest\fR can
 be provided instead of an explicit Cloud Composer version number indicating that

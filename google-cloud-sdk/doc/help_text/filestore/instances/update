@@ -39,16 +39,13 @@ FLAGS
      --file-share=[capacity=CAPACITY],[name=NAME]
         File share configuration for an instance. Specifying both name and
         capacity is required.
-
          capacity
             The desired size of the volume. The capacity must be a whole number
             followed by a size unit such as TB for terabyte. If no size unit is
             specified, GB is assumed. The minimum size for a standard instance
             is 1TB. The minimum size for a premium instance is 2.5TB.
-
          name
             The desired logical name of the volume.
-
      --location=LOCATION
         (DEPRECATED) Location of the Cloud Filestore instance.
 
@@ -105,7 +102,8 @@ EXAMPLES
             --update-labels=key1=value1 --remove-labels=key2
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha filestore instances update
         $ gcloud beta filestore instances update
 

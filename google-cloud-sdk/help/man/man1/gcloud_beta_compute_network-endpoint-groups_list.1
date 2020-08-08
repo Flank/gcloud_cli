@@ -11,7 +11,7 @@ gcloud beta compute network\-endpoint\-groups list \- list Google Compute Engine
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute network\-endpoint\-groups list\fR [\fINAME\fR\ ...] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-global\fR\ |\ \fB\-\-zones\fR=[\fIZONE\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute network\-endpoint\-groups list\fR [\fINAME\fR\ ...] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-global\fR\ |\ \fB\-\-regions\fR=[\fIREGION\fR,...]\ |\ \fB\-\-zones\fR=[\fIZONE\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,9 +20,10 @@ gcloud beta compute network\-endpoint\-groups list \- list Google Compute Engine
 \fB(BETA)\fR \fBgcloud beta compute network\-endpoint\-groups list\fR displays
 all Google Compute Engine network endpoint groups in a project.
 
-By default, global network endpoint groups and network endpoint groups from all
-zones are listed. The results can be narrowed down by providing the
-\f5\fI\-\-global\fR\fR or \f5\fI\-\-zones\fR\fR flag.
+By default, global network endpoint groups, network endpoint groups from all
+regions and network endpoint groups from all zones are listed. The results can
+be narrowed down by providing the \f5\fI\-\-global\fR\fR,
+\f5\fI\-\-regions\fR\fR or \f5\fI\-\-zones\fR\fR flag.
 
 
 
@@ -60,6 +61,15 @@ At most one of these may be specified:
 .TP 2m
 \fB\-\-global\fR
 If provided, only global resources are shown.
+
+.TP 2m
+\fB\-\-regions\fR=[\fIREGION\fR,...]
+(DEPRECATED) If provided, only regional resources are shown. If arguments are
+provided, only resources from the given regions are shown.
+
+Flag \f5\-\-regions\fR is deprecated. Use \f5\-\-filter="region:( REGION ...
+)"\fR instead. For example \f5\-\-filter="region:( europe\-west1 europe\-west2
+)"\fR.
 
 .TP 2m
 \fB\-\-zones\fR=[\fIZONE\fR,...]
@@ -144,6 +154,14 @@ To list all global network endpoint groups in a project, run:
 
 .RS 2m
 $ gcloud beta compute network\-endpoint\-groups list \-\-global
+.RE
+
+To list all network endpoint groups in the \f5\fIus\-central1\fR\fR and
+\f5\fIeurope\-west1\fR\fR regions, given they are regional resources, run:
+
+.RS 2m
+$ gcloud beta compute network\-endpoint\-groups list \e
+    \-\-filter="region:( europe\-west1 us\-central1 )"
 .RE
 
 To list all network endpoint groups in zones \f5\fIus\-central1\-b\fR\fR and

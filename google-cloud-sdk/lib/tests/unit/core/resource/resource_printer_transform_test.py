@@ -252,7 +252,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   def testTableTransformColor(self):
     self.StartEnvPatch({})
     encoding.SetEncodedValue(os.environ, 'TERM', 'xterm')
-    console_attr.GetConsoleAttr('utf8', reset=True)
+    console_attr.GetConsoleAttr('utf-8', reset=True)
 
     self.Print(projection='(status.color(red=FAIL|ERROR,yellow=WARNING,'
                'green=PASS|OK):label=STATUS)')

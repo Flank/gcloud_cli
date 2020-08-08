@@ -7,8 +7,8 @@ SYNOPSIS
         [--description=DESCRIPTION] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-groups unmanaged create creates a new Google
-    Compute Engine unmanaged instance group. For example:
+    gcloud compute instance-groups unmanaged create creates a new Compute
+    Engine unmanaged instance group. For example:
 
         $ gcloud compute instance-groups unmanaged create \
             example-instance-group --zone us-central1-a

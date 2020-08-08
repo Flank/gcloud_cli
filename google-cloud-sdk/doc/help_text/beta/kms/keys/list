@@ -2,19 +2,28 @@ NAME
     gcloud beta kms keys list - list the keys within a keyring
 
 SYNOPSIS
-    gcloud beta kms keys list [--keyring=KEYRING] [--location=LOCATION]
+    gcloud beta kms keys list (--keyring=KEYRING : --location=LOCATION)
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Lists all keys within the given keyring.
 
-FLAGS
-     --keyring=KEYRING
-        Key ring of the key.
+REQUIRED FLAGS
+     Keyring resource - The KMS keyring resource. The arguments in this group
+     can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [--keyring] on
+     the command line with a fully specified name; set the property
+     [core/project]. This must be specified.
 
-     --location=LOCATION
-        Location of the key.
+       --keyring=KEYRING
+          ID of the keyring or fully qualified identifier for the keyring. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --location=LOCATION
+          The Cloud location for the keyring.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

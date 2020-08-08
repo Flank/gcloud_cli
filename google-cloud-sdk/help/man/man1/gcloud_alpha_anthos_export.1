@@ -1,0 +1,97 @@
+
+.TH "GCLOUD_ALPHA_ANTHOS_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha anthos export \- export current configuration of an Anthos cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha anthos export\fR \fICLUSTER\fR [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-output\-directory\fR=\fIOUTPUT\-DIR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Export current configuration of an Anthos cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fICLUSTER\fR
+The cluster name from which to export the configurations.
+
+
+.RE
+.sp
+
+.SH "COMMONLY USED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+Project ID. Overrides the default \fBcore/project\fR property value for this
+command invocation.
+
+
+.RE
+.sp
+
+.SH "OTHER FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Specifies the Google Cloud location to use. If notspecified will use the current
+compute/zone property.
+
+.TP 2m
+\fB\-\-output\-directory\fR=\fIOUTPUT\-DIR\fR
+The output directory of the cluster resources. If empty will export files to
+./CLUSTER_NAME
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To export configuration from cluster 'my\-cluster' to the local directory
+\f5my\-dir\fR using project 'my\-project':
+
+.RS 2m
+$ gcloud alpha anthos export my\-cluster \-\-project=my\-project \e
+  \-\-output\-directory=my\-dir
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta anthos export
+.RE
+

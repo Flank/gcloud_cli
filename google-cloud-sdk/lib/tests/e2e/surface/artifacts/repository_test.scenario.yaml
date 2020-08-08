@@ -13,6 +13,17 @@ summary:
   - stderr: |
       Created repository [$$ar-repo$$].
 - execute:
+  - command: artifacts repositories describe $$ar-repo$$ --location=us-east1
+  - stderr: |
+      Encryption: Google-managed key
+  - stdout: |-
+      createTime: .*
+      description: My test repo
+      format: DOCKER
+      name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
+      updateTime: .*
+      $
+- execute:
   - command: artifacts repositories list --filter="$$ar-repo$$" --format="text(AR.name.basename())"
       --flatten="AR[]" --location=us-east1
   - stderr: ^Listing items under project cloud-sdk-integration-testing..*$
@@ -31,15 +42,11 @@ summary:
     - status: SUCCESS
   - stderr: |
       Deleted repository [$$ar-repo$$].
-- execute:
-  - command: artifacts repositories list --filter="$$ar-repo$$" --location=us-east1
-  - stderr: ^Listing items under project cloud-sdk-integration-testing..*$
-  - stderr: |
-      Listed 0 items.
 actions:
 - generate_resource_id:
     reference: ar-repo
     prefix: ar-repo
+
 - execute_command:
     command: artifacts repositories create $$ar-repo$$ --repository-format=docker
       --location=us-east1 --description="My test repo"
@@ -58,58 +65,82 @@ actions:
             status: '200'
           body:
             locations:
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
-              labels:
-                cloud.googleapis.com/region: asia-northeast2
-              locationId: asia-northeast2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-south1
-              labels:
-                cloud.googleapis.com/region: asia-south1
-              locationId: asia-south1
-            - name: projects/cloud-sdk-integration-testing/locations/europe
-              labels:
-                cloud.googleapis.com/region: europe
-              locationId: europe
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
-              labels:
-                cloud.googleapis.com/region: europe-west6
-              locationId: europe-west6
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1
-              labels:
-                cloud.googleapis.com/region: us-east1
-              locationId: us-east1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
-              labels:
-                cloud.googleapis.com/region: asia-northeast1
-              locationId: asia-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
-              labels:
-                cloud.googleapis.com/region: europe-west1
-              locationId: europe-west1
             - name: projects/cloud-sdk-integration-testing/locations/europe-west2
               labels:
                 cloud.googleapis.com/region: europe-west2
               locationId: europe-west2
-            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
-              labels:
-                cloud.googleapis.com/region: southamerica-east1
-              locationId: southamerica-east1
-            - name: projects/cloud-sdk-integration-testing/locations/us-west1
-              labels:
-                cloud.googleapis.com/region: us-west1
-              locationId: us-west1
             - name: projects/cloud-sdk-integration-testing/locations/us-west2
               labels:
                 cloud.googleapis.com/region: us-west2
               locationId: us-west2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-southeast1
+            - name: projects/cloud-sdk-integration-testing/locations/asia
               labels:
-                cloud.googleapis.com/region: asia-southeast1
-              locationId: asia-southeast1
+                cloud.googleapis.com/region: asia
+              locationId: asia
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
+              labels:
+                cloud.googleapis.com/region: asia-east2
+              locationId: asia-east2
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
+              labels:
+                cloud.googleapis.com/region: asia-northeast2
+              locationId: asia-northeast2
+            - name: projects/cloud-sdk-integration-testing/locations/europe
+              labels:
+                cloud.googleapis.com/region: europe
+              locationId: europe
+            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
+              labels:
+                cloud.googleapis.com/region: southamerica-east1
+              locationId: southamerica-east1
+            - name: projects/cloud-sdk-integration-testing/locations/us-east4
+              labels:
+                cloud.googleapis.com/region: us-east4
+              locationId: us-east4
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
+              labels:
+                cloud.googleapis.com/region: asia-northeast1
+              locationId: asia-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-south1
+              labels:
+                cloud.googleapis.com/region: asia-south1
+              locationId: asia-south1
+            - name: projects/cloud-sdk-integration-testing/locations/australia-southeast1
+              labels:
+                cloud.googleapis.com/region: australia-southeast1
+              locationId: australia-southeast1
             - name: projects/cloud-sdk-integration-testing/locations/europe-north1
               labels:
                 cloud.googleapis.com/region: europe-north1
               locationId: europe-north1
+            - name: projects/cloud-sdk-integration-testing/locations/us
+              labels:
+                cloud.googleapis.com/region: us
+              locationId: us
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+              locationId: us-central1
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1
+              labels:
+                cloud.googleapis.com/region: us-east1
+              locationId: us-east1
+            - name: projects/cloud-sdk-integration-testing/locations/us-west1
+              labels:
+                cloud.googleapis.com/region: us-west1
+              locationId: us-west1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
+              labels:
+                cloud.googleapis.com/region: asia-east1
+              locationId: asia-east1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-southeast1
+              labels:
+                cloud.googleapis.com/region: asia-southeast1
+              locationId: asia-southeast1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
+              labels:
+                cloud.googleapis.com/region: europe-west1
+              locationId: europe-west1
             - name: projects/cloud-sdk-integration-testing/locations/europe-west3
               labels:
                 cloud.googleapis.com/region: europe-west3
@@ -118,38 +149,14 @@ actions:
               labels:
                 cloud.googleapis.com/region: europe-west4
               locationId: europe-west4
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
+              labels:
+                cloud.googleapis.com/region: europe-west6
+              locationId: europe-west6
             - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
               labels:
                 cloud.googleapis.com/region: northamerica-northeast1
               locationId: northamerica-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/us
-              labels:
-                cloud.googleapis.com/region: us
-              locationId: us
-            - name: projects/cloud-sdk-integration-testing/locations/asia
-              labels:
-                cloud.googleapis.com/region: asia
-              locationId: asia
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
-              labels:
-                cloud.googleapis.com/region: asia-east1
-              locationId: asia-east1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
-              labels:
-                cloud.googleapis.com/region: asia-east2
-              locationId: asia-east2
-            - name: projects/cloud-sdk-integration-testing/locations/australia-southeast1
-              labels:
-                cloud.googleapis.com/region: australia-southeast1
-              locationId: australia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/us-central1
-              labels:
-                cloud.googleapis.com/region: us-central1
-              locationId: us-central1
-            - name: projects/cloud-sdk-integration-testing/locations/us-east4
-              labels:
-                cloud.googleapis.com/region: us-east4
-              locationId: us-east4
     - api_call:
         poll_operation: true
         expect_request:
@@ -158,9 +165,9 @@ actions:
           headers: {}
           body:
             json:
-              name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
-              format: DOCKER
               description: My test repo
+              format: DOCKER
+              name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
         return_response:
           headers:
             cache-control: private
@@ -168,8 +175,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/aba9931b-0973-41cd-b48d-146a625f474d
-        repeatable: true
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/17624e92-8aee-491d-aedf-e1ee8e3c3817
     - expect_stderr: |
         Create request issued for: [$$ar-repo$$]
     - expect_progress_tracker:
@@ -191,10 +197,148 @@ actions:
             name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
             format: DOCKER
             description: My test repo
-            createTime: '2020-04-14T22:29:21.399563Z'
-            updateTime: '2020-04-14T22:29:21.399563Z'
+            createTime: '2020-06-16T23:05:44.555093Z'
+            updateTime: '2020-06-16T23:05:44.555093Z'
     - expect_stderr: |
         Created repository [$$ar-repo$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories describe $$ar-repo$$ --location=us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4775'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            locations:
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1
+              labels:
+                cloud.googleapis.com/region: us-east1
+              locationId: us-east1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
+              labels:
+                cloud.googleapis.com/region: asia-east1
+              locationId: asia-east1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
+              labels:
+                cloud.googleapis.com/region: asia-east2
+              locationId: asia-east2
+            - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
+              labels:
+                cloud.googleapis.com/region: northamerica-northeast1
+              locationId: northamerica-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+              locationId: us-central1
+            - name: projects/cloud-sdk-integration-testing/locations/asia
+              labels:
+                cloud.googleapis.com/region: asia
+              locationId: asia
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
+              labels:
+                cloud.googleapis.com/region: europe-west1
+              locationId: europe-west1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west2
+              labels:
+                cloud.googleapis.com/region: europe-west2
+              locationId: europe-west2
+            - name: projects/cloud-sdk-integration-testing/locations/australia-southeast1
+              labels:
+                cloud.googleapis.com/region: australia-southeast1
+              locationId: australia-southeast1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-north1
+              labels:
+                cloud.googleapis.com/region: europe-north1
+              locationId: europe-north1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west3
+              labels:
+                cloud.googleapis.com/region: europe-west3
+              locationId: europe-west3
+            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
+              labels:
+                cloud.googleapis.com/region: southamerica-east1
+              locationId: southamerica-east1
+            - name: projects/cloud-sdk-integration-testing/locations/us
+              labels:
+                cloud.googleapis.com/region: us
+              locationId: us
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
+              labels:
+                cloud.googleapis.com/region: asia-northeast2
+              locationId: asia-northeast2
+            - name: projects/cloud-sdk-integration-testing/locations/asia-south1
+              labels:
+                cloud.googleapis.com/region: asia-south1
+              locationId: asia-south1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-southeast1
+              labels:
+                cloud.googleapis.com/region: asia-southeast1
+              locationId: asia-southeast1
+            - name: projects/cloud-sdk-integration-testing/locations/us-east4
+              labels:
+                cloud.googleapis.com/region: us-east4
+              locationId: us-east4
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
+              labels:
+                cloud.googleapis.com/region: europe-west6
+              locationId: europe-west6
+            - name: projects/cloud-sdk-integration-testing/locations/us-west1
+              labels:
+                cloud.googleapis.com/region: us-west1
+              locationId: us-west1
+            - name: projects/cloud-sdk-integration-testing/locations/us-west2
+              labels:
+                cloud.googleapis.com/region: us-west2
+              locationId: us-west2
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
+              labels:
+                cloud.googleapis.com/region: asia-northeast1
+              locationId: asia-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/europe
+              labels:
+                cloud.googleapis.com/region: europe
+              locationId: europe
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west4
+              labels:
+                cloud.googleapis.com/region: europe-west4
+              locationId: europe-west4
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '265'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
+            format: DOCKER
+            description: My test repo
+            createTime: '2020-06-16T23:05:44.555093Z'
+            updateTime: '2020-06-16T23:05:44.555093Z'
+    - expect_stderr: |
+        Encryption: Google-managed key
+    - expect_stdout:
+        matches: |
+          createTime: .*
+          description: My test repo
+          format: DOCKER
+          name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
+          updateTime: .*
     - expect_exit:
         code: 0
 - execute_command:
@@ -219,62 +363,22 @@ actions:
               labels:
                 cloud.googleapis.com/region: australia-southeast1
               locationId: australia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west4
-              labels:
-                cloud.googleapis.com/region: europe-west4
-              locationId: europe-west4
-            - name: projects/cloud-sdk-integration-testing/locations/asia
-              labels:
-                cloud.googleapis.com/region: asia
-              locationId: asia
-            - name: projects/cloud-sdk-integration-testing/locations/europe
-              labels:
-                cloud.googleapis.com/region: europe
-              locationId: europe
             - name: projects/cloud-sdk-integration-testing/locations/europe-north1
               labels:
                 cloud.googleapis.com/region: europe-north1
               locationId: europe-north1
-            - name: projects/cloud-sdk-integration-testing/locations/us
-              labels:
-                cloud.googleapis.com/region: us
-              locationId: us
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1
-              labels:
-                cloud.googleapis.com/region: us-east1
-              locationId: us-east1
-            - name: projects/cloud-sdk-integration-testing/locations/us-east4
-              labels:
-                cloud.googleapis.com/region: us-east4
-              locationId: us-east4
-            - name: projects/cloud-sdk-integration-testing/locations/us-west2
-              labels:
-                cloud.googleapis.com/region: us-west2
-              locationId: us-west2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
-              labels:
-                cloud.googleapis.com/region: asia-northeast1
-              locationId: asia-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west2
-              labels:
-                cloud.googleapis.com/region: europe-west2
-              locationId: europe-west2
             - name: projects/cloud-sdk-integration-testing/locations/europe-west3
               labels:
                 cloud.googleapis.com/region: europe-west3
               locationId: europe-west3
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
+            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
               labels:
-                cloud.googleapis.com/region: europe-west6
-              locationId: europe-west6
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
+                cloud.googleapis.com/region: southamerica-east1
+              locationId: southamerica-east1
+            - name: projects/cloud-sdk-integration-testing/locations/us
               labels:
-                cloud.googleapis.com/region: europe-west1
-              locationId: europe-west1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
-              labels:
-                cloud.googleapis.com/region: asia-east2
-              locationId: asia-east2
+                cloud.googleapis.com/region: us
+              locationId: us
             - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
               labels:
                 cloud.googleapis.com/region: asia-northeast2
@@ -287,26 +391,66 @@ actions:
               labels:
                 cloud.googleapis.com/region: asia-southeast1
               locationId: asia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/us-east4
               labels:
-                cloud.googleapis.com/region: northamerica-northeast1
-              locationId: northamerica-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
+                cloud.googleapis.com/region: us-east4
+              locationId: us-east4
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
               labels:
-                cloud.googleapis.com/region: southamerica-east1
-              locationId: southamerica-east1
-            - name: projects/cloud-sdk-integration-testing/locations/us-central1
-              labels:
-                cloud.googleapis.com/region: us-central1
-              locationId: us-central1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
-              labels:
-                cloud.googleapis.com/region: asia-east1
-              locationId: asia-east1
+                cloud.googleapis.com/region: europe-west6
+              locationId: europe-west6
             - name: projects/cloud-sdk-integration-testing/locations/us-west1
               labels:
                 cloud.googleapis.com/region: us-west1
               locationId: us-west1
+            - name: projects/cloud-sdk-integration-testing/locations/us-west2
+              labels:
+                cloud.googleapis.com/region: us-west2
+              locationId: us-west2
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
+              labels:
+                cloud.googleapis.com/region: asia-northeast1
+              locationId: asia-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/europe
+              labels:
+                cloud.googleapis.com/region: europe
+              locationId: europe
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west4
+              labels:
+                cloud.googleapis.com/region: europe-west4
+              locationId: europe-west4
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1
+              labels:
+                cloud.googleapis.com/region: us-east1
+              locationId: us-east1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
+              labels:
+                cloud.googleapis.com/region: asia-east1
+              locationId: asia-east1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
+              labels:
+                cloud.googleapis.com/region: asia-east2
+              locationId: asia-east2
+            - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
+              labels:
+                cloud.googleapis.com/region: northamerica-northeast1
+              locationId: northamerica-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+              locationId: us-central1
+            - name: projects/cloud-sdk-integration-testing/locations/asia
+              labels:
+                cloud.googleapis.com/region: asia
+              locationId: asia
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
+              labels:
+                cloud.googleapis.com/region: europe-west1
+              locationId: europe-west1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west2
+              labels:
+                cloud.googleapis.com/region: europe-west2
+              locationId: europe-west2
     - expect_stderr:
         matches: ^Listing items under project cloud-sdk-integration-testing..*
     - api_call:
@@ -318,91 +462,46 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '4730'
+            content-length: '2085'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             repositories:
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20191217-004600-1s0w
-              format: MAVEN
-              description: My test repo
-              createTime: '2019-12-17T00:46:28.250489Z'
-              updateTime: '2019-12-17T00:46:28.250489Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225117-x9ap
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200615-225434-0m6y
               format: DOCKER
               description: My test repo
-              createTime: '2020-01-07T22:51:19.336394Z'
-              updateTime: '2020-01-07T22:51:19.336394Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225123-j4kf
+              createTime: '2020-06-15T22:54:35.739766Z'
+              updateTime: '2020-06-15T22:54:35.739766Z'
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200615-225438-uut8
               format: DOCKER
               description: My test repo
-              createTime: '2020-01-07T22:51:25.201018Z'
-              updateTime: '2020-01-07T22:51:25.201018Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225129-iint
+              createTime: '2020-06-15T22:54:39.135909Z'
+              updateTime: '2020-06-15T22:54:39.135909Z'
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200615-225441-0894
               format: DOCKER
               description: My test repo
-              createTime: '2020-01-07T22:51:30.901304Z'
-              updateTime: '2020-01-07T22:51:30.901304Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225356-fftd
+              createTime: '2020-06-15T22:54:42.193400Z'
+              updateTime: '2020-06-15T22:54:42.193400Z'
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200615-225512-sky3
               format: DOCKER
               description: My test repo
-              createTime: '2020-01-07T22:54:00.375254Z'
-              updateTime: '2020-01-07T22:54:00.375254Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225402-uffn
+              createTime: '2020-06-15T22:55:15.078435Z'
+              updateTime: '2020-06-15T22:55:15.078435Z'
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200615-225515-1n3t
               format: DOCKER
               description: My test repo
-              createTime: '2020-01-07T22:54:05.481252Z'
-              updateTime: '2020-01-07T22:54:05.481252Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225407-zz3v
+              createTime: '2020-06-15T22:55:17.807993Z'
+              updateTime: '2020-06-15T22:55:17.807993Z'
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200615-225517-2v06
               format: DOCKER
               description: My test repo
-              createTime: '2020-01-07T22:54:10.667332Z'
-              updateTime: '2020-01-07T22:54:10.667332Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200204-031437-3dv3
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-02-04T03:14:41.653313Z'
-              updateTime: '2020-02-04T03:14:41.653313Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200226-201117-z86o
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-02-26T20:11:19.331390Z'
-              updateTime: '2020-02-26T20:11:19.331390Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200226-201119-v118
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-02-26T20:11:20.383715Z'
-              updateTime: '2020-02-26T20:11:20.383715Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200309-145115-9fze
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-09T14:51:16.460141Z'
-              updateTime: '2020-03-09T14:51:16.460141Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200310-080725-ggvp
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-10T08:07:26.335849Z'
-              updateTime: '2020-03-10T08:07:26.335849Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200317-080030-v6wc
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-17T08:00:31.958704Z'
-              updateTime: '2020-03-17T08:00:31.958704Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200326-201035-gcj3
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-26T20:10:37.198402Z'
-              updateTime: '2020-03-26T20:10:37.198402Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200326-201049-bcr8
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-26T20:10:50.673421Z'
-              updateTime: '2020-03-26T20:10:50.673421Z'
+              createTime: '2020-06-15T22:55:20.114557Z'
+              updateTime: '2020-06-15T22:55:20.114557Z'
             - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/$$ar-repo$$
               format: DOCKER
               description: My test repo
-              createTime: '2020-04-14T22:29:21.399563Z'
-              updateTime: '2020-04-14T22:29:21.399563Z'
+              createTime: '2020-06-16T23:05:44.555093Z'
+              updateTime: '2020-06-16T23:05:44.555093Z'
     - expect_stdout: |
         ---
         AR.name: $$ar-repo$$
@@ -410,6 +509,7 @@ actions:
         code: 0
 - execute_command:
     command: artifacts repositories delete $$ar-repo$$ --location=us-east1
+    cleanup_for: ar-repo
     events:
     - expect_prompt_continue:
         message: You are about to delete repository [$$ar-repo$$]
@@ -428,6 +528,82 @@ actions:
             status: '200'
           body:
             locations:
+            - name: projects/cloud-sdk-integration-testing/locations/asia
+              labels:
+                cloud.googleapis.com/region: asia
+              locationId: asia
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
+              labels:
+                cloud.googleapis.com/region: asia-east1
+              locationId: asia-east1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-south1
+              labels:
+                cloud.googleapis.com/region: asia-south1
+              locationId: asia-south1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-north1
+              labels:
+                cloud.googleapis.com/region: europe-north1
+              locationId: europe-north1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
+              labels:
+                cloud.googleapis.com/region: europe-west1
+              locationId: europe-west1
+            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
+              labels:
+                cloud.googleapis.com/region: southamerica-east1
+              locationId: southamerica-east1
+            - name: projects/cloud-sdk-integration-testing/locations/us
+              labels:
+                cloud.googleapis.com/region: us
+              locationId: us
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
+              labels:
+                cloud.googleapis.com/region: asia-northeast1
+              locationId: asia-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
+              labels:
+                cloud.googleapis.com/region: asia-northeast2
+              locationId: asia-northeast2
+            - name: projects/cloud-sdk-integration-testing/locations/australia-southeast1
+              labels:
+                cloud.googleapis.com/region: australia-southeast1
+              locationId: australia-southeast1
+            - name: projects/cloud-sdk-integration-testing/locations/us-west1
+              labels:
+                cloud.googleapis.com/region: us-west1
+              locationId: us-west1
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west4
+              labels:
+                cloud.googleapis.com/region: europe-west4
+              locationId: europe-west4
+            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
+              labels:
+                cloud.googleapis.com/region: europe-west6
+              locationId: europe-west6
+            - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
+              labels:
+                cloud.googleapis.com/region: northamerica-northeast1
+              locationId: northamerica-northeast1
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+              locationId: us-central1
+            - name: projects/cloud-sdk-integration-testing/locations/us-west2
+              labels:
+                cloud.googleapis.com/region: us-west2
+              locationId: us-west2
+            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
+              labels:
+                cloud.googleapis.com/region: asia-east2
+              locationId: asia-east2
+            - name: projects/cloud-sdk-integration-testing/locations/asia-southeast1
+              labels:
+                cloud.googleapis.com/region: asia-southeast1
+              locationId: asia-southeast1
+            - name: projects/cloud-sdk-integration-testing/locations/europe
+              labels:
+                cloud.googleapis.com/region: europe
+              locationId: europe
             - name: projects/cloud-sdk-integration-testing/locations/europe-west2
               labels:
                 cloud.googleapis.com/region: europe-west2
@@ -436,74 +612,6 @@ actions:
               labels:
                 cloud.googleapis.com/region: europe-west3
               locationId: europe-west3
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
-              labels:
-                cloud.googleapis.com/region: europe-west6
-              locationId: europe-west6
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
-              labels:
-                cloud.googleapis.com/region: europe-west1
-              locationId: europe-west1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
-              labels:
-                cloud.googleapis.com/region: asia-east2
-              locationId: asia-east2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
-              labels:
-                cloud.googleapis.com/region: asia-northeast2
-              locationId: asia-northeast2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-south1
-              labels:
-                cloud.googleapis.com/region: asia-south1
-              locationId: asia-south1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-southeast1
-              labels:
-                cloud.googleapis.com/region: asia-southeast1
-              locationId: asia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
-              labels:
-                cloud.googleapis.com/region: northamerica-northeast1
-              locationId: northamerica-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
-              labels:
-                cloud.googleapis.com/region: southamerica-east1
-              locationId: southamerica-east1
-            - name: projects/cloud-sdk-integration-testing/locations/us-central1
-              labels:
-                cloud.googleapis.com/region: us-central1
-              locationId: us-central1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
-              labels:
-                cloud.googleapis.com/region: asia-east1
-              locationId: asia-east1
-            - name: projects/cloud-sdk-integration-testing/locations/us-west1
-              labels:
-                cloud.googleapis.com/region: us-west1
-              locationId: us-west1
-            - name: projects/cloud-sdk-integration-testing/locations/australia-southeast1
-              labels:
-                cloud.googleapis.com/region: australia-southeast1
-              locationId: australia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west4
-              labels:
-                cloud.googleapis.com/region: europe-west4
-              locationId: europe-west4
-            - name: projects/cloud-sdk-integration-testing/locations/asia
-              labels:
-                cloud.googleapis.com/region: asia
-              locationId: asia
-            - name: projects/cloud-sdk-integration-testing/locations/europe
-              labels:
-                cloud.googleapis.com/region: europe
-              locationId: europe
-            - name: projects/cloud-sdk-integration-testing/locations/europe-north1
-              labels:
-                cloud.googleapis.com/region: europe-north1
-              locationId: europe-north1
-            - name: projects/cloud-sdk-integration-testing/locations/us
-              labels:
-                cloud.googleapis.com/region: us
-              locationId: us
             - name: projects/cloud-sdk-integration-testing/locations/us-east1
               labels:
                 cloud.googleapis.com/region: us-east1
@@ -512,14 +620,6 @@ actions:
               labels:
                 cloud.googleapis.com/region: us-east4
               locationId: us-east4
-            - name: projects/cloud-sdk-integration-testing/locations/us-west2
-              labels:
-                cloud.googleapis.com/region: us-west2
-              locationId: us-west2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
-              labels:
-                cloud.googleapis.com/region: asia-northeast1
-              locationId: asia-northeast1
     - api_call:
         poll_operation: true
         expect_request:
@@ -534,7 +634,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/def9bfe1-132d-48b5-9f20-9d5d21c5938b
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/cf2c5e5f-e9a8-46b6-a8db-818245453490
     - expect_stderr: |
         Delete request issued for: [$$ar-repo$$]
     - expect_progress_tracker:
@@ -544,209 +644,3 @@ actions:
         Deleted repository [$$ar-repo$$].
     - expect_exit:
         code: 0
-
-- execute_command:
-    command: artifacts repositories list --filter="$$ar-repo$$" --location=us-east1
-    events:
-    - api_call:
-        expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '4775'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            locations:
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west1
-              labels:
-                cloud.googleapis.com/region: europe-west1
-              locationId: europe-west1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-southeast1
-              labels:
-                cloud.googleapis.com/region: asia-southeast1
-              locationId: asia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/europe
-              labels:
-                cloud.googleapis.com/region: europe
-              locationId: europe
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west3
-              labels:
-                cloud.googleapis.com/region: europe-west3
-              locationId: europe-west3
-            - name: projects/cloud-sdk-integration-testing/locations/us
-              labels:
-                cloud.googleapis.com/region: us
-              locationId: us
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1
-              labels:
-                cloud.googleapis.com/region: us-east1
-              locationId: us-east1
-            - name: projects/cloud-sdk-integration-testing/locations/us-west2
-              labels:
-                cloud.googleapis.com/region: us-west2
-              locationId: us-west2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast2
-              labels:
-                cloud.googleapis.com/region: asia-northeast2
-              locationId: asia-northeast2
-            - name: projects/cloud-sdk-integration-testing/locations/australia-southeast1
-              labels:
-                cloud.googleapis.com/region: australia-southeast1
-              locationId: australia-southeast1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west2
-              labels:
-                cloud.googleapis.com/region: europe-west2
-              locationId: europe-west2
-            - name: projects/cloud-sdk-integration-testing/locations/northamerica-northeast1
-              labels:
-                cloud.googleapis.com/region: northamerica-northeast1
-              locationId: northamerica-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/us-east4
-              labels:
-                cloud.googleapis.com/region: us-east4
-              locationId: us-east4
-            - name: projects/cloud-sdk-integration-testing/locations/us-west1
-              labels:
-                cloud.googleapis.com/region: us-west1
-              locationId: us-west1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east1
-              labels:
-                cloud.googleapis.com/region: asia-east1
-              locationId: asia-east1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-east2
-              labels:
-                cloud.googleapis.com/region: asia-east2
-              locationId: asia-east2
-            - name: projects/cloud-sdk-integration-testing/locations/asia-northeast1
-              labels:
-                cloud.googleapis.com/region: asia-northeast1
-              locationId: asia-northeast1
-            - name: projects/cloud-sdk-integration-testing/locations/asia-south1
-              labels:
-                cloud.googleapis.com/region: asia-south1
-              locationId: asia-south1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-north1
-              labels:
-                cloud.googleapis.com/region: europe-north1
-              locationId: europe-north1
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west4
-              labels:
-                cloud.googleapis.com/region: europe-west4
-              locationId: europe-west4
-            - name: projects/cloud-sdk-integration-testing/locations/europe-west6
-              labels:
-                cloud.googleapis.com/region: europe-west6
-              locationId: europe-west6
-            - name: projects/cloud-sdk-integration-testing/locations/southamerica-east1
-              labels:
-                cloud.googleapis.com/region: southamerica-east1
-              locationId: southamerica-east1
-            - name: projects/cloud-sdk-integration-testing/locations/asia
-              labels:
-                cloud.googleapis.com/region: asia
-              locationId: asia
-            - name: projects/cloud-sdk-integration-testing/locations/us-central1
-              labels:
-                cloud.googleapis.com/region: us-central1
-              locationId: us-central1
-    - expect_stderr:
-        matches: ^Listing items under project cloud-sdk-integration-testing..*
-    - api_call:
-        expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-east1/repositories?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '4436'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            repositories:
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20191217-004600-1s0w
-              format: MAVEN
-              description: My test repo
-              createTime: '2019-12-17T00:46:28.250489Z'
-              updateTime: '2019-12-17T00:46:28.250489Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225117-x9ap
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-01-07T22:51:19.336394Z'
-              updateTime: '2020-01-07T22:51:19.336394Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225123-j4kf
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-01-07T22:51:25.201018Z'
-              updateTime: '2020-01-07T22:51:25.201018Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225129-iint
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-01-07T22:51:30.901304Z'
-              updateTime: '2020-01-07T22:51:30.901304Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225356-fftd
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-01-07T22:54:00.375254Z'
-              updateTime: '2020-01-07T22:54:00.375254Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225402-uffn
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-01-07T22:54:05.481252Z'
-              updateTime: '2020-01-07T22:54:05.481252Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200107-225407-zz3v
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-01-07T22:54:10.667332Z'
-              updateTime: '2020-01-07T22:54:10.667332Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200204-031437-3dv3
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-02-04T03:14:41.653313Z'
-              updateTime: '2020-02-04T03:14:41.653313Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200226-201117-z86o
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-02-26T20:11:19.331390Z'
-              updateTime: '2020-02-26T20:11:19.331390Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200226-201119-v118
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-02-26T20:11:20.383715Z'
-              updateTime: '2020-02-26T20:11:20.383715Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200309-145115-9fze
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-09T14:51:16.460141Z'
-              updateTime: '2020-03-09T14:51:16.460141Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200310-080725-ggvp
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-10T08:07:26.335849Z'
-              updateTime: '2020-03-10T08:07:26.335849Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200317-080030-v6wc
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-17T08:00:31.958704Z'
-              updateTime: '2020-03-17T08:00:31.958704Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200326-201035-gcj3
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-26T20:10:37.198402Z'
-              updateTime: '2020-03-26T20:10:37.198402Z'
-            - name: projects/cloud-sdk-integration-testing/locations/us-east1/repositories/ar-repo-20200326-201049-bcr8
-              format: DOCKER
-              description: My test repo
-              createTime: '2020-03-26T20:10:50.673421Z'
-              updateTime: '2020-03-26T20:10:50.673421Z'
-    - expect_stderr: |
-        Listed 0 items.
-    - expect_exit:
-        code: 0
-    cleanup_for: ar-repo

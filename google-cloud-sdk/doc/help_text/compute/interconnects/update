@@ -1,6 +1,5 @@
 NAME
-    gcloud compute interconnects update - update a Google Compute Engine
-        interconnect
+    gcloud compute interconnects update - update a Compute Engine interconnect
 
 SYNOPSIS
     gcloud compute interconnects update NAME [--admin-enabled]

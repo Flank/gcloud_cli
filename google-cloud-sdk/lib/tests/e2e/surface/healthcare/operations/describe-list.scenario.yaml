@@ -1,5 +1,5 @@
 title: cloud healthcare fhir-stores crud scenario
-release_tracks: [ALPHA, BETA, GA]
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

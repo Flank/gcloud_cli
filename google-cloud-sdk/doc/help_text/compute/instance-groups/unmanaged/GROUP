@@ -1,12 +1,12 @@
 NAME
-    gcloud compute instance-groups unmanaged - read and manipulate Google
-        Compute Engine unmanaged instance group
+    gcloud compute instance-groups unmanaged - read and manipulate Compute
+        Engine unmanaged instance group
 
 SYNOPSIS
     gcloud compute instance-groups unmanaged COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manipulate Google Compute Engine unmanaged instance groups.
+    Read and manipulate Compute Engine unmanaged instance groups.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -26,7 +26,7 @@ COMMANDS
         Create a Compute Engine unmanaged instance group.
 
      delete
-        Delete Google Compute Engine unmanaged instance groups.
+        Delete Compute Engine unmanaged instance groups.
 
      describe
         Describe an instance group.

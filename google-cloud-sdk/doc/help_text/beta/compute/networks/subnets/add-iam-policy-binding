@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute networks subnets add-iam-policy-binding - add an IAM
-        policy binding to a Google Compute Engine subnetwork
+        policy binding to a Compute Engine subnetwork
 
 SYNOPSIS
     gcloud beta compute networks subnets add-iam-policy-binding
@@ -8,7 +8,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Add an IAM policy binding to a Google Compute Engine subnetwork.
+    (BETA) Add an IAM policy binding to a Compute Engine subnetwork.
 
 POSITIONAL ARGUMENTS
      Subnetwork resource - The subnetwork for which to add the IAM policy to.

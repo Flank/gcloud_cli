@@ -38,8 +38,8 @@ AIRFLOW_VERSION_TYPE = arg_parsers.RegexpValidator(
     r'^(\d+\.\d+(?:\.\d+)?)', 'must be in the form X.Y[.Z].')
 
 IMAGE_VERSION_TYPE = arg_parsers.RegexpValidator(
-    r'^composer-(\d+\.\d+\.\d+|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
-    'must be in the form \'composer-A.B.C-airflow-X.Y[.Z]\' or '
+    r'^composer-(\d+\.\d+\.\d+(?:-[a-z]+\.\d+)?|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
+    'must be in the form \'composer-A.B.C[-D.E]-airflow-X.Y[.Z]\' or '
     '\'latest\' can be provided in place of the Cloud Composer version '
     'string. For example: \'composer-latest-airflow-1.10.0\'.')
 
@@ -182,7 +182,7 @@ UPDATE_IMAGE_VERSION_FLAG = base.Argument(
     Upgrade the environment to a later version in-place.
 
     The image version encapsulates the versions of both Cloud Composer and
-    Apache Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+    Apache Airflow. Must be of the form `composer-A.B.C[-D.E]-airflow-X.Y[.Z]`.
 
     The Cloud Composer and Airflow versions are semantic versions.
     `latest` can be provided instead of an explicit Cloud Composer
@@ -346,6 +346,13 @@ UPDATE_WEB_SERVER_ALLOW_IP = base.Argument(
     *description*::: An optional description of the IP range.
     """)
 
+CLOUD_SQL_MACHINE_TYPE = base.Argument(
+    '--cloud-sql-machine-type',
+    type=str,
+    help="""\
+    Cloud SQL machine type used by the Airflow database.
+    """)
+
 
 def _IsValidIpv4CidrBlock(ipv4_cidr_block):
   """Validates that IPV4 CIDR block arg has valid format.
@@ -417,7 +424,7 @@ ENABLE_PRIVATE_ENDPOINT_FLAG = base.Argument(
     If not specified, the master API endpoint will be accessible by its public
     IP address.
 
-    Cannot be specified unless '--enable-private-environnment' is also
+    Cannot be specified unless '--enable-private-environment' is also
     specified.
     """)
 
@@ -474,7 +481,7 @@ MASTER_IPV4_CIDR_FLAG = base.Argument(
     IPv4 CIDR range to use for the cluste master network. This should have a
     size of the netmask between 23 and 28.
 
-    Cannot be specified unless '--enable-private-environnment' is also
+    Cannot be specified unless '--enable-private-environment' is also
     specified.
     """)
 
@@ -493,7 +500,7 @@ WEB_SERVER_IPV4_CIDR_FLAG = base.Argument(
     IPv4 CIDR range to use for the Airflow web server network. This should have
     a size of the netmask between 24 and 29.
 
-    Cannot be specified unless '--enable-private-environnment' is also
+    Cannot be specified unless '--enable-private-environment' is also
     specified.
     """)
 
@@ -512,7 +519,7 @@ CLOUD_SQL_IPV4_CIDR_FLAG = base.Argument(
     IPv4 CIDR range to use for the Cloud SQL network. This should have a size
     of the netmask not greater than 24.
 
-    Cannot be specified unless '--enable-private-environnment' is also
+    Cannot be specified unless '--enable-private-environment' is also
     specified.
     """)
 

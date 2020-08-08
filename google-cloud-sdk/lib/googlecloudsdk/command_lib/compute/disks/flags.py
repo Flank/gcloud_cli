@@ -107,6 +107,18 @@ def MakeDiskArg(plural):
       zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION,
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION)
 
+
+def AddMultiWriterFlag(parser):
+  return parser.add_argument(
+      '--multi-writer',
+      action='store_true',
+      help="""
+      Create the disk in multi-writer mode so that it can be attached
+      with read-write access to multiple VMs. Can only be used with
+      zonal SSD persistent disks. Disks in multi-writer mode do not support
+      resize and snapshot operations.
+      """)
+
 SOURCE_SNAPSHOT_ARG = compute_flags.ResourceArgument(
     resource_name='snapshot',
     completer=SnapshotsCompleter,
@@ -127,7 +139,7 @@ SOURCE_IN_PLACE_SNAPSHOT_ARG = compute_flags.ResourceArgument(
     required=False,
     short_help='Source in place snapshot used to create the disks.',
     detailed_help=_DETAILED_SOURCE_IN_PLACE_SNAPSHOT_HELP,
-)
+    use_existing_default_scope=True)
 
 SOURCE_DISK_ARG = compute_flags.ResourceArgument(
     resource_name='source disk',

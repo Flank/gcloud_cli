@@ -3,7 +3,7 @@ NAME
         in Cloud Data Catalog
 
 SYNOPSIS
-    gcloud beta data-catalog tag-templates fields COMMAND
+    gcloud beta data-catalog tag-templates fields GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,6 +16,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     enum-values
+        (BETA) Manage tag template enum values in Cloud Data Catalog.
 
 COMMANDS
     COMMAND is one of the following:

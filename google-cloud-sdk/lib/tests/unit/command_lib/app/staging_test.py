@@ -270,7 +270,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
                       env.FLEX)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
-    command = ' '.join(args)
+    command = ' '.join(filter(None, args))
     self.AssertLogMatches(
         re.escape(self._SUCCESS_MESSAGE.format(command=command)))
     self.AssertLogMatches(self._OUTPUT_PATTERN)
@@ -285,7 +285,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
                       env.STANDARD)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
-    command = ' '.join(args)
+    command = ' '.join(filter(None, args))
     self.AssertLogMatches(
         re.escape(self._SUCCESS_MESSAGE.format(command=command)))
     self.AssertLogMatches(self._OUTPUT_PATTERN)
@@ -301,7 +301,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
                       env.STANDARD)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
-    command = ' '.join(args)
+    command = ' '.join(filter(None, args))
     self.AssertLogMatches(
         re.escape(self._SUCCESS_MESSAGE.format(command=command)))
     self.AssertLogMatches(self._OUTPUT_PATTERN)

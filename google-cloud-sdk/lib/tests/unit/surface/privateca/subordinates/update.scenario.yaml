@@ -200,7 +200,7 @@ actions:
           body:
             json:
               pemIssuerCertChain:
-              - |-
+              - |
                 -----BEGIN CERTIFICATE-----
                 MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
                 MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
@@ -228,7 +228,7 @@ actions:
                 rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
                 y4+LpDFE2AxuNZ/x
                 -----END CERTIFICATE-----
-              - |-
+              - |
                 -----BEGIN CERTIFICATE-----
                 MIIGGzCCBAOgAwIBAgIUearOADxVb0UXTUgiRKau+DrZms8wDQYJKoZIhvcNAQEL
                 BQAwgZwxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMREwDwYDVQQH
@@ -264,7 +264,7 @@ actions:
                 AwrA/tI6xv/OxFEgkFVgbB2n5sIQUX21J216nagiDJ7iIUhAcXQQgGQv437lLy+R
                 Qpia3sFMxKU9iaFwty6llwSOEp9zuxkwkU+G/20K2w==
                 -----END CERTIFICATE-----
-              - |-
+              - |
                 -----BEGIN CERTIFICATE-----
                 MIIGGzCCBAOgAwIBAgIUaZtIjugoa6GYNrd5jzZ+cXr6SA0wDQYJKoZIhvcNAQEL
                 BQAwgZwxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMREwDwYDVQQH

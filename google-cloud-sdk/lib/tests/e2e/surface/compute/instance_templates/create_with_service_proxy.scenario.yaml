@@ -1,0 +1,99 @@
+title: instance templates create with service proxy scenario test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instance-templates create $$instance-template$$ --service-proxy
+      enabled,network="some-network",serving-ports="70;80;90",proxy-port=15002,tracing=OFF,access-log="/var/log/envoy/access.log"
+      --service-proxy-labels myapp=review,version=canary
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$].
+  - stdout: .*$$instance-template$$.*$
+- execute:
+  - command: compute instance-templates describe $$instance-template$$ --format="text(properties.metadata,properties.labels,properties.serviceAccounts[0].scopes)"
+  - stdout: |
+      properties.labels.gce-service-proxy:     on
+      properties.metadata.fingerprint:         jVmEztLSWO0=
+      properties.metadata.items[0].key:        enable-guest-attributes
+      properties.metadata.items[0].value:      TRUE
+      properties.metadata.items[1].key:        enable-osconfig
+      properties.metadata.items[1].value:      true
+      properties.metadata.items[2].key:        gce-service-proxy
+      properties.metadata.items[2].value:      {"api-version": "0.2", "service": {"serving-ports": [80, 90, 70]}, "labels": {"myapp": "review", "version": "canary"}, "proxy-spec": {"proxy-port": 15002, "tracing": "OFF", "access-log": "/var/log/envoy/access.log", "network": "some-network"}}
+      properties.metadata.items[3].key:        gce-software-declaration
+      properties.metadata.items[3].value:      {"softwareRecipes": [{"name": "install-gce-service-proxy-agent", "desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": "#! /bin/bash\nexport SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\nsudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\nsudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}
+      properties.metadata.kind:                compute#metadata
+      properties.serviceAccounts[0].scopes[0]: https://www.googleapis.com/auth/cloud-platform
+      properties.serviceAccounts[0].scopes[1]: https://www.googleapis.com/auth/devstorage.read_only
+      properties.serviceAccounts[0].scopes[2]: https://www.googleapis.com/auth/logging.write
+      properties.serviceAccounts[0].scopes[3]: https://www.googleapis.com/auth/monitoring.write
+      properties.serviceAccounts[0].scopes[4]: https://www.googleapis.com/auth/pubsub
+      properties.serviceAccounts[0].scopes[5]: https://www.googleapis.com/auth/service.management.readonly
+      properties.serviceAccounts[0].scopes[6]: https://www.googleapis.com/auth/servicecontrol
+      properties.serviceAccounts[0].scopes[7]: https://www.googleapis.com/auth/trace.append
+- execute:
+  - command: compute instance-templates delete $$instance-template$$ -q
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$].
+
+actions:
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: alpha
+      BETA: beta
+
+- generate_resource_id:
+    reference: instance-template
+    prefix: gcloud-compute-instance-templates
+
+- execute_command:
+    command: compute instance-templates create $$instance-template$$ --service-proxy
+      enabled,network="some-network",serving-ports="70;80;90",proxy-port=15002,tracing=OFF,access-log="/var/log/envoy/access.log"
+      --service-proxy-labels myapp=review,version=canary
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$].
+    - expect_stdout:
+        matches: .*$$instance-template$$.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-templates describe $$instance-template$$ --format="text(properties.metadata,properties.labels,properties.serviceAccounts[0].scopes)"
+    validation_only: true
+    events:
+    - expect_stdout: |
+        properties.labels.gce-service-proxy:     on
+        properties.metadata.fingerprint:         jVmEztLSWO0=
+        properties.metadata.items[0].key:        enable-guest-attributes
+        properties.metadata.items[0].value:      TRUE
+        properties.metadata.items[1].key:        enable-osconfig
+        properties.metadata.items[1].value:      true
+        properties.metadata.items[2].key:        gce-service-proxy
+        properties.metadata.items[2].value:      {"api-version": "0.2", "service": {"serving-ports": [80, 90, 70]}, "labels": {"myapp": "review", "version": "canary"}, "proxy-spec": {"proxy-port": 15002, "tracing": "OFF", "access-log": "/var/log/envoy/access.log", "network": "some-network"}}
+        properties.metadata.items[3].key:        gce-software-declaration
+        properties.metadata.items[3].value:      {"softwareRecipes": [{"name": "install-gce-service-proxy-agent", "desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": "#! /bin/bash\nexport SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\nsudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\nsudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}
+        properties.metadata.kind:                compute#metadata
+        properties.serviceAccounts[0].scopes[0]: https://www.googleapis.com/auth/cloud-platform
+        properties.serviceAccounts[0].scopes[1]: https://www.googleapis.com/auth/devstorage.read_only
+        properties.serviceAccounts[0].scopes[2]: https://www.googleapis.com/auth/logging.write
+        properties.serviceAccounts[0].scopes[3]: https://www.googleapis.com/auth/monitoring.write
+        properties.serviceAccounts[0].scopes[4]: https://www.googleapis.com/auth/pubsub
+        properties.serviceAccounts[0].scopes[5]: https://www.googleapis.com/auth/service.management.readonly
+        properties.serviceAccounts[0].scopes[6]: https://www.googleapis.com/auth/servicecontrol
+        properties.serviceAccounts[0].scopes[7]: https://www.googleapis.com/auth/trace.append
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-templates delete $$instance-template$$ -q
+    cleanup_for: instance-template
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$].
+    - expect_exit:
+        code: 0

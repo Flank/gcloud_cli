@@ -12,6 +12,9 @@ SYNOPSIS
         [--python-version=PYTHON_VERSION] [--region=REGION]
         [--runtime-version=RUNTIME_VERSION] [--service-account=SERVICE_ACCOUNT]
         [--staging-bucket=STAGING_BUCKET]
+        [--args=[ARG,...] --command=[COMMAND,...] --env-vars=[KEY=VALUE,...]
+          --image=IMAGE --ports=[ARG,...]
+          --health-route=HEALTH_ROUTE --predict-route=PREDICT_ROUTE]
         [--package-uris=[PACKAGE_URI,...] --prediction-class=PREDICTION_CLASS]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -32,9 +35,8 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --accelerator=[count=COUNT],[type=TYPE]
         Manage the accelerator config for GPU serving. When deploying a model
-        with the new Alpha Google Compute Engine Machine Types, a GPU
-        accelerator may also be selected. Accelerator config for version
-        creation is currently available in us-central1 only.
+        with Compute Engine Machine Types, a GPU accelerator may also be
+        selected.
 
          type
             The type of the accelerator. Choices are 'nvidia-tesla-k80',
@@ -43,7 +45,9 @@ OPTIONAL FLAGS
 
          count
             The number of accelerators to attach to each machine running the
-            job.
+            job. This is usually 1; scaling parameters are configured using
+            manualScaling or autoScaling flags.
+
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
@@ -105,7 +109,7 @@ OPTIONAL FLAGS
      --machine-type=MACHINE_TYPE
         Type of machine on which to serve the model. Currently only applies to
         online prediction. For available machine types, see
-        https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#machine-types.
+        https://cloud.google.com/ai-platform/prediction/docs/machine-types-online-prediction#available_machine_types.
 
      --num-integral-steps=NUM_INTEGRAL_STEPS; default=50
         Number of integral steps for Integrated Gradients. Only valid when
@@ -159,6 +163,36 @@ OPTIONAL FLAGS
         Required only if a file upload is necessary (that is, other flags
         include local paths) and no other flags implicitly specify an upload
         path.
+
+     Configure the container to be deployed.
+
+       --args=[ARG,...]
+          Comma-separated arguments passed to the command run by the container
+          image. If not specified and no '--command' is provided, the container
+          image's default Cmd is used.
+
+       --command=[COMMAND,...]
+          Entrypoint for the container image. If not specified, the container
+          image's default Entrypoint is run.
+
+       --env-vars=[KEY=VALUE,...]
+          List of key-value pairs to set as environment variables.
+
+       --image=IMAGE
+          Name of the container image to deploy (e.g.
+          gcr.io/myproject/server:latest).
+
+       --ports=[ARG,...]
+          Container ports to receive requests at. Must be a number between 1
+          and 65535, inclusive.
+
+       Flags to control the paths that requests and health checks are sent to.
+
+         --health-route=HEALTH_ROUTE
+            HTTP path to send health checks to inside the container.
+
+         --predict-route=PREDICT_ROUTE
+            HTTP path to send prediction requests to inside the container.
 
      Configure user code in prediction. AI Platform allows a model to have
      user-provided prediction code; these options configure that code.

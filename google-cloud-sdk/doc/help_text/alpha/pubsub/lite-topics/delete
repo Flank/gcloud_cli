@@ -24,8 +24,6 @@ POSITIONAL ARGUMENTS
        --zone=ZONE
           ID of the location of the Pub/Sub Lite resource.
 
-          If not specified, will use default pubsub/lite_zone property.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -36,7 +34,7 @@ GCLOUD WIDE FLAGS
 
 API REFERENCE
     This command uses the pubsublite/v1 API. The full documentation for this
-    API can be found at: https://cloud.google.com/pubsub/docs
+    API can be found at: https://cloud.google.com/pubsub/lite/docs
 
 EXAMPLES
     To delete a Pub/Sub Lite topic, run:

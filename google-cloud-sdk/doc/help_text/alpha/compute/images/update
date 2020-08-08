@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute images update - update Google Compute Engine images
+    gcloud alpha compute images update - update a Compute Engine image
 
 SYNOPSIS
     gcloud alpha compute images update IMAGE_NAME [--description=DESCRIPTION]
@@ -7,8 +7,8 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute images update updates labels for a Google
-    Compute image.
+    (ALPHA) gcloud alpha compute images update updates labels for a Compute
+    Engine image.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
@@ -16,12 +16,12 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --description=DESCRIPTION
-        An optional text description for the image being created.
+        An optional text description for the image.
 
      --family=FAMILY
-        Family of the image. When creating an instance or disk, specifying a
-        family will cause the latest non-deprecated image in the family to be
-        used.
+        Name of the image family to use. If an image family is specified when
+        you create an instance or disk, the latest non-deprecated image in the
+        family is used.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -75,7 +75,7 @@ EXAMPLES
     To list only the labels when describing a resource, use --format:
 
         $ gcloud alpha compute images describe example-image \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -1,6 +1,6 @@
 NAME
-    gcloud compute networks peerings update - update a Google Compute Engine
-        network peering
+    gcloud compute networks peerings update - update a Compute Engine network
+        peering
 
 SYNOPSIS
     gcloud compute networks peerings update NAME --network=NETWORK

@@ -31,6 +31,9 @@ from google.auth import exceptions as google_auth_exceptions
 class PrintAccessTokenTestUsingGoogleAuth(sdk_test_base.WithFakeAuth,
                                           cli_test_base.CliTestBase):
 
+  def PreSetUp(self):
+    self.use_google_auth = True
+
   def testPrint(self):
     def FakeRefresh(cred, http=None):
       del http
@@ -64,7 +67,7 @@ class PrintAccessTokenTestUsingOauth2client(sdk_test_base.WithFakeAuth,
 
   def SetUp(self):
     self.StartObjectPatch(
-        properties.VALUES.auth.disable_google_auth,
+        properties.VALUES.auth.disable_load_google_auth,
         'GetBool',
         return_value=True)
 

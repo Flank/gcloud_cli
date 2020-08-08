@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
     gcloud dataproc clusters create (CLUSTER : --region=REGION)
         --autoscaling-policy=AUTOSCALING_POLICY [--no-address] [--async]
-        [--bucket=BUCKET]
+        [--bucket=BUCKET] [--enable-component-gateway]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
@@ -22,6 +22,7 @@ SYNOPSIS
         [--secondary-worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--secondary-worker-boot-disk-size=SECONDARY_WORKER_BOOT_DISK_SIZE]
         [--secondary-worker-boot-disk-type=SECONDARY_WORKER_BOOT_DISK_TYPE]
+        [--temp-bucket=TEMP_BUCKET]
         [--worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
         [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
@@ -92,6 +93,10 @@ FLAGS
         The Google Cloud Storage bucket to use by default to stage job
         dependencies, miscellaneous config files, and job driver console output
         when using this cluster.
+
+     --enable-component-gateway
+        Enable access to the web UIs of selected components on the cluster
+        through the component gateway.
 
      --initialization-action-timeout=TIMEOUT; default="10m"
         The maximum duration of each initialization action. See $ gcloud topic
@@ -236,6 +241,10 @@ FLAGS
 
      --secondary-worker-boot-disk-type=SECONDARY_WORKER_BOOT_DISK_TYPE
         The type of the boot disk. The value must be pd-standard or pd-ssd.
+
+     --temp-bucket=TEMP_BUCKET
+        The Google Cloud Storage bucket to use by default to to store ephemeral
+        cluster and jobs data, such as Spark and MapReduce history files.
 
      --worker-accelerator=[type=TYPE,[count=COUNT],...]
         Attaches accelerators (e.g. GPUs) to the worker instance(s).
@@ -493,6 +502,7 @@ FLAGS
                                    https://www.googleapis.com/auth/trace.append
             logging-write          https://www.googleapis.com/auth/logging.write
             monitoring             https://www.googleapis.com/auth/monitoring
+            monitoring-read        https://www.googleapis.com/auth/monitoring.read
             monitoring-write       https://www.googleapis.com/auth/monitoring.write
             pubsub                 https://www.googleapis.com/auth/pubsub
             service-control        https://www.googleapis.com/auth/servicecontrol

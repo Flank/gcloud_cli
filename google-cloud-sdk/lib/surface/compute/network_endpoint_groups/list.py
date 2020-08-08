@@ -23,9 +23,9 @@ from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
-  """Lists Google Compute Engine network endpoint groups."""
+  """Lists Compute Engine network endpoint groups."""
 
   detailed_help = base_classes.GetMultiScopeListerHelp(
       'network endpoint groups',
@@ -66,9 +66,9 @@ class List(base.ListCommand):
     return lister.Invoke(request_data, list_implementation)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class ListAlpha(List):
-  """Lists Google Compute Engine network endpoint groups."""
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+class ListAlphaBeta(List):
+  """Lists Compute Engine network endpoint groups."""
 
   detailed_help = base_classes.GetMultiScopeListerHelp(
       'network endpoint groups', [

@@ -24,12 +24,11 @@ from googlecloudsdk.command_lib.resource_settings import arguments
 from googlecloudsdk.command_lib.resource_settings import utils
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Describe(base.DescribeCommand):
-  r"""Get a resource setting.
+  r"""Show the value of a resource setting.
 
-  Get a resource setting
+  Show the value of a resource setting
 
   ## EXAMPLES
 
@@ -43,9 +42,19 @@ class Describe(base.DescribeCommand):
   def Args(parser):
     arguments.AddSettingsNameArgToParser(parser)
     arguments.AddResourceFlagsToParser(parser)
+    parser.add_argument(
+        '--effective',
+        action='store_true',
+        help='Describe the effective setting.')
 
   def Run(self, args):
-    """Get the resource settings.
+    """Get the (effective) resource settings.
+
+    If --effective is not specified, it is a regular resource setting and
+    it is retrieved using GetValue.
+
+    If --effective is specified, it is an effective setting and it is retrieved
+    using LookupEffectiveValue.
 
     Args:
       args: argparse.Namespace, An object that contains the values for the
@@ -57,6 +66,11 @@ class Describe(base.DescribeCommand):
 
     settings_service = api_utils.GetServiceFromArgs(args)
     setting_name = '{}/value'.format(utils.GetSettingsPathFromArgs(args))
+
+    if args.effective:
+      get_request = api_utils.GetLookupEffectiveValueRequestFromArgs(
+          args, setting_name)
+      return settings_service.LookupEffectiveValue(get_request)
 
     get_request = api_utils.GetGetValueRequestFromArgs(args, setting_name)
     setting_value = settings_service.GetValue(get_request)

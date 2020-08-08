@@ -24,6 +24,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import flags
+from googlecloudsdk.command_lib.run import messages_util
 from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import serverless_operations
@@ -56,6 +57,7 @@ class Update(base.Command):
     managed_group = flags.GetManagedArgGroup(parser)
     flags.AddCloudSQLFlags(managed_group)
     flags.AddRevisionSuffixArg(managed_group)
+    flags.AddVpcConnectorArg(managed_group)
 
     # Flags specific to connecting to a cluster
     cluster_group = flags.GetClusterArgGroup(parser)
@@ -83,15 +85,12 @@ class Update(base.Command):
     flags.AddPortFlag(parser)
     flags.AddCpuFlag(parser)
     flags.AddNoTrafficFlag(parser)
+    flags.AddServiceAccountFlag(parser)
     concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
 
   @staticmethod
   def Args(parser):
     Update.CommonArgs(parser)
-
-    # Flags specific to managed CR
-    managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddServiceAccountFlag(managed_group)
 
     # Flags only supported on GKE and Knative
     cluster_group = flags.GetClusterArgGroup(parser)
@@ -133,21 +132,9 @@ class Update(base.Command):
       if args.async_:
         pretty_print.Success('Deploying asynchronously.')
       else:
-        service = client.GetService(service_ref)
-        latest_ready = service.status.latestReadyRevisionName
-        latest_percent_traffic = service.latest_percent_traffic
-        msg = ('Service [{{bold}}{serv}{{reset}}] '
-               'revision [{{bold}}{rev}{{reset}}] '
-               'has been deployed and is serving '
-               '{{bold}}{latest_percent_traffic}{{reset}} percent of traffic')
-        if latest_percent_traffic:
-          msg += (' at {{bold}}{url}{{reset}}')
-        msg = msg.format(
-            serv=service_ref.servicesId,
-            rev=latest_ready,
-            url=service.domain if 'domain' in dir(service) else service.url,
-            latest_percent_traffic=latest_percent_traffic)
-        pretty_print.Success(msg)
+        pretty_print.Success(
+            messages_util.GetSuccessMessageForSynchronousDeploy(
+                client, service_ref))
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -156,10 +143,12 @@ class BetaUpdate(Update):
 
   @staticmethod
   def Args(parser):
-    Update.Args(parser)
+    Update.CommonArgs(parser)
+    flags.AddDeployTagFlag(parser)
 
-    # Flags specific to VPCAccess
-    flags.AddVpcConnectorArg(parser)
+    # Flags only supported on GKE and Knative
+    cluster_group = flags.GetClusterArgGroup(parser)
+    flags.AddMinInstancesFlag(cluster_group)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -172,11 +161,11 @@ class AlphaUpdate(Update):
 
     # Flags specific to managed CR
     managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddVpcConnectorArg(managed_group)
+    flags.AddEgressSettingsFlag(managed_group)
 
     # Flags not specific to any platform
     flags.AddMinInstancesFlag(parser)
-    flags.AddServiceAccountFlagAlpha(parser)
+    flags.AddDeployTagFlag(parser)
 
 
 AlphaUpdate.__doc__ = Update.__doc__

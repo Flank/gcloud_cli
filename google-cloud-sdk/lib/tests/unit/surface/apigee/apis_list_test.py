@@ -45,6 +45,14 @@ class APIsListTest(base.ApigeeSurfaceTest):
  - guest_order
  - auth_order""", normalize_space=True)
 
+  def testEmptyResponse(self):
+    self.AddHTTPResponse(
+        "https://apigee.googleapis.com/v1/organizations/test-org/apis",
+        status=200,
+        body=json.dumps({}))
+    self.RunApigee("apis list --organization=test-org --format=json")
+    self.AssertJsonOutputMatches([], "Must properly handle empty response.")
+
   def testProjectFallback(self):
     self.AddHTTPResponse(
         "https://apigee.googleapis.com/v1/organizations",

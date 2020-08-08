@@ -62,7 +62,7 @@ class OrgPoliciesIntegrationTest(e2e_base.WithServiceAuth):
     self.assertIsNone(result)
 
   def RunOrgPolicies(self, *command):
-    return self.Run(['beta', 'resource-manager', 'org-policies'] +
+    return self.Run(['resource-manager', 'org-policies'] +
                     list(command))
 
 

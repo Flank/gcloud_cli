@@ -144,7 +144,7 @@
           "type": "string"
         },
         "initialNodeCount": {
-          "description": "The number of nodes to create in this cluster. You must ensure that your\nCompute Engine <a href=\"\/compute\/docs\/resource-quotas\">resource quota<\/a>\nis sufficient for this number of instances. You must also have available\nfirewall and routes quota.\nFor requests, this field should only be used in lieu of a\n\"node_pool\" object, since this configuration (along with the\n\"node_config\") will be used to create a \"NodePool\" object with an\nauto-generated name. Do not use this and a node_pool at the same time.\n\nThis field is deprecated, use node_pool.initial_node_count instead.",
+          "description": "The number of nodes to create in this cluster. You must ensure that your\nCompute Engine [resource quota](https:\/\/cloud.google.com\/compute\/quotas)\nis sufficient for this number of instances. You must also have available\nfirewall and routes quota.\nFor requests, this field should only be used in lieu of a\n\"node_pool\" object, since this configuration (along with the\n\"node_config\") will be used to create a \"NodePool\" object with an\nauto-generated name. Do not use this and a node_pool at the same time.\n\nThis field is deprecated, use node_pool.initial_node_count instead.",
           "type": "integer",
           "format": "int32"
         },
@@ -269,6 +269,10 @@
           "description": "Shielded Nodes configuration.",
           "$ref": "ShieldedNodes"
         },
+        "releaseChannel": {
+          "description": "Release channel configuration.",
+          "$ref": "ReleaseChannel"
+        },
         "workloadIdentityConfig": {
           "description": "Configuration for the use of Kubernetes Service Accounts in GCP IAM\npolicies.",
           "$ref": "WorkloadIdentityConfig"
@@ -294,7 +298,7 @@
           "type": "string"
         },
         "currentNodeVersion": {
-          "description": "[Output only] Deprecated, use\n[NodePools.version](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/reference\/rest\/v1\/projects.zones.clusters.nodePools)\ninstead. The current version of the node software components. If they are\ncurrently at multiple versions because they're in the process of being\nupgraded, this reflects the minimum version of all nodes.",
+          "description": "[Output only] Deprecated, use\n[NodePools.version](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/reference\/rest\/v1\/projects.locations.clusters.nodePools)\ninstead. The current version of the node software components. If they are\ncurrently at multiple versions because they're in the process of being\nupgraded, this reflects the minimum version of all nodes.",
           "type": "string"
         },
         "createTime": {
@@ -399,7 +403,7 @@
           "type": "string"
         },
         "metadata": {
-          "description": "The metadata key\/value pairs assigned to instances in the cluster.\n\nKeys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes\nin length. These are reflected as part of a URL in the metadata server.\nAdditionally, to avoid ambiguity, keys must not conflict with any other\nmetadata keys for the project or be one of the reserved keys:\n \"cluster-location\"\n \"cluster-name\"\n \"cluster-uid\"\n \"configure-sh\"\n \"containerd-configure-sh\"\n \"enable-os-login\"\n \"gci-ensure-gke-docker\"\n \"gci-metrics-enabled\"\n \"gci-update-strategy\"\n \"instance-template\"\n \"kube-env\"\n \"startup-script\"\n \"user-data\"\n \"disable-address-manager\"\n \"windows-startup-script-ps1\"\n \"common-psm1\"\n \"k8s-node-setup-psm1\"\n \"install-ssh-psm1\"\n \"user-profile-psm1\"\n \"serial-port-logging-enable\"\n\nValues are free-form strings, and only have meaning as interpreted by\nthe image running in the instance. The only restriction placed on them is\nthat each value's size must be less than or equal to 32 KB.\n\nThe total size of all keys and values must be less than 512 KB.",
+          "description": "The metadata key\/value pairs assigned to instances in the cluster.\n\nKeys must conform to the regexp `[a-zA-Z0-9-_]+` and be less than 128 bytes\nin length. These are reflected as part of a URL in the metadata server.\nAdditionally, to avoid ambiguity, keys must not conflict with any other\nmetadata keys for the project or be one of the reserved keys:\n - \"cluster-location\"\n - \"cluster-name\"\n - \"cluster-uid\"\n - \"configure-sh\"\n - \"containerd-configure-sh\"\n - \"enable-os-login\"\n - \"gci-ensure-gke-docker\"\n - \"gci-metrics-enabled\"\n - \"gci-update-strategy\"\n - \"instance-template\"\n - \"kube-env\"\n - \"startup-script\"\n - \"user-data\"\n - \"disable-address-manager\"\n - \"windows-startup-script-ps1\"\n - \"common-psm1\"\n - \"k8s-node-setup-psm1\"\n - \"install-ssh-psm1\"\n - \"user-profile-psm1\"\n - \"serial-port-logging-enable\"\n\nValues are free-form strings, and only have meaning as interpreted by\nthe image running in the instance. The only restriction placed on them is\nthat each value's size must be less than or equal to 32 KB.\n\nThe total size of all keys and values must be less than 512 KB.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -448,7 +452,7 @@
           "type": "string"
         },
         "minCpuPlatform": {
-          "description": "Minimum CPU platform to be used by this instance. The instance may be\nscheduled on the specified or newer CPU platform. Applicable values are the\nfriendly names of CPU platforms, such as\n<code>minCpuPlatform: &quot;Intel Haswell&quot;<\/code> or\n<code>minCpuPlatform: &quot;Intel Sandy Bridge&quot;<\/code>. For more\ninformation, read [how to specify min CPU\nplatform](https:\/\/cloud.google.com\/compute\/docs\/instances\/specify-min-cpu-platform)",
+          "description": "Minimum CPU platform to be used by this instance. The instance may be\nscheduled on the specified or newer CPU platform. Applicable values are the\nfriendly names of CPU platforms, such as\n`minCpuPlatform: \"Intel Haswell\"` or\n`minCpuPlatform: \"Intel Sandy Bridge\"`. For more\ninformation, read [how to specify min CPU\nplatform](https:\/\/cloud.google.com\/compute\/docs\/instances\/specify-min-cpu-platform)",
           "type": "string"
         },
         "workloadMetadataConfig": {
@@ -466,6 +470,10 @@
           "description": "Sandbox configuration for this node.",
           "$ref": "SandboxConfig"
         },
+        "nodeGroup": {
+          "description": "Setting this field will assign instances of this\npool to run on the specified node group. This is useful for running\nworkloads on [sole tenant\nnodes](https:\/\/cloud.google.com\/compute\/docs\/nodes\/sole-tenant-nodes).",
+          "type": "string"
+        },
         "reservationAffinity": {
           "description": "The optional reservation affinity. Setting this field will apply\nthe specified [Zonal Compute\nReservation](https:\/\/cloud.google.com\/compute\/docs\/instances\/reserving-zonal-resources)\nto this node pool.",
           "$ref": "ReservationAffinity"
@@ -473,6 +481,10 @@
         "shieldedInstanceConfig": {
           "description": "Shielded Instance options.",
           "$ref": "ShieldedInstanceConfig"
+        },
+        "bootDiskKmsKey": {
+          "description": "\nThe Customer Managed Encryption Key used to encrypt the boot disk attached\nto each node in the node pool. This should be of the form\nprojects\/[KEY_PROJECT_ID]\/locations\/[LOCATION]\/keyRings\/[RING_NAME]\/cryptoKeys\/[KEY_NAME].\nFor more information about protecting resources with Cloud KMS Keys please\nsee:\nhttps:\/\/cloud.google.com\/compute\/docs\/disks\/customer-managed-encryption",
+          "type": "string"
         }
       }
     },
@@ -697,6 +709,14 @@
         "cloudRunConfig": {
           "description": "Configuration for the Cloud Run addon, which allows the user to use a\nmanaged Knative service.",
           "$ref": "CloudRunConfig"
+        },
+        "dnsCacheConfig": {
+          "description": "Configuration for NodeLocalDNS, a dns cache running on cluster nodes",
+          "$ref": "DnsCacheConfig"
+        },
+        "configConnectorConfig": {
+          "description": "Configuration for the ConfigConnector add-on, a Kubernetes\nextension to manage hosted GCP services through the Kubernetes API",
+          "$ref": "ConfigConnectorConfig"
         }
       }
     },
@@ -752,6 +772,42 @@
         "disabled": {
           "description": "Whether Cloud Run addon is enabled for this cluster.",
           "type": "boolean"
+        },
+        "loadBalancerType": {
+          "description": "Which load balancer type is installed for Cloud Run.",
+          "enumDescriptions": [
+            "Load balancer type for Cloud Run is unspecified.",
+            "Install external load balancer for Cloud Run.",
+            "Install internal load balancer for Cloud Run."
+          ],
+          "type": "string",
+          "enum": [
+            "LOAD_BALANCER_TYPE_UNSPECIFIED",
+            "LOAD_BALANCER_TYPE_EXTERNAL",
+            "LOAD_BALANCER_TYPE_INTERNAL"
+          ]
+        }
+      }
+    },
+    "DnsCacheConfig": {
+      "id": "DnsCacheConfig",
+      "description": "Configuration for NodeLocal DNSCache",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether NodeLocal DNSCache is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "ConfigConnectorConfig": {
+      "id": "ConfigConnectorConfig",
+      "description": "Configuration options for the Config Connector add-on.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether Cloud Connector is enabled for this cluster.",
+          "type": "boolean"
         }
       }
     },
@@ -769,7 +825,7 @@
           "$ref": "NodeConfig"
         },
         "initialNodeCount": {
-          "description": "The initial node count for the pool. You must ensure that your\nCompute Engine <a href=\"\/compute\/docs\/resource-quotas\">resource quota<\/a>\nis sufficient for this number of instances. You must also have available\nfirewall and routes quota.",
+          "description": "The initial node count for the pool. You must ensure that your\nCompute Engine [resource quota](https:\/\/cloud.google.com\/compute\/quotas)\nis sufficient for this number of instances. You must also have available\nfirewall and routes quota.",
           "type": "integer",
           "format": "int32"
         },
@@ -1102,7 +1158,7 @@
           "$ref": "MaintenanceWindow"
         },
         "resourceVersion": {
-          "description": "A hash identifying the version of this policy, so that updates to fields of\nthe policy won't accidentally undo intermediate changes (and so that users\nof the API unaware of some fields won't accidentally remove other fields).\nMake a <code>get()<\/code> request to the cluster to get the current\nresource version and include it with requests to set the policy.",
+          "description": "A hash identifying the version of this policy, so that updates to fields of\nthe policy won't accidentally undo intermediate changes (and so that users\nof the API unaware of some fields won't accidentally remove other fields).\nMake a `get()` request to the cluster to get the current\nresource version and include it with requests to set the policy.",
           "type": "string"
         }
       }
@@ -1154,7 +1210,7 @@
           "$ref": "TimeWindow"
         },
         "recurrence": {
-          "description": "An RRULE (https:\/\/tools.ietf.org\/html\/rfc5545#section-3.8.5.3) for how\nthis window reccurs. They go on for the span of time between the start and\nend time.\n\nFor example, to have something repeat every weekday, you'd use:\n  <code>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR<\/code>\nTo repeat some window daily (equivalent to the DailyMaintenanceWindow):\n  <code>FREQ=DAILY<\/code>\nFor the first weekend of every month:\n  <code>FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU<\/code>\nThis specifies how frequently the window starts. Eg, if you wanted to have\na 9-5 UTC-4 window every weekday, you'd use something like:\n<code>\n  start time = 2019-01-01T09:00:00-0400\n  end time = 2019-01-01T17:00:00-0400\n  recurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\n<\/code>\nWindows can span multiple days. Eg, to make the window encompass every\nweekend from midnight Saturday till the last minute of Sunday UTC:\n<code>\n  start time = 2019-01-05T00:00:00Z\n  end time = 2019-01-07T23:59:00Z\n  recurrence = FREQ=WEEKLY;BYDAY=SA\n<\/code>\nNote the start and end time's specific dates are largely arbitrary except\nto specify duration of the window and when it first starts.\nThe FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.",
+          "description": "An RRULE (https:\/\/tools.ietf.org\/html\/rfc5545#section-3.8.5.3) for how\nthis window reccurs. They go on for the span of time between the start and\nend time.\n\nFor example, to have something repeat every weekday, you'd use:\n`FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR`\n\nTo repeat some window daily (equivalent to the DailyMaintenanceWindow):\n`FREQ=DAILY`\n\nFor the first weekend of every month:\n`FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU`\n\nThis specifies how frequently the window starts. Eg, if you wanted to have\na 9-5 UTC-4 window every weekday, you'd use something like:\n```\nstart time = 2019-01-01T09:00:00-0400\nend time = 2019-01-01T17:00:00-0400\nrecurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\n```\n\nWindows can span multiple days. Eg, to make the window encompass every\nweekend from midnight Saturday till the last minute of Sunday UTC:\n```\nstart time = 2019-01-05T00:00:00Z\nend time = 2019-01-07T23:59:00Z\nrecurrence = FREQ=WEEKLY;BYDAY=SA\n```\n\nNote the start and end time's specific dates are largely arbitrary except\nto specify duration of the window and when it first starts.\nThe FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.",
           "type": "string"
         }
       }
@@ -1366,7 +1422,18 @@
         "peeringName": {
           "description": "Output only. The peering name in the customer VPC used by this cluster.",
           "type": "string"
+        },
+        "masterGlobalAccessConfig": {
+          "description": "Controls master global access settings.",
+          "$ref": "PrivateClusterMasterGlobalAccessConfig"
         }
+      }
+    },
+    "PrivateClusterMasterGlobalAccessConfig": {
+      "id": "PrivateClusterMasterGlobalAccessConfig",
+      "description": "Configuration for controlling master global access settings.",
+      "type": "object",
+      "properties": {
       }
     },
     "DatabaseEncryption": {
@@ -1416,6 +1483,29 @@
         }
       }
     },
+    "ReleaseChannel": {
+      "id": "ReleaseChannel",
+      "description": "ReleaseChannel indicates which release channel a cluster is\nsubscribed to. Release channels are arranged in order of risk.\n\nWhen a cluster is subscribed to a release channel, Google maintains\nboth the master version and the node version. Node auto-upgrade\ndefaults to true and cannot be disabled.",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "channel specifies which release channel the cluster is subscribed to.",
+          "enumDescriptions": [
+            "No channel specified.",
+            "RAPID channel is offered on an early access basis for customers who want\nto test new releases.\n\nWARNING: Versions available in the RAPID Channel may be subject to\nunresolved issues with no known workaround and are not subject to any\nSLAs.",
+            "Clusters subscribed to REGULAR receive versions that are considered GA\nquality. REGULAR is intended for production users who want to take\nadvantage of new features.",
+            "Clusters subscribed to STABLE receive versions that are known to be\nstable and reliable in production."
+          ],
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "RAPID",
+            "REGULAR",
+            "STABLE"
+          ]
+        }
+      }
+    },
     "WorkloadIdentityConfig": {
       "id": "WorkloadIdentityConfig",
       "description": "Configuration for the use of Kubernetes Service Accounts in GCP IAM\npolicies.",
@@ -1441,7 +1531,7 @@
           "type": "string"
         },
         "cluster": {
-          "description": "Required. A [cluster\nresource](https:\/\/cloud.google.com\/container-engine\/reference\/rest\/v1\/projects.zones.clusters)",
+          "description": "Required. A [cluster\nresource](https:\/\/cloud.google.com\/container-engine\/reference\/rest\/v1\/projects.locations.clusters)",
           "$ref": "Cluster"
         },
         "parent": {
@@ -1749,6 +1839,10 @@
         "desiredIntraNodeVisibilityConfig": {
           "description": "The desired config of Intra-node visibility.",
           "$ref": "IntraNodeVisibilityConfig"
+        },
+        "desiredReleaseChannel": {
+          "description": "The desired release channel configuration.",
+          "$ref": "ReleaseChannel"
         },
         "desiredMasterVersion": {
           "description": "The Kubernetes version to change the master to.\n\nUsers may specify either explicit versions offered by\nKubernetes Engine or version aliases, which have the following behavior:\n\n- \"latest\": picks the highest valid Kubernetes version\n- \"1.X\": picks the highest valid patch+gke.N patch in the 1.X version\n- \"1.X.Y\": picks the highest valid gke.N patch in the 1.X.Y version\n- \"1.X.Y-gke.N\": picks an explicit Kubernetes version\n- \"-\": picks the default Kubernetes version",
@@ -2098,7 +2192,7 @@
           "type": "string"
         },
         "validNodeVersions": {
-          "description": "List of valid node upgrade target versions.",
+          "description": "List of valid node upgrade target versions, in descending order.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2116,7 +2210,48 @@
           }
         },
         "validMasterVersions": {
-          "description": "List of valid master versions.",
+          "description": "List of valid master versions, in descending order.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "channels": {
+          "description": "List of release channel configurations.",
+          "type": "array",
+          "items": {
+            "$ref": "ReleaseChannelConfig"
+          }
+        }
+      }
+    },
+    "ReleaseChannelConfig": {
+      "id": "ReleaseChannelConfig",
+      "description": "ReleaseChannelConfig exposes configuration for a release channel.",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "The release channel this configuration applies to.",
+          "enumDescriptions": [
+            "No channel specified.",
+            "RAPID channel is offered on an early access basis for customers who want\nto test new releases.\n\nWARNING: Versions available in the RAPID Channel may be subject to\nunresolved issues with no known workaround and are not subject to any\nSLAs.",
+            "Clusters subscribed to REGULAR receive versions that are considered GA\nquality. REGULAR is intended for production users who want to take\nadvantage of new features.",
+            "Clusters subscribed to STABLE receive versions that are known to be\nstable and reliable in production."
+          ],
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "RAPID",
+            "REGULAR",
+            "STABLE"
+          ]
+        },
+        "defaultVersion": {
+          "description": "The default version for newly created clusters on the channel.",
+          "type": "string"
+        },
+        "validVersions": {
+          "description": "List of valid versions for the channel.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2383,7 +2518,7 @@
           }
         },
         "labelFingerprint": {
-          "description": "Required. The fingerprint of the previous set of labels for this resource,\nused to detect conflicts. The fingerprint is initially generated by\nKubernetes Engine and changes after every request to modify or update\nlabels. You must always provide an up-to-date fingerprint hash when\nupdating or changing labels. Make a <code>get()<\/code> request to the\nresource to get the latest fingerprint.",
+          "description": "Required. The fingerprint of the previous set of labels for this resource,\nused to detect conflicts. The fingerprint is initially generated by\nKubernetes Engine and changes after every request to modify or update\nlabels. You must always provide an up-to-date fingerprint hash when\nupdating or changing labels. Make a `get()` request to the\nresource to get the latest fingerprint.",
           "type": "string"
         },
         "name": {

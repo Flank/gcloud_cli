@@ -1,11 +1,11 @@
 NAME
-    gcloud logging - manage Stackdriver Logging
+    gcloud logging - manage Cloud Logging
 
 SYNOPSIS
     gcloud logging GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Manage Stackdriver Logging.
+    Manage Cloud Logging.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

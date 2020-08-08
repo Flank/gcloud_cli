@@ -11,14 +11,14 @@ gcloud beta sql users create \- creates a user in a given instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql users create\fR \fIUSERNAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-password\fR=\fIPASSWORD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql users create\fR \fIUSERNAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-password\fR=\fIPASSWORD\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR Creates a user in a given instance with specified username, host,
-and password.
+type, and password.
 
 
 
@@ -63,6 +63,12 @@ https://cloud.google.com/sql/docs/mysql/configure\-ip
 .TP 2m
 \fB\-\-password\fR=\fIPASSWORD\fR
 Cloud SQL user's password.
+
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR
+Cloud SQL user's type. It determines the method to authenticate the user during
+login. See the list of user types at
+https://cloud.google.com/sql/docs/postgres/admin\-api/v1beta4/users#type
 
 
 .RE

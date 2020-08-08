@@ -1,0 +1,112 @@
+
+.TH "GCLOUD_RESOURCE\-MANAGER_ORG\-POLICIES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud resource\-manager org\-policies describe \- describe an Organization Policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud resource\-manager org\-policies describe\fR \fIORG_POLICY_ID\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-effective\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describes an Organization Policy associated with the specified resource.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIORG_POLICY_ID\fR
+The Org Policy constraint name.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Resource that is associated with the organization policy. Exactly one of these
+must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Folder ID.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Organization ID.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+Project ID. Overrides the default \fBcore/project\fR property value for this
+command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-effective\fR
+Show the effective policy.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command retrieves an Organization Policy for constraint
+\f5serviceuser.services\fR on project \f5foo\-project\fR:
+
+.RS 2m
+$ gcloud resource\-manager org\-policies describe \e
+    serviceuser.services \-\-project=foo\-project
+.RE
+
+The following command retrieves the effective Organization Policy for constraint
+\f5serviceuser.services\fR on project \f5foo\-project\fR:
+
+.RS 2m
+$ gcloud resource\-manager org\-policies describe \e
+    serviceuser.services \-\-project=foo\-project \-\-effective
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha resource\-manager org\-policies describe
+$ gcloud beta resource\-manager org\-policies describe
+.RE
+

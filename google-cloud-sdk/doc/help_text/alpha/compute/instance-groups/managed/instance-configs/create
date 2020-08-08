@@ -6,6 +6,8 @@ NAME
 SYNOPSIS
     gcloud alpha compute instance-groups managed instance-configs create NAME
         --instance=INSTANCE
+        [--instance-update-minimal-action=INSTANCE_UPDATE_MINIMAL_ACTION;
+          default="none"]
         [--stateful-disk=[auto-delete=AUTO-DELETE],
           [device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]]
         [--stateful-metadata=KEY=VALUE,[KEY=VALUE,...]] [--no-update-instance]
@@ -13,7 +15,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-groups managed instance-configs
-    create creates a per-instance config for an instance controlled by a Google
+    create creates a per-instance config for an instance controlled by a
     Compute Engine managed instance group. An instance with a per instance
     config preserves the specified metadata and/or disks during instance
     recreation and deletion.
@@ -31,6 +33,21 @@ REQUIRED FLAGS
         URI/name of an existing instance in the managed instance group.
 
 OPTIONAL FLAGS
+     --instance-update-minimal-action=INSTANCE_UPDATE_MINIMAL_ACTION; default="none"
+        Perform at least this action on the instance while updating, if
+        --update-instance is set to true. INSTANCE_UPDATE_MINIMAL_ACTION must
+        be one of:
+
+         none
+            No action
+         refresh
+            Apply properties that are possible to apply without stopping the
+            instance
+         replace
+            Delete the instance and create it again
+         restart
+            Stop the instance and start it again
+
      --stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]
         Disks considered stateful by the instance group. Managed instance
         groups preserve and reattach stateful disks on VM autohealing, update,

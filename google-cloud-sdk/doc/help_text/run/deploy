@@ -6,7 +6,7 @@ SYNOPSIS
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
         [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
         [--memory=MEMORY] [--platform=PLATFORM] [--port=PORT]
-        [--timeout=TIMEOUT] [--no-traffic]
+        [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT] [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
@@ -17,8 +17,8 @@ SYNOPSIS
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
           | --set-secrets=[KEY=VALUE,...]
           | --remove-secrets=[KEY,...] --update-secrets=[KEY=VALUE,...]]
-        [--[no-]allow-unauthenticated --revision-suffix=REVISION_SUFFIX
-          --service-account=SERVICE_ACCOUNT
+        [--[no-]allow-unauthenticated --clear-vpc-connector
+          --revision-suffix=REVISION_SUFFIX --vpc-connector=VPC_CONNECTOR
           --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
           | --clear-cloudsql-instances
           | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
@@ -63,8 +63,8 @@ OPTIONAL FLAGS
         pass an empty string.
 
      --concurrency=CONCURRENCY
-        Set the number of concurrent requests allowed per container instance. A
-        concurrency of 0 or unspecified indicates any number of concurrent
+        Set the maximum number of concurrent requests allowed per container
+        instance. If concurrency is unspecified, any number of concurrent
         requests are allowed. To unset this field, provide the special value
         default.
 
@@ -100,6 +100,16 @@ OPTIONAL FLAGS
         Container port to receive requests at. Also sets the $PORT environment
         variable. Must be a number between 1 and 65535, inclusive. To unset
         this field, pass the special value "default".
+
+     --service-account=SERVICE_ACCOUNT
+        Service account associated with the revision of the service. The
+        service account represents the identity of the running revision, and
+        determines what permissions the revision has. For the managed platform,
+        this is the email address of an IAM service account. For the
+        Kubernetes-based platforms (gke, kubernetes), this is the name of a
+        Kubernetes service account in the same namespace as the service. If not
+        provided, the revision will use the default service account of the
+        project, or default Kubernetes namespace service account respectively.
 
      --timeout=TIMEOUT
         Set the maximum request execution time (timeout). It is specified as a
@@ -253,18 +263,17 @@ OPTIONAL FLAGS
           --allow-unauthenticated to enable and --no-allow-unauthenticated to
           disable.
 
+       --clear-vpc-connector
+          Remove the VPC connector for this Service.
+
        --revision-suffix=REVISION_SUFFIX
           Specify the suffix of the revision name. Revision names always start
           with the service name automatically. For example, specifying
           [--revision-suffix=v1] for a service named 'helloworld', would lead
           to a revision named 'helloworld-v1'.
 
-       --service-account=SERVICE_ACCOUNT
-          Email address of the IAM service account associated with the revision
-          of the service. The service account represents the identity of the
-          running revision, and determines what permissions the revision has.
-          If not provided, the revision will use the project's default service
-          account.
+       --vpc-connector=VPC_CONNECTOR
+          Set a VPC connector for this Service.
 
        These flags modify the Cloud SQL instances this Service connects to. You
        can specify a name of a Cloud SQL instance if it's in the same project

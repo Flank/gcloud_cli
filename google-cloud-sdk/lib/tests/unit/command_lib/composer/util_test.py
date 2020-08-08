@@ -424,8 +424,11 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
     fake_exec.AddCallback(
         0,
-        self.MakeGetPodsCallback([('airflow-worker12345', 'running'),
-                                  ('airflow-scheduler00001', 'running')]))
+        self.MakeGetPodsCallback(
+            [command_util.GkePodStatus(
+                'airflow-worker12345', 'running', 'true'),
+             command_util.GkePodStatus(
+                 'airflow-scheduler001', 'running', 'true')]))
 
     pod = command_util.GetGkePod('airflow-worker',
                                  self.TEST_KUBECTL_DEFAULT_NAMESPACE)
@@ -440,7 +443,9 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
     tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
 
     fake_exec.AddCallback(
-        0, self.MakeGetPodsCallback([('pod1', 'running'), ('pod2', 'running')]))
+        0, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus('pod1', 'running', 'true'),
+             command_util.GkePodStatus('pod2', 'running', 'true')]))
 
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'Desired GKE pod not found'):
@@ -455,12 +460,47 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
     tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
 
     fake_exec.AddCallback(
-        0, self.MakeGetPodsCallback([('pod1', 'creating'), ('pod2',
-                                                            'creating')]))
+        0, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus('pod1', 'creating', 'false'),
+             command_util.GkePodStatus('pod2', 'creating', 'false')]))
 
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'No running GKE pods found.'):
       command_util.GetGkePod('pod1', self.TEST_KUBECTL_DEFAULT_NAMESPACE)
+    fake_exec.Verify()
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testGetGkePod_PodReady(self, exec_mock, tmp_kubeconfig_mock):
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    fake_exec.AddCallback(
+        0, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus('airflow-worker1', 'running', 'false'),
+             command_util.GkePodStatus('airflow-worker2', 'running', 'true')]))
+
+    pod = command_util.GetGkePod('airflow-worker',
+                                 self.TEST_KUBECTL_DEFAULT_NAMESPACE)
+    self.assertEqual('airflow-worker2', pod)
+    fake_exec.Verify()
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testGetGkePod_PodNoReady(self, exec_mock, tmp_kubeconfig_mock):
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    fake_exec.AddCallback(
+        0, self.MakeGetPodsCallback(
+            [command_util.GkePodStatus('airflow-worker1', 'creating', 'true'),
+             command_util.GkePodStatus('airflow-worker2', 'running', '')]))
+
+    pod = command_util.GetGkePod('airflow-worker',
+                                 self.TEST_KUBECTL_DEFAULT_NAMESPACE)
+    self.assertEqual('airflow-worker2', pod)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')

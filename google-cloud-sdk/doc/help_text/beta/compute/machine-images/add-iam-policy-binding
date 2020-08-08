@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute machine-images add-iam-policy-binding - add IAM policy
-        binding to the IAM policy of a Google Compute Engine machine image
+        binding to the IAM policy of a Compute Engine machine image
 
 SYNOPSIS
     gcloud beta compute machine-images add-iam-policy-binding MACHINE_IMAGE

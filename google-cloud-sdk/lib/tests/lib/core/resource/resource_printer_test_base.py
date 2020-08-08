@@ -292,7 +292,7 @@ class Base(sdk_test_base.WithOutputCapture):
             'Joe',
             'Curly Joe',
         ]
-      elif 'utf8' in attributes.split(',') or 'win' in attributes.split(','):
+      elif 'utf-8' in attributes.split(',') or 'win' in attributes.split(','):
         resource = [
             {'name': 'Moe', 'kind': 'aaa', 'id': 1267},
             {'name': 'Larry', 'kind': 'xxx', 'id': 1245},

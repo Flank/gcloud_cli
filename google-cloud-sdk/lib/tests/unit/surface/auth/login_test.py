@@ -444,6 +444,24 @@ class LoginTestOauth2client(LoginTestMixin, cli_test_base.CliTestBase,
     self.assertEqual('junk', properties.VALUES.core.account.Get())
     self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
+  def testWebFlowError_ContextAwareAccessDenied(self):
+    """When login was denied because of context aware access policies."""
+    self.mock_load.return_value = None  # No creds to start.
+    self.mock_flow.side_effect = store.FlowError(
+        'access_denied: Account restricted')
+
+    with self.assertRaisesRegex(store.FlowError,
+                                'access_denied: Account restricted'):
+      self.Login(account='foo@google.com')
+    self.AssertErrContains('Access was blocked due to an organization policy')
+
+    self.mock_load.assert_called_once_with(
+        account='foo@google.com', scopes=self.expected_scopes)
+    self.assert_mock_flow_called_with(
+        launch_browser=True, scopes=self.expected_scopes)
+    self.assertEqual('junk', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
+
 
 class LoginTestGoogleAuth(LoginTestMixin, cli_test_base.CliTestBase,
                           test_case.WithInput):

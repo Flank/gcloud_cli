@@ -5,20 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute networks subnets update \- updates properties of an existing Google Compute Engine subnetwork
+gcloud alpha compute networks subnets update \- updates properties of an existing Compute Engine subnetwork
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-filter\-expr\fR=\fILOGGING_FILTER_EXPR\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-logging\-metadata\-fields\fR=[\fIMETADATA_FIELD\fR,...]] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-[no\-]enable\-private\-ipv6\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR\ |\ \fB\-\-private\-ipv6\-google\-access\-service\-accounts\fR=[\fIEMAIL\fR,...]\ \fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-filter\-expr\fR=\fILOGGING_FILTER_EXPR\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-logging\-metadata\-fields\fR=[\fIMETADATA_FIELD\fR,...]] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Updates properties of an existing Google Compute Engine
-subnetwork.
+\fB(ALPHA)\fR Updates properties of an existing Compute Engine subnetwork.
 
 
 
@@ -175,10 +174,10 @@ without a public ip address. Use \fB\-\-enable\-private\-ip\-google\-access\fR
 to enable and \fB\-\-no\-enable\-private\-ip\-google\-access\fR to disable.
 
 .TP 2m
-\fB\-\-[no\-]enable\-private\-ipv6\-access\fR
-Enable/disable private IPv6 access for the subnet. Use
-\fB\-\-enable\-private\-ipv6\-access\fR to enable and
-\fB\-\-no\-enable\-private\-ipv6\-access\fR to disable.
+\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
+The private IPv6 google access type for the VMs in this subnet.
+\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of: \fBdisable\fR,
+\fBenable\-bidirectional\-access\fR, \fBenable\-outbound\-vm\-access\fR.
 
 .TP 2m
 \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
@@ -205,25 +204,6 @@ The ACTIVE subnet that is currently used.
 .RE
 .sp
 
-
-.TP 2m
-\fB\-\-private\-ipv6\-google\-access\-service\-accounts\fR=[\fIEMAIL\fR,...]
-The service accounts can be used to selectively turn on Private IPv6 Google
-Access only on the VMs primary service account matching the value.
-
-Setting this will override the existing Private IPv6 Google Access service
-accounts for the subnetwork. The following will clear the existing Private IPv6
-Google Access service accounts:
-
-$ gcloud alpha compute networks subnets update MY\-SUBNET \e
-\-\-private\-ipv6\-google\-access\-service\-accounts ''
-
-.TP 2m
-\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
-The private IPv6 google access type for the VMs in this subnet.
-\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of: \fBdisable\fR,
-\fBenable\-bidirectional\-access\fR, \fBenable\-outbound\-vm\-access\fR,
-\fBenable\-outbound\-vm\-access\-for\-service\-accounts\fR.
 
 
 .RE

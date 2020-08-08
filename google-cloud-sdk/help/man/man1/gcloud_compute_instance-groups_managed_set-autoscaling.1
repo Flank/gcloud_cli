@@ -100,13 +100,21 @@ autoscaler is turned on again or when the restrictions are lifted.
 .RS 2m
 .TP 2m
 \fBoff\fR
-To turn off autoscaling, while keeping the new configuration.
+Turns off autoscaling, while keeping the new configuration.
 .TP 2m
 \fBon\fR
-To permit autoscaling to scale up and down (default for new autoscalers).
+Permits autoscaling to scale out and in (default for new autoscalers).
+.TP 2m
+\fBonly\-scale\-out\fR
+Permits autoscaling to scale only out and not in.
 .TP 2m
 \fBonly\-up\fR
-To permit autoscaling to scale only up and not down.
+(DEPRECATED) Permits autoscaling to scale only out and not in.
+
+.RS 2m
+Value `only\-up` is deprecated. Use `\-\-mode only\-scale\-out`
+instead.
+.RE
 .RE
 .sp
 

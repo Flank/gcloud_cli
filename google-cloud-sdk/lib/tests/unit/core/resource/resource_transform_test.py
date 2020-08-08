@@ -699,7 +699,7 @@ class ResourceTransformTest(test_case.Base):
                 'This is b\ufffdd UTF-8 text.',
                 b'ERROR']
     self.Run(resource, None, resource_transform.TransformDecode,
-             ['utf8'], expected, kwargs)
+             ['utf-8'], expected, kwargs)
 
   def testTransformDecodeUnknownEncoding(self):
     resource = ['This is ASCII text.']
@@ -963,7 +963,7 @@ class ResourceTransformTest(test_case.Base):
     expected = ['This is ASCII text.',
                 '12345']
     self.Run(resource, None, resource_transform.TransformEncode,
-             ['utf8'], expected, kwargs)
+             ['utf-8'], expected, kwargs)
 
   def testTransformEncodeUnknownEncoding(self):
     resource = ['This is ASCII text.']

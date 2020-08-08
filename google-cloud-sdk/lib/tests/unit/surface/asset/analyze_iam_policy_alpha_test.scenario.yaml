@@ -53,10 +53,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy?accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&options.expandGroups=True&options.expandRoles=True&options.outputGroupEdges=True&options.outputPartialResultBeforeTimeout=True&resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy
+          method: POST
           headers: {}
-          body: null
+          body: accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&options.expandGroups=True&options.expandRoles=True&options.outputGroupEdges=True&options.outputPartialResultBeforeTimeout=True&resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1
         return_response:
           headers:
             status: '200'
@@ -122,10 +122,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy?accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&identitySelector.identity=user%3Auser1%40foo.com&options.expandResources=True&options.outputPartialResultBeforeTimeout=True&options.outputResourceEdges=True
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy
+          method: POST
           headers: {}
-          body: null
+          body: accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&identitySelector.identity=user%3Auser1%40foo.com&options.expandResources=True&options.outputPartialResultBeforeTimeout=True&options.outputResourceEdges=True
         return_response:
           headers:
             status: '200'

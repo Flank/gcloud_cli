@@ -126,7 +126,8 @@ FLAGS
           Version of the image to run in the environment.
 
               The image version encapsulates the versions of both Cloud Composer
-              and Apache Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+              and Apache Airflow. Must be of the form
+              `composer-A.B.C[-D.E]-airflow-X.Y[.Z]`.
 
               The Cloud Composer and Airflow versions are semantic versions.
               `latest` can be provided instead of an explicit Cloud Composer
@@ -142,7 +143,7 @@ FLAGS
           IPv4 CIDR range to use for the Cloud SQL network. This should have a
           size of the netmask not greater than 24.
 
-          Cannot be specified unless '--enable-private-environnment' is also
+          Cannot be specified unless '--enable-private-environment' is also
           specified.
 
        --enable-private-endpoint
@@ -153,7 +154,7 @@ FLAGS
           If not specified, the master API endpoint will be accessible by its
           public IP address.
 
-          Cannot be specified unless '--enable-private-environnment' is also
+          Cannot be specified unless '--enable-private-environment' is also
           specified.
 
        --enable-private-environment
@@ -168,14 +169,14 @@ FLAGS
           IPv4 CIDR range to use for the cluste master network. This should
           have a size of the netmask between 23 and 28.
 
-          Cannot be specified unless '--enable-private-environnment' is also
+          Cannot be specified unless '--enable-private-environment' is also
           specified.
 
        --web-server-ipv4-cidr=WEB_SERVER_IPV4_CIDR
           IPv4 CIDR range to use for the Airflow web server network. This
           should have a size of the netmask between 24 and 29.
 
-          Cannot be specified unless '--enable-private-environnment' is also
+          Cannot be specified unless '--enable-private-environment' is also
           specified.
 
      IP Alias (VPC-native)

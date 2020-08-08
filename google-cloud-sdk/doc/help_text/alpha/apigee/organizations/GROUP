@@ -2,7 +2,7 @@ NAME
     gcloud alpha apigee organizations - manage Apigee organizations
 
 SYNOPSIS
-    gcloud alpha apigee organizations GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha apigee organizations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Apigee organizations.
@@ -14,12 +14,6 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
-
-GROUPS
-    GROUP is one of the following:
-
-     deployments
-        (ALPHA) Manage deployments within Apigee organizations.
 
 COMMANDS
     COMMAND is one of the following:

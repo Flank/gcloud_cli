@@ -36,7 +36,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    $ gcloud alpha trace sinks update my-sink        bigquery.googleapis.com/projects/my-project/datasets/my_new_dataset
+        $ gcloud alpha trace sinks update my-sink
+        bigquery.googleapis.com/projects/my-project/datasets/my_new_dataset
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

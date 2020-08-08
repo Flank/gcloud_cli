@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -euxo pipefail
+
 # get latest version number from https://cloud.google.com/sdk/docs/downloads-versioned-archives
 # or view version number on the website: https://cloud.google.com/sdk/docs/quickstart-linux
 #
@@ -5,7 +9,7 @@
 #
 # gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
 
-VERSION=294.0.0
+VERSION=303.0.0
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk_$VERSION.orig.tar.gz
 

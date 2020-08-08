@@ -57,8 +57,8 @@ EXAMPLES
     as 14400 seconds, run:
 
         $ gcloud dns record-sets transaction add "Hello world" "Bye world" \
-            --name=my.domain.
-            --ttl=14400 --type=TXT --zone=MANAGED_ZONE
+            --name=my.domain. --ttl=14400 \
+            --type=TXT --zone=MANAGED_ZONE
 
 NOTES
     These variants are also available:

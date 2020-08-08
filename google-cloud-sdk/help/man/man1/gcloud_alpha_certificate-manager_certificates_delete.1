@@ -1,0 +1,86 @@
+
+.TH "GCLOUD_ALPHA_CERTIFICATE\-MANAGER_CERTIFICATES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha certificate\-manager certificates delete \- delete a certificate
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha certificate\-manager certificates delete\fR \fICERTIFICATE\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Delete a certificate resource.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Certificate resource \- The certificate to delete. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[certificate] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project]. To
+set the [location] attribute: provide the argument [certificate] on the command
+line with a fully specified name; location is always global. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE\fR
+ID of the certificate or fully qualified identifier for the certificate.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete the certificate with name simple\-cert, run:
+
+.RS 2m
+$ gcloud alpha certificate\-manager certificates delete simple\-cert
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

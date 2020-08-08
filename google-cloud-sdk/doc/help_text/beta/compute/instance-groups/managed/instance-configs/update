@@ -5,6 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute instance-groups managed instance-configs update NAME
         --instance=INSTANCE
+        [--instance-update-minimal-action=INSTANCE_UPDATE_MINIMAL_ACTION;
+          default="none"]
         [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
         [--remove-stateful-metadata=KEY,[KEY,...]]
         [--stateful-disk=[auto-delete=AUTO-DELETE],
@@ -14,10 +16,10 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instance-groups managed instance-configs update
-    updates the per instance config of an instance controlled by a Google
-    Compute Engine managed instance group. The command lets you change the list
-    of instance-specific stateful resources, that is, the list of resources
-    that are preserved during instance restarts and recreations.
+    updates the per instance config of an instance controlled by a Compute
+    Engine managed instance group. The command lets you change the list of
+    instance-specific stateful resources, that is, the list of resources that
+    are preserved during instance restarts and recreations.
 
     Changes are applied immediately to the corresponding instances, by
     performing the necessary action (for example, REFRESH), unless overridden
@@ -32,6 +34,21 @@ REQUIRED FLAGS
         URI/name of an existing instance in the managed instance group.
 
 OPTIONAL FLAGS
+     --instance-update-minimal-action=INSTANCE_UPDATE_MINIMAL_ACTION; default="none"
+        Perform at least this action on the instance while updating, if
+        --update-instance is set to true. INSTANCE_UPDATE_MINIMAL_ACTION must
+        be one of:
+
+         none
+            No action
+         refresh
+            Apply properties that are possible to apply without stopping the
+            instance
+         replace
+            Delete the instance and create it again
+         restart
+            Stop the instance and start it again
+
      --remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
         List all device names to remove from the instance's config.
 

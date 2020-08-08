@@ -3,3 +3,4 @@ cron:
   url: /tasks/summary
   target: v2
   schedule: every 24 hours
+  timezone: America/Los_Angeles

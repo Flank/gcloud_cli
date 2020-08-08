@@ -237,6 +237,7 @@ def CreatePersistentCreateDiskMessages(
       mode = client.messages.AttachedDisk.ModeValueValuesEnum.READ_ONLY
 
     auto_delete = disk.get('auto-delete') == 'yes'
+    boot = disk.get('boot') == 'yes'
     disk_size_gb = utils.BytesToGb(disk.get('size'))
     img = disk.get('image')
     img_family = disk.get('image-family')
@@ -270,10 +271,12 @@ def CreatePersistentCreateDiskMessages(
     policies = disk.get('disk-resource-policy')
     if policies:
       init_params.resourcePolicies = policies
-
+    multi_writer = disk.get('multi-writer') == 'yes'
+    if multi_writer:
+      init_params.multiWriter = True
     create_disk = client.messages.AttachedDisk(
         autoDelete=auto_delete,
-        boot=False,
+        boot=boot,
         deviceName=device_name,
         initializeParams=init_params,
         mode=mode,

@@ -1,0 +1,36 @@
+title: ai-platform models delete scenario test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ai-platform models delete mymodel --region europe-west4
+  - stderr: |
+      Using endpoint [https://europe-west4-ml.googleapis.com/]
+  - prompt:
+    - message: This will delete model [mymodel]...
+    - input: y
+actions:
+- execute_command:
+    command: ai-platform models delete mymodel --region europe-west4
+    events:
+    - expect_stderr: |
+        Using endpoint [https://europe-west4-ml.googleapis.com/]
+    - expect_prompt_continue:
+        message: This will delete model [mymodel]...
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://europe-west4-ml.googleapis.com/v1/projects/fake-project/models/mymodel?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/p/operations/o",
+              "done": true
+            }
+    - expect_exit:
+        code: 0

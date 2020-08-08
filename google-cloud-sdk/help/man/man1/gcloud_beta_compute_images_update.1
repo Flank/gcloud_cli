@@ -5,20 +5,20 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute images update \- update a Google Compute Engine image
+gcloud beta compute images update \- update a Compute Engine image
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images update\fR \fIIMAGE_NAME\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images update\fR \fIIMAGE_NAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute images update\fR updates labels for a Google
-Compute image.
+\fB(BETA)\fR \fBgcloud beta compute images update\fR updates labels for a
+Compute Engine image.
 
 
 
@@ -36,6 +36,15 @@ Name of the disk image to update.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional text description for the image.
+
+.TP 2m
+\fB\-\-family\fR=\fIFAMILY\fR
+Name of the image family to use. If an image family is specified when you create
+an instance or disk, the latest non\-deprecated image in the family is used.
+
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -115,7 +124,7 @@ To list only the labels when describing a resource, use \-\-format:
 
 .RS 2m
 $ gcloud beta compute images describe example\-image \e
-    \-\-format='default(labels)'
+    \-\-format="default(labels)"
 .RE
 
 

@@ -5,11 +5,11 @@ release_tracks: [ALPHA]
 summary:
 - execute:
   - command: |
-      scc notifications create $$my-config$$ --organization organizations/702114178617 --pubsub-topic=projects/gcloudtestproject1/topics/notification-test --filter ""
+      scc notifications create $$my-config$$ --organization organizations/702114178617 --pubsub-topic=projects/gcloudtestproject1/topics/notification-test
   - stderr: |
       Created.
   - command: |
-      scc notifications update $$my-config$$ --organization 702114178617 --description "New Description"
+      scc notifications update $$my-config$$ --organization 702114178617 --description "New Description" --filter "state = \"ACTIVE\""
   - stderr: |
       Updated.
   - stdout: |
@@ -17,6 +17,7 @@ summary:
         description: New Description
         organizationName: organizations/702114178617
         pubsubTopic: projects/gcloudtestproject1/topics/oldTopic
+        streamingConfig.filter: state = "ACTIVE"
         updateTime: '2019-03-12T23:45:08.062Z'
   - execute:
   - command: |
@@ -57,37 +58,36 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    # Update description and pubsub topic
+    # Update description, pubsub topic and filter
     command: |
-      scc notifications update $$my-config$$ --organization 702114178617 --description "New Description" --pubsub-topic=projects/gcloudtestproject1/topics/notification-test-2
+      scc notifications update $$my-config$$ --organization 702114178617 --description "New Description" --pubsub-topic=projects/gcloudtestproject1/topics/notification-test-2 --filter 'state = "ACTIVE"'
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/notificationConfigs/$$my-config$$?alt=json&updateMask=description%2CpubsubTopic
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/notificationConfigs/$$my-config$$?alt=json&updateMask=description%2CpubsubTopic%2CstreamingConfig.filter
           method: PATCH
           headers: {}
-          body: |
-              configId: $$my-config$$,
-              organizationName: organizations/702114178617,
-              description: New Description,
-              pubsubTopic: projects/gcloudtestproject1/topics/notification-test
+          body:
+            json:
+              description: New Description
+              pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
+              streamingConfig: {
+                filter: state = "ACTIVE"
+              }
         return_response:
           headers:
             status: '200'
           body:
-            description: New Description
-            name: organizations/702114178617/notificationConfigs/$$my-config$$
-            pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
-            serviceAccount: service-org-702114178617@gcp-sa-scc-notification.iam.gserviceaccount.com
-            streamingConfig: {}
+            json:
+              description: New Description
+              name: organizations/702114178617/notificationConfigs/$$my-config$$
+              pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
+              serviceAccount: service-org-702114178617@gcp-sa-scc-notification.iam.gserviceaccount.com
+              streamingConfig: {
+                filter: state = "ACTIVE"
+              }
     - expect_stderr: |
         Updated.
-    - expect_stdout: |
-        description: New Description
-        name: organizations/702114178617/notificationConfigs/$$my-config$$
-        pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
-        serviceAccount: service-org-702114178617@gcp-sa-scc-notification.iam.gserviceaccount.com
-        streamingConfig: {}
     - expect_exit:
         code: 0
 - execute_command:
@@ -138,20 +138,22 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    # Update description and pubsub topic
+    # Update description, pubsub topic and filter
     command: |
-      scc notifications update organizations/702114178617/notificationConfigs/$$my-config-2$$ --description "New Description" --pubsub-topic=projects/gcloudtestproject1/topics/notification-test-2
+      scc notifications update organizations/702114178617/notificationConfigs/$$my-config-2$$ --description "New Description" --pubsub-topic=projects/gcloudtestproject1/topics/notification-test-2 --filter 'state = "INACTIVE"'
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/notificationConfigs/$$my-config-2$$?alt=json&updateMask=description%2CpubsubTopic
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/notificationConfigs/$$my-config-2$$?alt=json&updateMask=description%2CpubsubTopic%2CstreamingConfig.filter
           method: PATCH
           headers: {}
-          body: |
-              configId: organizations/702114178617/notificationConfigs/$$my-config-2$$,
-              organizationName": organizations/702114178617,
-              description: New Description,
+          body:
+            json:
+              description: New Description
               pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
+              streamingConfig: {
+                filter: state = "INACTIVE"
+              }
         return_response:
           headers:
             status: '200'
@@ -160,15 +162,11 @@ actions:
             name: organizations/702114178617/notificationConfigs/$$my-config-2$$
             pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
             serviceAccount: service-org-702114178617@gcp-sa-scc-notification.iam.gserviceaccount.com
-            streamingConfig: {}
+            streamingConfig: {
+              filter: state = "INACTIVE"
+            }
     - expect_stderr: |
         Updated.
-    - expect_stdout: |
-        description: New Description
-        name: organizations/702114178617/notificationConfigs/$$my-config-2$$
-        pubsubTopic: projects/gcloudtestproject1/topics/notification-test-2
-        serviceAccount: service-org-702114178617@gcp-sa-scc-notification.iam.gserviceaccount.com
-        streamingConfig: {}
     - expect_exit:
         code: 0
 - execute_command:

@@ -18,6 +18,9 @@ COMMANDS
      delete
         (ALPHA) Delete an Artifact Registry package.
 
+     import
+        (ALPHA) Import one or more packages into an artifact repository.
+
      list
         (ALPHA) List Artifact Registry packages.
 

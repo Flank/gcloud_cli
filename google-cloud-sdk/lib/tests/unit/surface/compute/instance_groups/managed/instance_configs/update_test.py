@@ -229,21 +229,23 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
     response = self.messages.InstanceGroupManager(name='group-1')
     self.client.instanceGroupManagers.Get.Expect(request, response=response)
 
-  def _ExpectApplyUpdatesToInstances(self):
+  def _ExpectApplyUpdatesToInstances(self, minimal_action='none'):
+    minimal_action = (
+        self.messages.InstanceGroupManagersApplyUpdatesRequest
+        .MinimalActionValueValuesEnum(minimal_action.upper()))
     request = (
         self.messages.ComputeInstanceGroupManagersApplyUpdatesToInstancesRequest
     )(
         instanceGroupManager='group-1',
         instanceGroupManagersApplyUpdatesRequest=(
-            self.messages.InstanceGroupManagersApplyUpdatesRequest
-        )(instances=[
-            self.project_uri + '/zones/us-central2-a/instances/foo',
-        ],
-          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest
-          .MinimalActionValueValuesEnum.NONE,
-          mostDisruptiveAllowedAction=self.messages
-          .InstanceGroupManagersApplyUpdatesRequest
-          .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
+            self.messages.InstanceGroupManagersApplyUpdatesRequest)(
+                instances=[
+                    self.project_uri + '/zones/us-central2-a/instances/foo',
+                ],
+                minimalAction=minimal_action,
+                mostDisruptiveAllowedAction=self.messages
+                .InstanceGroupManagersApplyUpdatesRequest
+                .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -374,6 +376,26 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
           --no-update-instance
         """)
 
+  def testUpdateForPassingOnlyDeviceNameWithoutParameters(self):
+    preserved_state_disks = [
+        self._preserved_state_disk_1, self._preserved_state_disk_2
+    ]
+    self._ExpectListPerInstanceConfigs()
+    self._ExpectUpdatePerInstanceConfigs(
+        preserved_state_disks=preserved_state_disks,
+        preserved_state_metadata=self.preserved_state_metadata)
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
+    self._ExpectGetInstanceGroupManager()
+    self.Run("""
+        compute instance-groups managed instance-configs update group-1
+          --zone us-central2-a
+          --instance foo
+          --stateful-disk device-name=foo
+        """)
+
   def testUnsuccessfulUpdateForNonExistingConfig(self):
     self._ExpectListPerInstanceConfigs(return_config=False)
     with self.AssertRaisesExceptionMatches(
@@ -421,19 +443,6 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
             --zone us-central2-a
             --instance foo
             --remove-stateful-metadata non-existing-key
-          """)
-
-  def testUnsuccessfulUpdateForPassingOnlyDeviceNameWithoutParameters(self):
-    self._ExpectListPerInstanceConfigs()
-    with self.AssertRaisesExceptionMatches(
-        calliope_exceptions.InvalidArgumentException,
-        ('[source] or [mode] is required when updating'
-         ' [device-name] already existing in instance config')):
-      self.Run("""
-          compute instance-groups managed instance-configs update group-1
-            --zone us-central2-a
-            --instance foo
-            --stateful-disk device-name=foo
           """)
 
   def testUnsuccessfulUpdateForRemoveNonExistingStatefulDisk(self):
@@ -595,7 +604,10 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
     self.client.regionInstanceGroupManagers.Get.Expect(
         request, response=response)
 
-  def _ExpectApplyUpdatesToInstances(self):
+  def _ExpectApplyUpdatesToInstances(self, minimal_action='none'):
+    minimal_action = (
+        self.messages.RegionInstanceGroupManagersApplyUpdatesRequest
+        .MinimalActionValueValuesEnum(minimal_action.upper()))
     request = (
         self.messages
         .ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
@@ -605,9 +617,7 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
                     instances=[
                         self.project_uri + '/zones/us-central2-a/instances/foo',
                     ],
-                    minimalAction=self.messages
-                    .RegionInstanceGroupManagersApplyUpdatesRequest
-                    .MinimalActionValueValuesEnum.NONE,
+                    minimalAction=minimal_action,
                     mostDisruptiveAllowedAction=self.messages
                     .RegionInstanceGroupManagersApplyUpdatesRequest
                     .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
@@ -639,7 +649,7 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
         preserved_state_metadata=preserved_state_metadata)
     self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances()
+    self._ExpectApplyUpdatesToInstances('restart')
     self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
@@ -651,6 +661,7 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
           --remove-stateful-disks baz
           --stateful-metadata "key-BAR=new value"
           --remove-stateful-metadata key-foo
+          --instance-update-minimal-action restart
         """.format(project_uri=self.project_uri))
 
   def testUpdateWithoutInstanceUpdate(self):
@@ -721,7 +732,7 @@ class InstanceGroupManagerInstanceConfigsUpdateAlphaZonalTest(
         preserved_state_metadata=preserved_state_metadata)
     self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances()
+    self._ExpectApplyUpdatesToInstances('restart')
     self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
@@ -733,6 +744,7 @@ class InstanceGroupManagerInstanceConfigsUpdateAlphaZonalTest(
           --remove-stateful-disks baz
           --update-stateful-metadata "key-BAR=new value"
           --remove-stateful-metadata key-foo
+          --instance-update-minimal-action restart
         """.format(project_uri=self.project_uri))
 
     self.AssertLogContains('The --update-stateful-disk option is deprecated; '

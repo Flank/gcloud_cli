@@ -50,6 +50,14 @@ old-organization  legacy-project
 """,
         normalize_space=True)
 
+  def testEmptyResponse(self):
+    self.AddHTTPResponse(
+        "https://apigee.googleapis.com/v1/organizations",
+        status=200,
+        body=json.dumps({}))
+    self.RunApigee("organizations list --format=json")
+    self.AssertJsonOutputMatches([], "Must properly handle empty response.")
+
   def testSortedResults(self):
     self.AddHTTPResponse(
         "https://apigee.googleapis.com/v1/organizations",

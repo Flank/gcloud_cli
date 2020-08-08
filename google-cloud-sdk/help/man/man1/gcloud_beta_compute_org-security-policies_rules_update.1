@@ -11,7 +11,7 @@ gcloud beta compute org\-security\-policies rules update \- update a Google Comp
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute org\-security\-policies rules update\fR \fIPRIORITY\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-action\fR=\fIACTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dest\-ip\-ranges\fR=[\fIDEST_IP_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-layer4\-configs\fR=[\fILAYER4_CONFIG\fR,...]] [\fB\-\-new\-priority\fR=\fINEW_PRIORITY\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]] [\fB\-\-target\-resources\fR=[\fITARGET_RESOURCES\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fITARGET_SERVICE_ACCOUNTS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute org\-security\-policies rules update\fR \fIPRIORITY\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-action\fR=\fIACTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dest\-ip\-ranges\fR=[\fIDEST_IP_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-layer4\-configs\fR=[\fILAYER4_CONFIG\fR,...]] [\fB\-\-new\-priority\fR=\fINEW_PRIORITY\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]] [\fB\-\-target\-resources\fR=[\fITARGET_RESOURCES\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fITARGET_SERVICE_ACCOUNTS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,9 +67,10 @@ Direction of the traffic the rule is applied. The default is to apply on
 incoming traffic. \fIDIRECTION\fR must be one of: \fBINGRESS\fR, \fBEGRESS\fR.
 
 .TP 2m
-\fB\-\-enable\-logging\fR
+\fB\-\-[no\-]enable\-logging\fR
 Use this flag to enable logging of connections that allowed or denied by this
-rule.
+rule. Use \fB\-\-enable\-logging\fR to enable and \fB\-\-no\-enable\-logging\fR
+to disable.
 
 .TP 2m
 \fB\-\-layer4\-configs\fR=[\fILAYER4_CONFIG\fR,...]

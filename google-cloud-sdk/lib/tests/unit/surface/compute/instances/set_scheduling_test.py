@@ -183,6 +183,45 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
               zone='central2-a'))],
     )
 
+  def testPreemptible(self):
+    self.Run("""
+       compute instances set-scheduling instance-1
+         --preemptible
+         --zone central2-a
+       """)
+
+    self.CheckRequests(
+        [(self.client.instances,
+          'SetScheduling',
+          self.messages.ComputeInstancesSetSchedulingRequest(
+              scheduling=self.messages.Scheduling(preemptible=True),
+              instance='instance-1',
+              project='my-project',
+              zone='central2-a'))],
+    )
+
+  def testPreemptibleOHMT(self):
+    self.Run("""
+       compute instances set-scheduling instance-1
+         --preemptible
+         --maintenance-policy TERMINATE
+         --zone central2-a
+       """)
+
+    expected = self.messages.Scheduling(
+        preemptible=True,
+        onHostMaintenance=self.terminate)
+
+    self.CheckRequests(
+        [(self.client.instances,
+          'SetScheduling',
+          self.messages.ComputeInstancesSetSchedulingRequest(
+              scheduling=expected,
+              instance='instance-1',
+              project='my-project',
+              zone='central2-a'))],
+    )
+
   def testMigrate(self):
     self.templateTestMigrate("""
         compute instances set-scheduling instance-1

@@ -176,10 +176,13 @@ class BuildPackagesTest(base.MlBetaPlatformTestBase):
 
 
 _GENERATED_SETUP_PY = """\
-from setuptools import setup
+from setuptools import setup, find_packages
 
 if __name__ == '__main__':
-    setup(name='test_package', packages=['test_package'])
+    setup(
+        name='test_package',
+        packages=find_packages(include=['test_package'])
+    )
 """
 _EXISTING_SETUP_PY = '''\
 # -*- coding: utf-8 -*- #

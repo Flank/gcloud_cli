@@ -44,15 +44,15 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To send all traffic to 'v2' of service 's1', run:
 
-        $ gcloud app services set-traffic s1 --splits v2=1
+        $ gcloud app services set-traffic s1 --splits=v2=1
 
     To split traffic evenly between 'v1' and 'v2' of service 's1', run:
 
-        $ gcloud app services set-traffic s1 --splits v2=.5,v1=.5
+        $ gcloud app services set-traffic s1 --splits=v2=.5,v1=.5
 
     To split traffic across all services:
 
-        $ gcloud app services set-traffic --splits v2=.5,v1=.5
+        $ gcloud app services set-traffic --splits=v2=.5,v1=.5
 
 NOTES
     This variant is also available:

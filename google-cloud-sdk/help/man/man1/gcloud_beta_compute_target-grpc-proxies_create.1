@@ -1,0 +1,112 @@
+
+.TH "GCLOUD_BETA_COMPUTE_TARGET\-GRPC\-PROXIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute target\-grpc\-proxies create \- create a target gRPC proxy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute target\-grpc\-proxies create\fR \fINAME\fR \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-validate\-for\-proxyless\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute target\-grpc\-proxies create\fR is used to
+create target gRPC proxies. A target gRPC proxy is a component of load balancers
+intended for load balancing gRPC traffic. Global forwarding rules reference a
+target gRPC proxy. The Target gRPC proxy references a URL map which specifies
+how traffic routes to gRPC backend services.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the target gRPC proxy to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-url\-map\fR=\fIURL_MAP\fR
+A reference to a URL map resource. A URL map defines the mapping of URLs to
+backend services. Before you can refer to a URL map, you must create the URL
+map. To delete a URL map that a target proxy is referring to, you must first
+delete the target gRPC proxy.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the target gRPC proxy.
+
+.TP 2m
+\fB\-\-validate\-for\-proxyless\fR
+If specified, configuration in the associated urlMap and the BackendServices is
+checked to allow only the features that are supported in the latest release of
+gRPC.
+
+If unspecified, no such configuration checks are performed. This may cause
+unexpected behavior in gRPC applications if unsupported features are configured.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+If there is an already\-created URL map with the name URL_MAP, create a global
+target gRPC proxy pointing to this map by running:
+
+.RS 2m
+$ gcloud beta compute target\-grpc\-proxies create PROXY_NAME \e
+    \-\-url\-map=URL_MAP
+.RE
+
+To create a proxy with a textual description, run:
+
+.RS 2m
+$ gcloud beta compute target\-grpc\-proxies create PROXY_NAME \e
+    \-\-url\-map=URL_MAP \-\-description="default proxy"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute target\-grpc\-proxies create
+$ gcloud alpha compute target\-grpc\-proxies create
+.RE
+

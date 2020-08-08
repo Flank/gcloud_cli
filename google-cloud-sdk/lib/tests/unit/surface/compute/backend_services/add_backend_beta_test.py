@@ -218,7 +218,8 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        '--global-network-endpoint-group | --network-endpoint-group-region | '
+        '--network-endpoint-group-zone]) '
         'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
@@ -247,7 +248,8 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        '--global-network-endpoint-group | --network-endpoint-group-region | '
+        '--network-endpoint-group-zone]) '
         'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
@@ -583,7 +585,8 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        '--global-network-endpoint-group | --network-endpoint-group-region | '
+        '--network-endpoint-group-zone]) '
         'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
@@ -880,6 +883,52 @@ class BackendServiceAddBackendGlobalNetworkEndpointGroupTest(
                   timeoutSec=120),
               project='my-project'))],
     )
+
+
+class BackendServiceAddBackendRegionNetworkEndpointGroupTest(
+    test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testAddRegionalNetworkEndpointGroup(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.BackendService(
+                name='my-backend-service',
+                fingerprint=b'my-fingerprint',
+                port=80,
+                timeoutSec=120)
+        ],
+        [],
+    ])
+
+    self.Run('compute backend-services add-backend my-backend-service '
+             '--network-endpoint-group-region us-central1 '
+             '--network-endpoint-group my-serverless-neg --global')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          group=(self.compute_uri +
+                                 '/projects/my-project/regions/us-central1'
+                                 '/networkEndpointGroups/my-serverless-neg')),
+                  ],
+                  healthChecks=[],
+                  timeoutSec=120),
+              project='my-project'))])
 
 
 if __name__ == '__main__':

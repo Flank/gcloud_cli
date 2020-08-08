@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import re
 import uuid
 
 from apitools.base.py import encoding
@@ -184,20 +185,23 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
 
   def _ExpectCloudBuild(self, daisy_step, log_location=None, timeout='7200s',
                         async_flag=False):
+    log_bucket_dir = ''
     if log_location:
-      buildin_logs_bucket = 'gs://{0}'.format(log_location)
+      if self.IsGCSBucketPath(log_location):
+        log_location = log_location.rstrip('/')
+      log_bucket_dir = self.TrimGCSPathProtocolPrefix(log_location)
+      buildin_logs_bucket = 'gs://{0}'.format(log_bucket_dir)
+      buildout_logs_bucket = buildin_logs_bucket
     else:
       buildin_logs_bucket = None
+      buildout_logs_bucket = 'gs://my-project_cloudbuild/logs'
+
     buildin = self.cloudbuild_v1_messages.Build(
         steps=[daisy_step],
         tags=self.tags,
         logsBucket=buildin_logs_bucket,
         timeout=timeout,
     )
-    if log_location:
-      buildout_logs_bucket = 'gs://{0}'.format(log_location)
-    else:
-      buildout_logs_bucket = 'gs://my-project_cloudbuild/logs'
     buildout = self.cloudbuild_v1_messages.Build(
         id='1234',
         projectId='my-project',
@@ -231,7 +235,7 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     if not async_flag:
       self.AddHTTPResponse(
           'https://storage.googleapis.com/{0}/log-1234.txt'.format(
-              log_location or 'my-project_cloudbuild/logs'),
+              log_bucket_dir or 'my-project_cloudbuild/logs'),
           request_headers={'Range': 'bytes=0-'}, status=200,
           body=('Cloudbuild output\n[import-image] output\n'
                 '[image-export] output\n[import-ovf] output'))
@@ -449,3 +453,13 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
   @staticmethod
   def GetScratchBucketRegion():
     return 'MY-REGION'
+
+  @staticmethod
+  def IsGCSBucketPath(path):
+    return re.match('^gs://([^/]*)/?$', path) or re.match(
+        '^https://storage.googleapis.com/([^/]*)/?$', path)
+
+  @staticmethod
+  def TrimGCSPathProtocolPrefix(path):
+    return path.replace('gs://',
+                        '').replace('https://storage.googleapis.com/', '')

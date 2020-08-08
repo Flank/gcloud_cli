@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha domains registrations configure contacts REGISTRATION
-        [--contact-data-from-file=CONTACT_DATA_FROM_FILE]
+        [--contact-data-from-file=CONTACT_DATA_FILE_NAME]
         [--contact-privacy=CONTACT_PRIVACY] [--validate-only] [--async]
         [--notices=[NOTICE,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -12,12 +12,9 @@ DESCRIPTION
     (ALPHA) Configure registration's contact settings: email, phone number,
     postal address and also contact privacy.
 
-    In some cases such changes will have to be confirmed via email sent to the
-    registrant before they take effect. In order to resend the email, execute
-    this command again.
-
-    This command can only be called on registrations in state ACTIVE or
-    SUSPENDED.
+    In some cases such changes have to be confirmed through an email sent to
+    the registrant before they take effect. In order to resend the email,
+    execute this command again.
 
 POSITIONAL ARGUMENTS
      Registration resource - The domain registration to configure contact
@@ -34,19 +31,19 @@ POSITIONAL ARGUMENTS
           registration.
 
 COMMONLY USED FLAGS
-     --contact-data-from-file=CONTACT_DATA_FROM_FILE
-        A YAML file containing the required contact data. It can specify
-        contact data with label 'allContacts' (it means that a single contact
-        will be used for registrant, admin and technical contacts) or separate
-        contact data with labels 'registrantContact', 'adminContact' and
-        'technicalContact'.
+     --contact-data-from-file=CONTACT_DATA_FILE_NAME
+        A YAML file containing the contact data for the domain's three
+        contacts: registrant, admin, and technical.
+
+        The file can either specify a single set of contact data with label
+        'allContacts', or three separate sets of contact data with labels
+        'adminContact' and 'technicalContact'.
 
         If 'registrantContact', 'adminContact' or 'technicalContact' labels are
-        used then only the specified contact is updated.
+        used then only the specified contacts are updated.
 
-        If specified, each contact data must contain values for all required
-        fields: email, phoneNumber and postalAddress in
-        google.type.PostalAddress format.
+        Each contact data must contain values for all required fields: email,
+        phoneNumber and postalAddress in google.type.PostalAddress format.
 
         For more guidance on how to specify postalAddress, please see:
         https://support.google.com/business/answer/6397478
@@ -116,11 +113,14 @@ COMMONLY USED FLAGS
             (proxy) contact info for your domain in the public directory at no
             extra cost. They will forward received messages to you.
          public-contact-data
-            All the data from contact config is publicly available.
+            All the data from contact config is publicly available. To set this
+            value, you must also pass the --notices flag with value
+            public-contact-data-acknowledgement or agree to the notice
+            interactively.
          redacted-contact-data
-            Limited personal info will be available to the public. The actual
-            information redacted depends on the domain. For more information
-            see https://support.google.com/domains/answer/3251242?hl=en.
+            Limited personal information will be available to the public. The
+            actual information redacted depends on the domain. For more
+            information see https://support.google.com/domains/answer/3251242.
 
      --validate-only
         Don't actually configure contact settings of the registration. Only
@@ -160,7 +160,7 @@ EXAMPLES
             example.com --contact-privacy=private-contact-data
 
     To change contact data for example.com according to information from a YAML
-    file contants.yaml, run:
+    file contacts.yaml, run:
 
         $ gcloud alpha domains registrations configure contacts \
             example.com --contact-data-from-file=contacts.yaml

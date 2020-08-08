@@ -1160,7 +1160,7 @@ def FileReader(path):
   Returns:
     A file-like object opened for read in text mode.
   """
-  return _FileOpener(path, 'rt', 'read', encoding='utf8')
+  return _FileOpener(path, 'rt', 'read', encoding='utf-8')
 
 
 def BinaryFileReader(path):
@@ -1192,7 +1192,7 @@ def FileWriter(path, private=False, append=False, create_path=False):
       path,
       mode,
       'write',
-      encoding='utf8',
+      encoding='utf-8',
       private=private,
       create_path=create_path)
 
@@ -1242,6 +1242,11 @@ def GetHomeDir():
 def ExpandHomeDir(path):
   """Returns path with leading ~<SEP> or ~<USER><SEP> expanded."""
   return encoding_util.Decode(os.path.expanduser(path))
+
+
+def ExpandHomeAndVars(path):
+  """Expands ~ and ENV_VARS in path."""
+  return encoding_util.Decode(os.path.expandvars(ExpandHomeDir(path)))
 
 
 def _MakePathToFile(path, mode=0o777):

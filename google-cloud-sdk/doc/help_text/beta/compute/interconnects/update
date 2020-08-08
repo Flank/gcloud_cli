@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute interconnects update - update a Google Compute Engine
+    gcloud beta compute interconnects update - update a Compute Engine
         interconnect
 
 SYNOPSIS

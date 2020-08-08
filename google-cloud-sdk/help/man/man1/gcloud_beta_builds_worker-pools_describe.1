@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_BETA_BUILDS_WORKER\-POOLS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta builds worker\-pools describe \- describe a worker pool used by Google Cloud Build
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta builds worker\-pools describe\fR \fIWORKER_POOL\fR \fB\-\-region\fR=\fIREGION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Describe a worker pool used by Google Cloud Build.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIWORKER_POOL\fR
+The ID of the WorkerPool to describe.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Cloud region where the WorkerPool is.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha builds worker\-pools describe
+.RE
+

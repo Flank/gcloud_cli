@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute interconnects attachments describe - describe a Google
+    gcloud alpha compute interconnects attachments describe - describe a
         Compute Engine interconnect attachment
 
 SYNOPSIS
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute interconnects attachments describe displays
-    all data associated with Google Compute Engine interconnect attachment in a
+    all data associated with Compute Engine interconnect attachment in a
     project.
 
 POSITIONAL ARGUMENTS

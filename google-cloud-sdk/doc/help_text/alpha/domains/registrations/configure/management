@@ -11,9 +11,6 @@ DESCRIPTION
     (ALPHA) Configure management settings of a registration. This includes
     settings related to transfers, billing and renewals of a registration.
 
-    This command can only be called on registrations in state ACTIVE or
-    SUSPENDED.
-
 POSITIONAL ARGUMENTS
      Registration resource - The domain registration to configure management
      settings for. This represents a Cloud resource. (NOTE) Some attributes are

@@ -11,7 +11,7 @@ gcloud ml\-engine models update \- update an existing AI Platform model
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine models update\fR \fIMODEL\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud ml\-engine models update\fR \fIMODEL\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,6 +38,18 @@ Name of the model.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 The description of the model.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
+
+\fIREGION\fR must be one of: \fBasia\-east1\fR, \fBeurope\-west4\fR,
+\fBus\-central1\fR.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]

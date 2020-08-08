@@ -25,10 +25,10 @@ from googlecloudsdk import calliope
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
-from tests.lib.surface.compute import url_maps_test_base
+from tests.lib.surface.compute.url_maps import test_base
 
 
-class UrlMapsExportTest(url_maps_test_base.UrlMapsTestBase):
+class UrlMapsExportTest(test_base.UrlMapsTestBase):
 
   def PreSetUp(self):
     # TODO(b/135125441): Use SelectApi() instead.

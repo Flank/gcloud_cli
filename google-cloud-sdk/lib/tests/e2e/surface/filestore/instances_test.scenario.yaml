@@ -43,7 +43,8 @@ summary:
 - execute:
   - command: filestore instances delete $$filestore-test-instance1$$ --zone us-central1-c
   - prompt:
-    - message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$.
+    - message: |-
+        You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$.
         Are you sure?
     - input: y
   - progress_tracker:
@@ -659,7 +660,8 @@ actions:
     cleanup_for: filestore-test-instance1
     events:
     - expect_prompt_continue:
-        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$.
+        message: |-
+          You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$.
           Are you sure?
         user_input: y
     - api_call:

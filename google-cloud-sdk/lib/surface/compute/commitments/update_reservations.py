@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command for updating the reservations in Google Compute Engine commitments."""
+"""Command for updating the reservations in Compute Engine commitments."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -34,6 +34,8 @@ class UpdateReservationsAlpha(base.UpdateCommand):
         the ``us-central1'' region with values from ``reservations.yaml'', run:
 
           $ {command} commitment-1 --reservations-from-file=reservations.yaml
+
+        For detailed examples, please refer to [](https://cloud.google.com/compute/docs/instances/reserving-zonal-resources#modifying_reservations_that_are_attached_to_commitments)
       '''
   }
 
@@ -41,7 +43,7 @@ class UpdateReservationsAlpha(base.UpdateCommand):
   def Args(parser):
     flags.MakeCommitmentArg(False).AddArgument(
         parser, operation_type='update reservation')
-    flags.AddReservationArgGroup(parser)
+    flags.AddUpdateReservationGroup(parser)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -54,8 +56,8 @@ class UpdateReservationsAlpha(base.UpdateCommand):
     service = client.apitools_client.regionCommitments
     messages = client.messages
     update_reservation_request = messages.RegionCommitmentsUpdateReservationsRequest(
-        reservations=reservation_helper.MakeReservations(
-            args, messages, holder))
+        reservations=reservation_helper.MakeUpdateReservations(
+            args, messages))
     request = messages.ComputeRegionCommitmentsUpdateReservationsRequest(
         commitment=commitment_ref.Name(),
         project=commitment_ref.project,

@@ -94,8 +94,7 @@ actions:
               instanceFilter:
                 all: true
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -114,8 +113,7 @@ actions:
           headers: {}
           body: null
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -160,8 +158,7 @@ actions:
                 all: true
               patchConfig: {}
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",

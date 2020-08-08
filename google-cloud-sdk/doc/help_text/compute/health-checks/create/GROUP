@@ -19,6 +19,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     grpc
+        Create a gRPC health check to monitor load balanced instances.
+
      http
         Create a HTTP health check to monitor load balanced instances.
 

@@ -18,12 +18,20 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+has_grpc = False
+try:
+  import grpc  # pylint: disable=g-import-not-at-top,unused-import
+  has_grpc = True
+except ImportError:
+  pass
 
 
 class GrpcTest(test_case.TestCase):
 
-  @test_case.Filters.SkipOnPy3('py3 grpc', 'b/78118402')
+  @test_case.Filters.RunOnlyIf(has_grpc, 'b/78118402')
   def testCanLoadExtension(self):
     # pylint: disable=g-import-not-at-top
     from grpc._cython import cygrpc
@@ -31,13 +39,14 @@ class GrpcTest(test_case.TestCase):
     metadata = cygrpc.Operation()
     del metadata
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/143144559')
-  @test_case.Filters.RunOnlyOnWindows('crcmod extension is only available on '
-                                      'windows when using bundled python.')
+  @sdk_test_base.Filters.RunOnlyWithBundledPython(
+      'crcmod extension is only available in bundled Python.')
   def testCrcmodCompiledExtension(self):
-    # pylint: disable=g-import-not-at-top
-    from crcmod import crcmod
-    self.assertTrue(crcmod._usingExtension)
+    try:
+      # pylint: disable=g-import-not-at-top,unused-import
+      from crcmod import _crcfunext
+    except ImportError as e:
+      self.fail(e)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute instance-templates delete - delete Google Compute
-        Engine virtual machine instance templates
+    gcloud beta compute instance-templates delete - delete Compute Engine
+        virtual machine instance templates
 
 SYNOPSIS
     gcloud beta compute instance-templates delete NAME [NAME ...]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instance-templates delete deletes one or more
-    Google Compute Engine virtual machine instance templates.
+    Compute Engine virtual machine instance templates.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

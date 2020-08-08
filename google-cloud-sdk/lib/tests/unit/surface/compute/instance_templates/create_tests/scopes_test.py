@@ -170,6 +170,29 @@ class ScopesDeprecationTests(create_test_base.InstanceTemplatesCreateTestBase):
           ))],
     )
 
+  def testAccountWithNoScopes(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+          --no-scopes
+          --service-account=1234@project.gserviceaccount.com
+        """)
+
+    template = self._MakeInstanceTemplate(serviceAccounts=[
+        m.ServiceAccount(
+            email='1234@project.gserviceaccount.com',),
+    ])
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates,
+          'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
   def testWithManyScopesAndServiceAccount(self):
     m = self.messages
     self.Run("""

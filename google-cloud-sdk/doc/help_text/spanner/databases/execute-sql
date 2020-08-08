@@ -63,7 +63,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To execute a SQL SELECT statement against example-database under        example-instance, run:
+    To execute a SQL SELECT statement against example-database under
+    example-instance, run:
 
         $ gcloud spanner databases execute-sql example-database \
             --instance=example-instance

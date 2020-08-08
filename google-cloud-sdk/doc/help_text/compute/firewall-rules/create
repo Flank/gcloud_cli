@@ -1,13 +1,13 @@
 NAME
-    gcloud compute firewall-rules create - create a Google Compute Engine
-        firewall rule
+    gcloud compute firewall-rules create - create a Compute Engine firewall
+        rule
 
 SYNOPSIS
     gcloud compute firewall-rules create NAME
         (--action=ACTION | --allow=PROTOCOL[:PORT[-PORT]],[...])
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
-        [--direction=DIRECTION] [--disabled] [--enable-logging]
+        [--direction=DIRECTION] [--disabled] [--[no-]enable-logging]
         [--network=NETWORK; default="default"] [--priority=PRIORITY]
         [--rules=PROTOCOL[:PORT[-PORT]],[...]]
         [--source-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
@@ -96,7 +96,7 @@ OPTIONAL FLAGS
 
         Firewall rules are enabled by default.
 
-     --enable-logging
+     --[no-]enable-logging
         Enable logging for the firewall rule. Logs will be exported to
         StackDriver. Firewall logging is disabled by default. To enable logging
         for an existing rule, run:
@@ -106,6 +106,8 @@ OPTIONAL FLAGS
         To disable logging on an existing rule, run:
 
             $ gcloud compute firewall-rules create MY-RULE --no-enable-logging
+
+        Use --enable-logging to enable and --no-enable-logging to disable.
 
      --network=NETWORK; default="default"
         The network to which this rule is attached. If omitted, the rule is

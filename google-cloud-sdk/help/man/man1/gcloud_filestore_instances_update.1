@@ -64,7 +64,6 @@ A description of the Cloud Filestore instance.
 \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR]
 File share configuration for an instance. Specifying both \f5name\fR and
 \f5capacity\fR is required.
-
 .RS 2m
 .TP 2m
 \fBcapacity\fR
@@ -72,11 +71,9 @@ The desired size of the volume. The capacity must be a whole number followed by
 a size unit such as \f5\fITB\fR\fR for terabyte. If no size unit is specified,
 GB is assumed. The minimum size for a standard instance is 1TB. The minimum size
 for a premium instance is 2.5TB.
-
 .TP 2m
 \fBname\fR
 The desired logical name of the volume.
-
 .RE
 .sp
 .TP 2m
@@ -162,9 +159,10 @@ $ gcloud filestore instances update NAME \e
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha filestore instances update
 $ gcloud beta filestore instances update
 .RE
 

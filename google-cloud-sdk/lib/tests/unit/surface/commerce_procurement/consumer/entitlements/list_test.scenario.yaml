@@ -1,0 +1,77 @@
+title: commerce procurement consumer entitlement list scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      commerce-procurement consumer entitlements list --page-size 1 --page-token random
+  - stdout: |
+      ---
+      entitlements:
+      - account: billingAccounts/billingAccountId/accounts/accountId
+        changeHistory:
+        - changeState: CHANGE_STATE_ABANDONED
+          newFlavorExternalName: flavorId
+        createTime: '2019-10-09T18:32:12.251Z'
+        name: projects/projectNumber/entitlements/entitlementId
+        order: billingAccounts/billingAccountId/orders/orderId
+        productExternalName: productId
+        provider: providers/providerId
+        state: ENTITLEMENT_STATE_UNAVAILABLE
+        stateReason: Order is already cancelled.
+        updateTime: '2019-11-09T06:41:39.042Z'
+      nextPageToken: next-random
+actions:
+- execute_command:
+    command: |
+      commerce-procurement consumer entitlements list --page-size 1 --page-token random
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/projects/fake-project/entitlements?alt=json&pageSize=1&pageToken=random
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "entitlements": [
+                {
+                  "name": "projects/projectNumber/entitlements/entitlementId",
+                  "order": "billingAccounts/billingAccountId/orders/orderId",
+                  "productExternalName": "productId",
+                  "state": "ENTITLEMENT_STATE_UNAVAILABLE",
+                  "stateReason": "Order is already cancelled.",
+                  "createTime": "2019-10-09T18:32:12.251Z",
+                  "updateTime": "2019-11-09T06:41:39.042Z",
+                  "changeHistory": [
+                    {
+                      "newFlavorExternalName": "flavorId",
+                      "changeState": "CHANGE_STATE_ABANDONED"
+                    }
+                  ],
+                  "provider": "providers/providerId",
+                  "account": "billingAccounts/billingAccountId/accounts/accountId"
+                }
+              ],
+              "nextPageToken": "next-random"
+            }
+    - expect_stdout: |
+        ---
+        entitlements:
+        - account: billingAccounts/billingAccountId/accounts/accountId
+          changeHistory:
+          - changeState: CHANGE_STATE_ABANDONED
+            newFlavorExternalName: flavorId
+          createTime: '2019-10-09T18:32:12.251Z'
+          name: projects/projectNumber/entitlements/entitlementId
+          order: billingAccounts/billingAccountId/orders/orderId
+          productExternalName: productId
+          provider: providers/providerId
+          state: ENTITLEMENT_STATE_UNAVAILABLE
+          stateReason: Order is already cancelled.
+          updateTime: '2019-11-09T06:41:39.042Z'
+        nextPageToken: next-random
+    - expect_exit:
+        code: 0

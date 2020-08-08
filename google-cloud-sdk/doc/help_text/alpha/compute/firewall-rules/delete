@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute firewall-rules delete - delete Google Compute Engine
-        firewall rules
+    gcloud alpha compute firewall-rules delete - delete Compute Engine firewall
+        rules
 
 SYNOPSIS
     gcloud alpha compute firewall-rules delete NAME [NAME ...]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute firewall-rules delete deletes one or more
-    Google Compute Engine firewall rules.
+    Compute Engine firewall rules.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

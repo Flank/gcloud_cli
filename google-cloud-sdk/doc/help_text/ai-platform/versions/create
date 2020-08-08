@@ -2,11 +2,13 @@ NAME
     gcloud ai-platform versions create - create a new AI Platform version
 
 SYNOPSIS
-    gcloud ai-platform versions create VERSION --model=MODEL [--async]
-        [--config=CONFIG] [--description=DESCRIPTION] [--framework=FRAMEWORK]
-        [--labels=[KEY=VALUE,...]] [--origin=ORIGIN]
-        [--python-version=PYTHON_VERSION] [--runtime-version=RUNTIME_VERSION]
-        [--staging-bucket=STAGING_BUCKET] [GCLOUD_WIDE_FLAG ...]
+    gcloud ai-platform versions create VERSION --model=MODEL
+        [--accelerator=[count=COUNT],[type=TYPE]] [--async] [--config=CONFIG]
+        [--description=DESCRIPTION] [--framework=FRAMEWORK]
+        [--labels=[KEY=VALUE,...]] [--machine-type=MACHINE_TYPE]
+        [--origin=ORIGIN] [--python-version=PYTHON_VERSION] [--region=REGION]
+        [--runtime-version=RUNTIME_VERSION] [--staging-bucket=STAGING_BUCKET]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Creates a new version of an AI Platform model.
@@ -23,6 +25,21 @@ REQUIRED FLAGS
         Name of the model.
 
 OPTIONAL FLAGS
+     --accelerator=[count=COUNT],[type=TYPE]
+        Manage the accelerator config for GPU serving. When deploying a model
+        with Compute Engine Machine Types, a GPU accelerator may also be
+        selected.
+
+         type
+            The type of the accelerator. Choices are 'nvidia-tesla-k80',
+            'nvidia-tesla-p100', 'nvidia-tesla-p4', 'nvidia-tesla-t4',
+            'nvidia-tesla-v100'.
+
+         count
+            The number of accelerators to attach to each machine running the
+            job. This is usually 1; scaling parameters are configured using
+            manualScaling or autoScaling flags.
+
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
@@ -72,6 +89,11 @@ OPTIONAL FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     --machine-type=MACHINE_TYPE
+        Type of machine on which to serve the model. Currently only applies to
+        online prediction. For available machine types, see
+        https://cloud.google.com/ai-platform/prediction/docs/machine-types-online-prediction#available_machine_types.
+
      --origin=ORIGIN
         Location of model/ "directory" (as output by
         https://www.tensorflow.org/versions/r0.12/api_docs/python/state_ops.html#Saver).
@@ -88,6 +110,17 @@ OPTIONAL FLAGS
         default version is 2.7. Python 3.5 is available when --runtime-version
         is set to 1.4 and above. Python 2.7 works with all supported runtime
         versions.
+
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
+        REGION must be one of: asia-east1, europe-west4, us-central1.
 
      --runtime-version=RUNTIME_VERSION
         AI Platform runtime version for this job. Must be specified unless

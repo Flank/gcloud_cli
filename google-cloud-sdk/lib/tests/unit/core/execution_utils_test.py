@@ -159,7 +159,7 @@ class ExecutionTests(_ExecTestBase, sdk_test_base.WithLogCapture,
     self.exit_mock = self.StartObjectPatch(sys, 'exit')
 
     # Set encoding so sys.stdout and sys.stderr mocks can accept unicode
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testExec_WithExit(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
@@ -255,7 +255,7 @@ class StreamingExecutionTests(_ExecTestBase, sdk_test_base.WithLogCapture,
     self.exit_mock = self.StartObjectPatch(sys, 'exit')
 
     # Set encoding so sys.stdout and sys.stderr mocks can accept unicode
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testExecPipeIn(self):
     self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),

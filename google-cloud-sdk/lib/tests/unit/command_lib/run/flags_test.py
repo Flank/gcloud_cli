@@ -507,6 +507,15 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testContainerPortInvalidValues(self, port_str):
     self.assertFalse(flags._PortValue(port_str))
 
+  @parameterized.parameters('private-ranges-only', 'all')
+  def testEgressSettings(self, egress):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    self.args.vpc_egress = egress
+    self._GetAndApplyChanges()
+    self.assertDictContainsSubset(
+        {'run.googleapis.com/vpc-access-egress': egress},
+        self.service.template_annotations)
+
 
 class GetRegionTest(base.ServerlessBase, cli_test_base.CliTestBase,
                     sdk_test_base.WithFakeAuth):
@@ -544,8 +553,11 @@ class GetRegionTest(base.ServerlessBase, cli_test_base.CliTestBase,
         self.assertEqual(expected_region, actual_region)
 
 
-class GetPlatformTest(base.ServerlessBase):
+class GetPlatformTestGA(base.ServerlessBase):
   """Test getting the platform."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.args = parser_extensions.Namespace()
@@ -567,27 +579,24 @@ class GetPlatformTest(base.ServerlessBase):
     self.parser.parse_args(['--platform', 'managed'], self.args)
     self.assertEqual(
         'managed',
-        flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
-                                     flags.Product.RUN))
+        flags.GetAndValidatePlatform(self.args, self.track, flags.Product.RUN))
 
   def testGetFromProperty(self):
     properties.VALUES.run.platform.Set('gke')
     self.assertEqual(
         'gke',
-        flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
-                                     flags.Product.RUN))
+        flags.GetAndValidatePlatform(self.args, self.track, flags.Product.RUN))
 
   def testInvalidProperty(self):
     properties.VALUES.run.platform.Set('invalid')
     with self.assertRaises(flags.ArgumentError):
-      flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.GetAndValidatePlatform(self.args, self.track, flags.Product.RUN)
 
   def testGetFromPrompt(self):
     self.WriteInput('2\n')
     expected_platform = 'gke'
-    actual_platform = flags.GetAndValidatePlatform(
-        self.args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
+    actual_platform = flags.GetAndValidatePlatform(self.args, self.track,
+                                                   flags.Product.RUN)
     self.AssertErrContains(
         'run `gcloud config set run/platform {}`'.format(expected_platform))
     self.assertEqual(expected_platform, actual_platform)
@@ -595,11 +604,25 @@ class GetPlatformTest(base.ServerlessBase):
   def testCantGetFromPrompt(self):
     self.is_interactive.return_value = False
     with self.assertRaises(flags.ArgumentError):
-      flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.GetAndValidatePlatform(self.args, self.track, flags.Product.RUN)
 
 
-class ValidationsTest(test_case.TestCase):
+class GetPlatformTestBeta(GetPlatformTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class GetPlatformTestAlpha(GetPlatformTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ValidationsTestGA(test_case.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.StartObjectPatch(
@@ -609,246 +632,181 @@ class ValidationsTest(test_case.TestCase):
     args = parser_extensions.Namespace(allow_unauthenticated=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.allow_unauthenticated = True
-      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
-                           flags.Product.RUN)
-
-  def testVerifyGKEFlagsServiceAccount(self):
-    args = parser_extensions.Namespace(service_account=None)
-    with self.assertRaises(exceptions.ConfigurationError):
-      args.service_account = 'test@iam.gserviceaccount.com'
-      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
-                           flags.Product.RUN)
-
-  def testVerifyGKEFlagsServiceAccountAlpha(self):
-    args = parser_extensions.Namespace(service_account=None)
-    args.service_account = 'test'
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                         flags.Product.RUN)
+      flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyGKEFlagsRegion(self):
     args = parser_extensions.Namespace(region=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.region = 'us-central1'
-      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
-                           flags.Product.RUN)
+      flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyGKEFlagsKubeconfig(self):
     args = parser_extensions.Namespace(kubeconfig=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.kubeconfig = '~/.kube/config'
-      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
-                           flags.Product.RUN)
+      flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
-  def testVerifyGKEFlagsNoTrafficAlpha(self):
+  def testVerifyGKEFlagsNoTraffic(self):
     args = parser_extensions.Namespace(no_traffic=None)
     args.no_traffic = True
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                         flags.Product.RUN)
+    flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
-  def testVerifyGKEFlagsNoTrafficBeta(self):
-    args = parser_extensions.Namespace(no_traffic=None)
-    args.no_traffic = True
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.BETA,
-                         flags.Product.RUN)
-
-  def testVerifyGKEFlagsNoTrafficGA(self):
-    args = parser_extensions.Namespace(no_traffic=None)
-    args.no_traffic = True
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
-
-  def testVerifyGKEFlagsClearSecretsAlpha(self):
+  def testVerifyGKEFlagsClearSecrets(self):
     args = parser_extensions.Namespace(clear_secrets=None)
     args.clear_secrets = True
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                         flags.Product.RUN)
+    flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
-  def testVerifyGKEFlagsClearSecretsBeta(self):
-    args = parser_extensions.Namespace(clear_secrets=None)
-    args.clear_secrets = True
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.BETA,
-                         flags.Product.RUN)
-
-  def testVerifyGKEFlagsClearSecretsGA(self):
-    args = parser_extensions.Namespace(clear_secrets=None)
-    args.clear_secrets = True
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
-
-  def testVerifyGKEFlagsMinInstanceGA(self):
+  def testVerifyGKEFlagsMinInstance(self):
     args = parser_extensions.Namespace(min_instances=None)
     args.min_instances = 3
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
-
-  def testVerifyGKEFlagsMinInstanceBeta(self):
-    args = parser_extensions.Namespace(min_instances=None)
-    args.min_instances = 3
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.BETA,
-                         flags.Product.RUN)
-
-  def testVerifyGKEFlagsMinInstanceAlpha(self):
-    args = parser_extensions.Namespace(min_instances=None)
-    args.min_instances = 3
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                         flags.Product.RUN)
+    flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyGKEFlagsContext(self):
     args = parser_extensions.Namespace(context=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.context = 'some-context'
-      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
-                           flags.Product.RUN)
+      flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
+
+  def testVerifyGKEFlagsEgressSettings(self):
+    args = parser_extensions.Namespace(vpc_egress='private-ranges-only')
+    with self.assertRaises(exceptions.ConfigurationError):
+      flags.VerifyGKEFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsConnectivity(self):
     args = parser_extensions.Namespace(connectivity=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.connectivity = True
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsCpu(self):
     args = parser_extensions.Namespace(cpu=None)
     args.cpu = 2
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                 flags.Product.RUN)
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsCluster(self):
     args = parser_extensions.Namespace(cluster=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.cluster = 'cluster-1'
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsLocation(self):
     args = parser_extensions.Namespace(cluster_location=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.cluster_location = 'us-central1-a'
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsKubeconfig(self):
     args = parser_extensions.Namespace(kubeconfig=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.kubeconfig = '~/.kube/config'
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsContext(self):
     args = parser_extensions.Namespace(context=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.context = 'some-context'
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
-  def testVerifyOnePlatformFlagsMinInstanceGA(self):
+  def testVerifyOnePlatformFlagsMinInstance(self):
     args = parser_extensions.Namespace(min_instances=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.min_instances = 3
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
-  def testVerifyOnePlatformFlagsMinInstanceBeta(self):
-    args = parser_extensions.Namespace(min_instances=None)
-    with self.assertRaises(exceptions.ConfigurationError):
-      args.min_instances = 3
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
-                                   flags.Product.RUN)
-
-  def testVerifyOnePlatformFlagsMinInstanceAlpha(self):
-    args = parser_extensions.Namespace(min_instances=None)
-    args.min_instances = 3
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                                 flags.Product.RUN)
-
-  def testVerifyOnePlatformFlagsNoTrafficGA(self):
+  def testVerifyOnePlatformFlagsNoTraffic(self):
     args = parser_extensions.Namespace(no_traffic=None)
     args.no_traffic = True
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                 flags.Product.RUN)
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
-  def testVerifyOnePlatformFlagsNoTrafficBeta(self):
-    args = parser_extensions.Namespace(no_traffic=None)
-    args.no_traffic = True
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
-                                 flags.Product.RUN)
-
-  def testVerifyOnePlatformFlagsNoTrafficAlpha(self):
-    args = parser_extensions.Namespace(no_traffic=None)
-    args.no_traffic = True
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                                 flags.Product.RUN)
-
-  def testVerifyOnePlatformFlagsTimeoutAlpha(self):
-    parser = argparse.ArgumentParser()
-    flags.AddTimeoutFlag(parser)
-    args = parser.parse_args(['--timeout', '1h'],
-                             parser_extensions.Namespace(timeout=None))
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                                 flags.Product.RUN)
-
-  def testVerifyOnePlatformFlagsTimeoutBeta(self):
-    parser = argparse.ArgumentParser()
-    flags.AddTimeoutFlag(parser)
-    args = parser.parse_args(['--timeout', '45m'],
-                             parser_extensions.Namespace(timeout=None))
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
-                                 flags.Product.RUN)
-
-  def testVerifyOnePlatformFlagsTimeoutGA(self):
+  def testVerifyOnePlatformFlagsTimeout(self):
     parser = argparse.ArgumentParser()
     flags.AddTimeoutFlag(parser)
     args = parser.parse_args(['--timeout', '1h'],
                              parser_extensions.Namespace(timeout=None))
     with self.assertRaises(exceptions.ConfigurationError):
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsTimeoutGAOk(self):
     parser = argparse.ArgumentParser()
     flags.AddTimeoutFlag(parser)
     args = parser.parse_args(['--timeout', '15m'],
                              parser_extensions.Namespace(timeout=None))
-    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                 flags.Product.RUN)
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsEgressSettings(self):
+    args = parser_extensions.Namespace(vpc_egress='private-ranges-only')
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyKubernetesFlagsAllowUnauthenticated(self):
     args = parser_extensions.Namespace(allow_unauthenticated=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.allow_unauthenticated = True
-      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
-                                  flags.Product.RUN)
-
-  def testVerifyKubernetesFlagsServiceAccount(self):
-    args = parser_extensions.Namespace(service_account=None)
-    with self.assertRaises(exceptions.ConfigurationError):
-      args.service_account = 'test@iam.gserviceaccount.com'
-      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
-                                  flags.Product.RUN)
-
-  def testVerifyKubernetesFlagsServiceAccountAlpha(self):
-    args = parser_extensions.Namespace(service_account=None)
-    args.service_account = 'test'
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
-                         flags.Product.RUN)
+      flags.VerifyKubernetesFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyKubernetesFlagsRegion(self):
     args = parser_extensions.Namespace(region=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.region = 'us-central1'
-      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
-                                  flags.Product.RUN)
+      flags.VerifyKubernetesFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyKubernetesFlagsCluster(self):
     args = parser_extensions.Namespace(cluster=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.cluster = 'cluster-1'
-      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
-                                  flags.Product.RUN)
+      flags.VerifyKubernetesFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyKubernetesFlagsLocation(self):
     args = parser_extensions.Namespace(cluster_location=None)
     with self.assertRaises(exceptions.ConfigurationError):
       args.cluster_location = 'us-central1-a'
-      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
-                                  flags.Product.RUN)
+      flags.VerifyKubernetesFlags(args, self.track, flags.Product.RUN)
+
+  def testVerifyKubernetesFlagsEgressSettings(self):
+    args = parser_extensions.Namespace(vpc_egress='private-ranges-only')
+    with self.assertRaises(exceptions.ConfigurationError):
+      flags.VerifyKubernetesFlags(args, self.track, flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsEventsIsAlphaOnly(self):
+    # The "gcloud events" subcommand is alpha only for --platform=managed
+    args = parser_extensions.Namespace()
+    with self.assertRaises(exceptions.ConfigurationError):
+      flags.VerifyOnePlatformFlags(args, self.track, flags.Product.EVENTS)
+
+
+class ValidationsTestBeta(ValidationsTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testVerifyOnePlatformFlagsTimeout(self):
+    parser = argparse.ArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    args = parser.parse_args(['--timeout', '45m'],
+                             parser_extensions.Namespace(timeout=None))
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
+
+
+class ValidationsTestAlpha(ValidationsTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testVerifyOnePlatformFlagsMinInstance(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    args.min_instances = 3
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsTimeout(self):
+    parser = argparse.ArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    args = parser.parse_args(['--timeout', '1h'],
+                             parser_extensions.Namespace(timeout=None))
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsEventsIsAlphaOnly(self):
+    # The "gcloud events" subcommand is alpha only for --platform=managed
+    args = parser_extensions.Namespace()
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.EVENTS)
 
 
 class GetKubeconfigTest(test_case.TestCase):

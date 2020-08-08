@@ -42,17 +42,17 @@ class StreamLogsTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
         core_apis.GetClientClass('storage', 'v1'))
     self.mocked_storage_v1.Mock()
     self.addCleanup(self.mocked_storage_v1.Unmock)
-    self.storage_v1_messages = core_apis.GetMessagesModule(
-        'storage', 'v1')
+    self.storage_v1_messages = core_apis.GetMessagesModule('storage', 'v1')
 
     properties.VALUES.core.project.Set('my-project')
 
     self._statuses = self.cloudbuild_v1_messages.Build.StatusValueValuesEnum
 
   def _Run(self, args):
-    self.Run(['beta']+args)
+    self.Run(['beta'] + args)
 
   def testInProgressStream(self):
+
     def mk_build(status):
       return self.cloudbuild_v1_messages.Build(
           createTime='2016-03-31T19:12:32.838111Z',
@@ -68,8 +68,7 @@ class StreamLogsTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
                   bucket='my-project_cloudbuild',
                   object='source/1464221100.0_gcr.io_project_image.tgz',
                   generation=123,
-              ),
-          ),
+              ),),
           steps=[
               self.cloudbuild_v1_messages.BuildStep(
                   name='gcr.io/cloud-builders/docker',
@@ -88,7 +87,8 @@ class StreamLogsTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.AddHTTPResponse(
         'https://storage.googleapis.com/my-project_cloudbuild/'
         'logs/log-123-456-789.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
+        request_headers={'Range': 'bytes=0-'},
+        status=200,
         body='Here is some streamed\ndata for you to print\n')
 
     self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
@@ -101,18 +101,22 @@ class StreamLogsTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.AddHTTPResponse(
         'https://storage.googleapis.com/my-project_cloudbuild/'
         'logs/log-123-456-789.txt',
-        request_headers={'Range': 'bytes=44-'}, status=200,
+        request_headers={'Range': 'bytes=44-'},
+        status=200,
         body='Here the last line\n')
 
     self._Run(['builds', 'log', '--stream', '123-456-789'])
 
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
 Here is some streamed
 data for you to print
 Here the last line
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
   def testInProgress(self):
+
     def mk_build(status):
       return self.cloudbuild_v1_messages.Build(
           createTime='2016-03-31T19:12:32.838111Z',
@@ -128,8 +132,7 @@ Here the last line
                   bucket='my-project_cloudbuild',
                   object='source/1464221100.0_gcr.io_project_image.tgz',
                   generation=123,
-              ),
-          ),
+              ),),
           steps=[
               self.cloudbuild_v1_messages.BuildStep(
                   name='gcr.io/cloud-builders/docker',
@@ -148,15 +151,18 @@ Here the last line
     self.AddHTTPResponse(
         'https://storage.googleapis.com/my-project_cloudbuild/'
         'logs/log-123-456-789.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
+        request_headers={'Range': 'bytes=0-'},
+        status=200,
         body='Here is some streamed\ndata for you to print\n')
 
     self._Run(['builds', 'log', '123-456-789'])
 
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
 Here is some streamed
 data for you to print
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
   def testAlreadyFinishedStream(self):
     self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
@@ -178,8 +184,7 @@ data for you to print
                     bucket='my-project_cloudbuild',
                     object='source/1464221100.0_gcr.io_project_image.tgz',
                     generation=123,
-                ),
-            ),
+                ),),
             steps=[
                 self.cloudbuild_v1_messages.BuildStep(
                     name='gcr.io/cloud-builders/docker',
@@ -191,15 +196,18 @@ data for you to print
     self.AddHTTPResponse(
         'https://storage.googleapis.com/my-project_cloudbuild/'
         'logs/log-123-456-789.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
+        request_headers={'Range': 'bytes=0-'},
+        status=200,
         body='Here is some streamed\ndata for you to print\n')
 
     self._Run(['builds', 'log', '--stream', '123-456-789'])
 
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
 Here is some streamed
 data for you to print
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
   def testAlreadyFinished(self):
     self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
@@ -221,8 +229,7 @@ data for you to print
                     bucket='my-project_cloudbuild',
                     object='source/1464221100.0_gcr.io_project_image.tgz',
                     generation=123,
-                ),
-            ),
+                ),),
             steps=[
                 self.cloudbuild_v1_messages.BuildStep(
                     name='gcr.io/cloud-builders/docker',
@@ -234,20 +241,34 @@ data for you to print
     self.AddHTTPResponse(
         'https://storage.googleapis.com/my-project_cloudbuild/'
         'logs/log-123-456-789.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
+        request_headers={'Range': 'bytes=0-'},
+        status=200,
         body='Here is some streamed\ndata for you to print\n')
 
     self._Run(['builds', 'log', '123-456-789'])
 
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
 Here is some streamed
 data for you to print
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
   def testNoLogsBucket(self):
     build = self.cloudbuild_v1_messages.Build(
-        id='123-456-789',
-        logsBucket=None)  # No logsBucket specified
+        id='123-456-789', logsBucket=None)  # No logsBucket specified
+    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
+            id='123-456-789',
+            projectId='my-project',
+        ),
+        response=build)
+    with self.assertRaises(cb_logs.NoLogsBucketException):
+      self._Run(['builds', 'log', '123-456-789'])
+
+  def testNoLogsBucketStreaming(self):
+    build = self.cloudbuild_v1_messages.Build(
+        id='123-456-789', logsBucket=None)  # No logsBucket specified
     self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
             id='123-456-789',
@@ -256,6 +277,54 @@ data for you to print
         response=build)
     with self.assertRaises(cb_logs.NoLogsBucketException):
       self._Run(['builds', 'log', '--stream', '123-456-789'])
+
+  def noStreamingTest(self, mode):
+    build = self.cloudbuild_v1_messages.Build(
+        id='123-456-789',
+        logsBucket=None,
+        options=self.cloudbuild_v1_messages.BuildOptions(logging=mode))
+    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
+            id='123-456-789',
+            projectId='my-project',
+        ),
+        response=build)
+    self._Run(['--verbosity=info', 'builds', 'log', '--stream', '123-456-789'])
+    self.AssertOutputEquals('')  # Expect nothing to be printed.
+    self.AssertErrContains(
+        'Not streaming logs: requested logging mode is {0}'.format(mode))
+
+  def testStreamingNone(self):
+    self.noStreamingTest(
+        self.cloudbuild_v1_messages.BuildOptions.LoggingValueValuesEnum.NONE)
+
+  def testStreamingStackdriver(self):
+    self.noStreamingTest(self.cloudbuild_v1_messages.BuildOptions
+                         .LoggingValueValuesEnum.STACKDRIVER_ONLY)
+
+  def noBucketTest(self, mode):
+    build = self.cloudbuild_v1_messages.Build(
+        id='123-456-789',
+        logsBucket=None,
+        options=self.cloudbuild_v1_messages.BuildOptions(logging=mode))
+    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
+            id='123-456-789',
+            projectId='my-project',
+        ),
+        response=build)
+    self._Run(['--verbosity=info', 'builds', 'log', '123-456-789'])
+    self.AssertOutputEquals('')  # Expect nothing to be printed.
+    self.AssertErrContains(
+        'GCS logs not available: build logging mode is {0}'.format(mode))
+
+  def testNoBucketNone(self):
+    self.noBucketTest(
+        self.cloudbuild_v1_messages.BuildOptions.LoggingValueValuesEnum.NONE)
+
+  def testNoBucketStackdriver(self):
+    self.noBucketTest(self.cloudbuild_v1_messages.BuildOptions
+                      .LoggingValueValuesEnum.STACKDRIVER_ONLY)
 
 
 if __name__ == '__main__':

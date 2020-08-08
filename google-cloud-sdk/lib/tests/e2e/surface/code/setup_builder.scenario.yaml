@@ -3,13 +3,13 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: code export --service-name=blahblah  --image-name=gcr.io/project/blahblah
+  - command: code export --service-name=blahblah  --image=gcr.io/project/blahblah
       --builder=my-builder:latest
   - write_file: pods_and_services.yaml
   - write_file: skaffold.yaml
 actions:
 - execute_command:
-    command: code export --service-name=blahblah  --image-name=gcr.io/project/blahblah
+    command: code export --service-name=blahblah  --image=gcr.io/project/blahblah
       --builder=my-builder:latest
     events:
     - expect_file_written:
@@ -61,17 +61,23 @@ actions:
             type: LoadBalancer
     - expect_file_written:
         path: skaffold.yaml
-        contents: |
-          apiVersion: skaffold/v1
-          build:
-            artifacts:
-            - buildpack:
-                builder: my-builder:latest
-              image: gcr.io/project/blahblah
-          deploy:
-            kubectl:
-              manifests:
-              - pods_and_services.yaml
-          kind: Config
+        contents:
+          matches: |
+            apiVersion: skaffold/v2beta4
+            build:
+              artifacts:
+              - buildpack:
+                  builder: my-builder:latest
+                  env:
+                  - GOOGLE_DEVMODE=1
+                context: .*[/\\]temp_cwd
+                image: gcr.io/project/blahblah
+                sync:
+                  auto: {}
+            deploy:
+              kubectl:
+                manifests:
+                - pods_and_services.yaml
+            kind: Config
     - expect_exit:
         code: 0

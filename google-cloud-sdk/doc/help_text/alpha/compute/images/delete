@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute images delete - delete Google Compute Engine images
+    gcloud alpha compute images delete - delete Compute Engine images
 
 SYNOPSIS
     gcloud alpha compute images delete IMAGE_NAME [IMAGE_NAME ...]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute images delete deletes one or more Google
-    Compute Engine images.
+    (ALPHA) gcloud alpha compute images delete deletes one or more Compute
+    Engine images.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME [IMAGE_NAME ...]

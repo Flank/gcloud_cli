@@ -1,0 +1,78 @@
+
+.TH "GCLOUD_ALPHA_RESOURCE\-SETTINGS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha resource\-settings \- create and manage Resource Settings
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha resource\-settings\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The gcloud Resource Settings command group lets you create and
+manipulate Resource Settings.
+
+The Resource Settings Service is a hierarchy\-aware service with a
+public\-facing API for end\-users to store settings that modify the behavior of
+their Google Cloud Platform resources (e.g., VM, firewall, Project, etc.). The
+settings are attached at the project level and above and can influence CRM
+resources as well as sub\-project resources that are descendants of the setting
+attachment point.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Show the value of a resource setting.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List all available resource settings.
+
+.TP 2m
+\fBlist\-values\fR
+\fB(ALPHA)\fR List the values for any configured resource settings.
+
+.TP 2m
+\fBset\-value\fR
+\fB(ALPHA)\fR Update the value of a resource setting.
+
+.TP 2m
+\fBunset\-value\fR
+\fB(ALPHA)\fR Remove the value of a resource setting.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

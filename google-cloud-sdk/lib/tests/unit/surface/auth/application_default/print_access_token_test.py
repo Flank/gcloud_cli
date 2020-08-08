@@ -20,9 +20,12 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.auth import util as auth_util
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth
+from googlecloudsdk.core.credentials import store as c_store
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
+
+from oauth2client.contrib import reauth
 
 from google.auth import _default as google_auth_default
 from google.auth import exceptions as google_auth_exceptions
@@ -48,8 +51,9 @@ class PrintAccessTokenTest(cli_test_base.CliTestBase,
                                                     'default')
     self.mock_default_creds.return_value = (
         self.MakeUserAccountCredentialsGoogleAuth(), 'project')
-    self.mock_refresh_grant = self.StartObjectPatch(
-        c_google_auth, '_RefreshGrant').side_effect = _MockRefreshGrant
+    self.mock_refresh_grant = self.StartObjectPatch(c_google_auth,
+                                                    '_RefreshGrant')
+    self.mock_refresh_grant.side_effect = _MockRefreshGrant
 
   def testPrint(self):
     self.Run('auth application-default print-access-token')
@@ -71,6 +75,22 @@ class PrintAccessTokenTest(cli_test_base.CliTestBase,
     self.AssertErrContains(
         'Impersonate service account '
         "'serviceaccount@project.iam.gserviceaccount.com' is detected.")
+
+  def testRaiseTokenRefreshError(self):
+    self.mock_refresh_grant.side_effect = google_auth_exceptions.RefreshError(
+        'API error')
+    with self.AssertRaisesExceptionMatches(
+        c_store.TokenRefreshError, '$ gcloud auth application-default login'):
+      self.Run('auth application-default print-access-token')
+
+  def testRaiseTokenRefreshReauthError(self):
+    self.mock_refresh_grant.side_effect = c_google_auth.ReauthRequiredError(
+        'API error')
+    self.StartObjectPatch(reauth, 'GetRaptToken')
+    with self.AssertRaisesExceptionMatches(
+        c_store.TokenRefreshReauthError,
+        '$ gcloud auth application-default login'):
+      self.Run('auth application-default print-access-token')
 
 
 if __name__ == '__main__':

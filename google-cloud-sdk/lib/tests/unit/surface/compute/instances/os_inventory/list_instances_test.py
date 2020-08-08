@@ -29,8 +29,8 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute import utils
+from tests.lib.surface.compute.instances import test_resources
 
 
 class ListInstancesTestBase(test_base.BaseTest,

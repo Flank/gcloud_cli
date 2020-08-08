@@ -1,11 +1,11 @@
 title: pubsub subscriptions create with filter test scenario
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 
 actions:
 # attempt to update a filter, assert that error is raised
 - execute_command:
     command: |
-      pubsub subscriptions update subs1 --filter filterString1
+      pubsub subscriptions update subs1 --message-filter filterString1
     events:
     - expect_stderr:
         matches: .*unrecognized arguments.*

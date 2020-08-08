@@ -23,8 +23,10 @@ REQUIRED FLAGS
         Data format of the input files. DATA_FORMAT must be one of:
 
          text
-            Text files; see
-            https://www.tensorflow.org/guide/datasets#consuming_text_data
+            Text and JSON files; for text files, see
+            https://www.tensorflow.org/guide/datasets#consuming_text_data, for
+            JSON files, see
+            https://cloud.google.com/ai-platform/prediction/docs/overview#batch_prediction_input_data
          tf-record
             TFRecord files; see
             https://www.tensorflow.org/guide/datasets#consuming_tfrecord_data

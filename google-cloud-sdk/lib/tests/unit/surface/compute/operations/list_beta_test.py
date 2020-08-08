@@ -25,7 +25,8 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute import test_resources as compute_resources
+from tests.lib.surface.compute.operations import test_resources
 import mock
 
 beta_messages = core_apis.GetMessagesModule('compute', 'beta')
@@ -122,7 +123,7 @@ class OperationsListBetaTest(test_base.BaseTest):
             """))
 
   def testWithNoArgumentZonesFlag(self):
-    self.make_requests.side_effect = [test_resources.BETA_ZONES]
+    self.make_requests.side_effect = [compute_resources.BETA_ZONES]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(
             test_resources.BETA_ZONAL_OPERATIONS),
@@ -186,7 +187,7 @@ class OperationsListBetaTest(test_base.BaseTest):
             """), normalize_space=True)
 
   def testRegionsAndGlobal(self):
-    self.make_requests.side_effect = [test_resources.BETA_REGIONS]
+    self.make_requests.side_effect = [compute_resources.BETA_REGIONS]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(
             (test_resources.BETA_GLOBAL_OPERATIONS +
@@ -226,8 +227,8 @@ class OperationsListBetaTest(test_base.BaseTest):
 
   def testRegionsAndZones(self):
     self.make_requests.side_effect = [
-        test_resources.REGIONS,
-        test_resources.BETA_ZONES,
+        compute_resources.REGIONS,
+        compute_resources.BETA_ZONES,
     ]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(
@@ -284,7 +285,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         errors=[])
 
   def testRegionsAndSpecificZones(self):
-    self.make_requests.side_effect = [test_resources.BETA_REGIONS]
+    self.make_requests.side_effect = [compute_resources.BETA_REGIONS]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(
             test_resources.BETA_REGIONAL_OPERATIONS +
@@ -329,7 +330,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         errors=[])
 
   def testZonesAndGlobal(self):
-    self.make_requests.side_effect = [test_resources.BETA_ZONES]
+    self.make_requests.side_effect = [compute_resources.BETA_ZONES]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(
             test_resources.BETA_GLOBAL_OPERATIONS +

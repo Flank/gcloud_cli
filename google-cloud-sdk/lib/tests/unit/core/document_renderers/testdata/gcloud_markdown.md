@@ -133,7 +133,7 @@ links:
   $ link:../group/set/property/value/a/b/c[gcloud group set] property value a b c
   $ link:../group/unset/property/a/b/c[gcloud group unset] property a b c
 
-Long examples should wrap at 80 characters:
+Long examples should scroll horizontally:
 
   $ link:../group/long-windeded/super-verbose/way/too-long/who-could[gcloud group long-windeded super-verbose way too-long who-could] \
       ever remember-this obscure-command maybe too much of-the \

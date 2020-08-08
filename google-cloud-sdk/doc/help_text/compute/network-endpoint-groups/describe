@@ -1,13 +1,13 @@
 NAME
-    gcloud compute network-endpoint-groups describe - describe a Google Compute
-        Engine network endpoint group
+    gcloud compute network-endpoint-groups describe - describe a Compute Engine
+        network endpoint group
 
 SYNOPSIS
     gcloud compute network-endpoint-groups describe NAME
         [--global | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Describe a Google Compute Engine network endpoint group.
+    Describe a Compute Engine network endpoint group.
 
 POSITIONAL ARGUMENTS
      NAME

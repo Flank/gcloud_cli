@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta composer environments update
         (ENVIRONMENT : --location=LOCATION)
-        (--node-count=NODE_COUNT
+        (--cloud-sql-machine-type=CLOUD_SQL_MACHINE_TYPE
+          | --node-count=NODE_COUNT
           | --airflow-version=AIRFLOW_VERSION --image-version=IMAGE_VERSION
           | --update-airflow-configs=[KEY=VALUE,...] --clear-airflow-configs
           | --remove-airflow-configs=[KEY,...]
@@ -43,6 +44,9 @@ POSITIONAL ARGUMENTS
 REQUIRED FLAGS
      The update type. Exactly one of these must be specified:
 
+       --cloud-sql-machine-type=CLOUD_SQL_MACHINE_TYPE
+          Cloud SQL machine type used by the Airflow database.
+
        --node-count=NODE_COUNT
           The new number of nodes running the environment. Must be >= 3.
 
@@ -62,7 +66,7 @@ REQUIRED FLAGS
 
             The image version encapsulates the versions of both Cloud Composer
             and Apache Airflow. Must be of the form
-            composer-A.B.C-airflow-X.Y[.Z].
+            composer-A.B.C[-D.E]-airflow-X.Y[.Z].
 
             The Cloud Composer and Airflow versions are semantic versions.
             latest can be provided instead of an explicit Cloud Composer

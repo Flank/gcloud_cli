@@ -25,6 +25,7 @@ from googlecloudsdk.api_lib.apigee import base
 from googlecloudsdk.command_lib.apigee import errors
 from googlecloudsdk.command_lib.apigee import request
 from googlecloudsdk.command_lib.apigee import resource_args
+from googlecloudsdk.core import log
 
 
 class OrganizationsClient(base.BaseClient):
@@ -35,9 +36,11 @@ class APIsClient(base.BaseClient):
   _entity_path = ["organization", "api"]
 
   @classmethod
-  def Deploy(cls, identifiers, override=False):
+  def Deploy(cls, identifiers, override=False, basepath=None):
     deployment_path = ["organization", "environment", "api", "revision"]
     query_params = {"override": "true"} if override else {}
+    if basepath:
+      query_params["basepath"] = basepath
     try:
       return request.ResponseToApiRequest(
           identifiers,
@@ -68,6 +71,38 @@ class EnvironmentsClient(base.BaseClient):
 
 class RevisionsClient(base.BaseClient):
   _entity_path = ["organization", "api", "revision"]
+
+
+class _DeveloperApplicationsClient(base.PagedListClient):
+  _entity_path = ["organization", "developer", "app"]
+  _list_container = "app"
+  _page_field = "name"
+
+
+class ApplicationsClient(base.PagedListClient):
+  """REST client for Apigee applications."""
+  _entity_path = ["organization", "app"]
+  _list_container = "app"
+  _page_field = "appId"
+  _limit_param = "rows"
+
+  @classmethod
+  def List(cls, identifiers):
+    if "developersId" in identifiers and identifiers["developersId"]:
+      list_implementation = _DeveloperApplicationsClient.List
+      expand_flag = "shallowExpand"
+    else:
+      list_implementation = super(ApplicationsClient, cls).List
+      expand_flag = "expand"
+    items = list_implementation(identifiers, extra_params={expand_flag: "true"})
+    for item in items:
+      yield {"appId": item["appId"], "name": item["name"]}
+
+
+class DevelopersClient(base.PagedListClient):
+  _entity_path = ["organization", "developer"]
+  _list_container = "developer"
+  _page_field = "email"
 
 
 class DeploymentsClient(object):
@@ -121,3 +156,48 @@ class DeploymentsClient(object):
     if not response:
       return []
     return response
+
+
+ProductsInfo = collections.namedtuple("ProductsInfo", [
+    "name", "displayName", "approvalType", "attributes", "description",
+    "apiResources", "environments", "proxies", "quota", "quotaInterval",
+    "quotaTimeUnit", "scopes"
+])
+
+
+class ProductsClient(base.PagedListClient):
+  """REST client for Apigee API products."""
+  _entity_path = ["organization", "product"]
+  _list_container = "apiProduct"
+  _page_field = "name"
+
+  @classmethod
+  def Create(cls, identifiers, product_info):
+    product_dict = product_info._asdict()
+    # Don't send fields unless there's a value for them.
+    product_dict = {
+        key: product_dict[key]
+        for key in product_dict
+        if product_dict[key] is not None
+    }
+
+    return request.ResponseToApiRequest(
+        identifiers, ["organization"],
+        "product",
+        method="POST",
+        body=json.dumps(product_dict))
+
+  @classmethod
+  def Update(cls, identifiers, product_info):
+    product_dict = product_info._asdict()
+    # Don't send fields unless there's a value for them.
+    product_dict = {
+        key: product_dict[key]
+        for key in product_dict
+        if product_dict[key] is not None
+    }
+
+    return request.ResponseToApiRequest(
+        identifiers, ["organization", "product"],
+        method="PUT",
+        body=json.dumps(product_dict))

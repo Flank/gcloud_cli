@@ -931,15 +931,6 @@ class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
         self.TEST_ENVIRONMENT_ID,
         response=expected_get_response)
 
-    image_version_resp = self.messages.ListImageVersionsResponse(
-        imageVersions=self.test_image_versions_list, nextPageToken=None)
-
-    self.ExpectEnvironmentsListUpgrades(
-        self.TEST_PROJECT,
-        self.TEST_LOCATION,
-        1000,
-        response=image_version_resp)
-
     expected_patch = self._buildImageVersionUpdateObject(later_image_version)
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
@@ -1033,15 +1024,6 @@ class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
         self.TEST_LOCATION,
         self.TEST_ENVIRONMENT_ID,
         response=expected_get_response)
-
-    image_version_resp = self.messages.ListImageVersionsResponse(
-        imageVersions=self.test_image_versions_list, nextPageToken=None)
-
-    self.ExpectEnvironmentsListUpgrades(
-        self.TEST_PROJECT,
-        self.TEST_LOCATION,
-        1000,
-        response=image_version_resp)
 
     with self.assertRaisesRegex(command_util.InvalidUserInputError,
                                 '.*Invalid environment upgrade.*'):
@@ -1215,6 +1197,37 @@ class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
           self.TEST_PROJECT,
           self.TEST_ENVIRONMENT_ID,
       )
+
+  def testUpdateCloudSqlMachineType(self):
+    """Test updating Cloud SQL machine type."""
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        databaseConfig=self.messages.DatabaseConfig(
+            machineType='db-n1-standard-2'))
+
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=self.messages.Environment(config=config),
+        update_mask='config.database_config.machine_type',
+        response=self.running_op)
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--cloud-sql-machine-type',
+        'db-n1-standard-2',
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+    )
+    self.AssertErrMatches(r'^Update in progress for environment \[{}] '
+                          r'with operation \[{}]'.format(
+                              self.TEST_ENVIRONMENT_NAME,
+                              self.TEST_OPERATION_NAME))
 
 
 class EnvironmentsUpdateAlphaTest(EnvironmentsUpdateBetaTest):

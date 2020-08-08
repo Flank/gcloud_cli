@@ -96,6 +96,9 @@ FLAGS
 
           + When health checking network endpoints in a Network Endpoint
             Group, use the port specified with each endpoint.
+            --use-serving-port must be used when using a Network Endpoint Group
+            as a backend as this flag specifies the portSpecification option
+            for a Health Check object.
           + When health checking other backends, use the port of the backend
             service.
 
@@ -111,5 +114,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. These variants are also available:
+
+        $ gcloud compute health-checks create grpc
+        $ gcloud beta compute health-checks create grpc
 

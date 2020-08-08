@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute interconnects attachments dedicated create - create a
-        Google Compute Engine dedicated interconnect attachment
+        Compute Engine dedicated interconnect attachment
 
 SYNOPSIS
     gcloud alpha compute interconnects attachments dedicated create NAME

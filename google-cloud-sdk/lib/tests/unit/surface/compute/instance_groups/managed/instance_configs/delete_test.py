@@ -54,6 +54,11 @@ class _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase(
 class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
     _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase):
 
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
   def _ExpectDeletePerInstanceConfigs(self):
     request = (
         self.messages.
@@ -122,22 +127,25 @@ class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
     )
     self.client.instanceGroupManagers.Get.Expect(request, response=response)
 
-  def _ExpectApplyNow(self):
+  def _ExpectApplyNow(self, minimal_action='none'):
+    # Convert string to enum
+    minimal_action = (
+        self.messages.InstanceGroupManagersApplyUpdatesRequest
+        .MinimalActionValueValuesEnum(minimal_action.upper()))
     request = (
         self.messages.ComputeInstanceGroupManagersApplyUpdatesToInstancesRequest
     )(
         instanceGroupManager='group-1',
         instanceGroupManagersApplyUpdatesRequest=(
-            self.messages.InstanceGroupManagersApplyUpdatesRequest
-        )(instances=[
-            self.project_uri + '/zones/us-central2-a/instances/foo',
-            self.project_uri + '/zones/us-central2-a/instances/bas',
-        ],
-          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest
-          .MinimalActionValueValuesEnum.NONE,
-          mostDisruptiveAllowedAction=self.messages
-          .InstanceGroupManagersApplyUpdatesRequest
-          .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
+            self.messages.InstanceGroupManagersApplyUpdatesRequest)(
+                instances=[
+                    self.project_uri + '/zones/us-central2-a/instances/foo',
+                    self.project_uri + '/zones/us-central2-a/instances/bas',
+                ],
+                minimalAction=minimal_action,
+                mostDisruptiveAllowedAction=self.messages
+                .InstanceGroupManagersApplyUpdatesRequest
+                .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -160,6 +168,22 @@ class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
         compute instance-groups managed instance-configs delete group-1
           --zone us-central2-a
           --instances foo,bas
+        """)
+
+  def testSimpleCaseWithUpdateActionRestart(self):
+    self._ExpectDeletePerInstanceConfigs()
+    self._ExpectPollingOperation('delete')
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyNow(minimal_action='restart')
+    self._ExpectPollingOperation('apply')
+    self._ExpectGetInstanceGroupManager()
+
+    self.Run("""
+        compute instance-groups managed instance-configs delete group-1
+          --zone us-central2-a
+          --instances foo,bas
+          --update-instance
+          --instance-update-minimal-action restart
         """)
 
   def testDeleteWithNoInstanceProvided(self):
@@ -293,7 +317,10 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
     self.client.regionInstanceGroupManagers.Get.Expect(
         request, response=response)
 
-  def _ExpectApplyNow(self):
+  def _ExpectApplyNow(self, minimal_action='none'):
+    minimal_action = (
+        self.messages.RegionInstanceGroupManagersApplyUpdatesRequest
+        .MinimalActionValueValuesEnum(minimal_action.upper()))
     request = (
         self.messages
         .ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
@@ -304,9 +331,7 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
                         self.project_uri + '/zones/us-central2-a/instances/foo',
                         self.project_uri + '/zones/us-central2-a/instances/bas',
                     ],
-                    minimalAction=self.messages
-                    .RegionInstanceGroupManagersApplyUpdatesRequest
-                    .MinimalActionValueValuesEnum.NONE,
+                    minimalAction=minimal_action,
                     mostDisruptiveAllowedAction=self.messages
                     .RegionInstanceGroupManagersApplyUpdatesRequest
                     .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
@@ -333,6 +358,22 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
         compute instance-groups managed instance-configs delete group-1
           --region us-central2
           --instances foo,bas
+        """)
+
+  def testSimpleCaseWithMinimalActionRestart(self):
+    self._ExpectListManagedInstances()
+    self._ExpectDeletePerInstanceConfigs()
+    self._ExpectPollingOperation('delete')
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyNow('restart')
+    self._ExpectPollingOperation('apply')
+    self._ExpectGetInstanceGroupManager()
+
+    self.Run("""
+        compute instance-groups managed instance-configs delete group-1
+          --region us-central2
+          --instances foo,bas
+          --instance-update-minimal-action restart
         """)
 
   def testDeleteWithNoInstanceProvided(self):

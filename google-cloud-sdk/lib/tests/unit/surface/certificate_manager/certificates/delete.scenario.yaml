@@ -1,0 +1,120 @@
+title: Certificate Manager certificate delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      certificate-manager certificates delete simple-cert
+  - prompt:
+    - message: You are about to delete certificate 'simple-cert'
+    - input: y
+  - progress_tracker:
+    - message: Waiting for 'operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa'
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted certificate [simple-cert].
+- execute:
+  - command: |
+      certificate-manager certificates delete simple-cert --async
+  - prompt:
+    - message: You are about to delete certificate 'simple-cert'
+    - input: y
+  - stderr: |
+      Started 'operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa'
+      Delete in progress for certificate [simple-cert].
+actions:
+- execute_command:
+    command: |
+      certificate-manager certificates delete simple-cert
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete certificate 'simple-cert'
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T01:21:03.946735611Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T01:21:03.946735611Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true
+            }
+    - expect_progress_tracker:
+        message: Waiting for 'operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa'
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted certificate [simple-cert].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      certificate-manager certificates delete simple-cert --async
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete certificate 'simple-cert'
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://certificatemanager.googleapis.com/v1alpha1/projects/fake-project/locations/global/certificates/simple-cert?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.certificatemanager.v1alpha1.OperationMetadata",
+                "createTime": "2020-06-17T01:21:03.946735611Z",
+                "target": "projects/fake-project/locations/global/certificates/simple-cert",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Started 'operation-1592356863072-5a83d792dd8e2-a97f97d2-d8da15aa'
+        Delete in progress for certificate [simple-cert].
+    - expect_exit:
+        code: 0

@@ -54,7 +54,7 @@ EXAMPLES
 
     To show only the 10 latest log entries for the default service, run:
 
-        $ gcloud app logs read --limit 10 --service=default
+        $ gcloud app logs read --limit=10 --service=default
 
     To show only the logs from the request log for standard apps, run:
 

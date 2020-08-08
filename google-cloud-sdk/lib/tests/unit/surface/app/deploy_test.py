@@ -566,8 +566,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
       # Verify that the built target/ area is not staged.
       staged_target_directory = os.path.join(staging_dir, 'target')
       if os.path.isdir(staged_target_directory):
-        self.fail(
-            'No expected directory [{0}] .'.format(staged_target_directory))
+        self.fail('Directory [{0}] exists but should not.'.format(
+            staged_target_directory))
 
   def testStaging_CannotDeployMavenForJava8(self):
     """Tests deploying a Maven project does not work for GAE Java8."""
@@ -580,6 +580,67 @@ class DeployWithApiTests(DeployWithApiTestsBase):
       stager = staging.GetStager(staging_area)
       with self.assertRaises(staging.MavenPomNotSupported):
         stager.Stage(app_dir, app_dir, 'java-maven-project', env.STANDARD)
+
+  def testStaging_GradleNoAppYaml(self):
+    """Tests that a deployment of Java11 Gradle project functions correctly."""
+
+    # Load a Gradle build.gradle project structure without app.yaml.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'gradle_no_appyaml')
+    with file_utils.TemporaryDirectory() as staging_area:
+      # Create a stager with an empty staging directory.
+      stager = staging.GetStager(staging_area)
+      # Call the staging phase:
+      staging_dir = stager.Stage(
+          os.path.join(app_dir, 'build.gradle'), app_dir, 'java-gradle-project',
+          env.STANDARD)
+
+      # Staging directory should now contain a build.gradle and a generated
+      # app.yaml with a single line: runtime: java11.
+      staged_build_file = os.path.join(staging_dir, 'build.gradle')
+      self.AssertFileExists(staged_build_file)
+      staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+      self.AssertFileExistsWithContents('runtime: java11\n', staged_yaml_file)
+
+  def testStaging_GradleWithAppYaml(self):
+    """Tests that a deployment of Java11 Gradle project functions correctly."""
+
+    # Load a Gradle build.gradle project structure with app.yaml.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'gradle_with_appyaml')
+    with file_utils.TemporaryDirectory() as staging_area:
+      # Create a stager with an empty staging directory.
+      stager = staging.GetStager(staging_area)
+      # Call the staging phase:
+      staging_dir = stager.Stage(app_dir, app_dir, 'java-gradle-project',
+                                 env.STANDARD)
+
+      # Staging directory should now contain a build.gradle and the
+      # app.yaml from src/main/appengine directory in its root.
+      staged_build_file = os.path.join(staging_dir, 'build.gradle')
+      self.AssertFileExists(staged_build_file)
+      staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+      self.AssertFileExistsWithContents(
+          'runtime: java11\nenv_variables:\n  SPANNER_INSTANCE: xxx\n',
+          staged_yaml_file)
+      # Verify that the built build/ area is not staged.
+      staged_build_directory = os.path.join(staging_dir, 'build')
+      if os.path.isdir(staged_build_directory):
+        self.fail('Directory [{0}] exists but should not.'.format(
+            staged_build_directory))
+
+  def testStaging_CannotDeployGradleForJava8(self):
+    """Tests deploying a Gradle project does not work for GAE Java8."""
+
+    # Load a Gradle build.gradle project structure which is a Java8 GAE
+    # application.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'gradle_gae_java8')
+    with file_utils.TemporaryDirectory() as staging_area:
+      # Create a stager with an empty staging directory.
+      stager = staging.GetStager(staging_area)
+      with self.assertRaises(staging.GradleBuildNotSupported):
+        stager.Stage(app_dir, app_dir, 'java-gradle-project', env.STANDARD)
 
   def testStaging_Java11JarWithManifestClassPath(self):
     """Tests that a deployment of Java11 jar with dep jars functions correctly.
@@ -654,6 +715,114 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     # Check that if no handlers, we get https
     url = 'https://{project}.appspot.com'.format(project=self.Project())
     self.AssertErrContains('Deployed service [default] to [{0}]'.format(url))
+
+  def testDeploy_JarWithCustomAppYaml(self):
+    """Tests that the optional --appyaml flag works."""
+    with file_utils.TemporaryDirectory() as appyaml_location:
+      customappyaml = self.WriteFile(
+          'customapp.yaml',
+          data=self.APP_DATA_CUSTOM_LOCATION_YAML,
+          directory=appyaml_location)
+      jar_file = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                               'lib', 'example.jar')
+      with file_utils.TemporaryDirectory() as staging_area:
+        # Create a stager with an empty staging directory.
+        stager = staging.GetStager(staging_area)
+        # Call the staging phase:
+        staging_dir = stager.Stage(jar_file, None, 'java-jar', env.STANDARD,
+                                   customappyaml)
+
+        # Staging directory should now contain a copy of the jar, and a
+        # user provided app.yaml with the content of custmapp.yaml.
+        self.AssertFileExists(os.path.join(staging_dir, 'example.jar'))
+
+        staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+        self.AssertFileExistsWithContents(self.APP_DATA_CUSTOM_LOCATION_YAML,
+                                          staged_yaml_file)
+
+  def testDeploy_MavenWithCustomAppYaml(self):
+    """Tests that a deployment of Java11 Maven project functions correctly.
+
+    Tested here with a customw overwritten app.yaml.
+    """
+    # Load a Maven pom.xml project structure with app.yaml.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'maven_with_appyaml')
+    with file_utils.TemporaryDirectory() as appyaml_location:
+      customappyaml = self.WriteFile(
+          'customapp.yaml',
+          data=self.APP_DATA_CUSTOM_LOCATION_YAML,
+          directory=appyaml_location)
+      with file_utils.TemporaryDirectory() as staging_area:
+        # Create a stager with an empty staging directory.
+        stager = staging.GetStager(staging_area)
+        # Call the staging phase:
+        staging_dir = stager.Stage(app_dir, app_dir, 'java-maven-project',
+                                   env.STANDARD, customappyaml)
+
+        # Staging directory should now contain a pom.xml and the overwritten
+        # file named app.yaml in its root.
+        staged_pom_file = os.path.join(staging_dir, 'pom.xml')
+        self.AssertFileExists(staged_pom_file)
+        staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+        self.AssertFileExistsWithContents(self.APP_DATA_CUSTOM_LOCATION_YAML,
+                                          staged_yaml_file)
+
+  def testDeploy_DirectoryWithCustomAppYaml(self):
+    """Tests that a directory that does not contain app.yaml can be be deployed with a custom app.yaml.
+
+    Tested here with a customw overwritten app.yaml.
+    """
+    # Load a directory that doe not have an app.yaml.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'lib')
+    with file_utils.TemporaryDirectory() as appyaml_location:
+      customappyaml = self.WriteFile(
+          'customapp.yaml',
+          data=self.APP_DATA_CUSTOM_LOCATION_YAML,
+          directory=appyaml_location)
+      with file_utils.TemporaryDirectory() as staging_area:
+        # Create a stager with an empty staging directory.
+        stager = staging.GetStager(staging_area)
+        # Call the staging phase:
+        staging_dir = stager.Stage(app_dir, app_dir, 'generic-copy',
+                                   env.STANDARD, customappyaml)
+
+        # Staging directory should now contain the overwritten
+        # file named app.yaml in its root.
+        staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+        self.AssertFileExistsWithContents(self.APP_DATA_CUSTOM_LOCATION_YAML,
+                                          staged_yaml_file)
+
+  def testDeploy_OneFileWithCustomAppYaml(self):
+    """Tests that a single file can be be deployed with a custom app.yaml.
+
+    For example, a Quarkus native image binary with a explicit app.yaml.
+    """
+
+    with file_utils.TemporaryDirectory() as tmp_location:
+      singlefile = self.WriteFile(
+          'singlebinaryfile', data='whatever', directory=tmp_location)
+      with file_utils.TemporaryDirectory() as appyaml_location:
+        customappyaml = self.WriteFile(
+            'customapp.yaml',
+            data=self.APP_DATA_CUSTOM_LOCATION_YAML,
+            directory=appyaml_location)
+        with file_utils.TemporaryDirectory() as staging_area:
+          # Create a stager with an empty staging directory.
+          stager = staging.GetStager(staging_area)
+          # Call the staging phase:
+          staging_dir = stager.Stage(None, singlefile, 'generic-copy',
+                                     env.STANDARD, customappyaml)
+
+          # Staging directory should now contain the overwritten
+          # file named app.yaml in its root.
+          staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+          self.AssertFileExistsWithContents(self.APP_DATA_CUSTOM_LOCATION_YAML,
+                                            staged_yaml_file)
+          # Staging directory should also contain the other file
+          binary_file = os.path.join(staging_dir, 'singlebinaryfile')
+          self.AssertFileExistsWithContents('whatever', binary_file)
 
   def testStaging_Java11JarRuntime(self):
     """Tests that a Titanium Java11 fatjar deployment functions correctly."""
@@ -952,6 +1121,12 @@ class DeployWithApiTests(DeployWithApiTestsBase):
         'May only contain lowercase letters'):
       self.Run(('app deploy --version=CapitalLettersInHere '
                 '{0}').format(self.FullPath('app.yaml')))
+
+  def testDeploy_CannotUseTwoDeployables(self):
+    """Test that --appyaml flag only allows for 1 deployable."""
+    with self.assertRaisesRegex(app_exceptions.MultiDeployError,
+                                'appyaml flag'):
+      self.Run(('app deploy --appyaml=../foo.yaml deployable1 deployable2 '))
 
   def testStopPreviousVersion_NoPreviousVersion(self):
     """Test deploy with --stop-previous-version if no previous versions."""

@@ -40,6 +40,9 @@ COMMANDS
      update
         Update Memorystore Redis instances.
 
+     upgrade
+        Upgrade a Memorystore for Redis instance to a specified Redis version.
+
 EXAMPLES
     To create an instance with the name my-redis-instance, run:
 

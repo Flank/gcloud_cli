@@ -63,9 +63,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     if expected_src_dir is None:
       expected_src_dir = '.'
 
-    def FakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None,
-                           update_date=False):
-      del dest_zip_file, predicate, update_date
+    def FakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None):
+      del dest_zip_file, predicate
       self.assertEqual(src_dir, expected_src_dir)
 
     return FakeMakeZipFromDir
@@ -344,7 +343,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         gcloudignore, 'GetFileChooserForDir', return_value=mock_chooser)
     self.StartObjectPatch(archive, 'MakeZipFromDir')
     self.ExpectGetFunction(region=region)
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self._ExpectGenerateUploadUrl(region=region)
 
     location_path = self.GetLocationRelativePath(
@@ -359,7 +357,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
-    self.MockRemoveIamPolicy('my-test', region=region)
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateSuccessfulOperation(operation_name))
@@ -393,7 +390,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(archive, 'MakeZipFromDir')
 
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     self._ExpectGenerateUploadUrl()
 
@@ -409,7 +405,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateSuccessfulOperation(operation_name))
@@ -445,7 +440,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(archive, 'MakeZipFromDir')
 
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     self._ExpectGenerateUploadUrl()
 
@@ -463,7 +457,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateSuccessfulOperation(operation_name))
@@ -509,7 +502,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self._GetFakeMakeZipFromDir(expected_src_dir='my/functions/directory'))
 
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     self._ExpectGenerateUploadUrl()
     location_path = self.GetLocationRelativePath(
@@ -524,7 +516,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateSuccessfulOperation(operation_name))
@@ -560,7 +551,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
   def testDeployFromGcsWithSourceFlag(self):
     self.MockUnpackedSourcesDirSize()
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     location_path = self.GetLocationRelativePath(
         self.Project(), _DEFAULT_LOCATION)
@@ -574,7 +564,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateSuccessfulOperation(operation_name))
@@ -596,7 +585,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
   def testDeployFromRepoWithSourceFlag(self):
     self.MockUnpackedSourcesDirSize()
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     location_path = self.GetLocationRelativePath(
         self.Project(), _DEFAULT_LOCATION)
@@ -612,7 +600,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateSuccessfulOperation(operation_name))
@@ -1116,7 +1103,6 @@ class FunctionsDeployOutputTest(FunctionsDeployTestBase):
   def testNoStackdriverLogPrintedIfNoBuildId(self):
     self.MockUnpackedSourcesDirSize()
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     location_path = self.GetLocationRelativePath(
         self.Project(), _DEFAULT_LOCATION)
@@ -1137,7 +1123,6 @@ class FunctionsDeployOutputTest(FunctionsDeployTestBase):
 
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         success_operation)
@@ -1157,7 +1142,6 @@ class FunctionsDeployOutputTest(FunctionsDeployTestBase):
   def testStackdriverLogPrintedOnlyOnceDuringMultiplePolls(self):
     self.MockUnpackedSourcesDirSize()
     self.ExpectGetFunction()
-    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     location_path = self.GetLocationRelativePath(
         self.Project(), _DEFAULT_LOCATION)
@@ -1173,7 +1157,6 @@ class FunctionsDeployOutputTest(FunctionsDeployTestBase):
 
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-    self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
         self._GenerateActiveOperation(operation_name))

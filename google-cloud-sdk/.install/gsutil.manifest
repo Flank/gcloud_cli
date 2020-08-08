@@ -182,6 +182,7 @@ platform/gsutil/gslib/tests/test_tracker_file.py
 platform/gsutil/gslib/tests/test_ubla.py
 platform/gsutil/gslib/tests/test_ui.py
 platform/gsutil/gslib/tests/test_update.py
+platform/gsutil/gslib/tests/test_user_agent_helper.py
 platform/gsutil/gslib/tests/test_util.py
 platform/gsutil/gslib/tests/test_versioning.py
 platform/gsutil/gslib/tests/test_web.py
@@ -1333,6 +1334,7 @@ platform/gsutil/third_party/funcsigs/tox.ini
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/.gitignore
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/CONTRIBUTING.md
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/LICENSE
+platform/gsutil/third_party/gcs-oauth2-boto-plugin/MANIFEST.in
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/README.md
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/gcs_oauth2_boto_plugin/__init__.py
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/gcs_oauth2_boto_plugin/oauth2_client.py
@@ -1340,6 +1342,7 @@ platform/gsutil/third_party/gcs-oauth2-boto-plugin/gcs_oauth2_boto_plugin/oauth2
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/gcs_oauth2_boto_plugin/oauth2_plugin.py
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/gcs_oauth2_boto_plugin/test_oauth2_client.py
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/requirements.txt
+platform/gsutil/third_party/gcs-oauth2-boto-plugin/setup.cfg
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/setup.py
 platform/gsutil/third_party/gcs-oauth2-boto-plugin/test-requirements.txt
 platform/gsutil/third_party/google-reauth-python/.coveragerc

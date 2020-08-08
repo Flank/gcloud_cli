@@ -34,7 +34,7 @@ EXAMPLES
 
         $ gcloud alpha deployment-manager types describe NAME \
             --provider=composite \
-            --format='yaml[json-decode] (composite_type)'
+            --format="yaml[json-decode] (composite_type)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

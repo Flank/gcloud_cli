@@ -318,6 +318,7 @@ class _Sections(object):
       SDK.
     survey: Section, The section containing survey properties for the Cloud SDK.
     test: Section, The section containing test properties for the Cloud SDK.
+    vmware: Section, The section containing vmware properties for the Cloud SDK.
     workflows: Section, The section containing workflows properties for the
       Cloud SDK.
   """
@@ -373,6 +374,7 @@ class _Sections(object):
     self.storage = _SectionStorage()
     self.survey = _SectionSurvey()
     self.test = _SectionTest()
+    self.vmware = _SectionVmware()
     self.workflows = _SectionWorkflows()
 
     sections = [
@@ -419,6 +421,7 @@ class _Sections(object):
         self.spanner,
         self.survey,
         self.test,
+        self.vmware,
         self.workflows,
     ]
     self.__sections = {section.name: section for section in sections}
@@ -1391,8 +1394,27 @@ class _SectionAuth(_Section):
         'role that includes the iam.serviceAccounts.getAccessToken permission '
         'for the service account. The roles/iam.serviceAccountTokenCreator '
         'role has this permission or you may create a custom role.')
-    self.disable_google_auth = self._AddBool(
-        'disable_google_auth', default=False, hidden=True)
+    self.disable_load_google_auth = self._AddBool(
+        'disable_load_google_auth',
+        default=False,
+        hidden=True,
+        help_text='Global switch to turn off loading credentials as '
+                  'google-auth. Users can use it to switch back to the old '
+                  'mode if google-auth breaks users.'
+    )
+    self.google_auth_allowed = self._AddBool(
+        'google_auth_allowed',
+        default=False,
+        hidden=True,
+        help_text='A switch to opt in a surface or a command group '
+                  'to google-auth.'
+    )
+    self.disable_activate_service_account_google_auth = self._AddBool(
+        'disable_activate_service_account_google_auth',
+        default=False,
+        hidden=True,
+        help_text='True to have activate-service-account command fall back to '
+        'execute against oauth2client library.')
 
 
 class _SectionBilling(_Section):
@@ -1529,14 +1551,6 @@ class _SectionPubsub(_Section):
         help_text=('Use the legacy output for beta pubsub commands. The legacy '
                    'output from beta is being deprecated. This property will '
                    'eventually be removed.'))
-    self.zone = self._Add(
-        'lite_zone',
-        # TODO(b/152969311): Create a Completer for the active zones.
-        # TODO(b/149560300): Add this to
-        # https://cloud.google.com/sdk/docs/properties.
-        help_text='Default zone to use when working with zonal Pub/Sub Lite '
-        'resources. When a `--zone` flag is required but not provided, '
-        'the command will fall back to this value, if set.')
 
 
 class _SectionComposer(_Section):
@@ -1764,11 +1778,13 @@ class _SectionApiEndpointOverrides(_Section):
     self.accessapproval = self._Add('accessapproval')
     self.accesscontextmanager = self._Add('accesscontextmanager')
     self.apigateway = self._Add('apigateway')
+    self.apigee = self._Add('apigee')
     self.appengine = self._Add('appengine')
     self.bigtableadmin = self._Add('bigtableadmin')
     self.binaryauthorization = self._Add('binaryauthorization')
     self.artifactregistry = self._Add('artifactregistry')
     self.categorymanager = self._Add('categorymanager')
+    self.certificatemanager = self._Add('certificatemanager')
     self.cloudasset = self._Add('cloudasset')
     self.cloudbilling = self._Add('cloudbilling')
     self.cloudbuild = self._Add('cloudbuild')
@@ -1817,6 +1833,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.monitoring = self._Add('monitoring')
     self.networkmanagement = self._Add('networkmanagement')
     self.networkservices = self._Add('networkservices')
+    self.networksecurity = self._Add('networksecurity')
     self.notebooks = self._Add('notebooks')
     self.orgpolicy = self._Add('orgpolicy')
     self.osconfig = self._Add('osconfig')
@@ -1851,6 +1868,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.vpcaccess = self._Add('vpcaccess')
     self.workflowexecutions = self._Add('workflowexecutions')
     self.workflows = self._Add('workflows')
+    self.sddc = self._Add('sddc')
 
   def EndpointValidator(self, value):
     """Checks to see if the endpoint override string is valid."""
@@ -2019,6 +2037,27 @@ class _SectionWorkflows(_Section):
         help_text='The default region to use when working with Cloud '
         'Workflows resources. When a `--location` flag is required '
         'but not provided, the command will fall back to this value, if set.')
+
+
+class _SectionVmware(_Section):
+  """Contains the properties for the 'vmware' section."""
+
+  def __init__(self):
+    super(_SectionVmware, self).__init__('vmware')
+
+    self.location = self._Add(
+        'location',
+        default='us-central1',
+        help_text='Default location to use when working with Cloud '
+        'VMware resources.  When a `--location` '
+        'flag is required but not provided, the command will fall back to '
+        'this value, if set.')
+
+    self.node_type = self._Add(
+        'node-type',
+        default='c1-highmem-72-metal',
+        hidden=True,
+        help_text='Node type to use when creating a new cluster.')
 
 
 class _Property(object):

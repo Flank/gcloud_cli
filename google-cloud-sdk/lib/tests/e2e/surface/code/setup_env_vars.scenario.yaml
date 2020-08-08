@@ -3,13 +3,15 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: code export --service-name=blahblah  --image-name=gcr.io/project/blahblah
+  - command: code export --service-name=blahblah  --image=gcr.io/project/blahblah
       --env-vars=a=b,c=d
   - write_file: pods_and_services.yaml
   - write_file: skaffold.yaml
 actions:
+- load_resource:
+    path: tests/e2e/surface/code/testdata/hello/Dockerfile
 - execute_command:
-    command: code export --service-name=blahblah  --image-name=gcr.io/project/blahblah
+    command: code export --service-name=blahblah  --image=gcr.io/project/blahblah
       --env-vars=a=b,c=d
     events:
     - expect_file_written:
@@ -65,16 +67,19 @@ actions:
             type: LoadBalancer
     - expect_file_written:
         path: skaffold.yaml
-        contents: |
-          apiVersion: skaffold/v1
-          build:
-            artifacts:
-            - context: .
-              image: gcr.io/project/blahblah
-          deploy:
-            kubectl:
-              manifests:
-              - pods_and_services.yaml
-          kind: Config
+        contents:
+          matches: |
+            apiVersion: skaffold/v2beta4
+            build:
+              artifacts:
+              - context: .*[/\\]temp_cwd
+                docker:
+                  dockerfile: Dockerfile
+                image: gcr.io/project/blahblah
+            deploy:
+              kubectl:
+                manifests:
+                - pods_and_services.yaml
+            kind: Config
     - expect_exit:
         code: 0

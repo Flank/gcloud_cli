@@ -33,6 +33,9 @@ COMMANDS
      remove-iam-policy-binding
         (ALPHA) Remove an IAM policy binding from a Cloud Bigtable table.
 
+     restore
+        (ALPHA) Restore a Cloud Bigtable backup to a new table.
+
      set-iam-policy
         (ALPHA) Set an IAM policy on a Cloud Bigtable table.
 

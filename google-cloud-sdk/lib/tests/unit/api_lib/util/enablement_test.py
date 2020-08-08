@@ -91,6 +91,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
           }}""").format(message=self.message))
 
     mock_http_methods = mock.Mock()
+    mock_http_methods.redirect_codes = []
     self.StartObjectPatch(http, 'Http', autospec=True,
                           return_value=mock_http_methods)
     mock_http_methods.request.side_effect = Perform
@@ -156,6 +157,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
         }}""").format(message=self.message))
 
     mock_http_methods = mock.Mock()
+    mock_http_methods.redirect_codes = []
     self.StartObjectPatch(http, 'Http', autospec=True,
                           return_value=mock_http_methods)
     mock_http_methods.request.side_effect = Perform

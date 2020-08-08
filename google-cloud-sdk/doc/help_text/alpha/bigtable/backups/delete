@@ -40,10 +40,18 @@ API REFERENCE
     This command uses the bigtableadmin/v2 API. The full documentation for this
     API can be found at: https://cloud.google.com/bigtable/
 
+EXAMPLES
+    To delete a backup, run:
+
+        $ gcloud alpha bigtable backups delete BACKUP_NAME \
+            --instance=INSTANCE_NAME --cluster=CLUSTER_NAME
+
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud bigtable backups delete
+        $ gcloud beta bigtable backups delete
 

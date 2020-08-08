@@ -52,7 +52,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200407-195538-2a41/operations/10526233935698984961
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200617-154443-gbej/operations/13453558287442116609
     - expect_stderr: |
         Create request issued for: [$$test-dataset$$]
     - expect_progress_tracker:
@@ -67,11 +67,13 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '127'
+            content-length: '196'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
+            storageOptions:
+              defaultBlobStorageClass: STANDARD
     - expect_stderr: |
         Created dataset [$$test-dataset$$].
     - expect_exit:
@@ -93,7 +95,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '454'
+            content-length: '121'
             content-type: application/json; charset=UTF-8
             status: '400'
           body:

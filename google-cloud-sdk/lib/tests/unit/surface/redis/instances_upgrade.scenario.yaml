@@ -1,5 +1,5 @@
 title: instances upgrade scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -27,7 +27,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://redis.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/instances/my-redis-instance:upgrade?alt=json
+          uri: https://redis.googleapis.com/v1/projects/fake-project/locations/us-central1/instances/my-redis-instance:upgrade?alt=json
           method: POST
           headers: {}
           body:
@@ -45,7 +45,7 @@ actions:
                 "target": "projects/fake-project/locations/us-central1/instances/my-redis-instance",
                 "verb": "upgrade",
                 "cancelRequested": false,
-                "apiVersion": "v1beta1"
+                "apiVersion": "v1"
               },
               "done": false
             }
@@ -56,7 +56,7 @@ actions:
         done: false
         metadata:
           '@type': type.googleapis.com/google.cloud.common.OperationMetadata
-          apiVersion: v1beta1
+          apiVersion: v1
           cancelRequested: false
           createTime: '2019-10-18T07:27:39.467589178Z'
           target: projects/fake-project/locations/us-central1/instances/my-redis-instance

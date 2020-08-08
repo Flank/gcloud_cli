@@ -6,9 +6,10 @@ SYNOPSIS
     gcloud alpha compute machine-images import IMAGE --source-uri=SOURCE_URI
         [--async] [--can-ip-forward] [--description=DESCRIPTION]
         [--no-guest-environment] [--guest-flush] [--labels=[KEY=VALUE,...]]
-        [--machine-type=MACHINE_TYPE] [--network=NETWORK]
-        [--network-tier=NETWORK_TIER] [--os=OS] [--no-restart-on-failure]
-        [--storage-location=LOCATION] [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
+        [--log-location=LOG_LOCATION] [--machine-type=MACHINE_TYPE]
+        [--network=NETWORK] [--network-tier=NETWORK_TIER] [--os=OS]
+        [--no-restart-on-failure] [--storage-location=LOCATION]
+        [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
         [--timeout=TIMEOUT; default="2h"] [--zone=ZONE]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions --custom-vm-type=CUSTOM_VM_TYPE]
@@ -20,8 +21,8 @@ DESCRIPTION
 
     Importing OVF involves:
       o Unpacking OVF package (if in OVA format) to Cloud Storage.
-      o Import disks from OVF to Google Compute Engine.
-      o Translate the boot disk to make it bootable in Google Compute Engine.
+      o Import disks from OVF to Compute Engine.
+      o Translate the boot disk to make it bootable in Compute Engine.
       o Create a machine image using OVF metadata and imported disks.
 
     Virtual instances, images, machine images, and disks in Compute engine and
@@ -66,6 +67,11 @@ OPTIONAL FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --log-location=LOG_LOCATION
+        Directory in Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ is created
+        and used.
 
      --machine-type=MACHINE_TYPE
         Specifies the machine type used for the instances. To get a list of

@@ -306,6 +306,7 @@ class TestBase(cli_test_base.CliTestBase):
         verticalPodAutoscaling=kwargs.get('verticalPodAutoscaling'),
         autoscaling=kwargs.get('clusterAutoscaling'),
         shieldedNodes=kwargs.get('shieldedNodes'),
+        releaseChannel=kwargs.get('releaseChannel'),
     )
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
@@ -379,6 +380,7 @@ class TestBase(cli_test_base.CliTestBase):
             reservationAffinity=kwargs.get('reservationAffinity', None),
             sandboxConfig=kwargs.get('sandboxConfig'),
             workloadMetadataConfig=kwargs.get('workloadMetadataConfig'),
+            bootDiskKmsKey=kwargs.get('bootDiskKmsKey'),
         ),
         locations=kwargs.get('nodePoolLocations', []),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
@@ -1089,14 +1091,14 @@ class BetaTestBase(GATestBase):
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
     if kwargs.get('clusterTelemetry'):
       cluster.clusterTelemetry = kwargs.get('clusterTelemetry')
-    cluster.releaseChannel = kwargs.get('releaseChannel')
+    cluster.notificationConfig = kwargs.get('notificationConfig')
+    cluster.confidentialNodes = kwargs.get('confidentialNodes')
 
     return cluster
 
   def _MakeNodePool(self, **kwargs):
     node_pool = GATestBase._MakeNodePool(self, **kwargs)
     node_pool.config.metadata = kwargs.get('metadata')
-    node_pool.config.bootDiskKmsKey = kwargs.get('bootDiskKmsKey')
     if kwargs.get('nodePoolLocations'):
       node_pool.locations = kwargs.get('nodePoolLocations')
     if 'upgradeSettings' in kwargs:
@@ -1179,6 +1181,16 @@ class BetaTestBase(GATestBase):
         locations=locations)
     self.mocked_client.projects_locations_clusters_nodePools.Update.Expect(
         msg, response=response, exception=exception)
+
+  def _MakeNotificationConfigFlagDict(self, pubsub, topic):
+    nc = ''
+    if pubsub is not None:
+      nc = 'pubsub={}'.format(pubsub)
+    if topic is not None:
+      if nc:
+        nc += ','
+      nc += 'pubsub-topic={}'.format(topic)
+    return nc
 
 
 class AlphaTestBase(BetaTestBase):

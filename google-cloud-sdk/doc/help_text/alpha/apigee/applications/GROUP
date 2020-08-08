@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha apigee applications - manage third-party applications which
+        call Apigee API proxies
+
+SYNOPSIS
+    gcloud alpha apigee applications COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage third-party applications which call Apigee API proxies.
+
+    gcloud alpha apigee applications manages applications that want to use APIs
+    exposed via Apigee.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe an Apigee application.
+
+     list
+        (ALPHA) List Apigee applications.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

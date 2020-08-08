@@ -11,7 +11,7 @@ gcloud compute instances import \- create Google Compute Engine virtual machine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances import\fR \fIINSTANCE_NAME\fR \fB\-\-source\-uri\fR=\fISOURCE_URI\fR [\fB\-\-async\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-os\fR=\fIOS\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances import\fR \fIINSTANCE_NAME\fR \fB\-\-source\-uri\fR=\fISOURCE_URI\fR [\fB\-\-async\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-os\fR=\fIOS\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -33,6 +33,8 @@ Create a VM instance using OVF metadata and imported disks and boot it.
 .RE
 .sp
 
+OVF import tool requires Cloud Build to be enabled. See
+https://cloud.google.com/compute/docs/import/import\-ovf\-files#enable\-cloud\-build
 Virtual machine instances, images and disks in Compute engine and files stored
 on Cloud Storage incur charges. See
 https://cloud.google.com/compute/docs/images/importing\-virtual\-disks#resource_cleanup.
@@ -103,6 +105,11 @@ Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
+
+.TP 2m
+\fB\-\-log\-location\fR=\fILOG_LOCATION\fR
+Directory in Cloud Storage to hold build logs. If not set, \f5gs://<project
+num>.cloudbuild\-logs.googleusercontent.com/\fR is created and used.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR

@@ -1,7 +1,6 @@
 NAME
     gcloud alpha compute instance-groups managed update-instances - immediately
-        update selected instances in a Google Compute Engine managed instance
-        group
+        update selected instances in a Compute Engine managed instance group
 
 SYNOPSIS
     gcloud alpha compute instance-groups managed update-instances NAME

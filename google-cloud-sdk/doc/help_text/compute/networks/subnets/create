@@ -10,8 +10,9 @@ SYNOPSIS
         [--logging-filter-expr=LOGGING_FILTER_EXPR]
         [--logging-flow-sampling=LOGGING_FLOW_SAMPLING]
         [--logging-metadata=LOGGING_METADATA]
-        [--logging-metadata-fields=[METADATA_FIELD,...]] [--purpose=PURPOSE]
-        [--region=REGION] [--role=ROLE]
+        [--logging-metadata-fields=[METADATA_FIELD,...]]
+        [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
+        [--purpose=PURPOSE] [--region=REGION] [--role=ROLE]
         [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -73,6 +74,11 @@ OPTIONAL FLAGS
         Can only be specified if VPC Flow Logs for this subnetwork is enabled
         and "metadata" is set to CUSTOM_METADATA. The comma-separated list of
         metadata fields that should be added to reported logs.
+
+     --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+        The private IPv6 google access type for the VMs in this subnet.
+        PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
+        enable-bidirectional-access, enable-outbound-vm-access.
 
      --purpose=PURPOSE
         The purpose of this subnetwork. PURPOSE must be one of:

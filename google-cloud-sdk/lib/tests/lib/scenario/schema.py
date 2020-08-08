@@ -186,6 +186,7 @@ class SetPropertyAction(Action):
     return cls(data.get('set_property', {}))
 
   def __init__(self, props):
+    super(SetPropertyAction, self).__init__()
     self.properties = props
 
   def Summary(self):
@@ -209,11 +210,12 @@ class WriteFileAction(Action):
     binary_contents = write_file_data.get('binary_contents')
     if (binary_contents is not None and
         isinstance(binary_contents, six.text_type)):
-      binary_contents = binary_contents.encode('utf8')
+      binary_contents = binary_contents.encode('utf-8')
 
     return cls(path, contents, binary_contents)
 
   def __init__(self, path, contents, binary_contents):
+    super(WriteFileAction, self).__init__()
     self._path = path
     self._contents = contents
     self._binary_contents = binary_contents
@@ -237,6 +239,7 @@ class LoadResourceAction(Action):
     return cls(path)
 
   def __init__(self, path):
+    super(LoadResourceAction, self).__init__()
     self._path = path
 
   def Execute(self, scenario_context):
@@ -260,6 +263,7 @@ class GenerateResourceIdAction(Action):
                action_data.get('delimiter', '-'))
 
   def __init__(self, reference, prefix, requires_cleanup, delimiter):
+    super(GenerateResourceIdAction, self).__init__()
     self._reference = reference
     self._prefix = prefix
     self._requires_cleanup = requires_cleanup
@@ -286,6 +290,7 @@ class DefineReferenceAction(Action):
          for t, v in action_data.get('track_values', {}).items()})
 
   def __init__(self, reference, value, track_values):
+    super(DefineReferenceAction, self).__init__()
     self._reference = reference
     self._value = value
     self._track_values = track_values
@@ -326,6 +331,7 @@ class ExecuteCommandUntilAction(Action):
                stderr,
                exponential_sleep_multiplier,
                wait_ceiling):
+    super(ExecuteCommandUntilAction, self).__init__()
     self._command = command
     self._retries = retries
     self._timeout = timeout
@@ -409,6 +415,7 @@ class ExecuteBinaryAction(Action):
     )
 
   def __init__(self, args, timeout, stdin, original_data):
+    super(ExecuteBinaryAction, self).__init__()
     self._args = args
     self._timeout = timeout
     self._stdin = stdin
@@ -464,6 +471,7 @@ class CommandExecutionAction(Action):
 
   def __init__(self, command, cleanup_for, validation_only,
                validate_remote_api_calls, label, original_event_data):
+    super(CommandExecutionAction, self).__init__()
     self.command = command
     self.cleanup_for = cleanup_for
     self.validation_only = validation_only

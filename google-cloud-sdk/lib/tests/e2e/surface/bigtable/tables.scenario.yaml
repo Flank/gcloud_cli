@@ -1,5 +1,48 @@
 title: tables e2e test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+  - stdout: |
+      columnFamilies:
+        do-not-delete-family: {}
+      granularity: MILLIS
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+- execute:
+  - command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view schema
+  - stdout: |
+      columnFamilies:
+        do-not-delete-family: {}
+      granularity: MILLIS
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+- execute:
+  - command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view name
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+- execute:
+  - command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view replication
+  - stdout: |
+      clusterStates:
+        cloud-bigtable-static-cluster:
+          replicationState: READY
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+- execute:
+  - command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view full
+  - stdout: |
+      clusterStates:
+        cloud-bigtable-static-cluster:
+          encryptionInfo:
+          - encryptionType: GOOGLE_DEFAULT_ENCRYPTION
+          replicationState: READY
+      columnFamilies:
+        do-not-delete-family: {}
+      granularity: MILLIS
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
 actions:
 - execute_command:
     command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
@@ -17,11 +60,9 @@ actions:
             name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
             columnFamilies:
               do-not-delete-family: {}
-              cf1: {}
             granularity: MILLIS
     - expect_stdout: |
         columnFamilies:
-          cf1: {}
           do-not-delete-family: {}
         granularity: MILLIS
         name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
@@ -44,11 +85,9 @@ actions:
             name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
             columnFamilies:
               do-not-delete-family: {}
-              cf1: {}
             granularity: MILLIS
     - expect_stdout: |
         columnFamilies:
-          cf1: {}
           do-not-delete-family: {}
         granularity: MILLIS
         name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
@@ -116,16 +155,18 @@ actions:
             clusterStates:
               cloud-bigtable-static-cluster:
                 replicationState: READY
+                encryptionInfo:
+                - encryptionType: GOOGLE_DEFAULT_ENCRYPTION
             columnFamilies:
               do-not-delete-family: {}
-              cf1: {}
             granularity: MILLIS
     - expect_stdout: |
         clusterStates:
           cloud-bigtable-static-cluster:
+            encryptionInfo:
+            - encryptionType: GOOGLE_DEFAULT_ENCRYPTION
             replicationState: READY
         columnFamilies:
-          cf1: {}
           do-not-delete-family: {}
         granularity: MILLIS
         name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table

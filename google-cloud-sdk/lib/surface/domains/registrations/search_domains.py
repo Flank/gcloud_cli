@@ -39,6 +39,9 @@ class SearchDomains(base.DescribeCommand):
 
   Search for available domains relevant to a specified query.
 
+  This command uses cached domain name availability information. Use the
+  get-register-params command to get up-to-date availability information.
+
   ## EXAMPLES
 
   To search for domains for ``my-new-project'', run:
@@ -58,7 +61,8 @@ class SearchDomains(base.DescribeCommand):
     parser.display_info.AddFormat(_FORMAT)
     base.Argument(
         'domain_query',
-        help='Domains search query.',
+        help=('Domain search query. '
+              'May be a domain name or arbitrary search terms.'),
     ).AddToParser(parser)
 
   def Run(self, args):
@@ -68,4 +72,13 @@ class SearchDomains(base.DescribeCommand):
     location_ref = args.CONCEPTS.location.Parse()
 
     # Sending the query direcyly to server (without normalization).
-    return client.SearchDomains(location_ref, args.domain_query)
+    suggestions = client.SearchDomains(location_ref, args.domain_query)
+    for s in suggestions:
+      try:
+        s.domainName = util.PunycodeToUnicode(s.domainName)
+      except UnicodeError:
+        pass  # Do not change the domain name.
+    if not suggestions:
+      messages = registrations.GetMessagesModule()
+      suggestions.append(messages.RegisterParameters())
+    return suggestions

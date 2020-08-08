@@ -36,7 +36,7 @@ class InstancesCreateCreateDiskTest(create_test_base.InstancesCreateTestBase):
         'compute instances create hamlet '
         '  --zone central2-a '
         '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
-        'image-project=debian-cloud,device-name=data,auto-delete=yes')
+        'image-project=debian-cloud,device-name=data,auto-delete=yes,boot=yes')
 
     self.CheckRequests(
         self.zone_get_request,
@@ -50,13 +50,6 @@ class InstancesCreateCreateDiskTest(create_test_base.InstancesCreateTestBase):
                       m.AttachedDisk(
                           autoDelete=True,
                           boot=True,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=self._default_image,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
                           deviceName='data',
                           initializeParams=m.AttachedDiskInitializeParams(
                               diskName='disk-1',
@@ -387,8 +380,8 @@ class InstancesCreateDiskTestBeta(create_test_base.InstancesCreateTestBase):
         'compute instances create testrp '
         '  --zone central2-a '
         '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
-        'image-project=debian-cloud,device-name=data,auto-delete=yes,'
-        'disk-resource-policy='
+        'image-project=debian-cloud,device-name=data,auto-delete=yes,boot=yes,'
+        'multi-writer=yes,disk-resource-policy='
         'https://compute.googleapis.com/compute/projects/'
         'cloudsdktest/regions/central2-a/resourcePolicies/testpolicy',
         self.track)
@@ -405,13 +398,6 @@ class InstancesCreateDiskTestBeta(create_test_base.InstancesCreateTestBase):
                       m.AttachedDisk(
                           autoDelete=True,
                           boot=True,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=self._default_image,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
                           deviceName='data',
                           initializeParams=m.AttachedDiskInitializeParams(
                               diskName='disk-1',
@@ -423,6 +409,7 @@ class InstancesCreateDiskTestBeta(create_test_base.InstancesCreateTestBase):
                               diskType=(self.compute_uri +
                                         '/projects/my-project/zones/central2-a/'
                                         'diskTypes/SSD'),
+                              multiWriter=True,
                               resourcePolicies=[
                                   'https://compute.googleapis.com/'
                                   'compute/projects/'

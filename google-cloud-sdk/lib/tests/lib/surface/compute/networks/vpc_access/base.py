@@ -92,3 +92,7 @@ class VpcAccessUnitTestBase(sdk_test_base.WithFakeAuth, _VpcAccessBase):
     self.ip_cidr_range = '10.132.0.0/28'
     self.min_throughput = 200
     self.max_throughput = 300
+    self.patch_min_throughput = 300
+    self.patch_max_throughput = 400
+    self.max_throughput_field = 'maxThroughput'
+    self.min_throughput_field = 'minThroughput'

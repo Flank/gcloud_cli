@@ -36,16 +36,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine network.
+        (ALPHA) Create a Compute Engine network.
 
      delete
-        (ALPHA) Delete Google Compute Engine networks.
+        (ALPHA) Delete Compute Engine networks.
 
      describe
-        (ALPHA) Describe a Google Compute Engine network.
+        (ALPHA) Describe a Compute Engine network.
 
      get-effective-firewalls
-        (ALPHA) Get the effective firewalls of a Google Compute Engine network.
+        (ALPHA) Get the effective firewalls of a Compute Engine network.
 
      list
         (ALPHA) List Google Compute Engine networks.
@@ -57,7 +57,7 @@ COMMANDS
         (ALPHA) List IP owners in a network.
 
      update
-        (ALPHA) Update a Google Compute Engine network.
+        (ALPHA) Update a Compute Engine network.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

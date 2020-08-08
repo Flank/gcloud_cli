@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import json
 from googlecloudsdk.command_lib.apigee import errors
 from googlecloudsdk.command_lib.apigee import request
+from googlecloudsdk.core import properties
 from tests.lib.surface.apigee import base
 
 
@@ -60,6 +61,16 @@ class RequestTest(base.ApigeeIsolatedTest):
     self.assertEqual(
         json.dumps(test_data)[3:], response,
         "Must receive the same binary data sent in response.")
+
+  def testNonstandardEndpont(self):
+    test_data = ["hello", "world"]
+    properties.VALUES.api_endpoint_overrides.apigee.Set(
+        "https://api.enterprise.apigee.com/")
+    self.AddHTTPResponse(
+        "https://api.enterprise.apigee.com/v1/organizations",
+        body=json.dumps(test_data))
+    response = request.ResponseToApiRequest({}, [], "organization")
+    self.assertEqual(test_data, response)
 
   def testQueryParameters(self):
     test_data = {"what": ["a", "B", 3], "test": "testOtherResponseFormats"}

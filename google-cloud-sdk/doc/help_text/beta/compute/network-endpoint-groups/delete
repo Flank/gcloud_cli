@@ -1,13 +1,13 @@
 NAME
-    gcloud beta compute network-endpoint-groups delete - delete a Google
-        Compute Engine network endpoint group
+    gcloud beta compute network-endpoint-groups delete - delete a Compute
+        Engine network endpoint group
 
 SYNOPSIS
     gcloud beta compute network-endpoint-groups delete NAME
-        [--global | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--global | --region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Delete a Google Compute Engine network endpoint group.
+    (BETA) Delete a Compute Engine network endpoint group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -18,6 +18,26 @@ FLAGS
 
        --global
           If set, the network endpoint group is global.
+
+       --region=REGION
+          Region of the network endpoint group to operate on. If not specified,
+          you may be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
 
        --zone=ZONE
           Zone of the network endpoint group to operate on. If not specified

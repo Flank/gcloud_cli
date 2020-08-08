@@ -122,7 +122,7 @@ class GetAndValidateArgsTest(test_case.TestCase):
 class IsValidLabelKeyTest(subtests.Base, test_case.WithOutputCapture):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def RunSubTest(self, string):
     result = labels_util.IsValidLabelKey(string)
@@ -160,12 +160,14 @@ class IsValidLabelKeyTest(subtests.Base, test_case.WithOutputCapture):
     Test(False, 't!')
     Test(False, 't>')
     Test(False, 'yÖ')
+    Test(False,
+         'toolooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong')
 
 
 class IsValidLabelValueTest(subtests.Base, test_case.WithOutputCapture):
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def RunSubTest(self, string):
     result = labels_util.IsValidLabelValue(string)

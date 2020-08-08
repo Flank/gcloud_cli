@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha compute instances ops-agents - manage Operation Suite (Ops)
+        agents for Compute Engine VM instances
+
+SYNOPSIS
+    gcloud alpha compute instances ops-agents GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Operation Suite (Ops) agents for Compute Engine VM
+    instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     policies
+        (ALPHA) Manage Operation Suite (Ops) agents policies that install,
+        update, and uninstall agents for Compute Engine VM instances.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

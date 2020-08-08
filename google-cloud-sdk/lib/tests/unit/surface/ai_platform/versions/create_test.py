@@ -70,7 +70,9 @@ class CreateTestBase(object):
                     response=None,
                     accelerator=None,
                     service_account=None,
-                    explain_config=None):
+                    explain_config=None,
+                    container=None,
+                    routes=None):
     if framework:
       framework = self.short_msgs.Version.FrameworkValueValuesEnum(framework)
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -92,7 +94,9 @@ class CreateTestBase(object):
                 packageUris=package_uris or [],
                 pythonVersion=python_version,
                 serviceAccount=service_account,
-                explanationConfig=explain_config)),
+                explanationConfig=explain_config,
+                container=container,
+                routes=routes)),
         response=response or op)
 
   def testCreate(self, module_name):
@@ -290,6 +294,40 @@ class CreateTestBase(object):
              '--config {}'.format(module_name, yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
+  def testCreateMachineTypeFlag(self, module_name):
+    self._ExpectCreate(machine_type='mls1-c1-m2')
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file --machine-type=mls1-c1-m2'.format(
+                 module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testCreateNewMachineTypeWithAccelerator(self, module_name):
+    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
+        count=2,
+        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
+              .NVIDIA_TESLA_K80))
+    self._ExpectCreate(
+        accelerator=accelerator_config, machine_type='n1-standard-4')
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--machine-type=n1-standard-4 '
+             '--accelerator=type=nvidia-tesla-k80,count=2'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testCreateAcceleratorFlag(self, module_name):
+    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
+        count=2,
+        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
+              .NVIDIA_TESLA_K80))
+    self._ExpectCreate(accelerator=accelerator_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--accelerator type=nvidia-tesla-k80,count=2'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
 
 class CreateGaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
@@ -303,15 +341,6 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
   def SetUp(self):
     super(CreateBetaTest, self).SetUp()
     self.track = calliope_base.ReleaseTrack.BETA
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateMachineTypeFlag(self, module_name):
-    self._ExpectCreate(machine_type='mls1-c1-m2')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file --machine-type=mls1-c1-m2'.format(
-                 module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
 
   @parameterized.parameters('ml-engine', 'ai-platform')
   def testUserCode(self, module_name):
@@ -367,34 +396,6 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
   @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateAcceleratorFlag(self, module_name):
-    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
-        count=2,
-        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
-              .NVIDIA_TESLA_K80))
-    self._ExpectCreate(accelerator=accelerator_config)
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--accelerator type=nvidia-tesla-k80,count=2'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateNewMachineTypeWithAccelerator(self, module_name):
-    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
-        count=2,
-        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
-              .NVIDIA_TESLA_K80))
-    self._ExpectCreate(
-        accelerator=accelerator_config, machine_type='n1-standard-4')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--machine-type=n1-standard-4 '
-             '--accelerator=type=nvidia-tesla-k80,count=2'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
   def testCreateExplainabilityIntegratedGradients(self, module_name):
     explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
     ig_config = self.msgs.GoogleCloudMlV1IntegratedGradientsAttribution()
@@ -444,34 +445,6 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateMachineTypeFlag(self, module_name):
-    self._ExpectCreate(machine_type='mls1-c1-m2')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file --machine-type=mls1-c1-m2'.format(
-                 module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateMachineTypeFromConfig(self, module_name):
-    yaml_contents = """\
-        description: dummy description
-        deploymentUri: gs://foo/bar
-        runtimeVersion: '1.0'
-        machineType: 'mls1-c1-m2'
-    """
-    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
-    self._ExpectCreate(
-        runtime_version='1.0',
-        deployment_uri='gs://foo/bar',
-        description='dummy description',
-        machine_type='mls1-c1-m2')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--config {}'.format(module_name, yaml_path))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
   def testPythonVersionFlag(self, module_name):
     self._ExpectCreate(python_version='2.7')
     self._ExpectOperationPolling()
@@ -495,35 +468,6 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self._ExpectOperationPolling()
     self.Run('{} versions create versionId --model modelId '
              '--config {}'.format(module_name, yaml_path))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateAcceleratorFlag(self, module_name):
-    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
-        count=2,
-        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.
-              TypeValueValuesEnum.NVIDIA_TESLA_K80)
-        )
-    self._ExpectCreate(accelerator=accelerator_config)
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--accelerator type=nvidia-tesla-k80,count=2'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateNewMachineTypeWithAccelerator(self, module_name):
-    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
-        count=2,
-        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
-              .NVIDIA_TESLA_K80))
-    self._ExpectCreate(
-        accelerator=accelerator_config, machine_type='n1-standard-4')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--machine-type=n1-standard-4 '
-             '--accelerator=type=nvidia-tesla-k80,count=2'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
   @parameterized.parameters('ml-engine', 'ai-platform')
@@ -567,6 +511,247 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
              '--explanation-method sampled-shapley '
              '--num-paths 42'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateFromConfigWithContainers(self, module_name):
+    yaml_contents = """\
+        container:
+          image: tensorflow/serving:2.1.0
+          args: [
+            "--rest_api_port=8080",
+            "--model_name=mymodel",
+            "--model_base_path=$(AIP_STORAGE_URI)"
+          ]
+        routes:
+          predict: /v1/models/mymodel:predict
+          health: /v1/models/mymodel
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    # Must explicitly set deploymentUri to None because the default is not
+    # None and it would be unwise to change the default.
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='tensorflow/serving:2.1.0',
+            args=[
+                '--rest_api_port=8080', '--model_name=mymodel',
+                '--model_base_path=$(AIP_STORAGE_URI)'
+            ]),
+        routes=self.short_msgs.RouteMap(
+            predict='/v1/models/mymodel:predict', health='/v1/models/mymodel'))
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--config {}'.format(module_name, yaml_path))
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithImage(self, module_name):
+    self._ExpectCreate(
+        deployment_uri='gs://path/to/file',
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0'))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--origin gs://path/to/file '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithSimpleCommand(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            command=['/bin/bash']))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--command=/bin/bash'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithTwoSeparateCommands(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            command=['/bin/bash', '-c']))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--command=/bin/bash --command=-c'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithCsvCommand(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            command=['/bin/bash', '-c']))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--command /bin/bash,-c'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithCsvArgs(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            args=['--arg1', '--arg2=a']))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--args=--arg1,--arg2=a'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithMultipleArgs(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            args=['--arg1', '--arg2=a']))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--args=--arg1 --args=--arg2=a'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithEnvVars(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            env=[
+                self.short_msgs.EnvVar(name='A', value='a'),
+                self.short_msgs.EnvVar(name='B', value='b')
+            ]))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--env-vars=A=a,B=b'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithMultipleEnvVars(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            env=[
+                self.short_msgs.EnvVar(name='A', value='a'),
+                self.short_msgs.EnvVar(name='B', value='b')
+            ]))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--env-vars=A=a --env-vars=B=b'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithSinglePort(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            ports=[self.short_msgs.ContainerPort(containerPort=3141)]))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--ports=3141'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithMultiplePorts(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0',
+            ports=[
+                self.short_msgs.ContainerPort(containerPort=3141),
+                self.short_msgs.ContainerPort(containerPort=1234)
+            ]))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--ports=3141,1234'
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithRoutes(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0'),
+        routes=self.short_msgs.RouteMap(predict='/a/b/c', health='/x/y/z'))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        '--predict-route=/a/b/c '
+        '--health-route=/x/y/z '
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateVersionWithImageNoOrigin(self, module_name):
+    self._ExpectCreate(
+        deployment_uri=None,
+        container=self.short_msgs.ContainerSpec(
+            image='gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0'))
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--image gcr.io/op-beta-walkthrough/tensorflow-serving:2.1.0 '
+        .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  # Note: Since we inherit from the GA Base class, we need to override the
+  # original test to check for the new error message. This would be better
+  # named testCreateMissingDeploymentUriAndImage.
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateMissingDeploymentUri(self, module_name):
+    with self.AssertRaisesExceptionMatches(
+        versions_util.InvalidArgumentCombinationError,
+        'Either `--origin`, `--image`, or equivalent parameters in a config '
+        'file (from `--config`) must be specified.'):
+      self.Run(
+          '{} versions create versionId --model modelId'.format(module_name))
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateWithCommandAndArgsButNotImage(self, module_name):
+    with self.AssertRaisesExceptionMatches(
+        ValueError,
+        '--image was not provided, but other container related flags were '
+        'specified. Please specify --image or remove the following flags: '
+        '--args, --command'):
+      self.Run(
+          '{} versions create versionId --model modelId '
+          '--command /bin/bash --args=--a,--b'.format(module_name))
 
 
 if __name__ == '__main__':

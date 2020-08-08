@@ -1,6 +1,6 @@
 NAME
-    gcloud compute network-endpoint-groups create - create a Google Compute
-        Engine network endpoint group
+    gcloud compute network-endpoint-groups create - create a Compute Engine
+        network endpoint group
 
 SYNOPSIS
     gcloud compute network-endpoint-groups create NAME
@@ -10,7 +10,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create a Google Compute Engine network endpoint group.
+    Create a Compute Engine network endpoint group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -22,9 +22,9 @@ FLAGS
         network endpoint.
 
         If this flag isn't specified for a NEG with endpoint type
-        GCE_VM_IP_PORT, then every network endpoint in the network endpoint
+        gce-vm-ip-port, then every network endpoint in the network endpoint
         group must have a port specified. For a NEG with endpoint type
-        INTERNET_IP_PORT and INTERNET_FQDN_PORT. If the default port is not
+        internet-ip-port and internet-fqdn-port. If the default port is not
         specified the well known port for your backend protocol will be used
         (80 for http, 443 for https).
 
@@ -32,35 +32,32 @@ FLAGS
         Name of the network in which the NEG is created. default project
         network is used if unspecified.
 
-        This is only supported for NEGs with endpoint type GCE_VM_IP_PORT.
+        This is only supported for NEGs with endpoint type gce-vm-ip-port.
 
      --network-endpoint-type=NETWORK_ENDPOINT_TYPE; default="gce-vm-ip-port"
         Determines the spec of endpoints attached to this group.
 
-        * GCE_VM_IP_PORT
+         gce-vm-ip-port
+            Endpoint IP address must belong to a VM in Google Compute Engine
+            (either the primary IP or as part of an aliased IP range). The
+            --default-port must be specified or every network endpoint in the
+            network endpoint group must have a port specified.
 
-              Endpoint IP address must belong to a VM in Google Compute Engine
-              (either the primary IP or as part of an aliased IP range).
-              The `--default-port` must be specified or every network endpoint
-              in the network endpoint group must have a port specified.
+         internet-ip-port
+            Endpoint IP address must be publicly routable address. The default
+            port will be used if specified. If the default port is not
+            specified, the well known port for your backend protocol will be
+            used as the default port (80 for http, 443 for https).
 
-        * INTERNET_IP_PORT
+         internet-fqdn-port
+            Endpoint FQDN must be resolvable to a public IP address via public
+            DNS. The default port will be used if specified. If the default
+            port is not specified, the well known port for your backend
+            protocol will be used as the default port (80 for http, 443 for
+            https).
 
-              Endpoint IP address must be publicly routable address. The default
-              port will be used if specified. If the default port is not
-              specified, the well known port for your backend protocol will be
-              used as the default port (80 for http,  443 for https).
-
-        * INTERNET_FQDN_PORT
-
-              Endpoint FQDN must be resolvable to a public IP address via public
-              DNS. The default port will be used if specified. If the default
-              port is not specified, the well known port for your backend
-              protocol will be used as the default port (80 for http, 443 for
-              https).
-
-    NETWORK_ENDPOINT_TYPE must be one of: gce-vm-ip-port, internet-ip-port,
-    internet-fqdn-port.
+            NETWORK_ENDPOINT_TYPE must be one of: gce-vm-ip-port,
+            internet-ip-port, internet-fqdn-port.
 
      --subnet=SUBNET
         Name of the subnet to which all network endpoints belong.
@@ -68,7 +65,7 @@ FLAGS
         If not specified, network endpoints may belong to any subnetwork in the
         region where the network endpoint group is created.
 
-        This is only supported for NEGs with endpoint type GCE_VM_IP_PORT.
+        This is only supported for NEGs with endpoint type gce-vm-ip-port.
 
      At most one of these may be specified:
 

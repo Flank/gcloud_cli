@@ -24,6 +24,34 @@ summary:
     - status: SUCCESS
   - stderr: |
       Created repository [my-repo].
+- execute:
+  - command: artifacts repositories create my-repo --project=my-project --repository-format=docker
+      --location=us-east1 --description="My cmek repo" --kms-key=projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
+  - stderr: |
+      Create request issued for: [my-repo]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created repository [my-repo].
+  - prompt:
+    - prompt_string: |2-
+
+        Do you want to grant the Artifact Registry Service Account permission to encrypt/decrypt with the selected key [projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key]
+    - input: y
+  - stderr: |
+      Added Cloud KMS CryptoKey Encrypter/Decrypter Role to [projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key]
+- execute:
+  - command: artifacts repositories create my-repo --project=my-project --repository-format=docker
+      --location=us-east1 --description="My cmek repo with service account already
+      set up" --kms-key=projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
+  - stderr: |
+      Create request issued for: [my-repo]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created repository [my-repo].
 actions:
 - execute_command:
     command: artifacts repositories create my-repo --project=my-project --repository-format=maven
@@ -140,6 +168,319 @@ actions:
                   "createTime": "2019-05-23T19:35:43.114453Z",
                   "format": "MAVEN",
                   "description": "My test repo",
+                  "name": "projects/my-repo/locations/us-east1/repositories/my-repo",
+                  "updateTime": "2019-05-23T19:35:43.114453Z"
+                }
+            }
+    - expect_stderr: |
+        Created repository [my-repo].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories create my-repo --project=my-project --repository-format=docker
+      --location=us-east1 --description="My cmek repo" --kms-key=projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-east1
+              locationId: us-east1
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/my-project/locations/us-east1/repositories/my-repo
+              format: DOCKER
+              description: My cmek repo
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "name": "projects/my-project/locations/us-east1/repositories/my-repo",
+                "format": "DOCKER",
+                "description": "My cmek repo",
+                "kmsKeyName": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key"
+              }
+            }
+    - expect_stderr: |
+        Create request issued for: [my-repo]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "repository":
+                {
+                  "createTime": "2019-05-23T19:35:43.114453Z",
+                  "format": "DOCKJR",
+                  "description": "My cmek repo",
+                  "name": "projects/my-repo/locations/us-east1/repositories/my-repo",
+                  "updateTime": "2019-05-23T19:35:43.114453Z",
+                  "kmsKeyName": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key"
+                }
+            }
+    - expect_stderr: |
+        Created repository [my-repo].
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/my-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "projectId": "my-project",
+              "projectNumber": 123456
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key:getIamPolicy?alt=json&options.requestedPolicyVersion=3
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_prompt_continue:
+        prompt_string: |2-
+
+          Do you want to grant the Artifact Registry Service Account permission to encrypt/decrypt with the selected key [projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key:getIamPolicy?alt=json&options.requestedPolicyVersion=3
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - serviceAccount:service-123456@gcp-sa-artifactregistry.iam.gserviceaccount.com
+                  role: roles/cloudkms.cryptoKeyEncrypterDecrypter
+                version: 3
+              updateMask: bindings,etag,version
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Added Cloud KMS CryptoKey Encrypter/Decrypter Role to [projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key]
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories create my-repo --project=my-project --repository-format=docker
+      --location=us-east1 --description="My cmek repo with service account already
+      set up" --kms-key=projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-east1
+              locationId: us-east1
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/my-project/locations/us-east1/repositories/my-repo
+              format: DOCKER
+              description: My cmek repo with service account already set up
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "name": "projects/my-project/locations/us-east1/repositories/my-repo",
+                "format": "DOCKER",
+                "description": "My cmek repo with service account already set up",
+                "kmsKeyName": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key"
+              }
+            }
+    - expect_stderr: |
+        Create request issued for: [my-repo]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "repository":
+                {
+                  "createTime": "2019-05-23T19:35:43.114453Z",
+                  "format": "DOCKJR",
+                  "description": "My cmek repo with service account already set up",
+                  "name": "projects/my-repo/locations/us-east1/repositories/my-repo",
+                  "updateTime": "2019-05-23T19:35:43.114453Z",
+                  "kmsKeyName": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key"
+                }
+            }
+    - expect_stderr: |
+        Created repository [my-repo].
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/my-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "projectId": "my-project",
+              "projectNumber": 123456
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key:getIamPolicy?alt=json&options.requestedPolicyVersion=3
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "bindings": [
+                {
+                  "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+                  "members": [
+                    "user:owner@gmail.com",
+                    "serviceAccount:service-123456@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+                  ]
+                }
+              ],
+              "version": 1
+            }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories create my-repo --project=my-project --repository-format=apt
+      --location=us-east1  --description="My apt repo"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-east1
+              locationId: us-east1
+    - expect_stderr: |+
+        Note: APT package support is in Alpha.
+
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/my-project/locations/us-east1/repositories/my-repo
+              format: APT
+              description: My apt repo
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "name": "projects/my-project/locations/us-east1/repositories/my-repo",
+                "format": "APT",
+                "description": "My test repo"
+              }
+            }
+    - expect_stderr: |
+        Create request issued for: [my-repo]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "repository":
+                {
+                  "createTime": "2019-05-23T19:35:43.114453Z",
+                  "format": "APT",
+                  "description": "My apt repo",
                   "name": "projects/my-repo/locations/us-east1/repositories/my-repo",
                   "updateTime": "2019-05-23T19:35:43.114453Z"
                 }

@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute networks subnets update - updates properties of an
-        existing Google Compute Engine subnetwork
+        existing Compute Engine subnetwork
 
 SYNOPSIS
     gcloud alpha compute networks subnets update NAME
@@ -15,14 +15,12 @@ SYNOPSIS
         [--region=REGION]
         [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
           | --[no-]enable-private-ip-google-access
-          | --[no-]enable-private-ipv6-access
-          | --remove-secondary-ranges=PROPERTY=VALUE,[...] | --role=ROLE
-          | --private-ipv6-google-access-service-accounts=[EMAIL,...]
-          --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
+          | --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+          | --remove-secondary-ranges=PROPERTY=VALUE,[...] | --role=ROLE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Updates properties of an existing Google Compute Engine subnetwork.
+    (ALPHA) Updates properties of an existing Compute Engine subnetwork.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -137,10 +135,10 @@ FLAGS
             --enable-private-ip-google-access to enable and
             --no-enable-private-ip-google-access to disable.
 
-         --[no-]enable-private-ipv6-access
-            Enable/disable private IPv6 access for the subnet. Use
-            --enable-private-ipv6-access to enable and
-            --no-enable-private-ipv6-access to disable.
+         --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+            The private IPv6 google access type for the VMs in this subnet.
+            PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
+            enable-bidirectional-access, enable-outbound-vm-access.
 
          --remove-secondary-ranges=PROPERTY=VALUE,[...]
             Removes secondary ranges from the subnetwork.
@@ -161,24 +159,6 @@ FLAGS
 
              ACTIVE
                 The ACTIVE subnet that is currently used.
-
-         --private-ipv6-google-access-service-accounts=[EMAIL,...]
-            The service accounts can be used to selectively turn on Private
-            IPv6 Google Access only on the VMs primary service account matching
-            the value.
-
-            Setting this will override the existing Private IPv6 Google Access
-            service accounts for the subnetwork. The following will clear the
-            existing Private IPv6 Google Access service accounts:
-
-            $ gcloud alpha compute networks subnets update MY-SUBNET \
-            --private-ipv6-google-access-service-accounts ''
-
-         --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
-            The private IPv6 google access type for the VMs in this subnet.
-            PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
-            enable-bidirectional-access, enable-outbound-vm-access,
-            enable-outbound-vm-access-for-service-accounts.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute interconnects delete - delete Google Compute Engine
+    gcloud alpha compute interconnects delete - delete Compute Engine
         interconnects
 
 SYNOPSIS
@@ -7,8 +7,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute interconnects delete deletes Google Compute
-    Engine interconnects. Interconnects        can only be deleted when no other resources (e.g.,
+    (ALPHA) gcloud alpha compute interconnects delete deletes Compute Engine
+    interconnects. Interconnects        can only be deleted when no other resources (e.g.,
         InterconnectAttachments) refer to them.
 
 POSITIONAL ARGUMENTS

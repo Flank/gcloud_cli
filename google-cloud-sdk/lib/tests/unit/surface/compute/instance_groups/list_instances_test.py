@@ -20,9 +20,13 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.api_lib.util import apis as core_apis
+from tests.lib import cli_test_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
+import mock
 
 
 class InstanceGroupsListInstancesTest(test_base.BaseTest):
@@ -30,9 +34,8 @@ class InstanceGroupsListInstancesTest(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi('v1')
     self.make_requests.side_effect = iter([
-        [self.messages.InstanceGroupsListInstances(
-            items=test_resources.MakeInstancesInInstanceGroup(
-                self.messages, self.resource_api))],
+        test_resources.MakeInstancesInInstanceGroup(
+            self.messages, self.resource_api),
     ])
 
   def testListInstances(self):
@@ -180,9 +183,8 @@ class InstanceGroupsListInstancesTest(test_base.BaseTest):
         [self.messages.Region(name='central2')],
         [self.messages.Zone(name='central2-a'),
          self.messages.Zone(name='central2-b')],
-        [self.messages.InstanceGroupsListInstances(
-            items=test_resources.MakeInstancesInInstanceGroup(
-                self.messages, 'v1'))],
+        test_resources.MakeInstancesInInstanceGroup(
+            self.messages, 'v1'),
     ])
     self.WriteInput('1\n')
     self.Run("""
@@ -207,6 +209,74 @@ class InstanceGroupsListInstancesTest(test_base.BaseTest):
             inst-2 central2-a RUNNING
             inst-3 central2-a STOPPED
             """), normalize_space=True)
+
+
+class InstanceGroupsListInstancesPaginationTest(
+    sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+
+  API_VERSION = 'v1'
+
+  def SetUp(self):
+    self.messages = core_apis.GetMessagesModule('compute', self.API_VERSION)
+    batch_make_requests_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.batch_helper.MakeRequests',
+        autospec=True)
+    self.addCleanup(batch_make_requests_patcher.stop)
+    self.batch_make_requests = batch_make_requests_patcher.start()
+
+  def testListInstancesWithPagination(self):
+    items = test_resources.MakeInstancesInManagedInstanceGroup(
+        self.messages, self.API_VERSION)
+
+    self.batch_make_requests.side_effect = iter([
+        [[self.messages.InstanceGroupManagersListManagedInstancesResponse(
+            managedInstances=[items[0], items[1]], nextPageToken='token-1')],
+         []],
+        [[self.messages.InstanceGroupManagersListManagedInstancesResponse(
+            managedInstances=[items[2], items[3]],)],
+         []]
+    ])
+
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --zone central2-a
+        """)
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION      INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE        template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING  template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING    template-2        yyy
+            inst-4 central2-a                      CREATING    template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+  def testListInstancesWithoutPagination(self):
+    items = test_resources.MakeInstancesInManagedInstanceGroup(
+        self.messages, self.API_VERSION)
+
+    self.batch_make_requests.side_effect = iter([
+        [[self.messages.InstanceGroupManagersListManagedInstancesResponse(
+            managedInstances=[items[0], items[1]],)],
+         []],
+        [[self.messages.InstanceGroupManagersListManagedInstancesResponse(
+            managedInstances=[items[2], items[3]],)],
+         []]
+    ])
+
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --zone central2-a
+        """)
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION      INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE        template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING  template-1
+            """),
+        normalize_space=True)
 
 if __name__ == '__main__':
   test_case.main()

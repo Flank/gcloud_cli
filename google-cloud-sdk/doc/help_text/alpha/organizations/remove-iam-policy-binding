@@ -47,8 +47,8 @@ OPTIONAL FLAGS
           conditions.
 
        --condition=[KEY=VALUE,...]
-          Condition of the binding to be removed. When condition is explicitly
-          specified as None (e.g. --condition=None), it matches a binding
+          The condition of the binding to be removed. When the condition is
+          explicitly specified as None (--condition=None), it matches a binding
           without a condition. Otherwise, only the binding with a condition
           which exactly matches the specified condition (including the optional
           description) will be removed.
@@ -58,12 +58,10 @@ OPTIONAL FLAGS
           False. This uses a subset of Common Expression Language syntax.
 
        title
-          (Required) Title for the expression, i.e. a short string describing
-          its purpose.
+          (Required) A short string describing the purpose of the expression.
 
        description
-          (Optional) Description for the expression. This is a longer text
-          which describes the expression.
+          (Optional) Additional description for the expression.
 
           NOTE: An unsatisfied condition will not allow access via this
           binding.

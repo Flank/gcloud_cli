@@ -266,6 +266,15 @@ class SubscriptionsPullBetaTest(SubscriptionsPullGATest):
     self.svc = self.client.projects_subscriptions.Pull
     self.ack_svc = self.client.projects_subscriptions.Acknowledge
 
+  def _GetMessageOutput(self,
+                        data,
+                        msg_id,
+                        ack_id,
+                        ordering_key='',
+                        delivery_attempt=''):
+    return '%s | %d | %s | | %s | %s' % (data, msg_id, ordering_key,
+                                         delivery_attempt, ack_id)
+
   def testSubscriptionsPullMaxMessagesDeprecated(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
 
@@ -300,48 +309,6 @@ class SubscriptionsPullBetaTest(SubscriptionsPullGATest):
         exceptions.ConflictingArgumentsException,
         'arguments not allowed simultaneously: --max-messages, --limit'):
       self.Run('pubsub subscriptions pull subs1 --max-messages 5 --limit 20')
-
-  def testSubscriptionsPullNoDeprecatedArgs(self):
-    pass
-
-
-class SubscriptionsPullAlphaTest(SubscriptionsPullBetaTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    properties.VALUES.core.user_output_enabled.Set(True)
-    self.svc = self.client.projects_subscriptions.Pull
-    self.ack_svc = self.client.projects_subscriptions.Acknowledge
-
-  def _GetMessageOutput(self,
-                        data,
-                        msg_id,
-                        ack_id,
-                        ordering_key='',
-                        delivery_attempt=''):
-    return '%s | %d | %s | | %s | %s' % (data, msg_id, ordering_key,
-                                         delivery_attempt, ack_id)
-
-  def testSubscriptionsPullWithWait(self):
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    exp_received_message = self.msgs.ReceivedMessage(
-        ackId='000', message=self.messages[0], deliveryAttempt=0)
-    exp_received_message.message.messageId = '1234567'
-
-    self.svc.Expect(
-        request=self.msgs.PubsubProjectsSubscriptionsPullRequest(
-            pullRequest=self.msgs.PullRequest(
-                maxMessages=1, returnImmediately=False),
-            subscription=sub_ref.RelativeName()),
-        response=self.msgs.PullResponse(
-            receivedMessages=[exp_received_message]))
-
-    self.Run('pubsub subscriptions pull subs1 --wait')
-
-    self.AssertOutputContains(
-        self._GetMessageOutput(
-            'Hello, World!', 1234567, '000', delivery_attempt=0),
-        normalize_space=True)
 
   def testSubscriptionsPullWithDeliveryAttempt(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -452,6 +419,40 @@ class SubscriptionsPullAlphaTest(SubscriptionsPullBetaTest):
 
   def testSubscriptionsPullNoDeprecatedArgs(self):
     pass
+
+
+class SubscriptionsPullAlphaTest(SubscriptionsPullBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    properties.VALUES.core.user_output_enabled.Set(True)
+    self.svc = self.client.projects_subscriptions.Pull
+    self.ack_svc = self.client.projects_subscriptions.Acknowledge
+
+  def testSubscriptionsPullWithWait(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    exp_received_message = self.msgs.ReceivedMessage(
+        ackId='000', message=self.messages[0], deliveryAttempt=0)
+    exp_received_message.message.messageId = '1234567'
+
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsSubscriptionsPullRequest(
+            pullRequest=self.msgs.PullRequest(
+                maxMessages=1, returnImmediately=False),
+            subscription=sub_ref.RelativeName()),
+        response=self.msgs.PullResponse(
+            receivedMessages=[exp_received_message]))
+
+    self.Run('pubsub subscriptions pull subs1 --wait')
+
+    self.AssertOutputContains(
+        self._GetMessageOutput(
+            'Hello, World!', 1234567, '000', delivery_attempt=0),
+        normalize_space=True)
+
+  def testSubscriptionsPullNoDeprecatedArgs(self):
+    pass
+
 
 if __name__ == '__main__':
   test_case.main()

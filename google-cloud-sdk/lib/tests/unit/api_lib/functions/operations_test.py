@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,7 +61,7 @@ class FunctionsOperationsTest(test_case.TestCase):
 
   def testGetOperationErrorUtf8(self):
     message = _UNICODE_MESSAGE
-    error = _MockHttpException(400, message=message.encode('utf8'))
+    error = _MockHttpException(400, message=message.encode('utf-8'))
     actual = operations.OperationErrorToString(error)
     self.assertTrue(message in actual)
 

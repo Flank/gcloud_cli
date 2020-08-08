@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute commitments describe - describe a Google Compute Engine
+    gcloud beta compute commitments describe - describe a Compute Engine
         commitment
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Describe a Google Compute Engine commitment.
+    (BETA) Describe a Compute Engine commitment.
 
 POSITIONAL ARGUMENTS
      COMMITMENT

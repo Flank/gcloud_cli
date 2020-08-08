@@ -33,6 +33,9 @@ COMMANDS
      add-iam-policy-binding
         (BETA) Add IAM policy binding for a project.
 
+     create
+        (BETA) Create a new project.
+
      delete
         (BETA) Delete a project.
 

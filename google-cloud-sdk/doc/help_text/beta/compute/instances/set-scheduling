@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute instances set-scheduling INSTANCE_NAME
         [--clear-min-node-cpu] [--maintenance-policy=MAINTENANCE_POLICY]
-        [--min-node-cpu=MIN_NODE_CPU] [--[no-]restart-on-failure] [--zone=ZONE]
+        [--min-node-cpu=MIN_NODE_CPU] [--preemptible]
+        [--[no-]restart-on-failure] [--zone=ZONE]
         [--clear-node-affinities | --node=NODE
           | --node-affinity-file=NODE_AFFINITY_FILE | --node-group=NODE_GROUP]
         [GCLOUD_WIDE_FLAG ...]
@@ -42,9 +43,16 @@ FLAGS
         Minimum number of virtual CPUs this instance will consume when running
         on a sole-tenant node.
 
+     --preemptible
+        If provided, instances will be preemptible and time-limited. Instances
+        may be preempted to free up resources for standard VM instances, and
+        will only be able to run for a limited amount of time. Preemptible
+        instances can not be restarted and will not migrate.
+
      --[no-]restart-on-failure
         The instances will be restarted if they are terminated by Compute
-        Engine. This does not affect terminations performed by the user. Use
+        Engine. This does not affect terminations performed by the user. This
+        option is mutually exclusive with --preemptible. Use
         --restart-on-failure to enable and --no-restart-on-failure to disable.
 
      --zone=ZONE

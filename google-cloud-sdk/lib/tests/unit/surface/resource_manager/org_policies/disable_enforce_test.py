@@ -17,11 +17,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
 
 class OrgPoliciesDisableEnforceTest(testbase.OrgPoliciesUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDisableEnforceOrgPolicy(self):
     test_policy = self.TestPolicy()
@@ -40,6 +44,17 @@ class OrgPoliciesDisableEnforceTest(testbase.OrgPoliciesUnitTestBase):
   def DoRequest(self, args):
     return self.RunOrgPolicies('disable-enforce', self.TEST_CONSTRAINT, *args)
 
+
+class OrgPoliciesDisableEnforceAlphaTest(OrgPoliciesDisableEnforceTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class OrgPoliciesDisableEnforceBetaTest(OrgPoliciesDisableEnforceTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 if __name__ == '__main__':
   test_case.main()

@@ -597,11 +597,11 @@ class InstanceTemplatesCreateFromContainerTest(
   def testCreateMetadataKeyConflict(self):
     with self.AssertRaisesExceptionMatches(
         containers_utils.InvalidMetadataKeyException,
-        'Metadata key "user-data" is not allowed when '
+        'Metadata key "google-container-manifest" is not allowed when '
         'running containerized VM'):
       self.Run("""
           compute instance-templates create-with-container it-1
-            --metadata user-data=somedata
+            --metadata google-container-manifest=somedata
             --container-image=gcr.io/my-docker/test-image
           """)
 
@@ -734,7 +734,7 @@ class InstanceTemplatesCreateFromContainerTest(
     self.AssertErrEquals('WARNING: This container deployment mechanism '
                          'requires a Container-Optimized OS image in order to '
                          'work. Select an image from a cos-cloud project '
-                         '(cost-stable, cos-beta, cos-dev image families).\n')
+                         '(cos-stable, cos-beta, cos-dev image families).\n')
 
   def testWithCustomImageFamily(self):
     m = self.messages
@@ -798,7 +798,53 @@ class InstanceTemplatesCreateFromContainerTest(
     self.AssertErrEquals('WARNING: This container deployment mechanism '
                          'requires a Container-Optimized OS image in order to '
                          'work. Select an image from a cos-cloud project '
-                         '(cost-stable, cos-beta, cos-dev image families).\n')
+                         '(cos-stable, cos-beta, cos-dev image families).\n')
+
+
+class InstanceTemplatesCreateWithContainerTestBeta(
+    InstanceTemplatesCreateWithContainerTestBase):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self._SetUp()
+
+  def testAcceleratorType(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create-with-container it-1
+          --container-image=gcr.io/my-docker/test-image
+          --accelerator=type=nvidia-tesla-k80,count=4
+        """)
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=m.InstanceTemplate(
+                  name='it-1',
+                  properties=m.InstanceProperties(
+                      canIpForward=False,
+                      disks=[self.default_attached_disk],
+                      labels=self.default_labels,
+                      machineType=self.default_machine_type,
+                      metadata=self.default_metadata,
+                      networkInterfaces=[self.default_network_interface],
+                      scheduling=m.Scheduling(automaticRestart=True),
+                      serviceAccounts=[self.default_service_account],
+                      tags=self.default_tags,
+                      guestAccelerators=[
+                          m.AcceleratorConfig(
+                              acceleratorType='nvidia-tesla-k80',
+                              acceleratorCount=4)
+                      ])),
+              project='my-project',
+          ))],
+    )
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        NAME  MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+        it-1  n1-standard-1
+        """))
 
 
 class InstanceTemplatesCreateWithContainerTestAlpha(
@@ -1225,12 +1271,11 @@ class InstanceTemplatesCreateFromContainerWithLocalSsdBetaTest(
     )
 
 
-class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessBeta(
+class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccess(
     InstanceTemplatesCreateWithContainerTestBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self._SetUp()
 
   def CreateRequestWithPrivateIpv6GoogleAccess(self,
@@ -1303,8 +1348,17 @@ class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessBeta(
     )
 
 
+class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessBeta(
+    InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccess):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self._SetUp()
+
+
 class InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessAlpha(
-    InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccessBeta):
+    InstanceTemplatesCreateWithContainerWithPrivateIpv6GoogleAccess):
 
   def SetUp(self):
     self.SelectApi('alpha')

@@ -39,7 +39,7 @@ class DisableTestGA(unit_test_base.SUUnitTestBase):
     self.ExpectDisableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('services disable %s' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s' % self.DEFAULT_SERVICE)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
@@ -47,14 +47,14 @@ class DisableTestGA(unit_test_base.SUUnitTestBase):
     self.ExpectDisableApiCall(self.OPERATION_NAME, force=True)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('services disable %s --force' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s --force' % self.DEFAULT_SERVICE)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
   def testDisableAsync(self):
     self.ExpectDisableApiCall(self.OPERATION_NAME)
 
-    self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s --async' % self.DEFAULT_SERVICE)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
@@ -64,36 +64,36 @@ class DisableTestGA(unit_test_base.SUUnitTestBase):
 
     with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException, r'Error.'):
-      self.Run('services disable %s' % self.DEFAULT_SERVICE_NAME)
+      self.Run('services disable %s' % self.DEFAULT_SERVICE)
 
   def testDisableProtected(self):
-    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE_NAME)
+    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE)
     self.StartObjectPatch(serviceusage,
                           'GetProtectedServiceWarning',
                           return_value=warning)
     self.ExpectDisableApiCall(self.OPERATION_NAME)
     self.WriteInput('Y')
-    self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s --async' % self.DEFAULT_SERVICE)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
   def testDisableProtectedCancel(self):
-    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE_NAME)
+    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE)
     self.StartObjectPatch(serviceusage,
                           'GetProtectedServiceWarning',
                           return_value=warning)
     self.WriteInput('N')
-    self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s --async' % self.DEFAULT_SERVICE)
     self.AssertErrNotContains(self.OPERATION_NAME)
     self.AssertErrContains(warning)
 
   def testDisableProtectedQuiet(self):
-    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE_NAME)
+    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE)
     self.StartObjectPatch(serviceusage,
                           'GetProtectedServiceWarning',
                           return_value=warning)
     with self.assertRaises(console_io.RequiredPromptError):
-      self.Run('services disable %s --quiet' % self.DEFAULT_SERVICE_NAME)
+      self.Run('services disable %s --quiet' % self.DEFAULT_SERVICE)
 
 
 class DisableTestBeta(DisableTestGA):

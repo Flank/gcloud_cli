@@ -11,7 +11,7 @@ gcloud ml\-engine models get\-iam\-policy \- get the IAM policy for a model
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine models get\-iam\-policy\fR \fIMODEL\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud ml\-engine models get\-iam\-policy\fR \fIMODEL\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,6 +42,25 @@ ID of the model or fully qualified identifier for the model.
 
 
 .RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
+
+\fIREGION\fR must be one of: \fBasia\-east1\fR, \fBeurope\-west4\fR,
+\fBus\-central1\fR.
+
+
 .RE
 .sp
 

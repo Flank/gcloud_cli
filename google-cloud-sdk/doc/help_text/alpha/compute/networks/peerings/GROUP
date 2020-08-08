@@ -20,10 +20,10 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine network peering.
+        (ALPHA) Create a Compute Engine network peering.
 
      delete
-        (ALPHA) Delete a Google Compute Engine network peering.
+        (ALPHA) Delete a Compute Engine network peering.
 
      list
         (ALPHA) List Google Compute Engine peerings.
@@ -32,7 +32,7 @@ COMMANDS
         (ALPHA) List received or advertised routes for a VPC network peering.
 
      update
-        (ALPHA) Update a Google Compute Engine network peering.
+        (ALPHA) Update a Compute Engine network peering.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

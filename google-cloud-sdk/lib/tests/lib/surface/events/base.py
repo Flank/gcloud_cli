@@ -64,7 +64,7 @@ class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   def _NamespaceRef(self, project='fake-project'):
     collection = '{}.namespaces'.format(self.api_name)
     return self._registry.Parse(
-        project, collection=collection, api_version=ALPHA_API_VERSION)
+        project, collection=collection, api_version=self.api_version)
 
   def _CoreNamespaceRef(self, project='fake-project'):
     """This method is for Anthos only."""
@@ -79,7 +79,7 @@ class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         name,
         params={'namespacesId': project},
         collection=collection,
-        api_version=ALPHA_API_VERSION)
+        api_version=self.api_version)
 
   def _SourceRef(self, name, plural_kind, project='fake-project'):
     collection = '{}.namespaces.{}'.format(self.api_name, plural_kind)
@@ -87,7 +87,7 @@ class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         name,
         params={'namespacesId': project},
         collection=collection,
-        api_version=ALPHA_API_VERSION)
+        api_version=self.api_version)
 
   def _SecretRef(self, name, project='fake-project'):
     """This method is for Anthos only."""

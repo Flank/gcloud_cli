@@ -11,7 +11,7 @@ gcloud alpha pubsub lite\-topics create \- create a Pub/Sub Lite topic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha pubsub lite\-topics create\fR \fITOPIC\fR \fB\-\-partitions\fR=\fIPARTITIONS\fR \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR [\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR] [\fB\-\-scale\fR=\fISCALE\fR;\ default=1] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha pubsub lite\-topics create\fR \fITOPIC\fR \fB\-\-partitions\fR=\fIPARTITIONS\fR \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR \fB\-\-zone\fR=\fIZONE\fR [\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR] [\fB\-\-scale\fR=\fISCALE\fR;\ default=1] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,7 +26,7 @@ gcloud alpha pubsub lite\-topics create \- create a Pub/Sub Lite topic
 .RS 2m
 .TP 2m
 \fITOPIC\fR
-Topic name.
+Topic ID.
 
 
 .RE
@@ -47,7 +47,22 @@ to make room for newer ones, regardless of the value of
 \f5message\-retention\-period\fR. A valid example value of this flag would be
 \f5per\-partition\-bytes=30GiB\fR.
 
+.TP 2m
 
+Location resource \- Identifies the Cloud zone this command will be executed on.
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [\-\-zone] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+ID of the location or fully qualified identifier for the location.
+
+
+.RE
 .RE
 .sp
 
@@ -69,22 +84,7 @@ MiB/s of publishing throughput and 8 MiB/s of subscribing throughput). This is
 also reflected in the cost of this topic; a topic with \f5scale\fR of 2 and
 count of 10 is charged for 20 partitions.
 
-.TP 2m
 
-Location resource \- Identifies the Cloud zone this command will be executed on.
-This represents a Cloud resource. (NOTE) Some attributes are not given arguments
-in this group but can be set in other ways. To set the [project] attribute:
-provide the argument [\-\-zone] on the command line with a fully specified name;
-set the property [pubsub/lite_zone] with a fully specified name; provide the
-argument [\-\-project] on the command line; set the property [core/project].
-
-.RS 2m
-.TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-ID of the location or fully qualified identifier for the location.
-
-
-.RE
 .RE
 .sp
 
@@ -102,7 +102,7 @@ Run \fB$ gcloud help\fR for details.
 .SH "API REFERENCE"
 
 This command uses the \fBpubsublite/v1\fR API. The full documentation for this
-API can be found at: https://cloud.google.com/pubsub/docs
+API can be found at: https://cloud.google.com/pubsub/lite/docs
 
 
 

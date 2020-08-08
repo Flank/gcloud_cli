@@ -1,0 +1,92 @@
+
+.TH "GCLOUD_ALPHA_APIGEE_PRODUCTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee products describe \- describes an Apigee API product
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee products describe\fR (\fIPRODUCT\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describes an Apigee API product.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+API product resource \- The API product to be described. The arguments in this
+group can be used to specify the attributes of this resource. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIPRODUCT\fR
+ID of the API product or fully qualified identifier for the API product. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization for the API product.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an API product called \f5\fIproduct\-name\fR\fR in the active Cloud
+Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee products describe product\-name
+.RE
+
+To describe an API product called \f5\fIother\-product\fR\fR from an Apigee
+organization called \f5\fIorg\-name\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha apigee products describe other\-product \e
+  \-\-organization=org\-name
+.RE
+
+To describe an API product called \f5\fIproduct\-name\fR\fR as a JSON object,
+run:
+
+.RS 2m
+$ gcloud alpha apigee products describe product\-name \-\-format=json
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

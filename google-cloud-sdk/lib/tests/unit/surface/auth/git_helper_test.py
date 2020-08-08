@@ -31,11 +31,14 @@ from tests.lib import test_case
 class GitHelperTest(sdk_test_base.WithFakeAuth,
                     cli_test_base.CliTestBase):
 
+  def PreSetUp(self):
+    self.use_google_auth = True
+
   def SetUp(self):
     def FakeRefresh(cred, http=None):
       del http
       if cred:
-        cred.access_token = self.FakeAuthAccessToken()
+        cred.token = self.FakeAuthAccessToken()
     self.StartObjectPatch(c_store, 'Refresh', side_effect=FakeRefresh)
 
   def testGitCredHelper(self):
@@ -164,6 +167,18 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
         'protocol=https\nhost=source.developers.google.com\n\n')
     self.AssertErrNotContains('Failed to clear OSX')
 
+
+class GitHelperTestOauth2client(GitHelperTest):
+
+  def PreSetUp(self):
+    self.use_google_auth = False
+
+  def SetUp(self):
+    def FakeRefresh(cred, http=None):
+      del http
+      if cred:
+        cred.access_token = self.FakeAuthAccessToken()
+    self.StartObjectPatch(c_store, 'Refresh', side_effect=FakeRefresh)
 
 if __name__ == '__main__':
   test_case.main()

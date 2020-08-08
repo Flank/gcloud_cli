@@ -214,8 +214,10 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
   """Base class for service usage unit tests."""
 
   PROJECT_NAME = 'fake-project'
-  DEFAULT_SERVICE_NAME = 'service-name.googleapis.com'
-  DEFAULT_SERVICE_NAME_2 = 'service-name-1.googleapis.com'
+  DEFAULT_CONSUMER = 'projects/helloworld'
+  DEFAULT_SERVICE = 'example.googleapis.com'
+  DEFAULT_SERVICE_2 = 'service-name-1.googleapis.com'
+  _LIMIT_OVERRIDE_RESOURCE = '%s/producerOverrides/%s'
 
   def PreSetUp(self):
     self.services_messages = core_apis.GetMessagesModule('serviceusage', 'v1')
@@ -246,6 +248,50 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
             'serviceusage', 'v1alpha', no_http=True))
     self.mocked_v1alpha_client.Mock()
     self.addCleanup(self.mocked_v1alpha_client.Unmock)
+    # setup common test resources
+    self.mutate_metric = 'example.googleapis.com/mutate_requests'
+    self.default_metric = 'example.googleapis.com/default_requests'
+    self.mutate_metric_resource_name = 'projects/123/services/example.googleapis.com/quotaMetrics/example.googleapis.com%2Fmutate_requests'
+    self.default_metric_resource_name = 'projects/123/services/example.googleapis.com/quotaMetrics/example.googleapis.com%2Fdefault_requests'
+    self.mutate_limit_name = 'projects/123/services/example.googleapis.com/quotaMetrics/example.googleapis.com%2Fmutate_requests/limits/%2Fmin%2Fproject'
+    self.default_limit_name = 'projects/123/services/example.googleapis.com/quotaMetrics/example.googleapis.com%2Fdefault_requests/limits/%2Fmin%2Fproject'
+    self.unit = '1/min/{project}'
+    self.mutate_quota_metric = self.services_v1beta1_messages.ConsumerQuotaMetric(
+        name=self.mutate_metric_resource_name,
+        displayName='Mutate requests',
+        metric=self.mutate_metric,
+        consumerQuotaLimits=[
+            self.services_v1beta1_messages.ConsumerQuotaLimit(
+                name=self.mutate_limit_name,
+                metric=self.mutate_metric,
+                unit=self.unit,
+                quotaBuckets=[
+                    self.services_v1beta1_messages.QuotaBucket(
+                        effectiveLimit=120,
+                        defaultLimit=120,
+                    ),
+                ],
+            ),
+        ],
+    )
+    self.default_quota_metric = self.services_v1beta1_messages.ConsumerQuotaMetric(
+        name=self.default_metric_resource_name,
+        displayName='Default requests',
+        metric=self.default_metric,
+        consumerQuotaLimits=[
+            self.services_v1beta1_messages.ConsumerQuotaLimit(
+                name=self.default_limit_name,
+                metric=self.default_metric,
+                unit=self.unit,
+                quotaBuckets=[
+                    self.services_v1beta1_messages.QuotaBucket(
+                        effectiveLimit=240,
+                        defaultLimit=120,
+                    ),
+                ],
+            ),
+        ],
+    )
 
   def ExpectEnableApiCall(self, operation, error=None, done=False):
     if error:
@@ -254,8 +300,8 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
       op = self.services_messages.Operation(name=operation, done=done)
     self.mocked_client.services.Enable.Expect(
         self.services_messages.ServiceusageServicesEnableRequest(
-            name='projects/%s/services/%s' % (self.PROJECT_NAME,
-                                              self.DEFAULT_SERVICE_NAME),),
+            name='projects/%s/services/%s' %
+            (self.PROJECT_NAME, self.DEFAULT_SERVICE),),
         op,
         exception=error)
 
@@ -266,10 +312,9 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
       op = self.services_messages.Operation(name=operation, done=False)
     self.mocked_client.services.BatchEnable.Expect(
         self.services_messages.ServiceusageServicesBatchEnableRequest(
-            batchEnableServicesRequest=self.services_messages.
-            BatchEnableServicesRequest(serviceIds=[
-                self.DEFAULT_SERVICE_NAME, self.DEFAULT_SERVICE_NAME_2
-            ]),
+            batchEnableServicesRequest=self.services_messages
+            .BatchEnableServicesRequest(
+                serviceIds=[self.DEFAULT_SERVICE, self.DEFAULT_SERVICE_2]),
             parent='projects/%s' % self.PROJECT_NAME),
         op,
         exception=error)
@@ -281,8 +326,8 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
       op = self.services_messages.Operation(name=operation, done=False)
     self.mocked_client.services.Disable.Expect(
         self.services_messages.ServiceusageServicesDisableRequest(
-            name='projects/%s/services/%s' % (self.PROJECT_NAME,
-                                              self.DEFAULT_SERVICE_NAME),
+            name='projects/%s/services/%s' %
+            (self.PROJECT_NAME, self.DEFAULT_SERVICE),
             disableServiceRequest=self.services_messages.DisableServiceRequest(
                 disableDependentServices=force,),
         ),
@@ -293,7 +338,7 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
     self.mocked_client.services.Get.Expect(
         self.services_messages.ServiceusageServicesGetRequest(
             name='projects/%s/services/%s' %
-            (self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),),
+            (self.PROJECT_NAME, self.DEFAULT_SERVICE),),
         response=service,
         exception=error)
 
@@ -302,8 +347,8 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
       resp = None
     else:
       resp = self.services_messages.ListServicesResponse(services=[
-          self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),
-          self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME_2)
+          self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE),
+          self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE_2)
       ])
     self.mocked_client.services.List.Expect(
         self.services_messages.ServiceusageServicesListRequest(
@@ -350,9 +395,76 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
         self.services_v1beta1_messages
         .ServiceusageServicesGenerateServiceIdentityRequest(
             parent='projects/%s/services/%s' %
-            (self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),),
+            (self.PROJECT_NAME, self.DEFAULT_SERVICE),),
         op,
         exception=error)
+
+  def ExpectListQuotaMetricsCall(self, metrics):
+    self.mocked_v1beta1_client.services_consumerQuotaMetrics.List.Expect(
+        self.services_v1beta1_messages
+        .ServiceusageServicesConsumerQuotaMetricsListRequest(
+            parent='%s/services/%s' %
+            (self.DEFAULT_CONSUMER, self.DEFAULT_SERVICE)),
+        self.services_v1beta1_messages.ListConsumerQuotaMetricsResponse(
+            metrics=metrics),
+    )
+
+  def ExpectUpdateQuotaOverrideCall(self,
+                                    limit_resource_name,
+                                    metric,
+                                    unit,
+                                    value,
+                                    operation,
+                                    dimensions=None,
+                                    force=False,
+                                    error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_v1beta1_messages.Operation(name=operation, done=False)
+    dt = self.services_v1beta1_messages.QuotaOverride.DimensionsValue
+    dimensions_message = None
+    if dimensions is not None:
+      dimensions_message = dt(
+          additionalProperties=[
+              dt.AdditionalProperty(key=k, value=v) for (k, v) in dimensions
+          ],)
+    request = self.services_v1beta1_messages.ServiceusageServicesConsumerQuotaMetricsImportConsumerOverridesRequest(
+        parent='%s/services/%s' % (self.DEFAULT_CONSUMER, self.DEFAULT_SERVICE),
+        importConsumerOverridesRequest=self.services_v1beta1_messages
+        .ImportConsumerOverridesRequest(
+            inlineSource=self.services_v1beta1_messages.OverrideInlineSource(
+                overrides=[
+                    self.services_v1beta1_messages.QuotaOverride(
+                        metric=metric,
+                        unit=unit,
+                        overrideValue=value,
+                        dimensions=dimensions_message)
+                ],),
+            force=force),
+    )
+    self.mocked_v1beta1_client.services_consumerQuotaMetrics.ImportConsumerOverrides.Expect(
+        request, op, exception=error)
+
+  def ExpectDeleteQuotaOverrideCall(self,
+                                    limit_resource_name,
+                                    metric,
+                                    unit,
+                                    override_id,
+                                    operation,
+                                    force=False,
+                                    error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_v1beta1_messages.Operation(name=operation, done=False)
+    name = self._LIMIT_OVERRIDE_RESOURCE % (limit_resource_name, override_id)
+    request = self.services_v1beta1_messages.ServiceusageServicesConsumerQuotaMetricsLimitsConsumerOverridesDeleteRequest(
+        name=name,
+        force=force,
+    )
+    self.mocked_v1beta1_client.services_consumerQuotaMetrics_limits_consumerOverrides.Delete.Expect(
+        request, op, exception=error)
 
 
 class SCMUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
@@ -427,45 +539,10 @@ class SCMUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
             metrics=metrics),
     )
 
-  def ExpectCreateQuotaOverrideCall(self,
-                                    limit_resource_name,
-                                    metric,
-                                    unit,
-                                    value,
-                                    operation,
-                                    dimensions=None,
-                                    force=False,
-                                    error=None):
-    if error:
-      op = None
-    else:
-      op = self.services_messages.Operation(name=operation, done=False)
-    dt = self.services_messages.V1Beta1QuotaOverride.DimensionsValue
-    dimensions_message = None
-    if dimensions is not None:
-      dimensions_message = dt(
-          additionalProperties=[
-              dt.AdditionalProperty(key=k, value=v) for (k, v) in dimensions
-          ],)
-    request = self.services_messages.ServiceconsumermanagementServicesConsumerQuotaMetricsLimitsProducerOverridesCreateRequest(
-        parent=limit_resource_name,
-        v1Beta1QuotaOverride=self.services_messages.V1Beta1QuotaOverride(
-            name='%s/producerOverrides/kawaii' % limit_resource_name,
-            metric=metric,
-            unit=unit,
-            dimensions=dimensions_message,
-            overrideValue=value,
-        ),
-        force=force,
-    )
-    self.mocked_client.services_consumerQuotaMetrics_limits_producerOverrides.Create.Expect(
-        request, op, exception=error)
-
   def ExpectUpdateQuotaOverrideCall(self,
                                     limit_resource_name,
                                     metric,
                                     unit,
-                                    override_id,
                                     value,
                                     operation,
                                     dimensions=None,
@@ -482,19 +559,21 @@ class SCMUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
           additionalProperties=[
               dt.AdditionalProperty(key=k, value=v) for (k, v) in dimensions
           ],)
-    name = self._LIMIT_OVERRIDE_RESOURCE % (limit_resource_name, override_id)
-    request = self.services_messages.ServiceconsumermanagementServicesConsumerQuotaMetricsLimitsProducerOverridesPatchRequest(
-        name=name,
-        v1Beta1QuotaOverride=self.services_messages.V1Beta1QuotaOverride(
-            name=name,
-            metric=metric,
-            unit=unit,
-            dimensions=dimensions_message,
-            overrideValue=value,
-        ),
-        force=force,
+    request = self.services_messages.ServiceconsumermanagementServicesConsumerQuotaMetricsImportProducerOverridesRequest(
+        parent='services/%s/%s' % (self.DEFAULT_SERVICE, self.DEFAULT_CONSUMER),
+        v1Beta1ImportProducerOverridesRequest=self.services_messages
+        .V1Beta1ImportProducerOverridesRequest(
+            inlineSource=self.services_messages.V1Beta1OverrideInlineSource(
+                overrides=[
+                    self.services_messages.V1Beta1QuotaOverride(
+                        metric=metric,
+                        unit=unit,
+                        overrideValue=value,
+                        dimensions=dimensions_message)
+                ],),
+            force=force),
     )
-    self.mocked_client.services_consumerQuotaMetrics_limits_producerOverrides.Patch.Expect(
+    self.mocked_client.services_consumerQuotaMetrics.ImportProducerOverrides.Expect(
         request, op, exception=error)
 
   def ExpectDeleteQuotaOverrideCall(self,

@@ -1,11 +1,11 @@
 NAME
-    gcloud alpha logging - manage Stackdriver Logging
+    gcloud alpha logging - manage Cloud Logging
 
 SYNOPSIS
     gcloud alpha logging GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Stackdriver Logging.
+    (ALPHA) Manage Cloud Logging.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,6 +20,9 @@ GROUPS
 
      buckets
         (ALPHA) Manage Cloud Logging buckets.
+
+     locations
+        (ALPHA) Query Cloud Logging locations.
 
      logs
         (ALPHA) Manages your project's logs.
@@ -41,6 +44,9 @@ COMMANDS
 
      read
         (ALPHA) Read log entries.
+
+     tail
+        (ALPHA) Tail log entries.
 
      write
         (ALPHA) Write a log entry.

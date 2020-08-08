@@ -32,14 +32,15 @@ class Startup(base.TopicCommand):
   installing a bundled Python interpreter, but on Mac and Linux you must have
   a Python interpreter available somewhere on your system. `gcloud` will
   attempt to locate an interpreter on your system PATH by looking for the
-  following binaries (in this order):
+  following binaries:
 
       * python2
       * python27
       * python
       * python3
 
-  Currently `gcloud` requires Python version 2.7.x or 3.5 and up.
+  Python 3 is preferred over Python 2. Note that `gcloud` requires Python
+  version 2.7.x or 3.5 and up.
 
   Other Python tools shipped in the Cloud SDK do not support Python 3 and
   require Python 2.7.x, including:

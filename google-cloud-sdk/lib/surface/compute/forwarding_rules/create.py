@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import copy
+import ipaddress
 
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import constants
@@ -29,7 +29,6 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.forwarding_rules import flags
 from googlecloudsdk.core import log
-import ipaddress
 import six
 from six.moves import range  # pylint: disable=redefined-builtin
 
@@ -138,18 +137,28 @@ class CreateHelper(object):
 
     ports_all_specified, range_list = _ExtractPortsAndAll(args.ports)
     port_range = _ResolvePortRange(args.port_range, range_list)
+    load_balancing_scheme = _GetLoadBalancingScheme(args, client.messages)
 
     if ports_all_specified and not is_psc_google_apis:
       raise exceptions.ToolException(
           '[--ports] can not be specified to all for global forwarding rules.')
-    if is_psc_google_apis and port_range:
-      raise exceptions.ToolException(
-          '[--ports] is not allowed for PSC-GoogleApis forwarding rules.')
     if not is_psc_google_apis and not port_range:
       raise exceptions.ToolException(
           '[--ports] is required for global forwarding rules.')
 
     if is_psc_google_apis:
+      if port_range:
+        raise exceptions.ToolException(
+            '[--ports] is not allowed for PSC-GoogleApis forwarding rules.')
+      if (load_balancing_scheme != client.messages
+          .ForwardingRule.LoadBalancingSchemeValueValuesEnum.EXTERNAL):
+        raise exceptions.InvalidArgumentException(
+            '--load-balancing-scheme',
+            'The --load-balancing-scheme flag is not allowed for PSC-GoogleApis'
+            ' forwarding rules.')
+      else:
+        load_balancing_scheme = None
+
       if args.target_google_apis_bundle in flags.PSC_GOOGLE_APIS_BUNDLES:
         target_as_str = args.target_google_apis_bundle
       else:
@@ -173,7 +182,6 @@ class CreateHelper(object):
     address = self._ResolveAddress(resources, args,
                                    compute_flags.compute_scope.ScopeEnum.GLOBAL,
                                    forwarding_rule_ref)
-
     forwarding_rule = client.messages.ForwardingRule(
         description=args.description,
         name=forwarding_rule_ref.Name(),
@@ -183,7 +191,7 @@ class CreateHelper(object):
         target=target_as_str,
         ipVersion=ip_version,
         networkTier=_ConstructNetworkTier(client.messages, args),
-        loadBalancingScheme=_GetLoadBalancingScheme(args, client.messages))
+        loadBalancingScheme=load_balancing_scheme)
 
     if args.IsSpecified('network'):
       forwarding_rule.network = flags.NetworkArg(
@@ -335,7 +343,7 @@ class Create(base.CreateCommand):
 
   _support_global_access = True
   _support_l7_internal_load_balancing = True
-  _support_target_grpc_proxy = False
+  _support_target_grpc_proxy = True
   _support_psc_google_apis = False
 
   @classmethod
@@ -358,7 +366,7 @@ class CreateBeta(Create):
   """Create a forwarding rule to direct network traffic to a load balancer."""
   _support_global_access = True
   _support_l7_internal_load_balancing = True
-  _support_target_grpc_proxy = False
+  _support_target_grpc_proxy = True
   _support_psc_google_apis = False
 
 
@@ -377,8 +385,8 @@ Create.detailed_help = {
 
 When creating a forwarding rule, exactly one of  ``--target-instance'',
 ``--target-pool'', ``--target-http-proxy'', ``--target-https-proxy'',
-``--target-ssl-proxy'', ``--target-tcp-proxy'', ``--target-vpn-gateway''
-or ``--backend-service'' must be specified.""".format(
+``--target-grpc-proxy'', ``--target-ssl-proxy'', ``--target-tcp-proxy'',
+``--target-vpn-gateway'' or ``--backend-service'' must be specified.""".format(
     overview=flags.FORWARDING_RULES_OVERVIEW)),
     'EXAMPLES':
         """
@@ -396,15 +404,7 @@ or ``--backend-service'' must be specified.""".format(
 }
 
 CreateBeta.detailed_help = Create.detailed_help
-CreateAlpha.detailed_help = copy.deepcopy(Create.detailed_help)
-CreateAlpha.detailed_help['DESCRIPTION'] = """
-*{{command}}* is used to create a forwarding rule. {overview}
-
-When creating a forwarding rule, exactly one of  ``--target-instance'',
-``--target-pool'', ``--target-http-proxy'', ``--target-https-proxy'',
-``--target-ssl-proxy'', ``--target-tcp-proxy'', ``--target-vpn-gateway'',
-``--target-google-apis-bundle'' or ``--backend-service'' must be specified.""".format(
-    overview=flags.FORWARDING_RULES_OVERVIEW)
+CreateAlpha.detailed_help = Create.detailed_help
 
 
 def _GetPortRange(ports_range_list):

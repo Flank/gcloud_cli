@@ -11,7 +11,7 @@ gcloud compute networks subnets create \- define a subnet for a network in custo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-filter\-expr\fR=\fILOGGING_FILTER_EXPR\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-logging\-metadata\-fields\fR=[\fIMETADATA_FIELD\fR,...]] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-filter\-expr\fR=\fILOGGING_FILTER_EXPR\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-logging\-metadata\-fields\fR=[\fIMETADATA_FIELD\fR,...]] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -101,6 +101,12 @@ annotations. \fILOGGING_METADATA\fR must be one of: \fBcustom\fR,
 Can only be specified if VPC Flow Logs for this subnetwork is enabled and
 "metadata" is set to CUSTOM_METADATA. The comma\-separated list of metadata
 fields that should be added to reported logs.
+
+.TP 2m
+\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
+The private IPv6 google access type for the VMs in this subnet.
+\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of: \fBdisable\fR,
+\fBenable\-bidirectional\-access\fR, \fBenable\-outbound\-vm\-access\fR.
 
 .TP 2m
 \fB\-\-purpose\fR=\fIPURPOSE\fR

@@ -44,7 +44,7 @@ EXAMPLES
 
     To show multiple services side-by-side with a specific version, run:
 
-        $ gcloud app services browse s1 s2 --version v1
+        $ gcloud app services browse s1 s2 --version=v1
 
 NOTES
     This variant is also available:

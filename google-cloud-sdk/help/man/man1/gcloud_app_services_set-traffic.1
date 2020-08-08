@@ -83,19 +83,19 @@ Run \fB$ gcloud help\fR for details.
 To send all traffic to 'v2' of service 's1', run:
 
 .RS 2m
-$ gcloud app services set\-traffic s1 \-\-splits v2=1
+$ gcloud app services set\-traffic s1 \-\-splits=v2=1
 .RE
 
 To split traffic evenly between 'v1' and 'v2' of service 's1', run:
 
 .RS 2m
-$ gcloud app services set\-traffic s1 \-\-splits v2=.5,v1=.5
+$ gcloud app services set\-traffic s1 \-\-splits=v2=.5,v1=.5
 .RE
 
 To split traffic across all services:
 
 .RS 2m
-$ gcloud app services set\-traffic \-\-splits v2=.5,v1=.5
+$ gcloud app services set\-traffic \-\-splits=v2=.5,v1=.5
 .RE
 
 

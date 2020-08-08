@@ -20,12 +20,18 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.auth import exceptions as auth_exceptions
 from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.core import config
+from googlecloudsdk.core import properties
+from googlecloudsdk.core.credentials import creds as c_creds
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
+from oauth2client import service_account
+from oauth2client.contrib import gce as oauth2client_gce
+import google.auth.compute_engine.credentials as google_auth_gce_creds
+import google.oauth2.service_account as google_auth_service_account
 
 
 def GetFakeRefresh(fake_id_token):
@@ -43,7 +49,10 @@ def GetFakeRefresh(fake_id_token):
     del gce_include_license
 
     if cred:
-      cred.token_response = {'id_token': fake_id_token}
+      if c_creds.IsOauth2ClientCredentials(cred):
+        cred.token_response = {'id_token': fake_id_token}
+      else:
+        cred.id_tokenb64 = fake_id_token
 
   return FakeRefresh
 
@@ -51,10 +60,26 @@ def GetFakeRefresh(fake_id_token):
 class PrintIdentityTokenTest(sdk_test_base.WithFakeAuth,
                              cli_test_base.CliTestBase):
 
+  def PreSetUp(self):
+    self.use_google_auth = False
+
   def TearDown(self):
     # 'gcloud auth print-identity-token' can change the global state
     # 'config.CLOUDSDK_CLIENT_ID'. Reset it after running each test.
     config.CLOUDSDK_CLIENT_ID = '32555940559.apps.googleusercontent.com'
+
+  def testIsGceAccountCredentials(self):
+    oauth2client_cred = oauth2client_gce.AppAssertionCredentials()
+    google_auth_cred = google_auth_gce_creds.Credentials()
+    self.assertTrue(auth_util.IsGceAccountCredentials(oauth2client_cred))
+    self.assertTrue(auth_util.IsGceAccountCredentials(google_auth_cred))
+
+  def testIsServiceAccountCredential(self):
+    oauth2client_cred = service_account.ServiceAccountCredentials(None, 'email')
+    google_auth_cred = google_auth_service_account.Credentials(
+        None, 'email', 'token_uri')
+    self.assertTrue(auth_util.IsServiceAccountCredential(oauth2client_cred))
+    self.assertTrue(auth_util.IsServiceAccountCredential(google_auth_cred))
 
   def testPrintServiceAccount(self):
 
@@ -220,6 +245,13 @@ class PrintIdentityTokenTest(sdk_test_base.WithFakeAuth,
         gce_token_format='standard',
         gce_include_license=False)
     self.AssertOutputEquals('FakeIdToken\n')
+
+
+class PrintIdentityTokenGoogleAuthTest(PrintIdentityTokenTest):
+
+  def PreSetUp(self):
+    properties.VALUES.auth.disable_load_google_auth.Set(False)
+    self.use_google_auth = True
 
 
 if __name__ == '__main__':

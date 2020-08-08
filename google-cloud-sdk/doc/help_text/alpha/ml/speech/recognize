@@ -205,13 +205,17 @@ API REFERENCE
     https://cloud.google.com/speech-to-text/docs/quickstart-protocol
 
 EXAMPLES
-    To get a transcript of an audio file 'my-recording.wav': $ gcloud alpha ml
-    speech recognize 'my-recording.wav' \        --language-code=en-US
+    To get a transcript of an audio file 'my-recording.wav':
+
+        $ gcloud alpha ml speech recognize 'my-recording.wav' \
+            --language-code=en-US
 
     To get a transcript of an audio file in bucket 'gs://bucket/myaudio' with a
-    custom sampling rate and encoding that uses hints and filters profanity: $
-    gcloud alpha ml speech recognize 'gs://bucket/myaudio' \        --language-code=es-ES --sample-rate=2200 --hints=Bueno \
-        --encoding=OGG_OPUS --filter-profanity
+    custom sampling rate and encoding that uses hints and filters profanity:
+
+        $ gcloud alpha ml speech recognize 'gs://bucket/myaudio' \
+            --language-code=es-ES --sample-rate=2200 --hints=Bueno \
+            --encoding=OGG_OPUS --filter-profanity
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -18,24 +18,21 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
-
-class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
+class DeleteTestV1(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'v1'
     self.SelectApi(self._api)
-    self._target_grpc_proxies_api = self.compute_alpha.targetGrpcProxies
+    self._target_grpc_proxies_api = self.compute_v1.targetGrpcProxies
 
   def RunDelete(self, command):
-    self.Run('alpha compute target-grpc-proxies delete ' + command)
+    self.Run('compute target-grpc-proxies delete ' + command)
 
   def testSingle(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -78,6 +75,28 @@ class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
     with self.AssertRaisesToolExceptionRegexp('Deletion aborted by user.'):
       self.RunDelete('proxy-1 proxy-2 proxy-3')
     self.CheckRequests()
+
+
+class DeleteTestBeta(DeleteTestV1):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_grpc_proxies_api = self.compute_beta.targetGrpcProxies
+
+  def RunDelete(self, command):
+    self.Run('beta compute target-grpc-proxies delete ' + command)
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_grpc_proxies_api = self.compute_alpha.targetGrpcProxies
+
+  def RunDelete(self, command):
+    self.Run('alpha compute target-grpc-proxies delete ' + command)
 
 
 if __name__ == '__main__':

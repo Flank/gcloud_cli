@@ -26,11 +26,11 @@ from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
-class ListCommandTestAlpha(base.BigtableV2TestBase, cli_test_base.CliTestBase,
-                           resource_completer_test_base.ResourceCompleterBase):
+class ListCommandTestGA(base.BigtableV2TestBase, cli_test_base.CliTestBase,
+                        resource_completer_test_base.ResourceCompleterBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.backups_list_mock = self.client.projects_instances_clusters_backups.List
@@ -99,6 +99,19 @@ class ListCommandTestAlpha(base.BigtableV2TestBase, cli_test_base.CliTestBase,
     self.AssertOutputContains('2019-06-01T00:00:00Z')
     self.AssertOutputContains('2019-06-10T00:00:00Z')
     self.AssertOutputContains('READY')
+
+
+class ListCommandTestBeta(ListCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListCommandTestAlpha(ListCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

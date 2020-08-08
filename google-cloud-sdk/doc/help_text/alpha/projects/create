@@ -16,8 +16,9 @@ POSITIONAL ARGUMENTS
      [PROJECT_ID]
         ID for the project you want to create.
 
-        Project IDs must start with a lowercase letter and can have lowercase
-        ASCII letters, digits or hyphens. Project IDs must be between 6 and 30
+        Project IDs are immutable and can be set only during project creation.
+        They must start with a lowercase letter and can have lowercase ASCII
+        letters, digits or hyphens. Project IDs must be between 6 and 30
         characters.
 
 FLAGS
@@ -79,7 +80,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
         $ gcloud projects create
+        $ gcloud beta projects create
 

@@ -194,7 +194,7 @@ class DescribeTestGA(test_base.BaseTest, test_case.WithOutputCapture):
 
   def testDescribeWithZypperPatchesInventoryData(self):
     installed_packages = (
-        b'{"Zypper_patches":[{"Name":"SUSE-SLE-Module-Basesystem-15-2019-2992",'
+        b'{"zypperPatches":[{"Name":"SUSE-SLE-Module-Basesystem-15-2019-2992",'
         b'"Category":"recommended","Severity":"moderate",'
         b'"Summary":"Update"}]}')
     self.make_requests.side_effect = iter([[
@@ -208,7 +208,7 @@ class DescribeTestGA(test_base.BaseTest, test_case.WithOutputCapture):
                     value='x86_64'),
                 self.messages.GuestAttributesEntry(
                     key='ShortName', namespace='guestInventory',
-                    value='debian'),
+                    value='sles'),
                 self.messages.GuestAttributesEntry(
                     key='InstalledPackages',
                     namespace='guestInventory',
@@ -233,14 +233,14 @@ class DescribeTestGA(test_base.BaseTest, test_case.WithOutputCapture):
         self.GetOutput(),
         textwrap.dedent("""\
           +----------------------------------------------------------------------------+
-          |                         Installed Patches (Zypper)                         |
+          |                      Installed Patches (Zypper Patch)                      |
           +-----------------------------------------+-------------+----------+---------+
           |                   NAME                  |   CATEGORY  | SEVERITY | SUMMARY |
           +-----------------------------------------+-------------+----------+---------+
           | SUSE-SLE-Module-Basesystem-15-2019-2992 | recommended | moderate | Update  |
           +-----------------------------------------+-------------+----------+---------+
           Architecture: x86_64
-          ShortName: debian
+          ShortName: sles
         """))
     self.AssertErrEquals('')
 

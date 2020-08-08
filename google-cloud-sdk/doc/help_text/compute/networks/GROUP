@@ -37,19 +37,19 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a Google Compute Engine network.
+        Create a Compute Engine network.
 
      delete
-        Delete Google Compute Engine networks.
+        Delete Compute Engine networks.
 
      describe
-        Describe a Google Compute Engine network.
+        Describe a Compute Engine network.
 
      list
         List Google Compute Engine networks.
 
      update
-        Update a Google Compute Engine network.
+        Update a Compute Engine network.
 
 NOTES
     These variants are also available:

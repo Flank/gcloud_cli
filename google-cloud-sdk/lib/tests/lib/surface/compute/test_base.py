@@ -102,23 +102,14 @@ class ApitoolsClientCache(object):
   def AddClient(self, api_name, api_version, client):
     self._cache.setdefault(api_name, {})[api_version] = client
 
-  # pylint:disable=unused-argument,g-doc-args,g-doc-return-or-yield
-  def GetClientInstance(self,
-                        api_name,
-                        api_version,
-                        no_http=False,
-                        use_google_auth=False):
-    """The mock of core_apis.GetClientInstance in the compute unit tests.
-
-       This function must match the signature of core_apis.GetClientInstance.
-    """
+  def GetClientInstance(self, api_name, api_version, no_http=False):
+    del no_http
     versions = self._cache.setdefault(api_name, {})
     if api_version not in versions:
       client = self._get_client_func(api_name, api_version)
       self.AddClient(api_name, api_version, client)
       return client
     return versions[api_version]
-    # pylint:enable=unused-argument,g-doc-args,g-doc-return-or-yield
 
 
 class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
@@ -416,7 +407,7 @@ projects/my-project/global/machineImages/machine-image-1",
     required_method_args = set(['requests', 'http', 'batch_url', 'errors'])
     optional_method_args = set([
         'progress_tracker', 'followup_overrides', 'log_result', 'timeout',
-        'no_followup'
+        'no_followup', 'always_return_operation'
     ])
 
     for (_, _, expected), (_, actual) in zip(

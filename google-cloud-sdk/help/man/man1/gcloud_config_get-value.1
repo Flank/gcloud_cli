@@ -17,7 +17,7 @@ gcloud config get\-value \- print the value of a Cloud SDK property
 
 .SH "DESCRIPTION"
 
-gcloud config get\-value prints the property value from your active
+gcloud config get\-value prints the property value from your active client side
 configuration only.
 
 
@@ -721,19 +721,6 @@ Username to use when connecting, if the proxy requires authentication.
 .RE
 .sp
 .TP 2m
-\fIpubsub\fR
-
-.RS 2m
-.TP 2m
-\fBlite_zone\fR
-Default zone to use when working with zonal Pub/Sub Lite resources. When a
-\f5\-\-zone\fR flag is required but not provided, the command will fall back to
-this value, if set.
-
-
-.RE
-.sp
-.TP 2m
 \fIredis\fR
 
 .RS 2m
@@ -824,6 +811,19 @@ this value, if set.
 .TP 2m
 \fBdisable_prompts\fR
 If True, gcloud will not prompt you to take periodic usage experience surveys.
+
+
+.RE
+.sp
+.TP 2m
+\fIvmware\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud VMware resources. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value, if set.
 
 
 .RE

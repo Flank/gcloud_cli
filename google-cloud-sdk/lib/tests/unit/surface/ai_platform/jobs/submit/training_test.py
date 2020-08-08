@@ -839,6 +839,61 @@ class TrainTestBase(object):
              '    -- --model-dir=gs://my-bucket '.format(
                  module_name, config_file))
 
+  def testTrain_AsyncKmsKeyName(self, module_name):
+    self._BaseSetUp()
+
+    key = 'projects/proj/locations/loc/keyRings/ring/cryptoKeys/key'
+    training_input = self.short_msgs.TrainingInput(
+        pythonModule='my_module',
+        packageUris=['gs://bucket/stuff.tar.gz'],
+        region='us-central1',
+        jobDir='gs://job-bucket/job-prefix',
+        encryptionConfig=self.short_msgs.EncryptionConfig(kmsKeyName=key))
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --kms-key {}'.format(module_name, key))
+
+  def testTrain_AsyncKmsKeyNameResourceArgs(self, module_name):
+    self._BaseSetUp()
+
+    key = 'projects/proj/locations/loc/keyRings/ring/cryptoKeys/key'
+    training_input = self.short_msgs.TrainingInput(
+        pythonModule='my_module',
+        packageUris=['gs://bucket/stuff.tar.gz'],
+        region='us-central1',
+        jobDir='gs://job-bucket/job-prefix',
+        encryptionConfig=self.short_msgs.EncryptionConfig(kmsKeyName=key))
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --kms-project proj '
+             '    --kms-location loc'
+             '    --kms-keyring ring'
+             '    --kms-key key'.format(module_name))
+
 
 @parameterized.parameters('ml-engine', 'ai-platform')
 class TrainIntegrationTestBase(object):
@@ -873,10 +928,13 @@ if __name__ == '__main__':
   tf.app.run()
 """
   _SETUP_PY = """\
-from setuptools import setup
+from setuptools import setup, find_packages
 
 if __name__ == '__main__':
-    setup(name='trainer', packages=['trainer'])
+    setup(
+        name='trainer',
+        packages=find_packages(include=['trainer'])
+    )
 """
   # This is the checksum of an empty file, which is the dummy value we're using
   # for our package.
@@ -1216,60 +1274,28 @@ class TrainTestBeta(TrainTestBase, base.MlBetaPlatformTestBase):
              '    --worker-image-uri gcr.io/project/containerimage3'
              '    -- --model-dir=gs://my-bucket '.format(module_name))
 
-  def testTrain_AsyncKmsKeyName(self, module_name):
-    self._BaseSetUp()
-
-    key = 'projects/proj/locations/loc/keyRings/ring/cryptoKeys/key'
+  def testTrain_CustomContainerWithNetwork(self, module_name):
+    scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
     training_input = self.short_msgs.TrainingInput(
-        pythonModule='my_module',
-        packageUris=['gs://bucket/stuff.tar.gz'],
+        scaleTier=scale_tier_enum.CUSTOM,
         region='us-central1',
-        jobDir='gs://job-bucket/job-prefix',
-        encryptionConfig=self.short_msgs.EncryptionConfig(kmsKeyName=key))
+        network='mynetwork',
+        args=['--model-dir=gs://my-bucket'],
+        masterConfig=self.short_msgs.ReplicaConfig(
+            imageUri='gcr.io/project/containerimage'),
+        masterType='complex_model_m')
     self.client.projects_jobs.Create.Expect(
         self._MakeCreateRequest(
-            self.short_msgs.Job(
-                jobId='my_job',
-                trainingInput=training_input),
+            self.short_msgs.Job(jobId='my_job', trainingInput=training_input),
             parent='projects/{}'.format(self.Project())),
         self.short_msgs.Job(jobId='my_job'))
-
     self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
+             '    --scale-tier CUSTOM  '
              '    --region us-central1 '
-             '    --kms-key {}'.format(module_name, key))
-
-  def testTrain_AsyncKmsKeyNameResourceArgs(self, module_name):
-    self._BaseSetUp()
-
-    key = 'projects/proj/locations/loc/keyRings/ring/cryptoKeys/key'
-    training_input = self.short_msgs.TrainingInput(
-        pythonModule='my_module',
-        packageUris=['gs://bucket/stuff.tar.gz'],
-        region='us-central1',
-        jobDir='gs://job-bucket/job-prefix',
-        encryptionConfig=self.short_msgs.EncryptionConfig(kmsKeyName=key))
-    self.client.projects_jobs.Create.Expect(
-        self._MakeCreateRequest(
-            self.short_msgs.Job(
-                jobId='my_job',
-                trainingInput=training_input),
-            parent='projects/{}'.format(self.Project())),
-        self.short_msgs.Job(jobId='my_job'))
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --kms-project proj '
-             '    --kms-location loc'
-             '    --kms-keyring ring'
-             '    --kms-key key'.format(module_name))
+             '    --master-machine-type complex_model_m'
+             '    --master-image-uri gcr.io/project/containerimage'
+             '    --network mynetwork'
+             '    -- --model-dir=gs://my-bucket '.format(module_name))
 
 
 class TrainTestAlpha(base.MlAlphaPlatformTestBase, TrainTestBeta):

@@ -23,7 +23,8 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute import test_resources as compute_resources
+from tests.lib.surface.compute.instances import test_resources
 
 
 class InstancesMiscTest(test_base.BaseTest, completer_test_base.CompleterBase):
@@ -113,7 +114,7 @@ class InstancesMiscTest(test_base.BaseTest, completer_test_base.CompleterBase):
     self.ExpectListerInvoke(
         scope_set=self.MakeAllScopes(zonal=True),
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1))
-    mtype = '--machine-type ' + test_resources.MACHINE_TYPES[0].name
+    mtype = '--machine-type ' + compute_resources.MACHINE_TYPES[0].name
     self.RunCompletion('beta compute instances set-machine-type ' + mtype +
                        ' --zone=zone-1 i',
                        ['instance-3',

@@ -23,6 +23,10 @@ import contextlib
 import json
 import os
 import re
+import textwrap
+
+from apitools.base.py import batch
+from apitools.base.py import http_wrapper
 
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import config
@@ -37,11 +41,17 @@ from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.scenario import assertions
+from tests.lib.scenario import events
 from tests.lib.scenario import reference_resolver
 from tests.lib.scenario import schema
 from tests.lib.scenario import session
 from tests.lib.scenario import test_base
 from tests.lib.scenario import updates
+
+import httplib2
+import mock
+import six
+from six.moves import http_client as httplib
 
 
 class _SessionTestsBase(sdk_test_base.WithOutputCapture,
@@ -53,10 +63,10 @@ class _SessionTestsBase(sdk_test_base.WithOutputCapture,
   def SetUp(self):
     self.stream_mocker = test_base.CreateStreamMocker(self)
 
-  def CommandExecution(self, *events):
+  def CommandExecution(self, *scenario_events):
     data = {
         'execute_command': {
-            'command': '', 'events': [e for e in events]}}
+            'command': '', 'events': list(scenario_events)}}
     return schema.CommandExecutionAction.FromData(data)
 
   @contextlib.contextmanager
@@ -72,10 +82,12 @@ class _SessionTestsBase(sdk_test_base.WithOutputCapture,
         yield s
 
   def ToJson(self, value):
-    return json.dumps(value).encode('utf8')
+    return json.dumps(value)
 
   def FromJson(self, value):
-    return json.loads(value.decode('utf8'))
+    if not isinstance(value, six.text_type):
+      value = value.decode('utf-8')
+    return json.loads(value)
 
 
 class SessionTests(_SessionTestsBase):
@@ -235,6 +247,19 @@ class SessionTests(_SessionTestsBase):
       answer = console_io.PromptResponse(message='foo')
       self.assertEqual('bar', answer)
 
+  def testMakeRealRequest(self):
+    client_mock = mock.Mock()
+    args = ['arg1']
+    kwargs = {'kwarg1': 'value'}
+    ce = self.CommandExecution({'expect_exit': {'code': 0}})
+    with self.Execute(ce) as s:
+      s._orig_request_method = mock.Mock(return_value=(
+          httplib2.Response({'status': httplib.OK}), 'test'.encode('utf-8')))
+      response = s._MakeRealRequest(client_mock, args, kwargs)
+      s._orig_request_method.assert_called_with(client_mock, args, kwargs)
+      self.assertEqual(response.status, httplib.OK)
+      self.assertEqual(response.body, 'test')
+
   def testOutputMixAndAggregation(self):
     ce = self.CommandExecution(
         {'expect_stdout': 'this'},
@@ -291,35 +316,36 @@ class SessionTests(_SessionTestsBase):
       status, body = http.Http().request(
           'https://example.com', method='GET', body='{"body": "foo"}',
           headers={'foo': 'bar'})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'', body)
 
+    response = None
     # Request assertion failure.
     with self.assertRaises(assertions.Error) as context:
       with self.Execute(ce):
-        status, body = http.Http().request(
+        response = http.Http().request(
             'https://foo.com', method='POST', body='{"body": "foo1"}',
             headers={'foo': 'bar1'})
-        self.assertEqual({'status': '200'}, status)
-        self.assertEqual(b'', body)
+    self.assertEqual({'status': httplib.OK}, response[0])
+    self.assertEqual(b'', response[1])
     self.assertEqual(4, len(context.exception.failures))
 
     # Response assertion failure.
-    data['api_call']['return_response']['headers']['status'] = '404'
+    data['api_call']['return_response']['headers']['status'] = httplib.NOT_FOUND
     ce = self.CommandExecution(data, {'expect_exit': {'code': 0}})
+    response = None
     with self.assertRaises(assertions.Error) as context:
       with self.Execute(ce):
-        status, body = http.Http().request(
+        http.Http().request(
             'https://example.com', method='GET', body='{"body": "foo"}',
             headers={'foo': 'bar'})
-        self.assertEqual({'status': '200'}, status)
-        self.assertEqual(b'', body)
-    self.assertEqual(3, len(context.exception.failures))
+    self.assertEqual(1, len(context.exception.failures))
 
   def testIgnoreApiCalls(self):
-    request_mock = self.StartPatch('httplib2.Http.request')
+    request_mock = self.StartPatch('httplib2.Http.request', auto_spec=True)
     response = {'status': 'RUNNING', 'progress': '0'}
-    request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+    request_mock.return_value = (httplib2.Response({'status': httplib.OK}),
+                                 self.ToJson(response).encode('utf-8'))
 
     ce = self.CommandExecution({'expect_stdout': 'foo'},
                                {'expect_exit': {'code': 0}},)
@@ -328,12 +354,13 @@ class SessionTests(_SessionTestsBase):
       status, body = http.Http().request(
           'https://example.com', method='GET', body='{"body": "foo"}',
           headers={'foo': 'bar'})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('RUNNING', self.FromJson(body)['status'])
       self.assertEqual('0', self.FromJson(body)['progress'])
 
   def testRepeatableAPICall(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
     running = {
         'api_call': {
             'repeatable': True,
@@ -365,32 +392,36 @@ class SessionTests(_SessionTestsBase):
         running, done, {'expect_exit': {'code': 0}})
     response = {'status': 'RUNNING', 'progress': '0'}
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE):
-      request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(response))
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('RUNNING', self.FromJson(body)['status'])
       self.assertEqual('0', self.FromJson(body)['progress'])
 
       response['progress'] = '50'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(response))
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('RUNNING', self.FromJson(body)['status'])
       self.assertEqual('50', self.FromJson(body)['progress'])
 
       response['status'] = 'DONE'
       response['progress'] = '100'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(response))
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('DONE', self.FromJson(body)['status'])
       self.assertEqual('100', self.FromJson(body)['progress'])
 
   def testOptionalAPICallRemote(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
     first_event = {'expect_stderr': 'err'}
     optional_call = {
         'api_call': {
@@ -448,23 +479,23 @@ class SessionTests(_SessionTestsBase):
         {'expect_exit': {'code': 0}})
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE):
       log.status.write('err')
-      request_mock.return_value = ({'status': '200'}, b'RUNNING')
+      request_mock.return_value = events.Response(httplib.OK, {}, 'RUNNING')
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'RUNNING', body)
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'RUNNING', body)
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'RUNNING', body)
-      request_mock.return_value = ({'status': '200'}, b'DONE')
+      request_mock.return_value = events.Response(httplib.OK, {}, 'DONE')
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'DONE', body)
 
   def testOptionalAPICallLocal(self):
@@ -523,12 +554,12 @@ class SessionTests(_SessionTestsBase):
       log.status.write('err')
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'PENDING', body)
 
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'DONE', body)
 
   def testAPICallOperationLocal(self):
@@ -561,7 +592,7 @@ class SessionTests(_SessionTestsBase):
     with self.Execute(ce, execution_mode=session.ExecutionMode.LOCAL, rrr=rrr):
       status, body = http.Http().request(
           'https://example.com/create', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       self.assertEqual(rrr._extracted_ids['operation'], 'operation-12345')
@@ -570,24 +601,25 @@ class SessionTests(_SessionTestsBase):
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       op_body['status'] = 'RUNNING'
       self.assertEqual(op_body, self.FromJson(body))
 
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       op_body['status'] = 'DONE'
       self.assertEqual(op_body, self.FromJson(body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
   def testAPICallOperation(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
     op_body = {
         'name': 'operation-12345',
         'kind': 'foo#operation',
@@ -616,45 +648,50 @@ class SessionTests(_SessionTestsBase):
 
     rrr = reference_resolver.ResourceReferenceResolver()
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE, rrr=rrr):
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
+
       status, body = http.Http().request(
           'https://example.com/create', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       self.assertEqual(rrr._extracted_ids['operation'], 'operation-12345')
       log.status.Print('Polling operation [operation-12345]')
 
       op_body['status'] = 'RUNNING'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
       # Running again.
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       op_body['status'] = 'DONE'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
       # Running again.
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
   def testAPICallOperationWithWait(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
     op_body = {
         'name': 'operation-12345',
         'kind': 'foo#operation',
@@ -683,35 +720,38 @@ class SessionTests(_SessionTestsBase):
 
     rrr = reference_resolver.ResourceReferenceResolver()
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE, rrr=rrr):
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/create', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       self.assertEqual(rrr._extracted_ids['operation'], 'operation-12345')
       log.status.Print('Polling operation [operation-12345]')
 
       op_body['status'] = 'RUNNING'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345/wait', method='POST',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
       # Running again.
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345/wait', method='POST',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       op_body['status'] = 'DONE'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345/wait', method='POST',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
   def testAPICallWithRefExtraction(self):
@@ -753,20 +793,26 @@ class SessionTests(_SessionTestsBase):
     with self.Execute(ce):
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(
           {'foo': {'bar': 'one_value'}, 'a': {'b': 'another_value'}},
-          json.loads(body.decode('utf8')))
+          json.loads(body.decode('utf-8')))
 
       status, body = http.Http().request(
           'https://example.com/one_value/another_value', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'', body)
 
-  def testAPICallResponsePayloadUpdates(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
-    request_mock.return_value = ({'status': '200'}, b'success')
+  @parameterized.parameters(
+      ({'headers': {'status': '404'}, 'body': 'error'},),
+      ({'headers': {'status': 404}, 'body': 'error'},),
+      ({'status': 404, 'headers': {}, 'body': 'error'},),
+  )
+  def testAPICallResponsePayloadUpdates(self, response):
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
+    request_mock.return_value = events.Response(httplib.OK, {}, 'success')
     data = {
         'api_call': {
             'expect_request': {
@@ -777,10 +823,7 @@ class SessionTests(_SessionTestsBase):
                     'json': {'body': 'foo'}
                 }
             },
-            'return_response': {
-                'headers': {'status': '404'},
-                'body': 'error'
-            }
+            'return_response': response
         }
     }
     ce = self.CommandExecution(data, {'expect_exit': {'code': 0}})
@@ -790,7 +833,7 @@ class SessionTests(_SessionTestsBase):
           'https://example.com', method='GET', body='{"body": "foo"}',
           headers={'foo': 'bar'})
       # We get the canned data, not the real API data (mocked out to 200)
-      self.assertEqual({'status': '404'}, status)
+      self.assertEqual({'status': httplib.NOT_FOUND}, status)
       self.assertEqual(b'error', body)
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE,
                       update_modes=[updates.Mode.API_RESPONSE_PAYLOADS]):
@@ -798,11 +841,174 @@ class SessionTests(_SessionTestsBase):
           'https://example.com', method='GET', body='{"body": "foo"}',
           headers={'foo': 'bar'})
       # The "real" call is now made and the mock response is returned.
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'success', body)
     # Canned data is updated when in API_RESPONSE_PAYLOADS update mode.
     self.assertEqual(data['api_call']['return_response'],
-                     {'headers': {'status': '200'}, 'body': 'success'})
+                     {'status': httplib.OK, 'headers': {}, 'body': 'success'})
+
+  def testBatchApiCall(self):
+    data = {
+        'api_call': {
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'headers': {'foo': 'bar'},
+                'body': {
+                    'json': {'body': 'foo'}
+                }
+            },
+            'expect_response': {
+                'headers': {'status': '200'},
+                'body': None,
+            },
+            'return_response': {
+                'headers': {'status': '200'},
+                'body': ''
+            }
+        }}
+    ce = self.CommandExecution(data, {'expect_exit': {'code': 0}})
+
+    batch_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute')
+    def validate_response(response, exception):
+      del exception  # unused
+      self.assertEqual('https://www.googleapis.com/batch/compute',
+                       response.request_url)
+      self.assertEqual({'status': httplib.OK}, response.info)
+      self.assertEqual('', response.content)
+
+    batch_request.Add(http_wrapper.Request(
+        url='https://example.com', http_method='GET', body='{"body": "foo"}',
+        headers={'foo': 'bar'}), validate_response)
+    with self.Execute(ce):
+      batch_request.Execute(http.Http())
+
+    batch_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute')
+    def validate_response1(response, exception):
+      del exception  # unused
+      self.assertEqual('https://www.googleapis.com/batch/compute',
+                       response.request_url)
+      self.assertEqual({'status': httplib.OK}, response.info)
+      self.assertEqual('', response.content)
+    batch_request.Add(http_wrapper.Request(
+        url='https://foo.com', http_method='POST', body='{"body": "foo1"}',
+        headers={'foo': 'bar1'}), validate_response1)
+    # Request assertion failure.
+    with self.assertRaises(assertions.Error) as context:
+      with self.Execute(ce):
+        batch_request.Execute(http.Http())
+    self.assertEqual(4, len(context.exception.failures))
+
+    # Response assertion failure.
+    data['api_call']['return_response']['headers']['status'] = httplib.NOT_FOUND
+    ce = self.CommandExecution(data, {'expect_exit': {'code': 0}})
+    batch_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute')
+    def validate_response2(response, exception):
+      del exception  # unused
+      self.assertEqual('https://www.googleapis.com/batch/compute',
+                       response.request_url)
+      self.assertEqual('', response.content)
+
+    batch_request.Add(http_wrapper.Request(
+        url='https://example.com', http_method='GET', body='{"body": "foo"}',
+        headers={'foo': 'bar'}), validate_response2)
+    with self.assertRaises(assertions.Error) as context:
+      with self.Execute(ce):
+        batch_request.Execute(http.Http())
+    self.assertEqual(1, len(context.exception.failures))
+
+  def testBatchApiCallRemote(self):
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
+    request_mock.return_value = events.Response(
+        httplib.OK,
+        {'Content-type': 'multipart/mixed; boundary=BATCH_BOUNDARY'},
+        textwrap.dedent("""\
+            --BATCH_BOUNDARY
+            Content-Type: application/http
+            Content-ID: <response-34573baf-914d-42df-bada-02a1d76cf771+0>
+
+            HTTP/1.1 200 OK
+
+            {
+             "data": "return data"
+            }
+            --BATCH_BOUNDARY--
+            """))
+    data = {
+        'api_call': {
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'headers': {'foo': 'bar'},
+                'body': {
+                    'json': {'body': 'foo'}
+                }
+            },
+            'expect_response': {
+                'headers': {'status': '200'},
+                'body': {'json': {'data': 'return data'}},
+            },
+            'return_response': {
+                'headers': {'status': '200'},
+                'body': {'data': 'return data'},
+            }
+        }}
+    ce = self.CommandExecution(data, {'expect_exit': {'code': 0}})
+
+    batch_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute', response_encoding='utf-8')
+    def validate_response(response, exception):
+      del exception  # unused
+      self.assertEqual('https://www.googleapis.com/batch/compute',
+                       response.request_url)
+      self.assertEqual({'status': '200'}, response.info)
+      self.assertEqual({'data': 'return data'}, self.FromJson(response.content))
+
+    batch_request.Add(http_wrapper.Request(
+        url='https://example.com', http_method='GET', body='{"body": "foo"}',
+        headers={'foo': 'bar'}), validate_response)
+    with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE):
+      batch_request.Execute(http.Http())
+
+    batch_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute', response_encoding='utf-8')
+    def validate_response1(response, exception):
+      del exception  # unused
+      self.assertEqual('https://www.googleapis.com/batch/compute',
+                       response.request_url)
+      self.assertEqual({'status': '200'}, response.info)
+      self.assertEqual({'data': 'return data'}, self.FromJson(response.content))
+    batch_request.Add(http_wrapper.Request(
+        url='https://foo.com', http_method='POST', body='{"body": "foo1"}',
+        headers={'foo': 'bar1'}), validate_response1)
+    # Request assertion failure.
+    with self.assertRaises(assertions.Error) as context:
+      with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE):
+        batch_request.Execute(http.Http())
+    self.assertEqual(4, len(context.exception.failures))
+
+    # Response assertion failure.
+    request_mock.return_value.status = httplib.NOT_FOUND
+    ce = self.CommandExecution(data, {'expect_exit': {'code': 0}})
+    batch_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute', response_encoding='utf-8')
+    def validate_response2(response, exception):
+      del exception  # unused
+      self.assertEqual('https://www.googleapis.com/batch/compute',
+                       response.request_url)
+      self.assertEqual({'data': 'return data'}, self.FromJson(response.content))
+
+    batch_request.Add(http_wrapper.Request(
+        url='https://example.com', http_method='GET', body='{"body": "foo"}',
+        headers={'foo': 'bar'}), validate_response2)
+    with self.assertRaises(assertions.Error) as context:
+      with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE):
+        batch_request.Execute(http.Http())
+    self.assertEqual(2, len(context.exception.failures))
 
   def testAllEvents(self):
     ce = self.CommandExecution(
@@ -845,7 +1051,7 @@ class SessionTests(_SessionTestsBase):
       status, body = http.Http().request(
           'https://example.com', method='GET', body='{"body": "foo"}',
           headers={'foo': 'bar'})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(b'', body)
       files.WriteFileContents('foo.txt', 'asdf')
       self.assertTrue(console_io.PromptContinue(message='foo'))
@@ -951,7 +1157,12 @@ class SessionUpdateTests(_SessionTestsBase):
              {'expect_request':
                   {'body': {'json': {'body': 'foo'}}, 'headers': {},
                    'method': 'GET', 'uri': 'https://example.com'},
-              'return_response': {'body': None, 'headers': {'status': '200'}}}},
+              'return_response': {
+                  'status': httplib.OK,
+                  'headers': {},
+                  'body': None}
+              }
+         },
         {'expect_stderr': 'foo'}]
     # Note that the expect_stderr is not deleted.
     actual = s.GetEventSequence()
@@ -959,7 +1170,8 @@ class SessionUpdateTests(_SessionTestsBase):
 
   def testRepeatableAPICall(self):
     """Check that repeatable calls are automatically marked as such."""
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
     running = {
         'api_call': {
             'expect_request': {
@@ -991,18 +1203,20 @@ class SessionUpdateTests(_SessionTestsBase):
     response = {'status': 'RUNNING', 'progress': '0'}
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE,
                       update_modes=[updates.Mode.API_REQUESTS]):
-      request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(response))
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('RUNNING', self.FromJson(body)['status'])
       self.assertEqual('0', self.FromJson(body)['progress'])
 
       response['progress'] = '50'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(response))
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('RUNNING', self.FromJson(body)['status'])
       self.assertEqual('50', self.FromJson(body)['progress'])
 
@@ -1010,18 +1224,20 @@ class SessionUpdateTests(_SessionTestsBase):
 
       response['status'] = 'DONE'
       response['progress'] = '100'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(response))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(response))
       status, body = http.Http().request(
           'https://example.com', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual('DONE', self.FromJson(body)['status'])
       self.assertEqual('100', self.FromJson(body)['progress'])
 
     self.assertEqual(running['api_call']['repeatable'], True)
-    self.assertEqual(done['api_call'].get('repeatable'), None)
+    self.assertIsNone(done['api_call'].get('repeatable'))
 
   def testAPICallGenerateOperationPolling(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
+                                         auto_spec=True)
     op_body = {
         'name': 'operation-12345',
         'kind': 'foo#operation',
@@ -1038,7 +1254,8 @@ class SessionUpdateTests(_SessionTestsBase):
                 'body': None
             },
             'return_response': {
-                'headers': {'status': '200'},
+                'status': httplib.OK,
+                'headers': {},
                 'body': op_body
             }
         }
@@ -1048,38 +1265,41 @@ class SessionUpdateTests(_SessionTestsBase):
     ce = self.CommandExecution(exit_call)
     with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE,
                       update_modes=updates.Mode._All()) as s:
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/create', method='GET', body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       op_body['status'] = 'RUNNING'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
       # Running again.
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
       op_body['status'] = 'DONE'
-      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      request_mock.return_value = events.Response(httplib.OK, {},
+                                                  self.ToJson(op_body))
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
       # Running again.
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
           body='', headers={})
-      self.assertEqual({'status': '200'}, status)
+      self.assertEqual({'status': httplib.OK}, status)
       self.assertEqual(op_body, self.FromJson(body))
 
     # Original call should show pending as the response.
@@ -1087,8 +1307,8 @@ class SessionUpdateTests(_SessionTestsBase):
     actual_events = s.GetEventSequence()
     self.assertEqual(2, len(actual_events))
 
-    self.assertDictEqual(create_call, actual_events[0])
-    self.assertEqual(exit_call, actual_events[1])
+    self.assertDictEqual(actual_events[0], create_call)
+    self.assertEqual(actual_events[1], exit_call)
 
 
 if __name__ == '__main__':

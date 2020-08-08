@@ -34,22 +34,22 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute import flags
-from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.disks import create
 from googlecloudsdk.command_lib.compute.disks import flags as disks_flags
 from googlecloudsdk.command_lib.compute.kms import resource_args as kms_resource_args
 from googlecloudsdk.command_lib.compute.resource_policies import flags as resource_flags
 from googlecloudsdk.command_lib.compute.resource_policies import util as resource_util
+from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 import six
 
 DETAILED_HELP = {
     'brief':
-        'Create Google Compute Engine persistent disks',
+        'Create Compute Engine persistent disks',
     'DESCRIPTION':
         """\
-        *{command}* creates one or more Google Compute Engine
+        *{command}* creates one or more Compute Engine
         persistent disks. When creating virtual machine instances,
         disks can be attached to the instances through the
         `gcloud compute instances create` command. Disks can also be
@@ -65,6 +65,10 @@ DETAILED_HELP = {
         image (using `gcloud compute images create`) and creating a
         new disk using `--image` in the desired project and/or
         zone.
+
+        For a comprehensive guide, including details on minimum and maximum
+        disk size, refer to:
+        https://cloud.google.com/compute/docs/disks
         """,
     'EXAMPLES':
         """\
@@ -77,7 +81,6 @@ DETAILED_HELP = {
 
 
 def _SourceArgs(parser,
-                source_disk_enabled=False,
                 source_in_place_snapshot_enabled=False):
   """Add mutually exclusive source args."""
   source_parent_group = parser.add_group()
@@ -112,27 +115,26 @@ def _SourceArgs(parser,
         """)
   disks_flags.SOURCE_SNAPSHOT_ARG.AddArgument(source_group)
   if source_in_place_snapshot_enabled:
-    source_ips = source_group.add_group('Source in place snapshot options')
-    disks_flags.SOURCE_IN_PLACE_SNAPSHOT_ARG.AddArgument(source_ips)
-  if source_disk_enabled:
-    disks_flags.SOURCE_DISK_ARG.AddArgument(source_group)
+    disks_flags.SOURCE_IN_PLACE_SNAPSHOT_ARG.AddArgument(source_group)
+  disks_flags.SOURCE_DISK_ARG.AddArgument(source_group)
 
 
 def _CommonArgs(parser,
                 include_physical_block_size_support=False,
                 vss_erase_enabled=False,
-                source_disk_enabled=False,
-                source_in_place_snapshot_enabled=False):
+                source_in_place_snapshot_enabled=False,
+                support_pd_interface=False):
   """Add arguments used for parsing in all command tracks."""
   Create.disks_arg.AddArgument(parser, operation_type='create')
   parser.add_argument(
       '--description',
       help='An optional, textual description for the disks being created.')
 
+  # TODO(b/158105562) Add help text for pd-extreme before GA.
   parser.add_argument(
       '--size',
       type=arg_parsers.BinarySize(
-          lower_bound='1GB',
+          lower_bound='10GB',
           suggested_binary_size_scales=['GB', 'GiB', 'TB', 'TiB', 'PiB', 'PB']),
       help="""\
         Size of the disks. The value must be a whole
@@ -141,10 +143,14 @@ def _CommonArgs(parser,
         assumed. For example, ``10GB'' will produce 10 gigabyte
         disks. Disk size must be a multiple of 1 GB. Limit your boot disk size
         to 2TB to account for MBR partition table limitations. If disk size is
-        not specified, the default size of {}GB for standard disks and {}GB for
-        pd-ssd disks will be used.
-        """.format(constants.DEFAULT_STANDARD_DISK_SIZE_GB,
-                   constants.DEFAULT_SSD_DISK_SIZE_GB))
+        not specified, the default size of {}GB for pd-standard disks, {}GB for
+        pd-balanced disks, and {}GB for pd-ssd disks will be used. For details
+        about disk size limits, refer to:
+        https://cloud.google.com/compute/docs/disks
+        """.format(
+            constants.DEFAULT_DISK_SIZE_GB_MAP[constants.DISK_TYPE_PD_STANDARD],
+            constants.DEFAULT_DISK_SIZE_GB_MAP[constants.DISK_TYPE_PD_BALANCED],
+            constants.DEFAULT_DISK_SIZE_GB_MAP[constants.DISK_TYPE_PD_SSD]))
 
   parser.add_argument(
       '--type',
@@ -154,6 +160,14 @@ def _CommonArgs(parser,
       list of available disk types, run `gcloud compute disk-types list`.
       The default disk type is pd-standard.
       """)
+
+  if support_pd_interface:
+    parser.add_argument(
+        '--interface',
+        help="""\
+        Specifies the disk interface to use for attaching this disk. Valid values
+        are `SCSI` and `NVME`. The default is `SCSI`.
+        """)
 
   parser.display_info.AddFormat(
       'table(name, zone.basename(), sizeGb, type.basename(), status)')
@@ -166,7 +180,7 @@ def _CommonArgs(parser,
             'be added onto the created disks to indicate the licensing and '
             'billing policies.'))
 
-  _SourceArgs(parser, source_disk_enabled, source_in_place_snapshot_enabled)
+  _SourceArgs(parser, source_in_place_snapshot_enabled)
 
   csek_utils.AddCsekKeyArgs(parser)
   labels_util.AddCreateLabelsFlags(parser)
@@ -213,10 +227,8 @@ def _ParseGuestOsFeaturesToMessages(args, client_messages):
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.Command):
-  """Create Google Compute Engine persistent disks."""
+  """Create Compute Engine persistent disks."""
 
-  source_disk_enabled = False
-  pd_balanced_enabled = False
   source_in_place_snapshot_enabled = False
 
   @classmethod
@@ -250,11 +262,6 @@ class Create(base.Command):
   def GetFromImage(self, args):
     return args.image or args.image_family
 
-  def GetFromSourceDisk(self, args):
-    if not self.source_disk_enabled:
-      return False
-    return args.source_disk
-
   def GetFromSourceInPlaceSnapshot(self, args):
     if not self.source_in_place_snapshot_enabled:
       return False
@@ -263,16 +270,22 @@ class Create(base.Command):
   def GetDiskSizeGb(self, args, from_image):
     size_gb = utils.BytesToGb(args.size)
 
-    if (not size_gb and not args.source_snapshot and not from_image and
-        not self.GetFromSourceDisk(args) and
-        not self.GetFromSourceInPlaceSnapshot(args)):
-      pd_disk_types = ['pd-ssd']
-      if self.pd_balanced_enabled:
-        pd_disk_types.append('pd-balanced')
-      if args.type and args.type in pd_disk_types:
-        size_gb = constants.DEFAULT_SSD_DISK_SIZE_GB
-      else:
-        size_gb = constants.DEFAULT_STANDARD_DISK_SIZE_GB
+    if size_gb:
+      # if disk size is given, use it.
+      pass
+    elif (args.source_snapshot or from_image or args.source_disk or
+          self.GetFromSourceInPlaceSnapshot(args)):
+      # if source is a snapshot/image/disk/in-place-snapshot, it is ok not to
+      # set size_gb since disk size can be obtained from the source.
+      pass
+    elif args.type in constants.DEFAULT_DISK_SIZE_GB_MAP:
+      # Get default disk size from disk_type.
+      size_gb = constants.DEFAULT_DISK_SIZE_GB_MAP[args.type]
+    else:
+      # If disk type is unspecified or unknown, we use the default size of
+      # pd-standard.
+      size_gb = constants.DEFAULT_DISK_SIZE_GB_MAP[
+          constants.DISK_TYPE_PD_STANDARD]
     utils.WarnIfDiskSizeIsTooSmall(size_gb, args.type)
     return size_gb
 
@@ -316,11 +329,12 @@ class Create(base.Command):
       return snapshot_ref.SelfLink()
     return None
 
-  def GetSourceInPlaceSnapshotUri(self, args, compute_holder, default_scope):
-    in_place_snapshot_ref = disks_flags.SOURCE_IN_PLACE_SNAPSHOT_ARG.ResolveAsResource(
-        args, compute_holder.resources, default_scope=default_scope)
-    if in_place_snapshot_ref:
-      return in_place_snapshot_ref.SelfLink()
+  def GetSourceInPlaceSnapshotUri(self, args, compute_holder):
+    if args.source_in_place_snapshot:
+      in_place_snapshot_ref = disks_flags.SOURCE_IN_PLACE_SNAPSHOT_ARG.ResolveAsResource(
+          args, compute_holder.resources)
+      if in_place_snapshot_ref:
+        return in_place_snapshot_ref.SelfLink()
     return None
 
   def GetSourceDiskUri(self, args, compute_holder):
@@ -384,17 +398,16 @@ class Create(base.Command):
            args,
            supports_kms_keys=False,
            supports_physical_block=False,
-           support_shared_disk=False,
-           support_vss_erase=False):
+           support_multiwriter_disk=False,
+           support_vss_erase=False,
+           support_pd_interface=False):
     compute_holder = self._GetApiHolder()
     client = compute_holder.client
 
     self.show_unformated_message = not (args.IsSpecified('image') or
                                         args.IsSpecified('image_family') or
-                                        args.IsSpecified('source_snapshot'))
-    if self.source_disk_enabled:
-      self.show_unformated_message = self.show_unformated_message and not (
-          args.IsSpecified('source_disk'))
+                                        args.IsSpecified('source_snapshot') or
+                                        args.IsSpecified('source_disk'))
     if self.source_in_place_snapshot_enabled:
       self.show_unformated_message = self.show_unformated_message and not (
           args.IsSpecified('source_in_place_snapshot'))
@@ -453,6 +466,10 @@ class Create(base.Command):
         kwargs['diskEncryptionKey'] = kms_utils.MaybeGetKmsKey(
             args, client.messages, kwargs.get('diskEncryptionKey', None))
 
+      if support_pd_interface and args.interface:
+        kwargs['interface'] = arg_utils.ChoiceToEnum(
+            args.interface, client.messages.Disk.InterfaceValueValuesEnum)
+
       # end of alpha/beta features.
 
       if supports_physical_block and args.IsSpecified('physical_block_size'):
@@ -484,25 +501,19 @@ class Create(base.Command):
           type=type_uri,
           physicalBlockSizeBytes=physical_block_size_bytes,
           **kwargs)
-      if self.source_disk_enabled:
-        source_disk_ref = self.GetSourceDiskUri(args, compute_holder)
-        disk.sourceDisk = source_disk_ref
+      disk.sourceDisk = self.GetSourceDiskUri(args, compute_holder)
       if self.source_in_place_snapshot_enabled:
-        if disk_ref.Collection() == 'compute.regionDisks':
-          disk.sourceInPlaceSnapshot = self.GetSourceInPlaceSnapshotUri(
-              args, compute_holder, compute_scope.ScopeEnum.REGION)
-        else:
-          disk.sourceInPlaceSnapshot = self.GetSourceInPlaceSnapshotUri(
-              args, compute_holder, compute_scope.ScopeEnum.ZONE)
-      if (support_shared_disk and
+        disk.sourceInPlaceSnapshot = self.GetSourceInPlaceSnapshotUri(
+            args, compute_holder)
+      if (support_multiwriter_disk and
           disk_ref.Collection() == 'compute.regionDisks' and
           args.IsSpecified('multi_writer')):
         raise exceptions.InvalidArgumentException(
             '--multi-writer',
             ('--multi-writer can be used only with --zone flag'))
 
-      if (support_shared_disk and disk_ref.Collection() == 'compute.disks' and
-          args.IsSpecified('multi_writer')):
+      if (support_multiwriter_disk and disk_ref.Collection() == 'compute.disks'
+          and args.IsSpecified('multi_writer')):
         disk.multiWriter = args.multi_writer
 
       if guest_os_feature_messages:
@@ -549,10 +560,8 @@ class Create(base.Command):
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
-  """Create Google Compute Engine persistent disks."""
+  """Create Compute Engine persistent disks."""
 
-  source_disk_enabled = False
-  pd_balanced_enabled = False
   source_in_place_snapshot_enabled = False
 
   @classmethod
@@ -562,26 +571,28 @@ class CreateBeta(Create):
     _CommonArgs(
         parser,
         include_physical_block_size_support=True,
-        vss_erase_enabled=True)
+        vss_erase_enabled=True,
+        support_pd_interface=True)
     image_utils.AddGuestOsFeaturesArg(parser, messages)
     _AddReplicaZonesArg(parser)
     kms_resource_args.AddKmsKeyResourceArg(
         parser, 'disk', region_fallthrough=True)
+    disks_flags.AddMultiWriterFlag(parser)
 
   def Run(self, args):
     return self._Run(
         args,
         supports_kms_keys=True,
         supports_physical_block=True,
-        support_vss_erase=True)
+        support_vss_erase=True,
+        support_multiwriter_disk=True,
+        support_pd_interface=True)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(CreateBeta):
-  """Create Google Compute Engine persistent disks."""
+  """Create Compute Engine persistent disks."""
 
-  source_disk_enabled = True
-  pd_balanced_enabled = True
   source_in_place_snapshot_enabled = True
 
   @classmethod
@@ -592,28 +603,22 @@ class CreateAlpha(CreateBeta):
         parser,
         include_physical_block_size_support=True,
         vss_erase_enabled=True,
-        source_disk_enabled=True,
-        source_in_place_snapshot_enabled=True)
+        source_in_place_snapshot_enabled=True,
+        support_pd_interface=True)
     image_utils.AddGuestOsFeaturesArg(parser, messages)
     _AddReplicaZonesArg(parser)
     kms_resource_args.AddKmsKeyResourceArg(
         parser, 'disk', region_fallthrough=True)
-    parser.add_argument(
-        '--multi-writer',
-        action='store_true',
-        help=('Create the disk in shared mode so that it can be attached with '
-              'read-write access to multiple VMs. Available only for zonal '
-              'disks. Cannot be used with regional disks. Shared disk is '
-              'exposed only as an NVMe device. Shared PD does not yet support '
-              'resize and snapshot operations.'))
+    disks_flags.AddMultiWriterFlag(parser)
 
   def Run(self, args):
     return self._Run(
         args,
         supports_kms_keys=True,
         supports_physical_block=True,
-        support_shared_disk=True,
-        support_vss_erase=True)
+        support_multiwriter_disk=True,
+        support_vss_erase=True,
+        support_pd_interface=True)
 
 
 def _ValidateAndParseDiskRefsRegionalReplica(args, compute_holder):

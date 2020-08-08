@@ -1,0 +1,90 @@
+
+.TH "GCLOUD_ALPHA_APIGEE_APPLICATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee applications describe \- describe an Apigee application
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee applications describe\fR (\fIAPPLICATION\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe an Apigee application.
+
+\f5gcloud alpha apigee applications describe\fR retrieves the application's
+details, including its developer, credentials, API products, and other
+information.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Application resource \- The application to be described. The arguments in this
+group can be used to specify the attributes of this resource. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIAPPLICATION\fR
+ID of the application or fully qualified identifier for the application. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization for the application.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an application for the active Cloud Platform project whose UUID is
+\f5\fI46d6151e\-0000\-4dfa\-b9c7\-c03b8b58bb2f\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha apigee applications describe \e
+  46d6151e\-0000\-4dfa\-b9c7\-c03b8b58bb2f
+.RE
+
+To describe that application in the Apigee organization \f5\fImy\-org\fR\fR,
+run:
+
+.RS 2m
+$ gcloud alpha apigee applications describe \e
+  46d6151e\-0000\-4dfa\-b9c7\-c03b8b58bb2f \-\-organization=my\-org
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

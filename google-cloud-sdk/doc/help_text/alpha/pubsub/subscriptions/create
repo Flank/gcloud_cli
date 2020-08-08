@@ -6,8 +6,8 @@ SYNOPSIS
     gcloud alpha pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
         [--ack-deadline=ACK_DEADLINE] [--enable-message-ordering]
-        [--expiration-period=EXPIRATION_PERIOD] [--filter=FILTER]
-        [--labels=[KEY=VALUE,...]]
+        [--expiration-period=EXPIRATION_PERIOD] [--labels=[KEY=VALUE,...]]
+        [--message-filter=MESSAGE_FILTER]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
         [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
         [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
@@ -55,9 +55,9 @@ OPTIONAL FLAGS
         acknowledge receiving a message before re-attempting delivery.
 
      --enable-message-ordering
-        Whether or not to receive messages with the same ordering key in order.
-        If true, messages with the same ordering key will by sent to
-        subscribers in the order in which they were received by Cloud Pub/Sub.
+        Whether to receive messages with the same ordering key in order. If
+        set, messages with the same ordering key are sent to subscribers in the
+        order that Pub/Sub receives them.
 
      --expiration-period=EXPIRATION_PERIOD
         The subscription will expire if it is inactive for the given period.
@@ -67,10 +67,6 @@ OPTIONAL FLAGS
         additionally accepts the special value "never" to indicate that the
         subscription will never expire.
 
-     --filter=FILTER
-        A non-empty string written in the Cloud Pub/Sub filter language. This
-        feature is part of an invitation-only alpha release.
-
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -78,6 +74,12 @@ OPTIONAL FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --message-filter=MESSAGE_FILTER
+        Expression to filter messages. If set, Pub/Sub only delivers the
+        messages that match the filter. The expression must be a non-empty
+        string in the Pub/Sub filtering language
+        (https://cloud.google.com/pubsub/docs/filtering).
 
      --message-retention-duration=MESSAGE_RETENTION_DURATION
         How long to retain unacknowledged messages in the subscription's

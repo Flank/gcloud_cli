@@ -25,12 +25,12 @@ COMMANDS
         (BETA) List insights for a Cloud project.
 
      mark-accepted
-        (BETA) Mark an insight's state as ACCEPTED. Can be applied to insights
-        in ACTIVE or ACCEPTED state.
+        (BETA) Mark an insight's state as ACCEPTED.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud recommender insights
         $ gcloud alpha recommender insights
 

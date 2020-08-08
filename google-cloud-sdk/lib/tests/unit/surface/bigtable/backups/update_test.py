@@ -24,10 +24,10 @@ from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-class UpdateCommandTestAlpha(base.BigtableV2TestBase):
+class UpdateCommandTestGA(base.BigtableV2TestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances_clusters_backups.Patch
@@ -70,6 +70,18 @@ class UpdateCommandTestAlpha(base.BigtableV2TestBase):
       self.Run('bigtable backups update thebackup --instance theinstance '
                '--cluster thecluster '
                '--expiration-date 2019-06-01T00:00:00Z --retention-period 5d')
+
+
+class UpdateCommandTestBeta(UpdateCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class UpdateCommandTestAlpha(UpdateCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

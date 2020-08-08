@@ -1,0 +1,177 @@
+
+.TH "GCLOUD_ASSET_SEARCH\-ALL\-IAM\-POLICIES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud asset search\-all\-iam\-policies \- searches all IAM policies within the specified accessible scope, such as a project, folder or organization
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud asset search\-all\-iam\-policies\fR [\fB\-\-query\fR=\fIQUERY\fR] [\fB\-\-scope\fR=\fISCOPE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Searches all IAM policies within the specified scope, such as a project, folder
+or organization. The caller must be granted the
+\f5\fIcloudasset.assets.searchAllIamPolicies\fR\fR permission on the desired
+scope.
+
+Note: The query is compared against each IAM policy binding, including its
+members, roles and conditions. The returned IAM policies, will only contain the
+bindings that match your query. To learn more about the IAM policy structure,
+see IAM policy doc (https://cloud.google.com/iam/docs/policies#structure).
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-query\fR=\fIQUERY\fR
+The query statement. See how to construct a query
+(https://cloud.google.com/asset\-inventory/docs/searching\-iam\-policies#how_to_construct_a_query)
+for more information. If not specified or empty, it will search all the IAM
+policies within the specified \f5scope\fR. Note that the query string is
+compared against each Cloud IAM policy binding, including its members, roles,
+and Cloud IAM conditions. The returned Cloud IAM policies will only contain the
+bindings that match your query. To learn more about the IAM policy structure,
+see IAM policy doc (https://cloud.google.com/iam/docs/policies#structure).
+
+Examples:
+
+.RS 2m
+.IP "\(em" 2m
+\f5policy : "amy@gmail.com"\fR to find IAM policy bindings that specify user
+\f5\fIamy@gmail.com\fR\fR.
+.IP "\(em" 2m
+\f5policy : "roles/compute.admin"\fR to find IAM policy bindings that specify
+the Compute Admin role.
+.IP "\(em" 2m
+\f5policy.role.permissions : "storage.buckets.update"\fR to find Cloud IAM
+policy bindings that specify a role containing the
+\f5\fIstorage.buckets.update\fR\fR permission. Note that if callers don't have
+\f5\fIiam.roles.get\fR\fR access to a role's included permissions, policy
+bindings that specify this role will be dropped from the search results.
+.IP "\(em" 2m
+\f5resource : "organizations/123456"\fR to find IAM policy bindings that are set
+on \f5\fIorganizations/123456\fR\fR.
+.IP "\(em" 2m
+\f5"Important"\fR to find IAM policy bindings that contain \f5\fIImportant\fR\fR
+as a word in any of the searchable fields (except for the included permissions).
+.IP "\(em" 2m
+\f5"*por*"\fR to find IAM policy bindings which contain \f5\fIpor\fR\fR as a
+substring in any of the searchable fields (except for the included permissions).
+.IP "\(em" 2m
+\f5(resource : ("instance1" OR "instance2") AND policy : "amy")\fR to find IAM
+policy bindings that are set on resources \f5\fIinstance1\fR\fR or
+\f5\fIinstance2\fR\fR and also specify user \f5\fIamy\fR\fR.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-scope\fR=\fISCOPE\fR
+A scope can be a project, a folder, or an organization. The search is limited to
+the IAM policies within this scope. The caller must be granted the
+\f5\fIcloudasset.assets.searchAllIamPolicies\fR\fR permission on the desired
+scope. If not specified, the configured project property
+(https://cloud.google.com//sdk/docs/configurations#setting_configuration_properties)
+will be used. To find the configured project, run: \f5gcloud config get\-value
+project\fR. To change the setting, run: \f5gcloud config set project
+PROJECT_ID\fR.
+
+The allowed values are:
+
+.RS 2m
+.IP "\(em" 2m
+\f5projects/{PROJECT_ID}\fR (e.g. \f5\fIprojects/foo\-bar\fR\fR)
+.IP "\(em" 2m
+\f5projects/{PROJECT_NUMBER}\fR (e.g. \f5\fIprojects/12345678\fR\fR)
+.IP "\(em" 2m
+\f5folders/{FOLDER_NUMBER}\fR (e.g. \f5\fIfolders/1234567\fR\fR)
+.IP "\(em" 2m
+\f5organizations/{ORGANIZATION_NUMBER}\fR (e.g.
+\f5\fIorganizations/123456\fR\fR)
+.RE
+.RE
+.sp
+
+
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To search all the IAM policies that specify \f5\fIamy@mycompany.com\fR\fR within
+\f5\fIorganizations/123456\fR\fR, ensure the caller has been granted the
+\f5\fIcloudasset.assets.searchAllIamPolicies\fR\fR permission on the
+organization and run:
+
+.RS 2m
+$ gcloud asset search\-all\-iam\-policies search\-all\-iam\-policies \e
+    \-\-scope='organizations/123456' \e
+    \-\-query='policy : "amy@mycompany.com"'
+.RE
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta asset search\-all\-iam\-policies
+.RE
+

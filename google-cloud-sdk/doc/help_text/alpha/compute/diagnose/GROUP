@@ -24,10 +24,10 @@ COMMANDS
         Storage Bucket.
 
      routes
-        (ALPHA) Routes to/from Google Compute Engine virtual machine instances.
+        (ALPHA) Routes to/from Compute Engine virtual machine instances.
 
      sosreport
-        (ALPHA) Sosreport run from a Google Compute Engine VM.
+        (ALPHA) Sosreport run from a Compute Engine VM.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -27,21 +27,23 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Get a resource setting.
+        (ALPHA) Show the value of a resource setting.
 
      list
         (ALPHA) List all available resource settings.
 
      list-values
-        (ALPHA) List all setting values that exist on the resource.
+        (ALPHA) List the values for any configured resource settings.
 
      set-value
-        (ALPHA) Set an resource setting from a JSON or YAML file.
+        (ALPHA) Update the value of a resource setting.
+
+     unset-value
+        (ALPHA) Remove the value of a resource setting.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

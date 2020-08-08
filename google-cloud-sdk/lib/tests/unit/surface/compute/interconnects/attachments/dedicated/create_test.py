@@ -93,7 +93,7 @@ class InterconnectAttachmentsDedicatedCreateGaTest(test_base.BaseTest):
         vlanTag8021q=400,
         candidateSubnets=['169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'])
     self.AssertOutputEquals('')
-    self.AssertErrContains('You must configure your Google Cloud Router with '
+    self.AssertErrContains('You must configure your Cloud Router with '
                            'an interface and BGP peer for your created VLAN '
                            'attachment. See also https://cloud.google.com'
                            '/interconnect/docs/how-to/dedicated'
@@ -259,7 +259,7 @@ class InterconnectAttachmentsDedicatedCreateGaTest(test_base.BaseTest):
         bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
             'BPS_50G'))
     self.AssertOutputEquals('')
-    self.AssertErrContains('You must configure your Google Cloud Router with '
+    self.AssertErrContains('You must configure your Cloud Router with '
                            'an interface and BGP peer for your created VLAN '
                            'attachment. See also https://cloud.google.com'
                            '/interconnect/docs/how-to/dedicated'
@@ -331,7 +331,7 @@ class InterconnectAttachmentsDedicatedCreateAlphaTest(
             'BPS_50G'),
         validateOnly=True)
     self.AssertOutputEquals('')
-    self.AssertErrContains('You must configure your Google Cloud Router with '
+    self.AssertErrContains('You must configure your Cloud Router with '
                            'an interface and BGP peer for your created VLAN '
                            'attachment. See also https://cloud.google.com'
                            '/interconnect/docs/how-to/dedicated'

@@ -20,6 +20,10 @@ REQUIRED FLAGS
      --iam-account=IAM_ACCOUNT
         The service account for which to create a key.
 
+        To list all service accounts in the project, run:
+
+            $ gcloud iam service-accounts list
+
 OPTIONAL FLAGS
      --key-file-type=KEY_FILE_TYPE; default="json"
         The type of key to create. KEY_FILE_TYPE must be one of: json, p12.

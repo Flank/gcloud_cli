@@ -17,9 +17,8 @@ DESCRIPTION
     destination. A sink exports all logs that matches --log-filter flag. An
     empty filter matches all logs. The sink's destination can be a Cloud
     Storage bucket, a BigQuery dataset, or a Cloud Pub/Sub topic. The
-    destination must already exist and Stackdriver Logging must have permission
-    to write to it. Log entries are exported as soon as the sink is created.
-    See
+    destination must already exist and Cloud Logging must have permission to
+    write to it. Log entries are exported as soon as the sink is created. See
     https://cloud.google.com/logging/docs/export/configure_export_v2#dest-auth.
 
 POSITIONAL ARGUMENTS
@@ -89,7 +88,7 @@ FLAGS
        --project=PROJECT_ID
           Create a sink associated with this project.
 
-          The Google Cloud Platform project name to use for this invocation. If
+          The Google Cloud Platform project ID to use for this invocation. If
           omitted, then the current project is assumed; the current project can
           be listed using gcloud config list --format='text(core.project)' and
           can be set using gcloud config set project PROJECTID.

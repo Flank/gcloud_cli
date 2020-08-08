@@ -88,9 +88,8 @@ Flags and positionals passed to the underlying ssh implementation.
 <p>
 The '--' argument must be specified between gcloud specific args on the left and
 IMPLEMENTATION-ARGS on the right. Example:
-<pre>
-  $ <a href="/sdk/../reference/markdown/markdown-command">gcloud markdown markdown-command</a> example-instance \
-      --zone us-central1-a -- -vvv -L 80:%INSTANCE%:80
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/markdown/markdown-command">gcloud markdown markdown-command</a> example-instance --zone us-central1-a -- -vvv -L 80:%INSTANCE%:80</code>
 </pre>
 
 </dd>
@@ -158,14 +157,14 @@ description of flags available to all commands.
 <dt>EXAMPLES</dt>
 <dd class="sectionbody">
 To foo the command run:
-<pre>
-  $ <a href="/sdk/../reference/markdown/markdown-command/list">gcloud markdown markdown-command list</a> --foo
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/markdown/markdown-command/list">gcloud markdown markdown-command list</a> --foo</code>
 </pre>
 
 <p>
 To bar the parent command run:
-<pre>
-  $ <a href="/sdk/../reference/markdown">gcloud markdown</a> --bar list
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal"><a href="/sdk/../reference/markdown">gcloud markdown</a> --bar list</code>
 </pre>
 
 </dd>

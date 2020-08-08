@@ -36,7 +36,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    $ gcloud logging metrics list --limit=10
+        $ gcloud logging metrics list --limit=10
 
 NOTES
     These variants are also available:

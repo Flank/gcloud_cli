@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha commerce-procurement consumer accounts describe - outputs the
+        Account object resulting from the Get API
+
+SYNOPSIS
+    gcloud alpha commerce-procurement consumer accounts describe
+        (ACCOUNT : --billing-account=BILLING_ACCOUNT) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Outputs the Account object resulting from the Get API.
+
+POSITIONAL ARGUMENTS
+     Account resource - Account to describe. The arguments in this group can be
+     used to specify the attributes of this resource. This must be specified.
+
+       ACCOUNT
+          ID of the account or fully qualified identifier for the account. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --billing-account=BILLING_ACCOUNT
+          Billing Account for the account.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

@@ -75,17 +75,21 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-The following command will read an IAM policy defined in a JSON file
-\'policy.json' and set it for an operation with identifier 'example\-operation'
+The following command will read an IAM policy defined in a JSON file.RS 2m
+'policy.json' and set it for an operation with identifier 'example\-operation'
+
+.RE
 
 .RS 2m
 $ gcloud alpha dataproc operations set\-iam\-policy \e
-    example\-operation policy.json
+example\-operation policy.json
 .RE
 
 
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
+.RS 2m
+See https://cloud.google.com/iam/docs/managing\-policies for details
+of the policy file format and contents.
+.RE
 
 
 

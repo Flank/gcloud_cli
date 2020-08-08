@@ -9,12 +9,12 @@ summary:
       Created tag template [$$my-tag-template$$].
 - execute:
   - command: data-catalog tag-templates fields create $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
-      --location=$$location$$ --display-name="Field display name" --type=enum(A|B)
+      --location=$$location$$ --display-name="Field display name" --type=enum(A-a|C_c|D d)
   - stderr: |
       Created tag template field [$$my-tag-template-field$$1].
 - execute:
   - command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
-      --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D
+      --location=$$location$$ --display-name="New field display name" --enum-values=C_c,B b,A-a
   - stderr: |
       Updated tag template field [$$my-tag-template-field$$1].
   - stdout: |
@@ -23,10 +23,23 @@ summary:
       type:
         enumType:
           allowedValues:
-          - displayName: A
-          - displayName: B
-          - displayName: C
-          - displayName: D
+          - displayName: C_c
+          - displayName: B b
+          - displayName: A-a
+- execute:
+  - command: data-catalog tag-templates fields enum-values rename "B b" --tag-template=$$my-tag-template$$ --field=$$my-tag-template-field$$1
+      --location=$$location$$ --new-id="renamed B b"
+  - stderr: |
+      Updated tag template field [$$my-tag-template-field$$1].
+  - stdout: |
+      displayName: New field display name
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1
+      type:
+        enumType:
+          allowedValues:
+          - displayName: C_c
+          - displayName: renamed B b
+          - displayName: A-a
 - execute:
   - command: data-catalog tag-templates fields rename $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
       --location=$$location$$ --new-id=$$my-tag-template-field$$2
@@ -36,10 +49,9 @@ summary:
       type:
         enumType:
           allowedValues:
-          - displayName: A
-          - displayName: B
-          - displayName: C
-          - displayName: D
+          - displayName: C_c
+          - displayName: renamed B b
+          - displayName: A-a
 - execute:
   - command: data-catalog tag-templates fields delete $$my-tag-template-field$$2 --tag-template=$$my-tag-template$$
       --location=$$location$$ --force --quiet
@@ -170,7 +182,7 @@ actions:
 # Updating a tag template field from optional to required should fail.
 - execute_command:
     command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
-      --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D --required
+      --location=$$location$$ --display-name="New field display name" --enum-values=C,D --required
     events:
     - api_call:
         expect_request:
@@ -200,7 +212,7 @@ actions:
           matches: .*INVALID_ARGUMENT.*Adding a new required field or changing an existing field from optional to required on an existing tag template is not supported.*
 - execute_command:
     command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
-      --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D
+      --location=$$location$$ --display-name="New field display name" --enum-values=C,D
     events:
     - api_call:
         expect_request:
@@ -226,8 +238,6 @@ actions:
             type:
               enumType:
                 allowedValues:
-                - displayName: A
-                - displayName: B
                 - displayName: C
                 - displayName: D
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1
@@ -239,8 +249,6 @@ actions:
         type:
           enumType:
             allowedValues:
-            - displayName: A
-            - displayName: B
             - displayName: C
             - displayName: D
     - expect_exit:
@@ -268,8 +276,6 @@ actions:
             type:
               enumType:
                 allowedValues:
-                - displayName: A
-                - displayName: B
                 - displayName: C
                 - displayName: D
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$2
@@ -279,8 +285,6 @@ actions:
         type:
           enumType:
             allowedValues:
-            - displayName: A
-            - displayName: B
             - displayName: C
             - displayName: D
     - expect_exit:

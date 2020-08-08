@@ -226,6 +226,37 @@ summary:
   - error: '1: Invalid value for [pre-patch-linux-executable]: The provided Google
       Cloud Storage path [https://storage.googleapis.com/my-butcket/my-folder/my-object]
       does not contain a valid generation number.'
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-mode=invalid-mode
+  - stderr: .*argument --rollout-mode.*Invalid choice.*'invalid-mode'.*$
+  - error: "1: .*argument --rollout-mode.*Invalid choice.*'invalid-mode'.*$"
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-mode=zone-by-zone
+  - error: '1: Invalid value for [rollout-mode]: [rollout-disruption-budget] or [rollout-disruption-budget-percent]
+      must also be specified.'
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-disruption-budget=10
+      --rollout-disruption-budget-percent=10
+  - stderr: .*At most one of --rollout-disruption-budget.*--rollout-disruption-budget-percent
+      may be specified.*$
+  - error: '1: .*At most one of --rollout-disruption-budget.*--rollout-disruption-budget-percent
+      may be specified.*$'
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-mode=concurrent-zones
+      --rollout-disruption-budget-percent=10
+  - stderr: Execution in progress for patch job.*$
+  - stdout: |
+      createTime: '2019-01-01T12:00:00Z'
+      instanceFilter:
+        all: true
+      name: projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+      patchConfig: {}
+      rollout:
+        disruptionBudget:
+          percent: 10
+        mode: CONCURRENT_ZONES
+      state: STARTED
+      updateTime: '2019-12-09T23:05:36.421Z'
 actions:
 - define_reference:
     reference: api-version
@@ -271,8 +302,7 @@ actions:
               instanceFilter:
                 all: true
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -291,8 +321,7 @@ actions:
           headers: {}
           body: null
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -334,8 +363,7 @@ actions:
                 all: true
               patchConfig: {}
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -380,8 +408,7 @@ actions:
                     app: worker
               patchConfig: {}
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -491,8 +518,7 @@ actions:
                   withOptional: false
                   withUpdate: false
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -569,8 +595,7 @@ actions:
                   withOptional: false
                   withUpdate: true
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -638,8 +663,7 @@ actions:
                 all: true
               patchConfig: {}
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-01-01T12:00:00Z",
@@ -749,8 +773,7 @@ actions:
                   withOptional: true
                   withUpdate: true
         return_response:
-          headers:
-            status: '200'
+          headers: {}
           body: |
             {
               "createTime": "2019-12-10T04:27:07.195Z",
@@ -924,3 +947,85 @@ actions:
         message: 'Invalid value for [pre-patch-linux-executable]: The provided Google
           Cloud Storage path [https://storage.googleapis.com/my-butcket/my-folder/my-object]
           does not contain a valid generation number.'
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-mode=invalid-mode
+    events:
+    - expect_stderr:
+        matches: .*argument --rollout-mode.*Invalid choice.*'invalid-mode'.*
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*argument --rollout-mode.*Invalid choice.*'invalid-mode'.*
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-mode=zone-by-zone
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [rollout-mode]: [rollout-disruption-budget] or
+          [rollout-disruption-budget-percent] must also be specified.'
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-disruption-budget=10
+      --rollout-disruption-budget-percent=10
+    events:
+    - expect_stderr:
+        matches: .*At most one of --rollout-disruption-budget.*--rollout-disruption-budget-percent
+          may be specified.*
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*At most one of --rollout-disruption-budget.*--rollout-disruption-budget-percent
+            may be specified.*
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter-all --async --rollout-mode=concurrent-zones
+      --rollout-disruption-budget-percent=10
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs:execute?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              dryRun: false
+              instanceFilter:
+                all: true
+              patchConfig: {}
+              rollout:
+                disruptionBudget:
+                  percent: 10
+                mode: CONCURRENT_ZONES
+        return_response:
+          headers: {}
+          body: |
+            {
+              "createTime": "2019-01-01T12:00:00Z",
+              "instanceFilter": {
+                "all": true
+              },
+              "name": "projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c",
+              "patchConfig": {},
+              "rollout": {
+                "disruptionBudget": {
+                  "percent": 10
+                },
+                "mode": "CONCURRENT_ZONES"
+              },
+              "state": "STARTED",
+              "updateTime": "2019-12-09T23:05:36.421Z"
+            }
+    - expect_stderr:
+        matches: Execution in progress for patch job.*
+    - expect_stdout: |
+        createTime: '2019-01-01T12:00:00Z'
+        instanceFilter:
+          all: true
+        name: projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+        patchConfig: {}
+        rollout:
+          disruptionBudget:
+            percent: 10
+          mode: CONCURRENT_ZONES
+        state: STARTED
+        updateTime: '2019-12-09T23:05:36.421Z'
+    - expect_exit:
+        code: 0

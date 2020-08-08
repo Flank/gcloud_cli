@@ -29,7 +29,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    $ gcloud alpha trace sinks delete my-sink
+        $ gcloud alpha trace sinks delete my-sink
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

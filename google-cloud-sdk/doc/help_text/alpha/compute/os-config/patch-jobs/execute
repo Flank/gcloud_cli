@@ -24,6 +24,9 @@ SYNOPSIS
         [--pre-patch-windows-executable=PRE_PATCH_WINDOWS_EXECUTABLE
           --pre-patch-windows-success-codes=[PRE_PATCH_WINDOWS_SUCCESS_CODES,
           ...]]
+        [--rollout-mode=ROLLOUT_MODE
+          --rollout-disruption-budget=ROLLOUT_DISRUPTION_BUDGET
+          | --rollout-disruption-budget-percent=ROLLOUT_DISRUPTION_BUDGET_PERCENT]
         [--windows-exclusive-patches=[WINDOWS_EXCLUSIVE_PATCHES,...]
           | --windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
           --windows-excludes=[WINDOWS_EXCLUDES,...]]
@@ -213,6 +216,34 @@ OPTIONAL FLAGS
           Additional exit codes that the executable can return to indicate a
           successful run. The default exit code for success is 0.
 
+     Rollout configurations for this patch job:
+
+       --rollout-mode=ROLLOUT_MODE
+          Mode of the rollout. ROLLOUT_MODE must be one of:
+
+           concurrent-zones
+              Patches are applied to VMs in all zones at the same time.
+           zone-by-zone
+              Patches are applied one zone at a time. The patch job begins in
+              the region with the lowest number of targeted VMs. Within the
+              region, patching begins in the zone with the lowest number of
+              targeted VMs. If multiple regions (or zones within a region) have
+              the same number of targeted VMs, a tie-breaker is achieved by
+              sorting the regions or zones in alphabetical order.
+
+       Disruption budget for this rollout. A running VM with an active agent is
+       considered disrupted if its patching operation fails anytime between the
+       time the agent is notified until the patch process completes. At most
+       one of these may be specified:
+
+         --rollout-disruption-budget=ROLLOUT_DISRUPTION_BUDGET
+            Number of VMs per zone to disrupt at any given moment.
+
+         --rollout-disruption-budget-percent=ROLLOUT_DISRUPTION_BUDGET_PERCENT
+            Percentage of VMs per zone to disrupt at any given moment. The
+            number of VMs calculated from multiplying the percentage by the
+            total number of VMs in a zone is rounded up.
+
      Settings for machines running Windows: At most one of these may be
      specified:
 
@@ -300,11 +331,10 @@ EXAMPLES
         $ gcloud alpha compute os-config patch-jobs execute \
         --display-name="my patch job" --instance-filter-all
 
-    To patch an instance named my-instance-1 in the us-east1-b zone, run:
+    To patch an instance named instance-1 in the us-east1-b zone, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter-names=          \
-        "zones/us-east1-b/instances/my-instance-1"
+        --instance-filter-names="zones/us-east1-b/instances/instance-1"
 
     To patch all instances in the us-central1-b and europe-west1-d zones, run:
 
@@ -320,37 +350,41 @@ EXAMPLES
     To patch all instances where the env label is test and app label is web or
     where the env label is staging and app label is web, run:
 
-        $ gcloud alpha compute os-config patch-jobs execute           \
-        --instance-filter-group-labels="env=test,app=web"           \
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter-group-labels="env=test,app=web" \
         --instance-filter-group-labels="env=staging,app=web"
 
     To apply security and critical patches to Windows instances with the prefix
     windows- in the instance name, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter-name-prefixes="windows-"           \
+        --instance-filter-name-prefixes="windows-" \
         --windows-classifications=SECURITY,CRITICAL
 
     To update only KB4339284 on Windows instances with the prefix windows- in
     the instance name, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter-name-prefixes="windows-"           \
+        --instance-filter-name-prefixes="windows-" \
         --windows-exclusive-patches=KB4339284
 
     To patch all instances in the current project and specify scripts to run
     pre-patch and post-patch, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter-all           \
-        --pre-patch-linux-executable="/bin/my-script"           \
-        --pre-patch-linux-success-codes=0,200           \
-        --pre-patch-windows-executable="C:\Users\user\test-script.ps1" \
-                  \
-        --post-patch-linux-executable="gs://my-bucket/my-linux-script#12\
-        345"           \
-            --post-patch-windows-executable="gs://my-bucket/my-windows-scrip\
-        t#67890"
+        --instance-filter-all \
+        --pre-patch-linux-executable="/bin/script" \
+        --pre-patch-linux-success-codes=0,200 \
+        --pre-patch-windows-executable="C:\Users\user\script.ps1" \
+        --post-patch-linux-executable="gs://my-bucket/linux-script#123" \
+        --post-patch-windows-executable="gs://my-bucket/windows-script#678"
+
+    To patch all instances zone-by-zone with no more than 50 percent of the
+    instances in the same zone disrupted at a given time, run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter-all --rollout-mode=zone-by-zone \
+        --rollout-disruption-budget-percent=50
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

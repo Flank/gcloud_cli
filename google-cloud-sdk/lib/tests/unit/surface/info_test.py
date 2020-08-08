@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+import re
 import sys
 import textwrap
 
@@ -53,12 +54,23 @@ class InfoTest(cli_test_base.CliTestBase,
     self.AssertOutputContains('git: [')
     self.AssertOutputContains('ssh: [')
 
+  # Cloud SDK is not installed outside of the bundle so core, alpha, and beta
+  # do not always exist.
+  @sdk_test_base.Filters.RunOnlyInBundle
+  def testInfo_AlphaBetaVersionSameAsCore(self):
+    self.Run('info')
+    output = self.GetOutput()
+    core_line = re.search(r'core: (.+)', output)
+    core_version = core_line.group(1)
+    self.AssertOutputContains('alpha: {}'.format(core_version))
+    self.AssertOutputContains('beta: {}'.format(core_version))
+
   def testInfo_PythonLocation(self):
     self.Run('info')
     self.AssertOutputContains('Python Location: [{}]'.format(sys.executable))
 
   def testInfo_PythonLocationUnicode(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     unicode_path = '/skrendu/į/Italiją'
     self.StartObjectPatch(sys, 'executable', unicode_path)
     self.Run('info')
@@ -133,15 +145,15 @@ class InfoTest(cli_test_base.CliTestBase,
   def testInfoWithToolsOnPath(self):
     # Mock out using actual $PATH.
     self.StartObjectPatch(update_manager.UpdateManager,
-                          'FindAllOldToolsOnPath',
+                          'FindAllOtherToolsOnPath',
                           return_value=set(['a.py']))
     self.StartObjectPatch(update_manager.UpdateManager,
                           'FindAllDuplicateToolsOnPath',
                           return_value=set(['b.py']))
     self.Run('info')
-    # Make sure that expected messaging results from old tools on the PATH.
-    self.AssertOutputContains('WARNING: There are old versions of the Google '
-                              'Cloud Platform tools on your system PATH.\n'
+    # Make sure that expected messaging results from other tools on the PATH.
+    self.AssertOutputContains('WARNING: There are other instances of the Google'
+                              ' Cloud Platform tools on your system PATH.\n'
                               '  a.py')
     self.AssertOutputContains('There are alternate versions of the following '
                               'Google Cloud Platform tools on your system '

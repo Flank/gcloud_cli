@@ -5,7 +5,10 @@ SYNOPSIS
     gcloud alpha asset feeds create FEED_ID --pubsub-topic=PUBSUB_TOPIC
         (--asset-names=[ASSET_NAMES,...] --asset-types=[ASSET_TYPES,...])
         (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
-          | --project=PROJECT_ID) [--content-type=CONTENT_TYPE]
+          | --project=PROJECT_ID)
+        [--condition-description=CONDITION_DESCRIPTION]
+        [--condition-expression=CONDITION_EXPRESSION]
+        [--condition-title=CONDITION_TITLE] [--content-type=CONTENT_TYPE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -50,7 +53,7 @@ REQUIRED FLAGS
        --project=PROJECT_ID
           project of the feed.
 
-          The Google Cloud Platform project name to use for this invocation. If
+          The Google Cloud Platform project ID to use for this invocation. If
           omitted, then the current project is assumed; the current project can
           be listed using gcloud config list --format='text(core.project)' and
           can be set using gcloud config set project PROJECTID.
@@ -62,6 +65,16 @@ REQUIRED FLAGS
           use --billing-project or billing/quota_project property.
 
 OPTIONAL FLAGS
+     --condition-description=CONDITION_DESCRIPTION
+        Description of the feed condition. For reference only.
+
+     --condition-expression=CONDITION_EXPRESSION
+        Feed condition expression. If not specified, no condition will be
+        applied to feed.
+
+     --condition-title=CONDITION_TITLE
+        Title of the feed condition. For reference only.
+
      --content-type=CONTENT_TYPE
         Asset content type. If not specified, no content but the asset name and
         type will be returned in the feed. To read more see

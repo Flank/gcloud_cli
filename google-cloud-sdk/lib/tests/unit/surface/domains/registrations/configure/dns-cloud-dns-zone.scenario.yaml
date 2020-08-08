@@ -56,6 +56,7 @@ summary:
   - stderr: |
       Cloud DNS Zone 'projects/different-project/managedZones/example-zone' is not signed. DNSSEC won't be enabled.
   - stderr: |
+      Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
       Update in progress for registration [example-interactive-cloud-dns-zone.com].
 actions:
 - execute_command:
@@ -118,8 +119,8 @@ actions:
               dnsSettings:
                 customDns:
                   nameServers:
-                  - ns-cloud-a1.googledomains.com.
-                  - ns-cloud-a2.googledomains.com.
+                  - ns-cloud-a1.googledomains.com
+                  - ns-cloud-a2.googledomains.com
               updateMask: dns_provider
               validateOnly: false
         return_response:
@@ -319,8 +320,8 @@ actions:
               dnsSettings:
                 customDns:
                   nameServers:
-                  - ns-cloud-a1.googledomains.com.
-                  - ns-cloud-a2.googledomains.com.
+                  - ns-cloud-a1.googledomains.com
+                  - ns-cloud-a2.googledomains.com
                   dsRecords:
                   - keyTag: 54547
                     algorithm: RSASHA256
@@ -521,8 +522,8 @@ actions:
               dnsSettings:
                 customDns:
                   nameServers:
-                  - ns-cloud-a1.googledomains.com.
-                  - ns-cloud-a2.googledomains.com.
+                  - ns-cloud-a1.googledomains.com
+                  - ns-cloud-a2.googledomains.com
               updateMask: dns_provider
               validateOnly: false
         return_response:
@@ -541,6 +542,7 @@ actions:
               "done": false
             }
     - expect_stderr: |
+        Started 'operation-1547472037425-57f6ae9172fbe-4e8005f1-751b4e86'
         Update in progress for registration [example-interactive-cloud-dns-zone.com].
     - expect_exit:
         code: 0

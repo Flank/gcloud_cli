@@ -10,7 +10,7 @@ DESCRIPTION
 
     For more information about Cloud Interconnect, see the Cloud Interconnect
     documentation
-    (https://cloud.google.com/interconnect/docs/concepts/overview).
+    (https://cloud.google.com//network-connectivity/docs/interconnect/concepts/overview).
 
     See also: Interconnects API
     (https://cloud.google.com/compute/docs/reference/rest/v1/interconnects).
@@ -27,7 +27,7 @@ GROUPS
     GROUP is one of the following:
 
      attachments
-        Read and manipulate Google Compute Engine interconnect attachments.
+        Read and manipulate Compute Engine interconnect attachments.
 
      locations
         Read and manipulate Compute Engine interconnect locations.
@@ -36,22 +36,22 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a Google Compute Engine interconnect.
+        Create a Compute Engine interconnect.
 
      delete
-        Delete Google Compute Engine interconnects.
+        Delete Compute Engine interconnects.
 
      describe
-        Describe a Google Compute Engine interconnect.
+        Describe a Compute Engine interconnect.
 
      get-diagnostics
-        Get diagnostics of a Google Compute Engine interconnect.
+        Get diagnostics of a Compute Engine interconnect.
 
      list
         List Google Compute Engine interconnects.
 
      update
-        Update a Google Compute Engine interconnect.
+        Update a Compute Engine interconnect.
 
 NOTES
     These variants are also available:

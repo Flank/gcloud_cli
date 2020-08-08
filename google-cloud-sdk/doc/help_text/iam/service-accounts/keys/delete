@@ -15,7 +15,11 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --iam-account=IAM_ACCOUNT
-        The service account whose key to delete.
+        The service account from which to delete a key.
+
+        To list all service accounts in the project, run:
+
+            $ gcloud iam service-accounts list
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -15,6 +15,12 @@ gcloud alpha services api\-keys create \- create an API key
 
 
 
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create an API key.
+
+
+
 .SH "FLAGS"
 
 .RS 2m
@@ -76,53 +82,62 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a key with display name and allowed ips specified: $ gcloud alpha
-services api\-keys create \-\-display\-name="test name" \e.RS 2m
-\-\-allowed\-ips=2620:15c:2c4:203:2776:1f90:6b3b:217,104.133.8.78
+To create a key with display name and allowed ips specified:
 
+.RS 2m
+$ gcloud alpha services api\-keys create \-\-display\-name="test name" \e
+    \-\-allowed\-ips=2620:15c:2c4:203:2776:1f90:6b3b:217,104.133.8.78
 .RE
 
-To create a key with allowed referrers restriction: $ gcloud alpha services
-api\-keys create \e.RS 2m
-\-\-allowed\-referrers="https://www.example.com/*,http://sub.example.com/*"
+To create a key with allowed referrers restriction:
 
+.RS 2m
+$ gcloud alpha services api\-keys create \e
+    \-\-allowed\-referrers="https://www.example.com/*,http://sub.exampl\e
+e.com/*"
 .RE
 
-To create a key with allowed ios app bundle ids: $ gcloud alpha services
-api\-keys create \-\-allowed\-bundle\-ids=my.app
+To create a key with allowed ios app bundle ids:
 
-To create a key with allowed android application: $ gcloud alpha services
-api\-keys create \e.RS 2m
-\-\-allowed\-application=sha1_fingerprint=foo1,package_name=bar.foo \e
-\-\-allowed\-application=sha1_fingerprint=foo2,package_name=foo.bar
-
+.RS 2m
+$ gcloud alpha services api\-keys create \-\-allowed\-bundle\-ids=my.app
 .RE
 
-To create a key with allowed api targets (service name only): $ gcloud alpha
-services api\-keys create \e.RS 2m
-\-\-api\-target=service=bar.service.com \e
-\-\-api\-target=service=foo.service.com
+To create a key with allowed android application:
 
+.RS 2m
+$ gcloud alpha services api\-keys create \e
+    \-\-allowed\-application=sha1_fingerprint=foo1,\e
+package_name=bar.foo \e
+    \-\-allowed\-application=sha1_fingerprint=foo2,package_name=foo.bar
+.RE
+
+To create a key with allowed api targets (service name only):
+
+.RS 2m
+$ gcloud alpha services api\-keys create \e
+    \-\-api\-target=service=bar.service.com \e
+    \-\-api\-target=service=foo.service.com
 .RE
 
 To create a keys with allowed api targets (service and methods are specified):
 
-$ gcloud alpha services api\-keys create \-\-flags\-file=my\-flags.yaml
-
 .RS 2m
-The content of 'my\-flags.yaml' is as following:
+$ gcloud alpha services api\-keys create \-\-flags\-file=my\-flags.yaml
 .RE
 
+The content of 'my\-flags.yaml' is as following:
+
 .RS 2m
-  \- \-\-api\-target:
-      service:
-        \- "foo.service.com"
-  \- \-\-api\-target:
-      service:
-        \- "bar.service.com"
-      methods:
-        \- "foomethod"
-        \- "barmethod"
+\- \-\-api\-target:
+    service:
+      \- "foo.service.com"
+\- \-\-api\-target:
+    service:
+      \- "bar.service.com"
+    methods:
+      \- "foomethod"
+      \- "barmethod"
 .RE
 
 

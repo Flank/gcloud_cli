@@ -32,17 +32,18 @@ from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.command_lib.static_completion import generate
 from googlecloudsdk.command_lib.static_completion import lookup
+from googlecloudsdk.command_lib.util.anthos import binary_operations
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.calliope import util
-
 import httplib2
 import mock
 
@@ -1128,6 +1129,98 @@ class DescribeTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
     self.AssertOutputContains('describers/group/uri')
 
 
+@test_case.Filters.DoNotRunInDebPackage('Given test binaries are grte which do '
+                                        'not work on non google machines')
+@test_case.Filters.DoNotRunInRpmPackage('Given test binaries are grte which do '
+                                        'not work on non google machines')
+class BinaryBackedCommandTest(util.WithTestTool,
+                              sdk_test_base.WithOutputCapture):
+  """Test for BinaryBacked Commands."""
+
+  def SetUp(self):
+
+    self.bin_dir = self.Resource('tests', 'unit', 'calliope', 'testdata',
+                                 'sdk_binary', 'bin')
+    platform = platforms.OperatingSystem.Current().file_name
+    self.platform_binary = os.path.join(self.bin_dir,
+                                        'basic_{}_go'.format(platform))
+    self.StartObjectPatch(binary_operations, 'CheckForInstalledBinary',
+                          return_value=self.platform_binary)
+
+    test_data_dir = self.Resource(
+        'tests', 'unit', 'calliope', 'testdata', 'sdk_binary')
+    loader = calliope.CLILoader(name='test',
+                                command_root_directory=test_data_dir)
+    self.cli = loader.Generate()
+
+  def testDefaultResultStdoutSuccess(self):  # stdout, None, 0
+    expected = ['GOT value for -a Basic Output', 'GOT value for -b 10']
+    actual = self.cli.Execute(['binary-command', 'Basic Output',
+                               '--exec-value', '10'])
+    for line in expected:
+      self.AssertOutputContains(line)
+    self.AssertErrEquals('')
+    self.assertEqual(expected, actual)
+
+  def testDefaultResultStdoutFailure(self):  # stdout, None, 1
+    expected = ['GOT value for -a EXIT_WITH_ERROR', 'GOT value for -b 10']
+    actual = self.cli.Execute(['binary-command', 'EXIT_WITH_ERROR',
+                               '--exec-value', '10'])
+    for line in expected:
+      self.AssertOutputContains(line)
+    self.AssertErrEquals('')
+    # Default handler returns as normal vs. raising an exception.
+    self.assertIsNone(actual)
+
+  def testDefaultResultStderrFailure(self):  # None, stderr, 1
+    expected_err = 'An error message.\n'
+    actual = self.cli.Execute(['binary-command',
+                               'EXIT_WITH_STDERR_AND_ERROR',
+                               '--stream-only'])
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(expected_err)
+    self.assertIsNone(actual)
+
+  def testDefaultResultSuccessWithStderr(self):  # stdout, stderr, 0
+    expected = ['GOT value for -a LOG_STATUS_TO_STDERR', 'GOT value for -b 10']
+
+    actual = self.cli.Execute(['binary-command', 'LOG_STATUS_TO_STDERR',
+                               '--exec-value', '10'])
+    for line in expected:
+      self.AssertOutputContains(line)
+    self.AssertErrContains('A status message.')
+    self.assertEqual(expected, actual)
+
+  def testDefaultResultFailureWithStdout(self):  # stdout, stderr, 1
+    expected_out = ('GOT value for -a EXIT_WITH_STDERR_AND_ERROR\n'
+                    'GOT value for -b 10\n')
+    actual = self.cli.Execute(['binary-command', 'EXIT_WITH_STDERR_AND_ERROR',
+                               '--exec-value', '10', '--stream-only'])
+    self.AssertOutputEquals(expected_out)
+    self.AssertErrEquals('An error message.\n')
+    self.assertIsNone(actual)
+
+  def testDefaultResultStderrSuccess(self):  # None, stderr, 0
+    actual = self.cli.Execute(['binary-command', 'LOG_STATUS_TO_STDERR',
+                               '--stream-only'])
+    self.AssertErrEquals('A status message.\n')
+    self.assertIsNone(actual)
+
+  def testDefaultResultNoOutputSuccess(self):  # None, None, 0
+    actual = self.cli.Execute(['binary-command', 'No output',
+                               '--stream-only'])
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('')
+    self.assertIsNone(actual)
+
+  def testDefaultResultNoOutputFailure(self):  # None, None, 1
+    actual = self.cli.Execute(['binary-command', 'EXIT_WITH_ERROR',
+                               '--stream-only'])
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('')
+    self.assertIsNone(actual)
+
+
 class UnicodeSupportedTest(util.WithTestTool,
                            sdk_test_base.WithOutputCapture):
 
@@ -1154,7 +1247,7 @@ class UnicodeSupportedTest(util.WithTestTool,
                                                 ignore_load_errors=True)
     self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
                           return_value=self.root)
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     with self.assertRaisesRegex(SystemExit, '2'):
       self.cli.Execute(['sdk7', 'Ṳᾔḯ¢◎ⅾℯ'])
     self.AssertErrContains("""\

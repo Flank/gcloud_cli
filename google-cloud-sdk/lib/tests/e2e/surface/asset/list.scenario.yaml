@@ -15,7 +15,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p5alpha1/projects/cloud-sdk-integration-testing/assets?alt=json&assetTypes=cloudresourcemanager.googleapis.com%2FProject&contentType=RESOURCE
+          uri: https://cloudasset.googleapis.com/v1p5beta1/projects/cloud-sdk-integration-testing/assets?alt=json&assetTypes=cloudresourcemanager.googleapis.com%2FProject&contentType=RESOURCE
           method: GET
           headers: {}
           body: null

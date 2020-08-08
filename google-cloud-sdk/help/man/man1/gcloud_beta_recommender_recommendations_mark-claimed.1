@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta recommender recommendations mark\-claimed \- mark the Recommendation State as CLAIMED. Can only be performed on recommendations in CLAIMED or ACTIVE state
+gcloud beta recommender recommendations mark\-claimed \- mark a recommendation's state as CLAIMED
 
 
 
@@ -17,11 +17,11 @@ gcloud beta recommender recommendations mark\-claimed \- mark the Recommendation
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Mark the Recommendation State as CLAIMED. Users can use this method
-to. indicate to the Recommender API that they are starting to apply the
-recommendation themselves. This stops the recommendation content from being
-updated. mark\-claimed can be applied to recommendations in CLAIMED or ACTIVE
-state.
+\fB(BETA)\fR Mark a recommendation's state as CLAIMED. Can be applied to
+recommendations in CLAIMED, SUCCEEDED, FAILED, or ACTIVE state. Users can use
+this method to indicate to the Recommender API that they are starting to apply
+the recommendation themselves. This stops the recommendation content from being
+updated.
 
 
 

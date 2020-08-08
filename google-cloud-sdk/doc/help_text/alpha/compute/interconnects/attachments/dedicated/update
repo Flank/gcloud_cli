@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute interconnects attachments dedicated update - update a
-        Google Compute Engine dedicated interconnect attachment
+        Compute Engine dedicated interconnect attachment
 
 SYNOPSIS
     gcloud alpha compute interconnects attachments dedicated update NAME

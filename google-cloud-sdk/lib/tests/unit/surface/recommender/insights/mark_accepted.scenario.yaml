@@ -1,11 +1,12 @@
 title: Mark an insight as ACCEPTED
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 actions:
 - define_reference:
     reference: api-version
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - execute_command:
     command: recommender insights mark-accepted my-insight --project=my-project --location=my-location
       --insight-type=my-insight-type --etag=my-etag

@@ -2,8 +2,8 @@ NAME
     gcloud kms keys update - update a key
 
 SYNOPSIS
-    gcloud kms keys update KEY [--default-algorithm=DEFAULT_ALGORITHM]
-        [--keyring=KEYRING] [--location=LOCATION]
+    gcloud kms keys update (KEY : --keyring=KEYRING --location=LOCATION)
+        [--default-algorithm=DEFAULT_ALGORITHM]
         [--next-rotation-time=NEXT_ROTATION_TIME]
         [--primary-version=PRIMARY_VERSION] [--remove-rotation-schedule]
         [--rotation-period=ROTATION_PERIOD] [--update-labels=[KEY=VALUE,...]]
@@ -32,8 +32,23 @@ DESCRIPTION
     4. Update the primary version for the given key with primary-version flag.
 
 POSITIONAL ARGUMENTS
-     KEY
-        Name of the key to update.
+     Key resource - The KMS key resource. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the argument [key] on the command line
+     with a fully specified name; set the property [core/project]. This must be
+     specified.
+
+       KEY
+          ID of the key or fully qualified identifier for the key. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --keyring=KEYRING
+          The KMS keyring of the key.
+
+       --location=LOCATION
+          The Cloud location for the key.
 
 FLAGS
      --default-algorithm=DEFAULT_ALGORITHM
@@ -48,12 +63,6 @@ FLAGS
         rsa-sign-pkcs1-4096-sha256, rsa-sign-pkcs1-4096-sha512,
         rsa-sign-pss-2048-sha256, rsa-sign-pss-3072-sha256,
         rsa-sign-pss-4096-sha256, rsa-sign-pss-4096-sha512.
-
-     --keyring=KEYRING
-        Key ring of the key.
-
-     --location=LOCATION
-        Location of the key.
 
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes

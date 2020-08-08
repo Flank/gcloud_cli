@@ -1,0 +1,88 @@
+NAME
+    gcloud alpha vmware privateclouds create - create a Cloud VMware
+        privatecloud
+
+SYNOPSIS
+    gcloud alpha vmware privateclouds create
+        (PRIVATECLOUD : --location=LOCATION)
+        --management-ip-range=MANAGEMENT_IP_RANGE --vpc-network=VPC_NETWORK
+        --workload-ip-range=WORKLOAD_IP_RANGE [--description=DESCRIPTION]
+        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a vmware privatecloud.
+
+POSITIONAL ARGUMENTS
+     Privatecloud resource - privatecloud. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the argument [privatecloud] on the
+     command line with a fully specified name; set the property [core/project];
+     provide the argument [--project] on the command line. This must be
+     specified.
+
+       PRIVATECLOUD
+          ID of the privatecloud or fully qualified identifier for the
+          privatecloud. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          Location of the privatecloud or cluster.
+
+REQUIRED FLAGS
+     --management-ip-range=MANAGEMENT_IP_RANGE
+        ip addresses range available to the privatecloud for management access,
+        in address/mask format, e.g. 10.0.1.0/29
+
+     --vpc-network=VPC_NETWORK
+        Name of the virtual network for this privatecloud
+
+     --workload-ip-range=WORKLOAD_IP_RANGE
+        ip addresses range available to the privatecloud in address/mask
+        format, e.g. 10.0.1.0/29
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        Text describing the privatecloud
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a privatecloud called example-privatecloud in project my-project
+    and location us-central1:
+
+        $ gcloud alpha vmware privateclouds create example-privatecloud
+
+    Or:
+
+        $ gcloud alpha vmware privateclouds create example-privatecloud \
+            --project=my-project --location=us-central1
+
+    Or:
+
+        $ gcloud alpha vmware privateclouds create \
+            /projects/my-project/locations/us-central1/example-privatecloud
+
+    In the first example, the project and location are taken from gcloud
+    properties core/project and vmware/location.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

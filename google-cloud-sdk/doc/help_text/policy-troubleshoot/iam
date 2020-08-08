@@ -7,8 +7,8 @@ SYNOPSIS
 
 DESCRIPTION
     Performs a check on whether a member is granted a permission on a resource
-    and how that grant/deny is determined according to the resource's effective
-    IAM policy interpretation.
+    and how that access is determined according to the resource's effective IAM
+    policy interpretation.
 
 POSITIONAL ARGUMENTS
      RESOURCE

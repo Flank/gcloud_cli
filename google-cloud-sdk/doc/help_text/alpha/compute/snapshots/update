@@ -68,7 +68,7 @@ EXAMPLES
     To list only the labels when describing a resource, use --format:
 
         $ gcloud alpha compute snapshots describe example-snapshot \
-            --format='default(labels)'
+            --format="default(labels)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

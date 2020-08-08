@@ -26,10 +26,10 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a Google Compute Engine network peering.
+        Create a Compute Engine network peering.
 
      delete
-        Delete a Google Compute Engine network peering.
+        Delete a Compute Engine network peering.
 
      list
         List Google Compute Engine peerings.
@@ -38,7 +38,7 @@ COMMANDS
         List received or advertised routes for a VPC network peering.
 
      update
-        Update a Google Compute Engine network peering.
+        Update a Compute Engine network peering.
 
 NOTES
     These variants are also available:

@@ -9,7 +9,7 @@ SYNOPSIS
         [--connection-draining-timeout=CONNECTION_DRAINING_TIMEOUT]
         [--custom-request-header=CUSTOM_REQUEST_HEADER]
         [--description=DESCRIPTION] [--drop-traffic-if-unhealthy]
-        [--[no-]enable-cdn] [--enable-logging]
+        [--[no-]enable-cdn] [--[no-]enable-logging]
         [--failover-ratio=FAILOVER_RATIO] [--health-checks=HEALTH_CHECK,[...]]
         [--http-health-checks=HTTP_HEALTH_CHECK,[...]]
         [--https-health-checks=HTTPS_HEALTH_CHECK,[...]]
@@ -28,15 +28,20 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute backend-services create is used to create
-    backend services. Backend services define groups of backends that can
-    receive traffic. Each backend group has parameters that define the group's
-    capacity (e.g. max CPU utilization, max queries per second, ...). URL maps
-    define which requests are sent to which backend services.
+    (BETA) gcloud beta compute backend-services create creates a backend
+    service. A backend service defines how Cloud Load Balancing distributes
+    traffic. The backend service configuration contains a set of values, such
+    as the protocol used to connect to backends, various distribution and
+    session settings, health checks, and timeouts. These settings provide
+    fine-grained control over how your load balancer behaves. Most of the
+    settings have default values that allow for easy configuration if you need
+    to get started quickly.
 
-    Backend services created through this command will start out without any
-    backend groups. To add backend groups, use 'gcloud compute backend-services
-    add-backend' or 'gcloud compute backend-services edit'.
+    After you create a backend service, you add backends by using gcloud
+    compute backend-services add-backend.
+
+    For more information about the available settings, see
+    https://cloud.google.com/load-balancing/docs/backend-service.
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
@@ -110,10 +115,11 @@ FLAGS
         the edge of Google's network. Cloud CDN is disabled by default. Use
         --enable-cdn to enable and --no-enable-cdn to disable.
 
-     --enable-logging
+     --[no-]enable-logging
         The logging options for the load balancer traffic served by this
         backend service. If logging is enabled, logs will be exported to
-        Stackdriver. Enabled by default.
+        Stackdriver. Enabled by default. Use --enable-logging to enable and
+        --no-enable-logging to disable.
 
      --failover-ratio=FAILOVER_RATIO
         If the ratio of the healthy VMs in the primary backend is at or below
@@ -147,12 +153,13 @@ FLAGS
         https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide.
 
      --iap=disabled|enabled,[oauth2-client-id=OAUTH2-CLIENT-ID,oauth2-client-secret=OAUTH2-CLIENT-SECRET]
-        Configure Identity Aware Proxy (IAP) service. You can configure IAP to
-        be 'enabled' or 'disabled' (default). If it is enabled you can provide
-        values for 'oauth2-client-id' and 'oauth2-client-secret'. For example,
-        '--iap=enabled,oauth2-client-id=foo,oauth2-client-secret=bar' will turn
-        IAP on, and '--iap=disabled' will turn it off. See
-        https://cloud.google.com/iap/ for more information about this feature.
+        Configure Identity Aware Proxy (IAP) for external HTTP(S) load
+        balancing. You can configure IAP to be enabled or disabled (default).
+        If enabled, you can provide values for oauth2-client-id and
+        oauth2-client-secret. For example,
+        --iap=enabled,oauth2-client-id=foo,oauth2-client-secret=bar turns IAP
+        on, and --iap=disabled turns it off. For more information, see
+        https://cloud.google.com/iap/.
 
      --load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"
         Specifies the load balancer type. Choose EXTERNAL for load balancers
@@ -194,7 +201,7 @@ FLAGS
         balancers), the protocol must be one of: TCP, UDP.
 
         If the load-balancing-scheme is INTERNAL_SELF_MANAGED (Traffic
-        Director), the protocol must be one of: HTTP, HTTPS, HTTP2.
+        Director), the protocol must be one of: HTTP, HTTPS, HTTP2, GRPC.
 
         If the load-balancing-scheme is INTERNAL_MANAGED (internal HTTP(S) load
         balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
@@ -204,7 +211,7 @@ FLAGS
         SSL, TCP.
 
      --session-affinity=SESSION_AFFINITY
-        The type of TCP session affinity to use. Not supported for UDP.
+        The type of session affinity to use. Supports both TCP and UDP.
         SESSION_AFFINITY must be one of:
 
          CLIENT_IP

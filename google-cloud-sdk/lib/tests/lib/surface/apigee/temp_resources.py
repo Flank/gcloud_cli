@@ -19,13 +19,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import contextlib
-import json
 import os
 import time
 from xml.sax import saxutils
 import zipfile
 
-from googlecloudsdk.command_lib.apigee import errors
 from googlecloudsdk.command_lib.apigee import request
 from googlecloudsdk.core.util import files
 from tests.lib import e2e_utils
@@ -211,96 +209,6 @@ def CleanUpOldResources(organization):
           continue
   except Exception:  # pylint: disable=broad-except
     pass
-
-  try:
-    environments = request.ResponseToApiRequest(
-        identifiers, ["organization"], "environment")
-    for environment in environments:
-      try:
-        env_identifiers = identifiers.copy()
-        env_identifiers["environmentsId"] = environment
-        environment = request.ResponseToApiRequest(
-            env_identifiers, ["organization", "environment"])
-        if _IsTimestampStale(environment["createdAt"]):
-          request.ResponseToApiRequest(
-              env_identifiers, ["organization", "environment"], method="DELETE")
-      except Exception:  # pylint: disable=broad-except
-        # Even if this environment is broken or malformed somehow, don't let
-        # that prevent cleanup of the others.
-        continue
-  except Exception:  # pylint: disable=broad-except
-    pass
-
-
-@contextlib.contextmanager
-def Environment(organization, prefix):
-  """Creates a temporary Apigee environment.
-
-  The environment will be automatically cleaned up upon exiting the context.
-
-  Args:
-    organization: the Apigee organization in which to create the environment.
-    prefix: a string to include at the beginning of the environment name.
-
-  Yields:
-    the name of the created environment.
-
-  Raises:
-    RuntimeError: the environment could not be created in a reasonable amount
-      of time.
-  """
-  identifiers = {"organizationsId": organization}
-  name = next(e2e_utils.GetResourceNameGenerator(prefix))
-  operation = request.ResponseToApiRequest(
-      identifiers, ["organization"],
-      "environment",
-      method="POST",
-      body=json.dumps({
-          "environment_id": name,
-          "description": "created during an e2e test"
-      }))
-  try:
-    # Environment creation is a long-running operation. Wait for it to complete.
-    poll_attempts = 0
-    while poll_attempts < 30 and ("done" not in operation or
-                                  not operation["done"]):
-      time.sleep(1)
-      operation = request.ResponseToApiRequest(
-          {
-              "operationsId": operation["name"].rsplit("/")[-1],
-              "organizationsId": organization
-          }, ["organization", "operation"])
-      poll_attempts += 1
-    if "done" not in operation or not operation["done"]:
-      raise RuntimeError("Took too long to create test environment. Status: " +
-                         json.dumps(operation))
-    yield name
-  finally:
-    identifiers["environmentsId"] = name
-    # Just in case something didn't get properly cleaned up at a higher level,
-    # undeploy everything in this environment.
-    try:
-      deployment_data = request.ResponseToApiRequest(
-          identifiers, ["organization", "environment"], "deployment")
-    except errors.EntityNotFoundError:
-      deployment_data = {}
-    if "deployments" in deployment_data:
-      for hanging_deployment in deployment_data["deployments"]:
-        try:
-          deployment_id = identifiers.copy()
-          deployment_id["apisId"] = hanging_deployment["apiProxy"]
-          deployment_id["revisionsId"] = hanging_deployment["revision"]
-          request.ResponseToApiRequest(
-              deployment_id, ["organization", "environment", "api", "revision"],
-              "deployment",
-              method="DELETE")
-        except (KeyError, errors.RequestError):
-          # Clean up as much as possible, even if something went wrong with this
-          # one.
-          continue
-
-    request.ResponseToApiRequest(
-        identifiers, ["organization", "environment"], method="DELETE")
 
 
 @contextlib.contextmanager

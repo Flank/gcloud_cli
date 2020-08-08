@@ -53,9 +53,10 @@ EXAMPLES
             list-preconfigured-expression-sets
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute security-policies list-preconfigured-expression-sets
         $ gcloud alpha compute security-policies \
             list-preconfigured-expression-sets
 

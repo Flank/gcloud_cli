@@ -32,16 +32,16 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
     self.CreateInstance('db-n1-standard-1')
     self.DoTestBackupList()
     self.DoTestInstanceOperations()
-    # TODO(b/144013563): re-enable these tests if network exception can be
-    # filed.
-    # self.DoTestConnect()
-    # Test connect again to ensure that the formatting issue doesn't crop up.
-    # self.DoTestConnect()
+    self.DoTestConnectWithProxy()
     self.DoTestOperations()
 
-  def testConnectWithProxy(self):
+  @test_case.Filters.DoNotRunOnMac('Most Macs used by Kokoro are IPv6; '
+                                   'Cloud SQL only supports IPv4: b/141325243')
+  def testConnect(self):
     self.CreateInstance('db-g1-small')
-    self.DoTestConnectWithProxy()
+    self.DoTestConnect()
+    # Test connect again to ensure that the formatting issue doesn't crop up.
+    self.DoTestConnect()
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestBackupList(self):
@@ -115,19 +115,15 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
     properties.VALUES.core.disable_prompts.Set(True)
     self.CreateInstance('db-g1-small')
 
+  @sdk_test_base.Filters.RunOnlyInBundle
+  def testSQLCommands(self):
+    self.DoTestConnectWithProxy()
+
   @test_case.Filters.RunOnlyWithEnv('KOKORO_ROOT', 'Needs to be run with ipv4.')
   @test_case.Filters.DoNotRunOnMac('Most Macs used by Kokoro are IPv6; '
-                                   'Cloud SQL only supports IPv4.')
-  # b/141325243 expands on the above DoNotRun.
-  def testSQLCommands(self):
-    # TODO(b/144013563): re-enable these tests if network exception can be
-    # filed.
-    # self.DoTestConnect()
-    pass
-
-  @sdk_test_base.Filters.RunOnlyInBundle
-  def testConnectWithProxy(self):
-    self.DoTestConnectWithProxy()
+                                   'Cloud SQL only supports IPv4: b/141325243')
+  def testConnect(self):
+    self.DoTestConnect()
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestConnect(self):

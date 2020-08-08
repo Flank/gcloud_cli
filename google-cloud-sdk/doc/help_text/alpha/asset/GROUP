@@ -39,9 +39,6 @@ COMMANDS
      list
         (ALPHA) List the cloud assets.
 
-     search-iam-policies
-        (ALPHA) Searches accessible IAM policies that match a query.
-
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

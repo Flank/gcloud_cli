@@ -11,7 +11,7 @@ gcloud beta compute forwarding\-rules create \- create a forwarding rule to dire
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute forwarding\-rules create\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-allow\-global\-access\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR] [\fB\-\-is\-mirroring\-collector\fR] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-service\-label\fR=\fISERVICE_LABEL\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-address\-region\fR=\fIADDRESS_REGION\fR\ |\ \fB\-\-global\-address\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-target\-http\-proxy\fR\ |\ \fB\-\-target\-http\-proxy\-region\fR=\fITARGET_HTTP_PROXY_REGION\fR] [\fB\-\-global\-target\-https\-proxy\fR\ |\ \fB\-\-target\-https\-proxy\-region\fR=\fITARGET_HTTPS_PROXY_REGION\fR] [\fB\-\-port\-range\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR]\ |\ \fB\-\-ports\fR=\fIALL\fR\ |\ [\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute forwarding\-rules create\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-grpc\-proxy\fR=\fITARGET_GRPC_PROXY\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-allow\-global\-access\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR] [\fB\-\-is\-mirroring\-collector\fR] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-service\-label\fR=\fISERVICE_LABEL\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-address\-region\fR=\fIADDRESS_REGION\fR\ |\ \fB\-\-global\-address\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-target\-http\-proxy\fR\ |\ \fB\-\-target\-http\-proxy\-region\fR=\fITARGET_HTTP_PROXY_REGION\fR] [\fB\-\-global\-target\-https\-proxy\fR\ |\ \fB\-\-target\-https\-proxy\-region\fR=\fITARGET_HTTPS_PROXY_REGION\fR] [\fB\-\-port\-range\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR]\ |\ \fB\-\-ports\fR=\fIALL\fR\ |\ [\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -61,9 +61,9 @@ https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts.
 When creating a forwarding rule, exactly one of
 \f5\fI\-\-target\-instance\fR\fR, \f5\fI\-\-target\-pool\fR\fR,
 \f5\fI\-\-target\-http\-proxy\fR\fR, \f5\fI\-\-target\-https\-proxy\fR\fR,
-\f5\fI\-\-target\-ssl\-proxy\fR\fR, \f5\fI\-\-target\-tcp\-proxy\fR\fR,
-\f5\fI\-\-target\-vpn\-gateway\fR\fR or \f5\fI\-\-backend\-service\fR\fR must be
-specified.
+\f5\fI\-\-target\-grpc\-proxy\fR\fR, \f5\fI\-\-target\-ssl\-proxy\fR\fR,
+\f5\fI\-\-target\-tcp\-proxy\fR\fR, \f5\fI\-\-target\-vpn\-gateway\fR\fR or
+\f5\fI\-\-backend\-service\fR\fR must be specified.
 
 
 
@@ -89,6 +89,10 @@ Exactly one of these must be specified:
 .TP 2m
 \fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR
 Target backend service that receives the traffic.
+
+.TP 2m
+\fB\-\-target\-grpc\-proxy\fR=\fITARGET_GRPC_PROXY\fR
+Target gRPC proxy that receives the traffic.
 
 .TP 2m
 \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR
@@ -210,7 +214,7 @@ Internal HTTP(S) Load Balancing, used with \-\-target\-http\-proxy,
 .TP 2m
 \fBINTERNAL_SELF_MANAGED\fR
 Traffic director load balancing or forwarding, used with
-\-\-target\-http\-proxy, \-\-target\-https\-proxy.
+\-\-target\-http\-proxy, \-\-target\-https\-proxy, \-\-target\-grpc\-proxy.
 .RE
 .sp
 

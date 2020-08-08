@@ -1,6 +1,5 @@
 NAME
-    gcloud compute disks update - update a Google Compute Engine persistent
-        disk
+    gcloud compute disks update - update a Compute Engine persistent disk
 
 SYNOPSIS
     gcloud compute disks update DISK_NAME [--update-labels=[KEY=VALUE,...]]
@@ -8,8 +7,7 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute disks update updates a Google Compute Engine persistent
-    disk.
+    gcloud compute disks update updates a Compute Engine persistent disk.
 
 POSITIONAL ARGUMENTS
      DISK_NAME
@@ -112,7 +110,7 @@ EXAMPLES
     the result:
 
         $ gcloud compute disks describe example-disk \
-          --format='default(labels)'
+          --format="default(labels)"
 
 NOTES
     These variants are also available:

@@ -251,21 +251,23 @@ class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
     response = self.messages.InstanceGroupManager(name='group-1')
     self.client.instanceGroupManagers.Get.Expect(request, response=response)
 
-  def _ExpectApplyUpdatesToInstances(self):
+  def _ExpectApplyUpdatesToInstances(self, minimal_action='none'):
+    minimal_action = (
+        self.messages.InstanceGroupManagersApplyUpdatesRequest
+        .MinimalActionValueValuesEnum(minimal_action.upper()))
     request = (
         self.messages.ComputeInstanceGroupManagersApplyUpdatesToInstancesRequest
     )(
         instanceGroupManager='group-1',
         instanceGroupManagersApplyUpdatesRequest=(
-            self.messages.InstanceGroupManagersApplyUpdatesRequest
-        )(instances=[
-            self.project_uri + '/zones/us-central2-a/instances/foo',
-        ],
-          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest
-          .MinimalActionValueValuesEnum.NONE,
-          mostDisruptiveAllowedAction=self.messages
-          .InstanceGroupManagersApplyUpdatesRequest
-          .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
+            self.messages.InstanceGroupManagersApplyUpdatesRequest)(
+                instances=[
+                    self.project_uri + '/zones/us-central2-a/instances/foo',
+                ],
+                minimalAction=minimal_action,
+                mostDisruptiveAllowedAction=self.messages
+                .InstanceGroupManagersApplyUpdatesRequest
+                .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -298,7 +300,7 @@ class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
         preserved_state_metadata=preserved_state_metadata)
     self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances()
+    self._ExpectApplyUpdatesToInstances('restart')
     self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
@@ -309,6 +311,7 @@ class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
           --stateful-disk device-name=foo,source={project_uri}/zones/us-central2-a/disks/foo,mode=rw,auto-delete=on-permanent-instance-deletion
           --stateful-disk device-name=baz,source={project_uri}/zones/us-central2-a/disks/baz,mode=ro,auto-delete=never
           --stateful-metadata "key-BAR=value BAR,key-foo=value foo"
+          --instance-update-minimal-action restart
         """.format(project_uri=self.project_uri))
 
   def testCreateOverrideForNonExistingDisk(self):
@@ -495,8 +498,8 @@ class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
 
     with self.AssertRaisesExceptionMatches(
         calliope_exceptions.BadArgumentException,
-        ('[source] must be given while defining stateful disks in instance'
-         ' configs for non existing instances')):
+        ('Invalid value for [stateful_disk]: [source] must be given while '
+         'defining stateful disks in instance configs for new instances')):
       self.Run("""
           compute instance-groups managed instance-configs create group-1
             --zone us-central2-a
@@ -510,8 +513,9 @@ class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
 
     with self.AssertRaisesExceptionMatches(
         calliope_exceptions.BadArgumentException,
-        ('[source] must be given while defining stateful disks in instance'
-         ' configs for non existing disks in given instance')):
+        ('Invalid value for [stateful_disk]: [source] is required because the '
+         'disk with the [device-name]: `abc` is not yet configured in the '
+         'instance config')):
       self.Run("""
           compute instance-groups managed instance-configs create group-1
             --zone us-central2-a
@@ -672,7 +676,10 @@ class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
     self.client.regionInstanceGroupManagers.Get.Expect(
         request, response=response)
 
-  def _ExpectApplyUpdatesToInstances(self):
+  def _ExpectApplyUpdatesToInstances(self, minimal_action='none'):
+    minimal_action = (
+        self.messages.RegionInstanceGroupManagersApplyUpdatesRequest
+        .MinimalActionValueValuesEnum(minimal_action.upper()))
     request = (
         self.messages
         .ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
@@ -682,9 +689,7 @@ class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
                     instances=[
                         self.project_uri + '/zones/us-central2-a/instances/foo',
                     ],
-                    minimalAction=self.messages
-                    .RegionInstanceGroupManagersApplyUpdatesRequest
-                    .MinimalActionValueValuesEnum.NONE,
+                    minimalAction=minimal_action,
                     mostDisruptiveAllowedAction=self.messages
                     .RegionInstanceGroupManagersApplyUpdatesRequest
                     .MostDisruptiveAllowedActionValueValuesEnum.REPLACE),
@@ -721,7 +726,7 @@ class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
         preserved_state_metadata=preserved_state_metadata)
     self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances()
+    self._ExpectApplyUpdatesToInstances('restart')
     self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
@@ -732,6 +737,7 @@ class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
           --stateful-disk device-name=foo,source={project_uri}/zones/us-central2-a/disks/foo,mode=rw
           --stateful-disk device-name=baz,source={project_uri}/zones/us-central2-a/disks/baz,mode=ro
           --stateful-metadata "key-BAR=value BAR,key-foo=value foo"
+          --instance-update-minimal-action restart
         """.format(project_uri=self.project_uri))
 
   def testCreateWithoutUpdateInstance(self):

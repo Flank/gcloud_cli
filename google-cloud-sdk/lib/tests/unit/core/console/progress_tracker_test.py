@@ -448,7 +448,7 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture,
                          '"status": "SUCCESS"}\n')
 
   @parameterized.named_parameters(
-      ('Utf8', 'utf8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']),
+      ('Utf8', 'utf-8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']),
       ('Cp437', 'cp437', ['|', '/', '-', '\\']),  # windows
       ('Ascii', 'ascii', ['|', '/', '-', '\\']))
   def testProgressTrackerSpinnersByEncoding(self, encoding, spinners):
@@ -1026,7 +1026,7 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
                          '["Hello World..."]}\n')
 
   @parameterized.named_parameters(
-      ('Utf8', 'utf8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']),
+      ('Utf8', 'utf-8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']),
       ('Cp437', 'cp437', ['|', '/', '-', '\\']),  # windows
       ('Ascii', 'ascii', ['|', '/', '-', '\\']))
   def testProgressTrackerSpinnersByEncoding(self, encoding, spinners):
@@ -1173,7 +1173,7 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         'Failed.\n')
 
   @parameterized.named_parameters(
-      ('Utf8', 'utf8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧'], 1, '✓ '),
+      ('Utf8', 'utf-8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧'], 1, '✓ '),
       ('Cp437', 'cp437', ['|', '/', '-', '\\'], 2, 'OK '),  # windows
       ('Ascii', 'ascii', ['|', '/', '-', '\\'], 2, 'OK '))
   def testProgressTrackerSpinnersByEncoding(self, encoding, spinners,
@@ -1245,7 +1245,7 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
   def testProgressTrackerHandlesTypedText(self):
     properties.VALUES.core.color_theme.Set('testing')
     self.SetConsoleSize(30)
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
       spt.StartStage(self.keys[0])

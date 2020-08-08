@@ -28,9 +28,7 @@ from tests.lib import e2e_utils
 from tests.lib import test_case
 from tests.lib.sdk_test_base import WithTempCWD
 
-# LINT.IfChange
 RESOURCE_PREFIX = 'cloud-sdk-integration-testing_cloudbuild'
-# LINT.ThenChange(//depot/google3/cloud/sdk/component_build/scripts/resources.yaml)
 CLOUDBUILD_YAML = """
 steps:
 # For ease of debugging, log what files are present.

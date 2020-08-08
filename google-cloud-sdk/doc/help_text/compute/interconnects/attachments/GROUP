@@ -1,13 +1,13 @@
 NAME
-    gcloud compute interconnects attachments - read and manipulate Google
-        Compute Engine interconnect attachments
+    gcloud compute interconnects attachments - read and manipulate Compute
+        Engine interconnect attachments
 
 SYNOPSIS
     gcloud compute interconnects attachments GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manipulate Google Compute Engine interconnect attachments.
+    Read and manipulate Compute Engine interconnect attachments.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -33,7 +33,7 @@ COMMANDS
         Delete interconnects.
 
      describe
-        Describe a Google Compute Engine interconnect attachment.
+        Describe a Compute Engine interconnect attachment.
 
      list
         List Google Compute Engine interconnect attachments.

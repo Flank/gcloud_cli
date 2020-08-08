@@ -36,9 +36,9 @@ class _BaseFlagsListSqlTest(object):
                     ],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_5,
-                        self.messages.Flag.AppliesToValueListEntryValuesEnum
                         .MYSQL_5_6,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -53,7 +53,7 @@ class _BaseFlagsListSqlTest(object):
                     ],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_6,
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -65,9 +65,9 @@ class _BaseFlagsListSqlTest(object):
                     allowedStringValues=[],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_5,
-                        self.messages.Flag.AppliesToValueListEntryValuesEnum
                         .MYSQL_5_6,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -108,9 +108,9 @@ class _BaseFlagsListSqlTest(object):
                     ],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_5,
-                        self.messages.Flag.AppliesToValueListEntryValuesEnum
                         .MYSQL_5_6,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -129,16 +129,16 @@ class _BaseFlagsListSqlTest(object):
     self.AssertOutputContains(
         """\
 NAME                             TYPE                   DATABASE_VERSION    ALLOWED_VALUES
-log_output                       STRING                 MYSQL_5_5,MYSQL_5_6 TABLE,NONE
-binlog_checksum                  STRING                 MYSQL_5_6           CRC32,NONE
-general_log                      BOOLEAN                MYSQL_5_5,MYSQL_5_6
-sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLOW_INVALID_DATES,ANSI_QUOTES,ERROR_FOR_DIVISION_BY_ZERO,HIGH_NOT_PRECEDENCE,IGNORE_SPACE,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_BACKSLASH_ESCAPES,NO_FIELD_OPTIONS,NO_KEY_OPTIONS,NO_TABLE_OPTIONS,NO_UNSIGNED_SUBTRACTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY,PIPES_AS_CONCAT,REAL_AS_FLOAT,STRICT_ALL_TABLES,STRICT_TRANS_TABLES,ANSI,DB2,MAXDB,MSSQL,MYSQL323,MYSQL40,ORACLE,POSTGRESQL,TRADITIONAL
+log_output                       STRING                 MYSQL_5_6,MYSQL_5_7 TABLE,NONE
+binlog_checksum                  STRING                 MYSQL_5_7           CRC32,NONE
+general_log                      BOOLEAN                MYSQL_5_6,MYSQL_5_7
+sql_mode                         STRING                 MYSQL_5_6,MYSQL_5_7 ALLOW_INVALID_DATES,ANSI_QUOTES,ERROR_FOR_DIVISION_BY_ZERO,HIGH_NOT_PRECEDENCE,IGNORE_SPACE,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_BACKSLASH_ESCAPES,NO_FIELD_OPTIONS,NO_KEY_OPTIONS,NO_TABLE_OPTIONS,NO_UNSIGNED_SUBTRACTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY,PIPES_AS_CONCAT,REAL_AS_FLOAT,STRICT_ALL_TABLES,STRICT_TRANS_TABLES,ANSI,DB2,MAXDB,MSSQL,MYSQL323,MYSQL40,ORACLE,POSTGRESQL,TRADITIONAL
 """,
         normalize_space=True)
 
   def _SetUpFlagsDatabaseVersionFilter(self):
     self.mocked_client.flags.List.Expect(
-        self.messages.SqlFlagsListRequest(databaseVersion='MYSQL_5_5'),
+        self.messages.SqlFlagsListRequest(databaseVersion='MYSQL_5_6'),
         self.messages.FlagsListResponse(
             items=[
                 self.messages.Flag(
@@ -148,9 +148,9 @@ sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLO
                     ],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_5,
-                        self.messages.Flag.AppliesToValueListEntryValuesEnum
                         .MYSQL_5_6,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -162,9 +162,9 @@ sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLO
                     allowedStringValues=[],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_5,
-                        self.messages.Flag.AppliesToValueListEntryValuesEnum
                         .MYSQL_5_6,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -205,9 +205,9 @@ sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLO
                     ],
                     appliesTo=[
                         self.messages.Flag.AppliesToValueListEntryValuesEnum
-                        .MYSQL_5_5,
-                        self.messages.Flag.AppliesToValueListEntryValuesEnum
                         .MYSQL_5_6,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_7,
                     ],
                     kind='sql#flag',
                     maxValue=None,
@@ -221,14 +221,14 @@ sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLO
 
   def testFlagsListFilterDatabaseVersion(self):
     self._SetUpFlagsDatabaseVersionFilter()
-    self.Run('sql flags list --database-version=MYSQL_5_5')
+    self.Run('sql flags list --database-version=MYSQL_5_6')
     # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
 NAME                             TYPE                   DATABASE_VERSION    ALLOWED_VALUES
-log_output                       STRING                 MYSQL_5_5,MYSQL_5_6 TABLE,NONE
-general_log                      BOOLEAN                MYSQL_5_5,MYSQL_5_6
-sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLOW_INVALID_DATES,ANSI_QUOTES,ERROR_FOR_DIVISION_BY_ZERO,HIGH_NOT_PRECEDENCE,IGNORE_SPACE,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_BACKSLASH_ESCAPES,NO_FIELD_OPTIONS,NO_KEY_OPTIONS,NO_TABLE_OPTIONS,NO_UNSIGNED_SUBTRACTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY,PIPES_AS_CONCAT,REAL_AS_FLOAT,STRICT_ALL_TABLES,STRICT_TRANS_TABLES,ANSI,DB2,MAXDB,MSSQL,MYSQL323,MYSQL40,ORACLE,POSTGRESQL,TRADITIONAL
+log_output                       STRING                 MYSQL_5_6,MYSQL_5_7 TABLE,NONE
+general_log                      BOOLEAN                MYSQL_5_6,MYSQL_5_7
+sql_mode                         STRING                 MYSQL_5_6,MYSQL_5_7 ALLOW_INVALID_DATES,ANSI_QUOTES,ERROR_FOR_DIVISION_BY_ZERO,HIGH_NOT_PRECEDENCE,IGNORE_SPACE,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_BACKSLASH_ESCAPES,NO_FIELD_OPTIONS,NO_KEY_OPTIONS,NO_TABLE_OPTIONS,NO_UNSIGNED_SUBTRACTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY,PIPES_AS_CONCAT,REAL_AS_FLOAT,STRICT_ALL_TABLES,STRICT_TRANS_TABLES,ANSI,DB2,MAXDB,MSSQL,MYSQL323,MYSQL40,ORACLE,POSTGRESQL,TRADITIONAL
 """,
         normalize_space=True)
 

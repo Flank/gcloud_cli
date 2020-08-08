@@ -47,7 +47,11 @@ ID of the subscription or fully qualified identifier for the subscription.
 .sp
 .TP 2m
 [\fIACK_ID\fR ...]
-(DEPRECATED) One or more ACK_ID to acknowledge.
+(DEPRECATED) One or more ACK_ID to acknowledge. An ACK_ID is a string that is
+returned to subscribers
+(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.ReceivedMessage).
+along with the message. The ACK_ID is different from the message ID
+(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.PubsubMessage).
 
 Positional argument \f5ACK_ID\fR is deprecated. Please use \f5\-\-ack\-ids\fR
 instead.
@@ -61,7 +65,11 @@ instead.
 .RS 2m
 .TP 2m
 \fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]
-One or more ACK_ID to acknowledge.
+One or more ACK_ID to acknowledge. An ACK_ID is a string that is returned to
+subscribers
+(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.ReceivedMessage).
+along with the message. The ACK_ID is different from the message ID
+(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#google.pubsub.v1.PubsubMessage).
 
 
 .RE

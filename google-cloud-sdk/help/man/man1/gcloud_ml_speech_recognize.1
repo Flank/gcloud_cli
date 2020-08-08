@@ -119,15 +119,19 @@ https://cloud.google.com/speech\-to\-text/docs/quickstart\-protocol
 
 .SH "EXAMPLES"
 
-To get a transcript of an audio file 'my\-recording.wav': $ gcloud ml speech
-recognize 'my\-recording.wav' \-\-language\-code=en\-US
+To get a transcript of an audio file 'my\-recording.wav':
+
+.RS 2m
+$ gcloud ml speech recognize 'my\-recording.wav' \-\-language\-code=en\-US
+.RE
 
 To get a transcript of an audio file in bucket 'gs://bucket/myaudio' with a
-custom sampling rate and encoding that uses hints and filters profanity: $
-gcloud ml speech recognize 'gs://bucket/myaudio' \e.RS 2m
-\-\-language\-code=es\-ES \-\-sample\-rate=2200 \-\-hints=Bueno \e
-\-\-encoding=OGG_OPUS \-\-filter\-profanity
+custom sampling rate and encoding that uses hints and filters profanity:
 
+.RS 2m
+$ gcloud ml speech recognize 'gs://bucket/myaudio' \e
+    \-\-language\-code=es\-ES \-\-sample\-rate=2200 \-\-hints=Bueno \e
+    \-\-encoding=OGG_OPUS \-\-filter\-profanity
 .RE
 
 

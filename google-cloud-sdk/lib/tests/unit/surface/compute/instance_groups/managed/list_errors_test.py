@@ -24,7 +24,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 
 
 class InstanceGroupsListErrorsZonalTestBase(sdk_test_base.WithFakeAuth,

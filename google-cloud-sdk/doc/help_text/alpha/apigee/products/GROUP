@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha apigee products - manage Apigee API products
+
+SYNOPSIS
+    gcloud alpha apigee products COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Apigee API products.
+
+    An API product is a collection of API resources combined with quota
+    settings and metadata, used to deliver customized and productized API
+    bundles to the developer community.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create an Apigee API product.
+
+     delete
+        (ALPHA) Deletes an Apigee API product.
+
+     describe
+        (ALPHA) Describes an Apigee API product.
+
+     list
+        (ALPHA) List Apigee API products.
+
+     update
+        (ALPHA) Modifies an existing Apigee API product.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

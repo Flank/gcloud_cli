@@ -82,11 +82,14 @@ FLAGS
      At most one of these may be specified:
 
        --composite-type=COMPOSITE_TYPE
-          Name of a composite type to deploy.
+          Name of a composite type to deploy. For an example of creating and
+          deploying a composite type, see:
+          https://cloud.google.com/deployment-manager/docs/configuration/templates/create-composite-types#examplecompositetype
 
        --config=CONFIG
           Filename of a top-level yaml config that specifies resources to
-          deploy.
+          deploy. For a guide to creating a configuration, refer to
+          https://cloud.google.com/deployment-manager/docs/configuration/create-basic-configuration
 
        --manifest-id=MANIFEST_ID
           Manifest Id of a previous deployment. This flag cannot be used with

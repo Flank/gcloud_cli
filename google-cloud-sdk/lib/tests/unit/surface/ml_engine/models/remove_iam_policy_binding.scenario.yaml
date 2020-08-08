@@ -8,7 +8,7 @@ summary:
   - stderr: |
       WARNING: The `gcloud ml-engine` commands have been renamed and will soon be removed. Please use `gcloud ai-platform` instead.
   - stderr: |
-      WARNING: Using endpoint [https://ml.googleapis.com/]
+      Using endpoint [https://ml.googleapis.com/]
   - stderr: |
       Updated IAM policy for model [my_model].
   - stdout: |
@@ -26,7 +26,7 @@ actions:
     events:
     - expect_stderr: |
         WARNING: The `gcloud ml-engine` commands have been renamed and will soon be removed. Please use `gcloud ai-platform` instead.
-        WARNING: Using endpoint [https://ml.googleapis.com/]
+        Using endpoint [https://ml.googleapis.com/]
     - api_call:
         expect_request:
           uri: https://ml.googleapis.com/v1/projects/fake-project/models/my_model:getIamPolicy?alt=json

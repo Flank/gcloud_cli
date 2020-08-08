@@ -43,8 +43,7 @@ def _DetailedHelp():
 
 
 def _AddArgs(parser, include_alpha_logging, include_l7_internal_load_balancing,
-             include_private_ipv6_access_alpha,
-             include_private_ipv6_access_beta, include_aggregate_purpose):
+             include_aggregate_purpose, api_version):
   """Add subnetwork create arguments to parser."""
   parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
 
@@ -177,56 +176,15 @@ def _AddArgs(parser, include_alpha_logging, include_l7_internal_load_balancing,
               'subnetwork is one that is ready to be promoted to ACTIVE or is '
               'currently draining.'))
 
-  if include_private_ipv6_access_alpha:
-    messages = apis.GetMessagesModule('compute',
-                                      compute_api.COMPUTE_ALPHA_API_VERSION)
-    parser.add_argument(
-        '--enable-private-ipv6-access',
-        action='store_true',
-        default=None,
-        help=('Enable/disable private IPv6 access for the subnet.'))
-
-    GetPrivateIpv6GoogleAccessTypeFlagMapperAlpha(
-        messages).choice_arg.AddToParser(parser)
-
-    parser.add_argument(
-        '--private-ipv6-google-access-service-accounts',
-        default=None,
-        metavar='EMAIL',
-        type=arg_parsers.ArgList(min_length=1),
-        help="""\
-        The service accounts can be used to selectively turn on Private IPv6
-        Google Access only on the VMs primary service account matching the
-        value.
-        """)
-  elif include_private_ipv6_access_beta:
-    messages = apis.GetMessagesModule('compute',
-                                      compute_api.COMPUTE_BETA_API_VERSION)
-    GetPrivateIpv6GoogleAccessTypeFlagMapperBeta(
-        messages).choice_arg.AddToParser(parser)
+  # Add private ipv6 google access enum based on api version.
+  messages = apis.GetMessagesModule('compute', api_version)
+  GetPrivateIpv6GoogleAccessTypeFlagMapper(messages).choice_arg.AddToParser(
+      parser)
 
   parser.display_info.AddCacheUpdater(network_flags.NetworksCompleter)
 
 
-def GetPrivateIpv6GoogleAccessTypeFlagMapperAlpha(messages):
-  return arg_utils.ChoiceEnumMapper(
-      '--private-ipv6-google-access-type',
-      messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum,
-      custom_mappings={
-          'DISABLE_GOOGLE_ACCESS':
-              'disable',
-          'ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE':
-              'enable-bidirectional-access',
-          'ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE':
-              'enable-outbound-vm-access',
-          'ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS':
-              'enable-outbound-vm-access-for-service-accounts'
-      },
-      help_str='The private IPv6 google access type for the VMs in this subnet.'
-  )
-
-
-def GetPrivateIpv6GoogleAccessTypeFlagMapperBeta(messages):
+def GetPrivateIpv6GoogleAccessTypeFlagMapper(messages):
   return arg_utils.ChoiceEnumMapper(
       '--private-ipv6-google-access-type',
       messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum,
@@ -244,8 +202,6 @@ def GetPrivateIpv6GoogleAccessTypeFlagMapperBeta(messages):
 
 def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
                       include_alpha_logging, include_l7_internal_load_balancing,
-                      include_private_ipv6_access_alpha,
-                      include_private_ipv6_access_beta,
                       include_aggregate_purpose):
   """Create the subnet resource."""
   subnetwork = messages.Subnetwork(
@@ -325,28 +281,16 @@ def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
         subnetwork.enableFlowLogs = None
         subnetwork.logConfig = None
 
-  if include_private_ipv6_access_alpha:
-    if args.enable_private_ipv6_access is not None:
-      subnetwork.enablePrivateV6Access = args.enable_private_ipv6_access
-    if args.private_ipv6_google_access_type is not None:
-      subnetwork.privateIpv6GoogleAccess = (
-          flags.GetPrivateIpv6GoogleAccessTypeFlagMapperAlpha(
-              messages).GetEnumForChoice(args.private_ipv6_google_access_type))
-    if args.private_ipv6_google_access_service_accounts is not None:
-      subnetwork.privateIpv6GoogleAccessServiceAccounts = (
-          args.private_ipv6_google_access_service_accounts)
-  elif include_private_ipv6_access_beta:
-    if args.private_ipv6_google_access_type is not None:
-      subnetwork.privateIpv6GoogleAccess = (
-          flags.GetPrivateIpv6GoogleAccessTypeFlagMapperBeta(
-              messages).GetEnumForChoice(args.private_ipv6_google_access_type))
+  if args.private_ipv6_google_access_type is not None:
+    subnetwork.privateIpv6GoogleAccess = (
+        flags.GetPrivateIpv6GoogleAccessTypeFlagMapper(
+            messages).GetEnumForChoice(args.private_ipv6_google_access_type))
 
   return subnetwork
 
 
 def _Run(args, holder, include_alpha_logging,
-         include_l7_internal_load_balancing, include_private_ipv6_access_alpha,
-         include_private_ipv6_access_beta, include_aggregate_purpose):
+         include_l7_internal_load_balancing, include_aggregate_purpose):
   """Issues a list of requests necessary for adding a subnetwork."""
   client = holder.client
 
@@ -361,8 +305,6 @@ def _Run(args, holder, include_alpha_logging,
   subnetwork = _CreateSubnetwork(client.messages, subnet_ref, network_ref, args,
                                  include_alpha_logging,
                                  include_l7_internal_load_balancing,
-                                 include_private_ipv6_access_alpha,
-                                 include_private_ipv6_access_beta,
                                  include_aggregate_purpose)
   request = client.messages.ComputeSubnetworksInsertRequest(
       subnetwork=subnetwork,
@@ -389,9 +331,8 @@ class Create(base.CreateCommand):
   _include_alpha_logging = False
   # TODO(b/144022508): Remove _include_l7_internal_load_balancing
   _include_l7_internal_load_balancing = True
-  _include_private_ipv6_access_alpha = False
-  _include_private_ipv6_access_beta = False
   _include_aggregate_purpose = False
+  _api_version = compute_api.COMPUTE_GA_API_VERSION
 
   detailed_help = _DetailedHelp()
 
@@ -399,29 +340,25 @@ class Create(base.CreateCommand):
   def Args(cls, parser):
     _AddArgs(parser, cls._include_alpha_logging,
              cls._include_l7_internal_load_balancing,
-             cls._include_private_ipv6_access_alpha,
-             cls._include_private_ipv6_access_beta,
-             cls._include_aggregate_purpose)
+             cls._include_aggregate_purpose, cls._api_version)
 
   def Run(self, args):
     """Issues a list of requests necessary for adding a subnetwork."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     return _Run(args, holder, self._include_alpha_logging,
                 self._include_l7_internal_load_balancing,
-                self._include_private_ipv6_access_alpha,
-                self._include_private_ipv6_access_beta,
                 self._include_aggregate_purpose)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
 
-  _include_private_ipv6_access_beta = True
+  _api_version = compute_api.COMPUTE_BETA_API_VERSION
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(CreateBeta):
 
   _include_alpha_logging = True
-  _include_private_ipv6_access_alpha = True
   _include_aggregate_purpose = True
+  _api_version = compute_api.COMPUTE_ALPHA_API_VERSION

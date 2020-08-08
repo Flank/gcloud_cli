@@ -1,0 +1,29 @@
+title: "'run code ... --appengine' picks builder image based on app.yaml platform"
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: code export --appengine
+  - write_file: pods_and_services.yaml
+  - write_file: skaffold.yaml
+actions:
+- define_reference:
+    reference: some_gae_supported_runtime
+    value: python37
+- write_file:
+    path: app.yaml
+    contents: |
+      runtime: $$some_gae_supported_runtime$$
+- execute_command:
+    command: code export --appengine
+    events:
+    - expect_file_written:
+        path: pods_and_services.yaml
+        contents:
+          matches: .*
+    - expect_file_written:
+        path: skaffold.yaml
+        contents:
+          matches: '.*builder: gcr\.io/gae-runtimes/buildpacks/$$some_gae_supported_runtime$$/builder:argo_current.*'
+    - expect_exit:
+        code: 0

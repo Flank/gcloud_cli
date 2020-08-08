@@ -315,6 +315,7 @@ class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
     self.messages = self.client.MESSAGES_MODULE
 
     self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
+    self.neg_type_enum = self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
 
   def testUpdate_NonGcpPrivateIpPortType_AddEndpointSimple(self):
     endpoints = [
@@ -395,6 +396,49 @@ class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
     self.AssertErrContains('Detaching 1 endpoints from [my-neg].')
 
   def testUpdate_GceVmPrimaryIpType_RemoveEndpointMultiple(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(ipAddress='127.0.0.1'),
+        self.messages.NetworkEndpoint(ipAddress='127.0.0.2')
+    ]
+    self._ExpectDetachEndpoints(endpoints)
+    self._ExpectPollAndGet()
+    self.Run('compute network-endpoint-groups update my-neg '
+             '--remove-endpoint ip=127.0.0.1 '
+             '--remove-endpoint ip=127.0.0.2 --zone ' + self.zone)
+
+  def testUpdate_GceVmIpType_AddEndpointSimple(self):
+    endpoints = [self.messages.NetworkEndpoint(ipAddress='127.0.0.1')]
+    self.messages.NetworkEndpointGroup(
+        name='my-neg', networkEndpointType=self.neg_type_enum.GCE_VM_IP)
+    self._ExpectAttachEndpoints(endpoints)
+    self._ExpectPollAndGet()
+    self.Run('compute network-endpoint-groups update my-neg '
+             '--add-endpoint ip=127.0.0.1 --zone ' + self.zone)
+    self.AssertErrContains('Attaching 1 endpoints to [my-neg].')
+
+  def testUpdate_GceVmIpType_AddEndpointMultiple(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(ipAddress='127.0.0.1'),
+        self.messages.NetworkEndpoint(ipAddress='127.0.0.2')
+    ]
+    self._ExpectAttachEndpoints(endpoints)
+    self._ExpectPollAndGet()
+    self.Run('compute network-endpoint-groups update my-neg '
+             '--add-endpoint ip=127.0.0.1 '
+             '--add-endpoint ip=127.0.0.2 --zone ' + self.zone)
+    self.AssertErrContains('Attaching 2 endpoints to [my-neg].')
+
+  def testUpdate_GceVmIpType_RemoveEndpointSimple(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(ipAddress='127.0.0.1'),
+    ]
+    self._ExpectDetachEndpoints(endpoints)
+    self._ExpectPollAndGet()
+    self.Run('compute network-endpoint-groups update my-neg '
+             '--remove-endpoint ip=127.0.0.1 --zone ' + self.zone)
+    self.AssertErrContains('Detaching 1 endpoints from [my-neg].')
+
+  def testUpdate_GceVmIpType_RemoveEndpointMultiple(self):
     endpoints = [
         self.messages.NetworkEndpoint(ipAddress='127.0.0.1'),
         self.messages.NetworkEndpoint(ipAddress='127.0.0.2')

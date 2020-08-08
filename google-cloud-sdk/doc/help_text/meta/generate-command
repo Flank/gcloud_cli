@@ -1,0 +1,33 @@
+NAME
+    gcloud meta generate-command - generate YAML file to implement given
+        command
+
+SYNOPSIS
+    gcloud meta generate-command COLLECTION [--output-dir=DIRECTORY]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The command YAML file is generated in the --output-dir directory.
+
+POSITIONAL ARGUMENTS
+     COLLECTION
+        The name of the collection to generate commands for.
+
+FLAGS
+     --output-dir=DIRECTORY
+        The directory where the generated command YAML files will be written.
+        If not specified then yaml files will not be generated. If no output
+        directory is specified, the new YAML file will be written to stdout.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

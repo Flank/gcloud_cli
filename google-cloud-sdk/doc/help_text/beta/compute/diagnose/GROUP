@@ -24,7 +24,7 @@ COMMANDS
         Storage Bucket.
 
      routes
-        (BETA) Routes to/from Google Compute Engine virtual machine instances.
+        (BETA) Routes to/from Compute Engine virtual machine instances.
 
 NOTES
     This command is currently in BETA and may change without notice. These

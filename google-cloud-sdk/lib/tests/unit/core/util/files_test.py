@@ -1450,7 +1450,7 @@ class HomeDirTest(test_case.Base):
 
   def testGetHomeDirutf8(self):
     self.StartObjectPatch(os.path, 'expanduser',
-                          return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+                          return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf-8'))
     self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.GetHomeDir())
 
   def testGetHomeDirunicode(self):
@@ -1464,12 +1464,48 @@ class HomeDirTest(test_case.Base):
 
   def testExpandHomeDirutf8(self):
     self.StartObjectPatch(os.path, 'expanduser',
-                          return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+                          return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf-8'))
     self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.ExpandHomeDir('~user'))
 
   def testExpandHomeDirunicode(self):
     self.StartObjectPatch(os.path, 'expanduser', return_value='Ṳᾔḯ¢◎ⅾℯ')
     self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.ExpandHomeDir('~user'))
+
+
+class ExpandDirTest(test_case.Base):
+
+  MY_VARS = {'$VAR1': 'FOO', '$VAR2': 'BAR', '$VAR3': 'OTHER_VAR'}
+
+  def _MockExpandUser(self, path):
+    regex = r'(~)|(~user)'
+    pattern = re.compile(regex)
+    return pattern.sub('abc.xyz', path)
+
+  def SetUp(self):
+    self.StartEnvPatch({k.replace('$', ''): v for k, v in self.MY_VARS.items()})
+    self.StartObjectPatch(
+        os.path, 'expanduser', autospec=True, side_effect=self._MockExpandUser)
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testExpandDirWithOneVar(self):
+    self.assertEqual(
+        os.path.join('abc.xyz', 'FOO'),
+        file_utils.ExpandHomeAndVars(os.path.join('~', '$VAR1')))
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testExpandDirWithMultivars(self):
+    self.assertEqual(
+        os.path.join('abc.xyz', 'FOO', 'OTHER_VAR', 'BAR'),
+        file_utils.ExpandHomeAndVars(
+            os.path.join('~', '$VAR1', '$VAR3', '$VAR2')))
+
+  @test_case.Filters.RunOnlyOnWindows
+  def testExpandHomeDirWinVars(self):
+    self.assertEqual(
+        os.path.join('abc.xyz', 'FOO', 'OTHER_VAR', 'BAR'),
+        file_utils.ExpandHomeDir(
+            file_utils.ExpandHomeAndVars(
+                os.path.join('~', '%VAR1%', '%VAR3%', '%VAR2%'))))
 
 
 class GetCWDTest(test_case.Base):
@@ -1479,7 +1515,7 @@ class GetCWDTest(test_case.Base):
     self.assertEqual('abc.xyz', file_utils.GetCWD())
 
   def testGetCWDutf8(self):
-    self.StartObjectPatch(os, 'getcwd', return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.StartObjectPatch(os, 'getcwd', return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf-8'))
     self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.GetCWD())
 
   def testGetCWDunicode(self):

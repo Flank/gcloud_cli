@@ -9,9 +9,12 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Search for available domains relevant to a specified query.
 
+    This command uses cached domain name availability information. Use the
+    get-register-params command to get up-to-date availability information.
+
 POSITIONAL ARGUMENTS
      DOMAIN_QUERY
-        Domains search query.
+        Domain search query. May be a domain name or arbitrary search terms.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

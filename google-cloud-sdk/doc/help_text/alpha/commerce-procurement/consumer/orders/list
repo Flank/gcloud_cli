@@ -1,0 +1,71 @@
+NAME
+    gcloud alpha commerce-procurement consumer orders list - outputs the List
+        of Order object resulting from the List API
+
+SYNOPSIS
+    gcloud alpha commerce-procurement consumer orders list
+        --billing-account=BILLING_ACCOUNT [--filter=FILTER]
+        [--page-size=PAGE_SIZE] [--page-token=PAGE_TOKEN]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Outputs the List of Order object resulting from the List API.
+
+REQUIRED FLAGS
+     Billing account resource - Parent billing account to list orders. This
+     represents a Cloud resource. This must be specified.
+
+       --billing-account=BILLING_ACCOUNT
+          ID of the billing-account or fully qualified identifier for the
+          billing-account.
+
+OPTIONAL FLAGS
+     --filter=FILTER
+        The filter that can be used to limit the list request.
+
+     --page-size=PAGE_SIZE
+        Maximum number of resources per page.
+
+     --page-token=PAGE_TOKEN
+        Token to specify next page in the list.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    The filter is a query string that can match a selected set of attributes
+    with string values. For example
+
+        $ gcloud alpha commerce-procurement consumer orders list \
+          --filter "display_name=TEST"
+
+    Supported query attributes are
+
+      o display_name
+
+    If the query contains some special characters other than letters,
+    underscore, or digits, the phrase must be quoted with double quotes. For
+    example, where the product name needs to be quoted because it contains
+    special character colon.
+
+        $ gcloud alpha commerce-procurement consumer orders list \
+          --filter "display_name=\"foo:bar\""
+
+    Queries can be combined with AND, OR, and NOT to form more complex queries.
+    They can also be grouped to force a desired evaluation order. For example,
+
+        $ gcloud alpha commerce-procurement consumer orders list \
+          --filter "display_name=foo OR display_name=bar"
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

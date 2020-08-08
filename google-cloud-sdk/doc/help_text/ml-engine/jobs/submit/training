@@ -16,6 +16,8 @@ SYNOPSIS
         [--use-chief-in-tf-config=USE_CHIEF_IN_TF_CONFIG]
         [--worker-accelerator=[count=COUNT],[type=TYPE]]
         [--worker-image-uri=WORKER_IMAGE_URI] [--async | --stream-logs]
+        [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--parameter-server-count=PARAMETER_SERVER_COUNT
           --parameter-server-machine-type=PARAMETER_SERVER_MACHINE_TYPE]
         [--worker-count=WORKER_COUNT --worker-machine-type=WORKER_MACHINE_TYPE]
@@ -301,6 +303,26 @@ FLAGS
           until cancelled with
 
               $ gcloud ai-platform jobs cancel JOB_ID
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the job. The 'AI Platform Service Agent' service
+     account must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'.
+     The arguments in this group can be used to specify the attributes of this
+     resource.
+
+       --kms-key=KMS_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --kms-keyring=KMS_KEYRING
+          The KMS keyring of the key.
+
+       --kms-location=KMS_LOCATION
+          The Cloud location for the key.
+
+       --kms-project=KMS_PROJECT
+          The Cloud project for the key.
 
      Configure parameter server machine type settings.
 

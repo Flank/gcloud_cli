@@ -35,22 +35,22 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding to a Google Compute Engine image.
+        (ALPHA) Add IAM policy binding to a Compute Engine image.
 
      add-labels
         (ALPHA) Add labels to Google Compute Engine images.
 
      create
-        (ALPHA) Create Google Compute Engine images.
+        (ALPHA) Create Compute Engine images.
 
      delete
-        (ALPHA) Delete Google Compute Engine images.
+        (ALPHA) Delete Compute Engine images.
 
      deprecate
-        (ALPHA) Manage deprecation status of Google Compute Engine images.
+        (ALPHA) Manage deprecation status of Compute Engine images.
 
      describe
-        (ALPHA) Describe a Google Compute Engine image.
+        (ALPHA) Describe a Compute Engine image.
 
      describe-from-family
         (ALPHA) Describe the latest image from an image family.
@@ -59,7 +59,7 @@ COMMANDS
         (ALPHA) Export a Compute Engine image.
 
      get-iam-policy
-        (ALPHA) Get the IAM policy for a Google Compute Engine image.
+        (ALPHA) Get the IAM policy for a Compute Engine image.
 
      import
         (ALPHA) Import an image into Compute Engine.
@@ -68,16 +68,16 @@ COMMANDS
         (ALPHA) List Google Compute Engine images.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding from a Google Compute Engine image.
+        (ALPHA) Remove IAM policy binding from a Compute Engine image.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine images.
 
      set-iam-policy
-        (ALPHA) Set the IAM policy for a Google Compute Engine image.
+        (ALPHA) Set the IAM policy for a Compute Engine image.
 
      update
-        (ALPHA) Update Google Compute Engine images.
+        (ALPHA) Update a Compute Engine image.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

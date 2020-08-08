@@ -4,8 +4,9 @@ NAME
 SYNOPSIS
     gcloud compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
-        [--destination-ranges=[CIDR_RANGE,...]] [--disabled] [--enable-logging]
-        [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
+        [--destination-ranges=[CIDR_RANGE,...]] [--disabled]
+        [--[no-]enable-logging] [--priority=PRIORITY]
+        [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
         [--target-service-accounts=[EMAIL,...]] [--target-tags=[TAG,...]]
@@ -78,7 +79,7 @@ FLAGS
 
             $ gcloud compute firewall-rules update MY-RULE --no-disabled
 
-     --enable-logging
+     --[no-]enable-logging
         Enable logging for the firewall rule. Logs will be exported to
         StackDriver. Firewall logging is disabled by default. To enable logging
         for an existing rule, run:
@@ -88,6 +89,8 @@ FLAGS
         To disable logging on an existing rule, run:
 
             $ gcloud compute firewall-rules update MY-RULE --no-enable-logging
+
+        Use --enable-logging to enable and --no-enable-logging to disable.
 
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT

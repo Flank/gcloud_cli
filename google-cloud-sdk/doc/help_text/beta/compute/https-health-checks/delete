@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute https-health-checks delete deletes one or more
-    Google Compute Engine HTTPS health checks.
+    Compute Engine HTTPS health checks.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

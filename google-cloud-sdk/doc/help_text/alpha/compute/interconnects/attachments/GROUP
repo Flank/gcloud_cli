@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute interconnects attachments - read and manipulate Google
+    gcloud alpha compute interconnects attachments - read and manipulate
         Compute Engine interconnect attachments
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine interconnect attachments.
+    (ALPHA) Read and manipulate Compute Engine interconnect attachments.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -33,7 +33,7 @@ COMMANDS
         (ALPHA) Delete interconnects.
 
      describe
-        (ALPHA) Describe a Google Compute Engine interconnect attachment.
+        (ALPHA) Describe a Compute Engine interconnect attachment.
 
      list
         (ALPHA) List Google Compute Engine interconnect attachments.

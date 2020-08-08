@@ -21,7 +21,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    $ gcloud alpha trace sinks list
+        $ gcloud alpha trace sinks list
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

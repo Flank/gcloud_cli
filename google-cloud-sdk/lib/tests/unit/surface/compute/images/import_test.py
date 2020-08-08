@@ -371,15 +371,26 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
-  def testLogLocation(self):
-    log_location = 'foo/bar'
+  def testLogLocationDir(self):
+    self.doTestLogLocation('gs://foo/bar')
+    self.doTestLogLocation('https://storage.googleapis.com/foo/bar')
+
+  def testLogLocationDirTrailingSlash(self):
+    self.doTestLogLocation('gs://foo/bar/')
+    self.doTestLogLocation('https://storage.googleapis.com/foo/bar/')
+
+  def testLogLocationBucketOnly(self):
+    self.doTestLogLocation('gs://foo')
+    self.doTestLogLocation('https://storage.googleapis.com/foo')
+
+  def doTestLogLocation(self, log_location):
     self.PrepareDaisyMocksWithRegionalBucket(
         self.GetImportStepForGSFile(), log_location=log_location)
     self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
-             --source-file {1} --log-location gs://{2}
+             --source-file {1} --log-location {2}
              --data-disk
              """.format(self.image_name, self.source_disk, log_location))
 

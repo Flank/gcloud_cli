@@ -1,0 +1,92 @@
+
+.TH "GCLOUD_BETA_ARTIFACTS_REPOSITORIES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta artifacts repositories describe \- describe an Artifact Registry repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta artifacts repositories describe\fR (\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Describe an Artifact Registry repository given the repository name.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Repository resource \- The Artifact Registry repository to describe. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [repository] on
+the command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREPOSITORY\fR
+ID of the repository or fully qualified identifier for the repository. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the repository. Overrides the default artifacts/location property
+value for this command invocation. To configure the default location, use the
+command: gcloud config set artifacts/location.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBartifactregistry/v1beta1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/artifacts/docs/
+
+
+
+.SH "EXAMPLES"
+
+To describe a repository named \f5my\-repo\fR under the current project in
+\f5us\-west1\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories describe my\-repo \e
+    \-\-location=us\-west1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha artifacts repositories describe
+.RE
+

@@ -199,12 +199,18 @@ def ExpandLocalDirAndVersion(directory):
 
 
 # Anthos Auth
-def GetClusterFlag():
-  return base.Argument(
-      '--cluster',
-      required=False,
-      help='Cluster to authenticate against. If no cluster is specified, '
-           'the command will print a list of available options.')
+def GetClusterFlag(positional=False, required=False,
+                   help_override=None, metavar=None):
+  """Anthos operation cluster name flag."""
+  help_txt = help_override or ('Cluster to authenticate against. If no cluster '
+                               'is specified, the command will print a list '
+                               'of available options.')
+  return GetFlagOrPositional(
+      name='CLUSTER',
+      positional=positional,
+      required=required,
+      help=help_txt,
+      metavar=metavar)
 
 
 def GetLoginConfigFlag():
@@ -231,3 +237,55 @@ def GetUserFlag():
       required=False,
       help='If configuring multiple user accounts in the same kubecconfig '
            'file, you can specify a user to differentiate between them.')
+
+
+def GetSetPreferredAuthenticationFlag():
+  return base.Argument(
+      '--set-preferred-auth',
+      required=False,
+      action='store_true',
+      help='If set, forces update of preferred '
+           'authentication for given cluster')
+
+
+def GetOutputDirFlag(positional=False, required=False,
+                     help_override=None, metavar='OUTPUT-DIR', default=None):
+  """Anthos operation local output directory flag."""
+  help_txt = help_override or ('The output directory of the cluster resources.'
+                               ' If empty will export files to ./CLUSTER_NAME')
+  return GetFlagOrPositional(
+      name='OUTPUT_DIRECTORY',
+      positional=positional,
+      required=required,
+      type=ExpandLocalDirAndVersion,
+      help=help_txt,
+      default=default,
+      metavar=metavar)
+
+
+def GetLocationFlag():
+  """Anthos location flag."""
+  return base.Argument(
+      '--location',
+      required=False,
+      help='Specifies the Google Cloud location to use. If not'
+           'specified will use the current compute/zone property.')
+
+
+def GetMergeFromFlag():
+  """Anthos create-login-config Merge-From flag."""
+  return base.Argument(
+      '--merge-from',
+      required=False,
+      help='Specifies the file path of an existing login '
+           'configuration file to merge with.')
+
+
+def GetConfigOutputFileFlag():
+  """Anthos create-login-config output flag."""
+  return base.Argument(
+      '--output',
+      required=False,
+      type=ExpandLocalDirAndVersion,
+      help='Destination to write login configuration file. '
+           'Defaults to "kubectl-anthos-config.yaml".')

@@ -29,7 +29,7 @@ from tests.lib import completer_test_base
 from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.cloudiot import base as iot_base
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 
 
 class CompleteCommandFlagCompleterTest(test_base.BaseTest,

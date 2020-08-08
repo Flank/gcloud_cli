@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute images create - create Google Compute Engine images
+    gcloud alpha compute images create - create Compute Engine images
 
 SYNOPSIS
     gcloud alpha compute images create IMAGE_NAME

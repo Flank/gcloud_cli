@@ -380,6 +380,16 @@ class EnvironmentVariables(test_case.TestCase):
     six.assertCountEqual(self, env_list, expected_env_list)
 
 
+def MakeFakeAbsPath(cwd):
+
+  def FakeAbsPath(path):
+    if os.path.isabs(path):
+      return path
+    return os.path.join(cwd, path)
+
+  return FakeAbsPath
+
+
 class SettingsTest(test_case.WithInput):
 
   def SetUp(self):
@@ -387,27 +397,51 @@ class SettingsTest(test_case.WithInput):
     flags.CommonFlags(self.parser)
 
   def testServiceNameUnderscoreToDash(self):
-    properties.VALUES.core.project.Set('my-project')
 
-    with mock.patch.object(files, 'GetCWD') as mock_getcwd:
+    with mock.patch.object(files, 'GetCWD') as mock_getcwd, \
+         mock.patch.object(os.path, 'abspath') as mock_abspath, \
+         mock.patch.object(properties.VALUES.core.project, 'Get',
+                           return_value='my-project'), \
+        mock.patch.object(os.path, 'exists', return_value=True):
       mock_getcwd.return_value = '/current/working_directory'
+      mock_abspath.side_effect = MakeFakeAbsPath('/current/working_directory')
 
       args = self.parser.parse_args([])
       settings = local.Settings.FromArgs(args)
 
     self.assertEqual(settings.service_name, 'working-directory')
-    self.assertEqual(settings.image_name, 'gcr.io/my-project/working-directory')
+    self.assertEqual(settings.image, 'gcr.io/my-project/working-directory')
 
   def testImageNameNoProject(self):
-    properties.VALUES.core.project.Set(None)
 
-    with mock.patch.object(files, 'GetCWD') as mock_getcwd:
+    with mock.patch.object(files, 'GetCWD') as mock_getcwd, \
+         mock.patch.object(os.path, 'abspath') as mock_abspath, \
+         mock.patch.object(properties.VALUES.core.project, 'Get',
+                           return_value=None), \
+        mock.patch.object(os.path, 'exists', return_value=True):
       mock_getcwd.return_value = '/current/working_directory'
+      mock_abspath.side_effect = MakeFakeAbsPath('/current/working_directory')
 
       args = self.parser.parse_args([])
       settings = local.Settings.FromArgs(args)
 
-    self.assertEqual(settings.image_name, 'working-directory')
+    self.assertEqual(settings.image, 'working-directory')
+
+  def testDockerFileNotInCWD(self):
+    properties.VALUES.core.project.Set('my-project')
+
+    with mock.patch.object(files, 'GetCWD') as mock_getcwd:
+      with mock.patch.object(os.path, 'abspath') as mock_abspath:
+        mock_getcwd.return_value = '/current/working_directory'
+        mock_abspath.side_effect = MakeFakeAbsPath('/current/working_directory')
+
+        args = self.parser.parse_args(
+            ['--dockerfile=/notcurrent/working_directory/Dockerfile'])
+
+        with self.assertRaisesRegex(
+            local.InvalidLocationError,
+            'Dockerfile must be located in the build context directory'):
+          local.Settings.FromArgs(args)
 
 
 class CloudSqlProxyGeneratorTest(test_case.TestCase):

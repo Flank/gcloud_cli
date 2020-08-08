@@ -1,5 +1,5 @@
 title: surface unit test for asset search-all-resources
-release_tracks: [BETA]
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: core/project proj-foo
@@ -22,13 +22,23 @@ summary:
 actions:
 - set_property:
     core/project: proj-foo  # `projects/proj-foo` has project number `projects/123`
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1p1beta1
+      GA: v1
+- define_reference:
+    reference: method-url
+    track_values:
+      BETA: "/resources:searchAll"
+      GA: ":searchAllResources"
 - execute_command:
     # Search with --scope specified with project number.
-    command: asset search-all-resources --scope='projects/123' --query='name:"*abc*"'
+    command: asset search-all-resources --scope='projects/123' --query='name:"*abc*"' --asset-types='compute.googleapis.com/Subnetwork,compute.googleapis.com/Instance'
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1beta1/projects/123/resources:searchAll?alt=json&query=name%3A%22%2Aabc%2A%22
+          uri: https://cloudasset.googleapis.com/$$api-version$$/projects/123$$method-url$$?alt=json&assetTypes=compute.googleapis.com%2FSubnetwork&assetTypes=compute.googleapis.com%2FInstance&pageSize=20&query=name%3A%22%2Aabc%2A%22
           method: GET
           headers: {}
           body: null
@@ -47,11 +57,11 @@ actions:
               ]
             }
     - expect_stdout: |
-        results:
-        - asset_type: compute.googleapis.com/Subnetwork
-          display_name: default
-          name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
-          project: projects/123
+        ---
+        asset_type: compute.googleapis.com/Subnetwork
+        display_name: default
+        name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+        project: projects/123
     - expect_exit:
         code: 0
 - execute_command:
@@ -60,7 +70,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1beta1/projects/proj-foo/resources:searchAll?alt=json&query=name%3A%22%2Aabc%2A%22
+          uri: https://cloudasset.googleapis.com/$$api-version$$/projects/proj-foo$$method-url$$?alt=json&pageSize=20&query=name%3A%22%2Aabc%2A%22
           method: GET
           headers: {}
           body: null
@@ -79,11 +89,11 @@ actions:
               ]
             }
     - expect_stdout: |
-        results:
-        - asset_type: compute.googleapis.com/Subnetwork
-          display_name: default
-          name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
-          project: projects/123
+        ---
+        asset_type: compute.googleapis.com/Subnetwork
+        display_name: default
+        name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+        project: projects/123
     - expect_exit:
         code: 0
 - execute_command:
@@ -92,7 +102,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1beta1/projects/proj-foo/resources:searchAll?alt=json&query=name%3A%22%2Aabc%2A%22
+          uri: https://cloudasset.googleapis.com/$$api-version$$/projects/proj-foo$$method-url$$?alt=json&pageSize=20&query=name%3A%22%2Aabc%2A%22
           method: GET
           headers: {}
           body: null
@@ -111,10 +121,10 @@ actions:
               ]
             }
     - expect_stdout: |
-        results:
-        - asset_type: compute.googleapis.com/Subnetwork
-          display_name: default
-          name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
-          project: projects/123
+        ---
+        asset_type: compute.googleapis.com/Subnetwork
+        display_name: default
+        name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+        project: projects/123
     - expect_exit:
         code: 0

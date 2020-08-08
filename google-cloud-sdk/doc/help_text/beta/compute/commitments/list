@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute commitments list - list Google Compute Engine
-        commitments
+    gcloud beta compute commitments list - list Compute Engine commitments
 
 SYNOPSIS
     gcloud beta compute commitments list [NAME ...]
@@ -9,7 +8,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List Google Compute Engine commitments.
+    (BETA) List Compute Engine commitments.
 
 POSITIONAL ARGUMENTS
      [NAME ...]

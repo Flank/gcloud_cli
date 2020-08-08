@@ -33,18 +33,23 @@ import six
 
 
 def CheckSpecifiedDiskArgs(args,
+                           support_disks=True,
                            skip_defaults=False,
                            support_kms=False,
                            support_nvdimm=False):
   """Checks if relevant disk arguments have been specified."""
   flags_to_check = [
-      'disk',
       'local_ssd',
       'boot_disk_type',
       'boot_disk_device_name',
       'boot_disk_auto_delete',
-      'require_csek_key_create',
   ]
+
+  if support_disks:
+    flags_to_check.extend([
+        'disk',
+        'require_csek_key_create',
+    ])
   if support_kms:
     flags_to_check.extend([
         'create_disk',
@@ -138,9 +143,9 @@ def CreateDiskMessages(args,
     boot_disk = CreateDefaultBootAttachedDiskMessage(
         compute_client=compute_client,
         resources=resource_parser,
-        disk_type=getattr(args, 'boot_disk_type', None),
-        disk_device_name=getattr(args, 'boot_disk_device_name', None),
-        disk_auto_delete=getattr(args, 'boot_disk_auto_delete', None),
+        disk_type=args.boot_disk_type,
+        disk_device_name=args.boot_disk_device_name,
+        disk_auto_delete=args.boot_disk_auto_delete,
         disk_size_gb=boot_disk_size_gb,
         require_csek_key_create=(args.require_csek_key_create
                                  if csek_keys else None),
@@ -351,12 +356,15 @@ def CreatePersistentCreateDiskMessages(compute_client,
       snapshot_key_file = disk.get('source_snapshot_csek')
       if snapshot_key_file:
         initialize_params.snapshotKeyFile = snapshot_key_file
-
+    boot = disk.get('boot') == 'yes'
+    multi_writer = disk.get('multi-writer') == 'yes'
+    if multi_writer:
+      initialize_params.multiWriter = True
     device_name = instance_utils.GetDiskDeviceName(disk, name,
                                                    container_mount_disk)
     create_disk = messages.AttachedDisk(
         autoDelete=auto_delete,
-        boot=False,
+        boot=boot,
         deviceName=device_name,
         initializeParams=initialize_params,
         mode=mode,
@@ -570,6 +578,36 @@ def _CreateLocalSsdMessage(resources,
   return local_ssd
 
 
+def GetBulkNetworkInterfaces(args, resource_parser, compute_client, holder,
+                             project, location, scope, skip_defaults):
+  if (skip_defaults and not instance_utils.IsAnySpecified(
+      args, 'network_interface', 'network', 'network_tier', 'subnet',
+      'no_address')):
+    return []
+  elif args.network_interface:
+    return CreateNetworkInterfaceMessages(
+        resources=resource_parser,
+        compute_client=compute_client,
+        network_interface_arg=args.network_interface,
+        project=project,
+        location=location,
+        scope=scope)
+  else:
+    return [
+        CreateNetworkInterfaceMessage(
+            resources=holder.resources,
+            compute_client=compute_client,
+            network=args.network,
+            subnet=args.subnet,
+            no_address=args.no_address,
+            project=project,
+            location=location,
+            scope=scope,
+            network_tier=getattr(args, 'network_tier', None),
+        )
+    ]
+
+
 def GetNetworkInterfaces(args, client, holder, project, location, scope,
                          skip_defaults):
   """Get network interfaces."""
@@ -593,7 +631,6 @@ def GetNetworkInterfaces(args, client, holder, project, location, scope,
           compute_client=client,
           network=args.network,
           subnet=args.subnet,
-          private_network_ip=args.private_network_ip,
           no_address=args.no_address,
           address=args.address,
           project=project,
@@ -603,6 +640,7 @@ def GetNetworkInterfaces(args, client, holder, project, location, scope,
           public_ptr=args.public_ptr,
           no_public_ptr_domain=args.no_public_ptr_domain,
           public_ptr_domain=args.public_ptr_domain,
+          private_network_ip=getattr(args, 'private_network_ip', None),
           network_tier=getattr(args, 'network_tier', None),
       )
   ]
@@ -621,12 +659,12 @@ def GetNetworkInterfacesAlpha(args, client, holder, project, location, scope,
           compute_client=client,
           network=args.network,
           subnet=args.subnet,
-          private_network_ip=args.private_network_ip,
           no_address=args.no_address,
           address=args.address,
           project=project,
           location=location,
           scope=scope,
+          private_network_ip=getattr(args, 'private_network_ip', None),
           network_tier=getattr(args, 'network_tier', None),
           no_public_dns=getattr(args, 'no_public_dns', None),
           public_dns=getattr(args, 'public_dns', None),
@@ -641,12 +679,12 @@ def CreateNetworkInterfaceMessage(resources,
                                   compute_client,
                                   network,
                                   subnet,
-                                  private_network_ip,
-                                  no_address,
-                                  address,
                                   project,
                                   location,
                                   scope,
+                                  no_address=None,
+                                  address=None,
+                                  private_network_ip=None,
                                   alias_ip_ranges_string=None,
                                   network_tier=None,
                                   no_public_dns=None,
@@ -762,11 +800,18 @@ def CreateNetworkInterfaceMessages(resources, compute_client,
 
       result.append(
           CreateNetworkInterfaceMessage(
-              resources, compute_client, interface.get('network', None),
-              interface.get('subnet', None),
-              interface.get('private-network-ip', None),
-              no_address, address, project, location, scope,
-              interface.get('aliases', None), network_tier))
+              resources=resources,
+              compute_client=compute_client,
+              network=interface.get('network', None),
+              subnet=interface.get('subnet', None),
+              private_network_ip=interface.get('private-network-ip', None),
+              no_address=no_address,
+              address=address,
+              project=project,
+              location=location,
+              scope=scope,
+              alias_ip_ranges_string=interface.get('aliases', None),
+              network_tier=network_tier))
   return result
 
 
@@ -876,7 +921,12 @@ def BuildConfidentialInstanceConfigMessage(messages, args):
     return None
 
 
-def GetImageUri(args, client, create_boot_disk, project, resource_parser):
+def GetImageUri(args,
+                client,
+                create_boot_disk,
+                project,
+                resource_parser,
+                confidential_vm=False):
   """Retrieves the image uri for the specified image."""
   if create_boot_disk:
     image_expander = image_utils.ImageExpander(client, resource_parser)
@@ -885,7 +935,8 @@ def GetImageUri(args, client, create_boot_disk, project, resource_parser):
         image=args.image,
         image_family=args.image_family,
         image_project=args.image_project,
-        return_image_resource=False)
+        return_image_resource=False,
+        confidential_vm=confidential_vm)
     return image_uri
 
 
@@ -899,13 +950,11 @@ def GetAccelerators(args, compute_client, resource_parser, project, location,
     # Accelerator count is default to 1.
     accelerator_count = int(args.accelerator.get('count', 1))
     return CreateAcceleratorConfigMessages(compute_client.messages,
-                                           accelerator_type,
-                                           accelerator_count)
+                                           accelerator_type, accelerator_count)
   return []
 
 
-def CreateAcceleratorConfigMessages(msgs, accelerator_type,
-                                    accelerator_count):
+def CreateAcceleratorConfigMessages(msgs, accelerator_type, accelerator_count):
   """Returns a list of accelerator config messages.
 
   Args:
@@ -919,8 +968,7 @@ def CreateAcceleratorConfigMessages(msgs, accelerator_type,
   """
 
   accelerator_config = msgs.AcceleratorConfig(
-      acceleratorType=accelerator_type,
-      acceleratorCount=accelerator_count)
+      acceleratorType=accelerator_type, acceleratorCount=accelerator_count)
   return [accelerator_config]
 
 

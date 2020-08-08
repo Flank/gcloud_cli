@@ -124,6 +124,24 @@ MAP = {
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
+    'anthosevents': {
+        'v1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.anthosevents.v1',
+                client_classpath='anthosevents_v1_client.AnthoseventsV1',
+                messages_modulepath='anthosevents_v1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+        'v1beta1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.anthosevents.v1beta1',
+                client_classpath='anthosevents_v1beta1_client.AnthoseventsV1beta1',
+                messages_modulepath='anthosevents_v1beta1_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
     'apigateway': {
         'v1alpha1':
             APIDef(
@@ -181,6 +199,14 @@ MAP = {
                 mtls_endpoint_override=''),
     },
     'artifactregistry': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.artifactregistry.v1alpha1',
+                client_classpath='artifactregistry_v1alpha1_client.ArtifactregistryV1alpha1',
+                messages_modulepath='artifactregistry_v1alpha1_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
         'v1beta1':
             APIDef(
                 class_path='googlecloudsdk.third_party.apis.artifactregistry.v1beta1',
@@ -291,14 +317,6 @@ MAP = {
                 default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
-        'v1p1alpha1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.cloudasset.v1p1alpha1',
-                client_classpath='cloudasset_v1p1alpha1_client.CloudassetV1p1alpha1',
-                messages_modulepath='cloudasset_v1p1alpha1_messages',
-                default_version=False,
-                enable_mtls=False,
-                mtls_endpoint_override=''),
         'v1p1beta1':
             APIDef(
                 class_path='googlecloudsdk.third_party.apis.cloudasset.v1p1beta1',
@@ -339,6 +357,14 @@ MAP = {
                 default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
+        'v1p5beta1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.cloudasset.v1p5beta1',
+                client_classpath='cloudasset_v1p5beta1_client.CloudassetV1p5beta1',
+                messages_modulepath='cloudasset_v1p5beta1_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
     },
     'cloudbilling': {
         'v1':
@@ -373,6 +399,24 @@ MAP = {
                 client_classpath='cloudbuild_v1alpha2_client.CloudbuildV1alpha2',
                 messages_modulepath='cloudbuild_v1alpha2_messages',
                 default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+        'v1beta1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.cloudbuild.v1beta1',
+                client_classpath='cloudbuild_v1beta1_client.CloudbuildV1beta1',
+                messages_modulepath='cloudbuild_v1beta1_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
+    'cloudcommerceconsumerprocurement': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.cloudcommerceconsumerprocurement.v1alpha1',
+                client_classpath='cloudcommerceconsumerprocurement_v1alpha1_client.CloudcommerceconsumerprocurementV1alpha1',
+                messages_modulepath='cloudcommerceconsumerprocurement_v1alpha1_messages',
+                default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
@@ -882,6 +926,16 @@ MAP = {
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
+    'eventarc': {
+        'v1beta1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.eventarc.v1beta1',
+                client_classpath='eventarc_v1beta1_client.EventarcV1beta1',
+                messages_modulepath='eventarc_v1beta1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
     'eventflow': {
         'v1beta2':
             APIDef(
@@ -1067,6 +1121,14 @@ MAP = {
                 default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
+        'v2alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.iam.v2alpha1',
+                client_classpath='iam_v2alpha1_client.IamV2alpha1',
+                messages_modulepath='iam_v2alpha1_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
     },
     'iamassist': {
         'v1alpha2':
@@ -1244,6 +1306,16 @@ MAP = {
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
+    'networksecurity': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.networksecurity.v1alpha1',
+                client_classpath='networksecurity_v1alpha1_client.NetworksecurityV1alpha1',
+                messages_modulepath='networksecurity_v1alpha1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
     'networkservices': {
         'v1alpha1':
             APIDef(
@@ -1348,6 +1420,14 @@ MAP = {
                 class_path='googlecloudsdk.third_party.apis.policytroubleshooter.v1beta',
                 client_classpath='policytroubleshooter_v1beta_client.PolicytroubleshooterV1beta',
                 messages_modulepath='policytroubleshooter_v1beta_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+        'v2alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.policytroubleshooter.v2alpha1',
+                client_classpath='policytroubleshooter_v2alpha1_client.PolicytroubleshooterV2alpha1',
+                messages_modulepath='policytroubleshooter_v2alpha1_messages',
                 default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
@@ -1508,6 +1588,16 @@ MAP = {
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
+    'sddc': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.sddc.v1alpha1',
+                client_classpath='sddc_v1alpha1_client.SddcV1alpha1',
+                messages_modulepath='sddc_v1alpha1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
     'secretmanager': {
         'v1':
             APIDef(
@@ -1515,14 +1605,6 @@ MAP = {
                 client_classpath='secretmanager_v1_client.SecretmanagerV1',
                 messages_modulepath='secretmanager_v1_messages',
                 default_version=True,
-                enable_mtls=False,
-                mtls_endpoint_override=''),
-        'v1beta1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.secretmanager.v1beta1',
-                client_classpath='secretmanager_v1beta1_client.SecretmanagerV1beta1',
-                messages_modulepath='secretmanager_v1beta1_messages',
-                default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
@@ -1533,22 +1615,6 @@ MAP = {
                 client_classpath='securitycenter_v1_client.SecuritycenterV1',
                 messages_modulepath='securitycenter_v1_messages',
                 default_version=True,
-                enable_mtls=False,
-                mtls_endpoint_override=''),
-        'v1beta1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.securitycenter.v1beta1',
-                client_classpath='securitycenter_v1beta1_client.SecuritycenterV1beta1',
-                messages_modulepath='securitycenter_v1beta1_messages',
-                default_version=False,
-                enable_mtls=False,
-                mtls_endpoint_override=''),
-        'v1p1beta1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.securitycenter.v1p1beta1',
-                client_classpath='securitycenter_v1p1beta1_client.SecuritycenterV1p1beta1',
-                messages_modulepath='securitycenter_v1p1beta1_messages',
-                default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },

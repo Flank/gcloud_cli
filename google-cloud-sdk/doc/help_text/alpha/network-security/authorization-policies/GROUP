@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha network-security authorization-policies - manage Network
+        Security AuthorizationPolicies
+
+SYNOPSIS
+    gcloud alpha network-security authorization-policies COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Network Security AuthorizationPolicies.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete authorization policy.
+
+     export
+        (ALPHA) Export authorization policy.
+
+     import
+        (ALPHA) Import authorization policy.
+
+     list
+        (ALPHA) List authorization policies.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

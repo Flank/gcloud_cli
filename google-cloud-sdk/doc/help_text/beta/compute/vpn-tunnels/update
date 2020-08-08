@@ -24,7 +24,7 @@ DESCRIPTION
     To list existing labels
 
         $ gcloud beta compute vpn-tunnels describe example-tunnel \
-            --format='default(labels)'
+            --format="default(labels)"
 
 POSITIONAL ARGUMENTS
      NAME

@@ -209,7 +209,7 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = v2_docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
 
     self.push_mock.upload.side_effect = err
 
@@ -225,7 +225,7 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = v2_docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.FORBIDDEN
-        }), ''.encode('utf8'))
+        }), ''.encode('utf-8'))
 
     self.push_mock.upload.side_effect = err
 

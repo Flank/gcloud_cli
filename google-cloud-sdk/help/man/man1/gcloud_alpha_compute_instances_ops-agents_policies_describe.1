@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCES_OPS\-AGENTS_POLICIES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instances ops\-agents policies describe \- describe a Google Cloud Operations Suite Agents (Ops\ Agents) policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instances ops\-agents policies describe\fR \fIPOLICY_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute instances ops\-agents policies describe\fR
+describes a policy that facilitates agent management across Google Cloud Compute
+instances based on user specified instance filters. This policy installs,
+specifies versioning, enables autoupgrade, and removes Ops Agents.
+
+The command returns the content of one policy. If no policies are found, it
+returns a \f5\fINOT_FOUND\fR\fR error.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPOLICY_ID\fR
+ID of the policy.
+
+This ID must start with \f5\fIops\-agents\-\fR\fR, contain only lowercase
+letters, numbers, and hyphens, end with a number or a letter, be between 1\-63
+characters, and be unique within the project. The goal of the prefix
+\f5\fIops\-agents\-\fR\fR is to easily distinguish these Ops Agents specific
+policies from other generic policies and lower the chance of naming conflicts.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an Ops agents policy named \f5\fIops\-agents\-test\-policy\fR\fR in
+the current project, run:
+
+.RS 2m
+$ gcloud alpha compute instances ops\-agents policies describe \e
+    ops\-agents\-test\-policy
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

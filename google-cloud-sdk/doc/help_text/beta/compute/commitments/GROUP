@@ -25,13 +25,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create Google Compute Engine commitments.
+        (BETA) Create Compute Engine commitments.
 
      describe
-        (BETA) Describe a Google Compute Engine commitment.
+        (BETA) Describe a Compute Engine commitment.
 
      list
-        (BETA) List Google Compute Engine commitments.
+        (BETA) List Compute Engine commitments.
 
      update-reservations
         (BETA) Update the resource shape of reservations within the commitment.

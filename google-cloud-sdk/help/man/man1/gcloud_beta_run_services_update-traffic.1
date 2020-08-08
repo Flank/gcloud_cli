@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta run services update\-traffic \- adjust the trafic assignments for a Cloud Run service
+gcloud beta run services update\-traffic \- adjust the traffic assignments for a Cloud Run service
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta run services update\-traffic\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-to\-latest\fR\ |\ \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta run services update\-traffic\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-clear\-tags\fR\ |\ \fB\-\-set\-tags\fR=[\fITAG\fR=\fIREVISION\fR,...]\ |\ \fB\-\-remove\-tags\fR=[\fITAG\fR,...]\ \fB\-\-update\-tags\fR=[\fITAG\fR=\fIREVISION\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-to\-latest\fR\ |\ \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]\ |\ \fB\-\-to\-tags\fR=[\fITAG\fR=\fIPERCENTAGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Adjust the trafic assignments for a Cloud Run service.
+\fB(BETA)\fR Adjust the traffic assignments for a Cloud Run service.
 
 
 
@@ -75,6 +75,48 @@ connecting.
 .sp
 
 
+.TP 2m
+
+Specify traffic tags. Traffic tags can be assigned to a revision by name or to
+the latest ready revision. Assigning a tag to a revision generates a URL
+prefixed with the tag that allows addressing that revision directly, regardless
+of the percent traffic specified. Keys are tags. Values are revision names or
+"LATEST" for the latest ready revision. For example,
+\-\-set\-tags=candidate=LATEST,current=myservice\-v1 assigns the tag "candidate"
+to the latest ready revision and the tag "current" to the revision with name
+"myservice\-v1" and clears any existing tags. Changing tags does not affect the
+traffic percentage assigned to revisions. When using a tags flag and one or more
+of \-\-to\-latest and \-\-to\-revisions in the same command, the tags change
+occurs first then the traffic percentage change occurs. At most one of these may
+be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-tags\fR
+Remove all tags.
+
+.TP 2m
+\fB\-\-set\-tags\fR=[\fITAG\fR=\fIREVISION\fR,...]
+List of key\-value pairs to set as tags. All existing tags will be removed
+first.
+
+.TP 2m
+
+Only \-\-update\-tags and \-\-remove\-tags can be used together. If both are
+specified, \-\-remove\-tags will be applied first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-tags\fR=[\fITAG\fR,...]
+List of tags to be removed.
+
+.TP 2m
+\fB\-\-update\-tags\fR=[\fITAG\fR=\fIREVISION\fR,...]
+List of key\-value pairs to set as tags.
+
+.RE
+.RE
+.sp
 .TP 2m
 
 Arguments to locate resources, depending on the platform used. At most one of
@@ -173,6 +215,22 @@ revision\-2, the service is updated with revsion\-1 assigned 45 percent of
 traffic and revision\-2 scaled down to 55 percent. You can use "LATEST" as a
 special revision name to always put the given percentage of traffic on the
 latest ready revision.
+
+.TP 2m
+\fB\-\-to\-tags\fR=[\fITAG\fR=\fIPERCENTAGE\fR,...]
+Comma separated list of traffic assignments in the form TAG=PERCENTAGE. TAG must
+match a traffic tag on a revision of the service. It may match a previously\-set
+tag, or one assigned using the \f5\-\-set\-tags\fR or \f5\-\-update\-tags\fR
+flags on this command. PERCENTAGE must be an integer percentage between 0 and
+100 inclusive. Up to 100 percent of traffic may be assigned. If 100 percent of
+traffic is assigned, the service traffic is updated as specified. If under 100
+percent of traffic is assigned, the service traffic is updated as specified to
+the given tags, and other traffic is scaled up or down proportionally. For
+example, assume the revision tagged \f5next\fR is serving 40 percent of traffic
+and the revision tagged \f5current\fR is serving 60 percent. If \f5next\fR is
+assigned 45 percent of traffic and no assignment is made for \f5current\fR, the
+service is updated with \f5next\fR assigned 45 percent of traffic and
+\f5current\fR scaled down to 55 percent.
 
 
 .RE

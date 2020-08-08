@@ -11,7 +11,7 @@ gcloud beta anthos auth login \- authenticate clusters using the Anthos client
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta anthos auth login\fR [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-login\-config\fR=\fILOGIN_CONFIG\fR] [\fB\-\-login\-config\-cert\fR=\fILOGIN_CONFIG_CERT\fR] [\fB\-\-user\fR=\fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta anthos auth login\fR [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-login\-config\fR=\fILOGIN_CONFIG\fR] [\fB\-\-login\-config\-cert\fR=\fILOGIN_CONFIG_CERT\fR] [\fB\-\-set\-preferred\-auth\fR] [\fB\-\-user\fR=\fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -45,6 +45,10 @@ Specifies the configuration yaml file for login. Can be a file path or a URL.
 \fB\-\-login\-config\-cert\fR=\fILOGIN_CONFIG_CERT\fR
 Specifies the CA certificate file to be added to trusted pool for making HTTPS
 connections to a \f5\-\-login\-config\fR URL.
+
+.TP 2m
+\fB\-\-set\-preferred\-auth\fR
+If set, forces update of preferred authentication for given cluster
 
 .TP 2m
 \fB\-\-user\fR=\fIUSER\fR

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +76,7 @@ class ListPrinterAttributeTest(resource_printer_test_base.Base):
   ]
 
   def SetUp(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
 
   def testList(self):
     self.Print(style='list', fields='')
@@ -116,7 +116,7 @@ class ListPrinterAttributeTest(resource_printer_test_base.Base):
 
   def testListListUtf8(self):
     self.Print(style='list', fields='',
-               resource=[x.encode('utf8') for x in self._RESOURCE_LIST])
+               resource=[x.encode('utf-8') for x in self._RESOURCE_LIST])
     self.AssertOutputContains("""\
  - .TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW
  - ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.

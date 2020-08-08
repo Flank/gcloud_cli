@@ -36,11 +36,11 @@ EXAMPLES
 
     To start a single version on a single service, run:
 
-        $ gcloud app versions start --service servicename v1
+        $ gcloud app versions start --service=servicename v1
 
     To start multiple versions in a single service, run:
 
-        $ gcloud app versions start --service servicename v1 v2
+        $ gcloud app versions start --service=servicename v1 v2
 
 NOTES
     This variant is also available:

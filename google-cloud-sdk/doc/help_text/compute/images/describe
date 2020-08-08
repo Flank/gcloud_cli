@@ -1,12 +1,12 @@
 NAME
-    gcloud compute images describe - describe a Google Compute Engine image
+    gcloud compute images describe - describe a Compute Engine image
 
 SYNOPSIS
     gcloud compute images describe IMAGE_NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute images describe displays all data associated with a Google
-    Compute Engine image in a project.
+    gcloud compute images describe displays all data associated with a Compute
+    Engine image in a project.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME

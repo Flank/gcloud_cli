@@ -11,7 +11,7 @@ gcloud compute instances create\-with\-container \- creates Google Compute engin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances create\-with\-container\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR] [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-mount\-disk\fR=[\fImode\fR=\fIMODE\fR],[\fImount\-path\fR=\fIMOUNT\-PATH\fR],[\fIname\fR=\fINAME\fR],[\fIpartition\fR=\fIPARTITION\fR]] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]] [\fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR;\ default="always"] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances create\-with\-container\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR] [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-mount\-disk\fR=[\fImode\fR=\fIMODE\fR],[\fImount\-path\fR=\fIMOUNT\-PATH\fR],[\fIname\fR=\fINAME\fR],[\fIpartition\fR=\fIPARTITION\fR]] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]] [\fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR;\ default="always"] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -85,7 +85,8 @@ must be a whole number followed by a size unit of \f5\fIKB\fR\fR for kilobyte,
 \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for
 terabyte. For example, \f5\fI10GB\fR\fR will produce a 10 gigabyte disk. The
 minimum size a boot disk can have is 10 GB. Disk size must be a multiple of 1
-GB. Limit boot disk size to 2TB to account for MBR partition table limitations.
+GB. Limit boot disk size to 2 TB to account for MBR partition table limitations.
+Default size unit is \f5\fIGB\fR\fR.
 
 .TP 2m
 \fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR
@@ -292,6 +293,7 @@ version of an image is needed.
 The Google Cloud project against which all image and image family references
 will be resolved. It is best practice to define image\-project. A full list of
 available projects can be generated by running \f5gcloud projects list\fR.
+
 .RS 2m
 .IP "\(bu" 2m
 If specifying one of our public images, image\-project must be provided.
@@ -558,6 +560,13 @@ to run for a limited amount of time. Preemptible instances can not be restarted
 and will not migrate.
 
 .TP 2m
+\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
+The private IPv6 Google access type for the VM.
+\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of:
+\fBenable\-bidirectional\-access\fR, \fBenable\-outbound\-vm\-access\fR,
+\fBinherit\-subnetwork\fR.
+
+.TP 2m
 \fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR
 Specifies the RFC1918 IP to assign to the instance. The IP should be in the
 subnet or legacy network IP range.
@@ -815,6 +824,7 @@ gke-default	https://www.googleapis.com/auth/devstorage.read_only
 	https://www.googleapis.com/auth/trace.append
 logging-write	https://www.googleapis.com/auth/logging.write
 monitoring	https://www.googleapis.com/auth/monitoring
+monitoring-read	https://www.googleapis.com/auth/monitoring.read
 monitoring-write	https://www.googleapis.com/auth/monitoring.write
 pubsub	https://www.googleapis.com/auth/pubsub
 service-control	https://www.googleapis.com/auth/servicecontrol
@@ -851,10 +861,10 @@ At most one of these may be specified:
 A service account is an identity attached to the instance. Its access tokens can
 be accessed through the instance metadata server and are used to authenticate
 applications on the instance. The account can be set using an email address
-corresponding to the required service account. You can explicitly specify the
-Compute Engine default service account using the 'default' alias.
+corresponding to the required service account.
 
-If not provided, the instance will get project's default service account.
+If not provided, the instance will use the project's default service account.
+
 
 .TP 2m
 \fB\-\-no\-service\-account\fR

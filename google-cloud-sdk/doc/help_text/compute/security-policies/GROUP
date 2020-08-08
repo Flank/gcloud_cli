@@ -53,6 +53,9 @@ COMMANDS
      list
         List Google Compute Engine security policies.
 
+     list-preconfigured-expression-sets
+        List all available preconfigured expression sets.
+
 NOTES
     These variants are also available:
 

@@ -18,8 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import encoding
 from apitools.base.py.testing import mock
+from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
@@ -27,37 +30,71 @@ from tests.lib import test_case
 
 
 # TODO(b/29358031): Move WithMockHttp somewhere more appropriate for unit tests.
-class DeleteTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
+class DeleteTestBeta(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
+
+  # Override only this method in subsequent classes for other release tracks.
+  def PreSetUp(self):
+    self.release_track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
+    self.api_version = cloudbuild_util.RELEASE_TRACK_TO_API_VERSION[
+        self.release_track]
     self.StartPatch('time.sleep')  # To speed up tests with polling
-
-    self.mocked_cloudbuild_v1alpha2 = mock.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1alpha2'))
-    self.mocked_cloudbuild_v1alpha2.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1alpha2.Unmock)
-    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha2')
+    self.mocked_cloudbuild_client = mock.Client(
+        core_apis.GetClientClass('cloudbuild', self.api_version))
+    self.mocked_cloudbuild_client.Mock()
+    self.addCleanup(self.mocked_cloudbuild_client.Unmock)
+    self.msg = core_apis.GetMessagesModule('cloudbuild', self.api_version)
 
     self.project_id = 'my-project'
+    self.workerpool_location = 'my-location'
     properties.VALUES.core.project.Set(self.project_id)
 
     self.frozen_time_str = '2018-11-12T00:10:00+00:00'
 
   def _Run(self, args):
-    self.Run(args)
+    if self.release_track.prefix:
+      self.Run([self.release_track.prefix] + args)
+    else:
+      self.Run(args)
 
   def testDelete(self):
     wp_in = self.msg.WorkerPool()
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
 
-    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Delete.Expect(
+    self.mocked_cloudbuild_client.projects_locations_workerPools.Delete.Expect(
+        self.msg.CloudbuildProjectsLocationsWorkerPoolsDeleteRequest(
+            name='projects/{}/locations/{}/workerPools/{}'.format(
+                self.project_id, self.workerpool_location, wp_in.name)),
+        response=self.msg.Operation(
+            response=encoding.JsonToMessage(
+                self.msg.Operation.ResponseValue,
+                encoding.MessageToJson(self.msg.Empty()))))
+
+    self._Run([
+        'builds', 'worker-pools', 'delete', wp_in.name, '--region',
+        self.workerpool_location
+    ])
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+
+  def PreSetUp(self):
+    self.release_track = calliope_base.ReleaseTrack.ALPHA
+
+  def testDelete(self):
+    wp_in = self.msg.WorkerPool()
+    wp_in.workerConfig = self.msg.WorkerConfig()
+    wp_in.name = 'fake_name'
+
+    self.mocked_cloudbuild_client.projects_workerPools.Delete.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsDeleteRequest(
-            name=u'projects/{}/workerPools/{}'.format(self.project_id,
-                                                      wp_in.name)),
+            name='projects/{}/workerPools/{}'.format(self.project_id,
+                                                     wp_in.name)),
         response=self.msg.Empty())
 
-    self._Run(['alpha', 'builds', 'worker-pools', 'delete', wp_in.name])
+    self._Run(['builds', 'worker-pools', 'delete', wp_in.name])
 
 
 if __name__ == '__main__':

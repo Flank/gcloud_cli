@@ -25,25 +25,25 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding to a Google Compute Engine disk.
+        (ALPHA) Add IAM policy binding to a Compute Engine disk.
 
      add-labels
         (ALPHA) Add labels to Google Compute Engine persistent disks.
 
      add-resource-policies
-        (ALPHA) Add resource policies to a Google Compute Engine disk.
+        (ALPHA) Add resource policies to a Compute Engine disk.
 
      create
-        (ALPHA) Create Google Compute Engine persistent disks.
+        (ALPHA) Create Compute Engine persistent disks.
 
      delete
-        (ALPHA) Delete a Google Compute Engine disk.
+        (ALPHA) Delete a Compute Engine disk.
 
      describe
-        (ALPHA) Describe a Google Compute Engine disk.
+        (ALPHA) Describe a Compute Engine disk.
 
      get-iam-policy
-        (ALPHA) Get the IAM policy for a Google Compute Engine disk.
+        (ALPHA) Get the IAM policy for a Compute Engine disk.
 
      list
         (ALPHA) List Google Compute Engine disks.
@@ -52,25 +52,25 @@ COMMANDS
         (ALPHA) Move a disk between zones.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding from a Google Compute Engine disk.
+        (ALPHA) Remove IAM policy binding from a Compute Engine disk.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine persistent disks.
 
      remove-resource-policies
-        (ALPHA) Remove resource policies from a Google Compute Engine disk.
+        (ALPHA) Remove resource policies from a Compute Engine disk.
 
      resize
         (ALPHA) Resize a disk or disks.
 
      set-iam-policy
-        (ALPHA) Set the IAM policy for a Google Compute Engine disk.
+        (ALPHA) Set the IAM policy for a Compute Engine disk.
 
      snapshot
-        (ALPHA) Create snapshots of Google Compute Engine persistent disks.
+        (ALPHA) Create snapshots of Compute Engine persistent disks.
 
      update
-        (ALPHA) Update a Google Compute Engine persistent disk.
+        (ALPHA) Update a Compute Engine persistent disk.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

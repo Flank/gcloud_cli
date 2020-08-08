@@ -1,6 +1,5 @@
 NAME
-    gcloud compute interconnects create - create a Google Compute Engine
-        interconnect
+    gcloud compute interconnects create - create a Compute Engine interconnect
 
 SYNOPSIS
     gcloud compute interconnects create NAME --customer-name=CUSTOMER_NAME

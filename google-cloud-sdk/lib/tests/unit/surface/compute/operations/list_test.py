@@ -24,7 +24,8 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute import test_resources as compute_resources
+from tests.lib.surface.compute.operations import test_resources
 import mock
 
 messages = core_apis.GetMessagesModule('compute', 'v1')
@@ -88,7 +89,7 @@ class OperationsListTest(test_base.BaseTest):
 
   def testWithNoArgumentRegionsFlag(self):
     self.make_requests.side_effect = [
-        test_resources.REGIONS,
+        compute_resources.REGIONS,
     ]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(test_resources.REGIONAL_OPERATIONS),
@@ -156,7 +157,7 @@ class OperationsListTest(test_base.BaseTest):
 
   def testWithNoArgumentZonesFlag(self):
     self.make_requests.side_effect = [
-        test_resources.ZONES,
+        compute_resources.ZONES,
     ]
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(test_resources.ZONAL_OPERATIONS),

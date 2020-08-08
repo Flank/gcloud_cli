@@ -36,14 +36,16 @@ from googlecloudsdk.core import log
 
 def _Args(parser,
           deprecate_maintenance_policy=False,
-          container_mount_enabled=False):
+          container_mount_enabled=False,
+          support_multi_writer=True):
   """Add flags shared by all release tracks."""
   parser.display_info.AddFormat(instances_flags.DEFAULT_LIST_FORMAT)
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(
       parser, True, container_mount_enabled=container_mount_enabled)
   instances_flags.AddCreateDiskArgs(
-      parser, container_mount_enabled=container_mount_enabled)
+      parser, container_mount_enabled=container_mount_enabled,
+      support_multi_writer=support_multi_writer)
   instances_flags.AddCanIpForwardArgs(parser)
   instances_flags.AddContainerMountDiskFlag(parser)
   instances_flags.AddAddressArgs(parser, instances=True)
@@ -82,14 +84,15 @@ class CreateWithContainer(base.CreateCommand):
   _support_create_boot_disk = True
   _support_match_container_mount_disks = True
   _support_nvdimm = False
-  _support_private_ipv6_google_access = False
 
   @staticmethod
   def Args(parser):
     """Register parser args."""
-    _Args(parser, container_mount_enabled=True)
+    _Args(parser, container_mount_enabled=True, support_multi_writer=False)
     instances_flags.AddNetworkTierArgs(parser, instance=True)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
+    instances_flags.AddPrivateIpv6GoogleAccessArg(
+        parser, utils.COMPUTE_GA_API_VERSION)
 
   def _ValidateArgs(self, args):
     self._ValidateTrackSpecificArgs(args)
@@ -120,7 +123,7 @@ class CreateWithContainer(base.CreateCommand):
       if resource_parser.Parse(image_uri).project != 'cos-cloud':
         log.warning('This container deployment mechanism requires a '
                     'Container-Optimized OS image in order to work. Select an '
-                    'image from a cos-cloud project (cost-stable, cos-beta, '
+                    'image from a cos-cloud project (cos-stable, cos-beta, '
                     'cos-dev image families).')
     else:
       image_uri = containers_utils.ExpandKonletCosImageFlag(compute_client)
@@ -247,8 +250,7 @@ class CreateWithContainer(base.CreateCommand):
           serviceAccounts=service_accounts,
           scheduling=scheduling,
           tags=tags)
-      if (self._support_private_ipv6_google_access and
-          args.private_ipv6_google_access_type is not None):
+      if args.private_ipv6_google_access_type is not None:
         instance.privateIpv6GoogleAccess = (
             instances_flags.GetPrivateIpv6GoogleAccessTypeFlagMapper(
                 compute_client.messages).GetEnumForChoice(
@@ -274,7 +276,6 @@ class CreateWithContainerBeta(CreateWithContainer):
   _support_create_boot_disk = True
   _support_match_container_mount_disks = True
   _support_nvdimm = False
-  _support_private_ipv6_google_access = True
 
   @staticmethod
   def Args(parser):
@@ -298,7 +299,6 @@ class CreateWithContainerAlpha(CreateWithContainerBeta):
   _support_create_boot_disk = True
   _support_match_container_mount_disks = True
   _support_nvdimm = True
-  _support_private_ipv6_google_access = True
 
   @staticmethod
   def Args(parser):

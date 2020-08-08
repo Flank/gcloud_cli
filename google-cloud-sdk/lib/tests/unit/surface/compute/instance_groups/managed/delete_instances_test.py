@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instance_groups import test_resources
 from mock import patch
 
 API_VERSION = 'v1'
@@ -146,10 +146,8 @@ class InstanceGroupManagersDeleteInstancesRegionalTest(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi(API_VERSION)
     self.make_requests.side_effect = iter([
-        [self.messages.InstanceGroupManagersListManagedInstancesResponse(
-            managedInstances=(
-                test_resources.MakeInstancesInManagedInstanceGroup(
-                    self.messages, API_VERSION)))],
+        test_resources.MakeInstancesInManagedInstanceGroup(
+            self.messages, API_VERSION),
         [],
     ])
     self.template_1_uri = (
@@ -230,12 +228,8 @@ class InstanceGroupManagersDeleteInstancesRegionalTest(test_base.BaseTest):
             self.messages.Zone(name='central1-b'),
             self.messages.Zone(name='central2-a'),
         ],
-        [
-            self.messages.InstanceGroupManagersListManagedInstancesResponse(
-                managedInstances=(
-                    test_resources.MakeInstancesInManagedInstanceGroup(
-                        self.messages, API_VERSION)))
-        ],
+        test_resources.MakeInstancesInManagedInstanceGroup(
+            self.messages, API_VERSION),
         []
     ])
     self.WriteInput('2\n')

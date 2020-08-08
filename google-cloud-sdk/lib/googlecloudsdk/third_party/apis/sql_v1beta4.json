@@ -455,10 +455,6 @@
             "CSV",
             "BAK"
           ]
-        },
-        "offload": {
-          "description": "Option for export offload.",
-          "type": "boolean"
         }
       }
     },
@@ -734,7 +730,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "This is the name of the flag. Flag names always use underscores, not\nhyphens, e.g. <b>max_allowed_packet<\/b>",
+          "description": "This is the name of the flag. Flag names always use underscores, not\nhyphens, for example: <b>max_allowed_packet<\/b>",
           "type": "string"
         },
         "type": {
@@ -869,7 +865,7 @@
           "type": "string"
         },
         "binLogCoordinates": {
-          "description": "Binary log coordinates, if specified, identify the position up to which the\nsource instance should be cloned. If not specified, the source instance is\ncloned up to the most recent binary log coordinates.",
+          "description": "Binary log coordinates, if specified, identify the position up to which the\nsource instance is cloned. If not specified, the source instance is\ncloned up to the most recent binary log coordinates.",
           "$ref": "BinLogCoordinates"
         },
         "pointInTime": {
@@ -966,11 +962,11 @@
           "type": "string"
         },
         "clientKey": {
-          "description": "PEM representation of the slave's private key. The corresponsing public key\nis encoded in the client's certificate. The format of the slave's private\nkey can be either PKCS #1 or PKCS #8.",
+          "description": "PEM representation of the replica's private key. The corresponsing public\nkey is encoded in the client's certificate. The format of the replica's\nprivate key can be either PKCS #1 or PKCS #8.",
           "type": "string"
         },
         "clientCertificate": {
-          "description": "PEM representation of the slave's x509 certificate.",
+          "description": "PEM representation of the replica's x509 certificate.",
           "type": "string"
         },
         "caCertificate": {
@@ -1019,7 +1015,7 @@
     },
     "DatabaseInstance": {
       "id": "DatabaseInstance",
-      "description": "A Cloud SQL instance resource.",
+      "description": "A Cloud SQL instance resource.\nNext field: 34",
       "type": "object",
       "properties": {
         "kind": {
@@ -1049,7 +1045,7 @@
           ]
         },
         "databaseVersion": {
-          "description": "The database engine type and version. The <b>databaseVersion<\/b>\nfield can not be changed after instance creation.\n<br>MySQL Second Generation\ninstances: <b>MYSQL_5_7<\/b> (default) or <b>MYSQL_5_6<\/b>.\n<br>PostgreSQL instances: <b>POSTGRES_9_6<\/b> (default) or\n<b>POSTGRES_11 Beta<\/b>\n<br>MySQL First Generation\ninstances: <b>MYSQL_5_6<\/b> (default) or <b>MYSQL_5_5<\/b>",
+          "description": "The database engine type and version. The <b>databaseVersion<\/b>\nfield cannot be changed after instance creation.\n<br>MySQL instances: <b>MYSQL_5_7<\/b> (default), or <b>MYSQL_5_6<\/b>.\n<br>PostgreSQL instances: <b>POSTGRES_9_6<\/b> (default), or\n<b>POSTGRES_10<\/b>, or <b>POSTGRES_11 Beta<\/b>, or <b>POSTGRES_12<\/b>.\n<br>SQL Server instances: <b>SQLSERVER_2017_STANDARD<\/b> (default),\n<b>SQLSERVER_2017_ENTERPRISE<\/b>, <b>SQLSERVER_2017_EXPRESS<\/b>, or\n<b>SQLSERVER_2017_WEB<\/b>.",
           "enumDescriptions": [
             "This is an unknown database version.",
             "The database version is MySQL 5.1.",
@@ -1123,7 +1119,7 @@
           "format": "int64"
         },
         "currentDiskSize": {
-          "description": "The current disk usage of the instance in bytes. This property has been\ndeprecated. Users should use the\n\"cloudsql.googleapis.com\/database\/disk\/bytes_used\" metric in Cloud\nMonitoring API instead. Please see <a\nhref=\"https:\/\/groups.google.com\/d\/msg\/google-cloud-sql-announce\/I_7-F9EBhT0\/BtvFtdFeAgAJ\">this\nannouncement<\/a> for details.",
+          "description": "The current disk usage of the instance in bytes. This property has been\ndeprecated. Use the\n\"cloudsql.googleapis.com\/database\/disk\/bytes_used\" metric in Cloud\nMonitoring API instead. Please see <a\nhref=\"https:\/\/groups.google.com\/d\/msg\/google-cloud-sql-announce\/I_7-F9EBhT0\/BtvFtdFeAgAJ\">this\nannouncement<\/a> for details.",
           "type": "string",
           "format": "int64"
         },
@@ -1159,7 +1155,7 @@
           "type": "string"
         },
         "ipv6Address": {
-          "description": "The IPv6 address assigned to the instance. This property is applicable only\nto First Generation instances.",
+          "description": "The IPv6 address assigned to the instance.\n(Deprecated) This property was applicable only\nto First Generation instances.",
           "type": "string"
         },
         "serviceAccountEmailAddress": {
@@ -1175,7 +1171,7 @@
           "$ref": "ReplicaConfiguration"
         },
         "backendType": {
-          "description": "<br><b>FIRST_GEN<\/b>: First Generation instance. MySQL only.\n<br><b>SECOND_GEN<\/b>: Second Generation instance or PostgreSQL\ninstance.\n<br><b>EXTERNAL<\/b>: A database server that is not\nmanaged by Google. <br>This property is read-only; use the\n<b>tier<\/b> property in the <b>settings<\/b> object to determine\nthe database type and Second or First Generation.",
+          "description": "<br><b>SECOND_GEN<\/b>: Cloud SQL database instance.\n<br><b>EXTERNAL<\/b>: A database server that is not\nmanaged by Google. <br>This property is read-only; use the\n<b>tier<\/b> property in the <b>settings<\/b> object to determine\nthe database type.",
           "enumDescriptions": [
             "This is an unknown backend type for instance.",
             "V1 speckle instance.",
@@ -1198,9 +1194,9 @@
           "description": "If the instance state is SUSPENDED, the reason for the suspension.",
           "enumDescriptions": [
             "This is an unknown suspension reason.",
-            "The instance is suspended due to billing issues (e.g., GCP account issue)",
-            "The instance is suspended due to illegal content (e.g., child pornography,\ncopyrighted material, etc.).",
-            "The instance is causing operational issues (e.g., causing the database\nto crash).",
+            "The instance is suspended due to billing issues (for example:, GCP account\nissue)",
+            "The instance is suspended due to illegal content (for example:, child\npornography, copyrighted material, etc.).",
+            "The instance is causing operational issues (for example:, causing the\ndatabase to crash).",
             "The KMS key used by the instance is either revoked or denied access to"
           ],
           "type": "array",
@@ -1224,7 +1220,7 @@
           "type": "string"
         },
         "region": {
-          "description": "The geographical region. Can be\n<br><b>us-central<\/b> (<b>FIRST_GEN<\/b> instances only)\n<br><b>us-central1<\/b> (<b>SECOND_GEN<\/b> instances only)\n<br><b>asia-east1<\/b> or <b>europe-west1<\/b>.\n<br>Defaults to <b>us-central<\/b> or\n<b>us-central1<\/b> depending on the instance type (First Generation\nor Second Generation). The region can not be changed after instance\ncreation.",
+          "description": "The geographical region. Can be\n<br><b>us-central<\/b> (<b>FIRST_GEN<\/b> instances only)\n<br><b>us-central1<\/b> (<b>SECOND_GEN<\/b> instances only)\n<br><b>asia-east1<\/b> or <b>europe-west1<\/b>.\n<br>Defaults to <b>us-central<\/b> or\n<b>us-central1<\/b> depending on the instance type.\nThe region cannot be changed after instance creation.",
           "type": "string"
         },
         "gceZone": {
@@ -1246,10 +1242,6 @@
         "scheduledMaintenance": {
           "description": "The start time of any upcoming scheduled maintenance for this instance.",
           "$ref": "SqlScheduledMaintenance"
-        },
-        "sqlserverInstanceConfiguration": {
-          "description": "SQL Server specific configuration",
-          "$ref": "SqlServerInstanceConfiguration"
         }
       }
     },
@@ -1264,14 +1256,14 @@
           "format": "int64"
         },
         "authorizedGaeApplications": {
-          "description": "The App Engine app IDs that can access this instance. First Generation\ninstances only.",
+          "description": "The App Engine app IDs that can access this instance.\n(Deprecated) Applied to First Generation instances only.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "tier": {
-          "description": "The tier (or machine type) for this instance, for example\n<b>db-n1-standard-1<\/b> (MySQL instances) or\n<b>db-custom-1-3840<\/b> (PostgreSQL instances). For MySQL instances,\nthis property determines whether the instance is First or Second\nGeneration. For more information, see <a\nhref=\"\/sql\/docs\/db_path\/instance-settings\">Instance Settings<\/a>.",
+          "description": "The tier (or machine type) for this instance, for example\n<b>db-n1-standard-1<\/b> (MySQL instances) or\n<b>db-custom-1-3840<\/b> (PostgreSQL instances).",
           "type": "string"
         },
         "kind": {
@@ -1314,7 +1306,7 @@
           ]
         },
         "replicationType": {
-          "description": "The type of replication this instance uses. This can be either\n<b>ASYNCHRONOUS<\/b> or <b>SYNCHRONOUS<\/b>. This property is\nonly applicable to First Generation instances.",
+          "description": "The type of replication this instance uses. This can be either\n<b>ASYNCHRONOUS<\/b> or <b>SYNCHRONOUS<\/b>.\n(Deprecated_ This property was only applicable to\nFirst Generation instances.",
           "enumDescriptions": [
             "This is an unknown replication type for a Cloud SQL instance.",
             "The synchronous replication mode for First Generation instances. It is the\ndefault value.",
@@ -1328,17 +1320,17 @@
           ]
         },
         "storageAutoResizeLimit": {
-          "description": "The maximum size to which storage capacity can be automatically increased.\nThe default value is 0, which specifies that there is no limit. Not used\nfor First Generation instances.",
+          "description": "The maximum size to which storage capacity can be automatically increased.\nThe default value is 0, which specifies that there is no limit.",
           "type": "string",
           "format": "int64"
         },
         "activationPolicy": {
-          "description": "The activation policy specifies when the instance is activated; it is\napplicable only when the instance state is RUNNABLE. Valid values:\n  <br><b>ALWAYS<\/b>: The instance is on, and remains so even in\nthe absence of connection requests.\n  <br><b>NEVER<\/b>: The instance is off; it is not activated, even if a\n  connection\nrequest arrives.\n  <br><b>ON_DEMAND<\/b>: First Generation instances only. The instance\nresponds to incoming requests, and turns itself off when not in use.\nInstances with <b>PER_USE<\/b> pricing turn off after 15 minutes of\ninactivity. Instances with <b>PER_PACKAGE<\/b> pricing turn off after\n12 hours o inactivity.",
+          "description": "The activation policy specifies when the instance is activated; it is\napplicable only when the instance state is RUNNABLE. Valid values:\n  <br><b>ALWAYS<\/b>: The instance is on, and remains so even in\nthe absence of connection requests.\n  <br><b>NEVER<\/b>: The instance is off; it is not activated, even if a\n  connection request arrives.",
           "enumDescriptions": [
             "Unknown activation plan.",
             "The instance is always up and running.",
-            "The instance should never spin up.",
-            "The instance spins up upon receiving requests."
+            "The instance never starts.",
+            "The instance starts upon receiving requests."
           ],
           "type": "string",
           "enum": [
@@ -1353,11 +1345,11 @@
           "$ref": "IpConfiguration"
         },
         "storageAutoResize": {
-          "description": "Configuration to increase storage size automatically. The default value is\ntrue. Not used for First Generation instances.",
+          "description": "Configuration to increase storage size automatically. The default value is\ntrue.",
           "type": "boolean"
         },
         "locationPreference": {
-          "description": "The location preference settings. This allows the instance to be located as\nnear as possible to either an App Engine app or Compute Engine zone for\nbetter performance. App Engine co-location is only applicable to First\nGeneration instances.",
+          "description": "The location preference settings. This allows the instance to be located as\nnear as possible to either an App Engine app or Compute Engine zone for\nbetter performance. App Engine co-location was only applicable to First\nGeneration instances.",
           "$ref": "LocationPreference"
         },
         "databaseFlags": {
@@ -1384,7 +1376,7 @@
           ]
         },
         "maintenanceWindow": {
-          "description": "The maintenance window for this instance. This specifies when the instance\ncan be restarted for maintenance purposes. Not used for First Generation\ninstances.",
+          "description": "The maintenance window for this instance. This specifies when the instance\ncan be restarted for maintenance purposes.",
           "$ref": "MaintenanceWindow"
         },
         "backupConfiguration": {
@@ -1396,17 +1388,21 @@
           "type": "boolean"
         },
         "crashSafeReplicationEnabled": {
-          "description": "Configuration specific to read replica instances. Indicates whether\ndatabase flags for crash-safe replication are enabled. This property is\nonly applicable to First Generation instances.",
+          "description": "Configuration specific to read replica instances. Indicates whether\ndatabase flags for crash-safe replication are enabled. This property was\nonly applicable to First Generation instances.",
           "type": "boolean"
         },
         "dataDiskSizeGb": {
-          "description": "The size of data disk, in GB. The data disk size minimum is 10GB. Not used\nfor First Generation instances.",
+          "description": "The size of data disk, in GB. The data disk size minimum is 10GB.",
           "type": "string",
           "format": "int64"
         },
         "activeDirectoryConfig": {
           "description": "Active Directory configuration, for now relevant only for SQL Server",
           "$ref": "SqlActiveDirectoryConfig"
+        },
+        "collation": {
+          "description": "The name of server Instance collation.",
+          "type": "string"
         }
       }
     },
@@ -1416,7 +1412,7 @@
       "type": "object",
       "properties": {
         "ipv4Enabled": {
-          "description": "Whether the instance should be assigned an IP address or not.",
+          "description": "Whether the instance is assigned a public IP address or not.",
           "type": "boolean"
         },
         "privateNetwork": {
@@ -1424,11 +1420,11 @@
           "type": "string"
         },
         "requireSsl": {
-          "description": "Whether SSL connections over IP should be enforced or not.",
+          "description": "Whether SSL connections over IP are enforced or not.",
           "type": "boolean"
         },
         "authorizedNetworks": {
-          "description": "The list of external networks that are allowed to connect to the instance\nusing the IP. In 'CIDR' notation, also known as 'slash' notation (e.g.\n<b>192.168.100.0\/24<\/b>).",
+          "description": "The list of external networks that are allowed to connect to the instance\nusing the IP. In 'CIDR' notation, also known as 'slash' notation (for\nexample: <b>192.168.100.0\/24<\/b>).",
           "type": "array",
           "items": {
             "$ref": "AclEntry"
@@ -1442,7 +1438,7 @@
       "type": "object",
       "properties": {
         "value": {
-          "description": "The whitelisted value for the access control list.",
+          "description": "The allowlisted value for the access control list.",
           "type": "string"
         },
         "expirationTime": {
@@ -1462,7 +1458,7 @@
     },
     "LocationPreference": {
       "id": "LocationPreference",
-      "description": "Preferred location. This specifies where a Cloud SQL instance should\npreferably be located, either in a specific Compute Engine zone, or\nco-located with an App Engine application. Note that if the preferred\nlocation is not available, the instance will be located as close as possible\nwithin the region. Only one location may be specified.",
+      "description": "Preferred location. This specifies where a Cloud SQL instance\nis located, either in a specific Compute Engine zone, or\nco-located with an App Engine application. Note that if the preferred\nlocation is not available, the instance will be located as close as possible\nwithin the region. Only one location may be specified.",
       "type": "object",
       "properties": {
         "followGaeApplication": {
@@ -1470,7 +1466,7 @@
           "type": "string"
         },
         "zone": {
-          "description": "The preferred Compute Engine zone (e.g. us-central1-a, us-central1-b,\netc.).",
+          "description": "The preferred Compute Engine zone (for example: us-central1-a,\nus-central1-b, etc.).",
           "type": "string"
         },
         "kind": {
@@ -1485,18 +1481,18 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The name of the flag. These flags are passed at instance startup, so\ninclude both server options and system variables for MySQL. Flags should be\nspecified with underscores, not hyphens. For more information, see <a\nhref=\"\/sql\/docs\/mysql\/flags\">Configuring Database Flags<\/a> in the Cloud\nSQL documentation.",
+          "description": "The name of the flag. These flags are passed at instance startup, so\ninclude both server options and system variables for MySQL. Flags are\nspecified with underscores, not hyphens. For more information, see <a\nhref=\"\/sql\/docs\/mysql\/flags\">Configuring Database Flags<\/a> in the Cloud\nSQL documentation.",
           "type": "string"
         },
         "value": {
-          "description": "The value of the flag. Booleans should be set to <b>on<\/b> for true\nand <b>off<\/b> for false. This field must be omitted if the flag\ndoesn't take a value.",
+          "description": "The value of the flag. Booleans are set to <b>on<\/b> for true\nand <b>off<\/b> for false. This field must be omitted if the flag\ndoesn't take a value.",
           "type": "string"
         }
       }
     },
     "MaintenanceWindow": {
       "id": "MaintenanceWindow",
-      "description": "Maintenance window. This specifies when a v2 Cloud SQL instance should\npreferably be restarted for system maintenance purposes.",
+      "description": "Maintenance window. This specifies when a Cloud SQL instance\nis restarted for system maintenance purposes.",
       "type": "object",
       "properties": {
         "hour": {
@@ -1589,7 +1585,7 @@
           "enumDescriptions": [
             "This is an unknown IP address type.",
             "IP address the customer is supposed to connect to. Usually this is the\nload balancer's IP address",
-            "Source IP address of the connection a read replica establishes to its\nexternal master. This IP address can be whitelisted by the customer\nin case it has a firewall that filters incoming connection to its\non premises master.",
+            "Source IP address of the connection a read replica establishes to its\nexternal master. This IP address can be allowlisted by the customer\nin case it has a firewall that filters incoming connection to its\non premises master.",
             "Private IP used when using private IPs and network peering.",
             "V1 IP of a migrated instance. We want the user to\ndecommission this IP as soon as the migration is complete.\nNote: V1 instances with V1 ip addresses will be counted as PRIMARY."
           ],
@@ -1684,11 +1680,11 @@
           "type": "string"
         },
         "clientCertificate": {
-          "description": "PEM representation of the slave's x509 certificate.",
+          "description": "PEM representation of the replica's x509 certificate.",
           "type": "string"
         },
         "clientKey": {
-          "description": "PEM representation of the slave's private key. The corresponsing public key\nis encoded in the client's certificate.",
+          "description": "PEM representation of the replica's private key. The corresponsing public\nkey is encoded in the client's certificate.",
           "type": "string"
         },
         "dumpFilePath": {
@@ -1722,7 +1718,7 @@
       "type": "object",
       "properties": {
         "dumpFilePath": {
-          "description": "Path to a SQL dump file in Google Cloud Storage from which the slave\ninstance is to be created. The URI is in the form gs:\/\/bucketName\/fileName.\nCompressed gzip files (.gz) are also supported.\nDumps should have the binlog co-ordinates from which replication should\nbegin. This can be accomplished by setting --master-data to 1 when using\nmysqldump.",
+          "description": "Path to a SQL dump file in Google Cloud Storage from which the replica\ninstance is to be created. The URI is in the form gs:\/\/bucketName\/fileName.\nCompressed gzip files (.gz) are also supported.\nDumps have the binlog co-ordinates from which replication\nbegins. This can be accomplished by setting --master-data to 1 when using\nmysqldump.",
           "type": "string"
         },
         "username": {
@@ -1748,11 +1744,11 @@
           "type": "string"
         },
         "clientCertificate": {
-          "description": "PEM representation of the slave's x509 certificate.",
+          "description": "PEM representation of the replica's x509 certificate.",
           "type": "string"
         },
         "clientKey": {
-          "description": "PEM representation of the slave's private key. The corresponsing public key\nis encoded in the client's certificate.",
+          "description": "PEM representation of the replica's private key. The corresponsing public\nkey is encoded in the client's certificate.",
           "type": "string"
         },
         "sslCipher": {
@@ -1785,17 +1781,6 @@
         "canReschedule": {
           "description": "If the scheduled maintenance can be rescheduled.",
           "type": "boolean"
-        }
-      }
-    },
-    "SqlServerInstanceConfiguration": {
-      "id": "SqlServerInstanceConfiguration",
-      "description": "SQL Server specific configuration.",
-      "type": "object",
-      "properties": {
-        "collation": {
-          "description": "The name of Sqlserver Instance collation.",
-          "type": "string"
         }
       }
     },
@@ -2063,7 +2048,10 @@
             "The value of parameter max_replication_slots is not sufficient.",
             "The value of parameter max_wal_senders is not sufficient.",
             "The value of parameter max_worker_processes is not sufficient.",
-            "Extensions installed are either not supported or having unsupported\nversions"
+            "Extensions installed are either not supported or having unsupported\nversions",
+            "The value of parameter rds.logical_replication is not set to 1.",
+            "The master logging setup doesn't allow EM sync.",
+            "The master database parameter setup doesn't allow EM sync."
           ],
           "type": "string",
           "enum": [
@@ -2081,7 +2069,10 @@
             "INSUFFICIENT_MAX_REPLICATION_SLOTS",
             "INSUFFICIENT_MAX_WAL_SENDERS",
             "INSUFFICIENT_MAX_WORKER_PROCESSES",
-            "UNSUPPORTED_EXTENSIONS"
+            "UNSUPPORTED_EXTENSIONS",
+            "INVALID_RDS_LOGICAL_REPLICATION",
+            "INVALID_LOGGING_SETUP",
+            "INVALID_DB_PARAM"
           ]
         },
         "detail": {
@@ -2141,7 +2132,7 @@
           "$ref": "SslCert"
         },
         "clientCert": {
-          "description": "The new client certificate and private key.  For First Generation\ninstances, the new certificate does not take effect until the instance is\nrestarted.",
+          "description": "The new client certificate and private key.",
           "$ref": "SslCertDetail"
         }
       }
@@ -3731,7 +3722,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "project": {
-                  "description": "ID of the project that contains the first generation instance.",
+                  "description": "ID of the project that contains the instance.",
                   "location": "path",
                   "required": true,
                   "type": "string"

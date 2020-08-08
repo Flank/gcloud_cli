@@ -24,7 +24,7 @@ from googlecloudsdk.command_lib.meta import cache_util
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.instances import test_resources
 
 
 class ListCommandTest(test_base.BaseTest, completer_test_base.CompleterBase):

@@ -153,8 +153,8 @@ the next section.
 <dt>examples</dt>
 <dd class="sectionbody">
 This is an example ``command&acute;&acute; line:
-<pre>
-  $ echo 'example command line'
+<pre class="prettyprint lang-sh">
+<code class="devsite-terminal">echo 'example command line'</code>
 </pre>
 
 </dd>

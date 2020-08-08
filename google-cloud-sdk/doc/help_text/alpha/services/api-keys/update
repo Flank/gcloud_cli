@@ -11,6 +11,9 @@ SYNOPSIS
           | --allowed-ips=[ALLOWED_IPS,...]
           | --allowed-referrers=[ALLOWED_REFERRERS,...]] [GCLOUD_WIDE_FLAG ...]
 
+DESCRIPTION
+    (ALPHA) Update an API key's metadata.
+
 POSITIONAL ARGUMENTS
      Key resource - The name of the key to update. This represents a Cloud
      resource. (NOTE) Some attributes are not given arguments in this group but
@@ -68,34 +71,47 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To remove all restrictions of the key: $ gcloud alpha services api-keys
-    update \        projects/myproject/keys/my-key-id --clear-restrictions
+    To remove all restrictions of the key:
 
-    To update display name and set allowed ips as server key restrictions: $
-    gcloud alpha services api-keys update \        projects/myproject/keys/my-key-id \
-        --display-name="test name" \
-        --allowed-ips=2620:15c:2c4:203:2776:1f90:6b3b:217,104.133.8.78
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id --clear-restrictions
 
-    To update key's allowed referrers restriction: $ gcloud alpha services
-    api-keys update \        projects/myproject/keys/my-key-id \
-        --allowed-referrers="https://www.example.com/*,http://sub.example.com/*"
+    To update display name and set allowed ips as server key restrictions:
 
-    To update key's allowed ios app bundle ids: $ gcloud alpha services
-    api-keys update \        projects/myproject/keys/my-key-id --allowed-bundle-ids=my.app
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id --display-name="test name" \
+            --allowed-ips=2620:15c:2c4:203:2776:1f90:6b3b:217,104.133.8.78
 
-    To update key's allowed android application: $ gcloud alpha services
-    api-keys update \        projects/myproject/keys/my-key-id \
-        --allowed-application=sha1_fingerprint=foo1,package_name=bar1 \
-        --allowed-application=sha1_fingerprint=foo2,package_name=bar2
+    To update key's allowed referrers restriction:
 
-    To update keys' allowed api target with multiple services: $ gcloud alpha
-    services api-keys update \        projects/myproject/keys/my-key-id \
-        --api-target=service=bar.service.com \
-        --api-target=service=foo.service.com
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id \
+            --allowed-referrers="https://www.example.com/*,http://sub.exampl\
+        e.com/*"
+
+    To update key's allowed ios app bundle ids:
+
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id --allowed-bundle-ids=my.app
+
+    To update key's allowed android application:
+
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id \
+            --allowed-application=sha1_fingerprint=foo1,package_name=bar1 \
+            --allowed-application=sha1_fingerprint=foo2,package_name=bar2
+
+    To update keys' allowed api target with multiple services:
+
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id \
+            --api-target=service=bar.service.com \
+            --api-target=service=foo.service.com
 
     To update keys' allowed api target with service and method:
 
-    $ gcloud alpha services api-keys update \        projects/myproject/keys/my-key-id  --flags-file=my-flags.yaml
+        $ gcloud alpha services api-keys update \
+            projects/myproject/keys/my-key-id  --flags-file=my-flags.yaml
 
         The content of 'my-flags.yaml' is as following:
 

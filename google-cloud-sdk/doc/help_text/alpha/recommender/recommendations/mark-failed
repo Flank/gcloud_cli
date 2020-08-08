@@ -1,7 +1,6 @@
 NAME
     gcloud alpha recommender recommendations mark-failed - mark a
-        recommendation's state as FAILED. mark-failed can be applied to
-        recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state
+        recommendation's state as FAILED
 
 SYNOPSIS
     gcloud alpha recommender recommendations mark-failed
@@ -9,8 +8,8 @@ SYNOPSIS
         --etag=ETAG [--state-metadata=KEY=VALUE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Mark a recommendation's state as FAILED. mark-failed can be applied
-    to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state.
+    (ALPHA) Mark a recommendation's state as FAILED. Can be applied to
+    recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state.
 
 POSITIONAL ARGUMENTS
      Recommendation resource - The Cloud Recommendation to mark as failed. The

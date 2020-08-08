@@ -1,5 +1,5 @@
 NAME
-    gcloud compute networks subnets describe - describe a Google Compute Engine
+    gcloud compute networks subnets describe - describe a Compute Engine
         subnetwork
 
 SYNOPSIS
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute networks subnets describe displays all data associated with
-    a Google Compute Engine subnetwork.
+    a Compute Engine subnetwork.
 
 POSITIONAL ARGUMENTS
      NAME

@@ -217,12 +217,12 @@ add //mock/tmp/dir/base-2.suffix
     self.AssertOutputEquals(expected, normalize_space=True)
 
   def testAssertOutputBytesEquals_EqualAscii(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     sys.stdout.write('expected output')
     self.AssertOutputBytesEquals(b'expected output')
 
   def testAssertOutputBytesEquals_NotEqualAscii(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     sys.stdout.write('expected output')
     with self.assertRaisesRegexp(
         AssertionError,
@@ -231,23 +231,23 @@ add //mock/tmp/dir/base-2.suffix
       self.AssertOutputBytesEquals(b'actual output')
 
   def testAssertOutputBytesEquals_EqualUnicode(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     unicode_string = 'Ṳᾔḯ¢◎ⅾℯ'
     sys.stdout.write(unicode_string)
-    self.AssertOutputBytesEquals(unicode_string.encode('utf8'))
+    self.AssertOutputBytesEquals(unicode_string.encode('utf-8'))
 
   def testAssertOutputBytesEquals_NotEqualUnicode(self):
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     unicode_string = 'Ṳᾔḯ¢◎ⅾℯ'
     sys.stdout.write('unicode')
     with self.assertRaisesRegexp(
         AssertionError,
         r'stdout does not equal the expected value.*'):
-      self.AssertOutputBytesEquals(unicode_string.encode('utf8'))
+      self.AssertOutputBytesEquals(unicode_string.encode('utf-8'))
 
   def testAssertOutputContainsUTF8WithAsciiEncodingMismatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.
-    sys.stdout.buffer.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    sys.stdout.buffer.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf-8'))
     expected = r'stdout does not equal the expected value.*\\u1e72'
     with self.assertRaisesRegex(AssertionError, expected):
       self.AssertOutputEquals('unicode')
@@ -256,8 +256,8 @@ add //mock/tmp/dir/base-2.suffix
       'Encoding mismatches are not allowed to occur on Py3')
   def testAssertOutputContainsUTF8WithUTF8EncodingMismatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.
-    self.SetEncoding('utf8')
-    sys.stdout.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.SetEncoding('utf-8')
+    sys.stdout.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf-8'))
     # No Regexp here because pytest has a str() that trips ascii codec error.
     with self.assertRaises(AssertionError):
       self.AssertOutputEquals('unicode')
@@ -266,8 +266,8 @@ add //mock/tmp/dir/base-2.suffix
       'Encoding mismatches are not allowed to occur on Py3')
   def testAssertOutputContainsUTF8WithUTF8EncodingMatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.
-    self.SetEncoding('utf8')
-    sys.stdout.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.SetEncoding('utf-8')
+    sys.stdout.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf-8'))
     self.AssertOutputEquals('Ṳᾔḯ¢◎ⅾℯ')
 
 

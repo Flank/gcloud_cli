@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute networks subnets get-iam-policy - get the IAM policy
-        for a Google Compute Engine subnetwork
+        for a Compute Engine subnetwork
 
 SYNOPSIS
     gcloud alpha compute networks subnets get-iam-policy
@@ -9,11 +9,11 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute networks subnets get-iam-policy displays the
-    IAM policy associated with a Google Compute Engine subnetwork in a project.
-    If formatted as JSON, the output can be edited and used as a policy file
-    for set-iam-policy. The output includes an "etag" field identifying the
-    version emitted and allowing detection of concurrent policy updates; see $
-    {parent} set-iam-policy for additional details.
+    IAM policy associated with a Compute Engine subnetwork in a project. If
+    formatted as JSON, the output can be edited and used as a policy file for
+    set-iam-policy. The output includes an "etag" field identifying the version
+    emitted and allowing detection of concurrent policy updates; see $ {parent}
+    set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
      Subnetwork resource - The network to display the IAM policy for. The

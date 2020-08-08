@@ -16,17 +16,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import json
 import os.path
 import subprocess
-import textwrap
 
 from googlecloudsdk.command_lib.code import kubernetes
+from googlecloudsdk.command_lib.code import run_subprocess
 from googlecloudsdk.core import config
 from googlecloudsdk.core.updater import update_manager
 from tests.lib import test_case
 import mock
-import six
 
 
 class Matcher(object):
@@ -50,74 +48,98 @@ class SdkPathTestCase(test_case.TestCase):
 
 class StartMinikubeTest(SdkPathTestCase):
 
+  MINIKUBE_TEARDOWN_CALL = mock.call([
+      os.path.join("sdk", "path", "bin", "minikube"), "stop", "-p",
+      "cluster-name"
+  ],
+                                     show_output=False,
+                                     timeout_sec=150)
+
   def testAlreadyRunning(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        status = six.ensure_binary(json.dumps({"Host": "Running"}))
-        popen.return_value.communicate.return_value = (status, None)
+    with mock.patch.object(run_subprocess, "GetOutputJson") as mock_get_json:
+      mock_get_json.return_value = {"Host": "Running"}
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.Minikube("cluster-name"):
           # Assert "minikube start" is not called.
-          check_call.assert_not_called()
+          mock_run.assert_not_called()
 
-    self.assertIn("stop", check_call.call_args[0][0])
+    self.assertEqual(self.MINIKUBE_TEARDOWN_CALL, mock_run.call_args)
 
   def testNotYetRunning(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        status = six.ensure_binary(json.dumps({}))
-        popen.return_value.communicate.return_value = (status, None)
+    with mock.patch.object(run_subprocess, "GetOutputJson") as mock_get_json:
+      mock_get_json.return_value = {}
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.Minikube("cluster-name"):
-          self.assertIn("cluster-name", check_call.call_args[0][0])
-          self.assertIn("start", check_call.call_args[0][0])
+          self.assertIn("cluster-name", mock_run.call_args[0][0])
+          self.assertIn("start", mock_run.call_args[0][0])
 
-    self.assertIn("stop", check_call.call_args[0][0])
+    self.assertEqual(self.MINIKUBE_TEARDOWN_CALL, mock_run.call_args)
+
+  def testNotYetRunningError(self):
+    with mock.patch.object(run_subprocess, "GetOutputJson") as mock_get_json:
+      mock_get_json.side_effect = subprocess.CalledProcessError(1, "cmd")
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
+
+        with kubernetes.Minikube("cluster-name"):
+          self.assertIn("cluster-name", mock_run.call_args[0][0])
+          self.assertIn("start", mock_run.call_args[0][0])
+
+    self.assertEqual(self.MINIKUBE_TEARDOWN_CALL, mock_run.call_args)
 
   def testDriver(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        status = six.ensure_binary(json.dumps({}))
-        popen.return_value.communicate.return_value = (status, None)
+    with mock.patch.object(run_subprocess, "GetOutputJson") as mock_get_json:
+      mock_get_json.return_value = {}
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.Minikube("cluster-name", vm_driver="my-driver"):
-          self.assertIn("--vm-driver=my-driver", check_call.call_args[0][0])
+          self.assertIn("--vm-driver=my-driver", mock_run.call_args[0][0])
 
-    self.assertIn("stop", check_call.call_args[0][0])
+    self.assertEqual(self.MINIKUBE_TEARDOWN_CALL, mock_run.call_args)
 
   def testDockerDriver(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        status = six.ensure_binary(json.dumps({}))
-        popen.return_value.communicate.return_value = (status, None)
+    with mock.patch.object(run_subprocess, "GetOutputJson") as mock_get_json:
+      mock_get_json.return_value = {}
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.Minikube("cluster-name", vm_driver="docker"):
-          check_call.assert_called_once_with(
+          mock_run.assert_called_once_with(
               Matcher(lambda cmd: "--vm-driver=docker" in cmd),
-              stdout=mock.ANY,
-              stderr=mock.ANY)
-          check_call.assert_called_once_with(
+              timeout_sec=150,
+              show_output=False)
+          mock_run.assert_called_once_with(
               Matcher(lambda cmd: "--container-runtime=docker" in cmd),
-              stdout=mock.ANY,
-              stderr=mock.ANY)
+              timeout_sec=150,
+              show_output=False)
 
-    self.assertIn("stop", check_call.call_args[0][0])
+    self.assertEqual(self.MINIKUBE_TEARDOWN_CALL, mock_run.call_args)
+
+  def testDebug(self):
+    with mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "Run") as mock_run, \
+         kubernetes.Minikube("cluster-name", debug=True):
+      mock_run.assert_called_once_with(
+          Matcher(lambda cmd: "--alsologtostderr" in cmd),
+          timeout_sec=150,
+          show_output=True)
+      mock_run.assert_called_once_with(
+          Matcher(lambda cmd: "-v8" in cmd), timeout_sec=150, show_output=True)
 
 
 class MinikubeClusterTest(SdkPathTestCase):
 
   def testEnvVars(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      env_vars = six.ensure_binary(
-          textwrap.dedent("""\
-            DOCKER_A=abcd
-            DOCKER_B=1234
-            MY_ENV_VAR=My23
-            ENV_VAR_WITH_EQ=a=3
-      """))
-      popen.return_value.communicate.return_value = (env_vars, None)
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = [
+          "DOCKER_A=abcd",
+          "DOCKER_B=1234",
+          "MY_ENV_VAR=My23",
+          "ENV_VAR_WITH_EQ=a=3",
+      ]
 
-      minikube_cluster = kubernetes.MinikubeCluster("cluster-name", False)
+      minikube_cluster = kubernetes.MinikubeCluster(
+          "cluster-name", shared_docker=False)
 
       expected_env_vars = {
           "DOCKER_A": "abcd",
@@ -127,47 +149,68 @@ class MinikubeClusterTest(SdkPathTestCase):
       }
       self.assertEqual(minikube_cluster.env_vars, expected_env_vars)
 
+  def testUsageComment(self):
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = [
+          "DOCKER_A=abcd",
+          "# A usage comment.",
+      ]
+
+      minikube_cluster = kubernetes.MinikubeCluster(
+          "cluster-name", shared_docker=False)
+
+      expected_env_vars = {
+          "DOCKER_A": "abcd",
+      }
+      self.assertEqual(minikube_cluster.env_vars, expected_env_vars)
+
 
 class StartKindTest(SdkPathTestCase):
 
   PATH_TO_KIND = os.path.join(SdkPathTestCase.SDK_PATH, "bin", "kind")
 
+  KIND_TEARDOWN_CALL = mock.call(
+      [PATH_TO_KIND, "delete", "cluster", "--name", "cluster-name"],
+      show_output=False,
+      timeout_sec=150)
+
   def testAlreadyRunning(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        popen.return_value.communicate.return_value = ("cluster-name\n", None)
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = ["cluster-name"]
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.KindClusterContext("cluster-name"):
           # Assert "kind create cluster" is not called.
-          check_call.assert_not_called()
+          mock_run.assert_not_called()
 
-    self.assertEqual(popen.call_args[0][0],
+    self.assertEqual(mock_get_lines.call_args[0][0],
                      [self.PATH_TO_KIND, "get", "clusters"])
-    self.assertIn("delete", check_call.call_args[0][0])
+    self.assertEqual(self.KIND_TEARDOWN_CALL, mock_run.call_args)
 
   def testNotYetRunning(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        popen.return_value.communicate.return_value = ("", None)
-
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = []
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
         with kubernetes.KindClusterContext("cluster-name"):
-          check_call.assert_called_once_with([
+          mock_run.assert_called_once_with([
               self.PATH_TO_KIND, "create", "cluster", "--name", "cluster-name"
-          ])
+          ],
+                                           timeout_sec=150,
+                                           show_output=True)
 
-    self.assertIn("delete", check_call.call_args[0][0])
+    self.assertEqual(self.KIND_TEARDOWN_CALL, mock_run.call_args)
 
   def testDeleteKind(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        popen.return_value.communicate.return_value = ("cluster-name\n", None)
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = ["cluster-name"]
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         kubernetes.DeleteKindClusterIfExists("cluster-name")
 
-    check_call.assert_called_once_with(
+    mock_run.assert_called_once_with(
         [self.PATH_TO_KIND, "delete", "cluster", "--name", "cluster-name"],
-        stdout=mock.ANY,
-        stderr=mock.ANY)
+        timeout_sec=150,
+        show_output=False)
 
 
 class KubeNamespace(SdkPathTestCase):
@@ -175,47 +218,45 @@ class KubeNamespace(SdkPathTestCase):
   PATH_TO_KUBECTL = os.path.join(SdkPathTestCase.SDK_PATH, "bin", "kubectl")
 
   def testNamespaceAlreadyExists(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        namespaces = six.b("namespace/a\nnamespace/b\n")
-        popen.return_value.communicate.return_value = (namespaces, None)
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = ["namespace/a", "namespace/b"]
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.KubeNamespace("a"):
-          check_call.assert_not_called()
+          mock_run.assert_not_called()
 
         with kubernetes.KubeNamespace("b"):
-          check_call.assert_not_called()
+          mock_run.assert_not_called()
 
   def testNamespaceNotExists(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        namespaces = six.b("namespace/a")
-        popen.return_value.communicate.return_value = (namespaces, None)
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = ["namespace/a"]
+      with mock.patch.object(run_subprocess, "Run") as mock_run:
 
         with kubernetes.KubeNamespace("b"):
-          self.assertEqual(check_call.call_args[0][0],
+          self.assertEqual(mock_run.call_args[0][0],
                            [self.PATH_TO_KUBECTL, "create", "namespace", "b"])
 
-        self.assertEqual(check_call.call_args_list[1][0][0],
+        self.assertEqual(mock_run.call_args_list[1][0][0],
                          [self.PATH_TO_KUBECTL, "delete", "namespace", "b"])
 
   def testCallWithContext(self):
-    with mock.patch.object(subprocess, "Popen") as popen:
-      with mock.patch.object(subprocess, "check_call") as check_call:
-        namespaces = six.b("namespace/a")
-        popen.return_value.communicate.return_value = (namespaces, None)
+    with mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
+      mock_get_lines.return_value = ["namespace/a"]
+      with mock.patch.object(run_subprocess, "Run") as mock_run, \
+       mock.patch.object(run_subprocess, "GetOutputLines") as mock_get_lines:
 
         with kubernetes.KubeNamespace("b", "my-context"):
-          self.assertEqual(popen.call_args[0][0], [
+          self.assertEqual(mock_get_lines.call_args[0][0], [
               self.PATH_TO_KUBECTL, "--context", "my-context", "get",
               "namespaces", "-o", "name"
           ])
-          self.assertEqual(check_call.call_args_list[0][0][0], [
+          self.assertEqual(mock_run.call_args_list[0][0][0], [
               self.PATH_TO_KUBECTL, "--context", "my-context", "create",
               "namespace", "b"
           ])
 
-        self.assertEqual(check_call.call_args_list[1][0][0], [
+        self.assertEqual(mock_run.call_args_list[1][0][0], [
             self.PATH_TO_KUBECTL, "--context", "my-context", "delete",
             "namespace", "b"
         ])

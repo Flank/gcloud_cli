@@ -11,7 +11,7 @@ gcloud alpha kms keys describe \- get metadata for a given key
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys describe\fR \fIKEY\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys describe\fR (\fIKEY\fR\ :\ \fB\-\-keyring\fR=\fIKEYRING\fR\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,25 +25,29 @@ gcloud alpha kms keys describe \- get metadata for a given key
 
 .RS 2m
 .TP 2m
-\fIKEY\fR
-Name of the key to describe.
 
-
-.RE
-.sp
-
-.SH "FLAGS"
+Key resource \- The KMS key resource. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [key] on the command line with a fully specified
+name; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
+\fIKEY\fR
+ID of the key or fully qualified identifier for the key. This positional must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
-Key ring of the key.
+The KMS keyring of the key.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Location of the key.
+The Cloud location for the key.
 
 
+.RE
 .RE
 .sp
 

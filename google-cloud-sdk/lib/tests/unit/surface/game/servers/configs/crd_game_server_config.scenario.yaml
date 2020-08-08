@@ -15,7 +15,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --labels a=x,b=y --fleet-configs-file fleet_configs.json
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -26,7 +26,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -37,7 +37,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -48,22 +48,41 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs.yaml
-  - stderr: |
-      Create request issued for: [my-config]
-  - progress_tracker:
-    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
-        to complete
-    - status: SUCCESS
-  - stderr: |
-      Created game server config [my-config].
-- execute:
-  - command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file invalid_fleet_configs.txt
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_fleet_configs.txt
   - error: '1: Invalid schema: expected proper fleet configs'
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs.txt
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_yaml.yaml
+  - error: '1: .*Error parsing fleet_configs file:.*$'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_yaml.yaml
+  - error: '1: .*Error parsing scaling_configs file:.*$'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_fleet_configs_no_spec.yaml
+  - error: '1: Invalid schema: expect `fleetSpec:` in fleet configs.'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs_no_spec.yaml
+  - error: '1: Invalid schema: expect `fleetAutoscalerSpec:` in scaling configs.'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_fleet_configs_unrecognized_fields.yaml
+  - error: |-
+      1: Invalid schema, the following fields are unrecognized:
+      .bar
+      .foo
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs_unrecognized_fields.yaml
+  - error: |-
+      1: Invalid schema, the following fields are unrecognized:
+      .bar
+      .foo
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs.txt
   - error: '1: Invalid schema: expected proper scaling configs'
 - execute:
   - command: |
@@ -144,7 +163,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_str.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -155,7 +174,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_with_name.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_with_name.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -166,7 +185,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.json --scaling-configs-file scaling_configs_str.json
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_str.json --scaling-configs-file scaling_configs_str.json
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -177,7 +196,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml --scaling-configs-file scaling_configs_str.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_str.yaml --scaling-configs-file scaling_configs_str.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -188,7 +207,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_without_name.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_without_name.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -199,7 +218,7 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_complex.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_complex.yaml
   - stderr: |
       Create request issued for: [my-config]
   - progress_tracker:
@@ -210,12 +229,19 @@ summary:
       Created game server config [my-config].
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_schedules.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_schedules.yaml
   - error: '1: Invalid schema: schedules must be a list'
 - execute:
   - command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_selectors.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_selectors.yaml
   - error: '1: Invalid schema: selectors must be a list'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment
+  - stderr: |-
+      .*--fleet-configs-file: Must be specified..*
+      $
+  - error: '1: argument --fleet-configs-file: Must be specified.'
 actions:
 - define_reference:
     reference: api-version
@@ -255,6 +281,35 @@ actions:
       - fleetSpec:
           replicas: 2
         name: TestFleetSpec
+- write_file:
+    path: invalid_yaml.yaml
+    contents: |
+      - foo:
+        bar
+- write_file:
+    path: invalid_fleet_configs_no_spec.yaml
+    contents: |
+      - name: foo
+- write_file:
+    path: invalid_scaling_configs_no_spec.yaml
+    contents: |
+      - name: foo
+- write_file:
+    path: invalid_fleet_configs_unrecognized_fields.yaml
+    contents: |
+      - fleetSpec: |
+          replicas: 2
+        foo: bar
+        bar: foo
+- write_file:
+    path: invalid_scaling_configs_unrecognized_fields.yaml
+    contents: |
+      - fleetAutoscalerSpec: |
+          policy:
+            buffer:
+              bufferSize: 2
+        foo: bar
+        bar: foo
 - write_file:
     path: invalid_fleet_configs.txt
     contents: |
@@ -540,96 +595,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --labels a=x,b=y --fleet-configs-file fleet_configs.json
-    events:
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
-          method: POST
-          headers: {}
-          body: |
-            {
-              "labels": {
-                "a": "x",
-                "b": "y"
-              },
-              "fleetConfigs": [
-                 {"fleetSpec": "\"replicas\": 2"}
-              ]
-            }
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
-              "done": true
-            }
-    - expect_stderr: |
-        Create request issued for: [my-config]
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
-                "createTime": "2019-06-17T17:55:25.592630443Z",
-                "endTime": "2019-06-17T17:55:26.143797134Z",
-                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
-                "verb": "create",
-                "requestedCancellation": false,
-                "apiVersion": "$$api-version$$"
-              },
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
-                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
-                "createTime": "2019-06-17T17:55:25.580478587Z",
-                "updateTime": "2019-06-17T17:55:25.597731920Z"
-              }
-            }
-    - expect_progress_tracker:
-        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
-          to complete
-        status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
-              "description": "description",
-              "createTime": "2019-06-17T17:55:25.580478587Z",
-              "updateTime": "2019-06-17T17:55:26.151280082Z",
-              "labels": {
-                "a": "x",
-                "b": "y"
-              },
-              "fleetConfigs": [
-                 {"fleetSpec": "\"replicas\": 2"}
-              ]
-            }
-    - expect_stderr: |
-        Created game server config [my-config].
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml
     events:
     - api_call:
         expect_request:
@@ -640,9 +606,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
         return_response:
           headers:
             status: '200'
@@ -700,10 +663,6 @@ actions:
               "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
               "createTime": "2019-06-17T17:55:25.580478587Z",
               "updateTime": "2019-06-17T17:55:26.151280082Z",
-              "labels": {
-                "a": "x",
-                "b": "y"
-              },
               "fleetConfigs": [
                  {"fleetSpec": "\"replicas\": 2"}
               ]
@@ -714,7 +673,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
     events:
     - api_call:
         expect_request:
@@ -725,9 +684,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
               scalingConfigs:
               - fleetAutoscalerSpec: '{"replicas": 100}'
                 name: sc1
@@ -797,10 +753,6 @@ actions:
               "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
               "createTime": "2019-06-17T17:55:25.580478587Z",
               "updateTime": "2019-06-17T17:55:26.151280082Z",
-              "labels": {
-                "a": "x",
-                "b": "y"
-              },
               "fleetConfigs": [
                 {"fleetSpec": "fleet-spec-0"}
               ],
@@ -825,7 +777,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs.yaml
     events:
     - api_call:
         expect_request:
@@ -836,9 +788,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
               scalingConfigs:
               - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
                 name: sc2
@@ -901,10 +850,6 @@ actions:
               "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
               "createTime": "2019-06-17T17:55:25.580478587Z",
               "updateTime": "2019-06-17T17:55:26.151280082Z",
-              "labels": {
-                "a": "x",
-                "b": "y"
-              },
               "fleetConfigs": [
                 {"fleetSpec": "fleet-spec-0"}
               ],
@@ -929,14 +874,64 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file invalid_fleet_configs.txt
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_fleet_configs.txt
     events:
     - expect_exit:
         code: 1
         message: 'Invalid schema: expected proper fleet configs'
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs.txt
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_yaml.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*Error parsing fleet_configs file:.*
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_yaml.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*Error parsing scaling_configs file:.*
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_fleet_configs_no_spec.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: expect `fleetSpec:` in fleet configs.'
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs_no_spec.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: expect `fleetAutoscalerSpec:` in scaling configs.'
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file invalid_fleet_configs_unrecognized_fields.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message: |-
+          Invalid schema, the following fields are unrecognized:
+          .bar
+          .foo
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs_unrecognized_fields.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message: |-
+          Invalid schema, the following fields are unrecognized:
+          .bar
+          .foo
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs.txt
     events:
     - expect_exit:
         code: 1
@@ -1300,7 +1295,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_str.yaml
     events:
     - api_call:
         expect_request:
@@ -1311,9 +1306,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
         return_response:
           headers:
             status: '200'
@@ -1385,7 +1377,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_with_name.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_with_name.yaml
     events:
     - api_call:
         expect_request:
@@ -1397,9 +1389,6 @@ actions:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
                 name: TestFleetSpec
-              labels:
-                a: x
-                b: y
         return_response:
           headers:
             status: '200'
@@ -1471,7 +1460,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.json --scaling-configs-file scaling_configs_str.json
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_str.json --scaling-configs-file scaling_configs_str.json
     events:
     - api_call:
         expect_request:
@@ -1482,9 +1471,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
               scalingConfigs:
               - fleetAutoscalerSpec: '{"replicas": 100}'
                 name: sc1
@@ -1582,7 +1568,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml --scaling-configs-file scaling_configs_str.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs_str.yaml --scaling-configs-file scaling_configs_str.yaml
     events:
     - api_call:
         expect_request:
@@ -1593,9 +1579,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
               scalingConfigs:
               - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
                 name: sc2
@@ -1686,7 +1669,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_without_name.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_without_name.yaml
     events:
     - api_call:
         expect_request:
@@ -1697,9 +1680,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
               scalingConfigs:
               - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
                 selectors:
@@ -1780,7 +1760,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_complex.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_complex.yaml
     events:
     - api_call:
         expect_request:
@@ -1791,9 +1771,6 @@ actions:
             json:
               fleetConfigs:
               - fleetSpec: '{"replicas": 2}'
-              labels:
-                a: x
-                b: y
               scalingConfigs:
               - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 1}}}'
                 name: scaling-config-3
@@ -1940,15 +1917,25 @@ actions:
         code: 0
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_schedules.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_schedules.yaml
     events:
     - expect_exit:
         code: 1
         message: 'Invalid schema: schedules must be a list'
 - execute_command:
     command: |
-      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_selectors.yaml
+      game servers configs create my-config --deployment my-deployment --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_selectors.yaml
     events:
     - expect_exit:
         code: 1
         message: 'Invalid schema: selectors must be a list'
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment
+    events:
+    - expect_stderr:
+        matches: |
+          .*--fleet-configs-file: Must be specified..*
+    - expect_exit:
+        code: 1
+        message: 'argument --fleet-configs-file: Must be specified.'

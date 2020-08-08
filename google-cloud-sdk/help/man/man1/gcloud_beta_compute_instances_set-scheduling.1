@@ -11,7 +11,7 @@ gcloud beta compute instances set\-scheduling \- set scheduling options for Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-clear\-min\-node\-cpu\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-node\-affinities\fR\ |\ \fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-clear\-min\-node\-cpu\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-preemptible\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-node\-affinities\fR\ |\ \fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,11 +67,18 @@ Minimum number of virtual CPUs this instance will consume when running on a
 sole\-tenant node.
 
 .TP 2m
+\fB\-\-preemptible\fR
+If provided, instances will be preemptible and time\-limited. Instances may be
+preempted to free up resources for standard VM instances, and will only be able
+to run for a limited amount of time. Preemptible instances can not be restarted
+and will not migrate.
+
+.TP 2m
 \fB\-\-[no\-]restart\-on\-failure\fR
 The instances will be restarted if they are terminated by Compute Engine. This
-does not affect terminations performed by the user. Use
-\fB\-\-restart\-on\-failure\fR to enable and \fB\-\-no\-restart\-on\-failure\fR
-to disable.
+does not affect terminations performed by the user. This option is mutually
+exclusive with \-\-preemptible. Use \fB\-\-restart\-on\-failure\fR to enable and
+\fB\-\-no\-restart\-on\-failure\fR to disable.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR

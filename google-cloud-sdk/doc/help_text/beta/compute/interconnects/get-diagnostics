@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute interconnects get-diagnostics - get diagnostics of a
-        Google Compute Engine interconnect
+        Compute Engine interconnect
 
 SYNOPSIS
     gcloud beta compute interconnects get-diagnostics NAME
@@ -8,8 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute interconnects get-diagnostics displays all
-    runtime data associated with Google Compute Engine interconnect in a
-    project.
+    runtime data associated with Compute Engine interconnect in a project.
 
 POSITIONAL ARGUMENTS
      NAME

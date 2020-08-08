@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 import argparse
 
+from googlecloudsdk.api_lib.sql import exceptions as sql_exceptions
 from googlecloudsdk.api_lib.sql import instances as instances_util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
@@ -468,15 +469,6 @@ class _BaseInstancePatchTest(object):
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.Run('sql instances patch custom-instance --backup-location=')
 
-  def testConflictingBackupFlagsBinLog(self):
-    diff = {
-        'name': 'custom-instance'
-    }
-    self.ExpectInstanceGet(self.GetV2Instance(), diff)
-    with self.assertRaises(exceptions.ToolException):
-      self.Run('sql instances patch custom-instance --no-backup '
-               '--enable-bin-log')
-
   def testConflictingBackupFlagsLocation(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('sql instances patch custom-instance --no-backup '
@@ -531,6 +523,50 @@ class _BaseInstancePatchTest(object):
 +settings.availabilityType: ZONAL
 """,
         normalize_space=True)
+
+  def testPostgresPointInTimeRecovery(self):
+    instance_name = 'custom-instance'
+    diff = {
+        'name':
+            instance_name,
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
+        'settings': {}
+    }
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    update_diff = {
+        'name': instance_name,
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    pointInTimeRecoveryEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='06:00')
+        }
+    }
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), update_diff)
+    self.ExpectDoneUpdateOperationGet()
+    diff['settings'].update(update_diff['settings'])
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    self.Run(
+        'sql instances patch custom-instance --enable-point-in-time-recovery')
+
+  def testCreatePostgresWithPointInTimeRecoveryAndNoBackup(self):
+    with self.AssertRaisesExceptionRegexp(
+        sql_exceptions.ArgumentError,
+        '`--enable-point-in-time-recovery` cannot be specified when '
+        '--no-backup is specified'):
+      self.Run('sql instances patch custom-instance '
+               '--enable-point-in-time-recovery --no-backup')
+
+  def testCreateMysqlWithBinLogAndNoBackup(self):
+    with self.AssertRaisesExceptionRegexp(
+        sql_exceptions.ArgumentError,
+        '`--enable-bin-log` cannot be specified when --no-backup is specified'):
+      self.Run('sql instances patch custom-instance --enable-bin-log '
+               '--no-backup')
 
 
 class InstancesPatchGATest(_BaseInstancePatchTest, base.SqlMockTestGA):
@@ -798,35 +834,7 @@ class InstancesPatchBetaTest(_BaseInstancePatchBetaTest, base.SqlMockTestBeta):
 
 class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
                               base.SqlMockTestAlpha):
-
-  def testPostgresPointInTimeRecovery(self):
-    instance_name = 'custom-instance'
-    diff = {
-        'name':
-            instance_name,
-        'databaseVersion':
-            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
-            .POSTGRES_9_6,
-        'settings': {}
-    }
-    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
-    update_diff = {
-        'name': instance_name,
-        'settings': {
-            'backupConfiguration':
-                self.messages.BackupConfiguration(
-                    pointInTimeRecoveryEnabled=True,
-                    enabled=True,
-                    kind='sql#backupConfiguration',
-                    startTime='06:00')
-        }
-    }
-    self.ExpectInstancePatch(self.GetPatchRequestInstance(), update_diff)
-    self.ExpectDoneUpdateOperationGet()
-    diff['settings'].update(update_diff['settings'])
-    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
-    self.Run(
-        'sql instances patch custom-instance --enable-point-in-time-recovery')
+  pass
 
 
 if __name__ == '__main__':

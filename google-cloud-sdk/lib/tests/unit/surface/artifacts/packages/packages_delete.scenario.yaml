@@ -14,6 +14,18 @@ summary:
     - status: SUCCESS
   - stderr: |
       Deleted package [my-pkg].
+- execute:
+  - command: artifacts packages delete @scope/my-pkg --repository=my-repo --location=us
+  - prompt:
+    - message: You are about to delete package [@scope/my-pkg]
+    - input: y
+  - stderr: |
+      Delete request issued for: [@scope/my-pkg]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted package [@scope/my-pkg].
 actions:
 - execute_command:
     command: artifacts packages delete my-pkg --repository=my-repo --location=us
@@ -59,5 +71,51 @@ actions:
         status: SUCCESS
     - expect_stderr: |
         Deleted package [my-pkg].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts packages delete @scope/my-pkg --repository=my-repo --location=us
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete package [@scope/my-pkg]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us
+              locationId: us
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/@scope%252Fmy-pkg?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Delete request issued for: [@scope/my-pkg]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted package [@scope/my-pkg].
     - expect_exit:
         code: 0

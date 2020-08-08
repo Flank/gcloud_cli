@@ -15,7 +15,7 @@ actions:
 # Set some flags for update command.
 - execute_command:
     command: |
-      pubsub lite-topics update topic1 --zone us-central1-a --scale 2 --per-partition-bytes 40GiB --message-retention-period 5s
+      pubsub lite-topics update topic1 --zone us-central1-a --scale 2 --per-partition-bytes 40GiB --message-retention-period 2w
     events:
     - api_call:
         expect_request:
@@ -48,7 +48,7 @@ actions:
                 scale: 2
               retentionConfig:
                 perPartitionBytes: '42949672960'
-                period: '5s'
+                period: '1209600s'
         return_response:
           headers:
             status: '200'
@@ -61,7 +61,7 @@ actions:
               },
               "retentionConfig": {
                 "perPartitionBytes": "42949672960",
-                "period": "5s"
+                "period": "1209600s"
               }
             }
     - expect_stderr: |
@@ -73,7 +73,7 @@ actions:
           scale: 2
         retentionConfig:
           perPartitionBytes: '42949672960'
-          period: 5s
+          period: 1209600s
     - expect_exit:
         code: 0
 
@@ -140,85 +140,6 @@ actions:
         code: 0
 
 # Missing zone arg should fail.
-- execute_command:
-    command: |
-      pubsub lite-topics update topic1 --scale=2
-    events:
-    - expect_exit:
-        code: 1
-        message:
-          matches: .*provide the argument \[--zone\] on the command line.*
-
-# Set pubsub/lite_zone property and omit --zone flag.
-- set_property:
-    pubsub/lite_zone: 'europe-west1-a'
-- execute_command:
-    command: |
-      pubsub lite-topics update topic1 --scale 2 --per-partition-bytes 40GiB --message-retention-period 5s
-    events:
-    - api_call:
-        expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
-          method: GET
-          body:
-            json:
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "projectNumber": "12345",
-              "projectId": "fake-project",
-              "lifecycleState": "ACTIVE",
-              "name": "fake-project",
-              "createTime": "2019-07-19T15:49:12.034Z",
-              "parent": {
-                "type": "folder",
-                "id": "54321"
-              }
-            }
-    - api_call:
-        expect_request:
-          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/europe-west1-a/topics/topic1?alt=json&updateMask=partitionConfig.scale%2CretentionConfig.perPartitionBytes%2CretentionConfig.period
-          method: PATCH
-          body:
-            json:
-              partitionConfig:
-                scale: 2
-              retentionConfig:
-                perPartitionBytes: '42949672960'
-                period: '5s'
-        return_response:
-          headers:
-            status: '200'
-          body: |-
-            {
-              "name": "projects/12345/locations/europe-west1-a/topics/topic1",
-              "partitionConfig": {
-                "count": "1",
-                "scale": 2
-              },
-              "retentionConfig": {
-                "perPartitionBytes": "42949672960",
-                "period": "5s"
-              }
-            }
-    - expect_stderr: |
-        Updated topic [topic1].
-    - expect_stdout: |
-        name: projects/12345/locations/europe-west1-a/topics/topic1
-        partitionConfig:
-          count: '1'
-          scale: 2
-        retentionConfig:
-          perPartitionBytes: '42949672960'
-          period: 5s
-    - expect_exit:
-        code: 0
-
-# Empty zone arg should fail.
-- set_property:
-    pubsub/lite_zone: ""
 - execute_command:
     command: |
       pubsub lite-topics update topic1 --scale=2

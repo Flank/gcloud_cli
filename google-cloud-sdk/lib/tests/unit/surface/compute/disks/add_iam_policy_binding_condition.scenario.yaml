@@ -1,5 +1,5 @@
 title: compute disks add-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 - define_reference:
@@ -7,6 +7,7 @@ actions:
     track_values:
       ALPHA: alpha
       BETA: beta
+      GA: v1
 # add binding with condition to a policy with condition
 - execute_command:
     command: compute disks add-iam-policy-binding my-disk --zone=ZONE --member=user:test@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'

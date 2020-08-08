@@ -80,7 +80,7 @@ Override the .gcloudignore file and use the specified file instead.
 \fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR
 Ingress settings controls what traffic can reach the function.By default
 \f5all\fR will be used. \fIINGRESS_SETTINGS\fR must be one of: \fBall\fR,
-\fBinternal\-only\fR.
+\fBinternal\-only\fR, \fBinternal\-and\-gclb\fR.
 
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
@@ -106,8 +106,6 @@ Choices:
 
 .RS 2m
 .IP "\(em" 2m
-\f5nodejs8\fR: Node.js 8
-.IP "\(em" 2m
 \f5nodejs10\fR: Node.js 10
 .IP "\(em" 2m
 \f5nodejs12\fR: Node.js 12
@@ -120,7 +118,11 @@ Choices:
 .IP "\(em" 2m
 \f5go113\fR: Go 1.13
 .IP "\(em" 2m
+\f5java11\fR: Java 11
+.IP "\(em" 2m
 \f5nodejs6\fR: Node.js 6 (deprecated)
+.IP "\(em" 2m
+\f5nodejs8\fR: Node.js 8 (deprecated)
 .RE
 .RE
 .sp
@@ -151,19 +153,23 @@ Local filesystem path (root directory of function source).
 .RE
 .RE
 .sp
-Note that if you do not specify the \f5\-\-source\fR flag:
+Note that, depending on your runtime type, Cloud Functions will look for files
+with specific names for deployable functions. For Node.js, these filenames are
+\f5index.js\fR or \f5function.js\fR. For Python, this is \f5main.py\fR.
+
+If you do not specify the \f5\-\-source\fR flag:
 
 .RS 2m
 .IP "\(bu" 2m
-Current directory will be used for new function deployments.
+The current directory will be used for new function deployments.
 .IP "\(bu" 2m
-If the function is previously deployed using a local filesystem path,
+If the function was previously deployed using a local filesystem path,
 .RE
 .sp
-then function's source code will be updated using the current directory.
+then the function's source code will be updated using the current directory.
 .RS 2m
 .IP "\(bu" 2m
-If the function is previously deployed using a Google Cloud Storage
+If the function was previously deployed using a Google Cloud Storage
 .RE
 .sp
 location or a source repository, then the function's source code will not be
@@ -261,9 +267,9 @@ At most one of these may be specified:
 \fB\-\-build\-worker\-pool\fR=\fIBUILD_WORKER_POOL\fR
 Name of the Cloud Build Custom Worker Pool that should be used to build the
 function. The format of this field is
-\f5projects/${PROJECT}/workerPools/${WORKERPOOL}\fR where ${PROJECT} is the
-project id where the worker pool is defined and ${WORKERPOOL} is the short name
-of the worker pool.
+\f5projects/${PROJECT}/locations/${LOCATION}/workerPools/${WORKERPOOL}\fR where
+${PROJECT} is the project id and ${LOCATION} is the location where the worker
+pool is defined and ${WORKERPOOL} is the short name of the worker pool.
 
 .TP 2m
 \fB\-\-clear\-build\-worker\-pool\fR
@@ -401,7 +407,10 @@ GET, DELETE, and OPTIONS.
 .TP 2m
 \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR
 Name of Pub/Sub topic. Every message published in this topic will trigger
-function execution with message contents passed as input data.
+function execution with message contents passed as input data. Note that this
+flag does not accept the format of projects/PROJECT_ID/topics/TOPIC_ID. Use this
+flag to specify the final element TOPIC_ID. The PROJECT_ID will be read from the
+active configuration.
 
 .TP 2m
 \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR
@@ -429,6 +438,24 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
 
 Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To deploy a function that is triggered by write events on the document
+\f5\fI/messages/{pushId}\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha functions deploy my_function \-\-runtime=python37 \e
+    \-\-trigger\-event=providers/cloud.firestore/eventTypes/\e
+document.write \e
+    \-\-trigger\-resource=projects/project_id/databases/(default)/\e
+documents/messages/{pushId}
+.RE
+
+See https://cloud.google.com/functions/docs/calling for more details of using
+other types of resource as triggers.
 
 
 

@@ -99,9 +99,14 @@ EXAMPLES
 
         $ gcloud run services describe <service-name>
 
-    To get those details in the Knative yaml format:
+    To get those details in the YAML format:
 
         $ gcloud run services describe <service-name> --format=yaml
+
+    To get them in YAML format suited to export (omitting metadata specific to
+    this deployment and status info):
+
+        $ gcloud run services describe <service-name> --format=export
 
 NOTES
     These variants are also available:

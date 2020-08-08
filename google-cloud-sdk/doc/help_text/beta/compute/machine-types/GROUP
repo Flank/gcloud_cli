@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute machine-types - read Google Compute Engine virtual
-        machine types
+    gcloud beta compute machine-types - read Compute Engine virtual machine
+        types
 
 SYNOPSIS
     gcloud beta compute machine-types COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -26,7 +26,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (BETA) Describe a Google Compute Engine machine type.
+        (BETA) Describe a Compute Engine machine type.
 
      list
         (BETA) List Google Compute Engine machine types.

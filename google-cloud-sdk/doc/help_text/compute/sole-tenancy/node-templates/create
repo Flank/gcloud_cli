@@ -50,7 +50,7 @@ REQUIRED FLAGS
 
           See the following for more information:
 
-              $ gcloud alpha compute sole-tenancy node-types
+              $ gcloud compute sole-tenancy node-types list
 
 OPTIONAL FLAGS
      --description=DESCRIPTION

@@ -1,13 +1,14 @@
 NAME
-    gcloud alpha resource-settings describe - get a resource setting
+    gcloud alpha resource-settings describe - show the value of a resource
+        setting
 
 SYNOPSIS
     gcloud alpha resource-settings describe SETTING_NAME
         (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
-          | --project=PROJECT_ID) [GCLOUD_WIDE_FLAG ...]
+          | --project=PROJECT_ID) [--effective] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Get a resource setting
+    (ALPHA) Show the value of a resource setting
 
 POSITIONAL ARGUMENTS
      SETTING_NAME
@@ -28,6 +29,10 @@ REQUIRED FLAGS
           Project ID. Overrides the default core/project property value for
           this command invocation.
 
+OPTIONAL FLAGS
+     --effective
+        Describe the effective setting.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -44,9 +49,8 @@ EXAMPLES
             --project=foo-project
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

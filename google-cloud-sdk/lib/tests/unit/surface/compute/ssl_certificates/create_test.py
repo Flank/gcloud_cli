@@ -372,7 +372,7 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
 
   def SetUp(self):
     self.SelectApi('beta')
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self.prefix = 'beta'
 
 
@@ -381,7 +381,7 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest,
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.SetEncoding('utf8')
+    self.SetEncoding('utf-8')
     self.prefix = 'alpha'
 
 

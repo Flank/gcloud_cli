@@ -60,9 +60,9 @@ class CloudPubsubTestBase(sdk_test_base.WithFakeAuth,
     # List of actual Cloud Pub/Sub message objects
     self.messages = [
         self.msgs.PubsubMessage(
-            data=self.message_data[0].encode('utf8'), attributes=attributes),
+            data=self.message_data[0].encode('utf-8'), attributes=attributes),
         self.msgs.PubsubMessage(
-            data=self.message_data[1].encode('utf8'), attributes=attributes),
+            data=self.message_data[1].encode('utf-8'), attributes=attributes),
         self.msgs.PubsubMessage(
             data=self.message_data[2], attributes=attributes)
     ]

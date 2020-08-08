@@ -24,7 +24,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.health_checks import test_resources
 
 
 class HealthChecksDeleteTest(test_base.BaseTest,
@@ -119,6 +119,7 @@ class HealthChecksDeleteTest(test_base.BaseTest,
         'health-check-ssl',
         'health-check-https',
         'health-check-http2',
+        'health-check-grpc',
     ])
 
 
@@ -202,16 +203,15 @@ class RegionHealthChecksDeleteTest(HealthChecksDeleteTest):
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
-    self.RunCompletion(
-        'compute health-checks delete h',
-        [
-            'health-check-http-2',
-            'health-check-http-1',
-            'health-check-tcp',
-            'health-check-ssl',
-            'health-check-https',
-            'health-check-http2',
-        ])
+    self.RunCompletion('compute health-checks delete h', [
+        'health-check-http-2',
+        'health-check-http-1',
+        'health-check-tcp',
+        'health-check-ssl',
+        'health-check-https',
+        'health-check-http2',
+        'health-check-grpc',
+    ])
 
 
 class RegionHealthChecksDeleteBetaTest(RegionHealthChecksDeleteTest):
@@ -226,18 +226,6 @@ class RegionHealthChecksDeleteAlphaTest(RegionHealthChecksDeleteBetaTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-
-  def testDeleteCompletion(self):
-    self.StartPatch(
-        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
-        return_value=resource_projector.MakeSerializable(
-            test_resources.HEALTH_CHECKS_ALPHA),
-        autospec=True)
-    self.RunCompletion(
-        'compute health-checks delete h',
-        [
-            'health-check-grpc',
-        ])
 
 
 if __name__ == '__main__':

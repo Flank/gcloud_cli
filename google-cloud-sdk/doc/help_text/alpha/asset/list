@@ -3,10 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha asset list
-        (--organization=ORGANIZATION_ID | --project=PROJECT_ID)
-        [--asset-types=[ASSET_TYPES,...]] [--content-type=CONTENT_TYPE]
-        [--snapshot-time=SNAPSHOT_TIME] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [--asset-types=[ASSET_TYPES,...]]
+        [--content-type=CONTENT_TYPE] [--snapshot-time=SNAPSHOT_TIME]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List the cloud assets. Note that to list a project different from
@@ -18,13 +19,16 @@ DESCRIPTION
 REQUIRED FLAGS
      Exactly one of these must be specified:
 
+       --folder=FOLDER_ID
+          The ID of the folder which is the root asset.
+
        --organization=ORGANIZATION_ID
           The ID of the organization which is the root asset.
 
        --project=PROJECT_ID
           The project which is the root asset.
 
-          The Google Cloud Platform project name to use for this invocation. If
+          The Google Cloud Platform project ID to use for this invocation. If
           omitted, then the current project is assumed; the current project can
           be listed using gcloud config list --format='text(core.project)' and
           can be set using gcloud config set project PROJECTID.
@@ -47,7 +51,7 @@ FLAGS
         Asset content type. If not specified, no content but the asset name and
         type will be returned in the feed. To read more see
         https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview#asset_content_type.
-        CONTENT_TYPE must be (currently only one value is supported): resource.
+        CONTENT_TYPE must be one of: resource, iam-policy.
 
      --snapshot-time=SNAPSHOT_TIME
         Timestamp to take a snapshot on assets. This can only be a current or

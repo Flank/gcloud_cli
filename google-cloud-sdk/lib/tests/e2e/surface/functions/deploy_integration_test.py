@@ -41,7 +41,6 @@ FUNCTION_JS_FILE = """exports.function = function(context, data) {
         """
 
 
-@test_case.Filters.skip('internal error', 'b/157216406')
 class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
 
   def _PrepareFunctionFiles(self):
@@ -262,8 +261,6 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
         'repos/foom/moveable-aliases/master/paths//'.format(self.function_name))
 
   def TearDown(self):
-    # Calling this from AddCleanup handler will trigger an exception
-    # FIXME(b/32226349)
     if self.delete_function_on_tear_down:
       self.Run('functions delete ' + self.function_name)
 

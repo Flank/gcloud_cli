@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute instance\-groups managed update \- update Google Compute Engine  managed instance groups
+gcloud compute instance\-groups managed update \- update Compute Engine managed instance groups
 
 
 
@@ -17,18 +17,18 @@ gcloud compute instance\-groups managed update \- update Google Compute Engine  
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute instance\-groups managed update\fR allows you to specify or
-modify AutoHealingPolicy for an existing managed instance group.
+\fBgcloud compute instance\-groups managed update\fR lets you specify or modify
+AutoHealingPolicy for an existing managed instance group.
 
-When updating the AutoHealingPolicy, you may specify the health check, initial
+When updating the AutoHealingPolicy, you can specify the health check, initial
 delay, or both. If the field is unspecified, its value won't be modified. If
-\f5\-\-health\-check\fR is specified, the health check will be used to monitor
-the health of your application. Whenever the health check signal for the
-instance becomes \f5UNHEALTHY\fR, the autohealing action (\f5RECREATE\fR) on an
-instance will be performed.
+\f5\-\-health\-check\fR is specified, the health check is used to monitor the
+health of your application. Whenever the health check signal for the instance
+becomes \f5UNHEALTHY\fR, the autohealing action (\f5RECREATE\fR) on an instance
+is performed.
 
-If no health check is specified, the instance autohealing will be triggered by
-the instance status only (i.e. the autohealing action (\f5RECREATE\fR) on an
+If no health check is specified, the instance autohealing is triggered by the
+instance status only (i.e., the autohealing action (\f5RECREATE\fR) on an
 instance will be performed if \f5instance.status\fR is not \f5RUNNING\fR).
 
 

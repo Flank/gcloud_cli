@@ -2,7 +2,7 @@ NAME
     gcloud anthos - anthos command Group
 
 SYNOPSIS
-    gcloud anthos GROUP [GCLOUD_WIDE_FLAG ...]
+    gcloud anthos GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Anthos command Group.
@@ -20,6 +20,12 @@ GROUPS
 
      auth
         Authenticate clusters using the Anthos client.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create-login-config
+        Generates a login configuration file.
 
 NOTES
     These variants are also available:

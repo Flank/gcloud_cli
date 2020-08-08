@@ -65,16 +65,21 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
     response["name"] = api
     self.AddHTTPResponse(url, status=200, body=json.dumps(response))
 
-  def _AddDeployResponse(self, organization, override):
+  def _AddDeployResponse(self, organization, override, path=None):
     url = ("https://apigee.googleapis.com/v1/organizations/%s/environments/%s"
            "/apis/%s/revisions/%s/deployments") % (
                organization, self._canned_response["environment"],
                self._canned_response["apiProxy"],
                self._canned_response["revision"])
+    params = {}
+    if override:
+      params["override"] = ["true"]
+    if path:
+      params["basepath"] = [path]
     self.AddHTTPResponse(
         url,
         status=200,
-        expected_params={"override": ["true"]} if override else None,
+        expected_params=params if params else None,
         body=json.dumps(self._canned_response))
 
   def testWithoutOrganization(self):
@@ -115,6 +120,17 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
     self._AddDeployResponse("my-org", override=False)
     self.RunApigee("apis deploy --format=json --project=my-project "
                    "--environment=test --api=demo")
+    self.AssertJsonOutputMatches(
+        self._canned_response,
+        "Must describe the successfully initiated deployment to the user.")
+
+  def testWithBasepath(self):
+    self._AddOrganizationListResponse()
+    path = "/funny/monkey"
+    self._canned_response["basePath"] = path
+    self._AddDeployResponse("my-org", override=False, path=path)
+    self.RunApigee("apis deploy --format=json --project=my-project "
+                   "--environment=test --api=demo 3 --basepath=/funny/monkey")
     self.AssertJsonOutputMatches(
         self._canned_response,
         "Must describe the successfully initiated deployment to the user.")

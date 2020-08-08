@@ -17,11 +17,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
 
 class OrgPoliciesDescribeTest(testbase.OrgPoliciesUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDescribeOrgPolicy(self):
     test_policy = self.TestPolicy()
@@ -80,6 +84,17 @@ class OrgPoliciesDescribeTest(testbase.OrgPoliciesUnitTestBase):
     return self.RunOrgPolicies('describe', '--effective', self.TEST_CONSTRAINT,
                                *args)
 
+
+class OrgPoliciesDescribeAlphaTest(OrgPoliciesDescribeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class OrgPoliciesDescribeBetaTest(OrgPoliciesDescribeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 if __name__ == '__main__':
   test_case.main()

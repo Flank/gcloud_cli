@@ -222,11 +222,11 @@ class RegionalForwardingRulesSetTargetTest(test_base.BaseTest):
     self.AssertErrContains('us-central2-b')
 
 
-class ForwardingRulesSetTargetTestBeta(test_base.BaseTest):
+class ForwardingRulesSetTargetTestV1(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testBackendService(self):
     messages = self.messages
@@ -331,23 +331,6 @@ class ForwardingRulesSetTargetTestBeta(test_base.BaseTest):
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
-  #  For Beta and GA, --target-grpc-proxy won't be supported
-  def testTargetGrpcProxy(self):
-    with self.AssertRaisesArgumentErrorMatches('unrecognized arguments'):
-      self.Run("""
-          compute forwarding-rules set-target forwarding-rule-1
-            --global
-            --target-grpc-proxy target-grpc-proxy-1
-          """)
-    self.CheckRequests()
-
-
-class ForwardingRulesSetTargetTestAlpha(ForwardingRulesSetTargetTestBeta):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testTargetGrpcProxy(self):
     self.Run("""
         compute forwarding-rules set-target forwarding-rule-1
@@ -365,6 +348,20 @@ class ForwardingRulesSetTargetTestAlpha(ForwardingRulesSetTargetTestBeta):
                         'target-grpc-proxy-1').format(api=self.api),)))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
+
+
+class ForwardingRulesSetTargetTestBeta(ForwardingRulesSetTargetTestV1):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ForwardingRulesSetTargetTestAlpha(ForwardingRulesSetTargetTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

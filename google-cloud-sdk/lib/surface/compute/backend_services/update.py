@@ -107,7 +107,7 @@ class UpdateHelper(object):
       flags.AddFailoverRatio(parser)
 
     if support_logging:
-      flags.AddEnableLogging(parser, default=None)
+      flags.AddEnableLogging(parser)
       flags.AddLoggingSampleRate(parser)
 
     AddIapFlag(parser)
@@ -358,7 +358,7 @@ class UpdateGA(base.UpdateCommand):
   _support_logging = True
   _support_failover = True
   _support_client_only = False
-  _support_grpc_protocol = False
+  _support_grpc_protocol = True
 
   @classmethod
   def Args(cls, parser):
@@ -387,7 +387,7 @@ class UpdateBeta(UpdateGA):
   """
 
   _support_client_only = False
-  _support_grpc_protocol = False
+  _support_grpc_protocol = True
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)

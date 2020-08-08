@@ -49,10 +49,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy
+          method: POST
           headers: {}
-          body: null
+          body: analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
         return_response:
           headers:
             status: '200'
@@ -166,10 +166,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy
+          method: POST
           headers: {}
-          body: null
+          body: analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
         return_response:
           headers:
             status: '200'
@@ -218,10 +218,10 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.identitySelector.identity=user%3Auser1%40foo.com&options.executionTimeout=60s&options.expandResources=True&options.outputResourceEdges=True
-          method: GET
+          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:analyzeIamPolicy
+          method: POST
           headers: {}
-          body: null
+          body: analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.identitySelector.identity=user%3Auser1%40foo.com&options.executionTimeout=60s&options.expandResources=True&options.outputResourceEdges=True
         return_response:
           headers:
             status: '200'

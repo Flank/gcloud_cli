@@ -1,7 +1,3 @@
-filters:
-  skipAlways:
-    reason: Failing - "internal error"
-    bug: b/135525225
 title: test resource policy
 release_tracks: [ALPHA]
 summary:

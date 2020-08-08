@@ -1,6 +1,6 @@
 NAME
-    gcloud compute images set-iam-policy - set the IAM policy for a Google
-        Compute Engine image
+    gcloud compute images set-iam-policy - set the IAM policy for a Compute
+        Engine image
 
 SYNOPSIS
     gcloud compute images set-iam-policy IMAGE POLICY_FILE

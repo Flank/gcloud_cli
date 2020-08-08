@@ -22,6 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import constants
 from googlecloudsdk.command_lib.tasks import parsers
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -285,6 +286,31 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
 
     self.assertEqual(actual_queue, expected_queue)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+
+class CreateAppEngineQueueTestNoLocMock(test_base.CloudTasksTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.command = 'tasks queues create'
+
+  def SetUp(self):
+    self.location_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations', locationsId='us-central1',
+        projectsId=self.Project())
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+
+  def testCreate_NoExistingApp(self):
+    properties.VALUES.core.disable_prompts.Set(True)
+    resolve_loc_mock = self.StartObjectPatch(app, '_GetLocation')
+    resolve_loc_mock.return_value = None
+    resolve_app_mock = self.StartObjectPatch(app, '_CreateApp')
+    resolve_app_mock.return_value = None
+    with self.assertRaises(app.RegionResolvingError):
+      self.Run(self.command + ' my-queue --quiet')
 
 
 class CreateAppEngineQueueTestBetaDeprecated(CreateAppEngineQueueTestBeta):

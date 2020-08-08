@@ -10,7 +10,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha composer environments list-upgrades prints a table
-    listing the available image-version upgrades with the following columns:
+    listing the suggested image-version upgrades with the following columns:
       o Image Version ID
       o Composer 'default' flag
       o List of supported python versions

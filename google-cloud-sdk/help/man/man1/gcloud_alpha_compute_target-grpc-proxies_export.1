@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_TARGET\-GRPC\-PROXIES_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute target\-grpc\-proxies export \- export a target gRPC proxy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute target\-grpc\-proxies export\fR \fINAME\fR [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Export a target gRPC proxy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the target gRPC proxy to export.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Path to a YAML file where the configuration will be exported. The exported data
+will not contain any output\-only fields. Alternatively, you may omit this flag
+to write to standard output. A schema describing the export/import format can be
+found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/alpha/TargetGrpcProxy.yaml.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

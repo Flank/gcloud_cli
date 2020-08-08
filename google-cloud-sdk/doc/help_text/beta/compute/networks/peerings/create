@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute networks peerings create - create a Google Compute
-        Engine network peering
+    gcloud beta compute networks peerings create - create a Compute Engine
+        network peering
 
 SYNOPSIS
     gcloud beta compute networks peerings create NAME --network=NETWORK

@@ -554,7 +554,7 @@ def AddSessionAffinity(parser,
               'client-IP\'s address and destination address.'
               )
       })
-  help_str = 'The type of TCP session affinity to use. Not supported for UDP.'
+  help_str = 'The type of session affinity to use. Supports both TCP and UDP.'
   parser.add_argument(
       '--session-affinity',
       choices=choices,
@@ -711,12 +711,11 @@ def AddFailoverRatio(parser):
       """)
 
 
-def AddEnableLogging(parser, default):
+def AddEnableLogging(parser):
   """Adds the enable logging argument to the argparse."""
   parser.add_argument(
       '--enable-logging',
-      action='store_true',
-      default=default,
+      action=arg_parsers.StoreTrueFalseAction,
       help="""\
       The logging options for the load balancer traffic served by this backend
       service. If logging is enabled, logs will be exported to Stackdriver.

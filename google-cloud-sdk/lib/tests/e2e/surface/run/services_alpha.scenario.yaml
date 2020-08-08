@@ -40,7 +40,7 @@ summary:
 - execute:
   - command: run services replace --region us-central1 service.yaml
   - stderr: |
-      Deploying container to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [us-central1]
+      Applying new configuration to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [us-central1]
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
@@ -926,7 +926,7 @@ actions:
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_stderr: |
-        Deploying container to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [us-central1]
+        Applying new configuration to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [us-central1]
     - api_call:
         expect_request:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
@@ -1201,7 +1201,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name-3$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+        New configuration has been applied to service [$$service-name$$].
+        URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
 - execute_command:
