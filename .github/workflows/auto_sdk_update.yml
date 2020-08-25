@@ -1,0 +1,42 @@
+name: Update Google Cloud SDK
+
+on:
+  schedule:
+    - cron: '0 4 * * 3' # At 04:00 on Wednesday
+  workflow_dispatch:    # or manually
+
+jobs:
+  update:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.2
+      with:
+        ref: ${{ secrets.PAT }}  
+
+    - name: Get latest version of GCloud SDK
+      run: |
+        sudo apt update
+        sudo apt install snapd
+        sudo snap install google-cloud-sdk --classic
+        
+    - name: Set current and latest SDK version variables
+      run: |
+        echo "::set-env name=LATEST_GCLOUD_SDK::$(gcloud version | grep "Google Cloud SDK" |  sed 's/Google Cloud SDK //')"
+        echo "::set-env name=CURRENT_GCLOUD_SDK::$(cat google-cloud-sdk/VERSION)"
+        
+    - name: Update version
+      if: ${{ env.LATEST_GCLOUD_SDK != env.CURRENT_GCLOUD_SDK }}
+      run: |
+        ./update.sh $LATEST_GCLOUD_SDK
+    - name: Commit and push changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      if: ${{ env.LATEST_GCLOUD_SDK != env.CURRENT_GCLOUD_SDK }}
+      with:
+        commit_message: Update to ${{ env.LATEST_GCLOUD_SDK }}
+        branch: master
+        commit_options: '--no-verify --signoff'
+        file_pattern: .
+        skip_dirty_check: true

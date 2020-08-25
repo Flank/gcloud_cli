@@ -9,7 +9,7 @@ set -euxo pipefail
 #
 # gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
 
-VERSION=303.0.0
+VERSION=$1
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk_$VERSION.orig.tar.gz
 
@@ -35,5 +35,3 @@ tar -xzf google-cloud-sdk-tests_$VERSION.orig.tar.gz
 rm google-cloud-sdk/bin/anthoscli
 
 gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
-
-git commit -am "Update to $VERSION"
