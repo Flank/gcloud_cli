@@ -286,3 +286,11 @@ class TriggersCreateTestAlpha(base.EventsBase):
                '--cluster=cluster-1 --cluster-location=us-central1-a '
                '--target-service=my-service --type=google.source.my.type '
                '--trigger-filters knsourcetrigger=value1,key2=value2')
+
+
+class TriggersCreateTestAlphaAnthos(TriggersCreateTestAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'anthosevents'
+    self.api_version = 'v1beta1'

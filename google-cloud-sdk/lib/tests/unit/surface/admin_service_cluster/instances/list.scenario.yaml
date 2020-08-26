@@ -1,0 +1,48 @@
+title: admin-service-cluster list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      admin-service-cluster instances list --location=us-central1
+  - stdout: |
+      NAME                                                                    LOCATION     GIT_ENDPOINT                                             GIT_BRANCH
+      projects/fake-project/locations/us-central1/anthosApiEndpoints/default  us-central1  git@git-server.git-server:/git-volume/repos/configs.git  master
+actions:
+- execute_command:
+    command: |
+      admin-service-cluster instances list --location=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://krmapihosting.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/anthosApiEndpoints?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            status: '200'
+          body: | # See Note Below
+            {
+              "anthosApiEndpoints": [
+                {
+                  "name": "projects/fake-project/locations/us-central1/anthosApiEndpoints/default",
+                  "manBlock": "0.0.0.0/0",
+                  "network": "default",
+                  "masterIpv4CidrBlock": "172.16.0.128/28",
+                  "gitEndpoint": "git@git-server.git-server:/git-volume/repos/configs.git",
+                  "gitBranch": "master",
+                  "gitSecretType": "ssh",
+                  "gitPolicyDir": "/",
+                  "gitSecretKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nxxxxxxxxxxxxxxxxxxxxxx\n-----END OPENSSH PRIVATE KEY-----\n",
+                  "clusterCidrBlock": "/20",
+                  "servicesCidrBlock": "/27"
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME                                                                    LOCATION     GIT_ENDPOINT                                             GIT_BRANCH
+        projects/fake-project/locations/us-central1/anthosApiEndpoints/default  us-central1  git@git-server.git-server:/git-volume/repos/configs.git  master
+    - expect_exit:
+        code: 0

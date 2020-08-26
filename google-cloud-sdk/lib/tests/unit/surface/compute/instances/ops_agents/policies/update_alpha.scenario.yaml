@@ -409,6 +409,456 @@ actions:
         code: 0
 - execute_command:
     command: |
+      compute instances ops-agents policies update ops-agents-my-guest-policy --project my-project --os-types=short-name=centos,version=7 --description="A test policy to install agents" --agent-rules="type=logging,package-state=removed" --instances=zones/us-central1-a/instances/test-instance-1 --group-labels="env=prod,product=myproduct;env=staging,product=myproduct" --clear-zones --etag 0a0dae85-ab41-4476-b9da-365c7da33374
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/v1beta/projects/my-project/guestPolicies/ops-agents-my-guest-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "name": "projects/my-project/guestPolicies/ops-agents-my-guest-policy",
+              "description": "{\"type\": \"ops-agents\", \"description\": \"A policy to install agents\", \"agentRules\": [{\"enableAutoupgrade\": true, \"packageState\": \"installed\", \"type\": \"metrics\", \"version\": \"6.*.*\"},{\"enableAutoupgrade\": true, \"packageState\": \"installed\", \"type\": \"logging\", \"version\": \"1.*.*\"}]}",
+              "createTime": "2020-06-29T20:49:28.521Z",
+              "updateTime": "2020-06-30T16:09:04.927Z",
+              "assignment": {
+                "groupLabels": [
+                  {
+                    "labels": {
+                      "env": "prod",
+                      "product": "myproduct"
+                    }
+                  }
+                ],
+                "zones": [
+                  "us-central1-a"
+                ],
+                "instances": [
+                  "zones/us-central1-a/instances/test-instance-1"
+                ],
+                "osTypes": [
+                  {
+                    "osShortName": "centos",
+                    "osVersion": "8"
+                  }
+                ]
+              },
+              "packages": [
+                {
+                  "name": "google-fluentd",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "google-fluentd-catch-all-config",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "google-fluentd-start-service",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "stackdriver-agent",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "stackdriver-agent-start-service",
+                  "desiredState": "UPDATED"
+                }
+              ],
+              "packageRepositories": [
+                {
+                  "yum": {
+                    "id": "google-cloud-monitoring",
+                    "displayName": "Google Cloud Monitoring Agent Repository",
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el10-x86_64-6",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ]
+                  }
+                },
+                {
+                  "yum": {
+                    "id": "google-cloud-logging",
+                    "displayName": "Google Cloud Logging Agent Repository",
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-logging-el10-x86_64-1",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ]
+                  }
+                }
+              ],
+              "recipes": [
+                {
+                  "name": "set-stackdriver-agent-version-0",
+                  "version": "0",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-monitoring.repo || true; find /var/cache/yum -name '*google-cloud-monitoring*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y stackdriver-agent || true; sudo yum install -y 'stackdriver-agent-6.*'; sudo service stackdriver-agent start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "set-google-fluentd-version-0",
+                  "version": "0",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-logging.repo || true; find /var/cache/yum -name '*google-cloud-logging*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y google-fluentd || true; sudo yum install -y 'google-fluentd-1.*'; sudo yum install -y google-fluentd-catch-all-config; sudo service google-fluentd start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "desiredState": "UPDATED"
+                }
+              ],
+              "etag": "0a0dae85-ab41-4476-b9da-365c7da33374"
+            }
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/v1beta/projects/my-project/guestPolicies/ops-agents-my-guest-policy?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              assignment:
+                groupLabels:
+                - labels:
+                    env: prod
+                    product: myproduct
+                - labels:
+                    env: staging
+                    product: myproduct
+                instances:
+                - zones/us-central1-a/instances/test-instance-1
+                osTypes:
+                - osShortName: centos
+                  osVersion: '7'
+              description: '{"type": "ops-agents", "description": "A test policy to
+                install agents", "agentRules": [{"enableAutoupgrade": true, "packageState":
+                "removed", "type": "logging", "version": "1.*.*"}]}'
+              etag: '0a0dae85-ab41-4476-b9da-365c7da33374'
+              packageRepositories:
+              - yum:
+                  baseUrl: https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64-1
+                  displayName: Google Cloud Logging Agent Repository
+                  gpgKeys:
+                  - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+                  - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+                  id: google-cloud-logging
+              packages:
+              - desiredState: REMOVED
+                name: google-fluentd
+              - desiredState: REMOVED
+                name: google-fluentd-catch-all-config
+              - desiredState: REMOVED
+                name: google-fluentd-start-service
+              recipes:
+              - desiredState: UPDATED
+                installSteps:
+                - scriptRun:
+                    script: |-
+                      #!/bin/bash
+                      echo 'Skipping as the package state is [removed].'
+                name: set-google-fluentd-version-1
+                version: '1'
+        return_response:
+          headers: {}
+          body: |
+            {
+              "name": "projects/my-project/guestPolicies/ops-agents-my-guest-policy",
+              "description": "{\"type\": \"ops-agents\", \"description\": \"A test policy to install agents\", \"agentRules\": [{\"enableAutoupgrade\": true, \"packageState\": \"removed\", \"type\": \"logging\", \"version\": \"1.*.*\"}]}",
+              "createTime": "2020-06-29T20:49:28.521Z",
+              "updateTime": "2020-06-30T16:33:55.811Z",
+              "assignment": {
+                "groupLabels": [
+                  {
+                    "labels": {
+                      "env": "prod",
+                      "product": "myproduct"
+                    }
+                  },
+                  {
+                    "labels": {
+                      "env": "staging",
+                      "product": "myproduct"
+                    }
+                  }
+                ],
+                "instances": [
+                  "zones/us-central1-a/instances/test-instance-1"
+                ],
+                "osTypes": [
+                  {
+                    "osShortName": "centos",
+                    "osVersion": "7"
+                  }
+                ]
+              },
+              "packages": [
+                {
+                  "name": "google-fluentd",
+                  "desiredState": "REMOVED"
+                },
+                {
+                  "name": "google-fluentd-catch-all-config",
+                  "desiredState": "REMOVED"
+                },
+                {
+                  "name": "google-fluentd-start-service",
+                  "desiredState": "REMOVED"
+                }
+              ],
+              "packageRepositories": [
+                {
+                  "yum": {
+                    "id": "google-cloud-logging",
+                    "displayName": "Google Cloud Logging Agent Repository",
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64-1",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ]
+                  }
+                }
+              ],
+              "recipes": [
+                {
+                  "name": "set-google-fluentd-version-1",
+                  "version": "1",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash\nSkipping as the package state is [removed].'"
+                      }
+                    }
+                  ],
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "set-stackdriver-agent-version-1",
+                  "version": "1",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-monitoring.repo || true; find /var/cache/yum -name '*google-cloud-monitoring*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y stackdriver-agent || true; sudo yum install -y 'stackdriver-agent-6.*'; sudo service stackdriver-agent start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "desiredState": "UPDATED"
+                }
+              ],
+              "etag": "67c7b3d6-5e22-44b8-a8d8-e74363540020"
+            }
+    - expect_stdout: |
+        agent_rules:
+        - enable_autoupgrade: true
+          package_state: removed
+          type: logging
+          version: 1.*.*
+        assignment:
+          group_labels:
+          - env: prod
+            product: myproduct
+          - env: staging
+            product: myproduct
+          instances:
+          - zones/us-central1-a/instances/test-instance-1
+          os_types:
+          - short_name: centos
+            version: '7'
+          zones: []
+        create_time: '2020-06-29T20:49:28.521Z'
+        description: A test policy to install agents
+        etag: 67c7b3d6-5e22-44b8-a8d8-e74363540020
+        id: projects/my-project/guestPolicies/ops-agents-my-guest-policy
+        update_time: '2020-06-30T16:33:55.811Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute instances ops-agents policies update ops-agents-my-guest-policy --project my-project --os-types=short-name=centos,version=7 --description="A test policy to install agents" --agent-rules="type=logging,package-state=removed" --instances=zones/us-central1-a/instances/test-instance-1 --group-labels="env=prod,product=myproduct;env=staging,product=myproduct" --clear-zones --etag fake_etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/v1beta/projects/my-project/guestPolicies/ops-agents-my-guest-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers: {}
+          body: |
+            {
+              "name": "projects/my-project/guestPolicies/ops-agents-my-guest-policy",
+              "description": "{\"type\": \"ops-agents\", \"description\": \"A policy to install agents\", \"agentRules\": [{\"enableAutoupgrade\": true, \"packageState\": \"installed\", \"type\": \"metrics\", \"version\": \"6.*.*\"},{\"enableAutoupgrade\": true, \"packageState\": \"installed\", \"type\": \"logging\", \"version\": \"1.*.*\"}]}",
+              "createTime": "2020-06-29T20:49:28.521Z",
+              "updateTime": "2020-06-30T16:09:04.927Z",
+              "assignment": {
+                "groupLabels": [
+                  {
+                    "labels": {
+                      "env": "prod",
+                      "product": "myproduct"
+                    }
+                  }
+                ],
+                "zones": [
+                  "us-central1-a"
+                ],
+                "instances": [
+                  "zones/us-central1-a/instances/test-instance-1"
+                ],
+                "osTypes": [
+                  {
+                    "osShortName": "centos",
+                    "osVersion": "8"
+                  }
+                ]
+              },
+              "packages": [
+                {
+                  "name": "google-fluentd",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "google-fluentd-catch-all-config",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "google-fluentd-start-service",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "stackdriver-agent",
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "stackdriver-agent-start-service",
+                  "desiredState": "UPDATED"
+                }
+              ],
+              "packageRepositories": [
+                {
+                  "yum": {
+                    "id": "google-cloud-monitoring",
+                    "displayName": "Google Cloud Monitoring Agent Repository",
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-monitoring-el10-x86_64-6",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ]
+                  }
+                },
+                {
+                  "yum": {
+                    "id": "google-cloud-logging",
+                    "displayName": "Google Cloud Logging Agent Repository",
+                    "baseUrl": "https://packages.cloud.google.com/yum/repos/google-cloud-logging-el10-x86_64-1",
+                    "gpgKeys": [
+                      "https://packages.cloud.google.com/yum/doc/yum-key.gpg",
+                      "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+                    ]
+                  }
+                }
+              ],
+              "recipes": [
+                {
+                  "name": "set-stackdriver-agent-version-0",
+                  "version": "0",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-monitoring.repo || true; find /var/cache/yum -name '*google-cloud-monitoring*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y stackdriver-agent || true; sudo yum install -y 'stackdriver-agent-6.*'; sudo service stackdriver-agent start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "desiredState": "UPDATED"
+                },
+                {
+                  "name": "set-google-fluentd-version-0",
+                  "version": "0",
+                  "installSteps": [
+                    {
+                      "scriptRun": {
+                        "script": "#!/bin/bash -e\nsudo rm /etc/yum.repos.d/google-cloud-logging.repo || true; find /var/cache/yum -name '*google-cloud-logging*' | xargs sudo rm -rf || true\nfor i in {1..5}; do\n  if (sudo yum remove -y google-fluentd || true; sudo yum install -y 'google-fluentd-1.*'; sudo yum install -y google-fluentd-catch-all-config; sudo service google-fluentd start); then\n    break\n  fi\n  sleep 1m\ndone"
+                      }
+                    }
+                  ],
+                  "desiredState": "UPDATED"
+                }
+              ],
+              "etag": "0a0dae85-ab41-4476-b9da-365c7da33374"
+            }
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/v1beta/projects/my-project/guestPolicies/ops-agents-my-guest-policy?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              assignment:
+                groupLabels:
+                - labels:
+                    env: prod
+                    product: myproduct
+                - labels:
+                    env: staging
+                    product: myproduct
+                instances:
+                - zones/us-central1-a/instances/test-instance-1
+                osTypes:
+                - osShortName: centos
+                  osVersion: '7'
+              description: '{"type": "ops-agents", "description": "A test policy to
+                install agents", "agentRules": [{"enableAutoupgrade": true, "packageState":
+                "removed", "type": "logging", "version": "1.*.*"}]}'
+              etag: 'fake_etag'
+              packageRepositories:
+              - yum:
+                  baseUrl: https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64-1
+                  displayName: Google Cloud Logging Agent Repository
+                  gpgKeys:
+                  - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+                  - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+                  id: google-cloud-logging
+              packages:
+              - desiredState: REMOVED
+                name: google-fluentd
+              - desiredState: REMOVED
+                name: google-fluentd-catch-all-config
+              - desiredState: REMOVED
+                name: google-fluentd-start-service
+              recipes:
+              - desiredState: UPDATED
+                installSteps:
+                - scriptRun:
+                    script: |-
+                      #!/bin/bash
+                      echo 'Skipping as the package state is [removed].'
+                name: set-google-fluentd-version-1
+                version: '1'
+        return_response:
+          headers: {'vary': 'Origin, X-Origin, Referer', 'content-type': 'application/json; charset=UTF-8', 'date': 'Thu, 13 Aug 2020 20:10:11 GMT', 'server': 'ESF', 'cache-control': 'private', 'x-xss-protection': '0', 'x-frame-options': 'SAMEORIGIN', 'x-content-type-options': 'nosniff', 'transfer-encoding': 'chunked', 'status': '400', 'content-length': '147', '-content-encoding': 'gzip'}
+          body: |
+            {
+              "error": {
+                "code": 400,
+                "message": "The etag supplied doesn't match the existing GuestPolicy.",
+                "status": "INVALID_ARGUMENT"
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: "INVALID_ARGUMENT: The etag supplied doesn't match the existing GuestPolicy."
+- execute_command:
+    command: |
       compute instances ops-agents policies update
     events:
     - expect_stderr:

@@ -102,3 +102,11 @@ class TypesListTestAlpha(base.EventsBase):
            google.source.0.et.2 SourceKind0 desc02
         """,
         normalize_space=True)
+
+
+class TypesListTestAlphaAnthos(TypesListTestAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'anthosevents'
+    self.api_version = 'v1beta1'

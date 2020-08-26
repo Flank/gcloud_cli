@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute instance\-groups managed instance\-configs \- manage instance\-specific settings of managed instance group
+gcloud beta compute instance\-groups managed instance\-configs \- manage instance\-specific settings in a managed instance group
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute instance\-groups managed instance\-configs \- manage instanc
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Manage instance\-specific settings of managed instance group.
+\fB(BETA)\fR Manage instance\-specific settings in a managed instance group.
 
 
 
@@ -44,15 +44,15 @@ group.
 
 .TP 2m
 \fBdelete\fR
-\fB(BETA)\fR Delete per instance configs from managed instance group.
+\fB(BETA)\fR Delete per\-instance configs from a managed instance group.
 
 .TP 2m
 \fBlist\fR
-\fB(BETA)\fR List per instance configs of a managed instance group.
+\fB(BETA)\fR List per\-instance configs of a managed instance group.
 
 .TP 2m
 \fBupdate\fR
-\fB(BETA)\fR Update per instance config of a managed instance group.
+\fB(BETA)\fR Update per\-instance config of a managed instance group.
 
 
 .RE
@@ -60,10 +60,11 @@ group.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed instance\-configs
 $ gcloud alpha compute instance\-groups managed instance\-configs
 .RE
 

@@ -26,9 +26,8 @@ Get the update history of assets that overlaps a time window.
 .RS 2m
 .TP 2m
 \fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...]
-A list of full names of the assets to get the history for. See
-https://cloud.google.com/apis/design/resource_names#full_resource_name for name
-format.
+A list of full names of the assets to get the history for. For more information,
+see: https://cloud.google.com/apis/design/resource_names#full_resource_name
 
 .TP 2m
 \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
@@ -41,8 +40,8 @@ assets. \fICONTENT_TYPE\fR must be one of: \fBresource\fR, \fBiam\-policy\fR,
 
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
-Start time of the time window (inclusive) for the asset history. Must be later
-than 2018\-10\-02T00:00:00Z. See $ gcloud topic datetimes for information on
+Start time of the time window (inclusive) for the asset history. Must be after
+the current time minus 35 days. See $ gcloud topic datetimes for information on
 time formats.
 
 .TP 2m

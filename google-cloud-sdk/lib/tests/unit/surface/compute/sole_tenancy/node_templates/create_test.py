@@ -160,14 +160,6 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
     self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
     self.assertEqual(result, template)
 
-
-class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
-
-  def SetUp(self):
-    self.region = 'us-central1'
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   def testCreateWithOvercommitType(self):
     template = self._CreateBaseNodeTemplateMessage()
     template.nodeType = 'n1-node-96-624'
@@ -183,6 +175,14 @@ class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
 
     self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
     self.assertEqual(result, template)
+
+
+class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
+
+  def SetUp(self):
+    self.region = 'us-central1'
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
 
 class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):

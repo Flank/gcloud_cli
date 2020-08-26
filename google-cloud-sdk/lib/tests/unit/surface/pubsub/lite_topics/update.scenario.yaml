@@ -8,14 +8,14 @@ actions:
       pubsub lite-topics update topic1 --zone us-central1-a
     events:
     - expect_stderr:
-        matches: ERROR.*argument \(--message-retention-period --per-partition-bytes --scale\). Must be specified.*
+        matches: ERROR.*argument \(--message-retention-period --per-partition-bytes --per-partition-publish-mib --per-partition-subscribe-mib\). Must be specified.*
     - expect_exit:
         code: 1
 
 # Set some flags for update command.
 - execute_command:
     command: |
-      pubsub lite-topics update topic1 --zone us-central1-a --scale 2 --per-partition-bytes 40GiB --message-retention-period 2w
+      pubsub lite-topics update topic1 --zone us-central1-a --per-partition-publish-mib 7 --per-partition-subscribe-mib 15 --per-partition-bytes 40GiB --message-retention-period 2w
     events:
     - api_call:
         expect_request:
@@ -40,12 +40,14 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/us-central1-a/topics/topic1?alt=json&updateMask=partitionConfig.scale%2CretentionConfig.perPartitionBytes%2CretentionConfig.period
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/us-central1-a/topics/topic1?alt=json&updateMask=partitionConfig.capacity.publishMibPerSec%2CpartitionConfig.capacity.subscribeMibPerSec%2CretentionConfig.perPartitionBytes%2CretentionConfig.period
           method: PATCH
           body:
             json:
               partitionConfig:
-                scale: 2
+                capacity:
+                  publishMibPerSec: 7
+                  subscribeMibPerSec: 15
               retentionConfig:
                 perPartitionBytes: '42949672960'
                 period: '1209600s'
@@ -57,7 +59,10 @@ actions:
               "name": "projects/12345/locations/us-central1-a/topics/topic1",
               "partitionConfig": {
                 "count": "2",
-                "scale": 2
+                "capacity": {
+                  "publishMibPerSec": 7,
+                  "subscribeMibPerSec": 15
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "42949672960",
@@ -69,8 +74,10 @@ actions:
     - expect_stdout: |
         name: projects/12345/locations/us-central1-a/topics/topic1
         partitionConfig:
+          capacity:
+            publishMibPerSec: 7
+            subscribeMibPerSec: 15
           count: '2'
-          scale: 2
         retentionConfig:
           perPartitionBytes: '42949672960'
           period: 1209600s
@@ -80,7 +87,7 @@ actions:
 # Set fully qualified resource arg.
 - execute_command:
     command: |
-      pubsub lite-topics update admin/projects/fake-project/locations/us-central1-a/topics/topic1 --scale 2
+      pubsub lite-topics update admin/projects/fake-project/locations/us-central1-a/topics/topic1 --per-partition-publish-mib 7
     events:
     - api_call:
         expect_request:
@@ -105,12 +112,13 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/us-central1-a/topics/topic1?alt=json&updateMask=partitionConfig.scale
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/12345/locations/us-central1-a/topics/topic1?alt=json&updateMask=partitionConfig.capacity.publishMibPerSec
           method: PATCH
           body:
             json:
               partitionConfig:
-                scale: 2
+                capacity:
+                  publishMibPerSec: 7
         return_response:
           headers:
             status: '200'
@@ -119,7 +127,10 @@ actions:
               "name": "projects/12345/locations/us-central1-a/topics/topic1",
               "partitionConfig": {
                 "count": "1",
-                "scale": 2
+                "capacity": {
+                  "publishMibPerSec": 7,
+                  "subscribeMibPerSec": 8
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "32212254720",
@@ -131,8 +142,10 @@ actions:
     - expect_stdout: |
         name: projects/12345/locations/us-central1-a/topics/topic1
         partitionConfig:
+          capacity:
+            publishMibPerSec: 7
+            subscribeMibPerSec: 8
           count: '1'
-          scale: 2
         retentionConfig:
           perPartitionBytes: '32212254720'
           period: 0s
@@ -142,7 +155,7 @@ actions:
 # Missing zone arg should fail.
 - execute_command:
     command: |
-      pubsub lite-topics update topic1 --scale=2
+      pubsub lite-topics update topic1 --per-partition-publish-mib 7
     events:
     - expect_exit:
         code: 1
@@ -152,7 +165,7 @@ actions:
 # Missing topic arg should fail.
 - execute_command:
     command: |
-      pubsub lite-topics update --zone=us-central1-a --scale=2
+      pubsub lite-topics update --zone=us-central1-a --per-partition-publish-mib 7
     events:
     - expect_exit:
         code: 1

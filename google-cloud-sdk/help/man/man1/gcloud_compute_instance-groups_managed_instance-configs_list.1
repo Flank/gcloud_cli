@@ -1,0 +1,146 @@
+
+.TH "GCLOUD_COMPUTE_INSTANCE\-GROUPS_MANAGED_INSTANCE\-CONFIGS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute instance\-groups managed instance\-configs list \- list per\-instance configs of a managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute instance\-groups managed instance\-configs list\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute instance\-groups managed instance\-configs list\fR lists
+per\-instance configs for each instance with preserved resources (like disks).
+The list is presented by default in the form of a tree (YAML) due to a potential
+for having multiple resources defined in a single per\-instance config.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to list instance configs for.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to list instance configs for. If not
+specified, you may be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to list instance configs for. If not
+specified, you may be prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list all the per\-instance configs for the managed instance group
+\f5\fImy\-group\fR\fR, run:
+
+.RS 2m
+$ gcloud compute instance\-groups managed instance\-configs list \e
+    my\-group \-\-region=europe\-west4
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed instance\-configs list
+$ gcloud beta compute instance\-groups managed instance\-configs list
+.RE
+

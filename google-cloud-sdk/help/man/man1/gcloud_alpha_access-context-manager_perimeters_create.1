@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager perimeters create \- create a new service 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-egress\-policies\fR=\fIYAML_FILE\fR] [\fB\-\-ingress\-policies\fR=\fIYAML_FILE\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,6 +72,26 @@ Return immediately, without waiting for the operation in progress to complete.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Long\-form description of service perimeter.
+
+.TP 2m
+\fB\-\-egress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Engress Policies.
+
+This file contains a list of YAML\-compliant objects representing Engress
+Policies described in the API reference.
+
+For more information about the alpha version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+.TP 2m
+\fB\-\-ingress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Ingress Policies.
+
+This file contains a list of YAML\-compliant objects representing Ingress
+Policies described in the API reference.
+
+For more information about the alpha version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
 
 .TP 2m
 \fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR; default="regular"
@@ -147,7 +167,7 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud access\-context\-manager perimeters create

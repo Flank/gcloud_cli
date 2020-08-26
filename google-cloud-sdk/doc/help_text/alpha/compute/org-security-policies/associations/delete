@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute org-security-policies associations delete - delete a
-        Google Compute Engine organization security policy association
+        Compute Engine organization security policy association
 
 SYNOPSIS
     gcloud alpha compute org-security-policies associations delete NAME
@@ -43,7 +43,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta compute org-security-policies associations delete
 

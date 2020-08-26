@@ -8,6 +8,7 @@ SYNOPSIS
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
         [--direction=DIRECTION] [--disabled] [--[no-]enable-logging]
+        [--logging-metadata=LOGGING_METADATA]
         [--network=NETWORK; default="default"] [--priority=PRIORITY]
         [--rules=PROTOCOL[:PORT[-PORT]],[...]]
         [--source-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
@@ -108,6 +109,11 @@ OPTIONAL FLAGS
             $ gcloud compute firewall-rules create MY-RULE --no-enable-logging
 
         Use --enable-logging to enable and --no-enable-logging to disable.
+
+     --logging-metadata=LOGGING_METADATA
+        Adds or removes metadata fields to or from the reported firewall logs.
+        Can only be specified if --enable-logging is true. LOGGING_METADATA
+        must be one of: exclude-all, include-all.
 
      --network=NETWORK; default="default"
         The network to which this rule is attached. If omitted, the rule is

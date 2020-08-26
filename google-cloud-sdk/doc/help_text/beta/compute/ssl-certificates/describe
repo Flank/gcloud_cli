@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute ssl-certificates describe - describe a Google Compute
-        Engine SSL certificate
+    gcloud beta compute ssl-certificates describe - describe a Compute Engine
+        SSL certificate
 
 SYNOPSIS
     gcloud beta compute ssl-certificates describe NAME
@@ -8,8 +8,8 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute ssl-certificates describe displays all data
-    (except private keys) associated with Google Compute Engine SSL certificate
-    in a project.
+    (except private keys) associated with Compute Engine SSL certificate in a
+    project.
 
 POSITIONAL ARGUMENTS
      NAME

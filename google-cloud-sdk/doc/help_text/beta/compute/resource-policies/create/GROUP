@@ -1,12 +1,12 @@
 NAME
-    gcloud beta compute resource-policies create - create Google Compute Engine
+    gcloud beta compute resource-policies create - create Compute Engine
         Resource Policies
 
 SYNOPSIS
     gcloud beta compute resource-policies create COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create Google Compute Engine Resource Policies.
+    (BETA) Create Compute Engine Resource Policies.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,11 +20,10 @@ COMMANDS
     COMMAND is one of the following:
 
      group-placement
-        (BETA) Create a Google Compute Engine group placement resource policy.
+        (BETA) Create a Compute Engine group placement resource policy.
 
      snapshot-schedule
-        (BETA) Create a Google Compute Engine Snapshot Schedule Resource
-        Policy.
+        (BETA) Create a Compute Engine Snapshot Schedule Resource Policy.
 
 NOTES
     This command is currently in BETA and may change without notice. These

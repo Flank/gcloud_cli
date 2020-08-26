@@ -11,7 +11,7 @@ gcloud beta asset analyze\-iam\-policy \- analyzes accessible IAM policies that 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta asset analyze\-iam\-policy\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR) [\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR] [\fB\-\-identity\fR=\fIIDENTITY\fR] [\fB\-\-execution\-timeout\fR=\fIEXECUTION_TIMEOUT\fR\ \fB\-\-expand\-groups\fR\ \fB\-\-expand\-resources\fR\ \fB\-\-expand\-roles\fR\ \fB\-\-output\-group\-edges\fR\ \fB\-\-output\-resource\-edges\fR\ \fB\-\-show\-response\fR] [\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]\ \fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta asset analyze\-iam\-policy\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR] [\fB\-\-identity\fR=\fIIDENTITY\fR] [\fB\-\-analyze\-service\-account\-impersonation\fR\ \fB\-\-execution\-timeout\fR=\fIEXECUTION_TIMEOUT\fR\ \fB\-\-expand\-groups\fR\ \fB\-\-expand\-resources\fR\ \fB\-\-expand\-roles\fR\ \fB\-\-output\-group\-edges\fR\ \fB\-\-output\-resource\-edges\fR\ \fB\-\-show\-response\fR] [\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]\ \fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,10 @@ The folder ID to perform the analysis.
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION_ID\fR
 The organization ID to perform the analysis.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+The project ID or number to perform the analysis.
 
 
 .RE
@@ -72,6 +76,13 @@ The identity appearing in the form of members in the IAM policy binding.
 The analysis options.
 
 .RS 2m
+.TP 2m
+\fB\-\-analyze\-service\-account\-impersonation\fR
+If true, the response will include access analysis from identities to resources
+via service account impersonation. This is a very expensive operation, because
+many derived queries will be executed. We highly recommend you use
+ExportIamPolicyAnalysis rpc instead. Default is false.
+
 .TP 2m
 \fB\-\-execution\-timeout\fR=\fIEXECUTION_TIMEOUT\fR
 The amount of time the executable has to complete. See JSON representation of
@@ -150,7 +161,6 @@ $ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID \e
     \-\-permissions='iam.serviceAccounts.actAs'
 .RE
 
-
 To find out which resources a user can access, run:
 
 .RS 2m
@@ -165,6 +175,14 @@ run:
 $ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID \e
     \-\-full\-resource\-name=YOUR_PROJECT_FULL_RESOURCE_NAME \e
     \-\-identity='user:u1@foo.com'
+.RE
+
+To find out which users have been granted the iam.serviceAccounts.actAs
+permission on any applicable resources, run:
+
+.RS 2m
+$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID \e
+    \-\-permissions='iam.serviceAccounts.actAs'
 .RE
 
 

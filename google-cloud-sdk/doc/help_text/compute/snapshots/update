@@ -1,5 +1,5 @@
 NAME
-    gcloud compute snapshots update - update a Google Compute Engine snapshot
+    gcloud compute snapshots update - update a Compute Engine snapshot
 
 SYNOPSIS
     gcloud compute snapshots update SNAPSHOT_NAME
@@ -7,7 +7,7 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute snapshots update updates labels for a Google Compute
+    gcloud compute snapshots update updates labels for a Compute Engine
     snapshot.
 
 POSITIONAL ARGUMENTS

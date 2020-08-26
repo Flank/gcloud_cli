@@ -62,6 +62,13 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         'v1beta': True,
         'v1': True
     }[api_version]
+
+    self.support_directional_policies = {
+        'v1alpha': True,
+        'v1beta': False,
+        'v1': False
+    }[api_version]
+
     self.client = mock.Client(
         client_class=apis.GetClientClass(self._API_NAME, api_version))
     self.client.Mock()
@@ -166,6 +173,73 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       ]
     """
 
+  INGRESS_POLICIES_SPECS = """
+      [
+        {
+          "ingressFrom": {
+            "identities": [
+              "user:testUser@google.com"
+            ],
+            "sources": [
+              {
+                "accessLevel": "accessPolicies/123/accessLevels/my_level"
+              },
+              {
+                "resource": "projects/123456789"
+              }
+            ]
+          },
+          "ingressTo": {
+            "operations": [
+              {
+                "actions": [
+                  {
+                    "action": "method_for_all",
+                    "actionType": "METHOD"
+                  },
+                  {
+                    "action": "method_for_one",
+                    "actionType": "METHOD"
+                  }
+                ],
+                "serviceName": "chemisttest.googleapis.com"
+              }
+            ]
+          }
+        }
+      ]
+    """
+
+  EGRESS_POLICIES_SPECS = """
+      [
+        {
+          "egressFrom": {
+            "allowedIdentity": "ANY_IDENTITY"
+          },
+          "egressTo": {
+            "operations": [
+              {
+                "actions": [
+                  {
+                    "action": "method_for_all",
+                    "actionType": "METHOD"
+                  },
+                  {
+                    "action": "method_for_one",
+                    "actionType": "METHOD"
+                  }
+                ],
+                "serviceName": "chemisttest.googleapis.com"
+              }
+            ],
+            "resources": [
+              "projects/123456789"
+            ]
+          }
+        }
+      ]
+    """
+
   def _ExpectGetOperation(self, name, resource_name=None):
     if resource_name:
       response = encoding.DictToMessage({'name': resource_name},
@@ -221,22 +295,33 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       policy='123',
       vpc_allowed_services=None,
       enable_vpc_accessible_services=None,
-      dry_run=False):
+      dry_run=False,
+      ingress_policies=[],
+      egress_policies=[]):
 
     if type_:
       type_ = self.messages.ServicePerimeter.PerimeterTypeValueValuesEnum(type_)
 
-    config = self.messages.ServicePerimeterConfig(
-        accessLevels=list(
-            map('accessPolicies/123/accessLevels/{}'.format, access_levels)),
-        resources=resources,
-        restrictedServices=restricted_services)
+    config = self.messages.ServicePerimeterConfig()
+
+    if access_levels is not None:
+      config.accessLevels = access_levels = list(
+          map('accessPolicies/123/accessLevels/{}'.format, access_levels))
+    if resources is not None:
+      config.resources = resources
+    if restricted_services is not None:
+      config.restrictedServices = restricted_services
+
     if self.include_unrestricted_services:
       config.unrestrictedServices = unrestricted_services
 
     if self.support_service_filters:
       self._FillInServiceFilterFields(config, vpc_allowed_services,
                                       enable_vpc_accessible_services)
+
+    if self.support_directional_policies:
+      config.ingressPolicies = ingress_policies
+      config.egressPolicies = egress_policies
 
     if not dry_run:
       return self.messages.ServicePerimeter(
@@ -297,3 +382,39 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
             filter=filter_,),
         response,
         exception=exception)
+
+  def _MakeIngressPolicies(self):
+    source1 = self.messages.IngressSource(
+        accessLevel='accessPolicies/123/accessLevels/my_level')
+    source2 = self.messages.IngressSource(resource='projects/123456789')
+    ingress_from = self.messages.IngressFrom(
+        identities=['user:testUser@google.com'], sources=[source1, source2])
+    method_type = self.messages.ApiAction.ActionTypeValueValuesEnum('METHOD')
+    action1 = self.messages.ApiAction(
+        action='method_for_all', actionType=method_type)
+    action2 = self.messages.ApiAction(
+        action='method_for_one', actionType=method_type)
+    operation1 = self.messages.ApiOperation(
+        serviceName='chemisttest.googleapis.com', actions=[action1, action2])
+    ingress_to = self.messages.IngressTo(operations=[operation1])
+    return [
+        self.messages.IngressPolicy(
+            ingressFrom=ingress_from, ingressTo=ingress_to)
+    ]
+
+  def _MakeEgressPolicies(self):
+    allowed_identity_any = self.messages.EgressFrom.AllowedIdentityValueValuesEnum(
+        'ANY_IDENTITY')
+    egress_from = self.messages.EgressFrom(allowedIdentity=allowed_identity_any)
+    method_type = self.messages.ApiAction.ActionTypeValueValuesEnum('METHOD')
+    action1 = self.messages.ApiAction(
+        action='method_for_all', actionType=method_type)
+    action2 = self.messages.ApiAction(
+        action='method_for_one', actionType=method_type)
+    operation1 = self.messages.ApiOperation(
+        serviceName='chemisttest.googleapis.com', actions=[action1, action2])
+    egress_to = self.messages.EgressTo(
+        operations=[operation1], resources=['projects/123456789'])
+    return [
+        self.messages.EgressPolicy(egressFrom=egress_from, egressTo=egress_to)
+    ]

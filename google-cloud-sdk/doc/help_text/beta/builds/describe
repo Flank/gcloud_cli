@@ -2,7 +2,7 @@ NAME
     gcloud beta builds describe - get information about a particular build
 
 SYNOPSIS
-    gcloud beta builds describe BUILD [GCLOUD_WIDE_FLAG ...]
+    gcloud beta builds describe BUILD [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Get information about a particular build.
@@ -11,6 +11,12 @@ POSITIONAL ARGUMENTS
      BUILD
         The build to describe. The ID of the build is printed at the end of the
         build submission process, or in the ID column when listing builds.
+
+FLAGS
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

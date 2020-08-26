@@ -51,8 +51,7 @@ API REFERENCE
     API can be found at: https://cloud.google.com/memorystore/
 
 EXAMPLES
-    The following command lists all the regions where you can create Memcached
-    instances:
+    To list all the regions where you can create Memcached instances, run:
 
         $ gcloud beta memcache regions list
 

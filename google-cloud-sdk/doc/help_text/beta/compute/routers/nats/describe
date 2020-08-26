@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute routers nats describe - describe a NAT in a Google
-        Compute Engine router
+    gcloud beta compute routers nats describe - describe a NAT in a Compute
+        Engine router
 
 SYNOPSIS
     gcloud beta compute routers nats describe NAME --router=ROUTER
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers nats describe is used to describe a NAT
-    in a Google Compute Engine router.
+    in a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

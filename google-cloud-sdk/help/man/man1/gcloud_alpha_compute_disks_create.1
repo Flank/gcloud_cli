@@ -11,7 +11,7 @@ gcloud alpha compute disks create \- create Compute Engine persistent disks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-interface\fR=\fIINTERFACE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-in\-place\-snapshot\fR=\fISOURCE_IN_PLACE_SNAPSHOT\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-interface\fR=\fIINTERFACE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-provisioned\-iops\fR=\fIPROVISIONED_IOPS\fR] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-instant\-snapshot\fR=\fISOURCE_INSTANT_SNAPSHOT\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -114,6 +114,12 @@ Physical block size of the persistent disk in bytes. Valid values are
 \fB16384\fR.
 
 .TP 2m
+\fB\-\-provisioned\-iops\fR=\fIPROVISIONED_IOPS\fR
+Provisioned IOPS of pd\-extreme disk to create. If specified, the value must be
+in the range between 10000 and 120000. If not specified, the default value is
+100000.
+
+.TP 2m
 \fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR
 A comma\-separated list of exactly 2 zones that a regional disk will be
 replicated to. Required when creating regional disk. The zones must be in the
@@ -208,8 +214,8 @@ source disk size. Use \fB\-\-size\fR to adjust the size of the disks.
 Source disk must be in the same zone/region as the disk to be created.
 
 .TP 2m
-\fB\-\-source\-in\-place\-snapshot\fR=\fISOURCE_IN_PLACE_SNAPSHOT\fR
-Source in place snapshot used to create the disks.
+\fB\-\-source\-instant\-snapshot\fR=\fISOURCE_INSTANT_SNAPSHOT\fR
+Source instant snapshot used to create the disks.
 
 .TP 2m
 \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR
@@ -343,7 +349,7 @@ $ gcloud alpha compute disks create my\-disk\-1 my\-disk\-2 \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud compute disks create

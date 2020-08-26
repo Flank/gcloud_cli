@@ -172,14 +172,6 @@ class TargetInstancesCreateBetaTest(TargetInstancesCreateTest):
     self._api = 'beta'
     self._target_instances_api = self.compute_beta.targetInstances
 
-
-class TargetInstancesCreateAlphaTest(TargetInstancesCreateTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self._api = 'alpha'
-    self._target_instances_api = self.compute_alpha.targetInstances
-
   def testWithNetwork(self):
     self.RunCreate("""
           my-target-instance
@@ -202,6 +194,14 @@ class TargetInstancesCreateAlphaTest(TargetInstancesCreateTest):
               project='my-project',
               zone='central2-a'))],
     )
+
+
+class TargetInstancesCreateAlphaTest(TargetInstancesCreateTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._target_instances_api = self.compute_alpha.targetInstances
 
 
 if __name__ == '__main__':

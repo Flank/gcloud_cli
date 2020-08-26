@@ -1,0 +1,126 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCES_UPDATE\-FROM\-FILE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instances update\-from\-file \- update a Compute Engine virtual machine instance using a configuration file
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instances update\-from\-file\fR \fIINSTANCE_NAME\fR [\fB\-\-minimal\-action\fR=\fIMINIMAL_ACTION\fR] [\fB\-\-most\-disruptive\-allowed\-action\fR=\fIMOST_DISRUPTIVE_ALLOWED_ACTION\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a Compute Engine virtual machine instance using a
+configuration file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE_NAME\fR
+Name of the instance to update. For details on valid instance names, refer to
+the criteria documented under the field 'name' at:
+https://cloud.google.com/compute/docs/reference/rest/v1/instances
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-minimal\-action\fR=\fIMINIMAL_ACTION\fR
+If specified, this action or higher level action is performed on the instance
+irrespective of what action is required for the update to take effect. If not
+specified, then Compute Engine acts based on the minimum action required.
+
+.TP 2m
+\fB\-\-most\-disruptive\-allowed\-action\fR=\fIMOST_DISRUPTIVE_ALLOWED_ACTION\fR
+If specified, Compute Engine returns an error if the update requires a higher
+action to be applied to the instance. If not specified, the default will be
+REFRESH
+
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a YAML file containing configuration export data. The YAML file must not
+contain any output\-only fields. Alternatively, you may omit this flag to read
+from standard input. A schema describing the export/import format can be found
+in: $CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/alpha/Instance.yaml.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the instance to update. If not specified, the user may be prompted to
+select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
+resources in the user's project. If the zone cannot be determined, the user will
+then be prompted with all Google Cloud Platform zones.
+
+To avoid prompting when this flag is omitted, the user can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+A virtual machine instance can be updated by running:
+
+.RS 2m
+$ gcloud alpha compute instances update\-from\-file my\-instance \e
+    \-\-source=<path\-to\-file>
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. These variants are also available:
+
+.RS 2m
+$ gcloud compute instances update\-from\-file
+$ gcloud beta compute instances update\-from\-file
+.RE
+

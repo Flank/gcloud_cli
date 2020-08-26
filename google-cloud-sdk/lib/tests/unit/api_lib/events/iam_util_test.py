@@ -103,9 +103,9 @@ class TestIAMAPICalls(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 class TestGetOrCreateServiceAccountWithPrompt(cli_test_base.CliTestBase):
 
   def SetUp(self):
+    self.account = 'test-account'
     self.mock_service_account = mock.Mock(
-        email='test-account@fake-project.iam.gserviceaccount.com'
-    )
+        email='test-account@fake-project.iam.gserviceaccount.com')
     self.get_service_account = self.StartObjectPatch(
         iam_util,
         '_GetServiceAccount',
@@ -124,11 +124,15 @@ class TestGetOrCreateServiceAccountWithPrompt(cli_test_base.CliTestBase):
         'PromptContinue',
     )
 
+  def getOrCreate(self):
+    return iam_util.GetOrCreateServiceAccountWithPrompt(
+        self.account, 'Display Name', 'Description')
+
   def testGetsExistingAccount(self):
     self.get_service_account.return_value = self.mock_service_account
 
-    result = iam_util.GetOrCreateEventingServiceAccountWithPrompt()
-    self.get_service_account.assert_called_once_with('cloud-run-events')
+    result = self.getOrCreate()
+    self.get_service_account.assert_called_once_with(self.account)
     self.assertFalse(self.create_service_account.called)
     self.assertEqual(result, self.mock_service_account.email)
 
@@ -136,11 +140,10 @@ class TestGetOrCreateServiceAccountWithPrompt(cli_test_base.CliTestBase):
     self.get_service_account.return_value = None
     self.create_service_account.return_value = self.mock_service_account
 
-    result = iam_util.GetOrCreateEventingServiceAccountWithPrompt()
-    self.get_service_account.assert_called_once_with('cloud-run-events')
+    result = self.getOrCreate()
+    self.get_service_account.assert_called_once_with(self.account)
     self.create_service_account.assert_called_once_with(
-        'cloud-run-events', 'Cloud Run Events for Anthos',
-        'Cloud Run Events on-cluster infrastructure')
+        self.account, 'Display Name', 'Description')
     self.assertEqual(result, self.mock_service_account.email)
 
   def testCreatesNewAccountWithPrompt(self):
@@ -148,20 +151,19 @@ class TestGetOrCreateServiceAccountWithPrompt(cli_test_base.CliTestBase):
     self.create_service_account.return_value = self.mock_service_account
     self.can_prompt.return_value = True
 
-    result = iam_util.GetOrCreateEventingServiceAccountWithPrompt()
-    email = 'cloud-run-events@fake-project.iam.gserviceaccount.com'
+    result = self.getOrCreate()
     self.prompt_continue.assert_called_once_with(
-        message='\nThis will create service account [{}]'.format(email),
+        message='This will create service account [{}]'.format(
+            self.mock_service_account.email),
         cancel_on_no=True)
 
-    self.get_service_account.assert_called_once_with('cloud-run-events')
+    self.get_service_account.assert_called_once_with(self.account)
     self.create_service_account.assert_called_once_with(
-        'cloud-run-events', 'Cloud Run Events for Anthos',
-        'Cloud Run Events on-cluster infrastructure')
+        self.account, 'Display Name', 'Description')
     self.assertEqual(result, self.mock_service_account.email)
 
 
-class TestBindMissingRolesWithPrompt(cli_test_base.CliTestBase):
+class TestPrintOrBindMissingRolesWithPrompt(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.email = 'test-account@fake-project.iam.gserviceaccount.com'
@@ -187,43 +189,54 @@ class TestBindMissingRolesWithPrompt(cli_test_base.CliTestBase):
 
   def accountHasOwnerRole(self):
     self.get_roles.return_value = {'roles/owner'}
-    iam_util.BindMissingRolesWithPrompt(
-        self.service_account_ref, ['roles/pubsub.editor'])
+    iam_util.PrintOrBindMissingRolesWithPrompt(
+        self.service_account_ref, ['roles/pubsub.editor'], True)
     self.get_roles.assert_called_once_with(self.service_account_ref)
     self.assertFalse(self.bind_roles.called)
 
   def testHasAllRoles(self):
     self.get_roles.return_value = {'roles/role1', 'roles/role2'}
-    iam_util.BindMissingRolesWithPrompt(
-        self.service_account_ref, ['roles/role1'])
+    iam_util.PrintOrBindMissingRolesWithPrompt(
+        self.service_account_ref, ['roles/role1'], True)
     self.get_roles.assert_called_once_with(self.service_account_ref)
     self.assertFalse(self.bind_roles.called)
 
   def testRolesNeedBindingNoPrompt(self):
     self.get_roles.return_value = {'roles/role1', 'roles/role2'}
-    iam_util.BindMissingRolesWithPrompt(
-        self.service_account_ref, ['roles/role1', 'roles/role3'])
+    iam_util.PrintOrBindMissingRolesWithPrompt(
+        self.service_account_ref, ['roles/role1', 'roles/role3'], True)
     self.get_roles.assert_called_once_with(self.service_account_ref)
     self.bind_roles.assert_called_once_with(
         self.service_account_ref, {'roles/role3'})
+
+  def testRolesNeedBindingOnlyPrintsWhenToldNotToBind(self):
+    self.get_roles.return_value = {'roles/role1', 'roles/role2'}
+    iam_util.PrintOrBindMissingRolesWithPrompt(
+        self.service_account_ref, ['roles/role1', 'roles/role3'], False)
+    self.get_roles.assert_called_once_with(self.service_account_ref)
+    self.assertFalse(self.bind_roles.called)
+    self.AssertErrContains(
+        'Service account [{}] is missing the following recommended roles:\n'
+        '- roles/role3'.format(self.email, normalize_space=True))
 
   def testRolesNeedBindingWithPrompt(self):
     self.can_prompt.return_value = True
 
     self.get_roles.return_value = {'roles/role1', 'roles/role2'}
-    iam_util.BindMissingRolesWithPrompt(
-        self.service_account_ref, ['roles/role1', 'roles/role3', 'roles/role4'])
+    iam_util.PrintOrBindMissingRolesWithPrompt(
+        self.service_account_ref, ['roles/role1', 'roles/role3', 'roles/role4'],
+        True)
     self.get_roles.assert_called_once_with(self.service_account_ref)
     self.bind_roles.assert_called_once_with(
         self.service_account_ref, {'roles/role3', 'roles/role4'})
     self.AssertErrContains(
-        'This will bind the following project roles to the service account [test-account@fake-project.iam.gserviceaccount.com]:\\n'
-        '- roles/role3\\n'
-        '- roles/role4', normalize_space=True)
+        'Service account [{}] is missing the following recommended roles:\n'
+        '- roles/role3\n'
+        '- roles/role4\n'.format(self.email), normalize_space=True)
 
   def testPubsubAdminCountsForPubsubEditor(self):
     self.get_roles.return_value = {'roles/pubsub.admin'}
-    iam_util.BindMissingRolesWithPrompt(
-        self.service_account_ref, ['roles/pubsub.editor'])
+    iam_util.PrintOrBindMissingRolesWithPrompt(
+        self.service_account_ref, ['roles/pubsub.editor'], True)
     self.get_roles.assert_called_once_with(self.service_account_ref)
     self.assertFalse(self.bind_roles.called)

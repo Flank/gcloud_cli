@@ -4,7 +4,10 @@ NAME
 
 SYNOPSIS
     gcloud beta dataflow flex-template build TEMPLATE_FILE_GCS_PATH
-        --image=IMAGE --sdk-language=SDK_LANGUAGE
+        --sdk-language=SDK_LANGUAGE
+        (--image=IMAGE | --env=[ENV,...]
+          --flex-template-base-image=FLEX_TEMPLATE_BASE_IMAGE
+          --image-gcr-path=IMAGE_GCR_PATH --jar=[JAR,...])
         [--metadata-file=METADATA_FILE] [--print-only] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,12 +19,46 @@ POSITIONAL ARGUMENTS
         if file already exists.
 
 REQUIRED FLAGS
-     --image=IMAGE
-        Path to the any image registry location of the flex template image.
-
      --sdk-language=SDK_LANGUAGE
         SDK language of the flex template job. SDK_LANGUAGE must be one of:
         JAVA, PYTHON.
+
+     Exactly one of these must be specified:
+
+       --image=IMAGE
+          Path to the any image registry location of the prebuilt flex template
+          image.
+
+       --env=[ENV,...]
+          Environment variables to create for the Dockerfile. You can pass them
+          as a comma separated list or repeat individually with --env flag. Ex:
+          --env="A=B,C=D" or --env A=B, --env C=D.You can find the list of
+          supported environment variables in this link.
+          https://cloud.google.com/dataflow/docs/guides/templates/troubleshooting-flex-templates#setting_required_dockerfile_environment_variables
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+       --flex-template-base-image=FLEX_TEMPLATE_BASE_IMAGE
+          Flex template base image to be used while building the container
+          image. Allowed choices are JAVA8, JAVA11 or gcr.io path of the
+          specific version of the base image. For JAVA8 and JAVA11 option, we
+          use the latest base image version to build the container. You can
+          also provide a specific version from this link
+          https://gcr.io/dataflow-templates-base/ This flag must be specified
+          if any of the other arguments in this group are specified.
+
+       --image-gcr-path=IMAGE_GCR_PATH
+          The Google Container Registry location to store the flex template
+          image to be built. This flag must be specified if any of the other
+          arguments in this group are specified.
+
+       --jar=[JAR,...]
+          Local path to your dataflow pipeline jar file and all their dependent
+          jar files required for the flex template classpath. You can pass them
+          as a comma separated list or repeat individually with --jar flag. Ex:
+          --jar="code.jar,dep.jar" or --jar code.jar, --jar dep.jar. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
 
 OPTIONAL FLAGS
      --metadata-file=METADATA_FILE
@@ -48,6 +85,17 @@ EXAMPLES
                 --metadata-file=/local/path/to/metadata.json \
             --sdk-language=JAVA
 
+        $ gcloud beta dataflow flex-template build \
+            gs://template-file-gcs-path             \
+            --image-gcr-path=gcr://path-tos-tore-image             \
+            --jar path/to/pipeline.jar --jar path/to/dependency.jar        \
+                 --env FLEX_TEMPLATE_JAVA_MAIN_CLASS=classpath             \
+            --flex-template-base-image JAVA11             \
+            --metadata-file=/local/path/to/metadata.json --sdk-language=JAVA
+
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataflow flex-template build
 

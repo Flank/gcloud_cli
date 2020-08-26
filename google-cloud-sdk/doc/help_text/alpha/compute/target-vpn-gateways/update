@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute target-vpn-gateways update - update a Google Compute
-        Engine Cloud VPN Classic Target VPN Gateway
+    gcloud alpha compute target-vpn-gateways update - update a Compute Engine
+        Cloud VPN Classic Target VPN Gateway
 
 SYNOPSIS
     gcloud alpha compute target-vpn-gateways update NAME [--region=REGION]
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute target-vpn-gateways update updates labels for
-    a Google Compute Engine Cloud VPN Classic Target VPN gateway. For example:
+    a Compute Engine Cloud VPN Classic Target VPN gateway. For example:
 
         $ gcloud alpha compute target-vpn-gateways update example-gateway \
             --region us-central1 \
@@ -94,7 +94,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta compute target-vpn-gateways update
 

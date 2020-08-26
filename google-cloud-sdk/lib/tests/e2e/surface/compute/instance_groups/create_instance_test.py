@@ -65,24 +65,6 @@ class ManagedInstanceGroupsCreateInstanceGAZonalTest(
     self.assertEqual(len(instance_names), 2)
     self.assertIn(new_instance_name, instance_names)
 
-
-class ManagedInstanceGroupsCreateInstanceGARegionalTest(
-    ManagedInstanceGroupsCreateInstanceGAZonalTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-
-  def SetUp(self):
-    self.prefix = 'mig-instance-configs-regional'
-    self.scope = e2e_test_base.REGIONAL
-
-
-class ManagedInstanceGroupsCreateInstanceBetaZonalTest(
-    ManagedInstanceGroupsCreateInstanceGAZonalTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def _UpdateTemplate(self, igm_name, template_name):
     """Update instance template for group to template_name."""
     self.Run("""\
@@ -214,11 +196,15 @@ class ManagedInstanceGroupsCreateInstanceBetaZonalTest(
                                     normalize_space=True)
 
 
-class ManagedInstanceGroupsCreateInstanceBetaRegionalTest(
-    ManagedInstanceGroupsCreateInstanceGARegionalTest):
+class ManagedInstanceGroupsCreateInstanceGARegionalTest(
+    ManagedInstanceGroupsCreateInstanceGAZonalTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def SetUp(self):
+    self.prefix = 'mig-instance-configs-regional'
+    self.scope = e2e_test_base.REGIONAL
 
 
 if __name__ == '__main__':

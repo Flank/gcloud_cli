@@ -27,10 +27,10 @@ from googlecloudsdk.command_lib.composer import image_versions_util
 from googlecloudsdk.command_lib.composer import parsers
 from googlecloudsdk.command_lib.composer import resource_args
 from googlecloudsdk.command_lib.composer import util as command_util
+from googlecloudsdk.command_lib.kms import resource_args as kms_resource_args
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 import six
-
 
 PREREQUISITE_OPTION_ERROR_MSG = """\
 Cannot specify --{opt} without --{prerequisite}.
@@ -364,6 +364,8 @@ class CreateBeta(Create):
     flags.WEB_SERVER_DENY_ALL.AddToParser(web_server_group)
     flags.CLOUD_SQL_MACHINE_TYPE.AddToParser(parser)
 
+    flags.WEB_SERVER_MACHINE_TYPE.AddToParser(parser)
+
   def Run(self, args):
     if self._support_web_server_access_control:
       self.ParseWebServerAccessControlConfigOptions(args)
@@ -415,6 +417,7 @@ class CreateBeta(Create):
         cloud_sql_ipv4_cidr=args.cloud_sql_ipv4_cidr,
         web_server_access_control=self.web_server_access_control,
         cloud_sql_machine_type=args.cloud_sql_machine_type,
+        web_server_machine_type=args.web_server_machine_type,
         release_track=self.ReleaseTrack())
 
 
@@ -435,6 +438,7 @@ class CreateAlpha(CreateBeta):
   def Args(parser):
     _CommonArgs(parser)
     flags.CLOUD_SQL_MACHINE_TYPE.AddToParser(parser)
+    flags.WEB_SERVER_MACHINE_TYPE.AddToParser(parser)
 
     # Private IP falgs without ranges missing in alpha.
     flags.AddPrivateIpEnvironmentFlags(parser, False)
@@ -450,6 +454,20 @@ class CreateAlpha(CreateBeta):
         help="""The type of executor by which task instances are run on Airflow;
         currently supported executor types are CELERY and KUBERNETES.
         Defaults to CELERY. Cannot be updated.""")
+
+    # Workaround to add hidden resource flag, as per b/130564349.
+    group_parser = parser.add_argument_group(hidden=True)
+    permission_info = '{} must hold permission {}'.format(
+        "The 'Cloud Composer Service Agent' service account",
+        "'Cloud KMS CryptoKey Encrypter/Decrypter'")
+    kms_resource_args.AddKmsKeyResourceArg(
+        group_parser, 'environment', permission_info=permission_info)
+
+  def Run(self, args):
+    self.kms_key = None
+    if args.kms_key:
+      self.kms_key = flags.GetAndValidateKmsEncryptionKey(args)
+    return super(CreateAlpha, self).Run(args)
 
   def GetOperationMessage(self, args):
     """See base class."""
@@ -475,8 +493,10 @@ class CreateAlpha(CreateBeta):
         services_secondary_range_name=args.services_secondary_range_name,
         cluster_ipv4_cidr_block=args.cluster_ipv4_cidr,
         services_ipv4_cidr_block=args.services_ipv4_cidr,
+        kms_key=self.kms_key,
         private_environment=args.enable_private_environment,
         private_endpoint=args.enable_private_endpoint,
         master_ipv4_cidr=args.master_ipv4_cidr,
         cloud_sql_machine_type=args.cloud_sql_machine_type,
+        web_server_machine_type=args.web_server_machine_type,
         release_track=self.ReleaseTrack())

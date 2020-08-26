@@ -62,7 +62,19 @@ class ResourceArgsTest(base.ApigeeIsolatedTest):
         parser,
         "organization.developer.app",
         "The application that will test name validation logic.")
-    bad_developer_name = "\0invalid/nonsense"
-    unparsed_args = ["--organization=o", "--developer="+bad_developer_name, "a"]
+    weird_name = "\0invalid/nonsense"
+    unparsed_args = ["--organization=oo", "--developer=" + weird_name, "a"]
     args = parser.parse_args(unparsed_args).CONCEPTS.app.Parse()
-    self.assertEqual(args.developersId, bad_developer_name)
+    self.assertEqual(args.developersId, weird_name)
+
+  def testResourceArgumentValidationPermissive(self):
+    parser = util.ArgumentParser()
+    resource_args.AddSingleResourceArgument(
+        parser,
+        "organization.developer.app",
+        "The application that will test name validation logic.",
+        validate=True)
+    weird_name = "\0invalid/nonsense"
+    unparsed_args = ["--organization=oo", "--developer=" + weird_name, "a"]
+    args = parser.parse_args(unparsed_args).CONCEPTS.app.Parse()
+    self.assertEqual(args.developersId, weird_name)

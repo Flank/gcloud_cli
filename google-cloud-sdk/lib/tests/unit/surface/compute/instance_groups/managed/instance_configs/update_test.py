@@ -36,14 +36,14 @@ import httplib2
 from mock import patch
 
 
-class _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase(
+class _InstanceGroupManagerInstanceConfigsUpdateGATestBase(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     sdk_test_base.WithLogCapture):
 
-  API_VERSION = 'beta'
+  API_VERSION = 'v1'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.client = mock.Client(
@@ -105,8 +105,8 @@ class _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase(
     return exceptions.HttpNotFoundError(response, body, url)
 
 
-class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
-    _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase):
+class InstanceGroupManagerInstanceConfigsUpdateGAZonalTest(
+    _InstanceGroupManagerInstanceConfigsUpdateGATestBase):
 
   def SetUp(self):
     self._preserved_state_disk_1 = config_utils.MakePreservedStateDiskMapEntry(
@@ -469,8 +469,8 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
           """)
 
 
-class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
-    _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase):
+class InstanceGroupManagerInstanceConfigsUpdateGARegionalTest(
+    _InstanceGroupManagerInstanceConfigsUpdateGATestBase):
 
   def SetUp(self):
     self.preserved_state_metadata = [
@@ -687,6 +687,48 @@ class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
         """)
 
 
+class _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase(
+    _InstanceGroupManagerInstanceConfigsUpdateGATestBase):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagerInstanceConfigsUpdateBetaZonalTest(
+    _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase,
+    InstanceGroupManagerInstanceConfigsUpdateGAZonalTest):
+
+  def SetUp(self):
+    self._preserved_state_disk_1 = config_utils.MakePreservedStateDiskMapEntry(
+        self.messages, 'foo',
+        (self.project_uri + '/zones/us-central2-a/disks/foo'), 'READ_WRITE')
+    self._preserved_state_disk_2 = config_utils.MakePreservedStateDiskMapEntry(
+        self.messages, 'baz',
+        (self.project_uri + '/zones/us-central2-a/disks/baz'), 'READ_ONLY')
+
+    self.preserved_state_metadata = [
+        config_utils.MakePreservedStateMetadataMapEntry(
+            self.messages, key='key-BAR', value='value BAR'),
+        config_utils.MakePreservedStateMetadataMapEntry(
+            self.messages, key='key-foo', value='value foo'),
+    ]
+
+
+class InstanceGroupManagerInstanceConfigsUpdateBetaRegionalTest(
+    _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase,
+    InstanceGroupManagerInstanceConfigsUpdateGARegionalTest):
+
+  def SetUp(self):
+    self.preserved_state_metadata = [
+        config_utils.MakePreservedStateMetadataMapEntry(
+            self.messages, key='key-BAR', value='value BAR'),
+        config_utils.MakePreservedStateMetadataMapEntry(
+            self.messages, key='key-foo', value='value foo'),
+    ]
+
+
 class _InstanceGroupManagerInstanceConfigsUpdateAlphaTestBase(
     _InstanceGroupManagerInstanceConfigsUpdateBetaTestBase):
 
@@ -714,45 +756,6 @@ class InstanceGroupManagerInstanceConfigsUpdateAlphaZonalTest(
         config_utils.MakePreservedStateMetadataMapEntry(
             self.messages, key='key-foo', value='value foo'),
     ]
-
-  def testSimpleCase(self):
-    disk_source = self.project_uri + '/zones/us-central2-a/disks/foo-2'
-    preserved_state_disks = [
-        config_utils.MakePreservedStateDiskMapEntry(
-            self.messages, 'foo', disk_source, 'READ_ONLY',
-            'on-permanent-instance-deletion'),
-    ]
-    preserved_state_metadata = [
-        config_utils.MakePreservedStateMetadataMapEntry(
-            self.messages, key='key-BAR', value='new value'),
-    ]
-    self._ExpectListPerInstanceConfigs()
-    self._ExpectUpdatePerInstanceConfigs(
-        preserved_state_disks=preserved_state_disks,
-        preserved_state_metadata=preserved_state_metadata)
-    self._ExpectPollingOperation()
-    self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances('restart')
-    self._ExpectPollingOperation('apply')
-    self._ExpectGetInstanceGroupManager()
-
-    self.Run("""
-        compute instance-groups managed instance-configs update group-1
-          --zone us-central2-a
-          --instance foo
-          --update-stateful-disk device-name=foo,source={project_uri}/zones/us-central2-a/disks/foo-2,mode=ro,auto-delete=on-permanent-instance-deletion
-          --remove-stateful-disks baz
-          --update-stateful-metadata "key-BAR=new value"
-          --remove-stateful-metadata key-foo
-          --instance-update-minimal-action restart
-        """.format(project_uri=self.project_uri))
-
-    self.AssertLogContains('The --update-stateful-disk option is deprecated; '
-                           'use --stateful-disk instead.')
-
-    self.AssertLogContains(
-        'The --update-stateful-metadata option is deprecated; '
-        'use --stateful-metadata instead.')
 
 
 class InstanceGroupManagerInstanceConfigsUpdateAlphaRegionalTest(

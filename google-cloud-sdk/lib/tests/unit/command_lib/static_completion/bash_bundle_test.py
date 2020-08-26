@@ -21,33 +21,27 @@ from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core import config
-from googlecloudsdk.core import execution_utils
 from tests.lib import sdk_test_base
 
 
-@sdk_test_base.Filters.RunOnlyInBundle  # requires gcloud installation to run
+@sdk_test_base.Filters.RunOnlyInBundle  # Requires a gcloud installation to run.
 @sdk_test_base.Filters.DoNotRunOnWindows('This tests a Linux shell script.')
 class CompletionBundle(sdk_test_base.BundledBase):
   """Bundle tests to ensure completion_test.sh script works in a bundle."""
-
-  def SetUp(self):
-    pass
 
   def testPythonArgComplete(self):
     gcloud_py_dir = os.path.dirname(config.GcloudPath())
     compdir = os.path.dirname(gcloud_py_dir)
     prog_dir = os.path.dirname(__file__)
     testfile = os.path.join(prog_dir, 'completion_test.sh')
-    exitval = execution_utils.Exec([testfile, compdir], no_exit=True)
-    self.assertTrue(exitval == 0)
+    result = self.ExecuteScript(testfile, [compdir])
+    self.assertEqual(0, result.return_code)
     # Testing /bin/zsh requires running in a local environment that has zsh
     # installed.
     if os.path.isfile('/bin/zsh') and os.access('/bin/zsh', os.X_OK):
-      exitval = execution_utils.Exec([testfile, '--shell=/bin/zsh', compdir],
-                                     no_exit=True)
-      self.assertTrue(exitval == 0)
+      result = self.ExecuteScript(testfile, ['--shell=/bin/zsh', compdir])
+      self.assertEqual(0, result.return_code)
 
 
 if __name__ == '__main__':
   sdk_test_base.main()
-

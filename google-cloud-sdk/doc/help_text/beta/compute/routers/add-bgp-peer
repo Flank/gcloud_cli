@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute routers add-bgp-peer - add a BGP peer to a Google
-        Compute Engine router
+    gcloud beta compute routers add-bgp-peer - add a BGP peer to a Compute
+        Engine router
 
 SYNOPSIS
     gcloud beta compute routers add-bgp-peer NAME --interface=INTERFACE
@@ -13,7 +13,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Add a BGP peer to a Google Compute Engine router.
+    (BETA) Add a BGP peer to a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

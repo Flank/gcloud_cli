@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud beta dataproc clusters create (CLUSTER : --region=REGION)
         --autoscaling-policy=AUTOSCALING_POLICY [--no-address] [--async]
-        [--bucket=BUCKET] [--enable-component-gateway]
+        [--bucket=BUCKET] [--dataproc-metastore=DATAPROC_METASTORE]
+        [--enable-component-gateway]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
@@ -93,6 +94,11 @@ FLAGS
         The Google Cloud Storage bucket to use by default to stage job
         dependencies, miscellaneous config files, and job driver console output
         when using this cluster.
+
+     --dataproc-metastore=DATAPROC_METASTORE
+        Specify the name of a Dataproc Metastore service to be used as an
+        external metastore in the format:
+        "projects/{project-id}/locations/{region}/services/{service-name}".
 
      --enable-component-gateway
         Enable access to the web UIs of selected components on the cluster

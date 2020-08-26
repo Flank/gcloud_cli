@@ -247,12 +247,30 @@ class UpdateTestBeta(UpdateTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
 
 class UpdateTestAlpha(UpdateTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
+
+  def testUpdate_TlsMode(self):
+    instance_to_update = self.messages.Instance(
+        name=self.instance_relative_name)
+    expected_update_mask = 'tls_mode'
+
+    expected_instance = self.messages.Instance(name=self.instance_relative_name)
+    expected_instance.tlsMode = self.messages.Instance.TlsModeValueValuesEnum(
+        'BASIC_TLS')
+
+    self.ExpectUpdate(instance_to_update, expected_instance,
+                      expected_update_mask)
+    self.Run('redis instances update {instance_id} --region {region_id} '
+             '--tls-mode basic_tls'.format(
+                 instance_id=self.instance_id, region_id=self.region_id))
+    self.AssertErrNotContains('Do you want to proceed with update?')
 
 
 class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
@@ -356,12 +374,14 @@ class RemoveRedisConfigsTestBeta(RemoveRedisConfigsTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
 
 class RemoveRedisConfigsTestAlpha(RemoveRedisConfigsTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 class LabelsTest(InstancesUpdateUnitTestBase):
@@ -474,12 +494,14 @@ class LabelsTestBeta(LabelsTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
 
 class LabelsTestAlpha(LabelsTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 if __name__ == '__main__':

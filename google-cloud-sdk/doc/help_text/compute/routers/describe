@@ -1,13 +1,13 @@
 NAME
-    gcloud compute routers describe - describe a Google Compute Engine router
+    gcloud compute routers describe - describe a Compute Engine router
 
 SYNOPSIS
     gcloud compute routers describe NAME [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routers describe displays all data associated with a Google
-    Compute Engine router.
+    gcloud compute routers describe displays all data associated with a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

@@ -11,7 +11,7 @@ gcloud beta notebooks instances create \- request for creating an instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta notebooks instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR ([\fB\-\-container\-repository\fR=\fICONTAINER_REPOSITORY\fR\ :\ \fB\-\-container\-tag\fR=\fICONTAINER_TAG\fR]\ |\ [\fB\-\-environment\fR=\fIENVIRONMENT\fR\ :\ \fB\-\-environment\-location\fR=\fIENVIRONMENT_LOCATION\fR]\ |\ \fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR\ (\fB\-\-vm\-image\-family\fR=\fIVM_IMAGE_FAMILY\fR\ |\ \fB\-\-vm\-image\-name\fR=\fIVM_IMAGE_NAME\fR)) [\fB\-\-async\fR] [\fB\-\-instance\-owners\fR=\fIINSTANCE_OWNERS\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-post\-startup\-script\fR=\fIPOST_STARTUP_SCRIPT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-accelerator\-core\-count\fR=\fIACCELERATOR_CORE_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR\ \fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-custom\-gpu\-driver\-path\fR=\fICUSTOM_GPU_DRIVER_PATH\fR\ \fB\-\-install\-gpu\-driver\fR] [\fB\-\-disk\-encryption\fR=\fIDISK_ENCRYPTION\fR\ [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR]] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-no\-proxy\-access\fR\ \fB\-\-no\-public\-ip\fR\ [\fB\-\-subnet\fR=\fISUBNET\fR\ :\ \fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta notebooks instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) ([\fB\-\-container\-repository\fR=\fICONTAINER_REPOSITORY\fR\ :\ \fB\-\-container\-tag\fR=\fICONTAINER_TAG\fR]\ |\ [\fB\-\-environment\fR=\fIENVIRONMENT\fR\ :\ \fB\-\-environment\-location\fR=\fIENVIRONMENT_LOCATION\fR]\ |\ [(\fB\-\-vm\-image\-family\fR=\fIVM_IMAGE_FAMILY\fR\ |\ \fB\-\-vm\-image\-name\fR=\fIVM_IMAGE_NAME\fR)\ :\ \fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR;\ default="deeplearning\-platform\-release"]) [\fB\-\-async\fR] [\fB\-\-instance\-owners\fR=\fIINSTANCE_OWNERS\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-1"] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-post\-startup\-script\fR=\fIPOST_STARTUP_SCRIPT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-accelerator\-core\-count\fR=\fIACCELERATOR_CORE_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR\ \fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-custom\-gpu\-driver\-path\fR=\fICUSTOM_GPU_DRIVER_PATH\fR\ \fB\-\-install\-gpu\-driver\fR] [\fB\-\-disk\-encryption\fR=\fIDISK_ENCRYPTION\fR\ [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR]] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-no\-proxy\-access\fR\ \fB\-\-no\-public\-ip\fR\ [\fB\-\-subnet\fR=\fISUBNET\fR\ :\ \fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -57,10 +57,6 @@ https://cloud.google.com/compute/docs/regions\-zones/#locations.
 
 .RS 2m
 .TP 2m
-\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
-The Compute Engine machine type of this instance.
-
-.TP 2m
 
 Exactly one of these must be specified:
 
@@ -103,10 +99,9 @@ https://cloud.google.com/compute/docs/regions\-zones/#locations.
 .RE
 .sp
 .TP 2m
-\fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR
+\fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR; default="deeplearning\-platform\-release"
 The ID of the Google Cloud project that this VM image belongs to. Format:
-projects/\f5{project_id}\fR. This flag must be specified if any of the other
-arguments in this group are specified.
+projects/\f5{project_id}\fR.
 
 .TP 2m
 
@@ -145,6 +140,10 @@ users of the VM instance's service account can use the instance.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 Labels to apply to this instance. These can be later modified by the setLabels
 method.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR; default="n1\-standard\-1"
+The Compute Engine machine type of this instance.
 
 .TP 2m
 \fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]

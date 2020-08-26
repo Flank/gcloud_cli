@@ -31,20 +31,19 @@ GROUPS
     GROUP is one of the following:
 
      rules
-        (BETA) Read and manipulate Google Compute Engine security policies
-        rules.
+        (BETA) Read and manipulate Compute Engine security policies rules.
 
 COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create a Google Compute Engine security policy.
+        (BETA) Create a Compute Engine security policy.
 
      delete
         (BETA) Delete security policies.
 
      describe
-        (BETA) Describe a Google Compute Engine security policy.
+        (BETA) Describe a Compute Engine security policy.
 
      export
         (BETA) Export security policy configs into yaml files.

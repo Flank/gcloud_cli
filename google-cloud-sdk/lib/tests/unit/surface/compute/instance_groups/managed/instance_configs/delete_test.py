@@ -30,13 +30,13 @@ from tests.lib import test_case
 from mock import patch
 
 
-class _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase(
+class _InstanceGroupManagerInstanceConfigsDeleteGATestBase(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
-  API_VERSION = 'beta'
+  API_VERSION = 'v1'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.client = mock.Client(
@@ -51,13 +51,13 @@ class _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase(
                             api_version=self.API_VERSION))
 
 
-class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
-    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase):
+class InstanceGroupManagerInstanceConfigsDeleteGATest(
+    _InstanceGroupManagerInstanceConfigsDeleteGATestBase):
 
-  API_VERSION = 'beta'
+  API_VERSION = 'v1'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectDeletePerInstanceConfigs(self):
     request = (
@@ -218,8 +218,8 @@ class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
           """)
 
 
-class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
-    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase):
+class RegionInstanceGroupManagerInstanceConfigsDeleteGATest(
+    _InstanceGroupManagerInstanceConfigsDeleteGATestBase):
 
   def _ExpectDeletePerInstanceConfigs(self):
     request = (
@@ -396,6 +396,27 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
           --instances foo,bas
           --no-update-instance
         """)
+
+
+class _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase(
+    _InstanceGroupManagerInstanceConfigsDeleteGATestBase):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
+    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase,
+    InstanceGroupManagerInstanceConfigsDeleteGATest):
+  pass
+
+
+class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
+    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase,
+    RegionInstanceGroupManagerInstanceConfigsDeleteGATest):
+  pass
 
 
 class _InstanceGroupManagerInstanceConfigsDeleteAlphaTestBase(

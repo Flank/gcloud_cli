@@ -834,7 +834,107 @@ class InstancesPatchBetaTest(_BaseInstancePatchBetaTest, base.SqlMockTestBeta):
 
 class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
                               base.SqlMockTestAlpha):
-  pass
+
+  _RESTART_WARNING = (
+      'WARNING: This patch modifies a value that requires '
+      'your instance to be restarted. Submitting this patch '
+      'will immediately restart your instance if it\'s running.')
+
+  def testJoinActiveDirectoryDomain(self):
+    """Tests joining an instance to an Active Directory domain.
+
+    Expects that joining a domain prompts for restart and includes the domain
+    in the activeDirectoryConfig of the diff.
+    """
+
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    diff = {'name': 'patch-instance3'}
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    diff.update({
+        'settings': {
+            'activeDirectoryConfig':
+                self.messages.SqlActiveDirectoryConfig(domain='my-domain.com'),
+        },
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+
+    self.Run('sql instances patch patch-instance3 --quiet '
+             '--active-directory-domain=my-domain.com --diff')
+
+    prompt_mock.assert_called_with(self._RESTART_WARNING)
+    self.AssertErrContains(
+        '{"activeDirectoryConfig": {"domain": "my-domain.com"}}')
+
+  def testChangeActiveDirectoryDomain(self):
+    """Tests changing an instance's Active Directory domain.
+
+    Expects that changing domains prompts for restart and includes the new
+    domain in the activeDirectoryConfig of the diff.
+    """
+
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    diff = {
+        'name': 'patch-instance3',
+        'settings': {
+            'activeDirectoryConfig':
+                self.messages.SqlActiveDirectoryConfig(domain='my-domain.com'),
+        },
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    diff.update({
+        'settings': {
+            'activeDirectoryConfig':
+                self.messages.SqlActiveDirectoryConfig(
+                    domain='my-new-domain.com'),
+        },
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+
+    self.Run('sql instances patch patch-instance3 --quiet '
+             '--active-directory-domain=my-new-domain.com --diff')
+
+    prompt_mock.assert_called_with(self._RESTART_WARNING)
+    self.AssertErrContains(
+        '{"activeDirectoryConfig": {"domain": "my-new-domain.com"}}')
+
+  def testLeaveActiveDirectoryDomain(self):
+    """Tests an instance leaving its Active Directory domain.
+
+    Expects that leaving a domain prompts for restart and includes an empty
+    domain field in the activeDirectoryConfig of the diff.
+    """
+
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    diff = {
+        'name': 'patch-instance3',
+        'settings': {
+            'activeDirectoryConfig':
+                self.messages.SqlActiveDirectoryConfig(domain='my-domain.com'),
+        },
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    diff.update({
+        'settings': {
+            'activeDirectoryConfig':
+                self.messages.SqlActiveDirectoryConfig(domain=''),
+        },
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+
+    self.Run('sql instances patch patch-instance3 --quiet '
+             '--active-directory-domain= --diff')
+
+    prompt_mock.assert_called_with(self._RESTART_WARNING)
+    self.AssertErrContains('{"activeDirectoryConfig": {"domain": ""}}')
 
 
 if __name__ == '__main__':

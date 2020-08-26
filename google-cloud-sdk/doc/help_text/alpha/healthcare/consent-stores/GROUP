@@ -35,6 +35,9 @@ COMMANDS
      describe
         (ALPHA) Describe a Cloud Healthcare API consent store.
 
+     evaluate-user-consents
+        (ALPHA) Check the consents for a particular user's data.
+
      get-iam-policy
         (ALPHA) Retrieve the IAM policy for a Cloud Healthcare API consent
         store.
@@ -59,5 +62,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

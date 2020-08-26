@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha apigee apis describe \- describes an Apigee API proxy
+gcloud alpha apigee apis describe \- describe an Apigee API proxy
 
 
 
@@ -17,7 +17,10 @@ gcloud alpha apigee apis describe \- describes an Apigee API proxy
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Describes an Apigee API proxy.
+\fB(ALPHA)\fR Describe an Apigee API proxy.
+
+\f5gcloud alpha apigee apis describe\fR shows metadata about an API proxy and
+its revisions.
 
 
 
@@ -26,8 +29,8 @@ gcloud alpha apigee apis describe \- describes an Apigee API proxy
 .RS 2m
 .TP 2m
 
-API proxy resource \- The API proxy to be described. The arguments in this group
-can be used to specify the attributes of this resource. This must be specified.
+API proxy resource \- API proxy to be described. The arguments in this group can
+be used to specify the attributes of this resource. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -38,7 +41,8 @@ specified.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
-The organization for the API proxy.
+Apigee organization containing the API proxy. If unspecified, the Cloud Platform
+project's associated organization will be used.
 
 
 .RE
@@ -104,5 +108,5 @@ $ gcloud alpha apigee apis describe proxy\-name \-\-format=json
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+allowlist.
 

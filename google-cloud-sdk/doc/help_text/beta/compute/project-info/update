@@ -1,14 +1,14 @@
 NAME
-    gcloud beta compute project-info update - update a Google Compute Engine
-        project resource
+    gcloud beta compute project-info update - update a Compute Engine project
+        resource
 
 SYNOPSIS
     gcloud beta compute project-info update
         [--default-network-tier=DEFAULT_NETWORK_TIER] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute project-info update is used to update a Google
-    Compute Engine project resource.
+    (BETA) gcloud beta compute project-info update is used to update a Compute
+    Engine project resource.
 
 FLAGS
      --default-network-tier=DEFAULT_NETWORK_TIER

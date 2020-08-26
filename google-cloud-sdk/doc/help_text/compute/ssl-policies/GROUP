@@ -26,13 +26,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a new Google Compute Engine SSL policy.
+        Create a new Compute Engine SSL policy.
 
      delete
-        Delete Google Compute Engine SSL policies.
+        Delete Compute Engine SSL policies.
 
      describe
-        Describe a Google Compute Engine ssl policy.
+        Describe a Compute Engine ssl policy.
 
      list
         List Google Compute Engine SSL policies.
@@ -41,7 +41,7 @@ COMMANDS
         List available features that can be specified in an SSL policy.
 
      update
-        Update a Google Compute Engine SSL policy.
+        Update a Compute Engine SSL policy.
 
 NOTES
     These variants are also available:

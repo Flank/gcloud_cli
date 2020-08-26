@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute routers nats create - add a NAT to a Google Compute
-        Engine router
+    gcloud beta compute routers nats create - add a NAT to a Compute Engine
+        router
 
 SYNOPSIS
     gcloud beta compute routers nats create NAME --router=ROUTER
@@ -17,7 +17,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers nats create is used to create a NAT on a
-    Google Compute Engine router.
+    Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

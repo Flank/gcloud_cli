@@ -1,5 +1,5 @@
 title: pubsub topics detach-subscription scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

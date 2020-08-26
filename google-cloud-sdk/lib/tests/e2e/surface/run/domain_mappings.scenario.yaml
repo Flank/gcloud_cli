@@ -349,7 +349,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://run.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/$$region$$/authorizeddomains?alt=json
+          uri: https://run.googleapis.com/v1/projects/cloud-sdk-integration-testing/authorizeddomains?alt=json
           method: GET
           headers: {}
           body: null

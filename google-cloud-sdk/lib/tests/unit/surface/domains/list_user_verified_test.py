@@ -30,8 +30,7 @@ from tests.lib import sdk_test_base
 
 
 class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
-                             cli_test_base.CliTestBase,
-                             parameterized.TestCase):
+                             cli_test_base.CliTestBase, parameterized.TestCase):
   """Tests using the AuthorizedDomains service."""
 
   APPENGINE_API = 'appengine'
@@ -46,8 +45,8 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
   def _FormatApp(self):
     return 'apps/{0}'.format(self.Project())
 
-  def _FormatRunProject(self, location):
-    return 'projects/{0}/locations/{1}'.format(self.Project(), location)
+  def _FormatRunProject(self):
+    return 'projects/{0}'.format(self.Project())
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -64,8 +63,7 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
     self.run_messages = core_apis.GetMessagesModule(self.RUN_API,
                                                     self.RUN_API_VERSION)
     self.run_mock_client = apitools_mock.Client(
-        core_apis.GetClientClass(self.RUN_API,
-                                 self.RUN_API_VERSION),
+        core_apis.GetClientClass(self.RUN_API, self.RUN_API_VERSION),
         real_client=core_apis.GetClientInstance(
             self.RUN_API, self.RUN_API_VERSION, no_http=True))
     self.run_mock_client.Mock()
@@ -95,11 +93,11 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
         parent=self._FormatApp())
     self.gae_mock_client.AppsAuthorizedDomainsService.List.Expect(
         gae_request, exception=gae_exception)
-    run_request = (self.run_messages.
-                   RunProjectsLocationsAuthorizeddomainsListRequest(
-                       parent=self._FormatRunProject('-')))
+    run_request = (
+        self.run_messages.RunProjectsAuthorizeddomainsListRequest(
+            parent=self._FormatRunProject()))
     response = self.run_messages.ListAuthorizedDomainsResponse(domains=domains)
-    self.run_mock_client.projects_locations_authorizeddomains.List.Expect(
+    self.run_mock_client.projects_authorizeddomains.List.Expect(
         run_request, response=response)
 
   def testListDomainMappings(self):
@@ -118,8 +116,9 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
         """,
         normalize_space=True)
 
-  @parameterized.parameters(api_exceptions.HttpNotFoundError(None, None, None),
-                            api_exceptions.HttpForbiddenError(None, None, None))
+  @parameterized.parameters(
+      api_exceptions.HttpNotFoundError(None, None, None),
+      api_exceptions.HttpForbiddenError(None, None, None))
   def testListDomainCloudRun(self, gae_exception):
     domains = [
         self.run_messages.AuthorizedDomain(id='example.com'),
@@ -142,10 +141,10 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
     self.gae_mock_client.AppsAuthorizedDomainsService.List.Expect(
         gae_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
-    run_request = (self.run_messages.
-                   RunProjectsLocationsAuthorizeddomainsListRequest(
-                       parent=self._FormatRunProject('-')))
-    self.run_mock_client.projects_locations_authorizeddomains.List.Expect(
+    run_request = (
+        self.run_messages.RunProjectsAuthorizeddomainsListRequest(
+            parent=self._FormatRunProject()))
+    self.run_mock_client.projects_authorizeddomains.List.Expect(
         run_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
     with self.assertRaises(calliope_exceptions.HttpException):

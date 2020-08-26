@@ -10,12 +10,6 @@ summary:
         along with all of the associated consumer information.
     - prompt_string: Continue anyway
     - input: y
-  - stderr: |
-      Waiting for async operation sm_op to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe sm_op
-
   - progress_tracker:
     - message: Waiting for API [test-name] to be deleted
     - status: SUCCESS
@@ -27,12 +21,6 @@ summary:
         along with all of the associated consumer information.
     - prompt_string: Continue anyway
     - input: y
-  - stderr: |
-      Waiting for async operation sm_op to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe sm_op
-
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -48,36 +36,6 @@ actions:
           along with all of the associated consumer information.
         prompt_string: Continue anyway
         user_input: y
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/test-name.apigateway.fake-project.cloud.goog?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: sm_op
-            done: false
-    - expect_stderr: |
-        Waiting for async operation sm_op to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/sm_op?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: sm_op
-            done: true
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe sm_op
-
     - api_call:
         expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-name?alt=json
@@ -115,36 +73,6 @@ actions:
           along with all of the associated consumer information.
         prompt_string: Continue anyway
         user_input: y
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/test-name.apigateway.fake-project.cloud.goog?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: sm_op
-            done: false
-    - expect_stderr: |
-        Waiting for async operation sm_op to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/sm_op?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: sm_op
-            done: true
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe sm_op
-
     - api_call:
         expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-name?alt=json

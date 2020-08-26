@@ -1,14 +1,14 @@
 NAME
-    gcloud compute routers remove-bgp-peer - remove a BGP peer from a Google
-        Compute Engine router
+    gcloud compute routers remove-bgp-peer - remove a BGP peer from a Compute
+        Engine router
 
 SYNOPSIS
     gcloud compute routers remove-bgp-peer NAME --peer-name=PEER_NAME
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routers remove-bgp-peer removes a BGP peer from a Google
-    Compute Engine router.
+    gcloud compute routers remove-bgp-peer removes a BGP peer from a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

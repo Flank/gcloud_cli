@@ -2,7 +2,7 @@ NAME
     gcloud builds log - stream the logs for a build
 
 SYNOPSIS
-    gcloud builds log BUILD [--stream] [GCLOUD_WIDE_FLAG ...]
+    gcloud builds log BUILD [--region=REGION] [--stream] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Stream the logs for a build.
@@ -14,6 +14,11 @@ POSITIONAL ARGUMENTS
         listing builds.
 
 FLAGS
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
+
      --stream
         If a build is ongoing, stream the logs to stdout until the build
         completes.

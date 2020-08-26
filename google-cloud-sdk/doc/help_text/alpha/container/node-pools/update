@@ -107,7 +107,7 @@ REQUIRED FLAGS
               Servers. This feature can only be enabled if Workload Identity is
               enabled at the cluster level.
            SECURE
-              [DPRECATED] Prevents pods not in hostNetwork from accessing
+              [DEPRECATED] Prevents pods not in hostNetwork from accessing
               certain VM metadata, specifically kube-env, which contains
               Kubelet credentials, and the instance identity token. This is a
               temporary security solution available while the bootstrapping
@@ -233,7 +233,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud container node-pools update
         $ gcloud beta container node-pools update

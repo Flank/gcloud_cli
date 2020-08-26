@@ -22,12 +22,12 @@ from tests.lib import test_case
 from tests.lib.surface.compute.instance_templates import create_test_base
 
 
-class InstanceTemplatesCreateWithMinNodeCpusBeta(
+class InstanceTemplatesCreateWithMinNodeCpus(
     create_test_base.InstanceTemplatesCreateTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def testCreateWithNoReservationAffinity(self):
     m = self.messages
@@ -68,6 +68,14 @@ class InstanceTemplatesCreateWithMinNodeCpusBeta(
               project='my-project',
           ))],
     )
+
+
+class InstanceTemplatesCreateWithMinNodeCpusBeta(
+    InstanceTemplatesCreateWithMinNodeCpus):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
 
 class InstanceTemplatesCreateWithMinNodeCpusAlpha(

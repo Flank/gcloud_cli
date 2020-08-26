@@ -26,25 +26,25 @@ GROUPS
     GROUP is one of the following:
 
      create
-        Create Google Compute Engine Resource Policies.
+        Create Compute Engine Resource Policies.
 
 COMMANDS
     COMMAND is one of the following:
 
      delete
-        Delete a Google Compute Engine resource policy.
+        Delete a Compute Engine resource policy.
 
      describe
-        Describe a Google Compute Engine resource policy.
+        Describe a Compute Engine resource policy.
 
      get-iam-policy
-        Get the IAM policy for a Google Compute Engine resource policy.
+        Get the IAM policy for a Compute Engine resource policy.
 
      list
         List Google Compute Engine resource policies.
 
      set-iam-policy
-        Set the IAM policy for a Google Compute Engine resource policy.
+        Set the IAM policy for a Compute Engine resource policy.
 
 NOTES
     These variants are also available:

@@ -514,18 +514,18 @@ class DataSet(_messages.Message):
 
 
 class DroppedLabels(_messages.Message):
-  r"""A set of (label, value) pairs which were dropped during aggregation,
-  attached to google.api.Distribution.Exemplars in google.api.Distribution
-  values during aggregation.These values are used in combination with the
-  label values that remain on the aggregated Distribution timeseries to
-  construct the full label set for the exemplar values. The resulting full
-  label set may be used to identify the specific task/job/instance (for
-  example) which may be contributing to a long-tail, while allowing the
-  storage savings of only storing aggregated distribution values for a large
-  group.Note that there are no guarantees on ordering of the labels from
-  exemplar-to-exemplar and from distribution-to-distribution in the same
-  stream, and there may be duplicates. It is up to clients to resolve any
-  ambiguities.
+  r"""A set of (label, value) pairs that were removed from a Distribution time
+  series during aggregation and then added as an attachment to a
+  Distribution.Exemplar.The full label set for the exemplars is constructed by
+  using the dropped pairs in combination with the label values that remain on
+  the aggregated Distribution time series. The constructed full label set can
+  be used to identify the specific entity, such as the instance or job, which
+  might be contributing to a long-tail. However, with dropped labels, the
+  storage requirements are reduced because only the aggregated distribution
+  values for a large group of time series are stored.Note that there are no
+  guarantees on ordering of the labels from exemplar-to-exemplar and from
+  distribution-to-distribution in the same stream, and there may be
+  duplicates. It is up to clients to resolve any ambiguities.
 
   Messages:
     LabelValue: Map from label to its value, for all labels dropped in any
@@ -567,7 +567,7 @@ class DroppedLabels(_messages.Message):
 class Empty(_messages.Message):
   r"""A generic empty message that you can re-use to avoid defining duplicated
   empty messages in your APIs. A typical example is to use it as the request
-  or the response type of an API method. For instance: service Foo {   rpc
+  or the response type of an API method. For instance: service Foo { rpc
   Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON
   representation for Empty is empty JSON object {}.
   """
@@ -745,7 +745,7 @@ class MonitoringProjectsDashboardsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the Dashboard. The format is one of:
       dashboards/[DASHBOARD_ID] (for system dashboards)
-      projects/[PROJECT_ID_OR_NUMBER]/dashboards/[DASHBOARD_ID]  (for custom
+      projects/[PROJECT_ID_OR_NUMBER]/dashboards/[DASHBOARD_ID] (for custom
       dashboards).
   """
 
@@ -960,10 +960,10 @@ class Scorecard(_messages.Message):
       threshold that triggers above/below, then the scorecard is in a warning
       state - unless x also puts it in a danger state. (Danger trumps
       warning.)As an example, consider a scorecard with the following four
-      thresholds: {  value: 90,  category: 'DANGER',  trigger: 'ABOVE', }, {
-      value: 70,  category: 'WARNING',  trigger: 'ABOVE', }, {  value: 10,
-      category: 'DANGER',  trigger: 'BELOW', }, {  value: 20,  category:
-      'WARNING',  trigger: 'BELOW', }Then: values less than or equal to 10
+      thresholds: { value: 90, category: 'DANGER', trigger: 'ABOVE', }, {
+      value: 70, category: 'WARNING', trigger: 'ABOVE', }, { value: 10,
+      category: 'DANGER', trigger: 'BELOW', }, { value: 20, category:
+      'WARNING', trigger: 'BELOW', }Then: values less than or equal to 10
       would put the scorecard in a DANGER state, values greater than 10 but
       less than or equal to 20 a WARNING state, values strictly between 20 and
       70 an OK state, values greater than or equal to 70 but less than 90 a

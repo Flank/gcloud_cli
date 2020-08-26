@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -64,6 +66,18 @@ class NamespacesDeleteTestBeta(base.ServiceDirectoryUnitTestBase):
 
     self.assertEqual(actual, expected)
     self.AssertErrContains('Deleted namespace [my-namespace]')
+
+  def testDelete_InvliadRequest_Fails(self):
+    req = self.msgs.ServicedirectoryProjectsLocationsNamespacesDeleteRequest(
+        name=self.namespace_name)
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces.Delete.Expect(
+        request=req, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run('service-directory namespaces delete my-namespace '
+               '--location my-location ')
+    self.AssertErrNotContains('Deleted namespace')
 
 
 class NamespacesDeleteTestAlpha(NamespacesDeleteTestBeta):

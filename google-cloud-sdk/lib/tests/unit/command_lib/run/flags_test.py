@@ -23,6 +23,7 @@ import os
 
 from googlecloudsdk.api_lib.container import kubeconfig
 from googlecloudsdk.api_lib.run import k8s_object
+from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.api_lib.services import enable_api
@@ -196,6 +197,20 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     labels = k8s_object.LabelsFromMetadata(self.serverless_messages,
                                            self.metadata)
     self.assertEqual(dict(**labels), {'ghi': 'baz'})
+
+  def testImageFlag(self):
+    container_image = 'gcr.io/example/image'
+    self.args.image = container_image
+
+    self._GetAndApplyChanges()
+
+    self.assertEqual(self.service.template.container.image, container_image)
+    self.assertEqual(
+        self.service.annotations.get(revision.USER_IMAGE_ANNOTATION),
+        container_image)
+    self.assertEqual(
+        self.service.template.annotations.get(revision.USER_IMAGE_ANNOTATION),
+        container_image)
 
   @parameterized.parameters([('4s', 4), ('8m16s', 8 * 60 + 16)])
   def testValidTimeoutDuration(self, timeout, expect_seconds):

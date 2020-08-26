@@ -32,7 +32,7 @@ from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 import mock
 
-_DEFAULT_TIMEOUT = '7056s'
+_DEFAULT_TIMEOUT = '6984s'
 
 
 class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
@@ -238,7 +238,8 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
               log_bucket_dir or 'my-project_cloudbuild/logs'),
           request_headers={'Range': 'bytes=0-'}, status=200,
           body=('Cloudbuild output\n[import-image] output\n'
-                '[image-export] output\n[import-ovf] output'))
+                '[image-export] output\n[import-ovf] output\n'
+                '[windows-upgrade] output'))
 
   def _ExpectIamRolesGet(self, is_import, permissions=None, skip_compute=False):
     if is_import:

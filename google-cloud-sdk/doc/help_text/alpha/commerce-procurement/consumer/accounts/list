@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha commerce-procurement consumer accounts list - outputs the List
-        of Account object resulting from the List API
+    gcloud alpha commerce-procurement consumer accounts list - returns the List
+        of Account objects resulting from the List API
 
 SYNOPSIS
     gcloud alpha commerce-procurement consumer accounts list
@@ -8,11 +8,11 @@ SYNOPSIS
         [--page-size=PAGE_SIZE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Outputs the List of Account object resulting from the List API.
+    (ALPHA) Returns the List of Account objects resulting from the List API.
 
 REQUIRED FLAGS
-     Billing account resource - Parent billing account to list accounts. This
-     represents a Cloud resource. This must be specified.
+     Billing account resource - Parent Cloud Billing account to list accounts.
+     This represents a Cloud resource. This must be specified.
 
        --billing-account=BILLING_ACCOUNT
           ID of the billing-account or fully qualified identifier for the
@@ -20,7 +20,7 @@ REQUIRED FLAGS
 
 FLAGS
      --page-token=PAGE_TOKEN
-        Token to specify next page in the list.
+        Token that specifies the next page in the list.
 
 LIST COMMAND FLAGS
      --page-size=PAGE_SIZE
@@ -43,5 +43,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

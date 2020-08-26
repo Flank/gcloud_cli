@@ -1146,9 +1146,10 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     #   u'regional_service', u'global_service', u'aggregation_service')"
     # Python 3: "MultiScopeLister('client', 'zonal_service','regional_service',
     #  'global_service', 'aggregation_service')"
-    expected = 'MultiScopeLister({}, {}, {}, {}, {}, {})'.format(
+    expected = 'MultiScopeLister({}, {}, {}, {}, {}, {}, {})'.format(
         repr('client'), repr('zonal_service'), repr('regional_service'),
-        repr('global_service'), repr('aggregation_service'), repr(True))
+        repr('global_service'), repr('aggregation_service'), repr(True),
+        repr(False))
     self.assertEqual(repr(multi_scope_lister), expected)
 
   def testEq(self):
@@ -1214,6 +1215,50 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
                  maxResults=123,
                  project='lister-project',
                  includeAllScopes=True))
+        ],
+        http=self.api_mock.adapter.apitools_client.http,
+        batch_url=self.api_mock.adapter.batch_url,
+        errors=[])
+
+  def testAggregatedListPartialSuccess(self):
+    lister_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
+        autospec=True)
+    self.addCleanup(lister_patcher.stop)
+    self.list_json = lister_patcher.start()
+    self.list_json.return_value = [1, 2, 3]
+
+    self.api_mock = utils.ComputeApiMock('alpha').Start()
+    self.addCleanup(self.api_mock.Stop)
+
+    resource_registry = resources.REGISTRY.Clone()
+    resource_registry.RegisterApiByName('compute', 'v1')
+
+    project = resource_registry.Parse(
+        'https://compute.googleapis.com/compute/alpha/projects/lister-project')
+
+    frontend = lister._Frontend('filter', 123,
+                                lister.AllScopes([project], True, True))
+
+    instances_lister = lister.MultiScopeLister(
+        self.api_mock.adapter,
+        aggregation_service=self.api_mock.adapter.apitools_client.instances,
+        return_partial_success=True)
+
+    result = list(instances_lister(frontend))
+
+    self.assertListEqual(result, [1, 2, 3])
+
+    self.list_json.assert_called_once_with(
+        requests=[
+            (self.api_mock.adapter.apitools_client.instances, 'AggregatedList',
+             self.api_mock.adapter.messages
+             .ComputeInstancesAggregatedListRequest(
+                 filter='filter',
+                 maxResults=123,
+                 project='lister-project',
+                 includeAllScopes=True,
+                 returnPartialSuccess=True))
         ],
         http=self.api_mock.adapter.apitools_client.http,
         batch_url=self.api_mock.adapter.batch_url,

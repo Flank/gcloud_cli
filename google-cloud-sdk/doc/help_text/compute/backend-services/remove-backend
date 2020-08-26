@@ -9,6 +9,7 @@ SYNOPSIS
           | --instance-group-zone=INSTANCE_GROUP_ZONE]
           | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
           : --global-network-endpoint-group
+          | --network-endpoint-group-region=NETWORK_ENDPOINT_GROUP_REGION
           | --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
@@ -91,6 +92,27 @@ REQUIRED FLAGS
 
            --global-network-endpoint-group
               If set, the network endpoint group is global.
+
+           --network-endpoint-group-region=NETWORK_ENDPOINT_GROUP_REGION
+              Region of the network endpoint group to remove from the backend
+              service. If not specified, you may be prompted to select a
+              region.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/region property:
+
+                  $ gcloud config set compute/region REGION
+
+              A list of regions can be fetched by running:
+
+                  $ gcloud compute regions list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/region
+
+              Alternatively, the region can be stored in the environment
+              variable CLOUDSDK_COMPUTE_REGION.
 
            --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
               Zone of the network endpoint group to remove from the backend

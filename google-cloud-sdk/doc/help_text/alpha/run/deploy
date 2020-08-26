@@ -4,15 +4,15 @@ NAME
 SYNOPSIS
     gcloud alpha run deploy [[SERVICE] --namespace=NAMESPACE]
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
-        [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
-        [--min-instances=MIN_INSTANCES] [--platform=PLATFORM] [--port=PORT]
-        [--service-account=SERVICE_ACCOUNT] [--tag=TAG] [--timeout=TIMEOUT]
-        [--no-traffic]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
+        [--memory=MEMORY] [--min-instances=MIN_INSTANCES] [--platform=PLATFORM]
+        [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--source=SOURCE]
+        [--tag=TAG] [--timeout=TIMEOUT] [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
+        [--image=IMAGE | --pack=[builder=BUILDER],[env=ENV],[image=IMAGE]]
         [--connectivity=CONNECTIVITY --[no-]use-http2 --clear-config-maps
           | --set-config-maps=[KEY=VALUE,...] | --remove-config-maps=[KEY,...]
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
@@ -68,10 +68,6 @@ FLAGS
      --cpu=CPU
         Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
 
-     --image=IMAGE
-        Name of the container image to deploy (e.g.
-        gcr.io/cloudrun/hello:latest).
-
      --max-instances=MAX_INSTANCES
         The maximum number of container instances of the Service to run. Use
         'default' to unset the limit and use the platform default.
@@ -115,6 +111,17 @@ FLAGS
         Kubernetes service account in the same namespace as the service. If not
         provided, the revision will use the default service account of the
         project, or default Kubernetes namespace service account respectively.
+
+     --source=SOURCE
+        The location of the source to build. The location can be a directory on
+        a local disk or a gzipped archive file (.tar.gz) in Google Cloud
+        Storage. If the source is a local directory, this command skips the
+        files specified in the --ignore-file. If --ignore-file is not
+        specified, use.gcloudignore file. If a .gcloudignore file is absent and
+        a .gitignore file is present in the local source directory, gcloud will
+        use a generated Git-compatible .gcloudignore file that respects your
+        .gitignored files. The global .gitignore is not respected. For more
+        information on .gcloudignore, see gcloud topic gcloudignore.
 
      --tag=TAG
         Traffic tag to assign to the newly created revision.
@@ -181,6 +188,23 @@ FLAGS
        --update-labels=[KEY=VALUE,...]
           List of label KEY=VALUE pairs to update. If a label exists its value
           is modified, otherwise a new label is created.
+
+     At most one of these may be specified:
+
+       --image=IMAGE
+          Name of the container image to deploy (e.g.
+          gcr.io/cloudrun/hello:latest).
+
+       --pack=[builder=BUILDER],[env=ENV],[image=IMAGE]
+          Uses CNCF buildpack (https://buildpacks.io/) to create image. The
+          "image" key/value must be provided. The image name must be in the
+          gcr.io/, *.gcr.io, or pkg.dev namespaces. By default
+          gcr.io/buildpacks/builder will be used. To specify your own builder
+          image use the optional "builder" key/value argument. To pass
+          environment variables to the builder use the optional "env" key/value
+          argument where value is a list of key values using escaping
+          (https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if
+          neccessary.
 
      Only applicable if connecting to Cloud Run for Anthos deployed on Google
      Cloud or Cloud Run for Anthos deployed on VMware. Specify --platform=gke
@@ -380,7 +404,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud run deploy
         $ gcloud beta run deploy

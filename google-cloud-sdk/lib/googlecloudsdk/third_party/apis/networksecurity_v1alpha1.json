@@ -289,11 +289,13 @@
         },
         "createTime": {
           "description": "Output only. The timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The timestamp when the resource was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -332,12 +334,6 @@
       "properties": {
         "mode": {
           "description": "Required. Specifies OPEN, TLS or MTLS authentication mode.",
-          "enumDescriptions": [
-            "TLS mode is unspecified.",
-            "Communications between services are not encrypted.",
-            "Communications are secured using TLS.",
-            "Communications are secured using MTLS, i.e., the server will request client certificates."
-          ],
           "type": "string",
           "enumDescriptions": [
             "TLS mode is unspecified.",
@@ -413,13 +409,6 @@
       "properties": {
         "mode": {
           "description": "Required. Specifies OPEN, TLS or MTLS authentication mode or permissive combinations of the above. The permissive mode is typically used during transition from one authentication mode to another.",
-          "enumDescriptions": [
-            "TLS mode is unspecified.",
-            "Communications between services are not encrypted.",
-            "Communications are secured using TLS.",
-            "Communications are secured using MTLS (i.e., the server will request client certificates.",
-            "The terminator of Traffic allows either plaintext or MTLS."
-          ],
           "type": "string",
           "enumDescriptions": [
             "TLS mode is unspecified.",
@@ -479,11 +468,13 @@
         },
         "createTime": {
           "description": "Output only. The timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The timestamp when the resource was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -496,11 +487,6 @@
         },
         "action": {
           "description": "Required. The action to take when a rule match is found. Possible values are \"ALLOW\" or \"DENY\".",
-          "enumDescriptions": [
-            "Default value.",
-            "Grant access.",
-            "Deny access."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default value.",
@@ -652,11 +638,13 @@
         },
         "createTime": {
           "description": "Output only. The timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The timestamp when the resource was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -784,11 +772,13 @@
         },
         "createTime": {
           "description": "Output only. The timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The timestamp when the resource was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -933,12 +923,6 @@
       "properties": {
         "logType": {
           "description": "The log type that this config enables.",
-          "enumDescriptions": [
-            "Default case. Should never be this.",
-            "Admin reads. Example: CloudIAM getIamPolicy",
-            "Data writes. Example: CloudSQL Users create",
-            "Data reads. Example: CloudSQL Users list"
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default case. Should never be this.",
@@ -997,32 +981,39 @@
       "properties": {
         "createTime": {
           "description": "Output only. The time the operation was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
           "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
           "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "verb": {
           "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "statusMessage": {
           "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true,
           "type": "string"
         },
         "requestedCancellation": {
           "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
           "type": "boolean"
         },
         "apiVersion": {
           "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }

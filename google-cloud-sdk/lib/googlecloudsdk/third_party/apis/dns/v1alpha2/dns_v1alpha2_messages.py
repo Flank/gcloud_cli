@@ -24,7 +24,7 @@ class Change(_messages.Message):
   Enums:
     StatusValueValuesEnum: Status of the operation (output only). A status of
       "done" means that the request to update the authoritative servers has
-      been sent, but the servers might not be updated yet.
+      been sent but the servers might not be updated yet.
 
   Fields:
     additions: Which ResourceRecordSets to add?
@@ -37,13 +37,13 @@ class Change(_messages.Message):
     startTime: The time that this operation was started by the server (output
       only). This is in RFC3339 text format.
     status: Status of the operation (output only). A status of "done" means
-      that the request to update the authoritative servers has been sent, but
+      that the request to update the authoritative servers has been sent but
       the servers might not be updated yet.
   """
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""Status of the operation (output only). A status of "done" means that
-    the request to update the authoritative servers has been sent, but the
+    the request to update the authoritative servers has been sent but the
     servers might not be updated yet.
 
     Values:
@@ -73,7 +73,7 @@ class ChangesListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your
-      pagination token.  In this way you can retrieve the complete contents of
+      pagination token. In this way you can retrieve the complete contents of
       even very large collections one page at a time. However, if the contents
       of the collection change between the first and last paginated list
       request, the set of all elements returned will be an inconsistent view
@@ -452,7 +452,7 @@ class DnsKeysListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your
-      pagination token.  In this way you can retrieve the complete contents of
+      pagination token. In this way you can retrieve the complete contents of
       even very large collections one page at a time. However, if the contents
       of the collection change between the first and last paginated list
       request, the set of all elements returned will be an inconsistent view
@@ -796,7 +796,7 @@ class ManagedZone(_messages.Message):
     dnsName: The DNS name of this managed zone, for instance "example.com.".
     dnssecConfig: DNSSEC configuration.
     forwardingConfig: The presence for this field indicates that outbound
-      forwarding is enabled for this zone.  The value of this field contains
+      forwarding is enabled for this zone. The value of this field contains
       the set of destinations to forward to.
     id: Unique identifier for the resource; defined by the server (output
       only)
@@ -947,33 +947,33 @@ class ManagedZoneForwardingConfigNameServerTarget(_messages.Message):
   r"""A ManagedZoneForwardingConfigNameServerTarget object.
 
   Enums:
-    ForwardingPathValueValuesEnum: Forwarding path for this NameServerTarget,
-      if unset or set to DEFAULT, Cloud DNS will make forwarding decision
-      based on address ranges, i.e. RFC1918 addresses go to the VPC, Non-
+    ForwardingPathValueValuesEnum: Forwarding path for this NameServerTarget.
+      If unset or set to DEFAULT, Cloud DNS will make forwarding decision
+      based on address ranges, i.e. RFC1918 addresses go to the VPC, non-
       RFC1918 addresses go to the Internet. When set to PRIVATE, Cloud DNS
-      will always send queries through VPC for this target
+      will always send queries through VPC for this target.
 
   Fields:
-    forwardingPath: Forwarding path for this NameServerTarget, if unset or set
+    forwardingPath: Forwarding path for this NameServerTarget. If unset or set
       to DEFAULT, Cloud DNS will make forwarding decision based on address
-      ranges, i.e. RFC1918 addresses go to the VPC, Non-RFC1918 addresses go
+      ranges, i.e. RFC1918 addresses go to the VPC, non-RFC1918 addresses go
       to the Internet. When set to PRIVATE, Cloud DNS will always send queries
-      through VPC for this target
+      through VPC for this target.
     ipv4Address: IPv4 address of a target name server.
     kind: A string attribute.
   """
 
   class ForwardingPathValueValuesEnum(_messages.Enum):
-    r"""Forwarding path for this NameServerTarget, if unset or set to DEFAULT,
+    r"""Forwarding path for this NameServerTarget. If unset or set to DEFAULT,
     Cloud DNS will make forwarding decision based on address ranges, i.e.
-    RFC1918 addresses go to the VPC, Non-RFC1918 addresses go to the Internet.
+    RFC1918 addresses go to the VPC, non-RFC1918 addresses go to the Internet.
     When set to PRIVATE, Cloud DNS will always send queries through VPC for
-    this target
+    this target.
 
     Values:
       default: Cloud DNS will make forwarding decision based on address
         ranges, i.e. RFC1918 addresses forward to the target through the VPC
-        and Non-RFC1918 addresses will forward to the target through the
+        and non-RFC1918 addresses will forward to the target through the
         Internet
       private: Cloud DNS will always forward to this target through the VPC.
     """
@@ -994,7 +994,7 @@ class ManagedZoneOperationsListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your page
-      token.  In this way you can retrieve the complete contents of even very
+      token. In this way you can retrieve the complete contents of even very
       large collections one page at a time. However, if the contents of the
       collection change between the first and last paginated list request, the
       set of all elements returned will be an inconsistent view of the
@@ -1118,7 +1118,7 @@ class ManagedZonesListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your page
-      token.  In this way you can retrieve the complete contents of even very
+      token. In this way you can retrieve the complete contents of even very
       large collections one page at a time. However, if the contents of the
       collection change between the first and last paginated list request, the
       set of all elements returned will be an inconsistent view of the
@@ -1237,7 +1237,7 @@ class PeeringZonesListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your page
-      token.  In this way you can retrieve the complete contents of even very
+      token. In this way you can retrieve the complete contents of even very
       large collections one page at a time. However, if the contents of the
       collection change between the first and last paginated list request, the
       set of all elements returned will be an inconsistent view of the
@@ -1262,7 +1262,7 @@ class PoliciesListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your page
-      token.  In this way you can retrieve the complete contents of even very
+      token. In this way you can retrieve the complete contents of even very
       large collections one page at a time. However, if the contents of the
       collection change between the first and last paginated list request, the
       set of all elements returned will be an inconsistent view of the
@@ -1356,33 +1356,33 @@ class PolicyAlternativeNameServerConfigTargetNameServer(_messages.Message):
   r"""A PolicyAlternativeNameServerConfigTargetNameServer object.
 
   Enums:
-    ForwardingPathValueValuesEnum: Forwarding path for this TargetNameServer,
-      if unset or set to DEFAULT, Cloud DNS will make forwarding decision
-      based on address ranges, i.e. RFC1918 addresses go to the VPC, Non-
+    ForwardingPathValueValuesEnum: Forwarding path for this TargetNameServer.
+      If unset or set to DEFAULT, Cloud DNS will make forwarding decision
+      based on address ranges, i.e. RFC1918 addresses go to the VPC, non-
       RFC1918 addresses go to the Internet. When set to PRIVATE, Cloud DNS
-      will always send queries through VPC for this target
+      will always send queries through VPC for this target.
 
   Fields:
-    forwardingPath: Forwarding path for this TargetNameServer, if unset or set
+    forwardingPath: Forwarding path for this TargetNameServer. If unset or set
       to DEFAULT, Cloud DNS will make forwarding decision based on address
-      ranges, i.e. RFC1918 addresses go to the VPC, Non-RFC1918 addresses go
+      ranges, i.e. RFC1918 addresses go to the VPC, non-RFC1918 addresses go
       to the Internet. When set to PRIVATE, Cloud DNS will always send queries
-      through VPC for this target
+      through VPC for this target.
     ipv4Address: IPv4 address to forward to.
     kind: A string attribute.
   """
 
   class ForwardingPathValueValuesEnum(_messages.Enum):
-    r"""Forwarding path for this TargetNameServer, if unset or set to DEFAULT,
+    r"""Forwarding path for this TargetNameServer. If unset or set to DEFAULT,
     Cloud DNS will make forwarding decision based on address ranges, i.e.
-    RFC1918 addresses go to the VPC, Non-RFC1918 addresses go to the Internet.
+    RFC1918 addresses go to the VPC, non-RFC1918 addresses go to the Internet.
     When set to PRIVATE, Cloud DNS will always send queries through VPC for
-    this target
+    this target.
 
     Values:
       default: Cloud DNS will make forwarding decision based on address
         ranges, i.e. RFC1918 addresses forward to the target through the VPC
-        and Non-RFC1918 addresses will forward to the target through the
+        and non-RFC1918 addresses will forward to the target through the
         Internet
       private: Cloud DNS will always forward to this target through the VPC.
     """
@@ -1485,13 +1485,12 @@ class ResourceRecordSet(_messages.Message):
     kind: A string attribute.
     name: For example, www.example.com.
     rrdatas: As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1)
-      -- see <a href="/dns/records/json-record">examples</a>.
+      -- see examples.
     signatureRrdatas: As defined in RFC 4034 (section 3.2).
     ttl: Number of seconds that this ResourceRecordSet can be cached by
       resolvers.
-    type: The identifier of a supported record type. See the list of <a
-      href="/dns/docs/overview#supported_dns_record_types">Supported DNS
-      record types</a>.
+    type: The identifier of a supported record type. See the list of Supported
+      DNS record types.
   """
 
   kind = _messages.StringField(1, default='dns#resourceRecordSet')
@@ -1511,7 +1510,7 @@ class ResourceRecordSetsListResponse(_messages.Message):
     nextPageToken: The presence of this field indicates that there exist more
       results following your last page of results in pagination order. To
       fetch them, make another list request using this value as your
-      pagination token.  In this way you can retrieve the complete contents of
+      pagination token. In this way you can retrieve the complete contents of
       even very large collections one page at a time. However, if the contents
       of the collection change between the first and last paginated list
       request, the set of all elements returned will be an inconsistent view

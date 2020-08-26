@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute routers nats list - lists the NATs on a Google Compute
-        Engine router
+    gcloud beta compute routers nats list - lists the NATs on a Compute Engine
+        router
 
 SYNOPSIS
     gcloud beta compute routers nats list --router=ROUTER [--region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers nats list is used to list the NATs on a
-    Google Compute Engine router.
+    Compute Engine router.
 
 REQUIRED FLAGS
      --router=ROUTER

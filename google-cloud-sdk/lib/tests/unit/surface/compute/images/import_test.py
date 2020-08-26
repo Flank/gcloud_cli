@@ -32,9 +32,9 @@ from googlecloudsdk.core.resources import InvalidResourceException
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import daisy_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.images import test_resources
 
-_DEFAULT_TIMEOUT = '7056s'
+_DEFAULT_TIMEOUT = '6984s'
 
 
 class ImageImportTest(daisy_test_base.DaisyBaseTest):
@@ -319,6 +319,38 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
              compute images import {0}
              --source-file {1} --os ubuntu-1604
              --family ubuntu
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testSysprepFlagIsPropagated(self):
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetNetworkStepForImport(sysprep_windows=True))
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             --zone my-region-c
+             --sysprep-windows
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testSysprepFlagHasNegative(self):
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetNetworkStepForImport(sysprep_windows=False))
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             --zone my-region-c
+             --no-sysprep-windows
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
@@ -1040,38 +1072,6 @@ class ImageImportTestBeta(ImageImportTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-
-  def testSysprepFlagIsPropagated(self):
-    self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetNetworkStepForImport(sysprep_windows=True))
-    self.AddStorageRewriteMock()
-
-    self.Run("""
-             compute images import {0}
-             --source-file {1} --os ubuntu-1604
-             --zone my-region-c
-             --sysprep-windows
-             """.format(self.image_name, self.source_disk))
-
-    self.AssertOutputContains("""\
-        [import-image] output
-        """, normalize_space=True)
-
-  def testSysprepFlagHasNegative(self):
-    self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetNetworkStepForImport(sysprep_windows=False))
-    self.AddStorageRewriteMock()
-
-    self.Run("""
-             compute images import {0}
-             --source-file {1} --os ubuntu-1604
-             --zone my-region-c
-             --no-sysprep-windows
-             """.format(self.image_name, self.source_disk))
-
-    self.AssertOutputContains("""\
-        [import-image] output
-        """, normalize_space=True)
 
   def testWindowsByolMapping(self):
     target_workflow = '../workflows/image_import/import_from_image.wf.json'

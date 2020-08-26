@@ -2,7 +2,8 @@ NAME
     gcloud alpha builds cancel - cancel an ongoing build
 
 SYNOPSIS
-    gcloud alpha builds cancel BUILDS [BUILDS ...] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha builds cancel BUILDS [BUILDS ...] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Cancel an ongoing build.
@@ -10,6 +11,12 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      BUILDS [BUILDS ...]
         IDs of builds to cancel
+
+FLAGS
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -32,7 +39,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud builds cancel
         $ gcloud beta builds cancel

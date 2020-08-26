@@ -25,6 +25,7 @@ from tests.lib.surface.apigee import base
 
 
 class BrokenClient(apigee.base.BaseClient):
+  """An Apigee HTTP client subclass that doesn't specify an entity path."""
   pass
 
 
@@ -35,6 +36,8 @@ class WrapperTest(base.ApigeeIsolatedTest):
       BrokenClient.List({"organizationsId": "some-org"})
     with self.assertRaises(NotImplementedError):
       BrokenClient.Describe({"organizationsId": "some-org"})
+    with self.assertRaises(NotImplementedError):
+      BrokenClient.Delete({"organizationsId": "some-org"})
 
   def testDeploymentListIgnoresDanglingRevisionIdentifier(self):
     fake_response = [

@@ -65,6 +65,14 @@ class DryRunDescribeTestBeta(accesscontextmanager.Base):
     self.Run('access-context-manager perimeters dry-run describe MY_PERIMETER'
              '   --policy 123')
 
+    directional_policies_diff = ''
+    if self.api_version == 'v1alpha':
+      directional_policies_diff = """\
+IngressPolicies:
+   NONE
+EgressPolicies:
+   NONE
+"""
     self.AssertOutputEquals("""\
 name: MY_PERIMETER
 title: Perimeter 1
@@ -82,7 +90,7 @@ accessLevels:
    accessPolicies/123/accessLevels/MY_LEVEL_2
 vpcAccessibleServices:
    NONE
-""")
+""" + directional_policies_diff)
 
 
 class DryRunDescribeTestAlpha(DryRunDescribeTestBeta):
@@ -91,6 +99,227 @@ class DryRunDescribeTestAlpha(DryRunDescribeTestBeta):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def _MakeDryRunIngressPolicies(self):
+    source1 = self.messages.IngressSource(
+        accessLevel='accessPolicies/123/accessLevels/my_other_level')
+    source2 = self.messages.IngressSource(resource='projects/234567890')
+    ingress_from = self.messages.IngressFrom(
+        identities=['user:testUser2@google.com'], sources=[source1, source2])
+    method_type = self.messages.ApiAction.ActionTypeValueValuesEnum(
+        'PERMISSION')
+    action1 = self.messages.ApiAction(
+        action='bigquery.jobs.update', actionType=method_type)
+    action2 = self.messages.ApiAction(
+        action='bigquery.datasets.create', actionType=method_type)
+    operation1 = self.messages.ApiOperation(
+        serviceName='bigquery.googleapis.com', actions=[action1, action2])
+    ingress_to = self.messages.IngressTo(operations=[operation1])
+    return [self.messages.IngressPolicy(
+            ingressFrom=ingress_from, ingressTo=ingress_to)]
+
+
+  def _MakeDryRunEgressPolicies(self):
+    method_type = self.messages.ApiAction.ActionTypeValueValuesEnum('METHOD')
+    permission_type = self.messages.ApiAction.ActionTypeValueValuesEnum(
+        'PERMISSION')
+    action1 = self.messages.ApiAction(
+        action='TableDataService.List', actionType=method_type)
+    action2 = self.messages.ApiAction(
+        action='bigquery.datasets.create', actionType=permission_type)
+    operation1 = self.messages.ApiOperation(
+        serviceName='bigquery.googleapis.com', actions=[action1, action2])
+    egress_to = self.messages.EgressTo(
+        operations=[operation1], resources=['projects/234567890'])
+    return [self.messages.EgressPolicy(egressTo=egress_to)]
+
+  def testDescribeDirectionalPolicies_SingeleDifference(self):
+    self.SetUpForAPI(self.api_version)
+    perimeter_with_status = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='Perimeter 1',
+        resources=None,
+        access_levels=None,
+        ingress_policies=self._MakeIngressPolicies(),
+        egress_policies=self._MakeEgressPolicies(),
+        restricted_services=None)
+
+    perimeter_with_spec = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='Perimeter 1',
+        resources=None,
+        access_levels=None,
+        restricted_services=None,
+        ingress_policies=self._MakeDryRunIngressPolicies(),
+        egress_policies=self._MakeDryRunEgressPolicies(),
+        dry_run=True)
+    final_perimeter = perimeter_with_spec
+    final_perimeter.status = perimeter_with_status.status
+
+    self._ExpectGet(final_perimeter)
+
+    self.Run('access-context-manager perimeters dry-run describe MY_PERIMETER'
+             '   --policy 123')
+
+    base_diff = """\
+name: MY_PERIMETER
+title: Perimeter 1
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+   NONE
+accessLevels:
+   NONE
+vpcAccessibleServices:
+   NONE
+"""
+    ingress_policies_diff = """\
+IngressPolicies:
+   ingressFrom:
+     identities:
+      -user:testUser@google.com
+      +user:testUser2@google.com
+     sources:
+      -accessLevel: accessPolicies/123/accessLevels/my_level
+      +accessLevel: accessPolicies/123/accessLevels/my_other_level
+      -resource: projects/123456789
+      +resource: projects/234567890
+   ingressTo:
+     operations:
+       actions:
+        -action: method_for_all
+        +action: bigquery.jobs.update
+        -actionType: METHOD
+        +actionType: PERMISSION
+        -action: method_for_one
+        +action: bigquery.datasets.create
+        -actionType: METHOD
+        +actionType: PERMISSION
+      -serviceName: chemisttest.googleapis.com
+      +serviceName: bigquery.googleapis.com
+"""
+    egress_policies_diff = """\
+EgressPolicies:
+  -egressFrom:
+    -allowedIdentity: ANY_IDENTITY
+   egressTo:
+     operations:
+       actions:
+        -action: method_for_all
+        +action: TableDataService.List
+         actionType: METHOD
+        -action: method_for_one
+        +action: bigquery.datasets.create
+        -actionType: METHOD
+        +actionType: PERMISSION
+      -serviceName: chemisttest.googleapis.com
+      +serviceName: bigquery.googleapis.com
+     resources:
+      -projects/123456789
+      +projects/234567890
+"""
+    self.AssertOutputEquals(base_diff + ingress_policies_diff + '  \n' +
+                            egress_policies_diff + '  \n')
+
+  def testDescribeDirectionalPolicies_MultipleDifferences(self):
+    self.SetUpForAPI(self.api_version)
+    perimeter_with_status = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='Perimeter 1',
+        resources=None,
+        access_levels=None,
+        ingress_policies=self._MakeIngressPolicies(),
+        egress_policies=self._MakeEgressPolicies(),
+        restricted_services=None)
+
+    perimeter_with_spec = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='Perimeter 1',
+        resources=None,
+        access_levels=None,
+        restricted_services=None,
+        ingress_policies=self._MakeIngressPolicies() + self._MakeDryRunIngressPolicies(),
+        egress_policies=self._MakeEgressPolicies() + self._MakeDryRunEgressPolicies(),
+        dry_run=True)
+    final_perimeter = perimeter_with_spec
+    final_perimeter.status = perimeter_with_status.status
+
+    self._ExpectGet(final_perimeter)
+
+    self.Run('access-context-manager perimeters dry-run describe MY_PERIMETER'
+             '   --policy 123')
+
+    base_diff = """\
+name: MY_PERIMETER
+title: Perimeter 1
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+   NONE
+accessLevels:
+   NONE
+vpcAccessibleServices:
+   NONE
+"""
+    ingress_policies_diff = """\
+IngressPolicies:
+   ingressFrom:
+     identities:
+       user:testUser@google.com
+     sources:
+       accessLevel: accessPolicies/123/accessLevels/my_level
+       resource: projects/123456789
+   ingressTo:
+     operations:
+       actions:
+         action: method_for_all
+         actionType: METHOD
+         action: method_for_one
+         actionType: METHOD
+       serviceName: chemisttest.googleapis.com
+  +ingressFrom:
+    +identities:
+      +user:testUser2@google.com
+    +sources:
+      +accessLevel: accessPolicies/123/accessLevels/my_other_level
+      +resource: projects/234567890
+  +ingressTo:
+    +operations:
+      +actions:
+        +action: bigquery.jobs.update
+        +actionType: PERMISSION
+        +action: bigquery.datasets.create
+        +actionType: PERMISSION
+      +serviceName: bigquery.googleapis.com
+"""
+    egress_policies_diff = """\
+EgressPolicies:
+   egressFrom:
+     allowedIdentity: ANY_IDENTITY
+   egressTo:
+     operations:
+       actions:
+         action: method_for_all
+         actionType: METHOD
+         action: method_for_one
+         actionType: METHOD
+       serviceName: chemisttest.googleapis.com
+     resources:
+       projects/123456789
+  +egressTo:
+    +operations:
+      +actions:
+        +action: TableDataService.List
+        +actionType: METHOD
+        +action: bigquery.datasets.create
+        +actionType: PERMISSION
+      +serviceName: bigquery.googleapis.com
+    +resources:
+      +projects/234567890
+"""
+    self.AssertOutputEquals(base_diff + ingress_policies_diff + '  \n' +
+                            egress_policies_diff + '  \n')
 
 if __name__ == '__main__':
   test_case.main()

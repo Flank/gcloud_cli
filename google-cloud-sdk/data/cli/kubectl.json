@@ -1,5 +1,5 @@
 {
-  "CLI_VERSION": "v1.15.11-dispatcher",
+  "CLI_VERSION": "v1.16.13-dispatcher",
   "VERSION": "1",
   "capsule": "",
   "commands": {
@@ -740,47 +740,19 @@
           "type": "bool",
           "value": ""
         },
-        "--experimental-field-manager": {
+        "--field-manager": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Name of the manager used to track field ownership. This is an alpha feature and flag.",
+          "description": "Name of the manager used to track field ownership.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--experimental-field-manager",
+          "name": "--field-manager",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--experimental-force-conflicts": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, server-side apply will force the changes against conflicts. This is an alpha feature and flag.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--experimental-force-conflicts",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--experimental-server-side": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, apply runs in the server instead of the client. This is an alpha feature and flag.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--experimental-server-side",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--filename": {
           "attr": {},
@@ -806,6 +778,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--force",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--force-conflicts": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, server-side apply will force the changes against conflicts.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--force-conflicts",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -960,6 +946,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--server-dry-run",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--server-side": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, apply runs in the server instead of the client.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--server-side",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -2759,7 +2759,7 @@
       "release": "GA",
       "sections": {
         "DESCRIPTION": "Copy files and directories to and from containers.",
-        "EXAMPLES": "  # !!!Important Note!!!\n  # Requires that the 'tar' binary is present in your container\n  # image.  If 'tar' is not present, 'kubectl cp' will fail.\n\n  # Copy /tmp/foo_dir local directory to /tmp/bar_dir in a remote pod in the default namespace\n  kubectl cp /tmp/foo_dir <some-pod>:/tmp/bar_dir\n\n  # Copy /tmp/foo local file to /tmp/bar in a remote pod in a specific container\n  kubectl cp /tmp/foo <some-pod>:/tmp/bar -c <specific-container>\n\n  # Copy /tmp/foo local file to /tmp/bar in a remote pod in namespace <some-namespace>\n  kubectl cp /tmp/foo <some-namespace>/<some-pod>:/tmp/bar\n\n  # Copy /tmp/foo from a remote pod to /tmp/bar locally\n  kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar"
+        "EXAMPLES": "  # !!!Important Note!!!\n  # Requires that the 'tar' binary is present in your container\n  # image.  If 'tar' is not present, 'kubectl cp' will fail.\n  #\n  # For advanced use cases, such as symlinks, wildcard expansion or\n  # file mode preservation consider using 'kubectl exec'.\n\n  # Copy /tmp/foo local file to /tmp/bar in a remote pod in namespace <some-namespace>\n  tar cf - /tmp/foo | kubectl exec -i -n <some-namespace> <some-pod> -- tar xf - -C /tmp/bar\n\n  # Copy /tmp/foo from a remote pod to /tmp/bar locally\n  kubectl exec -n <some-namespace> <some-pod> -- tar cf - /tmp/foo | tar xf - -C /tmp/bar\n\n  # Copy /tmp/foo_dir local directory to /tmp/bar_dir in a remote pod in the default namespace\n  kubectl cp /tmp/foo_dir <some-pod>:/tmp/bar_dir\n\n  # Copy /tmp/foo local file to /tmp/bar in a remote pod in a specific container\n  kubectl cp /tmp/foo <some-pod>:/tmp/bar -c <specific-container>\n\n  # Copy /tmp/foo local file to /tmp/bar in a remote pod in namespace <some-namespace>\n  kubectl cp /tmp/foo <some-namespace>/<some-pod>:/tmp/bar\n\n  # Copy /tmp/foo from a remote pod to /tmp/bar locally\n  kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar"
       }
     },
     "create": {
@@ -6255,6 +6255,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--raw": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Raw URI to DELETE to the server. Uses the transport specified by the kubeconfig file.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--raw",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
         "--recursive": {
           "attr": {},
           "category": "",
@@ -6433,47 +6447,19 @@
       "capsule": "",
       "commands": {},
       "flags": {
-        "--experimental-field-manager": {
+        "--field-manager": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Name of the manager used to track field ownership. This is an alpha feature and flag.",
+          "description": "Name of the manager used to track field ownership.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--experimental-field-manager",
+          "name": "--field-manager",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--experimental-force-conflicts": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, server-side apply will force the changes against conflicts. This is an alpha feature and flag.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--experimental-force-conflicts",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--experimental-server-side": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, apply runs in the server instead of the client. This is an alpha feature and flag.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--experimental-server-side",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--filename": {
           "attr": {},
@@ -6488,6 +6474,20 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
+        },
+        "--force-conflicts": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, server-side apply will force the changes against conflicts.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--force-conflicts",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
         },
         "--kustomize": {
           "attr": {},
@@ -6513,6 +6513,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--recursive",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--server-side": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, apply runs in the server instead of the client.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--server-side",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -7429,6 +7443,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--output-watch-events": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Output watch event objects when --watch or --watch-only is used. Existing objects are output as initial ADDED events.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--output-watch-events",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
         "--raw": {
           "attr": {},
           "category": "",
@@ -8028,7 +8056,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Print the logs for a container in a pod or specified resource. If the pod has only one container, the container name is optional.\n\nAliases:\nlogs, log",
+        "DESCRIPTION": "Print the logs for a container in a pod or specified resource. If the pod has only one container, the container name is optional.",
         "EXAMPLES": "  # Return snapshot logs from pod nginx with only one container\n  kubectl logs nginx\n\n  # Return snapshot logs from pod nginx with multi containers\n  kubectl logs nginx --all-containers=true\n\n  # Return snapshot logs from all containers in pods defined by label app=nginx\n  kubectl logs -lapp=nginx --all-containers=true\n\n  # Return snapshot of previous terminated ruby container logs from pod web-1\n  kubectl logs -p -c ruby web-1\n\n  # Begin streaming the logs of the ruby container in pod web-1\n  kubectl logs -f -c ruby web-1\n\n  # Begin streaming the logs from all containers in pods defined by label app=nginx\n  kubectl logs -f -lapp=nginx --all-containers=true\n\n  # Display only the most recent 20 lines of output in pod nginx\n  kubectl logs --tail=20 nginx\n\n  # Show all logs from pod nginx written in the last hour\n  kubectl logs --since=1h nginx\n\n  # Return snapshot logs from first container of a job named hello\n  kubectl logs job/hello\n\n  # Return snapshot logs from container nginx-1 of a deployment named nginx\n  kubectl logs deployment/nginx -c nginx-1"
       }
     },
@@ -8588,6 +8616,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--output",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--raw": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Raw URI to PUT to the server. Uses the transport specified by the kubeconfig file.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--raw",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -11925,6 +11967,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--local": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, annotation will NOT contact api-server but run locally.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--local",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
         "--output": {
           "attr": {},
           "category": "",
@@ -12012,6 +12068,20 @@
     }
   },
   "flags": {
+    "--add-dir-header": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "If true, adds the file directory to the header",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--add-dir-header",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
+    },
     "--alsologtostderr": {
       "attr": {},
       "category": "",

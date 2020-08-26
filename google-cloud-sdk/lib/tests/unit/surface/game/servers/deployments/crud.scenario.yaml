@@ -1,5 +1,5 @@
 title: Cloud Game Services deployments crud test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -131,6 +131,7 @@ actions:
     track_values:
       ALPHA: v1alpha
       BETA: v1beta
+      GA: v1
 
 - write_file:
     path: spec.json

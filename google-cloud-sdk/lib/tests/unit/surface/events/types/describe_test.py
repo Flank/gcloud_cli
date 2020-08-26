@@ -134,3 +134,11 @@ class TypesDescribeTestAlpha(base.EventsBase):
       self.Run('events types describe bad.event.type --platform=gke '
                '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.AssertErrContains('Unknown event type: bad.event.type.')
+
+
+class TypesDescribeTestAlphaAnthos(TypesDescribeTestAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'anthosevents'
+    self.api_version = 'v1beta1'

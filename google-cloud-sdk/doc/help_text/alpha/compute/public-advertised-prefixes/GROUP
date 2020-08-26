@@ -21,23 +21,23 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Creates a Google Compute Engine public advertised prefix.
+        (ALPHA) Creates a Compute Engine public advertised prefix.
 
      delete
-        (ALPHA) Deletes a Google Compute Engine public advertised prefix.
+        (ALPHA) Deletes a Compute Engine public advertised prefix.
 
      describe
-        (ALPHA) Describes a Google Compute Engine public advertised prefix.
+        (ALPHA) Describes a Compute Engine public advertised prefix.
 
      list
         (ALPHA) List Google Compute Engine public advertised prefixes.
 
      update
-        (ALPHA) Updates a Google Compute Engine public advertised prefix.
+        (ALPHA) Updates a Compute Engine public advertised prefix.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

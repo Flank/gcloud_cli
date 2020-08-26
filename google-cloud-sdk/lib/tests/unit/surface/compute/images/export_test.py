@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -503,6 +504,26 @@ class ImagesExportTestBeta(ImagesExportTestGA):
     self.AssertOutputContains("""\
         [image-export] output
         """, normalize_space=True)
+
+  def testDestinationUriBucketOnlyGCSPath(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for [destination-uri]: must be a path to an object in Google Cloud Storage'
+    ):
+      self.Run("""
+             compute images export --image {0}
+             --destination-uri {1}
+             """.format(self.image_name, 'gs://bucket'))
+
+  def testDestinationUriInvalidGCSPath(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for [destination-uri]: must be a path to an object in Google Cloud Storage'
+    ):
+      self.Run("""
+             compute images export --image {0}
+             --destination-uri {1}
+             """.format(self.image_name, 'NOT_A_GCS_PATH'))
 
 
 class ImagesExportTestAlpha(ImagesExportTestBeta):

@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute routers create - create a Google Compute Engine router
+    gcloud beta compute routers create - create a Compute Engine router
 
 SYNOPSIS
     gcloud beta compute routers create NAME --network=NETWORK

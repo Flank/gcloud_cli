@@ -96,94 +96,6 @@ class InstanceGroupManagerCreateInstanceGAZonalTest(
                             preserved_state_metadata,
                             instance_name='foo'):
     request = (
-        self.messages.ComputeInstanceGroupManagersCreateInstancesRequest)(
-            instanceGroupManager='group-1',
-            instanceGroupManagersCreateInstancesRequest=(
-                self.messages.InstanceGroupManagersCreateInstancesRequest
-            )(instances=[self.messages.PerInstanceConfig(name=instance_name)]),
-            project='fake-project',
-            zone='us-central2-a')
-    response = self.messages.Operation(
-        selfLink=(self.project_uri + '/zones/us-central2-a/operations/foo'),)
-    self.client.instanceGroupManagers.CreateInstances.Expect(
-        request,
-        response=response,
-    )
-
-  def _ExpectGetOperation(self, name='foo'):
-    request = self.messages.ComputeZoneOperationsGetRequest(
-        operation=name,
-        project='fake-project',
-        zone='us-central2-a',
-    )
-    response = self.messages.Operation(
-        status=self.messages.Operation.StatusValueValuesEnum.DONE,
-        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
-        targetLink=(self.project_uri +
-                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
-    )
-    self.client.zoneOperations.Get.Expect(
-        request,
-        response=response,
-    )
-
-  def _ExpectWaitOperation(self, name='foo'):
-    request = self.messages.ComputeZoneOperationsWaitRequest(
-        operation=name,
-        project='fake-project',
-        zone='us-central2-a',
-    )
-    response = self.messages.Operation(
-        status=self.messages.Operation.StatusValueValuesEnum.DONE,
-        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
-        targetLink=(self.project_uri +
-                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
-    )
-    self.client.zoneOperations.Wait.Expect(
-        request,
-        response=response,
-    )
-
-  def _ExpectPollingOperation(self, name='foo'):
-    self._ExpectWaitOperation(name)
-
-  def _ExpectGetInstanceGroupManager(self):
-    request = self.messages.ComputeInstanceGroupManagersGetRequest(
-        instanceGroupManager='group-1',
-        project='fake-project',
-        zone='us-central2-a',
-    )
-    response = self.messages.InstanceGroupManager(name='group-1')
-    self.client.instanceGroupManagers.Get.Expect(request, response=response)
-
-  def testSimpleCreateInstance(self):
-    self._ExpectCreateInstance(
-        preserved_state_disks=[],
-        preserved_state_metadata=[],
-        instance_name='foo')
-    self._ExpectWaitOperation()
-    self._ExpectGetInstanceGroupManager()
-
-    self.Run("""
-        compute instance-groups managed create-instance group-1
-          --zone us-central2-a
-          --instance foo
-        """)
-
-
-class InstanceGroupManagerCreateInstanceBetaZonalTest(
-    InstanceGroupManagerCreateInstanceGAZonalTest):
-
-  API_VERSION = 'beta'
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def _ExpectCreateInstance(self,
-                            preserved_state_disks,
-                            preserved_state_metadata,
-                            instance_name='foo'):
-    request = (
         self.messages.ComputeInstanceGroupManagersCreateInstancesRequest
     )(instanceGroupManager='group-1',
       instanceGroupManagersCreateInstancesRequest=(
@@ -235,6 +147,66 @@ class InstanceGroupManagerCreateInstanceBetaZonalTest(
         request,
         response=response,
     )
+
+  def _ExpectGetOperation(self, name='foo'):
+    request = self.messages.ComputeZoneOperationsGetRequest(
+        operation=name,
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
+    )
+    self.client.zoneOperations.Get.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectWaitOperation(self, name='foo'):
+    request = self.messages.ComputeZoneOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
+    )
+    self.client.zoneOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name='foo'):
+    self._ExpectWaitOperation(name)
+
+  def _ExpectGetInstanceGroupManager(self):
+    request = self.messages.ComputeInstanceGroupManagersGetRequest(
+        instanceGroupManager='group-1',
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.InstanceGroupManager(name='group-1')
+    self.client.instanceGroupManagers.Get.Expect(request, response=response)
+
+  def testSimpleCreateInstanceWithoutPreservedState(self):
+    self._ExpectCreateInstance(
+        preserved_state_disks=[],
+        preserved_state_metadata=[],
+        instance_name='foo')
+    self._ExpectWaitOperation()
+    self._ExpectGetInstanceGroupManager()
+
+    self.Run("""
+        compute instance-groups managed create-instance group-1
+          --zone us-central2-a
+          --instance foo
+        """)
 
   def testSimpleCreateInstance(self):
     self._ExpectCreateInstance(
@@ -317,13 +289,12 @@ class InstanceGroupManagerCreateInstanceBetaZonalTest(
           """.format(project_uri=self.project_uri))
 
 
-class InstanceGroupManagerCreateInstanceBetaRegionalTest(
+class InstanceGroupManagerCreateInstanceGARegionalTest(
     _InstanceGroupManagerCreateInstanceTestBase):
-
-  API_VERSION = 'beta'
+  API_VERSION = 'v1'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectListManagedInstances(self):
     request = (self.messages
@@ -504,6 +475,24 @@ class InstanceGroupManagerCreateInstanceBetaRegionalTest(
           --region us-central2
           --instance foo
         """)
+
+
+class InstanceGroupManagerCreateInstanceBetaZonalTest(
+    InstanceGroupManagerCreateInstanceGAZonalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagerCreateInstanceBetaRegionalTest(
+    InstanceGroupManagerCreateInstanceGARegionalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class InstanceGroupManagerCreateInstanceAlphaZonalTest(

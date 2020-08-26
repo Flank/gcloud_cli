@@ -23,7 +23,7 @@ import copy
 from googlecloudsdk.api_lib.compute.public_delegated_prefixes import PublicDelegatedPrefixPatchError
 from tests.lib import test_case
 from tests.lib.surface.compute import public_delegated_prefixes_test_utils
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.public_prefixes import test_resources
 
 
 class DelegateSubPrefixesCreateTest(

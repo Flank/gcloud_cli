@@ -43,8 +43,6 @@ class GenomicsV2alpha1(base_api.BaseApiClient):
     self.projects_operations = self.ProjectsOperationsService(self)
     self.projects_workers = self.ProjectsWorkersService(self)
     self.projects = self.ProjectsService(self)
-    self.workers_projects_workers = self.WorkersProjectsWorkersService(self)
-    self.workers_projects = self.WorkersProjectsService(self)
     self.workers = self.WorkersService(self)
 
   class PipelinesService(base_api.BaseApiService):
@@ -58,24 +56,7 @@ class GenomicsV2alpha1(base_api.BaseApiClient):
           }
 
     def Run(self, request, global_params=None):
-      r"""Runs a pipeline.  The returned Operation's metadata field will contain a.
-google.genomics.v2alpha1.Metadata object describing the status of the
-pipeline execution.  The [response] field will contain a
-google.genomics.v2alpha1.RunPipelineResponse object if the pipeline
-completes successfully.
-
-**Note:** Before you can use this method, the Genomics Service Agent
-must have access to your project. This is done automatically when the
-Cloud Genomics API is first enabled, but if you delete this permission,
-or if you enabled the Cloud Genomics API before the v2alpha1 API
-launch, you must disable and re-enable the API to grant the Genomics
-Service Agent the required permissions.
-Authorization requires the following [Google
-IAM](https://cloud.google.com/iam/) permission:
-
-* `genomics.operations.create`
-
-[1]: /genomics/gsa
+      r"""Runs a pipeline. The returned Operation's metadata field will contain a google.genomics.v2alpha1.Metadata object describing the status of the pipeline execution. The [response] field will contain a google.genomics.v2alpha1.RunPipelineResponse object if the pipeline completes successfully. **Note:** Before you can use this method, the Genomics Service Agent must have access to your project. This is done automatically when the Cloud Genomics API is first enabled, but if you delete this permission, or if you enabled the Cloud Genomics API before the v2alpha1 API launch, you must disable and re-enable the API to grant the Genomics Service Agent the required permissions. Authorization requires the following [Google IAM](https://cloud.google.com/iam/) permission: * `genomics.operations.create` [1]: /genomics/gsa.
 
       Args:
         request: (RunPipelineRequest) input message
@@ -111,15 +92,7 @@ IAM](https://cloud.google.com/iam/) permission:
           }
 
     def Cancel(self, request, global_params=None):
-      r"""Starts asynchronous cancellation on a long-running operation.
-The server makes a best effort to cancel the operation, but success is not
-guaranteed. Clients may use Operations.GetOperation
-or Operations.ListOperations
-to check whether the cancellation succeeded or the operation completed
-despite cancellation.
-Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
-
-* `genomics.operations.cancel`
+      r"""Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation. Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission: * `genomics.operations.cancel`.
 
       Args:
         request: (GenomicsProjectsOperationsCancelRequest) input message
@@ -146,12 +119,7 @@ Authorization requires the following [Google IAM](https://cloud.google.com/iam) 
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets the latest state of a long-running operation.
-Clients can use this method to poll the operation result at intervals as
-recommended by the API service.
-Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
-
-* `genomics.operations.get`
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service. Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission: * `genomics.operations.get`.
 
       Args:
         request: (GenomicsProjectsOperationsGetRequest) input message
@@ -178,10 +146,7 @@ Authorization requires the following [Google IAM](https://cloud.google.com/iam) 
     )
 
     def List(self, request, global_params=None):
-      r"""Lists operations that match the specified filter in the request.
-Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
-
-* `genomics.operations.list`
+      r"""Lists operations that match the specified filter in the request. Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission: * `genomics.operations.list`.
 
       Args:
         request: (GenomicsProjectsOperationsListRequest) input message
@@ -218,8 +183,7 @@ Authorization requires the following [Google IAM](https://cloud.google.com/iam) 
           }
 
     def CheckIn(self, request, global_params=None):
-      r"""The worker uses this method to retrieve the assigned operation and.
-provide periodic status updates.
+      r"""The worker uses this method to retrieve the assigned operation and provide periodic status updates.
 
       Args:
         request: (GenomicsProjectsWorkersCheckInRequest) input message
@@ -255,53 +219,6 @@ provide periodic status updates.
       self._upload_configs = {
           }
 
-  class WorkersProjectsWorkersService(base_api.BaseApiService):
-    """Service class for the workers_projects_workers resource."""
-
-    _NAME = 'workers_projects_workers'
-
-    def __init__(self, client):
-      super(GenomicsV2alpha1.WorkersProjectsWorkersService, self).__init__(client)
-      self._upload_configs = {
-          }
-
-    def UploadSosReport(self, request, global_params=None):
-      r"""The worker uses this method to upload SOS reports for unexpected errors.
-
-      Args:
-        request: (GenomicsWorkersProjectsWorkersUploadSosReportRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (UploadSOSReportResponse) The response message.
-      """
-      config = self.GetMethodConfig('UploadSosReport')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    UploadSosReport.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v2alpha1/workers/projects/{projectsId}/workers/{workersId}:uploadSosReport',
-        http_method='POST',
-        method_id='genomics.workers.projects.workers.uploadSosReport',
-        ordered_params=['id'],
-        path_params=['id'],
-        query_params=[],
-        relative_path='v2alpha1/workers/{+id}:uploadSosReport',
-        request_field='httpBody',
-        request_type_name='GenomicsWorkersProjectsWorkersUploadSosReportRequest',
-        response_type_name='UploadSOSReportResponse',
-        supports_download=False,
-    )
-
-  class WorkersProjectsService(base_api.BaseApiService):
-    """Service class for the workers_projects resource."""
-
-    _NAME = 'workers_projects'
-
-    def __init__(self, client):
-      super(GenomicsV2alpha1.WorkersProjectsService, self).__init__(client)
-      self._upload_configs = {
-          }
-
   class WorkersService(base_api.BaseApiService):
     """Service class for the workers resource."""
 
@@ -313,8 +230,7 @@ provide periodic status updates.
           }
 
     def CheckIn(self, request, global_params=None):
-      r"""The worker uses this method to retrieve the assigned operation and.
-provide periodic status updates.
+      r"""The worker uses this method to retrieve the assigned operation and provide periodic status updates.
 
       Args:
         request: (GenomicsWorkersCheckInRequest) input message

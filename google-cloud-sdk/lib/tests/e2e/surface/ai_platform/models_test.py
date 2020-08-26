@@ -83,6 +83,7 @@ class MlPlatformModelsIntegrationTestGA(MlPlatformModelsIntegrationTest,
                                         parameterized.TestCase):
   """e2e tests for ai-platform models command group."""
 
+  @test_case.Filters.skip('Intermittently requires another flag', 'b/162816316')
   def testMainOps(self, module_name):
     with self._CreateModel(module_name) as model:
       # Confirm the model exists

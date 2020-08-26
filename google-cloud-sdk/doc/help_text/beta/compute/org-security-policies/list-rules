@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute org-security-policies list-rules - list the rules of a
-        Google Compute Engine organization security policy
+        Compute Engine organization security policy
 
 SYNOPSIS
     gcloud beta compute org-security-policies list-rules SECURITY_POLICY

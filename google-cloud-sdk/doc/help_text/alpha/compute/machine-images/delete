@@ -30,7 +30,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta compute machine-images delete
 

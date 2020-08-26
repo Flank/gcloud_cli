@@ -71,39 +71,39 @@ Examples:
 
 .RS 2m
 .IP "\(em" 2m
-\f5name : "Important"\fR to find Cloud resources whose name contains
+\f5name:Important\fR to find Cloud resources whose name contains
 \f5\fIImportant\fR\fR as a word.
 .IP "\(em" 2m
-\f5displayName : "Impor*"\fR to find Cloud resources whose display name contains
+\f5displayName:Impor*\fR to find Cloud resources whose display name contains
 \f5\fIImpor\fR\fR as a prefix.
 .IP "\(em" 2m
-\f5description : "*por*"\fR to find Cloud resources whose description contains
+\f5description:*por*\fR to find Cloud resources whose description contains
 \f5\fIpor\fR\fR as a substring.
 .IP "\(em" 2m
-\f5location : "us\-west*"\fR to find Cloud resources whose location is prefixed
-with \f5\fIus\-west\fR\fR.
+\f5location:us\-west*\fR to find Cloud resources whose location is prefixed with
+\f5\fIus\-west\fR\fR.
 .IP "\(em" 2m
-\f5labels : "prod"\fR to find Cloud resources whose labels contain
-\f5\fIprod\fR\fR as a key or value.
+\f5labels:prod\fR to find Cloud resources whose labels contain \f5\fIprod\fR\fR
+as a key or value.
 .IP "\(em" 2m
-\f5labels.env : "prod"\fR to find Cloud resources which have a label
-\f5\fIenv\fR\fR and its value is \f5\fIprod\fR\fR.
+\f5labels.env:prod\fR to find Cloud resources that have a label \f5\fIenv\fR\fR
+and its value is \f5\fIprod\fR\fR.
 .IP "\(em" 2m
-\f5labels.env : *\fR to find Cloud resources which have a label \f5\fIenv\fR\fR.
+\f5labels.env:*\fR to find Cloud resources that have a label \f5\fIenv\fR\fR.
 .IP "\(em" 2m
-\f5"Important"\fR to find Cloud resources which contain \f5\fIImportant\fR\fR as
-a word in any of the searchable fields.
+\f5Important\fR to find Cloud resources that contain \f5\fIImportant\fR\fR as a
+word in any of the searchable fields.
 .IP "\(em" 2m
-\f5"Impor*"\fR to find Cloud resources which contain \f5\fIImpor\fR\fR as a
-prefix in any of the searchable fields.
+\f5Impor*\fR to find Cloud resources that contain \f5\fIImpor\fR\fR as a prefix
+in any of the searchable fields.
 .IP "\(em" 2m
-\f5"*por*"\fR to find Cloud resources which contain \f5\fIpor\fR\fR as a
-substring in any of the searchable fields.
+\f5*por*\fR to find Cloud resources that contain \f5\fIpor\fR\fR as a substring
+in any of the searchable fields.
 .IP "\(em" 2m
-\f5("Important" AND location : ("us\-west1" OR "global"))\fR to find Cloud
-resources which contain \f5\fIImportant\fR\fR as a word in any of the searchable
-fields and are also located in the \f5\fIus\-west1\fR\fR region or the
-\f5\fIglobal\fR\fR location.
+\f5Important location:(us\-west1 OR global)\fR to find Cloud resources that
+contain \f5\fIImportant\fR\fR as a word in any of the searchable fields and are
+also located in the \f5\fIus\-west1\fR\fR region or the \f5\fIglobal\fR\fR
+location.
 .RE
 .RE
 .sp
@@ -194,7 +194,7 @@ permission on the organization and run:
 
 .RS 2m
 $ gcloud beta asset search\-all\-resources \e
-    \-\-scope='organizations/123456' \-\-query='name : "*xyz*"'
+    \-\-scope='organizations/123456' \-\-query='name:*xyz*'
 .RE
 
 

@@ -132,6 +132,16 @@ class SnapshotsTests(util.Base):
                      snapshot.DependencyClosureForComponents(['a']))
     self.assertEqual(set(['a', 'b', 'c', 'd']),
                      snapshot.ConnectedComponents(['c']))
+    self.assertEqual(set(['a', 'b', 'c', 'd']),
+                     snapshot.StronglyConnectedComponents('a'))
+
+  def testStronglyConnectedSubcomponents(self):
+    snapshot = self.CreateSnapshotFromStrings(
+        1, 'a,b,c,d,e,f', 'a->b,c,d|b->a|c->a|d->e,f|e->d|f->d')
+    self.assertEqual(set(['a', 'b', 'c']),
+                     snapshot.StronglyConnectedComponents('a'))
+    self.assertEqual(set(['d', 'e', 'f']),
+                     snapshot.StronglyConnectedComponents('d'))
 
   def testBasicSnapshotDiff(self):
     # all components are connected, b gets updated

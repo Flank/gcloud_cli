@@ -27,13 +27,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Creates a Google Compute Engine public delegated prefix.
+        (ALPHA) Creates a Compute Engine public delegated prefix.
 
      delete
-        (ALPHA) Deletes a Google Compute Engine public delegated prefix.
+        (ALPHA) Deletes a Compute Engine public delegated prefix.
 
      describe
-        (ALPHA) Describes a Google Compute Engine public delegated prefix.
+        (ALPHA) Describes a Compute Engine public delegated prefix.
 
      list
         (ALPHA) List Google Compute Engine public delegated prefixes.
@@ -42,5 +42,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

@@ -65,7 +65,7 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
     response["name"] = api
     self.AddHTTPResponse(url, status=200, body=json.dumps(response))
 
-  def _AddDeployResponse(self, organization, override, path=None):
+  def _AddDeployResponse(self, organization, override):
     url = ("https://apigee.googleapis.com/v1/organizations/%s/environments/%s"
            "/apis/%s/revisions/%s/deployments") % (
                organization, self._canned_response["environment"],
@@ -74,8 +74,6 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
     params = {}
     if override:
       params["override"] = ["true"]
-    if path:
-      params["basepath"] = [path]
     self.AddHTTPResponse(
         url,
         status=200,
@@ -124,17 +122,6 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
         self._canned_response,
         "Must describe the successfully initiated deployment to the user.")
 
-  def testWithBasepath(self):
-    self._AddOrganizationListResponse()
-    path = "/funny/monkey"
-    self._canned_response["basePath"] = path
-    self._AddDeployResponse("my-org", override=False, path=path)
-    self.RunApigee("apis deploy --format=json --project=my-project "
-                   "--environment=test --api=demo 3 --basepath=/funny/monkey")
-    self.AssertJsonOutputMatches(
-        self._canned_response,
-        "Must describe the successfully initiated deployment to the user.")
-
   def testFailedDeployment(self):
     error_response = {
         "error": {
@@ -155,15 +142,16 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
                            "Must surface server's error message to the user.")
 
   def testFailedDeploymentWithComplexError(self):
+    unexpected_noise = "should be ignored"
     expected_error_message = "detailed description; show this one"
     expected_error_message2 = "also show this error message"
     error_response = {
         "error": {
             "code": 400,
-            "message": "this error should not be shown as it's too generic",
+            "message": "vague error message",
             "details": [{
                 "@type": "type.googleapis.com/google.rpc.DebugInfo",
-                "detail": "Unrelated noise."
+                "detail": unexpected_noise
             }, {
                 "@type":
                     "type.googleapis.com/google.rpc.PreconditionFailure",
@@ -191,10 +179,8 @@ class APIsDeployTest(base.ApigeeSurfaceTest):
                            "Must surface server's error message to the user.")
     self.AssertErrContains(expected_error_message2,
                            "Must surface server's error message to the user.")
-    self.AssertErrNotContains(
-        error_response["error"]["message"],
-        "Must skip top level error message for precondition failures with "
-        "detailed error messages.")
+    self.AssertErrNotContains(unexpected_noise,
+                              "Must skip error fields that cannot be parsed.")
 
   def test404WithExplicitRevision(self):
     url = ("https://apigee.googleapis.com/v1/organizations/my-org/"

@@ -183,6 +183,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
                 type=self.msgs.SandboxConfig.TypeValueValuesEnum.GVISOR),
         'bootDiskKmsKey':
             'projects/bing/locations/baz/keyRings/bar/cryptoKeys/foo',
+        'nodeGroup':
+            'test-node-group',
     }
 
     self.ExpectCreateNodePool(
@@ -228,7 +230,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --metadata key=value,key2=value2'
         ' --max-pods-per-node=30'
         ' --sandbox type=gvisor'
-        ' --boot-disk-kms-key={bootDiskKmsKey}'.format(**pool_kwargs))
+        ' --boot-disk-kms-key={bootDiskKmsKey}'
+        ' --node-group={nodeGroup}'.format(**pool_kwargs))
     # pylint: disable=line-too-long
     self.AssertErrContains(
         """WARNING: Starting in 1.12, new node pools will be created with \
@@ -839,6 +842,8 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
                                      .NodeMetadataValueValuesEnum.SECURE),
         'bootDiskKmsKey':
             'projects/bing/locations/baz/keyRings/bar/cryptoKeys/foo',
+        'nodeGroup':
+            'test-node-group',
     }
 
     self.ExpectCreateNodePool(
@@ -857,7 +862,8 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         self.node_pools_command_base.format(self.ZONE) + ' create {name}'
         ' --cluster={clusterId}'
         ' --workload-metadata-from-node=secure'
-        ' --boot-disk-kms-key={bootDiskKmsKey}'.format(**pool_kwargs))
+        ' --boot-disk-kms-key={bootDiskKmsKey}'
+        ' --node-group {nodeGroup}'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),

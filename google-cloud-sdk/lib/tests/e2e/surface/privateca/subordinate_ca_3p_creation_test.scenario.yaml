@@ -3,7 +3,14 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: privateca subordinates create $$ca-name$$ --create-csr --csr-output-file
+  - command: privateca roots create $$root-ca-id$$ --kms-key-version $$kms-key$$/cryptoKeyVersions/1
+      --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config
+      root-unconstrained --bucket $$bucket$$
+  - progress_tracker: []
+  - stderr: |
+      Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
+- execute:
+  - command: privateca subordinates create $$ca-id$$ --create-csr --csr-output-file
       csr.pem --subject "CN=Scenario Test,O=Google LLC" --kms-key-version $$kms-key$$/cryptoKeyVersions/1
       --reusable-config subordinate-mtls-pathlen-0 --bucket $$bucket$$
   - progress_tracker:
@@ -11,44 +18,52 @@ summary:
     - status: SUCCESS
   - write_file: csr.pem
   - stderr: |
-      Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$] and saved CSR to 'csr.pem'.
+      Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$] and saved CSR to 'csr.pem'.
 - execute:
-  - command: privateca certificates create subordinate-$$ca-name$$ --csr csr.pem --issuer
-      $$root-ca-name$$ --issuer-location $$location$$
+  - command: privateca certificates create subordinate-$$ca-id$$ --csr csr.pem --issuer
+      $$root-ca-id$$ --issuer-location $$location$$
   - progress_tracker:
     - message: Creating Certificate.
     - status: SUCCESS
   - stderr: |
-      Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-$$ca-name$$].
+      Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-$$ca-id$$].
 - execute:
-  - command: privateca certificates describe subordinate-$$ca-name$$ --issuer $$root-ca-name$$
+  - command: privateca certificates describe subordinate-$$ca-id$$ --issuer $$root-ca-id$$
       --issuer-location $$location$$ --format "value[delimiter='',separator=''](pemCertificate,
       pemCertificateChain)"
   - stdout: |
       $$pem-cert$$$$pem-chain$$
 - execute:
-  - command: privateca subordinates activate $$ca-name$$ --location $$location$$ --pem-chain
+  - command: privateca subordinates activate $$ca-id$$ --location $$location$$ --pem-chain
       chain.crt
   - progress_tracker:
     - message: Activating Certificate Authority.
     - status: SUCCESS
-  - stderr: |
-      Creating the initial Certificate Revocation List.
 - execute:
-  - command: privateca subordinates describe $$ca-name$$ --location $$location$$ --format
+  - command: privateca subordinates describe $$ca-id$$ --location $$location$$ --format
       "value[separator=','](pemCert, pemIssuerCertChain, state)"
   - stdout: |
       $$pem-cert$$,$$pem-chain$$,ENABLED
 - execute:
-  - command: privateca subordinates delete $$ca-name$$ --location $$location$$
+  - command: privateca subordinates delete $$ca-id$$ --location $$location$$
   - prompt:
-    - message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$]
+    - message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$]
     - input: y
   - progress_tracker:
     - message: Deleting Subordinate CA
     - status: SUCCESS
   - stderr: |
-      Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
+      Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
+- execute:
+  - command: privateca roots delete $$root-ca-id$$ --location $$location$$
+  - prompt:
+    - message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$]
+    - input: y
+  - progress_tracker:
+    - message: Deleting Root CA
+    - status: SUCCESS
+  - stderr: |
+      Deleted Root CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
 actions:
 - define_reference:
     reference: project
@@ -62,15 +77,30 @@ actions:
 - define_reference:
     reference: bucket
     value: do-not-delete-privateca-gcloud-tests
-- define_reference:
-    reference: root-ca-name
-    value: gcloud_test_root2
 - generate_resource_id:
-    reference: ca-name
+    reference: root-ca-id
+    prefix: gcloud-e2e
+    delimiter: '-'
+- generate_resource_id:
+    reference: ca-id
     prefix: e2e
     delimiter: '-'
 - execute_command:
-    command: privateca subordinates create $$ca-name$$ --create-csr --csr-output-file
+    command: privateca roots create $$root-ca-id$$ --kms-key-version $$kms-key$$/cryptoKeyVersions/1
+      --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config
+      root-unconstrained --bucket $$bucket$$
+    validation_only: true
+    validate_remote_api_calls: false
+    events:
+    - expect_progress_tracker:
+      - message: Creating Certificate Authority.
+      - status: SUCCESS
+    - expect_stderr: |
+        Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates create $$ca-id$$ --create-csr --csr-output-file
       csr.pem --subject "CN=Scenario Test,O=Google LLC" --kms-key-version $$kms-key$$/cryptoKeyVersions/1
       --reusable-config subordinate-mtls-pathlen-0 --bucket $$bucket$$
     events:
@@ -358,7 +388,7 @@ actions:
         poll_operation: true
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities\?alt=json&certificateAuthorityId=$$ca-name$$&requestId=[^&]+
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities\?alt=json&certificateAuthorityId=$$ca-id$$&requestId=[^&]+
           method: POST
           headers: {}
           body:
@@ -389,7 +419,7 @@ actions:
             metadata:
               '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
               createTime: '2020-06-01T23:29:24.115774362Z'
-              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$
+              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
               verb: create
               requestedCancellation: false
               apiVersion: v1alpha1
@@ -399,7 +429,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:getCsr?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:getCsr?alt=json
           method: GET
           body: null
         return_response:
@@ -429,24 +459,24 @@ actions:
         contents:
           matches: '-----BEGIN CERTIFICATE REQUEST-----.*-----END CERTIFICATE REQUEST-----\n'
     - expect_stderr: |
-        Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$] and saved CSR to 'csr.pem'.
+        Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$] and saved CSR to 'csr.pem'.
     - expect_exit:
         code: 0
 - execute_command:
-    command: privateca certificates create subordinate-$$ca-name$$ --csr csr.pem --issuer
-      $$root-ca-name$$ --issuer-location $$location$$
+    command: privateca certificates create subordinate-$$ca-id$$ --csr csr.pem --issuer
+      $$root-ca-id$$ --issuer-location $$location$$
     validation_only: true  # Because expect_progress_tracker doesn't seem to work in LOCAL mode.
     events:
     - api_call:
         poll_operation: true
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates\?alt=json&certificateId=subordinate-$$ca-name$$&requestId=[^&]+$
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates\?alt=json&certificateId=subordinate-$$ca-id$$&requestId=[^&]+$
           method: POST
           body:
             json:
               lifetime: 2592000s
-              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-$$ca-name$$
+              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-$$ca-id$$
         return_response:
           headers:
             status: '200'
@@ -454,7 +484,7 @@ actions:
             name: projects/$$project$$/locations/$$location$$/operations/operation-1592429403368-5a84e5ceaeb80-2884691b-65574229
             done: true
             response:
-              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-$$ca-name$$
+              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-$$ca-id$$
               pemCertificate: |
                 -----BEGIN CERTIFICATE-----
                 MIIEKDCCAtygAwIBAgIVAKDKBUAIdi0prnBNNn/6cS/r1mfIMEEGCSqGSIb3DQEB
@@ -513,17 +543,17 @@ actions:
         message: Creating Certificate.
         status: SUCCESS
     - expect_stderr: |
-        Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-$$ca-name$$].
+        Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-$$ca-id$$].
     - expect_exit:
         code: 0
 - execute_command:
-    command: privateca certificates describe subordinate-$$ca-name$$ --issuer $$root-ca-name$$
+    command: privateca certificates describe subordinate-$$ca-id$$ --issuer $$root-ca-id$$
       --issuer-location $$location$$ --format "value[delimiter='',separator=''](pemCertificate,
       pemCertificateChain)"
     events:
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-$$ca-name$$?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-$$ca-id$$?alt=json
           method: GET
           body: null
         return_response:
@@ -531,7 +561,7 @@ actions:
             status: '200'
           body: |
             {
-              "name": "projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-$$ca-name$$",
+              "name": "projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-$$ca-id$$",
               "pemCsr": "-----BEGIN CERTIFICATE REQUEST-----\nMIICxjCCAa4CAQAwLTETMBEGA1UEChMKR29vZ2xlIExMQzEWMBQGA1UEAxMNU2Nl\nbmFyaW8gVGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMO3FK7v\n6FnvAkbarR5J0mQe4HjMhgpAByNCEmyHx3c4WurU/ITfEjX83T+W5j2Qn/R8S2BG\nBSPB8F18zMwK6qAKzz/riqJEZGzj2RfSJQYIUQbbzCbtqHxjxhuOOmFC/HBhvuUt\nuv6ecYl4F+y+r9xeD0QGmc4amrHCrBXtHi61lg8yHbNXldc+pyT4PEWgw2Yduieg\nPrnCB8jCaJ8iQMGcwP8v84uvDficNoQi+CTaX7NF0G/4+K4Iv+0BO6evClQYWPUs\n/+Q7F3Bg4mFBO1JblYAvRzNOg5iEp4iYv7xdHSURShu5g289Ga3nXVadx2wJfia8\niZR8m0qjN7fmquECAwEAAaBUMFIGCSqGSIb3DQEJDjFFMEMwDgYDVR0PAQH/BAQD\nAgEGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjASBgNVHRMBAf8ECDAG\nAQH/AgEAMA0GCSqGSIb3DQEBCwUAA4IBAQAzv2tmBPBqfRi0qUU8lSJZs76TvNnc\n1aoCWdW2iIlDcmFkfSaLNgWw2st0oCTN3jrGOyGoEWW6zenRmiDJRdIA06sy6EsP\n6xuP2jfCTjfPv58fUG+s+l6YtIgTK0oYLf+lIcep69lrdzb1W2xkoqs9XCGGAU67\n4MpBr42AVkCuu7zxoJZkR6MdZaMF8i/2H8VOsyQwYc6UarINzJZXmTKDzFLHO1WC\nuOek1PuJsD+CKejiAUnlkdgJ7YvASX5rTY1HMnJitIDLCwfL4rF9DiIvdYFnbc1n\nJzrrFSyXNeJI3/CH3XkH8sis6KWJO922ZV9zi7BUXn7yvHvoNwINJu47\n-----END CERTIFICATE REQUEST-----\n",
               "lifetime": "2592000s",
               "pemCertificate": "-----BEGIN CERTIFICATE-----\nMIIEejCCA2KgAwIBAgIUQP/iU02mqn96kJVqm4NaLPZoTRAwDQYJKoZIhvcNAQEL\nBQAwKzETMBEGA1UEChMKZ29vZ2xlLmNvbTEUMBIGA1UEAwwLZ2Nsb3VkX3Rlc3Qw\nHhcNMjAwNjEyMTgzNzUyWhcNMjAwNzEyMTgzNzUyWjAtMRMwEQYDVQQKEwpHb29n\nbGUgTExDMRYwFAYDVQQDEw1TY2VuYXJpbyBUZXN0MIIBIjANBgkqhkiG9w0BAQEF\nAAOCAQ8AMIIBCgKCAQEAw7cUru/oWe8CRtqtHknSZB7geMyGCkAHI0ISbIfHdzha\n6tT8hN8SNfzdP5bmPZCf9HxLYEYFI8HwXXzMzArqoArPP+uKokRkbOPZF9IlBghR\nBtvMJu2ofGPGG446YUL8cGG+5S26/p5xiXgX7L6v3F4PRAaZzhqascKsFe0eLrWW\nDzIds1eV1z6nJPg8RaDDZh26J6A+ucIHyMJonyJAwZzA/y/zi68N+Jw2hCL4JNpf\ns0XQb/j4rgi/7QE7p68KVBhY9Sz/5DsXcGDiYUE7UluVgC9HM06DmISniJi/vF0d\nJRFKG7mDbz0ZreddVp3HbAl+JryJlHybSqM3t+aq4QIDAQABo4IBkjCCAY4wDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjASBgNV\nHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBRm8TT8IrjTJlmXDU8YZ/0Q3NC/ETAf\nBgNVHSMEGDAWgBTYuXpp+XKRBclH6h9dj3CKIbTvMzCBiAYIKwYBBQUHAQEEfDB6\nMHgGCCsGAQUFBzAChmxodHRwOi8vcHJpdmF0ZWNhX2NvbnRlbnRfMTM4M2NiYTct\nMmY3ZC00ZGRjLWIyM2ItN2YwNWFlMGIzMmE1LnN0b3JhZ2UuZ29vZ2xlYXBpcy5j\nb20vLnByaXZhdGVfY2FfZGF0YS9jYS5jcnQwfgYDVR0fBHcwdTBzoHGgb4ZtaHR0\ncDovL3ByaXZhdGVjYV9jb250ZW50XzEzODNjYmE3LTJmN2QtNGRkYy1iMjNiLTdm\nMDVhZTBiMzJhNS5zdG9yYWdlLmdvb2dsZWFwaXMuY29tLy5wcml2YXRlX2NhX2Rh\ndGEvY3JsLmNybDANBgkqhkiG9w0BAQsFAAOCAQEAT6r4dc7e3E7CyzhHq03a3PGm\nBl+Hh2MGuvU+twn67y2y1sGxb5fnJVTtkb3Wms/OdwEHw8s2HRe9qC7RbjhfLh5X\nzEN4ZlQIcxxP2M12o944L34gKCwDsIaVfndKe9POAjMdmroJnTlONRbUQUwXflJI\nFzu11CV0Wkib1wKP9jTHWbBl8s7lL+eAQwxObvg6gIyY1vU2Hn09S537USIEJzeY\nQsoZTIYFvfxuOENoRYxClk01RntcEbFqUoPjaDigWVaC/M10qVcTSkRYVdxirLMX\nF1AVoIHrN/uS7SBVkwr3XiIArv3kWu0p0LoDX5/4uv/FLbY3rQuHx6iHoy5SgA==\n-----END CERTIFICATE-----\n",
@@ -604,14 +634,14 @@ actions:
     contents: |
       $$pem-cert$$$$pem-chain$$
 - execute_command:
-    command: privateca subordinates activate $$ca-name$$ --location $$location$$ --pem-chain
+    command: privateca subordinates activate $$ca-id$$ --location $$location$$ --pem-chain
       chain.crt
     validation_only: true  # Because expect_progress_tracker doesn't seem to work in LOCAL mode.
     events:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:activate?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:activate?alt=json
           method: POST
           body:
             json:
@@ -627,43 +657,16 @@ actions:
     - expect_progress_tracker:
         message: Activating Certificate Authority.
         status: SUCCESS
-    - expect_stderr: |
-        Creating the initial Certificate Revocation List.
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '659'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            pemCrl: |
-              -----BEGIN X509 CRL-----
-              MIIBqTCBkgIBATANBgkqhkiG9w0BAQsFADAtMRMwEQYDVQQKEwpHb29nbGUgTExD
-              MRYwFAYDVQQDEw1TY2VuYXJpbyBUZXN0Fw0yMDA2MDEyMzI5MjVaFw0yMDA2MDgy
-              MzI5MjVaMACgLzAtMAoGA1UdFAQDAgEAMB8GA1UdIwQYMBaAFGbxNPwiuNMmWZcN
-              Txhn/RDc0L8RMA0GCSqGSIb3DQEBCwUAA4IBAQCi8sqq94UYZVsGplOS4gntRUA0
-              D2S+BxQJEYmS6M5N0S47Va+WvJduhDTSQHSP5EoS9MM+WFH1jH+Wp/jwzYSwHz1Z
-              4Vl5fdEN1CvGpnq0j2ElNp0QqMFeM0crN7FeOvIXWhe+XbT3VwLsqYsF65NNO99q
-              5HJbpHDrzkjWOi4cnYVR+ffZWwtQzqUcYNPfRAVxadFqBBcSHUMqtupU3CguQcSs
-              2W61wAfkvm6eLX5IXPPpy+o0HY6UAElhNd6l9utssL/Rjfjb2ktXKAUTl8b4RnDa
-              YgM5Q+65s9zYwbz1DI/3nJAmLnXKNXyta71ZqmcnkfJO0DzOqiGLtTLH6a4A
-              -----END X509 CRL-----
     - expect_exit:
         code: 0
 - execute_command:
-    command: privateca subordinates describe $$ca-name$$ --location $$location$$ --format
+    command: privateca subordinates describe $$ca-id$$ --location $$location$$ --format
       "value[separator=','](pemCert, pemIssuerCertChain, state)"
     validation_only: true
     events:
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$?alt=json
           method: GET
           body: null
         return_response:
@@ -675,15 +678,15 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: privateca subordinates delete $$ca-name$$ --location $$location$$
-    cleanup_for: ca-name
+    command: privateca subordinates delete $$ca-id$$ --location $$location$$
+    cleanup_for: ca-id
     events:
     - expect_prompt_continue:
-        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$]
+        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$]
         user_input: y
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -694,7 +697,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$
+            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
             type: SUBORDINATE
             config:
               subjectConfig:
@@ -785,7 +788,7 @@ actions:
         poll_operation: true
         expect_request:
           uri:
-            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$\?alt=json&requestId=[^&]+$
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$\?alt=json&requestId=[^&]+$
           method: DELETE
           headers: {}
           body: null
@@ -800,7 +803,7 @@ actions:
             metadata:
               '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
               createTime: '2020-06-01T23:29:27.242772472Z'
-              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$
+              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
               verb: delete
               requestedCancellation: false
               apiVersion: v1alpha1
@@ -809,6 +812,22 @@ actions:
         message: Deleting Subordinate CA
         status: SUCCESS
     - expect_stderr: |
-        Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
+        Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots delete $$root-ca-id$$ --location $$location$$
+    validation_only: true
+    validate_remote_api_calls: false
+    cleanup_for: root-ca-id
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$]
+        user_input: y
+    - expect_progress_tracker:
+        message: Deleting Root CA
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted Root CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
     - expect_exit:
         code: 0

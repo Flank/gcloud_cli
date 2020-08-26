@@ -8,7 +8,8 @@ summary:
   - stderr: |
       ERROR: (gcloud.alpha.api-gateway.apis.create) argument API: Must be specified.
       Usage: gcloud alpha api-gateway apis create API [optional flags]
-        optional flags may be  --async | --display-name | --help | --labels
+        optional flags may be  --async | --display-name | --help | --labels |
+                               --managed-service
 
       For detailed information on this command and its flags, run:
         gcloud alpha api-gateway apis create --help
@@ -21,7 +22,8 @@ actions:
     - expect_stderr: |
         ERROR: (gcloud.alpha.api-gateway.apis.create) argument API: Must be specified.
         Usage: gcloud alpha api-gateway apis create API [optional flags]
-          optional flags may be  --async | --display-name | --help | --labels
+          optional flags may be  --async | --display-name | --help | --labels |
+                                 --managed-service
 
         For detailed information on this command and its flags, run:
           gcloud alpha api-gateway apis create --help

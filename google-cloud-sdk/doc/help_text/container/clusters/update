@@ -6,10 +6,11 @@ SYNOPSIS
     gcloud container clusters update NAME
         (--complete-credential-rotation | --complete-ip-rotation
           | --database-encryption-key=DATABASE_ENCRYPTION_KEY
-          | --disable-database-encryption | --disable-workload-identity
-          | --enable-autoscaling | --enable-binauthz
-          | --enable-intra-node-visibility | --enable-legacy-authorization
-          | --enable-master-authorized-networks | --enable-network-policy
+          | --disable-database-encryption | --disable-default-snat
+          | --disable-workload-identity | --enable-autoscaling
+          | --enable-binauthz | --enable-intra-node-visibility
+          | --enable-legacy-authorization | --enable-master-authorized-networks
+          | --enable-master-global-access | --enable-network-policy
           | --enable-shielded-nodes | --enable-stackdriver-kubernetes
           | --enable-vertical-pod-autoscaling | --generate-password
           | --maintenance-window=START_TIME | --node-locations=ZONE,[ZONE,...]
@@ -93,6 +94,16 @@ REQUIRED FLAGS
           application layer. For more information, see
           https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
 
+       --disable-default-snat
+          Disable default source NAT rules applied in cluster nodes.
+
+          By default, network traffic sending from Pods to outside of VPC will
+          get masqueraded by the node external IP. When this flag is set, no
+          default sNAT will be enforced on the cluster. The flag must be set if
+          the cluster uses privately used public IPs.
+
+          Can only be used with private cluster in VPC Native network mode.
+
        --disable-workload-identity
           Disable Workload Identity on the cluster.
 
@@ -141,6 +152,11 @@ REQUIRED FLAGS
           Use --no-enable-master-authorized-networks to disable. When disabled,
           public internet (0.0.0.0/0) is allowed to connect to Kubernetes
           master through HTTPS.
+
+       --enable-master-global-access
+          Use with private clusters to allow access to the master's private
+          endpoint from any Google Cloud region or on-premises environment
+          regardless of the private cluster's region.
 
        --enable-network-policy
           Enable network policy enforcement for this cluster. If you are
@@ -271,7 +287,8 @@ REQUIRED FLAGS
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
           KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
-          CloudRun=ENABLED|DISABLED NodeLocalDNS=ENABLED|DISABLED
+          CloudRun=ENABLED|DISABLED ConfigConnector=ENABLED|DISABLED
+          NodeLocalDNS=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the

@@ -58,9 +58,14 @@ class TriggersDeleteTestAlpha(base.EventsBase):
     """Creates a trigger and assigns it as output to GetTrigger."""
     self.trigger = trigger.Trigger.New(self.mock_client, 'default')
     self.trigger.name = 'my-trigger'
-    self.trigger.status.conditions = [
-        self.messages.TriggerCondition(type='Ready', status='True')
-    ]
+    if self.api_name == 'anthosevents':
+      self.trigger.status.conditions = [
+          self.messages.Condition(type='Ready', status='True')
+      ]
+    else:
+      self.trigger.status.conditions = [
+          self.messages.TriggerCondition(type='Ready', status='True')
+      ]
     self.trigger.dependency = source_obj
     self.trigger.filter_attributes[
         trigger.EVENT_TYPE_FIELD] = 'com.google.event.type'
@@ -99,3 +104,11 @@ class TriggersDeleteTestAlpha(base.EventsBase):
       self.Run('events triggers delete my-trigger --platform=gke '
                '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.operations.DeleteTrigger.assert_not_called()
+
+
+class TriggersDeleteTestAlphaAnthos(TriggersDeleteTestAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'anthosevents'
+    self.api_version = 'v1beta1'

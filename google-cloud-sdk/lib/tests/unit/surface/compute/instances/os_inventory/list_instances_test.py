@@ -46,7 +46,8 @@ class ListInstancesTestBase(test_base.BaseTest,
     self.implementation = lister.MultiScopeLister(
         self.api_mock.adapter,
         zonal_service=self.api_mock.adapter.apitools_client.instances,
-        aggregation_service=self.api_mock.adapter.apitools_client.instances)
+        aggregation_service=self.api_mock.adapter.apitools_client.instances,
+        return_partial_success=self._return_partial_success)
 
     if self.api_version == 'v1':
       self.instances = test_resources.INSTANCES_V1
@@ -110,6 +111,7 @@ class ListInstancesTestGA(ListInstancesTestBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
     self.api_version = 'v1'
+    self._return_partial_success = False
 
   def testNoInventoryFilterArg(self):
     self.ExpectListerInvoke(
@@ -370,6 +372,7 @@ class ListInstancesTestBeta(ListInstancesTestGA):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
+    self._return_partial_success = False
 
 
 class ListInstancesTestAlpha(ListInstancesTestBeta):
@@ -377,6 +380,7 @@ class ListInstancesTestAlpha(ListInstancesTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
+    self._return_partial_success = True
 
 
 if __name__ == '__main__':

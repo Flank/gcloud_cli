@@ -185,13 +185,13 @@ Optional textual description for the forwarding rule.
 IP protocol that the rule will serve. The default is \f5TCP\fR.
 
 Note that if the load\-balancing scheme is \f5INTERNAL\fR, the protocol must be
-one of: \f5TCP\fR, \f5UDP\fR.
+one of: \f5TCP\fR, \f5UDP\fR, \f5ALL\fR.
 
-For a load\-balancing scheme that is \f5EXTERNAL\fR, all IP_PROTOCOL options are
-valid.
+For a load\-balancing scheme that is \f5EXTERNAL\fR, all IP_PROTOCOL options
+other than \f5ALL\fR are valid.
 
 \fIIP_PROTOCOL\fR must be one of: \fBAH\fR, \fBESP\fR, \fBICMP\fR, \fBSCTP\fR,
-\fBTCP\fR, \fBUDP\fR.
+\fBTCP\fR, \fBUDP\fR, \fBALL\fR.
 
 .TP 2m
 \fB\-\-is\-mirroring\-collector\fR
@@ -562,7 +562,7 @@ $ gcloud alpha compute forwarding\-rules create RULE_NAME \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud compute forwarding\-rules create

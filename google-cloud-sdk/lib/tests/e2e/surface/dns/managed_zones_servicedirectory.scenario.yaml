@@ -62,8 +62,6 @@ actions:
 - execute_command:
     command: service-directory namespaces create $$namespace-name$$ --location us-east1
     events:
-    - expect_stderr: |
-        Created namespace [$$namespace-name$$].
     - api_call:
         expect_request:
           uri: https://$$sd-url$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces?alt=json&namespaceId=$$namespace-name$$
@@ -78,6 +76,8 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$namespace-name$$
+    - expect_stderr: |
+        Created namespace [$$namespace-name$$].
     - expect_exit:
         code: 0
 
@@ -204,8 +204,6 @@ actions:
     command: service-directory namespaces delete $$namespace-name$$ --location us-east1
     cleanup_for: namespace-name
     events:
-    - expect_stderr: |
-        Deleted namespace [$$namespace-name$$].
     - api_call:
         expect_request:
           uri: https://$$sd-url$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$namespace-name$$?alt=json
@@ -220,5 +218,7 @@ actions:
             status: '200'
           body: |
             {}
+    - expect_stderr: |
+        Deleted namespace [$$namespace-name$$].
     - expect_exit:
         code: 0

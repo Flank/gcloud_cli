@@ -1,10 +1,11 @@
 title: compute instances remove-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 - define_reference:
     reference: release-track
     track_values:
+      GA: v1
       ALPHA: alpha
       BETA: beta
 # remove binding with condition to a policy with condition

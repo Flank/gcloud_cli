@@ -95,6 +95,7 @@ actions:
     track_values:
       ALPHA: v1alpha
       BETA: v1beta
+      GA: v1
 
 - write_file:
     path: fleet_configs.json

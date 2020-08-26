@@ -32,6 +32,8 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
     self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
     self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS[0]
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS[
+        0]
     self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS[
         0]
 
@@ -81,19 +83,6 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
            size: 1
             """.format(api=self.api)))
 
-
-class BetaNetworkEndpointGroupsDescribeTest(NetworkEndpointGroupsDescribeTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_BETA[
-        0]
-    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_BETA[
-        0]
-    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA[
-        0]
-
   def testRegionalCase(self):
     self.make_requests.side_effect = iter([[self.region_neg_test_resource]])
     result = self.Run(
@@ -121,6 +110,19 @@ class BetaNetworkEndpointGroupsDescribeTest(NetworkEndpointGroupsDescribeTest):
             selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
             size: 0
         """.format(api=self.api)))
+
+
+class BetaNetworkEndpointGroupsDescribeTest(NetworkEndpointGroupsDescribeTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_BETA[
+        0]
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_BETA[
+        0]
+    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA[
+        0]
 
 
 class AlphaNetworkEndpointGroupsDescribeTest(

@@ -25,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        Describe a Google Compute Engine operation.
+        Describe a Compute Engine operation.
 
      list
         List Google Compute Engine operations.

@@ -18,8 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import os
+
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.surface.artifacts import base
 
@@ -31,19 +34,18 @@ class MavenTestsBeta(base.ARTestBase):
     self.track = calliope_base.ReleaseTrack.BETA
 
   def testMaven(self):
-    cmd = ' '.join([
+    cmd = [
         'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
         '--location=us'
-    ])
+    ]
     self.SetListLocationsExpect('us')
     self.SetGetRepositoryExpect(
         'us', 'my-repo', self.messages.Repository.FormatValueValuesEnum.MAVEN)
     self.Run(cmd)
     self.AssertOutputEquals(
         """\
-Please insert following snippet into your pom.xml
+<!-- Insert following snippet into your pom.xml -->
 
-======================================================
 <project>
   <distributionManagement>
     <snapshotRepository>
@@ -79,22 +81,169 @@ Please insert following snippet into your pom.xml
     </extensions>
   </build>
 </project>
-======================================================
+
+""",
+        normalize_space=True)
+
+  def testMavenJsonKeyInput(self):
+    with files.TemporaryDirectory() as tmp_dir:
+      key_file = os.path.join(tmp_dir, 'path/to/key.json')
+      cmd = [
+          'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
+          '--location=us',
+          '--json-key=%s' % key_file
+      ]
+      self.WriteKeyFile(key_file)
+      self.SetListLocationsExpect('us')
+      self.SetGetRepositoryExpect(
+          'us', 'my-repo', self.messages.Repository.FormatValueValuesEnum.MAVEN)
+
+      self.Run(cmd)
+      self.AssertOutputEquals(
+          """\
+<!-- Insert following snippet into your pom.xml -->
+
+<project>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>artifact-registry</id>
+      <url>https://us-maven.pkg.dev/fake-project/my-repo</url>
+    </snapshotRepository>
+    <repository>
+      <id>artifact-registry</id>
+      <url>https://us-maven.pkg.dev/fake-project/my-repo</url>
+    </repository>
+  </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>artifact-registry</id>
+      <url>https://us-maven.pkg.dev/fake-project/my-repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+</project>
+
+<!-- Insert following snippet into your settings.xml -->
+
+<settings>
+  <servers>
+    <server>
+      <id>artifact-registry</id>
+      <configuration>
+        <httpConfiguration>
+          <get>
+            <usePreemptive>true</usePreemptive>
+          </get>
+          <put>
+            <params>
+              <property>
+                <name>http.protocol.expect-continue</name>
+                <value>false</value>
+              </property>
+            </params>
+          </put>
+        </httpConfiguration>
+      </configuration>
+      <username>_json_key_base64</username>
+      <password>eyJhIjoiYiJ9</password>
+    </server>
+  </servers>
+</settings>
+
+""",
+          normalize_space=True)
+
+  def testMavenJsonKeyConfig(self):
+    self.SetUpCreds()
+    cmd = [
+        'artifacts',
+        'print-settings',
+        'mvn',
+        '--repository=my-repo',
+        '--location=asia',
+    ]
+    self.SetListLocationsExpect('asia')
+    self.SetGetRepositoryExpect(
+        'asia', 'my-repo', self.messages.Repository.FormatValueValuesEnum.MAVEN)
+
+    self.Run(cmd)
+    self.AssertOutputEquals(
+        """\
+<!-- Insert following snippet into your pom.xml -->
+
+<project>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>artifact-registry</id>
+      <url>https://asia-maven.pkg.dev/fake-project/my-repo</url>
+    </snapshotRepository>
+    <repository>
+      <id>artifact-registry</id>
+      <url>https://asia-maven.pkg.dev/fake-project/my-repo</url>
+    </repository>
+  </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>artifact-registry</id>
+      <url>https://asia-maven.pkg.dev/fake-project/my-repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+</project>
+
+<!-- Insert following snippet into your settings.xml -->
+
+<settings>
+  <servers>
+    <server>
+      <id>artifact-registry</id>
+      <configuration>
+        <httpConfiguration>
+          <get>
+            <usePreemptive>true</usePreemptive>
+          </get>
+          <put>
+            <params>
+              <property>
+                <name>http.protocol.expect-continue</name>
+                <value>false</value>
+              </property>
+            </params>
+          </put>
+        </httpConfiguration>
+      </configuration>
+      <username>_json_key_base64</username>
+      <password>ewogICJjbGllbnRfZW1haWwiOiAiYmFyQGRldmVsb3Blci5nc2VydmljZWFjY291bnQuY29tIiwKICAiY2xpZW50X2lkIjogImJhci5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgInByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuYXNkZlxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAicHJpdmF0ZV9rZXlfaWQiOiAia2V5LWlkIiwKICAidHlwZSI6ICJzZXJ2aWNlX2FjY291bnQiCn0=</password>
+    </server>
+  </servers>
+</settings>
 
 """,
         normalize_space=True)
 
   def testMissingRepo(self):
-    cmd = ' '.join(['artifacts', 'print-settings', 'mvn'])
+    cmd = ['artifacts', 'print-settings', 'mvn']
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Failed to find attribute [repository]')
 
   def testInvalidLocation(self):
-    cmd = ' '.join([
+    cmd = [
         'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
         '--location=invalid'
-    ])
+    ]
     self.SetListLocationsExpect('us')
     with self.assertRaises(ar_exceptions.UnsupportedLocationError):
       self.Run(cmd)
@@ -102,10 +251,10 @@ Please insert following snippet into your pom.xml
         'invalid is not a valid location. Valid locations are')
 
   def testInvalidRepoType(self):
-    cmd = ' '.join([
+    cmd = [
         'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
         '--location=us'
-    ])
+    ]
     self.SetListLocationsExpect('us')
     self.SetGetRepositoryExpect(
         'us', 'my-repo', self.messages.Repository.FormatValueValuesEnum.NPM)

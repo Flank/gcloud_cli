@@ -23,6 +23,7 @@ from tests.lib import test_case
 from tests.lib.surface.firestore import e2e_base
 
 
+@test_case.Filters.skip('Internal error', 'b/163053392')
 class OperationsIntegrationTestGA(e2e_base.FirestoreE2ETestBase):
   """Integration test for all GA operations commands.
 

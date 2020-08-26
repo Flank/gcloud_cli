@@ -19,7 +19,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (BETA) Show metadata for a Memorystore Memcached region.
+        (BETA) Display metadata for a Memorystore Memcached region.
 
      list
         (BETA) List Memorystore Memcached regions.

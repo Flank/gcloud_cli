@@ -3,14 +3,16 @@ NAME
 
 SYNOPSIS
     gcloud beta notebooks instances create (INSTANCE : --location=LOCATION)
-        --machine-type=MACHINE_TYPE
         ([--container-repository=CONTAINER_REPOSITORY
           : --container-tag=CONTAINER_TAG] | [--environment=ENVIRONMENT
           : --environment-location=ENVIRONMENT_LOCATION]
-          | --vm-image-project=VM_IMAGE_PROJECT
-          (--vm-image-family=VM_IMAGE_FAMILY | --vm-image-name=VM_IMAGE_NAME))
-        [--async] [--instance-owners=INSTANCE_OWNERS]
-        [--labels=[KEY=VALUE,...]] [--metadata=[KEY=VALUE,...]]
+          | [(--vm-image-family=VM_IMAGE_FAMILY
+          | --vm-image-name=VM_IMAGE_NAME)
+          : --vm-image-project=VM_IMAGE_PROJECT;
+          default="deeplearning-platform-release"]) [--async]
+        [--instance-owners=INSTANCE_OWNERS] [--labels=[KEY=VALUE,...]]
+        [--machine-type=MACHINE_TYPE; default="n1-standard-1"]
+        [--metadata=[KEY=VALUE,...]]
         [--post-startup-script=POST_STARTUP_SCRIPT]
         [--service-account=SERVICE_ACCOUNT]
         [--accelerator-core-count=ACCELERATOR_CORE_COUNT
@@ -48,9 +50,6 @@ POSITIONAL ARGUMENTS
           https://cloud.google.com/compute/docs/regions-zones/#locations.
 
 REQUIRED FLAGS
-     --machine-type=MACHINE_TYPE
-        The Compute Engine machine type of this instance.
-
      Exactly one of these must be specified:
 
        --container-repository=CONTAINER_REPOSITORY
@@ -82,10 +81,9 @@ REQUIRED FLAGS
             Google Cloud location of this environment
             https://cloud.google.com/compute/docs/regions-zones/#locations.
 
-       --vm-image-project=VM_IMAGE_PROJECT
+       --vm-image-project=VM_IMAGE_PROJECT; default="deeplearning-platform-release"
           The ID of the Google Cloud project that this VM image belongs to.
-          Format: projects/{project_id}. This flag must be specified if any of
-          the other arguments in this group are specified.
+          Format: projects/{project_id}.
 
        Exactly one of these must be specified:
 
@@ -110,6 +108,9 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         Labels to apply to this instance. These can be later modified by the
         setLabels method.
+
+     --machine-type=MACHINE_TYPE; default="n1-standard-1"
+        The Compute Engine machine type of this instance.
 
      --metadata=[KEY=VALUE,...]
         Custom metadata to apply to this instance.

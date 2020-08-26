@@ -134,6 +134,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--kubeconfig=' + self.kubeconfig,
@@ -163,6 +168,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--gke-uri=https://container.googleapis.com/v1/projects/project/locations/location/clusters/cluster'
@@ -191,6 +201,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--gke-uri=https://container.googleapis.com/projects/project/zones/zone/clusters/cluster',
@@ -219,6 +234,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--gke-uri=https://container.googleapis.com/projects/project/regions/region/clusters/cluster',
@@ -247,6 +267,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--gke-cluster=location/cluster',
@@ -277,7 +302,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
-
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--kubeconfig=' + self.kubeconfig,
@@ -305,7 +334,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
-
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--kubeconfig=' + self.kubeconfig,
@@ -335,7 +368,11 @@ class UnregisterTest(base.MembershipsTestBase):
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
     self.StartObjectPatch(
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
-
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--context=test-context',
@@ -365,7 +402,11 @@ class UnregisterTest(base.MembershipsTestBase):
         exclusivity_util,
         'GetMembershipCROwnerID',
         return_value='other-project')
-
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
     self.RunCommand([
         'my-cluster',
         '--kubeconfig=' + self.kubeconfig,
@@ -409,6 +450,11 @@ class UnregisterTestAlpha(UnregisterTestBeta):
         {'issuer': TEST_BUCKET_ISSUER_URL})
     mock_delete_bucket = self.StartObjectPatch(
         api_util, 'DeleteWorkloadIdentityBucket')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
 
     self.RunCommand([
         'my-cluster', '--kubeconfig=' + self.kubeconfig,
@@ -447,6 +493,11 @@ class UnregisterTestAlpha(UnregisterTestBeta):
         'Oops!')
     mock_delete_bucket = self.StartObjectPatch(
         api_util, 'DeleteWorkloadIdentityBucket')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
 
     # Test that the command works and only bucket deletion is skipped.
     self.RunCommand([
@@ -487,6 +538,11 @@ class UnregisterTestAlpha(UnregisterTestBeta):
     mock_delete_bucket = self.StartObjectPatch(
         api_util, 'DeleteWorkloadIdentityBucket')
     mock_delete_bucket.side_effect = exceptions.Error('Oops!')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
+    membership = self._MakeMembership(
+        description='my-cluster', external_id='fake-uid')
+    mock_get_membership.return_value = membership
+    self.mockValidateExclusivitySucceed()
 
     # Test that the command works and only bucket deletion is skipped.
     self.RunCommand([

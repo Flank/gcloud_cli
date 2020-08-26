@@ -381,6 +381,7 @@ class TestBase(cli_test_base.CliTestBase):
             sandboxConfig=kwargs.get('sandboxConfig'),
             workloadMetadataConfig=kwargs.get('workloadMetadataConfig'),
             bootDiskKmsKey=kwargs.get('bootDiskKmsKey'),
+            nodeGroup=kwargs.get('nodeGroup'),
         ),
         locations=kwargs.get('nodePoolLocations', []),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),

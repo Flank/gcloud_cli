@@ -293,10 +293,10 @@ class CommitmentsCreateTestBeta(CommitmentsCreateTestGA,
     )
 
 
-class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta):
+class CommitmentsCreateLicenseTest(test_base.TestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateLicense(self):
     commitment = self.MakeLicenseCommitment(name='test', license_url='sap-12',
@@ -340,6 +340,18 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta):
           )
          )],
     )
+
+
+class CommitmentsCreateLicenseBetaTest(CommitmentsCreateLicenseTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CommitmentsCreateLicenseAlphaTest(CommitmentsCreateLicenseBetaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

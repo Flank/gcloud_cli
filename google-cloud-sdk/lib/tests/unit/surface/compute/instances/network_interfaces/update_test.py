@@ -218,11 +218,11 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
                '--aliases "10.128.1.0/24;r1:/32"')
 
 
-class AlphaUpdateNetworkInterfaceTest(UpdateNetworkInterfaceTest):
+class UpdateNetworkInterfaceTestBeta(UpdateNetworkInterfaceTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api = 'alpha'
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api = 'beta'
 
   def _GetNetworkUrl(self, name, project=None):
     return 'https://compute.googleapis.com/compute/{api}/projects/{project}/global/networks/{network}'.format(
@@ -355,6 +355,13 @@ class AlphaUpdateNetworkInterfaceTest(UpdateNetworkInterfaceTest):
         --network=projects/other-project/global/networks/net1
         --subnetwork=projects/other-project/regions/atlanta/subnetworks/sub1
         """)
+
+
+class UpdateNetworkInterfaceTestAlpha(UpdateNetworkInterfaceTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api = 'alpha'
 
 
 if __name__ == '__main__':

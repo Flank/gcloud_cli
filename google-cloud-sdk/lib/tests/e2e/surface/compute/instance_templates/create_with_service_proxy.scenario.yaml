@@ -13,7 +13,7 @@ summary:
   - command: compute instance-templates describe $$instance-template$$ --format="text(properties.metadata,properties.labels,properties.serviceAccounts[0].scopes)"
   - stdout: |
       properties.labels.gce-service-proxy:     on
-      properties.metadata.fingerprint:         jVmEztLSWO0=
+      properties.metadata.fingerprint:         hKaa_NNjOuY=
       properties.metadata.items[0].key:        enable-guest-attributes
       properties.metadata.items[0].value:      TRUE
       properties.metadata.items[1].key:        enable-osconfig
@@ -21,7 +21,7 @@ summary:
       properties.metadata.items[2].key:        gce-service-proxy
       properties.metadata.items[2].value:      {"api-version": "0.2", "service": {"serving-ports": [80, 90, 70]}, "labels": {"myapp": "review", "version": "canary"}, "proxy-spec": {"proxy-port": 15002, "tracing": "OFF", "access-log": "/var/log/envoy/access.log", "network": "some-network"}}
       properties.metadata.items[3].key:        gce-software-declaration
-      properties.metadata.items[3].value:      {"softwareRecipes": [{"name": "install-gce-service-proxy-agent", "desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": "#! /bin/bash\nexport SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\nsudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\nsudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}
+      properties.metadata.items[3].value:      {"softwareRecipes": [{"name": "install-gce-service-proxy-agent", "desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": "#! /bin/bash\nZONE=$( curl --silent http://metadata.google.internal/computeMetadata/v1/instance/zone -H Metadata-Flavor:Google | cut -d/ -f4 )\nexport SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\nsudo gsutil cp   gs://gce-service-proxy-${ZONE}/service-proxy-agent/releases/service-proxy-agent-0.2.tgz   ${SERVICE_PROXY_AGENT_DIRECTORY}   || sudo gsutil cp     gs://gce-service-proxy/service-proxy-agent/releases/service-proxy-agent-0.2.tgz     ${SERVICE_PROXY_AGENT_DIRECTORY}\nsudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}
       properties.metadata.kind:                compute#metadata
       properties.serviceAccounts[0].scopes[0]: https://www.googleapis.com/auth/cloud-platform
       properties.serviceAccounts[0].scopes[1]: https://www.googleapis.com/auth/devstorage.read_only
@@ -35,7 +35,6 @@ summary:
   - command: compute instance-templates delete $$instance-template$$ -q
   - stderr: |
       Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$].
-
 actions:
 
 - define_reference:
@@ -67,7 +66,7 @@ actions:
     events:
     - expect_stdout: |
         properties.labels.gce-service-proxy:     on
-        properties.metadata.fingerprint:         jVmEztLSWO0=
+        properties.metadata.fingerprint:         hKaa_NNjOuY=
         properties.metadata.items[0].key:        enable-guest-attributes
         properties.metadata.items[0].value:      TRUE
         properties.metadata.items[1].key:        enable-osconfig
@@ -75,7 +74,7 @@ actions:
         properties.metadata.items[2].key:        gce-service-proxy
         properties.metadata.items[2].value:      {"api-version": "0.2", "service": {"serving-ports": [80, 90, 70]}, "labels": {"myapp": "review", "version": "canary"}, "proxy-spec": {"proxy-port": 15002, "tracing": "OFF", "access-log": "/var/log/envoy/access.log", "network": "some-network"}}
         properties.metadata.items[3].key:        gce-software-declaration
-        properties.metadata.items[3].value:      {"softwareRecipes": [{"name": "install-gce-service-proxy-agent", "desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": "#! /bin/bash\nexport SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\nsudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\nsudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}
+        properties.metadata.items[3].value:      {"softwareRecipes": [{"name": "install-gce-service-proxy-agent", "desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": "#! /bin/bash\nZONE=$( curl --silent http://metadata.google.internal/computeMetadata/v1/instance/zone -H Metadata-Flavor:Google | cut -d/ -f4 )\nexport SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\nsudo gsutil cp   gs://gce-service-proxy-${ZONE}/service-proxy-agent/releases/service-proxy-agent-0.2.tgz   ${SERVICE_PROXY_AGENT_DIRECTORY}   || sudo gsutil cp     gs://gce-service-proxy/service-proxy-agent/releases/service-proxy-agent-0.2.tgz     ${SERVICE_PROXY_AGENT_DIRECTORY}\nsudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}
         properties.metadata.kind:                compute#metadata
         properties.serviceAccounts[0].scopes[0]: https://www.googleapis.com/auth/cloud-platform
         properties.serviceAccounts[0].scopes[1]: https://www.googleapis.com/auth/devstorage.read_only

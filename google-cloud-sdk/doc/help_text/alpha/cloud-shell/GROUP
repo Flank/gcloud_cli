@@ -5,8 +5,7 @@ SYNOPSIS
     gcloud alpha cloud-shell COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) The gcloud shell command group lets you interact with and connect
-    to your Google Cloud Shell environment.
+    (ALPHA) Interact with and connect to your Cloud Shell environment.
 
     More information on Cloud Shell can be found at
     https://cloud.google.com/shell/docs/.
@@ -40,5 +39,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

@@ -1229,6 +1229,37 @@ class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
+  def testUpdateWebServerMachineType(self):
+    """Test updating web server machine type."""
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        webServerConfig=self.messages.WebServerConfig(
+            machineType='n1-standard-2'))
+
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=self.messages.Environment(config=config),
+        update_mask='config.web_server_config.machine_type',
+        response=self.running_op)
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--web-server-machine-type',
+        'n1-standard-2',
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+    )
+    self.AssertErrMatches(r'^Update in progress for environment \[{}] '
+                          r'with operation \[{}]'.format(
+                              self.TEST_ENVIRONMENT_NAME,
+                              self.TEST_OPERATION_NAME))
+
 
 class EnvironmentsUpdateAlphaTest(EnvironmentsUpdateBetaTest):
 

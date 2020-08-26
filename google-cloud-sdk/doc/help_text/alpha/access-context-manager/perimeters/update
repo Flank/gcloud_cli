@@ -15,6 +15,8 @@ SYNOPSIS
         [--add-restricted-services=[SERVICE,...] | --clear-restricted-services
           | --remove-restricted-services=[SERVICE,...]
           | --set-restricted-services=[SERVICE,...]]
+        [--clear-egress-policies | --set-egress-policies=YAML_FILE]
+        [--clear-ingress-policies | --set-ingress-policies=YAML_FILE]
         [--enable-vpc-accessible-services
           --add-vpc-allowed-services=[VPC_SERVICE,...]
           | --clear-vpc-allowed-services
@@ -109,6 +111,36 @@ FLAGS
           Completely replace the current restricted services with the given
           values.
 
+     These flags modify the enforced EgressPolicies of this ServicePerimeter.
+     At most one of these may be specified:
+
+       --clear-egress-policies
+          Empties existing enforced Egress Policies.
+
+       --set-egress-policies=YAML_FILE
+          Path to a file containing a list of Egress Policies.
+
+          This file contains a list of YAML-compliant objects representing
+          Egress Policies described in the API reference.
+
+          For more information, see:
+          https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+     These flags modify the enforced IngressPolicies of this ServicePerimeter.
+     At most one of these may be specified:
+
+       --clear-ingress-policies
+          Empties existing enforced Ingress Policies.
+
+       --set-ingress-policies=YAML_FILE
+          Path to a file containing a list of Ingress Policies.
+
+          This file contains a list of YAML-compliant objects representing
+          Ingress Policies described in the API reference.
+
+          For more information, see:
+          https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
      --enable-vpc-accessible-services
         When specified restrict API calls within the Service Perimeter to the
         set of vpc allowed services. To disable use
@@ -139,7 +171,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud access-context-manager perimeters update
         $ gcloud beta access-context-manager perimeters update

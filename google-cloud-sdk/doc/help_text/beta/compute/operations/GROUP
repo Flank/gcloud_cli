@@ -26,10 +26,10 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (BETA) Describe a Google Compute Engine operation.
+        (BETA) Describe a Compute Engine operation.
 
      list
-        (BETA) List Google Compute Engine operations.
+        (BETA) List Compute Engine operations.
 
 NOTES
     This command is currently in BETA and may change without notice. These

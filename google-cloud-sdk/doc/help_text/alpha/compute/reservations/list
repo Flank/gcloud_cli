@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute reservations list - list Google Compute Engine
-        reservations
+    gcloud alpha compute reservations list - list Compute Engine reservations
 
 SYNOPSIS
     gcloud alpha compute reservations list [--filter=EXPRESSION]
@@ -8,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List Google Compute Engine reservations.
+    (ALPHA) List Compute Engine reservations.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -56,7 +55,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute reservations list
         $ gcloud beta compute reservations list

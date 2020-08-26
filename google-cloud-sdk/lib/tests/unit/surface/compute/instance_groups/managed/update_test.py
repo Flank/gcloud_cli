@@ -125,131 +125,6 @@ class InstanceGroupManagersUpdateZonalTestGA(test_base.BaseTest,
 
     self.make_requests.side_effect = MakeRequests
 
-  def testUpdateWhenIgmDoesNotExist_throws(self):
-    self._setNoInitialIgm()
-
-    with self.assertRaisesRegex(
-        managed_instance_groups_utils.ResourceNotFoundException,
-        'Could not fetch resource:'):
-      self.Run("""
-          compute instance-groups managed update group-1
-            --{} {}
-          """.format(*self.scope_params))
-
-  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
-         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
-         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
-  def testInvalidCollectionPath(self):
-    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
-      self.Run(
-          """compute instance-groups managed update group-1 --{} {}""".format(
-              *self.scope_params))
-
-  def testUpdateWithHealthCheck(self):
-    self._setInitialIgm()
-
-    health_check_uri = (
-        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
-            self.compute_uri))
-    self.Run("""
-        compute instance-groups managed update group-1
-        --{} {}
-        --health-check health-check-1
-        """.format(*self.scope_params))
-    self._checkGetAndPatchRequests(health_check=health_check_uri)
-
-  def testUpdateWithHttpHealthCheck(self):
-    self._setInitialIgm()
-
-    health_check_uri = (
-        '{0}/projects/my-project/global/httpHealthChecks/health-check-1'.format(
-            self.compute_uri))
-    self.Run("""
-        compute instance-groups managed update group-1
-        --{} {}
-        --http-health-check health-check-1
-        """.format(*self.scope_params))
-    self._checkGetAndPatchRequests(health_check=health_check_uri)
-
-  def testUpdateWithHttpsHealthCheck(self):
-    self._setInitialIgm()
-
-    health_check_uri = (
-        '{0}/projects/my-project/global/httpsHealthChecks/health-check-1'
-        .format(self.compute_uri))
-    self.Run("""
-        compute instance-groups managed update group-1
-        --{} {}
-        --https-health-check health-check-1
-        """.format(*self.scope_params))
-    self._checkGetAndPatchRequests(health_check=health_check_uri)
-
-  def testUpdateWithTwoHealthChecks(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --http-health-check: At most one of --health-check | '
-        '--http-health-check | --https-health-check may be specified.'):
-      self.Run("""
-          compute instance-groups managed update group-1
-            --{} {}
-            --http-health-check health-check-1
-            --https-health-check health-check-2
-          """.format(*self.scope_params))
-
-  def testUpdateWithInitialDelay_patchSemantics(self):
-    health_check_uri = (
-        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
-            self.compute_uri))
-    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
-
-    self.Run("""
-        compute instance-groups managed update group-1
-        --{} {}
-        --initial-delay 10m
-        """.format(*self.scope_params))
-    self._checkGetAndPatchRequests(
-        health_check=health_check_uri, initial_delay=10 * 60)
-
-  def testUpdateWithHealthCheck_patchSemantics(self):
-    health_check_uri = (
-        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
-            self.compute_uri))
-    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
-
-    health_check_uri2 = (
-        '{0}/projects/my-project/global/healthChecks/health-check-2'.format(
-            self.compute_uri))
-    self.Run("""
-        compute instance-groups managed update group-1
-        --{} {}
-        --health-check health-check-2
-        """.format(*self.scope_params))
-    self._checkGetAndPatchRequests(
-        health_check=health_check_uri2, initial_delay=120)
-
-  def testUpdateWithClearAutohealing(self):
-    health_check_uri = (
-        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
-            self.compute_uri))
-    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
-
-    self.Run("""
-        compute instance-groups managed update group-1
-        --{} {}
-        --clear-autohealing
-        """.format(*self.scope_params))
-    self._checkGetAndPatchRequests(clear_autohealing=True)
-
-
-class InstanceGroupManagersUpdateZonalTestBeta(
-    InstanceGroupManagersUpdateZonalTestGA):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def SetUp(self):
-    InstanceGroupManagersUpdateZonalTestGA.SetUp(self)
-    self.SelectApi('beta')
-
   def _getUpdateRequestStub(self,
                             stateful_policy=None,
                             autohealing_policies=None):
@@ -571,6 +446,131 @@ class InstanceGroupManagersUpdateZonalTestBeta(
     self._checkGetAndPatchRequests(
         health_check=health_check_uri2, initial_delay=120)
 
+  def testUpdateWhenIgmDoesNotExist_throws(self):
+    self._setNoInitialIgm()
+
+    with self.assertRaisesRegex(
+        managed_instance_groups_utils.ResourceNotFoundException,
+        'Could not fetch resource:'):
+      self.Run("""
+          compute instance-groups managed update group-1
+            --{} {}
+          """.format(*self.scope_params))
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run(
+          """compute instance-groups managed update group-1 --{} {}""".format(
+              *self.scope_params))
+
+  def testUpdateWithHealthCheck(self):
+    self._setInitialIgm()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --health-check health-check-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(health_check=health_check_uri)
+
+  def testUpdateWithHttpHealthCheck(self):
+    self._setInitialIgm()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/httpHealthChecks/health-check-1'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --http-health-check health-check-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(health_check=health_check_uri)
+
+  def testUpdateWithHttpsHealthCheck(self):
+    self._setInitialIgm()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/httpsHealthChecks/health-check-1'
+        .format(self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --https-health-check health-check-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(health_check=health_check_uri)
+
+  def testUpdateWithTwoHealthChecks(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --http-health-check: At most one of --health-check | '
+        '--http-health-check | --https-health-check may be specified.'):
+      self.Run("""
+          compute instance-groups managed update group-1
+            --{} {}
+            --http-health-check health-check-1
+            --https-health-check health-check-2
+          """.format(*self.scope_params))
+
+  def testUpdateWithInitialDelay_patchSemantics(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --initial-delay 10m
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(
+        health_check=health_check_uri, initial_delay=10 * 60)
+
+  def testUpdateWithHealthCheck_patchSemantics(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    health_check_uri2 = (
+        '{0}/projects/my-project/global/healthChecks/health-check-2'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --health-check health-check-2
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(
+        health_check=health_check_uri2, initial_delay=120)
+
+  def testUpdateWithClearAutohealing(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --clear-autohealing
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(clear_autohealing=True)
+
+
+class InstanceGroupManagersUpdateZonalTestBeta(
+    InstanceGroupManagersUpdateZonalTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    InstanceGroupManagersUpdateZonalTestGA.SetUp(self)
+    self.SelectApi('beta')
+
 
 class InstanceGroupManagersUpdateZonalTestAlpha(
     InstanceGroupManagersUpdateZonalTestBeta):
@@ -581,22 +581,6 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
   def SetUp(self):
     InstanceGroupManagersUpdateZonalTestBeta.SetUp(self)
     self.SelectApi('alpha')
-
-  def testUpdateAddStatefulDisk(self):
-    self._setInitialIgm()
-
-    self.Run("""
-        compute instance-groups managed update group-1
-          --{} {}
-          --update-stateful-disk device-name=disk-1,auto-delete=on-permanent-instance-deletion
-        """.format(*self.scope_params))
-
-    self._checkGetAndPatchRequests(disks=[
-        self._createStatefulDiskDict('disk-1', 'on-permanent-instance-deletion')
-    ])
-
-    self.AssertLogContains('The --update-stateful-disk option is deprecated; '
-                           'use --stateful-disk instead.')
 
 
 class InstanceGroupManagersUpdateRegionalTestGA(
@@ -717,18 +701,6 @@ class InstanceGroupManagersUpdateRegionalTestGA(
         igm,
     ], []])
 
-
-class InstanceGroupManagersUpdateRegionalTestBeta(
-    InstanceGroupManagersUpdateRegionalTestGA,
-    InstanceGroupManagersUpdateZonalTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def SetUp(self):
-    InstanceGroupManagersUpdateRegionalTestGA.SetUp(self)
-    self.SelectApi('beta')
-
   def _getUpdateRequestStub(self,
                             stateful_policy=None,
                             update_policy=None,
@@ -847,6 +819,18 @@ class InstanceGroupManagersUpdateRegionalTestBeta(
             --{} {}
             --stateful-disk device-name=disk-1
           """.format(*self.scope_params))
+
+
+class InstanceGroupManagersUpdateRegionalTestBeta(
+    InstanceGroupManagersUpdateRegionalTestGA,
+    InstanceGroupManagersUpdateZonalTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    InstanceGroupManagersUpdateRegionalTestGA.SetUp(self)
+    self.SelectApi('beta')
 
 
 class InstanceGroupManagersUpdateRegionalTestAlpha(

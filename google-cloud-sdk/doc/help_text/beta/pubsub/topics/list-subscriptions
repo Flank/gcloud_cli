@@ -64,17 +64,12 @@ EXAMPLES
     'mysubs'), run:
 
         $ gcloud beta pubsub topics list-subscriptions mytopic \
-            --filter=subscriptionId:mysubs
+            --filter=mysubs
 
     To combine multiple filters (with AND or OR), run:
 
         $ gcloud beta pubsub topics list-subscriptions mytopic \
-            --filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
-
-    To filter subscriptions that match an expression:
-
-        $ gcloud beta pubsub topics list-subscriptions mytopic \
-            --filter="subscriptionId:subs_*"
+            --filter="mysubs1 OR mysubs2"
 
 NOTES
     This command is currently in BETA and may change without notice. These

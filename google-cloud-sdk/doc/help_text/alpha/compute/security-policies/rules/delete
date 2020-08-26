@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute security-policies rules delete - delete Google Compute
-        Engine security policy rules
+    gcloud alpha compute security-policies rules delete - delete Compute Engine
+        security policy rules
 
 SYNOPSIS
     gcloud alpha compute security-policies rules delete [PRIORITY ...]
@@ -32,7 +32,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute security-policies rules delete
         $ gcloud beta compute security-policies rules delete

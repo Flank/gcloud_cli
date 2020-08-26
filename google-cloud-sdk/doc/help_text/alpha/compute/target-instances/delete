@@ -7,9 +7,8 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute target-instances delete deletes one or more
-    Google Compute Engine target instances. Target instances can be deleted
-    only if they are not being used by any other resources like forwarding
-    rules.
+    Compute Engine target instances. Target instances can be deleted only if
+    they are not being used by any other resources like forwarding rules.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -48,7 +47,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute target-instances delete
         $ gcloud beta compute target-instances delete

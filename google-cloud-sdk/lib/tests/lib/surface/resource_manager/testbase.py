@@ -247,6 +247,10 @@ class OrgPoliciesUnitTestBase(cli_test_base.CliTestBase,
         constraint=self.TEST_CONSTRAINT,
         booleanPolicy=self.messages.BooleanPolicy(enforced=True))
 
+  def RestoreDefaultPolicy(self, constraint=TEST_CONSTRAINT):
+    return self.messages.OrgPolicy(
+        constraint=constraint, restoreDefault=self.messages.RestoreDefault())
+
   def WhitelistPolicy(self, allowed_values):
     return self.messages.OrgPolicy(
         constraint=self.WHITELIST_CONSTRAINT,

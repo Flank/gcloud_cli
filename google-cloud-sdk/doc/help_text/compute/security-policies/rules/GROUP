@@ -1,12 +1,12 @@
 NAME
-    gcloud compute security-policies rules - read and manipulate Google Compute
-        Engine security policies rules
+    gcloud compute security-policies rules - read and manipulate Compute Engine
+        security policies rules
 
 SYNOPSIS
     gcloud compute security-policies rules COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manipulate Google Compute Engine security policies rules.
+    Read and manipulate Compute Engine security policies rules.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,16 +20,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a Google Compute Engine security policy rule.
+        Create a Compute Engine security policy rule.
 
      delete
-        Delete Google Compute Engine security policy rules.
+        Delete Compute Engine security policy rules.
 
      describe
-        Describe a Google Compute Engine security policy rule.
+        Describe a Compute Engine security policy rule.
 
      update
-        Update a Google Compute Engine security policy rule.
+        Update a Compute Engine security policy rule.
 
 NOTES
     These variants are also available:

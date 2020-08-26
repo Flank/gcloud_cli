@@ -16,7 +16,7 @@ SYNOPSIS
 DESCRIPTION
     (BETA) gcloud beta compute instance-groups managed instance-configs create
     creates a per-instance config for an instance controlled by a Compute
-    Engine managed instance group. An instance with a per instance config
+    Engine managed instance group. An instance with a per-instance config
     preserves the specified metadata and/or disks during instance recreation
     and deletion.
 
@@ -26,7 +26,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        Name of the managed instance group to create a per instance config for.
+        Name of the managed instance group to create a per-instance config for.
 
 REQUIRED FLAGS
      --instance=INSTANCE
@@ -122,7 +122,7 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          Region of the managed instance group to create a per instance config
+          Region of the managed instance group to create a per-instance config
           for. If not specified, you may be prompted to select a region.
 
           A list of regions can be fetched by running:
@@ -133,7 +133,7 @@ OPTIONAL FLAGS
           invocation.
 
        --zone=ZONE
-          Zone of the managed instance group to create a per instance config
+          Zone of the managed instance group to create a per-instance config
           for. If not specified, you may be prompted to select a zone.
 
           A list of zones can be fetched by running:
@@ -161,14 +161,15 @@ EXAMPLES
         zones/us-central1-a/disks/my-disk-3 \
             --stateful-metadata="my-key=my-value"
 
-    If my-disk did not exist previously in the per instance config, and if it
+    If my-disk did not exist previously in the per-instance config, and if it
     does not exist in the group's instance template, then the command adds
     my-disk to my-instance.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed instance-configs create
         $ gcloud alpha compute instance-groups managed instance-configs \
             create
 

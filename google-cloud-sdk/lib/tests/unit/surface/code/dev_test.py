@@ -21,6 +21,8 @@ import os.path
 import subprocess
 
 from googlecloudsdk.command_lib.code import kubernetes
+from googlecloudsdk.command_lib.code import run_subprocess
+from googlecloudsdk.command_lib.code import skaffold_events
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.updater import update_manager
@@ -41,6 +43,7 @@ class DevTest(test_case.TestCase):
   ]
 
   def SetUp(self):
+    self.StartObjectPatch(skaffold_events, 'PrintUrlThreadContext')
     self.StartObjectPatch(dev, 'Skaffold')
     properties.VALUES.core.project.Set('myproject')
     self.addCleanup(properties.VALUES.core.project.Set, None)
@@ -51,6 +54,7 @@ class DevTest(test_case.TestCase):
 
     self.find_executable_on_path = self.StartObjectPatch(
         file_utils, 'FindExecutableOnPath', return_value=True)
+    self.mock_run = self.StartObjectPatch(run_subprocess, 'Run')
 
   def testSelectMinikube(self):
     args = self.parser.parse_args(['--minikube-profile=fake-profile'] +
@@ -127,6 +131,15 @@ class DevTest(test_case.TestCase):
     with self.assertRaises(dev.RuntimeMissingDependencyError):
       cmd.Run(args)
 
+  def testDockerRunning(self):
+    args = self.parser.parse_args(self.COMMON_ARGS)
+    cmd = dev.Dev(None, None)
+
+    self.mock_run.side_effect = subprocess.CalledProcessError(
+        returncode=1, cmd='')
+    with self.assertRaises(dev.RuntimeMissingDependencyError):
+      cmd.Run(args)
+
 
 class SkaffoldTest(test_case.TestCase):
 
@@ -159,36 +172,30 @@ class SkaffoldTest(test_case.TestCase):
       with dev.Skaffold('./skaffold.yaml', context_name='fake-context'):
         pass
 
-      popen.assert_called_with([
-          self.SKAFFOLD_PATH, 'dev', '-f', './skaffold.yaml', '--port-forward',
-          '--kube-context', 'fake-context'
-      ],
-                               env=mock.ANY)
+    _, args, _ = popen.mock_calls[0]
+    self.assertIn('--kube-context=fake-context', args[0])
 
   def testCommandWithNamespace(self):
     with mock.patch.object(subprocess, 'Popen') as popen:
       with dev.Skaffold('./skaffold.yaml', namespace='fake-namespace'):
         pass
 
-      popen.assert_called_with([
-          self.SKAFFOLD_PATH, 'dev', '-f', './skaffold.yaml', '--port-forward',
-          '--namespace', 'fake-namespace'
-      ],
-                               env=mock.ANY)
+    _, args, _ = popen.mock_calls[0]
+    self.assertIn('--namespace=fake-namespace', args[0])
 
   def testEnvVars(self):
     with mock.patch.object(subprocess, 'Popen') as popen:
       with dev.Skaffold('./skaffold.yaml', env_vars={'A': 'B', 'C': 'D'}):
         pass
 
-      _, _, kwargs = popen.mock_calls[0]
-      self.assertEqual(kwargs['env']['A'], 'B')
-      self.assertEqual(kwargs['env']['C'], 'D')
+    _, _, kwargs = popen.mock_calls[0]
+    self.assertEqual(kwargs['env']['A'], 'B')
+    self.assertEqual(kwargs['env']['C'], 'D')
 
   def testDebug(self):
     with mock.patch.object(subprocess, 'Popen') as popen:
       with dev.Skaffold('./skaffold.yaml', debug=True):
         pass
 
-      _, args, _ = popen.mock_calls[0]
-      self.assertIn('-vdebug', args[0])
+    _, args, _ = popen.mock_calls[0]
+    self.assertIn('-vdebug', args[0])

@@ -867,10 +867,10 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
 
-  def testCreateDiskWithSourceInPlaceSnapshot(self):
+  def testCreateDiskWithSourceInstantSnapshot(self):
     self.Run("""
         compute disks create testdisk --zone central2-a
-         --source-in-place-snapshot sourceIPS
+         --source-instant-snapshot sourceIPS
     """)
 
     self.CheckRequests(self.zone_get_request,
@@ -878,11 +878,58 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
                          self.messages.ComputeDisksInsertRequest(
                              disk=self.messages.Disk(
                                  name='testdisk',
-                                 sourceInPlaceSnapshot=self.compute_uri +
+                                 sourceInstantSnapshot=self.compute_uri +
                                  '/projects/my-project/zones/'
-                                 'central2-a/inPlaceSnapshots/sourceIPS'),
+                                 'central2-a/instantSnapshots/sourceIPS'),
                              project='my-project',
                              zone='central2-a'))])
+
+  def testCreatePdExtremeDiskWithProvisionedIops(self):
+    self.Run("""
+        compute disks create testdisk --zone central2-a
+         --type pd-extreme --provisioned-iops 50000
+    """)
+
+    self.CheckRequests(self.zone_get_request,
+                       [(self.compute.disks, 'Insert',
+                         self.messages.ComputeDisksInsertRequest(
+                             disk=self.messages.Disk(
+                                 name='testdisk',
+                                 sizeGb=1000,
+                                 type=self.compute_uri +
+                                 '/projects/my-project/zones/'
+                                 'central2-a/diskTypes/pd-extreme',
+                                 provisionedIops=50000),
+                             project='my-project',
+                             zone='central2-a'))])
+
+  def testCreatePdExtremeDiskWithTooSmallProvisionedIopsFail(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        'argument --provisioned-iops: Value must be greater than or equal to '
+        '10000; received: 1000'):
+      self.Run("""
+          compute disks create testdisk --zone central2-a
+           --type pd-extreme --provisioned-iops 1000
+      """)
+
+  def testCreatePdExtremeDiskWithTooLargeProvisionedIopsFail(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        'argument --provisioned-iops: Value must be less than or equal to '
+        '120000; received: 999999'):
+      self.Run("""
+          compute disks create testdisk --zone central2-a
+           --type pd-extreme --provisioned-iops 999999
+      """)
+
+  def testCreateNonExtremeDiskWithProvisionedIopsFail(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        ('Invalid value for [--provisioned-iops]: --provisioned-iops can be '
+         'used only with pd-extreme disk type.')):
+      self.Run("""
+          compute disks create testdisk --zone central2-a
+           --type pd-ssd --provisioned-iops 100000
+      """)
 
 
 class DisksCreateTestWithCsekKeys(test_base.BaseTest):
@@ -1573,10 +1620,10 @@ class RegionalDisksCreateTestAlpha(RegionalDisksCreateTestBeta):
         [],
     ])
 
-  def testCreateDiskWithSourceInPlaceSnapshot(self):
+  def testCreateDiskWithSourceInstantSnapshot(self):
     self.Run("""
         compute disks create testdisk --region central2 --replica-zones central2-b,central2-c
-         --source-in-place-snapshot sourceIPS
+         --source-instant-snapshot sourceIPS
     """)
 
     self.CheckRequests([], [
@@ -1587,9 +1634,9 @@ class RegionalDisksCreateTestAlpha(RegionalDisksCreateTestBeta):
          self.messages.ComputeRegionDisksInsertRequest(
              disk=self.messages.Disk(
                  name='testdisk',
-                 sourceInPlaceSnapshot=self.compute_uri +
+                 sourceInstantSnapshot=self.compute_uri +
                  '/projects/my-project/regions/'
-                 'central2/inPlaceSnapshots/sourceIPS',
+                 'central2/instantSnapshots/sourceIPS',
                  replicaZones=[
                      self.compute_uri + '/projects/my-project/zones/central2-b',
                      self.compute_uri + '/projects/my-project/zones/central2-c'

@@ -20,6 +20,13 @@ summary:
       privateca roots describe invalid_ca --location europe-west1
   - error: '1: Cannot perform roots command on Subordinate CA. Please use the `privateca
       subordinates` command group instead.'
+- set_property: privateca/location us-central1
+- execute:
+  - command: |
+      privateca roots describe ca1
+  - stdout: |-
+      .*name: projects/fake-project/locations/us-central1/certificateAuthorities/ca1.*
+      $
 actions:
 - execute_command:
     command: |
@@ -83,3 +90,25 @@ actions:
         code: 1
         message: Cannot perform roots command on Subordinate CA. Please use the `privateca
           subordinates` command group instead.
+- set_property:
+    privateca/location: us-central1
+- execute_command:
+    command: |
+      privateca roots describe ca1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/certificateAuthorities/ca1?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/certificateAuthorities/ca1
+            type: SELF_SIGNED
+    - expect_stdout:
+        matches: |
+          .*name: projects/fake-project/locations/us-central1/certificateAuthorities/ca1.*
+    - expect_exit:
+        code: 0

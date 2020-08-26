@@ -279,9 +279,11 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testSubcommandRun_Backfill(self, exec_mock, tmp_kubeconfig_mock):
+  def testSubcommandRun_BackfillNewAirflow_YesAdded(self, exec_mock,
+                                                    tmp_kubeconfig_mock):
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
-        self.messages.Environment.StateValueValuesEnum.RUNNING)
+        self.messages.Environment.StateValueValuesEnum.RUNNING,
+        image_version='composer-1.2.3-airflow-1.10.6')
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -308,6 +310,47 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
         2,
         self.MakeKubectlExecCallback(
             self.TEST_POD, subcmd=subcmd, subcmd_args=subcmd_args + ['--yes']))
+
+    self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
+                         self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, subcmd,
+                         '--', *subcmd_args)
+
+    fake_exec.Verify()
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testSubcommandRun_BackfillOlderAirflow_YesNotAdded(
+      self, exec_mock, tmp_kubeconfig_mock):
+    test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
+        self.messages.Environment.StateValueValuesEnum.RUNNING,
+        image_version='composer-1.2.3-airflow-1.10.3')
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=test_env_object)
+
+    subcmd = 'backfill'
+    subcmd_args = []
+
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    fake_exec.AddCallback(
+        0, self.MakeFetchKubectlNamespaceCallback([('default', 'Active')]))
+    fake_exec.AddCallback(
+        1,
+        self.MakeGetPodsCallback(
+            [command_util.GkePodStatus(self.TEST_POD, 'running', 'true')]))
+
+    # Ensure that the '--yes' argument has not been added to the list of
+    # 'backfill' args.
+    fake_exec.AddCallback(
+        2,
+        self.MakeKubectlExecCallback(
+            self.TEST_POD, subcmd=subcmd, subcmd_args=subcmd_args))
 
     self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, subcmd,

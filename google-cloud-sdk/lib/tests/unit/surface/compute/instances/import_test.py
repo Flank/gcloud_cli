@@ -29,7 +29,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import ovf_import_test_base
 from tests.lib.surface.compute.instances import test_resources
 
-_DEFAULT_TIMEOUT = '7056s'
+_DEFAULT_TIMEOUT = '6984s'
 
 
 class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
@@ -184,7 +184,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=59s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=59s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step, timeout='60s')
@@ -552,7 +552,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
         '-os={0}'.format(self.os),
         '-tags={0}'.format(tags),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step)
@@ -567,7 +567,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-node-affinity-label=compute.googleapis.com/node-name,IN,A_NODE',
         '-release-track={0}'.format(self.track.id.lower()),
     ])
@@ -583,7 +583,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-node-affinity-label=compute.googleapis.com/node-group-name,IN,A_NODE_GROUP',
         '-release-track={0}'.format(self.track.id.lower()),
     ])
@@ -599,7 +599,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-node-affinity-label=key1,IN,value1,value2',
         '-node-affinity-label=key2,NOT_IN,value3,value4,value5',
         '-release-track={0}'.format(self.track.id.lower()),
@@ -649,7 +649,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format('gs://bucket-name/'),
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step)

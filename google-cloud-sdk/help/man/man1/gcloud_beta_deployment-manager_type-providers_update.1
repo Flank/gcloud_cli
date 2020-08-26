@@ -11,7 +11,7 @@ gcloud beta deployment\-manager type\-providers update \- update a type provider
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta deployment\-manager type\-providers update\fR \fIPROVIDER_NAME\fR \fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR [\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta deployment\-manager type\-providers update\fR \fIPROVIDER_NAME\fR \fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR [\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR] [\fB\-\-async\fR] [\fB\-\-custom\-certificate\-authority\-roots\fR=\fICA_ROOT\fR,[\fICA_ROOT\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,11 @@ YAML file with options for the API: e.g. options and collection overrides.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-custom\-certificate\-authority\-roots\fR=\fICA_ROOT\fR,[\fICA_ROOT\fR,...]
+Comma\-separated list of CA root certificates to use when connecting to the
+type's API by HTTPS.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR

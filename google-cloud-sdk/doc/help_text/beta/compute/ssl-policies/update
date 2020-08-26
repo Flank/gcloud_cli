@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute ssl-policies update - update a Google Compute Engine
-        SSL policy
+    gcloud beta compute ssl-policies update - update a Compute Engine SSL
+        policy
 
 SYNOPSIS
     gcloud beta compute ssl-policies update SSL_POLICY

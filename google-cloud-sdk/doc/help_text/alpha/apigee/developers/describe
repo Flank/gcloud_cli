@@ -22,7 +22,8 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --organization=ORGANIZATION
-          The organization for the developer.
+          Apigee organization containing the developer. If unspecified, the
+          Cloud Platform project's associated organization will be used.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -47,5 +48,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

@@ -11,7 +11,7 @@ gcloud builds list \- list builds
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud builds list\fR [\fB\-\-ongoing\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=50] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=20] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud builds list\fR [\fB\-\-ongoing\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=50] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=20] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,6 +27,12 @@ List builds.
 .TP 2m
 \fB\-\-ongoing\fR
 Only list builds that are currently QUEUED or WORKING.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
 
 
 .RE

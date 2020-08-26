@@ -115,7 +115,7 @@ class ListTest(
     # pylint: disable=line-too-long
     self.AssertOutputEquals(
         """\
-        INSTANCE_NAME LOCATION NETWORK NODE_COUNT NODE_CPU NODE_MB STATUS CREATE_TIME UPDATE_TIME
+        INSTANCE_NAME REGION NETWORK NODE_COUNT NODE_CPU NODE_MB STATUS CREATE_TIME UPDATE_TIME
         test-instance_0 us-central1 authorizedNetwork 3 3 10 READY 2020-01-01T00:00:00 2020-01-02T00:00:00
         test-instance_1 us-central1 authorizedNetwork 3 3 10 READY 2020-01-01T00:00:00 2020-01-02T00:00:00
         test-instance_2 us-central1 authorizedNetwork 3 3 10 READY 2020-01-01T00:00:00 2020-01-02T00:00:00

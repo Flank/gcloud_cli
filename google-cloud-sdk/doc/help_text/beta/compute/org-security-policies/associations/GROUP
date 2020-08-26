@@ -1,15 +1,14 @@
 NAME
     gcloud beta compute org-security-policies associations - read and
-        manipulate Google Compute Engine organization security policy
-        associations
+        manipulate Compute Engine organization security policy associations
 
 SYNOPSIS
     gcloud beta compute org-security-policies associations COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read and manipulate Google Compute Engine organization security
-    policy associations.
+    (BETA) Read and manipulate Compute Engine organization security policy
+    associations.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -27,7 +26,7 @@ COMMANDS
         organization or folder resource.
 
      delete
-        (BETA) Delete a Google Compute Engine organization security policy
+        (BETA) Delete a Compute Engine organization security policy
         association.
 
      list

@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud beta compute routes delete NAME [NAME ...] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute routes delete deletes one or more Google Compute
-    Engine routes.
+    (BETA) gcloud beta compute routes delete deletes one or more Compute Engine
+    routes.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

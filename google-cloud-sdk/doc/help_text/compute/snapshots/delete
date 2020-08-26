@@ -1,12 +1,12 @@
 NAME
-    gcloud compute snapshots delete - delete Google Compute Engine snapshots
+    gcloud compute snapshots delete - delete Compute Engine snapshots
 
 SYNOPSIS
     gcloud compute snapshots delete SNAPSHOT_NAME [SNAPSHOT_NAME ...]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute snapshots delete deletes one or more Google Compute Engine
+    gcloud compute snapshots delete deletes one or more Compute Engine
     snapshots.
 
 POSITIONAL ARGUMENTS
@@ -22,7 +22,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To delete Google Compute Engine snapshots with the names 'snapshot-1' and
+    To delete Compute Engine snapshots with the names 'snapshot-1' and
     'snapshot-2', run:
 
         $ gcloud compute snapshots delete snapshot-1 snapshot-2

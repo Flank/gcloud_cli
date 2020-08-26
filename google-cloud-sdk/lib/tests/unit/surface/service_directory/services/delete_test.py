@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -66,6 +68,19 @@ class ServicesDeleteTestBeta(base.ServiceDirectoryUnitTestBase):
 
     self.assertEqual(actual, expected)
     self.AssertErrContains('Deleted service [my-service]')
+
+  def testDelete_InvliadRequest_Fails(self):
+    req = self.msgs.ServicedirectoryProjectsLocationsNamespacesServicesDeleteRequest(
+        name=self.service_name)
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces_services.Delete.Expect(
+        request=req, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run('service-directory services delete my-service '
+               '--location my-location '
+               '--namespace my-namespace ')
+    self.AssertErrNotContains('Deleted service')
 
 
 class ServicesDeleteTestAlpha(ServicesDeleteTestBeta):

@@ -144,7 +144,7 @@ $ gcloud alpha container node\-pools create node\-pool\-1 \e
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR, \fB\-m\fR \fIMACHINE_TYPE\fR
-The type of machine to use for nodes. Defaults to n1\-standard\-1. The list of
+The type of machine to use for nodes. Defaults to e2\-medium. The list of
 predefined machine types is available using the following command:
 
 .RS 2m
@@ -246,6 +246,14 @@ Additionally, the following keys are reserved for use by Kubernetes Engine:
 \f5\fIuser\-data\fR\fR
 
 .RE
+.RE
+.sp
+Google Kubernetes Engine sets the following keys by default:
+
+.RS 2m
+.IP "\(bu" 2m
+\f5\fIserial\-port\-logging\-enable\fR\fR
+
 .RE
 .sp
 See also Compute Engine's documentation
@@ -493,10 +501,10 @@ App Engine Metadata Servers. This feature can only be enabled if Workload
 Identity is enabled at the cluster level.
 .TP 2m
 \fBSECURE\fR
-[DPRECATED] Prevents pods not in hostNetwork from accessing certain VM metadata,
-specifically kube\-env, which contains Kubelet credentials, and the instance
-identity token. This is a temporary security solution available while the
-bootstrapping process for cluster nodes is being redesigned with significant
+[DEPRECATED] Prevents pods not in hostNetwork from accessing certain VM
+metadata, specifically kube\-env, which contains Kubelet credentials, and the
+instance identity token. This is a temporary security solution available while
+the bootstrapping process for cluster nodes is being redesigned with significant
 security improvements. This feature is scheduled to be deprecated in the future
 and later removed.
 .RE
@@ -753,7 +761,7 @@ $ gcloud alpha container node\-pools create node\-pool\-1 \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud container node\-pools create

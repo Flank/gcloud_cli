@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha commerce-procurement consumer orders describe - outputs the
+    gcloud alpha commerce-procurement consumer orders describe - returns the
         Order object resulting from the Get API
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         (ORDER : --billing-account=BILLING_ACCOUNT) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Outputs the Order object resulting from the Get API.
+    (ALPHA) Returns the Order object resulting from the Get API.
 
 POSITIONAL ARGUMENTS
      Order resource - Order to describe. The arguments in this group can be
@@ -19,7 +19,7 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --billing-account=BILLING_ACCOUNT
-          Billing Account for the order.
+          Cloud Billing account for the Procurement order.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -34,5 +34,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

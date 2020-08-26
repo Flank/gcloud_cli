@@ -11,7 +11,7 @@ gcloud compute instance\-groups managed create \- create a Compute Engine manage
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -106,6 +106,30 @@ meet its target distribution.
 \fITYPE\fR must be one of: \fBNONE\fR, \fBPROACTIVE\fR.
 
 .RS 2m
+.TP 2m
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]
+Disks considered stateful by the instance group. Managed instance groups
+preserve and reattach stateful disks on VM autohealing, update, and recreate
+events.
+
+Use this argument multiple times to attach more disks.
+
+.RS 2m
+.TP 2m
+\fBdevice\-name\fR
+(Requied) Device name of the disk to mark stateful.
+
+.TP 2m
+\fBauto\-delete\fR
+(Optional) Specifies the auto deletion policy of the stateful disk. Supported
+values are \f5\fInever\fR\fR (never delete this disk) and
+\f5\fIon\-permanent\-instance\-deletion\fR\fR (delete the stateful disk when the
+given instance is permanently deleted from the instance group; for example when
+the group is resized down). If omitted, \f5\fInever\fR\fR is used as the
+default.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]
 Specifies any target pools you want the instances of this managed instance group

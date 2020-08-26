@@ -1,0 +1,44 @@
+title: database-migration migration-jobs delete scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration migration-jobs delete test-job --region=us-central1
+  - prompt:
+    - message: You are about to delete migration_job [test-job]
+    - input: y
+  - stderr: |
+      Deleted migration_job [test-job].
+actions:
+- execute_command:
+    command: database-migration migration-jobs delete test-job --region=us-central1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete migration_job [test-job]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/migrationJobs/test-job?alt=json&force=False
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1595447252790-5ab0d02c2ad3c-e2fa0308-84ef21f0",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-07-22T19:47:32.850589977Z",
+                "target": "projects/fake-project/locations/us-central1/migrationJobs/test-job",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Deleted migration_job [test-job].
+    - expect_exit:
+        code: 0

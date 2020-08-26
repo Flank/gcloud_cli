@@ -1,12 +1,12 @@
 NAME
-    gcloud compute resource-policies create - create Google Compute Engine
-        Resource Policies
+    gcloud compute resource-policies create - create Compute Engine Resource
+        Policies
 
 SYNOPSIS
     gcloud compute resource-policies create COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create Google Compute Engine Resource Policies.
+    Create Compute Engine Resource Policies.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,10 +20,10 @@ COMMANDS
     COMMAND is one of the following:
 
      group-placement
-        Create a Google Compute Engine group placement resource policy.
+        Create a Compute Engine group placement resource policy.
 
      snapshot-schedule
-        Create a Google Compute Engine Snapshot Schedule Resource Policy.
+        Create a Compute Engine Snapshot Schedule Resource Policy.
 
 NOTES
     These variants are also available:

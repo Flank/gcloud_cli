@@ -199,6 +199,99 @@ class DryRunCreateTestAlpha(DryRunCreateTestBeta):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def testCreateDirectionalPolicies_existingPerimeter(self):
+    self.SetUpForAPI(self.api_version)
+    ingress_policies = self._MakeIngressPolicies()
+    egress_policies = self._MakeEgressPolicies()
+
+    initial_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        type_=self._GetPerimeterType('regular'),
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        type_='PERIMETER_TYPE_REGULAR',
+        ingress_policies=ingress_policies,
+        egress_policies=egress_policies,
+        dry_run=True,
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    perimeter_in_update_request = self.messages.ServicePerimeter(
+        spec=expected_perimeter.spec, useExplicitDryRunSpec=True)
+
+    self._ExpectPatch(
+        perimeter_in_update_request, expected_perimeter,
+        'spec.egressPolicies,spec.ingressPolicies,useExplicitDryRunSpec',
+        initial_perimeter)
+
+    ingress_policies_spec_path = self.Touch(
+        self.temp_path, 'ingress.yaml', contents=self.INGRESS_POLICIES_SPECS)
+
+    egress_policies_spec_path = self.Touch(
+        self.temp_path, 'egress.yaml', contents=self.EGRESS_POLICIES_SPECS)
+
+    result = self.Run(
+        'access-context-manager perimeters dry-run create MY_PERIMETER '
+        '   --policy 123 --ingress-policies {} --egress-policies {}'.format(
+            ingress_policies_spec_path, egress_policies_spec_path))
+
+    self.assertEqual(result, expected_perimeter)
+
+  def testCreateDirectionalPolicies_newPerimeter(self):
+    self.SetUpForAPI(self.api_version)
+    ingress_policies = self._MakeIngressPolicies()
+    egress_policies = self._MakeEgressPolicies()
+
+    initial_perimeter = None
+
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        type_='PERIMETER_TYPE_REGULAR',
+        ingress_policies=ingress_policies,
+        egress_policies=egress_policies,
+        dry_run=True,
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    perimeter_in_update_request = self.messages.ServicePerimeter(
+        name='accessPolicies/123/servicePerimeters/MY_PERIMETER',
+        title='My Perimeter Title',
+        perimeterType=self._GetPerimeterType('regular'),
+        description='foo bar',
+        spec=expected_perimeter.spec,
+        useExplicitDryRunSpec=True)
+
+    self._ExpectPatch(
+        perimeter_in_update_request, expected_perimeter,
+        'description,name,perimeterType,spec.egressPolicies,spec.ingressPolicies'
+        ',title,useExplicitDryRunSpec', initial_perimeter)
+
+    ingress_policies_spec_path = self.Touch(
+        self.temp_path, 'ingress.yaml', contents=self.INGRESS_POLICIES_SPECS)
+
+    egress_policies_spec_path = self.Touch(
+        self.temp_path, 'egress.yaml', contents=self.EGRESS_POLICIES_SPECS)
+
+    result = self.Run(
+        'access-context-manager perimeters dry-run create MY_PERIMETER '
+        '   --policy 123 --perimeter-title="My Perimeter Title" '
+        '   --perimeter-description="foo bar" --perimeter-type="regular" '
+        '   --perimeter-ingress-policies {} --perimeter-egress-policies {}'
+        .format(ingress_policies_spec_path, egress_policies_spec_path))
+
+    self.assertEqual(result, expected_perimeter)
+
 
 if __name__ == '__main__':
   test_case.main()

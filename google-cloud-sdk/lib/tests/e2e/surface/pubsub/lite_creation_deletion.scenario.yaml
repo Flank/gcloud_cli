@@ -6,7 +6,7 @@ actions:
     prefix: lite-topic
 
 - execute_command:
-    command: pubsub lite-topics create $$my-topic$$ --zone us-central1-a --partitions 1 --per-partition-bytes 30GiB
+    command: pubsub lite-topics create $$my-topic$$ --zone europe-west1-b --partitions 1 --per-partition-bytes 30GiB --per-partition-publish-mib 5 --per-partition-subscribe-mib 10
     events:
     - api_call:
         expect_request:
@@ -31,13 +31,15 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics?alt=json&topicId=$$my-topic$$
+          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/europe-west1-b/topics?alt=json&topicId=$$my-topic$$
           method: POST
           body:
             json:
               partitionConfig:
                 count: '1'
-                scale: 1
+                capacity:
+                  publishMibPerSec: 5
+                  subscribeMibPerSec: 10
               retentionConfig:
                 perPartitionBytes: '32212254720'
         return_response:
@@ -45,10 +47,13 @@ actions:
             status: '200'
           body: |-
             {
-              "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+              "name": "projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$",
               "partitionConfig": {
                 "count": "1",
-                "scale": 1
+                "capacity": {
+                  "publishMibPerSec": 5,
+                  "subscribeMibPerSec": 10
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "32212254720"
@@ -61,7 +66,7 @@ actions:
 
 - execute_command:
     command: |
-      pubsub lite-topics describe $$my-topic$$ --zone us-central1-a
+      pubsub lite-topics describe $$my-topic$$ --zone europe-west1-b
     events:
     - api_call:
         expect_request:
@@ -86,7 +91,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json
+          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$?alt=json
           method: GET
           body:
         return_response:
@@ -94,10 +99,13 @@ actions:
             status: '200'
           body: |-
             {
-              "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+              "name": "projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$",
               "partitionConfig": {
                 "count": "1",
-                "scale": 1
+                "capacity": {
+                  "publishMibPerSec": 5,
+                  "subscribeMibPerSec": 10
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "32212254720",
@@ -105,10 +113,12 @@ actions:
               }
             }
     - expect_stdout: |
-        name: projects/462803083913/locations/us-central1-a/topics/$$my-topic$$
+        name: projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$
         partitionConfig:
+          capacity:
+            publishMibPerSec: 5
+            subscribeMibPerSec: 10
           count: '1'
-          scale: 1
         retentionConfig:
           perPartitionBytes: '32212254720'
           period: 0s
@@ -117,7 +127,7 @@ actions:
 
 - execute_command:
     command: |
-      pubsub lite-topics list --zone us-central1-a
+      pubsub lite-topics list --zone europe-west1-b
     events:
     - api_call:
         expect_request:
@@ -142,7 +152,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics?alt=json
+          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/europe-west1-b/topics?alt=json
           method: GET
           body:
         return_response:
@@ -152,10 +162,13 @@ actions:
             {
               "topics": [
                 {
-                  "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+                  "name": "projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$",
                   "partitionConfig": {
                     "count": "1",
-                    "scale": 1
+                    "capacity": {
+                      "publishMibPerSec": 5,
+                      "subscribeMibPerSec": 10
+                    }
                   },
                   "retentionConfig": {
                     "perPartitionBytes": "32212254720",
@@ -167,20 +180,21 @@ actions:
     - expect_stdout:
         # Allow other resources to be listed in case some exist from other e2e tests.
         matches: |
-          (\s|.)*---
-          name: projects/462803083913/locations/us-central1-a/topics/$$my-topic$$
+          .*name: projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$
           partitionConfig:
+            capacity:
+              publishMibPerSec: 5
+              subscribeMibPerSec: 10
             count: '1'
-            scale: 1
           retentionConfig:
             perPartitionBytes: '32212254720'
-            period: 0s(\s---(\s|.)*)*
+            period: 0s.*
     - expect_exit:
         code: 0
 
 - execute_command:
     command: |
-      pubsub lite-topics update $$my-topic$$ --zone us-central1-a --scale 2 --per-partition-bytes 40GiB --message-retention-period 2w
+      pubsub lite-topics update $$my-topic$$ --zone europe-west1-b --per-partition-publish-mib 10 --per-partition-bytes 40GiB --message-retention-period 2w
     events:
     - api_call:
         expect_request:
@@ -205,12 +219,13 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json&updateMask=partitionConfig.scale%2CretentionConfig.perPartitionBytes%2CretentionConfig.period
+          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$?alt=json&updateMask=partitionConfig.capacity.publishMibPerSec%2CretentionConfig.perPartitionBytes%2CretentionConfig.period
           method: PATCH
           body:
             json:
               partitionConfig:
-                scale: 2
+                capacity:
+                  publishMibPerSec: 10
               retentionConfig:
                 perPartitionBytes: '42949672960'
                 period: '1209600s'
@@ -219,10 +234,13 @@ actions:
             status: '200'
           body: |-
             {
-              "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+              "name": "projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$",
               "partitionConfig": {
                 "count": "1",
-                "scale": 2
+                    "capacity": {
+                      "publishMibPerSec": 10,
+                      "subscribeMibPerSec": 10
+                    }
               },
               "retentionConfig": {
                 "perPartitionBytes": "42949672960",
@@ -232,10 +250,12 @@ actions:
     - expect_stderr: |
         Updated topic [$$my-topic$$].
     - expect_stdout: |
-        name: projects/462803083913/locations/us-central1-a/topics/$$my-topic$$
+        name: projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$
         partitionConfig:
+          capacity:
+            publishMibPerSec: 10
+            subscribeMibPerSec: 10
           count: '1'
-          scale: 2
         retentionConfig:
           perPartitionBytes: '42949672960'
           period: 1209600s
@@ -244,7 +264,7 @@ actions:
 
 - execute_command:
     command: |
-      pubsub lite-topics delete $$my-topic$$ --zone us-central1-a
+      pubsub lite-topics delete $$my-topic$$ --zone europe-west1-b
     cleanup_for: my-topic
     events:
     - expect_prompt_continue:
@@ -273,7 +293,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json
+          uri: https://europe-west1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/europe-west1-b/topics/$$my-topic$$?alt=json
           method: DELETE
           body:
         return_response:

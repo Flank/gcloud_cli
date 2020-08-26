@@ -250,6 +250,27 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(parsed_message, expected_message)
 
   @parameterized.parameters(
+      (['GOOD', 'YES'], ['GOOD', 'NO'], ['NO']),
+      (['GOOD'], ['GOOD', 'EXTRA'], ['EXTRA']),
+      (['GOOD', 'YES'], ['GOOD', 'YES', 'EXTRA', 'EXTRA2'], ['EXTRA, EXTRA2']),
+  )
+  def testValidEnumNamesErrors(self, api_names, choices, bad_choices):
+    with self.assertRaisesRegex(
+        arg_parsers.ArgumentTypeError,
+        '{} is/are not valid enum values.'.format(', '.join(bad_choices))):
+      arg_utils.CheckValidEnumNames(api_names, choices)
+
+  @parameterized.parameters(
+      (['GOOD', 'YES'], ['GOOD', 'YES']),
+      (['GOOD_ONE'], ['good-one']),
+      (['GOOD_ONE'], ['good_one']),
+      (['GOOD_ONE'], ['GOOD_ONE']),
+      (['GOOD_ONE'], ['GOOD-ONE']),
+  )
+  def test_one_space(self, api_names, choices):
+    self.assertIsNone(arg_utils.CheckValidEnumNames(api_names, choices))
+
+  @parameterized.parameters(
       ('THING_ONE', 'thing-one'),
       ('THING-ONE', 'thing-one'),
       ('thing_one', 'thing-one'),

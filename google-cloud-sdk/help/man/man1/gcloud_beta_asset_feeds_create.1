@@ -52,15 +52,15 @@ At least one of these must be specified:
 A comma\-separated list of the full names of the assets to receive updates. For
 example:
 \f5//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1\fR.
-See https://cloud.google.com/apis/design/resource_names#full_resource_name for
-more information.
+For more information, see:
+https://cloud.google.com/apis/design/resource_names#full_resource_name
 
 .TP 2m
 \fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]
 A comma\-separated list of types of the assets types to receive updates. For
-example: \f5compute.googleapis.com/Disk,compute.googleapis.com/Network\fR See
+example: \f5compute.googleapis.com/Disk,compute.googleapis.com/Network\fR For
+more information, see:
 https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/overview
-for all supported asset types.
 
 .RE
 .sp
@@ -107,7 +107,8 @@ Description of the feed condition. For reference only.
 .TP 2m
 \fB\-\-condition\-expression\fR=\fICONDITION_EXPRESSION\fR
 Feed condition expression. If not specified, no condition will be applied to
-feed.
+feed. For more information, see:
+https://cloud.google.com/asset\-inventory/docs/monitoring\-asset\-changes#feed_with_condition
 
 .TP 2m
 \fB\-\-condition\-title\fR=\fICONDITION_TITLE\fR
@@ -116,7 +117,7 @@ Title of the feed condition. For reference only.
 .TP 2m
 \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
 Asset content type. If not specified, no content but the asset name and type
-will be returned in the feed. To read more see
+will be returned in the feed. For more information, see
 https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/overview#asset_content_type.
 \fICONTENT_TYPE\fR must be one of: \fBresource\fR, \fBiam\-policy\fR,
 \fBorg\-policy\fR, \fBaccess\-policy\fR.

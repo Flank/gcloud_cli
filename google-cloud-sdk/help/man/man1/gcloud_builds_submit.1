@@ -11,7 +11,7 @@ gcloud builds submit \- submit a build using Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-worker\-pool\fR=\fIWORKER_POOL\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -97,6 +97,12 @@ Machine type used to run the build. \fIMACHINE_TYPE\fR must be one of:
 \fBn1\-highcpu\-32\fR, \fBn1\-highcpu\-8\fR.
 
 .TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
+
+.TP 2m
 \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 Parameters to be substituted in the build specification.
 
@@ -126,6 +132,12 @@ specified as a duration; for example, "2h15m5s" is two hours, fifteen minutes,
 and five seconds. If you don't specify a unit, seconds is assumed. For example,
 "10" is 10 seconds. Overrides the default \fBbuilds/timeout\fR property value
 for this command invocation.
+
+.TP 2m
+\fB\-\-worker\-pool\fR=\fIWORKER_POOL\fR
+Specify a worker pool for the build to run in. Format:
+projects/{project}/locations/{region}/workerPools/{workerPool}. This field is
+restricted to custom workers beta users.
 
 .TP 2m
 

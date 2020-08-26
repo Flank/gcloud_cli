@@ -1,0 +1,59 @@
+title: iam workload-identity-pools providers update-oidc test
+release_tracks: [ALPHA, BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam workload-identity-pools providers update-oidc my-provider
+      --workload-identity-pool='my-workload-identity-pool' --location='global'
+      --display-name='My oidc provider' --description='My oidc provider description' --disabled
+      --attribute-mapping="google.subject=assertion.arn" --attribute-condition="true"
+      --issuer-uri="https://test.com" --allowed-audiences="https://test.com/myapp1,https://test.com/myapp2"
+  - stderr: |
+      Update WorkloadIdentityPoolProvider my-provider
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1beta
+      BETA: v1beta
+- execute_command:
+    label: update a WorkloadIdentityPool
+    command: iam workload-identity-pools providers update-oidc my-provider
+      --workload-identity-pool my-workload-identity-pool --location global
+      --display-name='My oidc provider' --description='My oidc provider description' --disabled
+      --attribute-mapping="google.subject=assertion.arn" --attribute-condition="true"
+      --issuer-uri="https://test.com" --allowed-audiences="https://test.com/myapp1,https://test.com/myapp2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1beta/projects/fake-project/locations/global/workloadIdentityPools/my-workload-identity-pool/providers/my-provider?alt=json&updateMask=attributeCondition%2CattributeMapping%2Cdescription%2Cdisabled%2CdisplayName%2Coidc.allowedAudiences%2Coidc.issuerUri
+          method: PATCH
+          body: |
+            {
+              "displayName": "My oidc provider",
+              "description": "My oidc provider description",
+              "disabled": true,
+              "attributeMapping": "google.subject=assertion.arn",
+              "attributeCondition": "true",
+              "oidc": {
+                "issuerUri": "https://test.com",
+                "allowedAudiences": [
+                  "https://test.com/myapp1",
+                  "https://test.com/myapp2"
+                ]
+              }
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/providers/my-provider/operations/operation-id"
+            }
+    - expect_stderr: |
+        Updated WorkloadIdentityPoolProvider [my-provider].
+    - expect_stdout: |
+        name: projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/providers/my-provider/operations/operation-id
+    - expect_exit:
+        code: 0

@@ -11,7 +11,7 @@ gcloud beta compute target\-instances create \- create a target instance for han
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute target\-instances create\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute target\-instances create\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -59,6 +59,12 @@ An optional, textual description of the target instance.
 Zone of the instance to operate on. If not specified, it will be set to the same
 as zone. Overrides the default \fBcompute/zone\fR property value for this
 command invocation.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Network that this target instance applies to. This is only necessary if the
+corresponding instance has multiple network interfaces. If not specified, the
+default network interface will be used.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR

@@ -138,11 +138,17 @@ class BackendServicesListTest(test_base.BaseTest):
             self.internal_load_balancing_backend_services)
     ]
     self.Run('alpha compute backend-services list')
+
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.messages.ComputeBackendServicesAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
     self.list_json.assert_called_once_with(
         requests=[(self.compute.backendServices,
                    'AggregatedList',
                    self.messages.ComputeBackendServicesAggregatedListRequest(
-                       project='my-project', includeAllScopes=True))],
+                       project='my-project', **request_params))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

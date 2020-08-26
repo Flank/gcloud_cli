@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute reservations set-iam-policy - set the IAM policy for a
-        Google Compute Engine reservation
+        Compute Engine reservation
 
 SYNOPSIS
     gcloud alpha compute reservations set-iam-policy
@@ -61,7 +61,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute reservations set-iam-policy
         $ gcloud beta compute reservations set-iam-policy

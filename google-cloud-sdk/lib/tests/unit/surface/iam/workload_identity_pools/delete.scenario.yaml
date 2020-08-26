@@ -1,0 +1,38 @@
+title: iam workload-identity-pools delete test
+release_tracks: [ALPHA, BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam workload-identity-pools delete my-workload-identity-pool --location global
+  - stderr: |
+      Delete WorkloadIdentityPool my-workload-identity-pool.
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1beta
+      BETA: v1beta
+- execute_command:
+    label: delete a WorkloadIdentityPool
+    command: iam workload-identity-pools delete my-workload-identity-pool --location global
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete workload_identity_pool [my-workload-identity-pool]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/$$api-version$$/projects/fake-project/locations/global/workloadIdentityPools/my-workload-identity-pool?alt=json
+          method: DELETE
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/operations/operation-id"
+            }
+    - expect_stderr: |
+        Deleted workload_identity_pool [my-workload-identity-pool].
+    - expect_exit:
+        code: 0

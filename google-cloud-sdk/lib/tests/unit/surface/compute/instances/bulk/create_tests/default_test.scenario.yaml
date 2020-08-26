@@ -117,7 +117,7 @@ actions:
             targetId: '193063108346'
             status: RUNNING
             statusMessage: Bulk insert initiated
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 0
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -142,7 +142,7 @@ actions:
             targetId: '193063108346'
             status: DONE
             statusMessage: 'VM instances created: 1, failed: 0.'
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 100
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -232,7 +232,7 @@ actions:
             targetId: '193063108346'
             status: RUNNING
             statusMessage: Bulk insert initiated
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 0
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -257,7 +257,7 @@ actions:
             targetId: '193063108346'
             status: DONE
             statusMessage: 'VM instances created: 1, failed: 0.'
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 100
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -349,7 +349,7 @@ actions:
             targetId: '193063108346'
             status: RUNNING
             statusMessage: Bulk insert initiated
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 0
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -374,7 +374,7 @@ actions:
             targetId: '193063108346'
             status: DONE
             statusMessage: 'VM instances created: 3, failed: 0.'
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 100
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -466,7 +466,7 @@ actions:
             targetId: '193063108346'
             status: RUNNING
             statusMessage: Bulk insert initiated
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 0
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -491,7 +491,7 @@ actions:
             targetId: '193063108346'
             status: DONE
             statusMessage: 'VM instances created: 2, failed: 1.'
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 100
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -594,7 +594,7 @@ actions:
             targetId: '193063108346'
             status: RUNNING
             statusMessage: Bulk insert initiated
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 0
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'
@@ -619,7 +619,7 @@ actions:
             targetId: '193063108346'
             status: DONE
             statusMessage: 'VM instances created: 1, failed: 0.'
-            user: nathanlooney@google.com
+            user: user@google.com
             progress: 100
             insertTime: '2020-05-01T11:49:26.902-07:00'
             startTime: '2020-05-01T11:49:26.911-07:00'

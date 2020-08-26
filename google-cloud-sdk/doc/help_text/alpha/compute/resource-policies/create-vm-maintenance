@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute resource-policies create-vm-maintenance - create a
-        Google Compute Engine VM Maintenance Resource Policy
+        Compute Engine VM Maintenance Resource Policy
 
 SYNOPSIS
     gcloud alpha compute resource-policies create-vm-maintenance NAME
@@ -11,7 +11,7 @@ DESCRIPTION
     (ALPHA) (DEPRECATED) create-vm-maintenance is deprecated. Use compute
     resource-policies create vm-maintenance instead.
 
-    Create a Google Compute Engine VM Maintenance Resource Policy.
+    Create a Compute Engine VM Maintenance Resource Policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -64,9 +64,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command creates a Google Compute Engine VM Maintenance
-    Resource Policy with a daily maintenance activity window that starts at
-    04:00Z.
+    The following command creates a Compute Engine VM Maintenance Resource
+    Policy with a daily maintenance activity window that starts at 04:00Z.
 
         $ gcloud alpha compute resource-policies create-vm-maintenance \
             my-resource-policy --region=REGION --start-time=04:00Z \
@@ -76,5 +75,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

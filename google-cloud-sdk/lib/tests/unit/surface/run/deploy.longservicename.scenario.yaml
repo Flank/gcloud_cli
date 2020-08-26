@@ -1,0 +1,450 @@
+title: Tests that server giving new fields sends new fields, and vice versa.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: run/platform managed
+- execute:
+  - command: run deploy xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      --image gcr.io/knative-samples/helloworld-nodejs --region us-central1 --project=fake-project
+      --no-allow-unauthenticated
+  - stderr: |
+      Deploying container to Cloud Run service [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] in project [fake-project] region [us-central1]
+  - staged_progress_tracker:
+    - message: Deploying new service...
+    - status: FAILURE
+  - error: '1: This instance is spec-only.'
+  - stderr: |
+      Deploying container to Cloud Run for Anthos service [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
+  - staged_progress_tracker:
+    - message: Deploying...
+    - status: SUCCESS
+actions:
+- set_property:
+    # container/use_client_certificate: true
+    # auth/disable_ssl_validation: true
+    run/platform: managed
+
+- execute_command:
+    command: run deploy xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      --image gcr.io/knative-samples/helloworld-nodejs --region us-central1 --project=fake-project
+      --no-allow-unauthenticated --revision-suffix=yyyyy-zzz
+    events:
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/fake-project/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1016'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Resource 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                of kind 'SERVICE' in region 'us-central1' in project 'fake-project'
+                does not exist.
+              status: NOT_FOUND
+    - expect_stderr: |
+        Deploying container to Cloud Run service [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] in project [fake-project] region [us-central1]
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/fake-project/services?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                  run.googleapis.com/client-name: gcloud
+                labels: {}
+                name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                namespace: fake-project
+              spec:
+                template:
+                  metadata:
+                    annotations:
+                      client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                      run.googleapis.com/client-name: gcloud
+                    labels: {}
+                    name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-yyyyy-zzz
+                  spec:
+                    containers:
+                    - image: gcr.io/knative-samples/helloworld-nodejs
+              status:
+                address: {}
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1860'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 2
+              name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources:
+                      requests:
+                        cpu: 400m
+                    timeoutSeconds: 300
+              traffic:
+              - latestRevision: false
+                percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+            status:
+              address:
+                hostname: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:04Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:04Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:04Z'
+                status: 'True'
+                type: RoutesReady
+              url: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.example.com
+              domainInternal: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              latestCreatedRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              latestReadyRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              observedGeneration: 2
+              traffic:
+              - latestRevision: true
+                percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/fake-project/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: null
+    - expect_staged_progress_tracker:
+        message: Deploying new service...
+        status: FAILURE
+    - expect_exit:
+        code: 1
+        message: This instance is spec-only.
+    - expect_stderr: |
+        Deploying container to Cloud Run for Anthos service [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/fake-project/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx?alt=json
+          method: GET
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                generation: 2
+                name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                namespace: default
+              spec:
+                template:
+                  metadata:
+                    creationTimestamp: '2019-07-23T18:13:29Z'
+                  spec:
+                    containers:
+                    - image: gcr.io/knative-samples/helloworld-nodejs
+                      name: ''
+                      resources:
+                        requests:
+                          cpu: 400m
+                      timeoutSeconds: 300
+                    serviceAccountName: test-service-account
+                traffic:
+                - percent: 10
+                  revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+                - percent: 90
+                  revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+              status:
+                address:
+                  hostname: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+                conditions:
+                - status: 'True'
+                  type: ConfigurationsReady
+                - status: 'True'
+                  type: Ready
+                - status: 'True'
+                  type: RoutesReady
+                url: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.example.com
+                domainInternal: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+                observedGeneration: 2
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 3
+              labels:
+                serving.knative.dev/visibility: cluster-local
+              name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources:
+                      requests:
+                        cpu: 400m
+                    timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+            status:
+              address:
+                hostname: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:07Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:07Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:07Z'
+                status: 'True'
+                type: RoutesReady
+              url: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.example.com
+              domainInternal: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              latestCreatedRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              latestReadyRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              observedGeneration: 2
+              traffic:
+              - latestRevision: true
+                percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 3
+              labels:
+                serving.knative.dev/visibility: cluster-local
+              name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources:
+                      requests:
+                        cpu: 400m
+                    timeoutSeconds: 300
+              traffic:
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+              - percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+            status:
+              address:
+                hostname: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: RoutesReady
+              url: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              domainInternal: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              latestCreatedRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev03
+              latestReadyRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev03
+              observedGeneration: 3
+              traffic:
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+              - percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+    - expect_staged_progress_tracker:
+        message: Deploying...
+        status: SUCCESS
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 3
+              labels:
+                serving.knative.dev/visibility: cluster-local
+              name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources:
+                      requests:
+                        cpu: 400m
+                    timeoutSeconds: 300
+              traffic:
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+              - percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+            status:
+              address:
+                hostname: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: RoutesReady
+              url: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              domainInternal: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.default.svc.cluster.local
+              latestCreatedRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev03
+              latestReadyRevisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev03
+              observedGeneration: 3
+              traffic:
+              - latestRevision: false
+                percent: 90
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev01
+              - percent: 10
+                revisionName: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-rev02
+        expect_response:
+          extract_references:
+          - field: status.latestCreatedRevisionName
+            reference: service-revision-name-3
+          body:
+            json: {}

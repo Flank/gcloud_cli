@@ -38,7 +38,7 @@ COMMANDS
         Delete target pools.
 
      describe
-        Describe a Google Compute Engine target pool.
+        Describe a Compute Engine target pool.
 
      get-health
         Get the health of instances in a target pool.

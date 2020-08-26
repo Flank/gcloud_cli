@@ -75,6 +75,9 @@ DESCRIPTION
         keys. This format requires a projection to define the values to be
         printed.
 
+        To use \n or \t as an attribute value please escape the \ with your
+        shell's escape sequence, example separator="\\n" for bash.
+
         The format attributes are:
 
          delimiter="string"
@@ -208,6 +211,9 @@ DESCRIPTION
         CSV with no heading and <TAB> separator instead of <COMMA>. Used to
         retrieve individual resource values. This format requires a projection
         to define the value(s) to be printed.
+
+        To use \n or \t as an attribute value please escape the \ with your
+        shell's escape sequence, example separator="\\n" for bash.
 
         The format attributes are:
 

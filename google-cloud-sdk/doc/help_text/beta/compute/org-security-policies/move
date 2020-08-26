@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute org-security-policies move - move a Google Compute
-        Engine organization security policy
+    gcloud beta compute org-security-policies move - move a Compute Engine
+        organization security policy
 
 SYNOPSIS
     gcloud beta compute org-security-policies move SECURITY_POLICY

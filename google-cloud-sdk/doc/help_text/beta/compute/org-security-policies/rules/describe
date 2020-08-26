@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute org-security-policies rules describe - describe a
-        Google Compute Engine organization security policy rule
+        Compute Engine organization security policy rule
 
 SYNOPSIS
     gcloud beta compute org-security-policies rules describe PRIORITY

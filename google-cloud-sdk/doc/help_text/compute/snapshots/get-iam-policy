@@ -1,6 +1,6 @@
 NAME
-    gcloud compute snapshots get-iam-policy - get the IAM policy for a Google
-        Compute Engine snapshot
+    gcloud compute snapshots get-iam-policy - get the IAM policy for a Compute
+        Engine snapshot
 
 SYNOPSIS
     gcloud compute snapshots get-iam-policy SNAPSHOT_NAME [--filter=EXPRESSION]

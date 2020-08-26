@@ -6,8 +6,9 @@ SYNOPSIS
     gcloud compute instance-groups managed create NAME --size=SIZE
         --template=TEMPLATE [--base-instance-name=BASE_INSTANCE_NAME]
         [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
-        [--instance-redistribution-type=TYPE] [--target-pool=[TARGET_POOL,...]]
-        [--zones=ZONE,[ZONE,...]]
+        [--instance-redistribution-type=TYPE]
+        [--stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]]
+        [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
         [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
           | --https-health-check=HTTPS_HEALTH_CHECK]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -71,6 +72,24 @@ OPTIONAL FLAGS
           instances to meet its target distribution.
 
     TYPE must be one of: NONE, PROACTIVE.
+
+     --stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]
+        Disks considered stateful by the instance group. Managed instance
+        groups preserve and reattach stateful disks on VM autohealing, update,
+        and recreate events.
+
+        Use this argument multiple times to attach more disks.
+
+         device-name
+            (Requied) Device name of the disk to mark stateful.
+
+         auto-delete
+            (Optional) Specifies the auto deletion policy of the stateful disk.
+            Supported values are never (never delete this disk) and
+            on-permanent-instance-deletion (delete the stateful disk when the
+            given instance is permanently deleted from the instance group; for
+            example when the group is resized down). If omitted, never is used
+            as the default.
 
      --target-pool=[TARGET_POOL,...]
         Specifies any target pools you want the instances of this managed

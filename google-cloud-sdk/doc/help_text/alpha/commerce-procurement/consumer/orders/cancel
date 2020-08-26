@@ -1,6 +1,6 @@
 NAME
     gcloud alpha commerce-procurement consumer orders cancel - cancels the
-        order resource from Cancel API
+        order resource from the Cancel API
 
 SYNOPSIS
     gcloud alpha commerce-procurement consumer orders cancel
@@ -8,7 +8,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Cancels the order resource from Cancel API.
+    (ALPHA) Cancels the order resource from the Cancel API.
 
 POSITIONAL ARGUMENTS
      Order resource - Order to describe. The arguments in this group can be
@@ -20,11 +20,11 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --billing-account=BILLING_ACCOUNT
-          Billing Account for the order.
+          Cloud Billing account for the Procurement order.
 
 FLAGS
      --etag=ETAG
-        The weak etag for validation check if specified.
+        The weak etag for validation check, if specified.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -39,5 +39,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

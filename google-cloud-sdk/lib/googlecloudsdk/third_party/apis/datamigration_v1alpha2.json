@@ -240,11 +240,13 @@
         },
         "createTime": {
           "description": "Output only. The timestamp when the migration job resource was created. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The timestamp when the migration job resource was last updated. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -261,24 +263,6 @@
         },
         "state": {
           "description": "The current migration job state.",
-          "enumDescriptions": [
-            "The state of the migration job is unknown.",
-            "The migration job is down for maintenance.",
-            "The migration job is in draft mode and no resources are created.",
-            "The migration job is being created.",
-            "The migration job is created, not started and is fully editable.",
-            "The migration job is running.",
-            "The migration job failed.",
-            "The migration job has been completed.",
-            "The migration job is being deleted.",
-            "The migration job is being stopped.",
-            "The migration job is currently stopped.",
-            "The migration job has been deleted.",
-            "The migration job is being updated.",
-            "The migration job is starting.",
-            "The migration job is restarting.",
-            "The migration job is resuming."
-          ],
           "type": "string",
           "enumDescriptions": [
             "The state of the migration job is unknown.",
@@ -319,14 +303,7 @@
         },
         "phase": {
           "description": "Output only. The current migration job phase.",
-          "enumDescriptions": [
-            "The phase of the migration job is unknown.",
-            "The migration job is in the full dump phase.",
-            "The migration job is CDC phase.",
-            "The migration job is running the promote phase.",
-            "Only RDS flow - waiting for source writes to stop",
-            "Only RDS flow - the sources writes stopped, waiting for dump to begin"
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "The phase of the migration job is unknown.",
@@ -347,11 +324,6 @@
         },
         "type": {
           "description": "Required. The migration job type.",
-          "enumDescriptions": [
-            "The type of the migration job is unknown.",
-            "The migration job is a one time migration.",
-            "The migration job is a continuous migration."
-          ],
           "type": "string",
           "enumDescriptions": [
             "The type of the migration job is unknown.",
@@ -390,11 +362,13 @@
         },
         "duration": {
           "description": "Output only. The duration of the migration job (in seconds). A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
+          "readOnly": true,
           "type": "string",
           "format": "google-duration"
         },
         "error": {
           "description": "Output only. The error details in case of state FAILED.",
+          "readOnly": true,
           "$ref": "Status"
         },
         "sourceDatabase": {
@@ -407,6 +381,7 @@
         },
         "endTime": {
           "description": "Output only. If the migration job is completed, the time when it was completed.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         }
@@ -461,11 +436,6 @@
       "properties": {
         "provider": {
           "description": "The database provider.",
-          "enumDescriptions": [
-            "The database provider is unknown.",
-            "CloudSQL runs the database.",
-            "RDS runs the database."
-          ],
           "type": "string",
           "enumDescriptions": [
             "The database provider is unknown.",
@@ -480,11 +450,6 @@
         },
         "engine": {
           "description": "The database engine.",
-          "enumDescriptions": [
-            "The source database engine of the migration job is unknown.",
-            "The source engine is MySQL.",
-            "The source engine is PostgreSQL."
-          ],
           "type": "string",
           "enumDescriptions": [
             "The source database engine of the migration job is unknown.",
@@ -642,11 +607,13 @@
         },
         "createTime": {
           "description": "Output only. The timestamp when the resource was created. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The timestamp when the resource was last updated. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -659,16 +626,6 @@
         },
         "state": {
           "description": "The current connection profile state (e.g. DRAFT, READY, or FAILED).",
-          "enumDescriptions": [
-            "The state of the connection profile is unknown.",
-            "The connection profile is in draft mode and fully editable.",
-            "The connection profile is being created.",
-            "The connection profile is ready.",
-            "The connection profile is being updated.",
-            "The connection profile is being deleted.",
-            "The connection profile has been deleted.",
-            "The last action on the connection profile failed."
-          ],
           "type": "string",
           "enumDescriptions": [
             "The state of the connection profile is unknown.",
@@ -709,15 +666,11 @@
         },
         "error": {
           "description": "Output only. The error details in case of state FAILED.",
+          "readOnly": true,
           "$ref": "Status"
         },
         "provider": {
           "description": "The database provider.",
-          "enumDescriptions": [
-            "The database provider is unknown.",
-            "CloudSQL runs the database.",
-            "RDS runs the database."
-          ],
           "type": "string",
           "enumDescriptions": [
             "The database provider is unknown.",
@@ -764,6 +717,7 @@
         },
         "hasPassword": {
           "description": "Output only. Indicates If this connection profile password is stored.",
+          "readOnly": true,
           "type": "boolean"
         }
       }
@@ -775,11 +729,7 @@
       "properties": {
         "type": {
           "description": "Output only. The ssl config type according to 'client_key', 'client_certificate' and 'ca_certificate'.",
-          "enumDescriptions": [
-            "Unspecified.",
-            "Only 'ca_certificate' specified.",
-            "Both server ('ca_certificate'), and client ('client_key', 'client_certificate') specified."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Unspecified.",
@@ -838,6 +788,7 @@
         },
         "hasPassword": {
           "description": "Output only. Indicates If this connection profile password is stored.",
+          "readOnly": true,
           "type": "boolean"
         }
       }
@@ -849,6 +800,7 @@
       "properties": {
         "cloudSqlId": {
           "description": "Output only. The Cloud SQL instance ID that this connection profile is associated with.",
+          "readOnly": true,
           "type": "string"
         },
         "settings": {
@@ -857,10 +809,12 @@
         },
         "privateIp": {
           "description": "Output only. The Cloud SQL database instance's private IP.",
+          "readOnly": true,
           "type": "string"
         },
         "publicIp": {
           "description": "Output only. The Cloud SQL database instance's public IP.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -872,14 +826,6 @@
       "properties": {
         "databaseVersion": {
           "description": "The database engine type and version (`MYSQL_5_7` or `MYSQL_5_6`).",
-          "enumDescriptions": [
-            "Unspecified version.",
-            "MySQL 5.6.",
-            "MySQL 5.7.",
-            "PostgreSQL 9.6.",
-            "PostgreSQL 11.",
-            "PostgreSQL 10."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Unspecified version.",
@@ -916,11 +862,6 @@
         },
         "activationPolicy": {
           "description": "The activation policy specifies when the instance is activated; it is applicable only when the instance state is 'RUNNABLE'. Valid values: 'ALWAYS': The instance is on, and remains so even in the absence of connection requests. `NEVER`: The instance is off; it is not activated, even if a connection request arrives.",
-          "enumDescriptions": [
-            "unspecified policy.",
-            "The instance is always up and running.",
-            "The instance should never spin up."
-          ],
           "type": "string",
           "enumDescriptions": [
             "unspecified policy.",
@@ -950,11 +891,6 @@
         },
         "dataDiskType": {
           "description": "The type of storage: `PD_SSD` (default) or `PD_HDD`.",
-          "enumDescriptions": [
-            "Unspecified.",
-            "SSD disk.",
-            "HDD disk."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Unspecified.",
@@ -986,6 +922,7 @@
         },
         "hasRootPassword": {
           "description": "Output only. Indicates If this connection profile root password is stored.",
+          "readOnly": true,
           "type": "boolean"
         }
       }
@@ -1095,32 +1032,39 @@
       "properties": {
         "createTime": {
           "description": "Output only. The time the operation was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
           "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
           "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "verb": {
           "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "statusMessage": {
           "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true,
           "type": "string"
         },
         "requestedCancellation": {
           "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
           "type": "boolean"
         },
         "apiVersion": {
           "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -1132,24 +1076,6 @@
       "properties": {
         "errorCode": {
           "description": "An instance of ErrorCode specifying the error that occurred.",
-          "enumDescriptions": [
-            "An unknown error occurred",
-            "We failed to connect to one of the connection profile.",
-            "We failed to authenticate to one of the connection profile.",
-            "One of the involved connection profiles has an invalid configuration.",
-            "The versions of the source and the destination are incompatible.",
-            "The types of the source and the destination are incompatible.",
-            "No pglogical extension installed on databases, applicable for postgres.",
-            "pglogical node already exists on databases, applicable for postgres.",
-            "The value of parameter wal_level is not set to logical.",
-            "The value of parameter shared_preload_libraries does not include pglogical.",
-            "The value of parameter max_replication_slots is not sufficient.",
-            "The value of parameter max_wal_senders is not sufficient.",
-            "The value of parameter max_worker_processes is not sufficient.",
-            "Extensions installed are either not supported or having unsupported versions.",
-            "Unsupported migration type.",
-            "Invalid RDS logical replication."
-          ],
           "type": "string",
           "enumDescriptions": [
             "An unknown error occurred",

@@ -20,6 +20,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     instance-configs
+        Manage instance-specific settings in a managed instance group.
+
      rolling-action
         Manipulate rolling actions on Compute Engine managed instance groups.
 
@@ -34,7 +37,7 @@ COMMANDS
 
      create-instance
         Create a new virtual machine instance in a managed instance group with
-        a defined name.
+        a defined name and optionally its stateful configuration.
 
      delete
         Delete Compute Engine managed instance groups.
@@ -79,7 +82,7 @@ COMMANDS
         Stop autoscaling a managed instance group.
 
      update
-        Update Compute Engine managed instance groups.
+        Update a Compute Engine managed instance group.
 
      update-autoscaling
         Update autoscaling parameters of a managed instance group.

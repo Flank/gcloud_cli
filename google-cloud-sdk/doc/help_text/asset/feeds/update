@@ -97,7 +97,9 @@ OPTIONAL FLAGS
           condition will be applied to feed.
 
        --condition-expression=CONDITION_EXPRESSION
-          Condition expression to overwrite the existing one.
+          Condition expression to overwrite the existing one. For more
+          information, see:
+          https://cloud.google.com/asset-inventory/docs/monitoring-asset-changes#feed_with_condition
 
      At most one of these may be specified:
 
@@ -116,7 +118,8 @@ OPTIONAL FLAGS
           returned in the feed.
 
        --content-type=CONTENT_TYPE
-          Asset content type to overwrite the existing one. To read more see:
+          Asset content type to overwrite the existing one. For more
+          information, see:
           https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview#asset_content_type.
           CONTENT_TYPE must be one of: resource, iam-policy, org-policy,
           access-policy.

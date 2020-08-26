@@ -1,6 +1,5 @@
 NAME
-    gcloud compute routers get-status - get status of a Google Compute Engine
-        router
+    gcloud compute routers get-status - get status of a Compute Engine router
 
 SYNOPSIS
     gcloud compute routers get-status NAME [--region=REGION]
@@ -8,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute routers get-status displays all runtime data associated with
-    a Google Compute Engine router.
+    a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

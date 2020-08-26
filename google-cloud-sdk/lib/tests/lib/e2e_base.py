@@ -33,7 +33,6 @@ import tempfile
 
 from googlecloudsdk.api_lib.auth import service_account as auth_service_account
 from googlecloudsdk.api_lib.iamcredentials import util as iamcred_util
-from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -253,12 +252,6 @@ class WithServiceAuth(WithServiceAccountFile):
   def PreSetUp(self):
     self.requires_refresh_token = False
     self.disable_activate_service_account_google_auth = False
-
-    # TODO(b/157745076): Activating service account via google-auth is enabled
-    # only for Googlers at the moment. We need to mock IsHostGoogleDomain() to
-    # to return True so that google-auth will invoked in the tests.
-    # Remove this mock once it is enabled for everyone.
-    self.StartObjectPatch(auth_util, 'IsHostGoogleDomain', return_value=True)
 
   def SetUp(self):
     """Runs the auth command."""

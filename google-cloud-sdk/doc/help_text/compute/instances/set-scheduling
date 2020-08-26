@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud compute instances set-scheduling INSTANCE_NAME
-        [--maintenance-policy=MAINTENANCE_POLICY] [--preemptible]
+        [--clear-min-node-cpu] [--maintenance-policy=MAINTENANCE_POLICY]
+        [--min-node-cpu=MIN_NODE_CPU] [--preemptible]
         [--[no-]restart-on-failure] [--zone=ZONE]
         [--clear-node-affinities | --node=NODE
           | --node-affinity-file=NODE_AFFINITY_FILE | --node-group=NODE_GROUP]
@@ -21,6 +22,11 @@ POSITIONAL ARGUMENTS
         https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 FLAGS
+     --clear-min-node-cpu
+        Removes the min-node-cpu field from the instance. If specified, the
+        instance min-node-cpu will be cleared. The instance will not be
+        overcommitted and utilize the full CPU count assigned.
+
      --maintenance-policy=MAINTENANCE_POLICY
         Specifies the behavior of the instances when their host machines
         undergo maintenance. The default is MIGRATE. MAINTENANCE_POLICY must be
@@ -32,6 +38,10 @@ FLAGS
             event.
          TERMINATE
             The instances should be terminated.
+
+     --min-node-cpu=MIN_NODE_CPU
+        Minimum number of virtual CPUs this instance will consume when running
+        on a sole-tenant node.
 
      --preemptible
         If provided, instances will be preemptible and time-limited. Instances

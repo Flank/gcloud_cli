@@ -26,6 +26,9 @@ GROUPS
      ios
         (BETA) Command group for iOS application testing.
 
+     ip-blocks
+        (BETA) Explore IP blocks used by Firebase Test Lab devices.
+
      network-profiles
         (BETA) Explore network profiles available for testing.
 

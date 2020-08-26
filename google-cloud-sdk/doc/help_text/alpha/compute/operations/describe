@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute operations describe - describe a Google Compute Engine
+    gcloud alpha compute operations describe - describe a Compute Engine
         operation
 
 SYNOPSIS
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute operations describe displays all data
-    associated with a Google Compute Engine operation in a project.
+    associated with a Compute Engine operation in a project.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -55,7 +55,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute operations describe
         $ gcloud beta compute operations describe

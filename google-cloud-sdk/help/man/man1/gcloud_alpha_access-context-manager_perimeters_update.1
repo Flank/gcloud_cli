@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager perimeters update \- update an existing ac
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager perimeters update\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-title\fR=\fITITLE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-add\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-clear\-access\-levels\fR\ |\ \fB\-\-remove\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-set\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-add\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-clear\-resources\fR\ |\ \fB\-\-remove\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-set\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-add\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-clear\-restricted\-services\fR\ |\ \fB\-\-remove\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-set\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-add\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]\ |\ \fB\-\-clear\-vpc\-allowed\-services\fR\ |\ \fB\-\-remove\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager perimeters update\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-title\fR=\fITITLE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-add\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-clear\-access\-levels\fR\ |\ \fB\-\-remove\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-set\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-add\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-clear\-resources\fR\ |\ \fB\-\-remove\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-set\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-add\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-clear\-restricted\-services\fR\ |\ \fB\-\-remove\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-set\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-clear\-egress\-policies\fR\ |\ \fB\-\-set\-egress\-policies\fR=\fIYAML_FILE\fR] [\fB\-\-clear\-ingress\-policies\fR\ |\ \fB\-\-set\-ingress\-policies\fR=\fIYAML_FILE\fR] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-add\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]\ |\ \fB\-\-clear\-vpc\-allowed\-services\fR\ |\ \fB\-\-remove\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -150,6 +150,50 @@ Completely replace the current restricted services with the given values.
 .RE
 .sp
 .TP 2m
+
+These flags modify the enforced EgressPolicies of this ServicePerimeter. At most
+one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-egress\-policies\fR
+Empties existing enforced Egress Policies.
+
+.TP 2m
+\fB\-\-set\-egress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Egress Policies.
+
+This file contains a list of YAML\-compliant objects representing Egress
+Policies described in the API reference.
+
+For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+.RE
+.sp
+.TP 2m
+
+These flags modify the enforced IngressPolicies of this ServicePerimeter. At
+most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-ingress\-policies\fR
+Empties existing enforced Ingress Policies.
+
+.TP 2m
+\fB\-\-set\-ingress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Ingress Policies.
+
+This file contains a list of YAML\-compliant objects representing Ingress
+Policies described in the API reference.
+
+For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+.RE
+.sp
+.TP 2m
 \fB\-\-enable\-vpc\-accessible\-services\fR
 When specified restrict API calls within the Service Perimeter to the set of vpc
 allowed services. To disable use '\-\-no\-enable\-vpc\-accessible\-services'.
@@ -194,7 +238,7 @@ Run \fB$ gcloud help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud access\-context\-manager perimeters update

@@ -1,13 +1,13 @@
 NAME
-    gcloud compute packet-mirrorings delete - delete a Google Compute Engine
-        packet mirroring policy
+    gcloud compute packet-mirrorings delete - delete a Compute Engine packet
+        mirroring policy
 
 SYNOPSIS
     gcloud compute packet-mirrorings delete NAME [NAME ...] [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Delete a Google Compute Engine Packet Mirroring policy.
+    Delete a Compute Engine Packet Mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

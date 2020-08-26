@@ -8,11 +8,12 @@ SYNOPSIS
         [--guest-os-features=[GUEST_OS_FEATURE,...]] [--interface=INTERFACE]
         [--labels=[KEY=VALUE,...]] [--licenses=[LICENSE,...]] [--multi-writer]
         [--physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"]
-        [--replica-zones=ZONE,ZONE] [--no-require-csek-key-create]
+        [--provisioned-iops=PROVISIONED_IOPS] [--replica-zones=ZONE,ZONE]
+        [--no-require-csek-key-create]
         [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-disk=SOURCE_DISK
-          | --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
+          | --source-instant-snapshot=SOURCE_INSTANT_SNAPSHOT
           | --source-snapshot=SOURCE_SNAPSHOT]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
@@ -97,6 +98,11 @@ FLAGS
         4096(default) and 16384. PHYSICAL_BLOCK_SIZE must be one of: 4096,
         16384.
 
+     --provisioned-iops=PROVISIONED_IOPS
+        Provisioned IOPS of pd-extreme disk to create. If specified, the value
+        must be in the range between 10000 and 120000. If not specified, the
+        default value is 100000.
+
      --replica-zones=ZONE,ZONE
         A comma-separated list of exactly 2 zones that a regional disk will be
         replicated to. Required when creating regional disk. The zones must be
@@ -179,8 +185,8 @@ FLAGS
           Source disk must be in the same zone/region as the disk to be
           created.
 
-       --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
-          Source in place snapshot used to create the disks.
+       --source-instant-snapshot=SOURCE_INSTANT_SNAPSHOT
+          Source instant snapshot used to create the disks.
 
        --source-snapshot=SOURCE_SNAPSHOT
           Source snapshot used to create the disks. It is safe to delete a
@@ -274,7 +280,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute disks create
         $ gcloud beta compute disks create

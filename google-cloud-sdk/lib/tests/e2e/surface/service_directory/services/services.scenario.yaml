@@ -60,8 +60,6 @@ actions:
     command: |
       service-directory services create $$my-service$$ --location us-east1 --namespace $$my-namespace$$
     events:
-    - expect_stderr: |
-        Created service [$$my-service$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services?alt=json&serviceId=$$my-service$$
@@ -76,6 +74,8 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_stderr: |
+        Created service [$$my-service$$].
     - expect_exit:
         code: 0
 
@@ -132,8 +132,6 @@ actions:
       service-directory services delete $$my-service$$ --location us-east1 --namespace $$my-namespace$$
     cleanup_for: my-service
     events:
-    - expect_stderr: |
-        Deleted service [$$my-service$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$?alt=json
@@ -148,6 +146,8 @@ actions:
             status: '200'
           body: |
             {}
+    - expect_stderr: |
+        Deleted service [$$my-service$$].
     - expect_exit:
         code: 0
 

@@ -19,8 +19,8 @@ SYNOPSIS
         [--machine-type=MACHINE_TYPE] [--maintenance-policy=MAINTENANCE_POLICY]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
-        [--min-cpu-platform=PLATFORM] [--network=NETWORK]
-        [--network-interface=[PROPERTY=VALUE,...]]
+        [--min-cpu-platform=PLATFORM] [--min-node-cpu=MIN_NODE_CPU]
+        [--network=NETWORK] [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible]
         [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--private-network-ip=PRIVATE_NETWORK_IP]
@@ -383,6 +383,10 @@ FLAGS
 
         You can find more information on-line:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
+     --min-node-cpu=MIN_NODE_CPU
+        Minimum number of virtual CPUs this instance will consume when running
+        on a sole-tenant node.
 
      --network=NETWORK
         Specifies the network that the instances will be part of. If --subnet

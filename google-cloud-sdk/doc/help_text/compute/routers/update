@@ -1,5 +1,5 @@
 NAME
-    gcloud compute routers update - update a Google Compute Engine router
+    gcloud compute routers update - update a Compute Engine router
 
 SYNOPSIS
     gcloud compute routers update NAME [--advertisement-mode=MODE] [--async]
@@ -12,8 +12,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routers update is used to update a Google Compute Engine
-    router.
+    gcloud compute routers update is used to update a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

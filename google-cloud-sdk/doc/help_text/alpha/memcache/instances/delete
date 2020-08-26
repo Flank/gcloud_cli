@@ -16,12 +16,12 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      Instance resource - Arguments and flags that specify the Memcached
-     instance you want to delete. The arguments in this group can be used to
-     specify the attributes of this resource. (NOTE) Some attributes are not
-     given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the argument [instance] on the command line
-     with a fully specified name; provide the argument [--project] on the
-     command line; set the property [core/project]. This must be specified.
+     instance to delete. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [instance] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
 
        INSTANCE
           ID of the instance or fully qualified identifier for the instance.
@@ -49,8 +49,8 @@ API REFERENCE
     API can be found at: https://cloud.google.com/memorystore/
 
 EXAMPLES
-    The following command deletes an instance with the name
-    my-memcache-instance in region us-central1:
+    To delete an instance named my-memcache-instance in region us-central1,
+    run:
 
         $ gcloud alpha memcache instances delete my-memcache-instance \
             --region=us-central1
@@ -59,7 +59,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta memcache instances delete
 

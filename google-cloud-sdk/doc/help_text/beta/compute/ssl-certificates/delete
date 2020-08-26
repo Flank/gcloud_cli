@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute ssl-certificates delete - delete Google Compute Engine
-        SSL certificates
+    gcloud beta compute ssl-certificates delete - delete Compute Engine SSL
+        certificates
 
 SYNOPSIS
     gcloud beta compute ssl-certificates delete NAME [NAME ...]
@@ -8,9 +8,8 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute ssl-certificates delete deletes one or more
-    Google Compute Engine SSL certificates. SSL certificates can only be
-    deleted when no other resources (for example, target HTTPS proxies) refer
-    to them.
+    Compute Engine SSL certificates. SSL certificates can only be deleted when
+    no other resources (for example, target HTTPS proxies) refer to them.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

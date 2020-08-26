@@ -1,5 +1,5 @@
 title: scc notifications describe scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 - execute:
   - command: |

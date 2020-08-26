@@ -1,0 +1,101 @@
+title: database-migration operations describe scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration operations describe operation-123 --region=us-central1
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata
+        apiVersion: v1alpha2
+        createTime: '2020-07-21T17:09:24.318666476Z'
+        endTime: '2020-07-21T17:09:24.358331658Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/us-central1/migrationJobs/test-job
+        verb: update
+      name: projects/fake-project/locations/us-central1/operations/operation-123
+      response:
+        '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.MigrationJob
+        createTime: '2020-07-21T17:05:19.211441641Z'
+        destination: projects/fake-project/locations/us-central1/connectionProfiles/test-dest
+        displayName: test-job
+        name: projects/fake-project/locations/us-central1/migrationJobs/test-job
+        source: projects/fake-project/locations/us-central1/connectionProfiles/test-source
+        sourceDatabase:
+          engine: MYSQL
+          provider: CLOUDSQL
+        state: DRAFT
+        type: ONE_TIME
+        updateTime: '2020-07-21T17:09:24.321285172Z'
+        vpcPeeringConnectivity: {}
+actions:
+- execute_command:
+    command: database-migration operations describe operation-123 --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/operations/operation-123?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-123",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-07-21T17:09:24.318666476Z",
+                "endTime": "2020-07-21T17:09:24.358331658Z",
+                "target": "projects/fake-project/locations/us-central1/migrationJobs/test-job",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.MigrationJob",
+                "name": "projects/fake-project/locations/us-central1/migrationJobs/test-job",
+                "createTime": "2020-07-21T17:05:19.211441641Z",
+                "updateTime": "2020-07-21T17:09:24.321285172Z",
+                "displayName": "test-job",
+                "state": "DRAFT",
+                "type": "ONE_TIME",
+                "source": "projects/fake-project/locations/us-central1/connectionProfiles/test-source",
+                "destination": "projects/fake-project/locations/us-central1/connectionProfiles/test-dest",
+                "sourceDatabase": {
+                  "provider": "CLOUDSQL",
+                  "engine": "MYSQL"
+                },
+                "vpcPeeringConnectivity": {}
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata
+          apiVersion: v1alpha2
+          createTime: '2020-07-21T17:09:24.318666476Z'
+          endTime: '2020-07-21T17:09:24.358331658Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/us-central1/migrationJobs/test-job
+          verb: update
+        name: projects/fake-project/locations/us-central1/operations/operation-123
+        response:
+          '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.MigrationJob
+          createTime: '2020-07-21T17:05:19.211441641Z'
+          destination: projects/fake-project/locations/us-central1/connectionProfiles/test-dest
+          displayName: test-job
+          name: projects/fake-project/locations/us-central1/migrationJobs/test-job
+          source: projects/fake-project/locations/us-central1/connectionProfiles/test-source
+          sourceDatabase:
+            engine: MYSQL
+            provider: CLOUDSQL
+          state: DRAFT
+          type: ONE_TIME
+          updateTime: '2020-07-21T17:09:24.321285172Z'
+          vpcPeeringConnectivity: {}
+    - expect_exit:
+        code: 0

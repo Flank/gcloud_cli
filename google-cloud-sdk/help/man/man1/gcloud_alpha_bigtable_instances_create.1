@@ -11,7 +11,7 @@ gcloud alpha bigtable instances create \- create a new Bigtable instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha bigtable instances create\fR \fIINSTANCE\fR \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR] [\fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR;\ default="ssd"] [\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR;\ default="PRODUCTION"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha bigtable instances create\fR \fIINSTANCE\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-cluster\-config\fR=[\fIid\fR=\fIID\fR,\fIzone\fR=\fIZONE\fR,\fInodes\fR=\fINODES\fR,...]] [\fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR] [\fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR;\ default="ssd"] [\fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR] [\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR;\ default="PRODUCTION"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -46,15 +46,6 @@ ID of the instance or fully qualified identifier for the instance.
 
 .RS 2m
 .TP 2m
-\fB\-\-cluster\fR=\fICLUSTER\fR
-ID of the cluster.
-
-.TP 2m
-\fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR
-ID of the zone where the cluster is located. Supported zones are listed at
-https://cloud.google.com/bigtable/docs/locations.
-
-.TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 Friendly name of the instance.
 
@@ -70,8 +61,43 @@ Friendly name of the instance.
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+(DEPRECATED) ID of the cluster
+
+The \-\-cluster argument is deprecated; use \-\-cluster\-config instead.
+
+.TP 2m
+\fB\-\-cluster\-config\fR=[\fIid\fR=\fIID\fR,\fIzone\fR=\fIZONE\fR,\fInodes\fR=\fINODES\fR,...]
+\fBRepeatable\fR. Specify cluster config as a key\-value dictionary.
+
+This is the recommended argument for specifying cluster configurations.
+
+Keys can be:
+
+.RS 2m
+*id*: Required. The ID of the cluster.
+.RE
+
+.RS 2m
+*zone*: Required. ID of the zone where the cluster is located. Supported zones are listed at https://cloud.google.com/bigtable/docs/locations.
+.RE
+
+.RS 2m
+*nodes*: The number of nodes of the cluster. Default=1.
+.RE
+
+If this argument is specified, the deprecated arguments for configuring a single
+cluster will be ignored, including \fB\-\-cluster\fR, \fB\-\-cluster\-zone\fR,
+\fB\-\-cluster\-num\-nodes\fR.
+
+See \fBEXAMPLES\fR section.
+
+.TP 2m
 \fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR
-Number of nodes to serve.
+(DEPRECATED) Number of nodes to serve.
+
+The \-\-cluster\-num\-nodes argument is deprecated; use \-\-cluster\-config
+instead.
 
 .TP 2m
 \fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR; default="ssd"
@@ -79,8 +105,19 @@ Storage class for the cluster. \fICLUSTER_STORAGE_TYPE\fR must be one of:
 \fBhdd\fR, \fBssd\fR.
 
 .TP 2m
+\fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR
+(DEPRECATED) ID of the zone where the cluster is located. Supported zones are
+listed at https://cloud.google.com/bigtable/docs/locations.
+
+The \-\-cluster\-zone argument is deprecated; use \-\-cluster\-config instead.
+
+.TP 2m
 \fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR; default="PRODUCTION"
-The type of instance to create. \fIINSTANCE_TYPE\fR must be one of:
+(DEPRECATED) The type of instance to create.
+
+The \-\-instance\-type argument is deprecated. DEVELOPMENT instances are no
+longer offered. All instances are of type PRODUCTION. \fIINSTANCE_TYPE\fR must
+be one of:
 
 .RS 2m
 .TP 2m
@@ -90,8 +127,9 @@ only. They do not provide high availability and no service level agreement
 applies.
 .TP 2m
 \fBPRODUCTION\fR
-Production instances have a minimum of three nodes, provide high availability,
-and are suitable for applications in production.
+Production instances provide high availability, and are suitable for
+applications in production. For backward compatibility, default have 3 nodes if
+\-\-cluster\-num\-nodes is not specified.
 .RE
 .sp
 
@@ -118,16 +156,17 @@ To create an instance with id \f5my\-instance\-id\fR with a cluster located in
 
 .RS 2m
 $ gcloud alpha bigtable instances create my\-instance\-id \e
-    \-\-display\-name="My Instance" \-\-cluster=my\-cluster\-id \e
-    \-\-cluster\-zone=us\-east1\-c
+    \-\-display\-name="My Instance" \e
+    \-\-cluster\-config=id=my\-cluster\-id,zone=us\-east1\-c
 .RE
 
-To create a \f5DEVELOPMENT\fR instance, run:
+To create an instance with multiple clusters, run:
 
 .RS 2m
-$ gcloud alpha bigtable instances create my\-dev\-instance \e
-    \-\-display\-name="Dev Instance" \-\-instance\-type=DEVELOPMENT \e
-    \-\-cluster=my\-cluster\-id \-\-cluster\-zone=us\-east1\-c
+$ gcloud alpha bigtable instances create my\-instance\-id \e
+    \-\-display\-name="My Instance" \e
+    \-\-cluster\-config=id=my\-cluster\-id\-1,zone=us\-east1\-c \e
+    \-\-cluster\-config=id=my\-cluster\-id\-2,zone=us\-west1\-c,nodes=3
 .RE
 
 To create an instance with \f5HDD\fR storage and \f510\fR nodes, run:
@@ -135,8 +174,7 @@ To create an instance with \f5HDD\fR storage and \f510\fR nodes, run:
 .RS 2m
 $ gcloud alpha bigtable instances create my\-hdd\-instance \e
     \-\-display\-name="HDD Instance" \-\-cluster\-storage\-type=HDD \e
-    \-\-cluster\-num\-nodes=10 \-\-cluster=my\-cluster\-id \e
-    \-\-cluster\-zone=us\-east1\-c
+    \-\-cluster\-config=id=my\-cluster\-id,zone=us\-east1\-c,nodes=10
 .RE
 
 
@@ -146,7 +184,7 @@ $ gcloud alpha bigtable instances create my\-hdd\-instance \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud bigtable instances create

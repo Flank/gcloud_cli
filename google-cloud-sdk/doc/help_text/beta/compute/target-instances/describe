@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute target-instances describe displays all data
-    associated with a Google Compute Engine target instance in a project.
+    associated with a Compute Engine target instance in a project.
 
 POSITIONAL ARGUMENTS
      NAME

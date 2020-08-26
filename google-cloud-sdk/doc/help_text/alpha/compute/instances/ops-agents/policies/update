@@ -6,7 +6,7 @@ SYNOPSIS
     gcloud alpha compute instances ops-agents policies update POLICY_ID
         [--agent-rules=[type=TYPE,version=VERSION,package-state=PACKAGE-STATE,
           enable-autoupgrade=ENABLE-AUTOUPGRADE;...]]
-        [--description=DESCRIPTION]
+        [--description=DESCRIPTION] [--etag=ETAG]
         [--os-types=[short-name=SHORT-NAME,version=VERSION;...]]
         [--clear-group-labels
           | --group-labels=[LABEL_NAME=LABEL_VALUE,
@@ -187,6 +187,18 @@ FLAGS
      --description=DESCRIPTION
         Description of the policy.
 
+     --etag=ETAG
+        Etag of the policy.
+
+        etag is used for optimistic concurrency control as a way to help
+        prevent simultaneous updates of a policy from overwriting each other.
+        It is strongly suggested that systems make use of the etag in the
+        read-modify-write cycle to perform policy updates in order to avoid
+        race conditions: an etag is returned in the response of a describe
+        command, and systems are expected to put that etag in the request to an
+        update command to ensure that their change will be applied to the same
+        version of the policy.
+
      --os-types=[short-name=SHORT-NAME,version=VERSION;...]
         A list of OS types to filter instances that the policy applies to.
 
@@ -345,9 +357,18 @@ EXAMPLES
             --group-labels="env=prod,product=myapp;env=staging,product=myapp\
         "
 
+    To perform the same update as above, conditionally on the fact that the
+    policy's etag (retrieved by an earlier command) is
+    f59741c8-bb5e-4ee6-bf6f-c4ebeb6b06e0, run:
+
+        $ gcloud alpha compute instances ops-agents policies update \
+            ops-agents-labels-policy --clear-instances \
+            --group-labels="env=prod,product=myapp;env=staging,product=myapp\
+        " --etag f59741c8-bb5e-4ee6-bf6f-c4ebeb6b06e0
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

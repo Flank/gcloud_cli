@@ -4,8 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha sql instances patch INSTANCE
-        [--activation-policy=ACTIVATION_POLICY] [--[no-]assign-ip] [--async]
-        [--availability-type=AVAILABILITY_TYPE] [--cpu=CPU] [--diff]
+        [--activation-policy=ACTIVATION_POLICY]
+        [--active-directory-domain=ACTIVE_DIRECTORY_DOMAIN] [--[no-]assign-ip]
+        [--async] [--availability-type=AVAILABILITY_TYPE] [--cpu=CPU] [--diff]
         [--[no-]enable-bin-log] [--[no-]enable-database-replication]
         [--enable-point-in-time-recovery] [--follow-gae-app=FOLLOW_GAE_APP]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
@@ -43,6 +44,10 @@ FLAGS
         https://cloud.google.com/sql/faq#activation_policy. ACTIVATION_POLICY
         must be one of: always, never, on-demand.
 
+     --active-directory-domain=ACTIVE_DIRECTORY_DOMAIN
+        Managed Service for Microsoft Active Directory domain this instance is
+        joined to. Only available for SQL Server instances.
+
      --[no-]assign-ip
         Assign a public IP address to the instance. This is a public,
         externally available IPv4 address that you can use to connect to your
@@ -73,9 +78,10 @@ FLAGS
         Show what changed as a result of the update.
 
      --[no-]enable-bin-log
-        Specified if binary log should be enabled. If backup configuration is
-        disabled, binary log must be disabled as well. Use --enable-bin-log to
-        enable and --no-enable-bin-log to disable.
+        Allows for data recovery from a specific point in time, down to a
+        fraction of a second. Must have automatic backups enabled to use. Make
+        sure storage can support at least 7 days of logs. Use --enable-bin-log
+        to enable and --no-enable-bin-log to disable.
 
      --[no-]enable-database-replication
         Enable database replication. Applicable only for read replica
@@ -84,9 +90,9 @@ FLAGS
         --no-enable-database-replication to disable.
 
      --enable-point-in-time-recovery
-        Specifies if point-in-time recovery (using write-ahead log archiving)
-        should be enabled. If backup configuration is disabled, point-in-time
-        recovery must be disabled as well.
+        Allows for data recovery from a specific point in time, down to a
+        fraction of a second, via write-ahead logs. Must have automatic backups
+        enabled to use. Make sure storage can support at least 7 days of logs.
 
      --follow-gae-app=FOLLOW_GAE_APP
         First Generation instances only. The App Engine app this instance
@@ -278,7 +284,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud sql instances patch
         $ gcloud beta sql instances patch

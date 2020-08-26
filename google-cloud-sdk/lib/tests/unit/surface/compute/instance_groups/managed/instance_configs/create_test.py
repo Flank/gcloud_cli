@@ -35,13 +35,13 @@ import httplib2
 from mock import patch
 
 
-class _InstanceGroupManagerInstanceConfigsCreateBetaTestBase(
+class _InstanceGroupManagerInstanceConfigsCreateGATestBase(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
-  API_VERSION = 'beta'
+  API_VERSION = 'v1'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.client = mock.Client(
@@ -133,8 +133,8 @@ class _InstanceGroupManagerInstanceConfigsCreateBetaTestBase(
     return exceptions.HttpNotFoundError(response, body, url)
 
 
-class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
-    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase):
+class InstanceGroupManagerInstanceConfigsCreateGAZonalTest(
+    _InstanceGroupManagerInstanceConfigsCreateGATestBase):
 
   def _ExpectListPerInstanceConfigs(self,
                                     instance_name='foo',
@@ -535,8 +535,8 @@ class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
           """)
 
 
-class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
-    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase):
+class InstanceGroupManagerInstanceConfigsCreateGARegionalTest(
+    _InstanceGroupManagerInstanceConfigsCreateGATestBase):
 
   def _ExpectListManagedInstances(self):
     request = (self.messages.
@@ -803,6 +803,27 @@ class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
           """.format(project_uri=self.project_uri))
 
 
+class _InstanceGroupManagerInstanceConfigsCreateBetaTestBase(
+    _InstanceGroupManagerInstanceConfigsCreateGATestBase):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
+    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase,
+    InstanceGroupManagerInstanceConfigsCreateGAZonalTest):
+  pass
+
+
+class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
+    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase,
+    InstanceGroupManagerInstanceConfigsCreateGARegionalTest):
+  pass
+
+
 class _InstanceGroupManagerInstanceConfigsCreateAlphaTestBase(
     _InstanceGroupManagerInstanceConfigsCreateBetaTestBase):
 
@@ -818,7 +839,7 @@ class InstanceGroupManagerInstanceConfigsCreateAlphaZonalTest(
   pass
 
 
-class _InstanceGroupManagerInstanceConfigsCreateAlphaRegionalTest(
+class InstanceGroupManagerInstanceConfigsCreateAlphaRegionalTest(
     _InstanceGroupManagerInstanceConfigsCreateAlphaTestBase,
     InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest):
   pass

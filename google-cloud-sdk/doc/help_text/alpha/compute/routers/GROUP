@@ -33,49 +33,49 @@ COMMANDS
     COMMAND is one of the following:
 
      add-bgp-peer
-        (ALPHA) Add a BGP peer to a Google Compute Engine router.
+        (ALPHA) Add a BGP peer to a Compute Engine router.
 
      add-interface
-        (ALPHA) Add an interface to a Google Compute Engine router.
+        (ALPHA) Add an interface to a Compute Engine router.
 
      create
-        (ALPHA) Create a Google Compute Engine router.
+        (ALPHA) Create a Compute Engine router.
 
      delete
-        (ALPHA) Delete Google Compute Engine routers.
+        (ALPHA) Delete Compute Engine routers.
 
      describe
-        (ALPHA) Describe a Google Compute Engine router.
+        (ALPHA) Describe a Compute Engine router.
 
      get-nat-mapping-info
         (ALPHA) Display NAT Mapping information in a router.
 
      get-status
-        (ALPHA) Get status of a Google Compute Engine router.
+        (ALPHA) Get status of a Compute Engine router.
 
      list
         (ALPHA) List Google Compute Engine routers.
 
      remove-bgp-peer
-        (ALPHA) Remove a BGP peer from a Google Compute Engine router.
+        (ALPHA) Remove a BGP peer from a Compute Engine router.
 
      remove-interface
-        (ALPHA) Remove an interface from a Google Compute Engine router.
+        (ALPHA) Remove an interface from a Compute Engine router.
 
      update
-        (ALPHA) Update a Google Compute Engine router.
+        (ALPHA) Update a Compute Engine router.
 
      update-bgp-peer
-        (ALPHA) Update a BGP peer on a Google Compute Engine router.
+        (ALPHA) Update a BGP peer on a Compute Engine router.
 
      update-interface
-        (ALPHA) Update an interface on a Google Compute Engine router.
+        (ALPHA) Update an interface on a Compute Engine router.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers
         $ gcloud beta compute routers

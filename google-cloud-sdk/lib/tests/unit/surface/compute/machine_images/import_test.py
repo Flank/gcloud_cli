@@ -28,7 +28,7 @@ from googlecloudsdk.core.resources import InvalidResourceException
 from tests.lib import test_case
 from tests.lib.surface.compute import ovf_import_test_base
 
-_DEFAULT_TIMEOUT = '7056s'
+_DEFAULT_TIMEOUT = '6984s'
 
 
 class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
@@ -506,7 +506,7 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-os={0}'.format(self.os),
         '-tags={0}'.format(tags),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step)
@@ -544,7 +544,7 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format('gs://bucket-name/'),
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step)

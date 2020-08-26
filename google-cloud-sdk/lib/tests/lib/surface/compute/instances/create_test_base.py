@@ -43,6 +43,12 @@ def DefaultMachineTypeOf(api_version):
       'central2-a/machineTypes/n1-standard-1').format(ver=api_version)
 
 
+def DefaultConfidentialVmMachineTypeOf(api_version):
+  return (
+      'https://compute.googleapis.com/compute/{ver}/projects/my-project/zones/'
+      'central2-a/machineTypes/n2d-standard-2').format(ver=api_version)
+
+
 def DefaultPreemptibleMachineTypeOf(api_version):
   return (
       'https://compute.googleapis.com/compute/{ver}/projects/my-project/zones/'
@@ -96,6 +102,8 @@ class InstancesCreateTestBase(test_base.BaseTest):
     self._default_confidential_vm_image = (
         DefaultConfidentialVmImageOf(self.api_version))
     self._default_machine_type = DefaultMachineTypeOf(self.api_version)
+    self._default_confidential_vm_machine_type = (
+        DefaultConfidentialVmMachineTypeOf(self.api_version))
     self._default_network = DefaultNetworkOf(self.api_version)
     self._one_to_one_nat = (
         self.messages.AccessConfig.TypeValueValuesEnum.ONE_TO_ONE_NAT)

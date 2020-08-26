@@ -24,6 +24,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import cli as calliope_cli
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import metrics
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -141,6 +142,31 @@ class CliTests(sdk_test_base.SdkBase):
     c = self.MakeCli()
     c._HandleAllErrors(exceptions.Error('\xff'), 'path', 'GLOBAL')
     log_error.assert_called_with('(path) \\xff')
+
+  @mock.patch.object(metrics, 'Error')
+  def testDoesNotSetHttpStatusCode(self, mock_metrics_error):
+    c = self.MakeCli()
+    c._HandleAllErrors(exceptions.Error(''), 'path', None)
+    mock_metrics_error.assert_called_once_with(
+        'path', exceptions.Error, None, error_extra_info={'error_code': 1})
+
+  @mock.patch.object(metrics, 'Error')
+  def testSetsHttpStatusCode(self, mock_metrics_error):
+
+    class TestHttpError(exceptions.Error):
+      class TestHttpErrorPayload:
+        status_code = 404
+
+      def __init__(self):
+        super(TestHttpError, self).__init__('')
+        self.payload = self.TestHttpErrorPayload()
+
+    c = self.MakeCli()
+    c._HandleAllErrors(TestHttpError(), 'path', None)
+
+    expected_extra_error_info = {'error_code': 1, 'http_status_code': 404}
+    mock_metrics_error.assert_called_once_with(
+        'path', TestHttpError, None, error_extra_info=expected_extra_error_info)
 
 
 if __name__ == '__main__':

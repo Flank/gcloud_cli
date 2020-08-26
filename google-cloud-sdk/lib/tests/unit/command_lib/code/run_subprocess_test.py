@@ -16,11 +16,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import json
 import os.path
 import subprocess
 
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.command_lib.code import cross_platform_temp_file
+from googlecloudsdk.command_lib.code import json_stream
 from googlecloudsdk.command_lib.code import run_subprocess
 from googlecloudsdk.core import config
 from googlecloudsdk.core.updater import update_manager
@@ -143,3 +145,28 @@ class GetOutputJsonTest(test_case.TestCase):
           ['bash', '-c', 'echo should not see this in test log >&2'],
           timeout_sec=10,
           show_stderr=False)
+
+
+class StreamOutputJsonTest(test_case.TestCase):
+
+  def testJsonObjects(self):
+    objs = [{'one': 'two', 'three': 4}, {'five': {'six': 'seven'}}]
+    text = '\n'.join(json.dumps(obj) for obj in objs)
+
+    with cross_platform_temp_file.NamedTempFile(text) as multi_line_file:
+      cmd = ['cat', multi_line_file.name]
+      self.assertSequenceEqual(
+          tuple(run_subprocess.StreamOutputJson(cmd, timeout_sec=10)), objs)
+
+  def testTimeout(self):
+    with self.assertRaises(utils.TimeoutError):
+      tuple(
+          run_subprocess.StreamOutputJson(
+              cmd=['bash', '-c', 'sleep 2; echo {}'], timeout_sec=0.1))
+
+  def testExitNonZero(self):
+    with mock.patch.object(subprocess, 'Popen') as mock_open, \
+         mock.patch.object(json_stream, 'ReadJsonStream', return_value=[]), \
+         self.assertRaises(subprocess.CalledProcessError):
+      mock_open.return_value.returncode = 1
+      tuple(run_subprocess.StreamOutputJson(['/mock/cmd'], timeout_sec=1))

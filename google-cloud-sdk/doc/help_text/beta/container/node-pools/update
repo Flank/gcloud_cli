@@ -107,7 +107,7 @@ REQUIRED FLAGS
               Servers. This feature can only be enabled if Workload Identity is
               enabled at the cluster level.
            SECURE
-              [DPRECATED] Prevents pods not in hostNetwork from accessing
+              [DEPRECATED] Prevents pods not in hostNetwork from accessing
               certain VM metadata, specifically kube-env, which contains
               Kubelet credentials, and the instance identity token. This is a
               temporary security solution available while the bootstrapping

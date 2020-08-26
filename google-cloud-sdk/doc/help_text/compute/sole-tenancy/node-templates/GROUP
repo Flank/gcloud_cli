@@ -29,7 +29,7 @@ COMMANDS
         Create a Compute Engine node template.
 
      delete
-        Delete a Google Compute Engine node template.
+        Delete a Compute Engine node template.
 
      describe
         Describe a Compute Engine node template.

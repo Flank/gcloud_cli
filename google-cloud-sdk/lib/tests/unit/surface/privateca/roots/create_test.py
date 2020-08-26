@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.privateca import locations
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.privateca import create_utils
+from googlecloudsdk.core import properties
 from surface.privateca.roots import create
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -36,6 +37,8 @@ class CreateFlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   def SetUp(self):
     self.parser = util.ArgumentParser()
     create.Create.Args(self.parser)
+    properties.VALUES.core.project.Set(None)
+    properties.VALUES.privateca.location.Set(None)
 
   @mock.patch.object(
       locations,
@@ -160,6 +163,24 @@ class CreateFlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     _, _, ca_source_ref, _ = create_utils._ParseCAResourceArgs(args)
     self.assertEqual(ca_source_ref.projectsId, 'bar')
     self.assertEqual(ca_source_ref.locationsId, 'us-west1')
+    self.assertEqual(ca_source_ref.certificateAuthoritiesId, 'source-root')
+
+  @mock.patch.object(
+      locations,
+      'GetSupportedLocations',
+      autospec=True,
+      return_value=['us-west1', 'us-east1', 'europe-west1'])
+  def testParseSourceWithImplicitLocation(self, location_mock):
+    properties.VALUES.core.project.Set('bar')
+    properties.VALUES.privateca.location.Set('us-central1')
+    args = self.parser.parse_args([
+        'new-ca',
+        '--kms-key-version=projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1',
+        '--from-ca=source-root',
+    ])
+    _, _, ca_source_ref, _ = create_utils._ParseCAResourceArgs(args)
+    self.assertEqual(ca_source_ref.projectsId, 'bar')
+    self.assertEqual(ca_source_ref.locationsId, 'us-central1')
     self.assertEqual(ca_source_ref.certificateAuthoritiesId, 'source-root')
 
 

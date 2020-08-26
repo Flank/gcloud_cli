@@ -3,14 +3,20 @@ NAME
         to the .npmrc file
 
 SYNOPSIS
-    gcloud beta artifacts print-settings npm [--scope=SCOPE]
-        [--repository=REPOSITORY : --location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta artifacts print-settings npm [--json-key=JSON_KEY]
+        [--scope=SCOPE] [--repository=REPOSITORY : --location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Print credential settings to add to the .npmrc file for connecting
     to an npm repository.
 
 FLAGS
+     --json-key=JSON_KEY
+        Path to service account JSON key. If not specified, current active
+        service account credentials or a placeholder for gcloud credentials is
+        used.
+
      --scope=SCOPE
         The scope to associate with the Artifact Registry registry. If not
         specified, Artifact Registry is set as the default registry.
@@ -49,6 +55,11 @@ EXAMPLES
 
         $ gcloud beta artifacts print-settings npm \
             --repository="my-repository"
+
+    To print a snippet using service account key:
+
+        $ gcloud beta artifacts print-settings npm \
+            --json-key=path/to/key.json
 
     To print a snippet for the repository set in the artifacts/repository
     property with scope @my-company:

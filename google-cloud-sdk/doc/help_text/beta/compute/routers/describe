@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute routers describe - describe a Google Compute Engine
-        router
+    gcloud beta compute routers describe - describe a Compute Engine router
 
 SYNOPSIS
     gcloud beta compute routers describe NAME [--region=REGION]
@@ -8,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers describe displays all data associated
-    with a Google Compute Engine router.
+    with a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

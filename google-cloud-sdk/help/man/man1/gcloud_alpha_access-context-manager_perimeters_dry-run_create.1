@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager perimeters dry\-run create \- create a dry
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager perimeters dry\-run create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) (\fB\-\-access\-levels\fR=[\fIaccess_levels\fR,...]\ \fB\-\-resources\fR=[\fIresources\fR,...]\ \fB\-\-restricted\-services\fR=[\fIrestricted_services\fR,...]\ \fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIvpc_allowed_services\fR,...]\ |\ [\fB\-\-perimeter\-title\fR=\fIPERIMETER_TITLE\fR\ \fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR\ :\ \fB\-\-perimeter\-access\-levels\fR=[\fIaccess_levels\fR,...]\ \fB\-\-perimeter\-description\fR=\fIPERIMETER_DESCRIPTION\fR\ \fB\-\-perimeter\-resources\fR=[\fIresources\fR,...]\ \fB\-\-perimeter\-restricted\-services\fR=[\fIrestricted_services\fR,...]\ \fB\-\-perimeter\-enable\-vpc\-accessible\-services\fR\ \fB\-\-perimeter\-vpc\-allowed\-services\fR=[\fIvpc_allowed_services\fR,...]]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager perimeters dry\-run create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) (\fB\-\-access\-levels\fR=[\fIaccess_levels\fR,...]\ \fB\-\-egress\-policies\fR=\fIYAML_FILE\fR\ \fB\-\-ingress\-policies\fR=\fIYAML_FILE\fR\ \fB\-\-resources\fR=[\fIresources\fR,...]\ \fB\-\-restricted\-services\fR=[\fIrestricted_services\fR,...]\ \fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIvpc_allowed_services\fR,...]\ |\ [\fB\-\-perimeter\-title\fR=\fIPERIMETER_TITLE\fR\ \fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR\ :\ \fB\-\-perimeter\-access\-levels\fR=[\fIaccess_levels\fR,...]\ \fB\-\-perimeter\-description\fR=\fIPERIMETER_DESCRIPTION\fR\ \fB\-\-perimeter\-egress\-policies\fR=\fIYAML_FILE\fR\ \fB\-\-perimeter\-ingress\-policies\fR=\fIYAML_FILE\fR\ \fB\-\-perimeter\-resources\fR=[\fIresources\fR,...]\ \fB\-\-perimeter\-restricted\-services\fR=[\fIrestricted_services\fR,...]\ \fB\-\-perimeter\-enable\-vpc\-accessible\-services\fR\ \fB\-\-perimeter\-vpc\-allowed\-services\fR=[\fIvpc_allowed_services\fR,...]]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -75,6 +75,20 @@ Comma\-separated list of IDs for access levels (in the same policy) that an
 intra\-perimeter request must satisfy to be allowed.
 
 .TP 2m
+\fB\-\-egress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Egress Policies. This file contains a list
+of YAML\-compliant objects representing Egress Policies described in the API
+reference. For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+.TP 2m
+\fB\-\-ingress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Ingress Policies. This file contains a list
+of YAML\-compliant objects representing Ingress Policies described in the API
+reference. For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+.TP 2m
 \fB\-\-resources\fR=[\fIresources\fR,...]
 Comma\-separated list of resources (currently only projects, in the form
 \f5projects/<projectnumber>\fR) in this perimeter.
@@ -136,6 +150,20 @@ intra\-perimeter request must satisfy to be allowed.
 .TP 2m
 \fB\-\-perimeter\-description\fR=\fIPERIMETER_DESCRIPTION\fR
 Long\-form description of Service Perimeter.
+
+.TP 2m
+\fB\-\-perimeter\-egress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Egress Policies. This file contains a list
+of YAML\-compliant objects representing Egress Policies described in the API
+reference. For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+.TP 2m
+\fB\-\-perimeter\-ingress\-policies\fR=\fIYAML_FILE\fR
+Path to a file containing a list of Ingress Policies. This file contains a list
+of YAML\-compliant objects representing Ingress Policies described in the API
+reference. For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
 
 .TP 2m
 \fB\-\-perimeter\-resources\fR=[\fIresources\fR,...]
@@ -216,7 +244,7 @@ a_level" \-\-perimeter\-restricted\-services="storage.googleapis.com"
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud access\-context\-manager perimeters dry\-run create

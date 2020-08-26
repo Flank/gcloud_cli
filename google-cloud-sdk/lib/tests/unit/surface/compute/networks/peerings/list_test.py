@@ -28,7 +28,7 @@ from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.networks import test_resources
 
 
 # This test can be deleted once list_test.scenario.yaml is promoted to GA.

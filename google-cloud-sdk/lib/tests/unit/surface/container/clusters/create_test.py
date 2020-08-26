@@ -1750,6 +1750,28 @@ resourceLimits:
       self.Run((self.clusters_command_base.format(self.ZONE) +
                 ' create {0} --addons=CloudRun').format(self.CLUSTER_NAME))
 
+  def testCreateEnableAddonsConfigConnectorWithoutStackdriverKubernetes(self):
+    logging = 'Cloud Logging'
+    monitoring = 'Cloud Monitoring'
+    err_msg = (
+        'The ConfigConnector-on-GKE addon (--addons=ConfigConnector) requires '
+        '%s and %s to be enabled via the --enable-stackdriver-kubernetes flag.'
+    ) % (logging, monitoring)
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run(
+          (self.clusters_command_base.format(self.ZONE) +
+           ' create {0} --addons=ConfigConnector').format(self.CLUSTER_NAME))
+
+  def testCreateEnableAddonsConfigConnectorWithoutWorkloadIdentity(self):
+    err_msg = ('The ConfigConnector-on-GKE addon (--addons=ConfigConnector) '
+               'requires workload identity to be enabled via the '
+               '--workload-pool=WORKLOAD_POOL flag.')
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run((
+          self.clusters_command_base.format(self.ZONE) +
+          ' create {0} --addons=ConfigConnector --enable-stackdriver-kubernetes'
+      ).format(self.CLUSTER_NAME))
+
   def testAutoUpgradeDefault(self):
     cluster_kwargs = {
         'management':
@@ -1885,6 +1907,45 @@ resourceLimits:
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  @parameterized.parameters(
+      (' --enable-master-global-access ', True),
+      (' --no-enable-master-global-access ', False),
+  )
+  def testEnableMasterGlobalAccess(self, flags, enabled):
+    cluster_kwargs = {
+        'name': self.CLUSTER_NAME,
+    }
+
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        createSubnetwork=False,
+        useIpAliases=True,
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+        enabled=enabled)
+    config = self._MakePrivateClusterConfig(
+        masterGlobalAccessConfig=master_global_access_config,
+        enablePrivateNodes=True,
+        masterIpv4Cidr='172.16.10.0/28')
+    expected_cluster.privateClusterConfig = config
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--enable-private-nodes '
+        '--master-ipv4-cidr=172.16.10.0/28 '
+        '{flags}'
+        '--quiet'.format(name=self.CLUSTER_NAME, flags=flags))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
 
 class CreateTestGAOnly(CreateTestGA):
   """gcloud GA track only using container v1 API (not beta/alpha)."""
@@ -1947,6 +2008,40 @@ class CreateTestGAOnly(CreateTestGA):
       self.Run((self.clusters_command_base.format(self.ZONE) +
                 ' create {0} --enable-stackdriver-kubernetes '
                 '--addons=CloudRun').format(self.CLUSTER_NAME))
+
+  def testCreateEnableAddonsConfigConnector(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=True),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=True),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=True)),
+        'loggingService':
+            'logging.googleapis.com/kubernetes',
+        'monitoringService':
+            'monitoring.googleapis.com/kubernetes',
+    }
+
+    cluster = self._MakeCluster(**cluster_kwargs)
+    cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
+        workloadPool='{}.svc.id.goog'.format(self.PROJECT_ID))
+    self.ExpectCreateCluster(cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.15.11-gke.5'))
+
+    self.Run(
+        (self.clusters_command_base.format(self.ZONE) + ' create {cluster} '
+         ' --enable-stackdriver-kubernetes'
+         ' --workload-pool={project}.svc.id.goog'
+         ' --addons=ConfigConnector --quiet').format(
+             cluster=self.CLUSTER_NAME, project=self.PROJECT_ID))
+    self.AssertOutputContains('RUNNING')
 
   def testCreateEnableAddonsNodeLocalDNS(self):
     cluster_kwargs = {
@@ -2287,6 +2382,21 @@ resourceLimits:
               name=self.CLUSTER_NAME, channel=channel_name))
     self.AssertErrContains('Invalid choice')
 
+  def testCreateNoEnableIpAlias(self):
+    cluster_kwargs = {}
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(useRoutes=True)
+    expected_cluster.ipAllocationPolicy = policy
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--no-enable-ip-alias'.format(name=self.CLUSTER_NAME))
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -2497,21 +2607,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
-  def testCreateNoEnableIpAlias(self):
-    cluster_kwargs = {}
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(useRoutes=True)
-    expected_cluster.ipAllocationPolicy = policy
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--no-enable-ip-alias'.format(name=self.CLUSTER_NAME))
-
   def testCreateAllowRouteOverlap(self):
     cluster_kwargs = {
         'clusterIpv4Cidr': '10.1.0.0/16',
@@ -2604,45 +2699,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         '--private-cluster '
         '--master-ipv4-cidr=172.16.10.0/28 '
         '--quiet'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
-
-  @parameterized.parameters(
-      (' --enable-master-global-access ', True),
-      (' --no-enable-master-global-access ', False),
-  )
-  def testEnableMasterGlobalAccess(self, flags, enabled):
-    cluster_kwargs = {
-        'name': self.CLUSTER_NAME,
-    }
-
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(
-        createSubnetwork=False,
-        useIpAliases=True,
-    )
-    expected_cluster.ipAllocationPolicy = policy
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
-        enabled=enabled)
-    config = self._MakePrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config,
-        enablePrivateNodes=True,
-        masterIpv4Cidr='172.16.10.0/28')
-    expected_cluster.privateClusterConfig = config
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-ip-alias '
-        '--private-cluster '
-        '--master-ipv4-cidr=172.16.10.0/28 '
-        '{flags}'
-        '--quiet'.format(name=self.CLUSTER_NAME, flags=flags))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
@@ -3151,28 +3207,6 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
              cluster=self.CLUSTER_NAME, project=self.PROJECT_ID))
     self.AssertOutputContains('RUNNING')
 
-  def testCreateEnableAddonsConfigConnectorWithoutStackdriverKubernetes(self):
-    logging = 'Cloud Logging'
-    monitoring = 'Cloud Monitoring'
-    err_msg = (
-        'The ConfigConnector-on-GKE addon (--addons=ConfigConnector) requires '
-        '%s and %s to be enabled via the --enable-stackdriver-kubernetes flag.'
-    ) % (logging, monitoring)
-    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
-      self.Run(
-          (self.clusters_command_base.format(self.ZONE) +
-           ' create {0} --addons=ConfigConnector').format(self.CLUSTER_NAME))
-
-  def testCreateEnableAddonsConfigConnectorWithoutWorkloadIdentity(self):
-    err_msg = ('The ConfigConnector-on-GKE addon (--addons=ConfigConnector) '
-               'requires workload identity to be enabled via the '
-               '--workload-pool=WORKLOAD_POOL flag.')
-    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
-      self.Run((
-          self.clusters_command_base.format(self.ZONE) +
-          ' create {0} --addons=ConfigConnector --enable-stackdriver-kubernetes'
-      ).format(self.CLUSTER_NAME))
-
   def testCreateEnableAddonsApplicationManager(self):
     cluster_kwargs = {
         'addonsConfig':
@@ -3618,6 +3652,15 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  def testCreateSnapshotsExport(self):
+    kubernetes_objects_export_config = self.msgs.KubernetesObjectsExportConfig(
+        kubernetesObjectsChangesTarget='CLOUD_LOGGING',
+        kubernetesObjectsSnapshotsTarget='CLOUD_LOGGING')
+    self._TestCreate(
+        {'kubernetesObjectsExportConfig': kubernetes_objects_export_config},
+        flags='--kubernetes-objects-changes-target=CLOUD_LOGGING --kubernetes-objects-snapshots-target=CLOUD_LOGGING'
+    )
+
   def testPrivateIPv6GoogleAccessBidirectional(self):
     cluster_kwargs = {'management': self._MakeDefaultNodeManagement()}
     expected_cluster = self._MakeCluster(**cluster_kwargs)
@@ -3833,7 +3876,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
 
   def testCreateEnableAddonsCloudRun(self):
     auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
-    load_balancer_type = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_UNSPECIFIED
     cluster_kwargs = {
         'addonsConfig':
             self.msgs.AddonsConfig(
@@ -3846,8 +3888,7 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
                     disabled=True),
                 cloudRunConfig=self.msgs.CloudRunConfig(
                     disabled=False,
-                    enableAlphaFeatures=False,
-                    loadBalancerType=load_balancer_type),
+                    enableAlphaFeatures=False),
                 istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
         'clusterTelemetry':
             self.msgs.ClusterTelemetry(
@@ -3931,7 +3972,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
 
   def testCreateEnableAddonsCloudRunAlphaFeatures(self):
     auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
-    load_balancer_type = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_UNSPECIFIED
     cluster_kwargs = {
         'addonsConfig':
             self.msgs.AddonsConfig(
@@ -3944,8 +3984,7 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
                     disabled=True),
                 cloudRunConfig=self.msgs.CloudRunConfig(
                     disabled=False,
-                    enableAlphaFeatures=True,
-                    loadBalancerType=load_balancer_type),
+                    enableAlphaFeatures=True),
                 istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
         'clusterTelemetry':
             self.msgs.ClusterTelemetry(
@@ -4377,8 +4416,9 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
   def testEnableDefaultDNS(self):
     cluster_kwargs = {}
     expected_cluster = self._MakeCluster(**cluster_kwargs)
-    expected_dns_config = self.messages.DNSConfig(clusterDns=(
-        self.messages.DNSConfig.ClusterDnsValueValuesEnum.PLATFORM_DEFAULT))
+    expected_dns_config = self.messages.DNSConfig(
+        clusterDns=(
+            self.messages.DNSConfig.ClusterDnsValueValuesEnum.PLATFORM_DEFAULT))
     expected_cluster.networkConfig = self.messages.NetworkConfig(
         dnsConfig=expected_dns_config)
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
@@ -4517,52 +4557,14 @@ linuxConfig:
         name=self.CLUSTER_NAME,
         flags=flags))
 
-  @parameterized.parameters(
-      (' --enable-master-global-access ', True),
-      (' --no-enable-master-global-access ', False),
-  )
-  def testEnableMasterGlobalAccess(self, flags, enabled):
-    cluster_kwargs = {
-        'name': self.CLUSTER_NAME,
-    }
-
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(
-        createSubnetwork=False,
-        useIpAliases=True,
-    )
-    expected_cluster.ipAllocationPolicy = policy
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
-        enabled=enabled)
-    config = self._MakePrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config,
-        enablePrivateNodes=True,
-        masterIpv4Cidr='172.16.10.0/28')
-    expected_cluster.privateClusterConfig = config
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-ip-alias '
-        '--private-cluster '
-        '--master-ipv4-cidr=172.16.10.0/28 '
-        '{flags}'
-        '--quiet'.format(name=self.CLUSTER_NAME, flags=flags))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
-
   def testEnableDataplaneV2(self):
     cluster_kwargs = {}
     expected_cluster = self._MakeCluster(**cluster_kwargs)
     expected_cluster.networkConfig = (
-        self.messages.NetworkConfig(datapathProvider=(
-            self.messages.NetworkConfig.
-            DatapathProviderValueValuesEnum.ADVANCED_DATAPATH)))
+        self.messages.NetworkConfig(
+            datapathProvider=(
+                self.messages.NetworkConfig.DatapathProviderValueValuesEnum
+                .ADVANCED_DATAPATH)))
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     return_args = cluster_kwargs.copy()

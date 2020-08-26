@@ -1,6 +1,6 @@
 NAME
-    gcloud compute routers add-interface - add an interface to a Google Compute
-        Engine router
+    gcloud compute routers add-interface - add an interface to a Compute Engine
+        router
 
 SYNOPSIS
     gcloud compute routers add-interface NAME --interface-name=INTERFACE_NAME
@@ -12,7 +12,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute routers add-interface is used to add an interface to a
-    Google Compute Engine router.
+    Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

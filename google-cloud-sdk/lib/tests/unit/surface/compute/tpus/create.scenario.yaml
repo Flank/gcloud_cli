@@ -1,5 +1,5 @@
 title: Create TPU
-release_tracks: [BETA, GA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: compute/zone us-central1-c

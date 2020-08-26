@@ -1,6 +1,6 @@
 NAME
     gcloud compute reservations add-iam-policy-binding - add IAM policy binding
-        to a Google Compute Engine reservation
+        to a Compute Engine reservation
 
 SYNOPSIS
     gcloud compute reservations add-iam-policy-binding
@@ -9,7 +9,7 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Add an IAM policy binding to the IAM policy of a Google Compute Engine
+    Add an IAM policy binding to the IAM policy of a Compute Engine
     reservation. One binding consists of a member, a role, and an optional
     condition.
 

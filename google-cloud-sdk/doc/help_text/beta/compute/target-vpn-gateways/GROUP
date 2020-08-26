@@ -33,16 +33,14 @@ COMMANDS
         (BETA) Delete Cloud VPN Classic Target VPN Gateways.
 
      describe
-        (BETA) Describe a Google Compute Engine Cloud VPN Classic Target VPN
-        Gateway.
+        (BETA) Describe a Compute Engine Cloud VPN Classic Target VPN Gateway.
 
      list
         (BETA) List Google Compute Engine Cloud VPN Classic Target VPN
         Gateways.
 
      update
-        (BETA) Update a Google Compute Engine Cloud VPN Classic Target VPN
-        Gateway.
+        (BETA) Update a Compute Engine Cloud VPN Classic Target VPN Gateway.
 
 NOTES
     This command is currently in BETA and may change without notice. These

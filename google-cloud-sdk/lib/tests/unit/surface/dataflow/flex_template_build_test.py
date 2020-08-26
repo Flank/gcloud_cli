@@ -35,18 +35,10 @@ class BuildUnitTest(base.DataflowMockingTestBase,
     self.metadata_file = self.Resource('tests/unit/surface/dataflow/test_data',
                                        'flex_template_metadata.json')
 
-  def testRunBetaMissingImage(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --image: Must be specified.'):
-      self.Run('beta dataflow flex-template build '
-               'gs://foo '
-               '--metadata-file {} '
-               '--sdk-language JAVA'.format(self.metadata_file))
-
   def testRunBetaMissingSDKLanguage(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --sdk-language: Must be specified.'):
-      self.Run('beta dataflow flex-template build '
+      self.Run('dataflow flex-template build '
                'gs://foo --image gcr://foo-image '
                '--metadata-file {}'.format(self.metadata_file))
 
@@ -54,7 +46,7 @@ class BuildUnitTest(base.DataflowMockingTestBase,
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
         'argument --sdk-language: Invalid choice: \'java\'.'):
-      self.Run('beta dataflow flex-template build '
+      self.Run('dataflow flex-template build '
                '--image gcr://foo-image '
                '--metadata-file {} '
                '--sdk-language java'.format(self.metadata_file))
@@ -62,7 +54,7 @@ class BuildUnitTest(base.DataflowMockingTestBase,
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
         'argument --sdk-language: Invalid choice: \'python\'.'):
-      self.Run('beta dataflow flex-template build '
+      self.Run('dataflow flex-template build '
                '--image gcr://foo-image '
                '--metadata-file {} '
                '--sdk-language python'.format(self.metadata_file))
@@ -70,7 +62,7 @@ class BuildUnitTest(base.DataflowMockingTestBase,
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
         'argument --sdk-language: Invalid choice: \'random\'.'):
-      self.Run('beta dataflow flex-template build '
+      self.Run('dataflow flex-template build '
                '--image gcr://foo-image '
                '--metadata-file {} '
                '--sdk-language random'.format(self.metadata_file))
@@ -79,7 +71,7 @@ class BuildUnitTest(base.DataflowMockingTestBase,
     with self.AssertRaisesArgumentErrorMatches(
         'argument TEMPLATE_FILE_GCS_PATH: Must be specified.'):
       self.Run(
-          'beta dataflow flex-template build '
+          'dataflow flex-template build '
           '--image gcr://foo-image '
           '--metadata-file {} '
           '--sdk-language JAVA'.format(self.metadata_file))
@@ -87,29 +79,81 @@ class BuildUnitTest(base.DataflowMockingTestBase,
   def testRunBetaBadTemplateFileGCSPath(self):
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must begin with \'gs://\''):
-      self.Run('beta dataflow flex-template build gs//foo '
+      self.Run('dataflow flex-template build gs//foo '
                '--image gcr://foo-image '
                '--metadata-file {} '
                '--sdk-language JAVA'.format(self.metadata_file))
 
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must begin with \'gs://\''):
-      self.Run('beta dataflow flex-template build gcs://foo '
+      self.Run('dataflow flex-template build gcs://foo '
                '--image docker.io/foo-image '
                '--metadata-file {} '
                '--sdk-language JAVA'.format(self.metadata_file))
 
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must begin with \'gs://\''):
-      self.Run('beta dataflow flex-template build foo '
+      self.Run('dataflow flex-template build foo '
                '--image foo-image '
                '--metadata-file {} '
                '--sdk-language JAVA'.format(self.metadata_file))
 
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must begin with \'gs://\''):
-      self.Run('beta dataflow flex-template build gs:foo '
+      self.Run('dataflow flex-template build gs:foo '
                '--image gcr.io/foo-image '
+               '--metadata-file {} '
+               '--sdk-language JAVA'.format(self.metadata_file))
+
+  def testRunBetaNoImage(self):
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        ('Exactly one of (--image | --env --flex-template-base-image '
+         '--image-gcr-path --jar) must be specified.')):
+      self.Run('dataflow flex-template build gs://foo '
+               '--metadata-file {} '
+               '--sdk-language JAVA'.format(self.metadata_file))
+
+  def testRunBetaWithImageAndImageGcrPath(self):
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --env --flex-template-base-image --jar: Must be specified.'):
+      self.Run('dataflow flex-template build gs://foo '
+               '--image gcr.io/foo-image '
+               '--image-gcr-path gcr.io/foo-image '
+               '--metadata-file {} '
+               '--sdk-language JAVA'.format(self.metadata_file))
+
+  def testRunBetaWithImageGcrPathAndMissingBaseImage(self):
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --flex-template-base-image: Must be specified.'):
+      self.Run('dataflow flex-template build gs://foo '
+               '--image-gcr-path gcr.io/foo-image '
+               '--jar test.jar '
+               '--env FLEX_TEMPLATE_JAVA_MAIN_CLASS=SomeClass '
+               '--metadata-file {} '
+               '--sdk-language JAVA'.format(self.metadata_file))
+
+  def testRunBetaWithImageGcrPathAndMissingEnv(self):
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --env: Must be specified.'):
+      self.Run('dataflow flex-template build gs://foo '
+               '--image-gcr-path gcr.io/foo-image '
+               '--jar test.jar '
+               '--flex-template-base-image JAVA11 '
+               '--metadata-file {} '
+               '--sdk-language JAVA'.format(self.metadata_file))
+
+  def testRunBetaWithImageGcrPathAndMissingJars(self):
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --jar: Must be specified.'):
+      self.Run('dataflow flex-template build gs://foo '
+               '--image-gcr-path gcr.io/foo-image '
+               '--env FLEX_TEMPLATE_JAVA_MAIN_CLASS=SomeClass '
+               '--flex-template-base-image JAVA11 '
                '--metadata-file {} '
                '--sdk-language JAVA'.format(self.metadata_file))
 

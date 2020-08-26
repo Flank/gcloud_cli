@@ -198,7 +198,7 @@ FLAGS
         Protocol for incoming requests.
 
         If the load-balancing-scheme is INTERNAL (internal TCP/UDP load
-        balancers), the protocol must be one of: TCP, UDP.
+        balancers), the protocol must be one of: TCP, UDP, ALL.
 
         If the load-balancing-scheme is INTERNAL_SELF_MANAGED (Traffic
         Director), the protocol must be one of: HTTP, HTTPS, HTTP2, GRPC.
@@ -368,7 +368,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute backend-services create
         $ gcloud beta compute backend-services create

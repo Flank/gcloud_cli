@@ -45,9 +45,6 @@ class ServiceAccountBaseTest(e2e_base.WithServiceAuth,
 
   def TearDown(self):
     if self.requires_cleanup:
-      # TODO(b/36050343): b/26496763. Rapid deletions can lead to a server side
-      # error, so any code paths which explicitly test deleting shouldn't use
-      # this automatic cleanup.
       self.RunFormat('iam service-accounts delete {email}')
 
   def RunFormat(self, cmd, *args):

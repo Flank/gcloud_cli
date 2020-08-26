@@ -11,7 +11,7 @@ gcloud alpha identity groups update \- update a group
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha identity groups update\fR \fIEMAIL\fR [\fB\-\-clear\-description\fR\ |\ \fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-clear\-display\-name\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha identity groups update\fR \fIEMAIL\fR [\fB\-\-add\-posix\-group\fR=\fIPOSIX_GROUP\fR\ |\ \fB\-\-clear\-posix\-groups\fR\ |\ \fB\-\-remove\-posix\-groups\fR=[\fIPOSIX_GROUP\fR,...]] [\fB\-\-clear\-description\fR\ |\ \fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-clear\-display\-name\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -35,6 +35,36 @@ The email address of the group to be updated.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-posix\-group\fR=\fIPOSIX_GROUP\fR
+Group id (gid) and a name for a POSIX group that you want to add to the
+specified Cloud Identity group. You can specify multiple POSIX groups to add
+with multiple instances of this flag.
+
+For example, use '\-\-add\-posix\-group=gid=1005,name=eng' to add a single
+group, or '\-\-add\-posix\-group=gid=1005,name=eng
+\-\-add\-posix\-group=gid=1006,name=docs' to add multiple groups.
+
+.TP 2m
+\fB\-\-clear\-posix\-groups\fR
+Clear all POSIX groups from the specified Cloud Identity group.
+
+.TP 2m
+\fB\-\-remove\-posix\-groups\fR=[\fIPOSIX_GROUP\fR,...]
+Remove POSIX groups from the specified Cloud Identity group. You can specify
+multiple POSIX groups by either name or gid by using a comma\-separated list.
+
+For example, use '\-\-remove\-posix\-groups=1005,1006' to remove POSIX groups
+with group ids '1005' and '1006', or use '\-\-remove\-posix\-groups=eng,docs' to
+remove POSIX groups named 'eng' and 'docs'.
+
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:
@@ -103,7 +133,7 @@ $ gcloud alpha identity groups update eng\-discuss@foo.com  \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta identity groups update

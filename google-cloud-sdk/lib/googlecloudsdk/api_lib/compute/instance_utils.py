@@ -94,7 +94,8 @@ def InterpretMachineType(machine_type,
                          custom_cpu,
                          custom_memory,
                          ext=True,
-                         vm_type=False):
+                         vm_type=False,
+                         confidential_vm=False):
   """Interprets the machine type for the instance.
 
   Args:
@@ -103,6 +104,8 @@ def InterpretMachineType(machine_type,
     custom_memory: amount of RAM memory in bytes for custom machine type,
     ext: extended custom machine type should be used if true,
     vm_type:  VM instance generation
+    confidential_vm: If True, default machine type is different for confidential
+      VMs.
 
   Returns:
     A string representing the URL naming a machine-type.
@@ -114,9 +117,12 @@ def InterpretMachineType(machine_type,
       custom machine type flags are used to generate a new instance.
   """
   # Setting the machine type
-  machine_type_name = constants.DEFAULT_MACHINE_TYPE
   if machine_type:
     machine_type_name = machine_type
+  elif confidential_vm:
+    machine_type_name = constants.DEFAULT_MACHINE_TYPE_FOR_CONFIDENTIAL_VMS
+  else:
+    machine_type_name = constants.DEFAULT_MACHINE_TYPE
 
   # Setting the specs for the custom machine.
   if custom_cpu or custom_memory or ext:
@@ -238,7 +244,8 @@ def CreateSchedulingMessage(messages,
                             restart_on_failure,
                             node_affinities=None,
                             min_node_cpu=None,
-                            location_hint=None):
+                            location_hint=None,
+                            maintenance_freeze_duration=None):
   """Create scheduling message for VM."""
   # Note: We always specify automaticRestart=False for preemptible VMs. This
   # makes sense, since no-restart-on-failure is defined as "store-true", and
@@ -265,6 +272,10 @@ def CreateSchedulingMessage(messages,
 
   if location_hint:
     scheduling.locationHint = location_hint
+
+  if maintenance_freeze_duration:
+    scheduling.maintenanceFreezeDurationHours = maintenance_freeze_duration
+
   return scheduling
 
 
@@ -440,7 +451,7 @@ def GetScheduling(args,
                   client,
                   skip_defaults,
                   support_node_affinity=False,
-                  support_min_node_cpu=False,
+                  support_min_node_cpu=True,
                   support_location_hint=False):
   """Generate a Scheduling Message or None based on specified args."""
   node_affinities = None
@@ -457,6 +468,10 @@ def GetScheduling(args,
       args, 'maintenance_policy', 'preemptible', 'restart_on_failure') and
       not node_affinities):
     return None
+  freeze_duration = None
+  if hasattr(args, 'maintenance_freeze_duration') and args.IsSpecified(
+      'maintenance_freeze_duration'):
+    freeze_duration = args.maintenance_freeze_duration
   return CreateSchedulingMessage(
       messages=client.messages,
       maintenance_policy=args.maintenance_policy,
@@ -464,7 +479,8 @@ def GetScheduling(args,
       restart_on_failure=args.restart_on_failure,
       node_affinities=node_affinities,
       min_node_cpu=min_node_cpu,
-      location_hint=location_hint)
+      location_hint=location_hint,
+      maintenance_freeze_duration=freeze_duration)
 
 
 def GetServiceAccounts(args, client, skip_defaults):
@@ -533,7 +549,7 @@ def CheckSpecifiedMachineTypeArgs(args, skip_defaults):
 
 
 def CreateMachineTypeUri(args, compute_client, resource_parser, project,
-                         location, scope):
+                         location, scope, confidential_vm=False):
   """Create a machine type URI for given args and instance reference."""
 
   machine_type = args.machine_type
@@ -548,7 +564,8 @@ def CreateMachineTypeUri(args, compute_client, resource_parser, project,
       custom_cpu=custom_cpu,
       custom_memory=custom_memory,
       ext=ext,
-      vm_type=vm_type)
+      vm_type=vm_type,
+      confidential_vm=confidential_vm)
 
   # Check to see if the custom machine type ratio is supported
   CheckCustomCpuRamRatio(compute_client, project, location, machine_type_name)

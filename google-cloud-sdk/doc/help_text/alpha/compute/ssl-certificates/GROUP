@@ -31,13 +31,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine SSL certificate.
+        (ALPHA) Create a Compute Engine SSL certificate.
 
      delete
-        (ALPHA) Delete Google Compute Engine SSL certificates.
+        (ALPHA) Delete Compute Engine SSL certificates.
 
      describe
-        (ALPHA) Describe a Google Compute Engine SSL certificate.
+        (ALPHA) Describe a Compute Engine SSL certificate.
 
      list
         (ALPHA) List Google Compute Engine SSL certificates.
@@ -46,7 +46,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute ssl-certificates
         $ gcloud beta compute ssl-certificates

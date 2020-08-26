@@ -2,7 +2,8 @@ NAME
     gcloud beta builds cancel - cancel an ongoing build
 
 SYNOPSIS
-    gcloud beta builds cancel BUILDS [BUILDS ...] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta builds cancel BUILDS [BUILDS ...] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Cancel an ongoing build.
@@ -10,6 +11,12 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      BUILDS [BUILDS ...]
         IDs of builds to cancel
+
+FLAGS
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

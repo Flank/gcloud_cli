@@ -26,7 +26,7 @@ from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.compute import ssl_policies_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.ssl_policies import test_resources
 
 
 class SslPoliciesExportTestAlpha(ssl_policies_test_base.SslPoliciesTestBase):

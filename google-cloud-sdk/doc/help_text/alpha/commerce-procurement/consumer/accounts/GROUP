@@ -22,15 +22,16 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Outputs the Account object resulting from the Get API.
+        (ALPHA) Returns the Account object resulting from the Get API.
 
      list
-        (ALPHA) Outputs the List of Account object resulting from the List API.
+        (ALPHA) Returns the List of Account objects resulting from the List
+        API.
 
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

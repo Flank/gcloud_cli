@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute routers update-bgp-peer - update a BGP peer on a Google
+    gcloud beta compute routers update-bgp-peer - update a BGP peer on a
         Compute Engine router
 
 SYNOPSIS
@@ -18,7 +18,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers update-bgp-peer is used to update a BGP
-    peer on a Google Compute Engine router.
+    peer on a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

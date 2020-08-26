@@ -186,7 +186,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Read only. Full path to the `AuthorizedDomain` resource in the API. Example: `apps\/myapp\/authorizedDomains\/example.com`.",
+          "description": "Deprecated Read only. Full path to the `AuthorizedDomain` resource in the API. Example: `projects\/myproject\/authorizedDomains\/example.com`.",
           "type": "string"
         },
         "id": {
@@ -300,7 +300,7 @@
           "type": "string"
         },
         "resourceVersion": {
-          "description": "(Optional) An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources. Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https:\/\/git.k8s.io\/community\/contributors\/devel\/api-conventions.md#concurrency-control-and-consistency",
+          "description": "(Optional) An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources. Populated by the system. Read-only. Value must be treated as opaque by clients. More info: https:\/\/git.k8s.io\/community\/contributors\/devel\/sig-architecture\/api-conventions.md#concurrency-control-and-consistency",
           "type": "string"
         },
         "generation": {
@@ -773,7 +773,10 @@
       "properties": {
         "command": {
           "description": "(Optional) Cloud Run fully managed: not supported Cloud Run for Anthos: supported Command is the command line to execute inside the container, the working directory for the command is root ('\/') in the container's filesystem. The command is simply exec'd, it is not run inside a shell, so traditional shell instructions ('|', etc) won't work. To use a shell, you need to explicitly call out to that shell. Exit status of 0 is treated as live\/healthy and non-zero is unhealthy.",
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1239,11 +1242,6 @@
         },
         "certificateMode": {
           "description": "The mode of the certificate.",
-          "enumDescriptions": [
-            "",
-            "Do not provision an HTTPS certificate.",
-            "Automatically provisions an HTTPS certificate via GoogleCA or LetsEncrypt."
-          ],
           "type": "string",
           "enumDescriptions": [
             "",
@@ -1311,12 +1309,6 @@
         },
         "type": {
           "description": "Resource record type. Example: `AAAA`.",
-          "enumDescriptions": [
-            "An unknown resource record.",
-            "An A resource record. Data is an IPv4 address.",
-            "An AAAA resource record. Data is an IPv6 address.",
-            "A CNAME resource record. Data is a domain name to be aliased."
-          ],
           "type": "string",
           "enumDescriptions": [
             "An unknown resource record.",
@@ -1811,12 +1803,6 @@
       "properties": {
         "logType": {
           "description": "The log type that this config enables.",
-          "enumDescriptions": [
-            "Default case. Should never be this.",
-            "Admin reads. Example: CloudIAM getIamPolicy",
-            "Data writes. Example: CloudSQL Users create",
-            "Data reads. Example: CloudSQL Users list"
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default case. Should never be this.",
@@ -1943,7 +1929,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Name of the parent Application resource. Example: `apps\/myapp`.",
+                      "description": "Name of the parent Project resource. Example: `projects\/myproject`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -2864,6 +2850,46 @@
               }
             }
           }
+        },
+        "authorizeddomains": {
+          "methods": {
+            "list": {
+              "id": "run.projects.authorizeddomains.list",
+              "path": "v1/{+parent}/authorizeddomains",
+              "flatPath": "v1/projects/{projectsId}/authorizeddomains",
+              "httpMethod": "GET",
+              "parameters": {
+                "parent": {
+                  "description": "Name of the parent Project resource. Example: `projects\/myproject`.",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^projects\/[^\/]+$",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "Maximum results to return per page.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "pageToken": {
+                  "description": "Continuation token for fetching the next page of results.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "response": {
+                "$ref": "ListAuthorizedDomainsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "List authorized domains."
+            }
+          }
         }
       }
     },
@@ -2878,7 +2904,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Name of the parent Application resource. Example: `apps\/myapp`.",
+                  "description": "Name of the parent Project resource. Example: `projects\/myproject`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^namespaces\/[^\/]+$",

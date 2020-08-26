@@ -96,11 +96,11 @@ class Product(enum.Enum):
   EVENTS = 'Events'
 
 
-def AddImageArg(parser):
+def AddImageArg(parser, required=True):
   """Add an image resource arg."""
   parser.add_argument(
       '--image',
-      required=True,
+      required=required,
       help='Name of the container image to deploy (e.g. '
       '`gcr.io/cloudrun/hello:latest`).')
 
@@ -119,7 +119,6 @@ def AddConfigFlags(parser):
       help='The YAML or JSON file to use as the build configuration file.')
   build_config.add_argument(
       '--pack',
-      hidden=True,
       type=arg_parsers.ArgDict(
           spec={
               'image': str,
@@ -973,6 +972,12 @@ def _GetTrafficChanges(args):
 def GetConfigurationChanges(args):
   """Returns a list of changes to Configuration, based on the flags set."""
   changes = []
+
+  # FlagIsExplicitlySet can't be used here because args.image is also set from
+  # code in deploy.py.
+  if hasattr(args, 'image') and args.image is not None:
+    changes.append(config_changes.ImageChange(args.image))
+
   changes.extend(_GetScalingChanges(args))
   if _HasEnvChanges(args):
     changes.append(_GetEnvChanges(args))
@@ -1515,6 +1520,7 @@ def ValidatePlatformIsManaged(unused_ref, unused_args, req):
   return req
 
 
+# TODO(b/165145546): Remove advanced build flags for 'gcloud run deploy'
 def AddBuildTimeoutFlag(parser):
   parser.add_argument(
       '--build-timeout',
@@ -1530,7 +1536,6 @@ def AddSourceFlag(parser):
   """Add deploy source flags, an image or a source for build."""
   parser.add_argument(
       '--source',
-      hidden=True,
       help='The location of the source to build. The location can be a '
       'directory on a local disk or a gzipped archive file (.tar.gz) in '
       'Google Cloud Storage. If the source is a local directory, this '

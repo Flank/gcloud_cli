@@ -1,6 +1,6 @@
 NAME
-    gcloud compute packet-mirrorings update - update a Google Compute Engine
-        packet mirroring policy
+    gcloud compute packet-mirrorings update - update a Compute Engine packet
+        mirroring policy
 
 SYNOPSIS
     gcloud compute packet-mirrorings update NAME [--async]
@@ -23,7 +23,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Update a Google Compute Engine packet mirroring policy.
+    Update a Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME

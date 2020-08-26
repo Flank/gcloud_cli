@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute org-security-policies rules create - create a Google
-        Compute Engine security policy rule
+    gcloud beta compute org-security-policies rules create - create a Compute
+        Engine security policy rule
 
 SYNOPSIS
     gcloud beta compute org-security-policies rules create PRIORITY

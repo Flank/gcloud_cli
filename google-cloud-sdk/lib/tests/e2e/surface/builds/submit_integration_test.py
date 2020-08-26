@@ -48,6 +48,7 @@ steps:
 """
 
 
+@test_case.Filters.skip('likely GCR related', 'b/163030401')
 class SubmitIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
 
   def CreateTempBucket(self):

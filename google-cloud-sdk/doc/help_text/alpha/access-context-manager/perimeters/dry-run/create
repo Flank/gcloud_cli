@@ -5,13 +5,16 @@ NAME
 SYNOPSIS
     gcloud alpha access-context-manager perimeters dry-run create
         (PERIMETER : --policy=POLICY)
-        (--access-levels=[access_levels,...] --resources=[resources,...]
+        (--access-levels=[access_levels,...] --egress-policies=YAML_FILE
+          --ingress-policies=YAML_FILE --resources=[resources,...]
           --restricted-services=[restricted_services,...]
           --enable-vpc-accessible-services
           --vpc-allowed-services=[vpc_allowed_services,...]
           | [--perimeter-title=PERIMETER_TITLE --perimeter-type=PERIMETER_TYPE
           : --perimeter-access-levels=[access_levels,...]
           --perimeter-description=PERIMETER_DESCRIPTION
+          --perimeter-egress-policies=YAML_FILE
+          --perimeter-ingress-policies=YAML_FILE
           --perimeter-resources=[resources,...]
           --perimeter-restricted-services=[restricted_services,...]
           --perimeter-enable-vpc-accessible-services
@@ -53,6 +56,18 @@ REQUIRED FLAGS
          --access-levels=[access_levels,...]
             Comma-separated list of IDs for access levels (in the same policy)
             that an intra-perimeter request must satisfy to be allowed.
+
+         --egress-policies=YAML_FILE
+            Path to a file containing a list of Egress Policies. This file
+            contains a list of YAML-compliant objects representing Egress
+            Policies described in the API reference. For more information, see:
+            https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+         --ingress-policies=YAML_FILE
+            Path to a file containing a list of Ingress Policies. This file
+            contains a list of YAML-compliant objects representing Ingress
+            Policies described in the API reference. For more information, see:
+            https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
 
          --resources=[resources,...]
             Comma-separated list of resources (currently only projects, in the
@@ -101,6 +116,18 @@ REQUIRED FLAGS
 
          --perimeter-description=PERIMETER_DESCRIPTION
             Long-form description of Service Perimeter.
+
+         --perimeter-egress-policies=YAML_FILE
+            Path to a file containing a list of Egress Policies. This file
+            contains a list of YAML-compliant objects representing Egress
+            Policies described in the API reference. For more information, see:
+            https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+         --perimeter-ingress-policies=YAML_FILE
+            Path to a file containing a list of Ingress Policies. This file
+            contains a list of YAML-compliant objects representing Ingress
+            Policies described in the API reference. For more information, see:
+            https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
 
          --perimeter-resources=[resources,...]
             Comma-separated list of resources (currently only projects, in the
@@ -155,7 +182,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud access-context-manager perimeters dry-run create
         $ gcloud beta access-context-manager perimeters dry-run create

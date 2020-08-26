@@ -113,6 +113,9 @@ robo-script.gcs:
 additional-apks.two:
   additional-apks: ['local/dir/apk1.apk', 'gs://bucket/apk2.apk']
 
+additional-ipas.two:
+  additional-ipas: ['local/dir/ipa1.ipa', 'gs://bucket/ipa2.ipa']
+
 other-files.good:
   other-files:
     /sdcard/dir1/file.txt: local/dir/file1.txt

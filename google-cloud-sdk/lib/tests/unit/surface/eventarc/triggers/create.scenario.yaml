@@ -1,0 +1,133 @@
+title: eventarc triggers create test scenario
+release_tracks: [BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      eventarc triggers create test-trigger1 --location us-central1
+        --matching-criteria type=google.cloud.pubsub.topic.v1.messagePublished
+        --destination-run-service fake-destination-service1
+  - progress_tracker:
+    - message: Waiting for operation [fake-operation1] to complete
+    - status: SUCCESS
+- execute:
+  - command: |
+      eventarc triggers create test-trigger2 --location global
+        --matching-criteria type=google.cloud.audit.log.v1.written
+        --matching-criteria serviceName=storage.googleapis.com
+        --matching-criteria methodName=storage.buckets.create
+        --service-account fake-service-account
+        --destination-run-service fake-destination-service2
+        --destination-run-location europe-west1
+        --destination-run-path fake/destination/path --async
+
+actions:
+- execute_command:
+    command: |
+      eventarc triggers create test-trigger1 --location us-central1
+        --matching-criteria type=google.cloud.pubsub.topic.v1.messagePublished
+        --destination-run-service fake-destination-service1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://eventarc.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/triggers?alt=json&triggerId=test-trigger1
+          method: POST
+          headers: {}
+          body:
+            json:
+              destination:
+                cloudRunService:
+                  service: projects/fake-project/locations/us-central1/services/fake-destination-service1
+              matchingCriteria:
+              - attribute: type
+                value: google.cloud.pubsub.topic.v1.messagePublished
+              name: projects/fake-project/locations/us-central1/triggers/test-trigger1
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/operations/fake-operation1
+            done: false
+    - api_call:
+        expect_request:
+          uri: https://eventarc.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/operations/fake-operation1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/operations/fake-operation1
+            done: true
+            response:
+              destination:
+                cloudRunService:
+                  service: projects/fake-project/locations/us-central1/services/fake-destination-service1
+              matchingCriteria:
+              - attribute: type
+                value: google.cloud.pubsub.topic.v1.messagePublished
+              name: projects/fake-project/locations/us-central1/triggers/test-trigger1
+    - expect_progress_tracker:
+        message: Waiting for operation [fake-operation1] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://eventarc.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/triggers/test-trigger1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            destination:
+              cloudRunService:
+                service: projects/fake-project/locations/us-central1/services/fake-destination-service1
+            matchingCriteria:
+            - attribute: type
+              value: google.cloud.pubsub.topic.v1.messagePublished
+            name: projects/fake-project/locations/us-central1/triggers/test-trigger1
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      eventarc triggers create test-trigger2 --location global
+        --matching-criteria type=google.cloud.audit.log.v1.written
+        --matching-criteria serviceName=storage.googleapis.com
+        --matching-criteria methodName=storage.buckets.create
+        --service-account fake-service-account
+        --destination-run-service fake-destination-service2
+        --destination-run-location europe-west1
+        --destination-run-path fake/destination/path --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://eventarc.googleapis.com/v1beta1/projects/fake-project/locations/global/triggers?alt=json&triggerId=test-trigger2
+          method: POST
+          headers: {}
+          body:
+            json:
+              destination:
+                cloudRunService:
+                  path: fake/destination/path
+                  service: projects/fake-project/locations/europe-west1/services/fake-destination-service2
+              matchingCriteria:
+              - attribute: type
+                value: google.cloud.audit.log.v1.written
+              - attribute: serviceName
+                value: storage.googleapis.com
+              - attribute: methodName
+                value: storage.buckets.create
+              name: projects/fake-project/locations/global/triggers/test-trigger2
+              serviceAccount: projects/fake-project/serviceAccounts/fake-service-account
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/operations/fake-operation2
+            done: false
+    - expect_exit:
+        code: 0

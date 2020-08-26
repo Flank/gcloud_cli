@@ -337,6 +337,35 @@ class RegionalForwardingRulesCreateBackendServicesAlphaTest(
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
 
+  def testAllProtocol(self):
+    self.Run("""compute forwarding-rules create forwarding-rule-1
+                --load-balancing-scheme internal
+                --target-instance ti
+                --region us-central2
+                --ip-protocol ALL
+                --target-instance-zone us-central2-b
+                --ports all""")
+
+    load_balancing_scheme = (
+        self.messages.ForwardingRule.LoadBalancingSchemeValueValuesEnum.INTERNAL
+    )
+    ip_protocol = (self.messages.ForwardingRule.IPProtocolValueValuesEnum.ALL)
+    self.CheckRequests(
+        [(self.compute.forwardingRules, 'Insert',
+          self.messages.ComputeForwardingRulesInsertRequest(
+              forwardingRule=self.messages.ForwardingRule(
+                  name='forwarding-rule-1',
+                  IPProtocol=ip_protocol,
+                  loadBalancingScheme=load_balancing_scheme,
+                  target='https://compute.googleapis.com/compute/alpha/'
+                  'projects/my-project/zones/us-central2-b/'
+                  'targetInstances/'
+                  'ti'.format(api=self.resource_api),
+                  ports=[],
+                  allPorts=True),
+              project='my-project',
+              region='us-central2'))],)
+
 
 if __name__ == '__main__':
   test_case.main()

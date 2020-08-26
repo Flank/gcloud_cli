@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -89,6 +91,23 @@ class ServicesUpdateTestBeta(base.ServiceDirectoryUnitTestBase):
 
     self.assertEqual(actual, expected)
     self.AssertErrContains('Updated service [my-service].')
+
+  def testUpdate_InvliadRequest_Fails(self):
+    req = self.msgs.ServicedirectoryProjectsLocationsNamespacesServicesPatchRequest(
+        service=self._Service(
+            metadata=self._Metadata([self._AdditionalProperty('a', 'b')])),
+        name=self.service_name,
+        updateMask='metadata')
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces_services.Patch.Expect(
+        request=req, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run('service-directory services update my-service '
+               '--namespace my-namespace '
+               '--location my-location '
+               '--metadata a=b')
+    self.AssertErrNotContains('Updated service')
 
 
 class ServicesUpdateTestAlpha(ServicesUpdateTestBeta):

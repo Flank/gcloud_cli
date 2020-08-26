@@ -6,16 +6,16 @@ summary:
   - command: |
       api-gateway api-configs list
   - stdout: |
-      CONFIG_ID  API_ID    DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-      config1    apiName   Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
-      config2    apiName2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
+      CONFIG_ID  API_ID  DISPLAY_NAME       SERVICE_CONFIG_ID     STATE     CREATE_TIME
+      configs    apis    Config Numero Uno  someServiceConfigID   ACTIVE    2019-11-04T21:12:05
+      configs    apis    Config Numero Dos  someServiceConfigID2  CREATING  2019-11-04T21:12:05
 - execute:
   - command: |
       api-gateway api-configs list --api apiName
   - stdout: |
-      CONFIG_ID  API_ID   DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-      config1    apiName  Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
-      config2    apiName  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
+      CONFIG_ID  API_ID  DISPLAY_NAME       SERVICE_CONFIG_ID     STATE     CREATE_TIME
+      configs    apis    Config Numero Uno  someServiceConfigID   ACTIVE    2019-11-04T21:12:05
+      configs    apis    Config Numero Dos  someServiceConfigID2  CREATING  2019-11-04T21:12:05
 actions:
 - execute_command:
     command: |
@@ -36,18 +36,16 @@ actions:
               displayName: Config Numero Uno
               state: ACTIVE
               createTime: '2019-11-04T21:12:05.040425833Z'
-              serviceRollout:
-                rolloutId: someRoulloutId
+              serviceConfigId: someServiceConfigID
             - name: /projects/asdfasdf/locations/global/apis/apiName2/configs/config2
               displayName: Config Numero Dos
               state: CREATING
               createTime: '2019-11-04T21:12:05.040425833Z'
-              serviceRollout:
-                rolloutId: someRoulloutId2
+              serviceConfigId: someServiceConfigID2
     - expect_stdout: |
-        CONFIG_ID  API_ID    DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-        config1    apiName   Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
-        config2    apiName2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
+        CONFIG_ID  API_ID  DISPLAY_NAME       SERVICE_CONFIG_ID     STATE     CREATE_TIME
+        configs    apis    Config Numero Uno  someServiceConfigID   ACTIVE    2019-11-04T21:12:05
+        configs    apis    Config Numero Dos  someServiceConfigID2  CREATING  2019-11-04T21:12:05
     - expect_exit:
         code: 0
 - execute_command:
@@ -69,17 +67,15 @@ actions:
               displayName: Config Numero Uno
               state: ACTIVE
               createTime: '2019-11-04T21:12:05.040425833Z'
-              serviceRollout:
-                rolloutId: someRoulloutId
+              serviceConfigId: someServiceConfigID
             - name: /projects/asdfasdf/locations/global/apis/apiName/configs/config2
               displayName: Config Numero Dos
               state: CREATING
               createTime: '2019-11-04T21:12:05.040425833Z'
-              serviceRollout:
-                rolloutId: someRoulloutId2
+              serviceConfigId: someServiceConfigID2
     - expect_stdout: |
-        CONFIG_ID  API_ID   DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-        config1    apiName  Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
-        config2    apiName  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
+        CONFIG_ID  API_ID  DISPLAY_NAME       SERVICE_CONFIG_ID     STATE     CREATE_TIME
+        configs    apis    Config Numero Uno  someServiceConfigID   ACTIVE    2019-11-04T21:12:05
+        configs    apis    Config Numero Dos  someServiceConfigID2  CREATING  2019-11-04T21:12:05
     - expect_exit:
         code: 0

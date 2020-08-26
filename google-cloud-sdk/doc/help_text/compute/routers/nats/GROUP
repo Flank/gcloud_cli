@@ -22,19 +22,19 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Add a NAT to a Google Compute Engine router.
+        Add a NAT to a Compute Engine router.
 
      delete
-        Remove a NAT from a Google Compute Engine router.
+        Remove a NAT from a Compute Engine router.
 
      describe
-        Describe a NAT in a Google Compute Engine router.
+        Describe a NAT in a Compute Engine router.
 
      list
-        Lists the NATs on a Google Compute Engine router.
+        Lists the NATs on a Compute Engine router.
 
      update
-        Update a NAT on a Google Compute Engine router.
+        Update a NAT on a Compute Engine router.
 
 NOTES
     These variants are also available:

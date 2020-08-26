@@ -22,10 +22,10 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Creates the free trial resource from Create API.
+        (ALPHA) Creates the Free Trial resource from the Create API.
 
      list
-        (ALPHA) Outputs the List of Free Trial object resulting from the List
+        (ALPHA) Returns the List of Free Trial objects resulting from the List
         API.
 
 NOTES
@@ -33,5 +33,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

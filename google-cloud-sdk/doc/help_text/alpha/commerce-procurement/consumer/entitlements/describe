@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha commerce-procurement consumer entitlements describe - outputs
+    gcloud alpha commerce-procurement consumer entitlements describe - returns
         the Entitlement object resulting from the Get API
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         ENTITLEMENT [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Outputs the Entitlement object resulting from the Get API.
+    (ALPHA) Returns the Entitlement object resulting from the Get API.
 
 POSITIONAL ARGUMENTS
      Entitlement resource - Entitlement to describe. This represents a Cloud
@@ -34,5 +34,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

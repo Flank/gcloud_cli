@@ -2,31 +2,15 @@ NAME
     gcloud alpha container clusters create-auto -
 
 SYNOPSIS
-    gcloud alpha container clusters create-auto NAME
-        [--accelerator=[type=TYPE,[count=COUNT],...]] [--addons=[ADDON,...]]
-        [--async] [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
+    gcloud alpha container clusters create-auto NAME [--async]
+        [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
-        [--create-subnetwork=[KEY=VALUE,...]]
-        [--database-encryption-key=DATABASE_ENCRYPTION_KEY]
-        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE]
-        [--enable-cloud-logging] [--enable-cloud-monitoring]
-        [--enable-ip-alias] [--enable-network-policy] [--enable-shielded-nodes]
-        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
-        [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
-        [--max-nodes-per-pool=MAX_NODES_PER_POOL]
-        [--metadata=KEY=VALUE,[KEY=VALUE,...]]
-        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]] [--network=NETWORK]
-        [--node-labels=[NODE_LABEL,...]] [--num-nodes=NUM_NODES; default=3]
+        [--create-subnetwork=[KEY=VALUE,...]] [--network=NETWORK]
         [--release-channel=CHANNEL] [--services-ipv4-cidr=CIDR]
-        [--services-secondary-range-name=NAME]
-        [--shielded-integrity-monitoring] [--shielded-secure-boot]
-        [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
+        [--services-secondary-range-name=NAME] [--subnetwork=SUBNETWORK]
         [--enable-master-authorized-networks
           --master-authorized-networks=NETWORK,[NETWORK,...]]
-        [--enable-private-endpoint --enable-private-nodes
-          --master-ipv4-cidr=MASTER_IPV4_CIDR --private-cluster]
-        [--password=PASSWORD --enable-basic-auth
-          | --username=USERNAME, -u USERNAME]
+        [--enable-private-endpoint --master-ipv4-cidr=MASTER_IPV4_CIDR]
         [--region=REGION | --zone=ZONE, -z ZONE]
         [--scopes=[SCOPE,...];
           default="gke-default" --service-account=SERVICE_ACCOUNT]
@@ -44,29 +28,6 @@ POSITIONAL ARGUMENTS
         40 characters.
 
 FLAGS
-     --accelerator=[type=TYPE,[count=COUNT],...]
-        Attaches accelerators (e.g. GPUs) to all nodes.
-
-         type
-            (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia
-            Tesla K80) of accelerator to attach to the instances. Use gcloud
-            compute accelerator-types list to learn about all available
-            accelerator types.
-
-         count
-            (Optional) The number of accelerators to attach to the instances.
-            The default value is 1.
-
-     --addons=[ADDON,...]
-        Addons
-        (https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster.AddonsConfig)
-        are additional Kubernetes cluster components. Addons specified by this
-        flag will be enabled. The others will be disabled. Default addons:
-        HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
-        HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        NetworkPolicy, CloudRun, NodeLocalDNS, Istio, ApplicationManager,
-        GcePersistentDiskCsiDriver, ConfigConnector, CloudBuild.
-
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
@@ -122,168 +83,10 @@ FLAGS
         Can not be specified unless '--enable-ip-alias' is also specified. Can
         not be used in conjunction with the '--subnetwork' option.
 
-     --database-encryption-key=DATABASE_ENCRYPTION_KEY
-        Enable Database Encryption.
-
-        Enable database encryption that will be used to encrypt Kubernetes
-        Secrets at the application layer. The key provided should be the
-        resource ID in the format of
-        projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
-        For more information, see
-        https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
-
-     --disk-size=DISK_SIZE
-        Size for node VM boot disks. Defaults to 100GB.
-
-     --disk-type=DISK_TYPE
-        Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
-        be one of: pd-standard, pd-ssd.
-
-     --enable-cloud-logging
-        (DEPRECATED) Automatically send logs from the cluster to the Google
-        Cloud Logging API. This flag is deprecated, use
-        --enable-stackdriver-kubernetes instead.
-
-        From 1.14, legacy Stackdriver GKE logging is deprecated. Thus, flag
-        --enable-cloud-logging is also deprecated. Please use
-        --enable-stackdriver-kubernetes instead, to migrate to new Stackdriver
-        Kubernetes Engine monitoring and logging. For more details, please
-        read: https://cloud.google.com/monitoring/kubernetes-engine/migration.
-
-     --enable-cloud-monitoring
-        (DEPRECATED) Automatically send metrics from pods in the cluster to the
-        Google Cloud Monitoring API. VM metrics will be collected by Google
-        Compute Engine regardless of this setting. This flag is deprecated, use
-        --enable-stackdriver-kubernetes instead.
-
-        From 1.14, legacy Stackdriver GKE monitoring is deprecated. Thus, flag
-        --enable-cloud-monitoring is also deprecated. Please use
-        --enable-stackdriver-kubernetes instead, to migrate to new Stackdriver
-        Kubernetes Engine monitoring and logging. For more details, please
-        read: https://cloud.google.com/monitoring/kubernetes-engine/migration.
-
-     --enable-ip-alias
-        Enable use of alias IPs
-        (https://cloud.google.com/compute/docs/alias-ip/) for Pod IPs. This
-        will require at least two secondary ranges in the subnetwork, one for
-        the pod IPs and another to reserve space for the services range.
-
-     --enable-network-policy
-        Enable network policy enforcement for this cluster. If you are enabling
-        network policy on an existing cluster the network policy addon must
-        first be enabled on the master by using
-        --update-addons=NetworkPolicy=ENABLED flag.
-
-     --enable-shielded-nodes
-        Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will
-        enable a more secure Node credential bootstrapping implementation.
-        Starting with version 1.18, clusters will have shielded GKE nodes by
-        default.
-
-     --image-type=IMAGE_TYPE
-        The image type to use for the cluster. Defaults to server-specified.
-
-        Image Type specifies the base OS that the nodes in the cluster will run
-        on. If an image type is specified, that will be assigned to the cluster
-        and all future upgrades will use the specified image type. If it is not
-        specified the server will pick the default image type.
-
-        The default image type and the list of valid image types are available
-        using the following command.
-
-            $ gcloud container get-server-config
-
-     --issue-client-certificate
-        Issue a TLS client certificate with admin permissions.
-
-        When enabled, the certificate and private key pair will be present in
-        MasterAuth field of the Cluster object. For cluster versions before
-        1.12, a client certificate will be issued by default. As of 1.12,
-        client certificates are disabled by default.
-
-     --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
-        The type of machine to use for nodes. Defaults to n1-standard-1. The
-        list of predefined machine types is available using the following
-        command:
-
-            $ gcloud compute machine-types list
-
-        You can also specify custom machine types with the string
-        "custom-CPUS-RAM" where CPUS is the number of virtual CPUs and RAM is
-        the amount of RAM in MiB.
-
-        For example, to create a node pool using custom machines with 2 vCPUs
-        and 12 GB of RAM:
-
-            $ gcloud alpha container clusters create-auto high-mem-pool \
-                --machine-type=custom-2-12288
-
-     --max-nodes-per-pool=MAX_NODES_PER_POOL
-        The maximum number of nodes to allocate per default initial node pool.
-        Kubernetes Engine will automatically create enough nodes pools such
-        that each node pool contains less than --max-nodes-per-pool nodes.
-        Defaults to 1000 nodes, but can be set as low as 100 nodes per pool on
-        initial create.
-
-     --metadata=KEY=VALUE,[KEY=VALUE,...]
-        Compute Engine metadata to be made available to the guest operating
-        system running on nodes within the node pool.
-
-        Each metadata entry is a key/value pair separated by an equals sign.
-        Metadata keys must be unique and less than 128 bytes in length. Values
-        must be less than or equal to 32,768 bytes in length. The total size of
-        all keys and values must be less than 512 KB. Multiple arguments can be
-        passed to this flag. For example:
-
-        --metadata key-1=value-1,key-2=value-2,key-3=value-3
-
-        Additionally, the following keys are reserved for use by Kubernetes
-        Engine:
-
-        * cluster-location
-        * cluster-name
-        * cluster-uid
-        * configure-sh
-        * enable-os-login
-        * gci-update-strategy
-        * gci-ensure-gke-docker
-        * instance-template
-        * kube-env
-        * startup-script
-        * user-data
-
-    See also Compute Engine's documentation
-    (https://cloud.google.com/compute/docs/storing-retrieving-metadata) on
-    storing and retrieving instance metadata.
-
-     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
-        Same as --metadata except that the value for the entry will be read
-        from a local file.
-
      --network=NETWORK
         The Compute Engine Network that the cluster will connect to. Google
         Kubernetes Engine will use this network when creating routes and
         firewalls for the clusters. Defaults to the 'default' network.
-
-     --node-labels=[NODE_LABEL,...]
-        Applies the given kubernetes labels on all nodes in the new node pool.
-        Example:
-
-            $ gcloud alpha container clusters create-auto example-cluster \
-                --node-labels=label-a=value1,label-2=value2
-
-        New nodes, including ones created by resize or recreate, will have
-        these labels on the kubernetes API node object and can be used in
-        nodeSelectors. See http://kubernetes.io/docs/user-guide/node-selection/
-        for examples.
-
-        Note that kubernetes labels, intended to associate cluster components
-        and resources with one another and manage resource lifecycles, are
-        different from Kubernetes Engine labels that are used for the purpose
-        of tracking billing and usage information.
-
-     --num-nodes=NUM_NODES; default=3
-        The number of nodes to be created in each of the cluster's zones.
 
      --release-channel=CHANNEL
         Release channel a cluster is subscribed to.
@@ -331,15 +134,6 @@ FLAGS
         Must be used in conjunction with '--enable-ip-alias'. Cannot be used
         with --create-subnetwork.
 
-     --shielded-integrity-monitoring
-        Enables monitoring and attestation of the boot integrity of the
-        instance. The attestation is performed against the integrity policy
-        baseline. This baseline is initially derived from the implicitly
-        trusted boot image when the instance is created.
-
-     --shielded-secure-boot
-        The instance will boot with secure boot enabled.
-
      --subnetwork=SUBNETWORK
         The Google Compute Engine subnetwork
         (https://cloud.google.com/compute/docs/subnetworks) to which the
@@ -347,19 +141,6 @@ FLAGS
         specified by --network.
 
         Cannot be used with the "--create-subnetwork" option.
-
-     --tags=TAG,[TAG,...]
-        Applies the given Compute Engine tags (comma separated) on all nodes in
-        the new node-pool. Example:
-
-            $ gcloud alpha container clusters create-auto example-cluster \
-                --tags=tag1,tag2
-
-        New nodes, including ones created by resize or recreate, will have
-        these tags on the Compute Engine API instance object and can be used in
-        firewall rules. See
-        https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
-        for examples.
 
      Master Authorized Networks
 
@@ -391,43 +172,10 @@ FLAGS
           Cluster is managed using the private IP address of the master API
           endpoint.
 
-       --enable-private-nodes
-          Cluster is created with no public IP addresses on the cluster nodes.
-
        --master-ipv4-cidr=MASTER_IPV4_CIDR
           IPv4 CIDR range to use for the master network. This should have a
           netmask of size /28 and should be used in conjunction with the
           --enable-private-nodes flag.
-
-       --private-cluster
-          (DEPRECATED) Cluster is created with no public IP addresses on the
-          cluster nodes.
-
-          The --private-cluster flag is deprecated and will be removed in a
-          future release. Use --enable-private-nodes instead.
-
-     Basic auth
-
-       --password=PASSWORD
-          The password to use for cluster auth. Defaults to a server-specified
-          randomly-generated string.
-
-       Options to specify the username. At most one of these may be specified:
-
-         --enable-basic-auth
-            Enable basic (username/password) auth for the cluster.
-            --enable-basic-auth is an alias for --username=admin;
-            --no-enable-basic-auth is an alias for --username="". Use
-            --password to specify a password; if not, the server will randomly
-            generate one. For cluster versions before 1.12, if neither
-            --enable-basic-auth nor --username is specified,
-            --enable-basic-auth will default to true. After 1.12,
-            --enable-basic-auth will default to false.
-
-         --username=USERNAME, -u USERNAME
-            The user name to use for basic auth for the cluster. Use --password
-            to specify a password; if not, the server will randomly generate
-            one.
 
      At most one of these may be specified:
 
@@ -525,5 +273,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

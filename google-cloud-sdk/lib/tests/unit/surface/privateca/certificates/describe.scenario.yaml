@@ -105,6 +105,13 @@ summary:
       s5U/uohHAyLaUTaQtzkaXJ7PQms538GD5AXwakLm1q+x8A67VWx36fMv7PXXh2fR
       MVu83sJV3ww6XiSs4LL/31e+jKZ78Cc=
       -----END CERTIFICATE-----
+- set_property: privateca/location us-central1
+- execute:
+  - command: |
+      privateca certificates describe my-cert --issuer my-ca
+  - stdout: |-
+      .*name: projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert.*
+      $
 actions:
 - set_property:
     core/project: foo
@@ -349,5 +356,26 @@ actions:
         s5U/uohHAyLaUTaQtzkaXJ7PQms538GD5AXwakLm1q+x8A67VWx36fMv7PXXh2fR
         MVu83sJV3ww6XiSs4LL/31e+jKZ78Cc=
         -----END CERTIFICATE-----
+    - expect_exit:
+        code: 0
+- set_property:
+    privateca/location: us-central1
+- execute_command:
+    command: |
+      privateca certificates describe my-cert --issuer my-ca
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert
+    - expect_stdout:
+        matches: |
+          .*name: projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert.*
     - expect_exit:
         code: 0

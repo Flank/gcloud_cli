@@ -25,7 +25,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.ssl_certificates import test_resources
 import mock
 
 
@@ -83,10 +83,11 @@ class SslCertificatesListTest(test_base.BaseTest,
         compute ssl-certificates list
         """)
 
+    aggregated_list_request = self._getListRequestMessage('my-project')
+
     self.list_json.assert_called_once_with(
         requests=[(self.compute.sslCertificates, 'AggregatedList',
-                   self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project', includeAllScopes=True))],
+                   aggregated_list_request)],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -109,10 +110,12 @@ class SslCertificatesListTest(test_base.BaseTest,
     self.RunVersioned("""
         compute ssl-certificates list --uri
         """)
+
+    aggregated_list_request = self._getListRequestMessage('my-project')
+
     self.list_json.assert_called_once_with(
         requests=[(self.compute.sslCertificates, 'AggregatedList',
-                   self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project', includeAllScopes=True))],
+                   aggregated_list_request)],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -187,13 +190,19 @@ class SslCertificatesListTest(test_base.BaseTest,
         ],
         cli=self.cli,
     )
+
+    aggregated_list_request = self._getListRequestMessage('my-project')
+
     self.list_json.assert_called_with(
         requests=[(self.compute.sslCertificates, 'AggregatedList',
-                   self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project', includeAllScopes=True))],
+                   aggregated_list_request)],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
+
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeSslCertificatesAggregatedListRequest(
+        project=project, includeAllScopes=True)
 
 
 class SslCertificatesListBetaTest(SslCertificatesListTest):
@@ -203,11 +212,20 @@ class SslCertificatesListBetaTest(SslCertificatesListTest):
     return 'beta'
 
 
-class SslCertificatesListAlphaTest(SslCertificatesListTest):
+class SslCertificatesListAlphaTest(SslCertificatesListBetaTest):
 
   @property
   def _api(self):
     return 'alpha'
+
+  def _getListRequestMessage(self, project):
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.messages.ComputeSslCertificatesAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
+    return self.messages.ComputeSslCertificatesAggregatedListRequest(
+        project=project, **request_params)
 
 
 if __name__ == '__main__':

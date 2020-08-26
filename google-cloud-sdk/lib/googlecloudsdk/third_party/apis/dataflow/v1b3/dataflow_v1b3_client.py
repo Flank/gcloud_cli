@@ -49,6 +49,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     self.projects_locations_jobs_debug = self.ProjectsLocationsJobsDebugService(self)
     self.projects_locations_jobs_messages = self.ProjectsLocationsJobsMessagesService(self)
     self.projects_locations_jobs_snapshots = self.ProjectsLocationsJobsSnapshotsService(self)
+    self.projects_locations_jobs_stages = self.ProjectsLocationsJobsStagesService(self)
     self.projects_locations_jobs_workItems = self.ProjectsLocationsJobsWorkItemsService(self)
     self.projects_locations_jobs = self.ProjectsLocationsJobsService(self)
     self.projects_locations_snapshots = self.ProjectsLocationsSnapshotsService(self)
@@ -71,9 +72,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new Template with TemplateVersion. Requires.
-project_id(projects) and template display_name(catalogTemplates).
-The template display_name is set by the user.
+      r"""Creates a new Template with TemplateVersion. Requires project_id(projects) and template display_name(catalogTemplates). The template display_name is set by the user.
 
       Args:
         request: (DataflowProjectsCatalogTemplatesTemplateVersionsCreateRequest) input message
@@ -110,8 +109,7 @@ The template display_name is set by the user.
           }
 
     def Commit(self, request, global_params=None):
-      r"""Creates a new TemplateVersion (Important: not new Template) entry in the.
-spanner table. Requires project_id and display_name (template).
+      r"""Creates a new TemplateVersion (Important: not new Template) entry in the spanner table. Requires project_id and display_name (template).
 
       Args:
         request: (DataflowProjectsCatalogTemplatesCommitRequest) input message
@@ -165,9 +163,7 @@ spanner table. Requires project_id and display_name (template).
     )
 
     def Get(self, request, global_params=None):
-      r"""Get TemplateVersion using project_id and display_name with an optional.
-version_id field. Get latest (has tag "latest") TemplateVersion if
-version_id not set.
+      r"""Get TemplateVersion using project_id and display_name with an optional version_id field. Get latest (has tag "latest") TemplateVersion if version_id not set.
 
       Args:
         request: (DataflowProjectsCatalogTemplatesGetRequest) input message
@@ -194,8 +190,7 @@ version_id not set.
     )
 
     def Label(self, request, global_params=None):
-      r"""Updates the label of the TemplateVersion. Label can be duplicated in.
-Template, so either add or remove the label in the TemplateVersion.
+      r"""Updates the label of the TemplateVersion. Label can be duplicated in Template, so either add or remove the label in the TemplateVersion.
 
       Args:
         request: (DataflowProjectsCatalogTemplatesLabelRequest) input message
@@ -222,11 +217,7 @@ Template, so either add or remove the label in the TemplateVersion.
     )
 
     def Tag(self, request, global_params=None):
-      r"""Updates the tag of the TemplateVersion, and tag is unique in Template.
-If tag exists in another TemplateVersion in the Template, updates the tag
-to this TemplateVersion will remove it from the old TemplateVersion and add
-it to this TemplateVersion. If request is remove_only (remove_only = true),
-remove the tag from this TemplateVersion.
+      r"""Updates the tag of the TemplateVersion, and tag is unique in Template. If tag exists in another TemplateVersion in the Template, updates the tag to this TemplateVersion will remove it from the old TemplateVersion and add it to this TemplateVersion. If request is remove_only (remove_only = true), remove the tag from this TemplateVersion.
 
       Args:
         request: (DataflowProjectsCatalogTemplatesTagRequest) input message
@@ -325,13 +316,7 @@ remove the tag from this TemplateVersion.
           }
 
     def List(self, request, global_params=None):
-      r"""Request the job status.
-
-To request the status of a job, we recommend using
-`projects.locations.jobs.messages.list` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.messages.list` is not recommended, as you can only request
-the status of jobs that are running in `us-central1`.
+      r"""Request the job status. To request the status of a job, we recommend using `projects.locations.jobs.messages.list` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.messages.list` is not recommended, as you can only request the status of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsMessagesListRequest) input message
@@ -455,13 +440,7 @@ the status of jobs that are running in `us-central1`.
     )
 
     def Create(self, request, global_params=None):
-      r"""Creates a Cloud Dataflow job.
-
-To create a job, we recommend using `projects.locations.jobs.create` with a
-[regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.create` is not recommended, as your job will always start
-in `us-central1`.
+      r"""Creates a Cloud Dataflow job. To create a job, we recommend using `projects.locations.jobs.create` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.create` is not recommended, as your job will always start in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsCreateRequest) input message
@@ -487,13 +466,7 @@ in `us-central1`.
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets the state of the specified Cloud Dataflow job.
-
-To get the state of a job, we recommend using `projects.locations.jobs.get`
-with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.get` is not recommended, as you can only get the state of
-jobs that are running in `us-central1`.
+      r"""Gets the state of the specified Cloud Dataflow job. To get the state of a job, we recommend using `projects.locations.jobs.get` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.get` is not recommended, as you can only get the state of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsGetRequest) input message
@@ -519,13 +492,7 @@ jobs that are running in `us-central1`.
     )
 
     def GetMetrics(self, request, global_params=None):
-      r"""Request the job status.
-
-To request the status of a job, we recommend using
-`projects.locations.jobs.getMetrics` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.getMetrics` is not recommended, as you can only request the
-status of jobs that are running in `us-central1`.
+      r"""Request the job status. To request the status of a job, we recommend using `projects.locations.jobs.getMetrics` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.getMetrics` is not recommended, as you can only request the status of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsGetMetricsRequest) input message
@@ -551,14 +518,7 @@ status of jobs that are running in `us-central1`.
     )
 
     def List(self, request, global_params=None):
-      r"""List the jobs of a project.
-
-To list the jobs of a project in a region, we recommend using
-`projects.locations.jobs.list` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). To
-list the all jobs across all regions, use `projects.jobs.aggregated`. Using
-`projects.jobs.list` is not recommended, as you can only get the list of
-jobs that are running in `us-central1`.
+      r"""List the jobs of a project. To list the jobs of a project in a region, we recommend using `projects.locations.jobs.list` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). To list the all jobs across all regions, use `projects.jobs.aggregated`. Using `projects.jobs.list` is not recommended, as you can only get the list of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsListRequest) input message
@@ -610,13 +570,7 @@ jobs that are running in `us-central1`.
     )
 
     def Update(self, request, global_params=None):
-      r"""Updates the state of an existing Cloud Dataflow job.
-
-To update the state of an existing job, we recommend using
-`projects.locations.jobs.update` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.update` is not recommended, as you can only update the state
-of jobs that are running in `us-central1`.
+      r"""Updates the state of an existing Cloud Dataflow job. To update the state of an existing job, we recommend using `projects.locations.jobs.update` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.update` is not recommended, as you can only update the state of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsUpdateRequest) input message
@@ -750,13 +704,7 @@ of jobs that are running in `us-central1`.
           }
 
     def List(self, request, global_params=None):
-      r"""Request the job status.
-
-To request the status of a job, we recommend using
-`projects.locations.jobs.messages.list` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.messages.list` is not recommended, as you can only request
-the status of jobs that are running in `us-central1`.
+      r"""Request the job status. To request the status of a job, we recommend using `projects.locations.jobs.messages.list` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.messages.list` is not recommended, as you can only request the status of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsMessagesListRequest) input message
@@ -814,6 +762,42 @@ the status of jobs that are running in `us-central1`.
         request_field='',
         request_type_name='DataflowProjectsLocationsJobsSnapshotsListRequest',
         response_type_name='ListSnapshotsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsJobsStagesService(base_api.BaseApiService):
+    """Service class for the projects_locations_jobs_stages resource."""
+
+    _NAME = 'projects_locations_jobs_stages'
+
+    def __init__(self, client):
+      super(DataflowV1b3.ProjectsLocationsJobsStagesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetExecutionDetails(self, request, global_params=None):
+      r"""Request detailed information about the execution status of a stage of the job. EXPERIMENTAL. This API is subject to change or removal without notice.
+
+      Args:
+        request: (DataflowProjectsLocationsJobsStagesGetExecutionDetailsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (StageExecutionDetails) The response message.
+      """
+      config = self.GetMethodConfig('GetExecutionDetails')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetExecutionDetails.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='dataflow.projects.locations.jobs.stages.getExecutionDetails',
+        ordered_params=['projectId', 'location', 'jobId', 'stageId'],
+        path_params=['jobId', 'location', 'projectId', 'stageId'],
+        query_params=['endTime', 'pageSize', 'pageToken', 'startTime'],
+        relative_path='v1b3/projects/{projectId}/locations/{location}/jobs/{jobId}/stages/{stageId}/executionDetails',
+        request_field='',
+        request_type_name='DataflowProjectsLocationsJobsStagesGetExecutionDetailsRequest',
+        response_type_name='StageExecutionDetails',
         supports_download=False,
     )
 
@@ -890,13 +874,7 @@ the status of jobs that are running in `us-central1`.
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a Cloud Dataflow job.
-
-To create a job, we recommend using `projects.locations.jobs.create` with a
-[regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.create` is not recommended, as your job will always start
-in `us-central1`.
+      r"""Creates a Cloud Dataflow job. To create a job, we recommend using `projects.locations.jobs.create` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.create` is not recommended, as your job will always start in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsCreateRequest) input message
@@ -922,13 +900,7 @@ in `us-central1`.
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets the state of the specified Cloud Dataflow job.
-
-To get the state of a job, we recommend using `projects.locations.jobs.get`
-with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.get` is not recommended, as you can only get the state of
-jobs that are running in `us-central1`.
+      r"""Gets the state of the specified Cloud Dataflow job. To get the state of a job, we recommend using `projects.locations.jobs.get` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.get` is not recommended, as you can only get the state of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsGetRequest) input message
@@ -953,14 +925,34 @@ jobs that are running in `us-central1`.
         supports_download=False,
     )
 
-    def GetMetrics(self, request, global_params=None):
-      r"""Request the job status.
+    def GetExecutionDetails(self, request, global_params=None):
+      r"""Request detailed information about the execution status of the job. EXPERIMENTAL. This API is subject to change or removal without notice.
 
-To request the status of a job, we recommend using
-`projects.locations.jobs.getMetrics` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.getMetrics` is not recommended, as you can only request the
-status of jobs that are running in `us-central1`.
+      Args:
+        request: (DataflowProjectsLocationsJobsGetExecutionDetailsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (JobExecutionDetails) The response message.
+      """
+      config = self.GetMethodConfig('GetExecutionDetails')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetExecutionDetails.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='dataflow.projects.locations.jobs.getExecutionDetails',
+        ordered_params=['projectId', 'location', 'jobId'],
+        path_params=['jobId', 'location', 'projectId'],
+        query_params=[],
+        relative_path='v1b3/projects/{projectId}/locations/{location}/jobs/{jobId}/executionDetails',
+        request_field='',
+        request_type_name='DataflowProjectsLocationsJobsGetExecutionDetailsRequest',
+        response_type_name='JobExecutionDetails',
+        supports_download=False,
+    )
+
+    def GetMetrics(self, request, global_params=None):
+      r"""Request the job status. To request the status of a job, we recommend using `projects.locations.jobs.getMetrics` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.getMetrics` is not recommended, as you can only request the status of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsGetMetricsRequest) input message
@@ -986,14 +978,7 @@ status of jobs that are running in `us-central1`.
     )
 
     def List(self, request, global_params=None):
-      r"""List the jobs of a project.
-
-To list the jobs of a project in a region, we recommend using
-`projects.locations.jobs.list` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). To
-list the all jobs across all regions, use `projects.jobs.aggregated`. Using
-`projects.jobs.list` is not recommended, as you can only get the list of
-jobs that are running in `us-central1`.
+      r"""List the jobs of a project. To list the jobs of a project in a region, we recommend using `projects.locations.jobs.list` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). To list the all jobs across all regions, use `projects.jobs.aggregated`. Using `projects.jobs.list` is not recommended, as you can only get the list of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsListRequest) input message
@@ -1045,13 +1030,7 @@ jobs that are running in `us-central1`.
     )
 
     def Update(self, request, global_params=None):
-      r"""Updates the state of an existing Cloud Dataflow job.
-
-To update the state of an existing job, we recommend using
-`projects.locations.jobs.update` with a [regional endpoint]
-(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
-`projects.jobs.update` is not recommended, as you can only update the state
-of jobs that are running in `us-central1`.
+      r"""Updates the state of an existing Cloud Dataflow job. To update the state of an existing job, we recommend using `projects.locations.jobs.update` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.update` is not recommended, as you can only update the state of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsUpdateRequest) input message
@@ -1175,10 +1154,7 @@ of jobs that are running in `us-central1`.
           }
 
     def Validate(self, request, global_params=None):
-      r"""Validates a GoogleSQL query for Cloud Dataflow syntax. Will always.
-confirm the given query parses correctly, and if able to look up
-schema information from DataCatalog, will validate that the query
-analyzes properly as well.
+      r"""Validates a GoogleSQL query for Cloud Dataflow syntax. Will always confirm the given query parses correctly, and if able to look up schema information from DataCatalog, will validate that the query analyzes properly as well.
 
       Args:
         request: (DataflowProjectsLocationsSqlValidateRequest) input message
@@ -1400,9 +1376,7 @@ analyzes properly as well.
           }
 
     def List(self, request, global_params=None):
-      r"""List TemplateVersions using project_id and an optional display_name field.
-List all the TemplateVersions in the Template if display set.
-List all the TemplateVersions in the Project if display_name not set.
+      r"""List TemplateVersions using project_id and an optional display_name field. List all the TemplateVersions in the Template if display set. List all the TemplateVersions in the Project if display_name not set.
 
       Args:
         request: (DataflowProjectsTemplateVersionsListRequest) input message

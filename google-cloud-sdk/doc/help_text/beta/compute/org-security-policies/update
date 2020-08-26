@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute org-security-policies update - update a Google Compute
-        Engine organization security policy
+    gcloud beta compute org-security-policies update - update a Compute Engine
+        organization security policy
 
 SYNOPSIS
     gcloud beta compute org-security-policies update SECURITY_POLICY

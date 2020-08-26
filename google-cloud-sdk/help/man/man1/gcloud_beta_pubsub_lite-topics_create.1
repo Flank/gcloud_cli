@@ -11,7 +11,7 @@ gcloud beta pubsub lite\-topics create \- create a Pub/Sub Lite topic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta pubsub lite\-topics create\fR \fITOPIC\fR \fB\-\-partitions\fR=\fIPARTITIONS\fR \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR \fB\-\-zone\fR=\fIZONE\fR [\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR] [\fB\-\-scale\fR=\fISCALE\fR;\ default=1] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta pubsub lite\-topics create\fR \fITOPIC\fR \fB\-\-partitions\fR=\fIPARTITIONS\fR \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR \fB\-\-zone\fR=\fIZONE\fR [\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR] [\fB\-\-per\-partition\-publish\-mib\fR=\fIPER_PARTITION_PUBLISH_MIB\fR;\ default=4] [\fB\-\-per\-partition\-subscribe\-mib\fR=\fIPER_PARTITION_SUBSCRIBE_MIB\fR;\ default=8] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -77,12 +77,13 @@ reached. A valid example value of this flag would be
 \f5message\-retention\-period="2w"\fR.
 
 .TP 2m
-\fB\-\-scale\fR=\fISCALE\fR; default=1
-Topic partition scale value. Every partition in the topic is allocated
-throughput equivalent to \f5scale\fR times the standard partition throughput (4
-MiB/s of publishing throughput and 8 MiB/s of subscribing throughput). This is
-also reflected in the cost of this topic; a topic with \f5scale\fR of 2 and
-count of 10 is charged for 20 partitions.
+\fB\-\-per\-partition\-publish\-mib\fR=\fIPER_PARTITION_PUBLISH_MIB\fR; default=4
+Topic partition publish throughput capacity in MiB/s. Must be between 4 and 16.
+
+.TP 2m
+\fB\-\-per\-partition\-subscribe\-mib\fR=\fIPER_PARTITION_SUBSCRIBE_MIB\fR; default=8
+Topic partition subscribe throughput capacity in MiB/s. Must be between 4 and
+32.
 
 
 .RE
@@ -114,7 +115,6 @@ To create a Pub/Sub lite\-topic, run:
 $ gcloud beta pubsub lite\-topics create mytopic \e
     \-\-zone=us\-central1\-a \e
     \-\-partitions=1 \e
-    \-\-scale=1 \e
     \-\-per\-partition\-bytes=30GiB \e
     \-\-message\-retention\-period=2w
 .RE

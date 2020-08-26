@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute reservations list - list Google Compute Engine
-        reservations
+    gcloud beta compute reservations list - list Compute Engine reservations
 
 SYNOPSIS
     gcloud beta compute reservations list [--filter=EXPRESSION] [--limit=LIMIT]
@@ -8,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List Google Compute Engine reservations.
+    (BETA) List Compute Engine reservations.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

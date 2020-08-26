@@ -15,6 +15,12 @@ summary:
         role: roles/non-primitive
       etag: etag
       version: 1
+- set_property: privateca/location us-central1
+- execute:
+  - command: privateca subordinates set-iam-policy my-ca policy.json --project=my-project
+  - stderr: |
+      Updated IAM policy for Certificate Authority [my-ca].
+  - stdout: .*$
 actions:
 - write_file:
     path: policy.json
@@ -31,7 +37,6 @@ actions:
           }
         ]
       }
-
 - execute_command:
     command: privateca subordinates set-iam-policy my-ca --location europe policy.json
       --project=my-project
@@ -81,5 +86,31 @@ actions:
           role: roles/non-primitive
         etag: etag
         version: 1
+    - expect_exit:
+        code: 0
+- set_property:
+    privateca/location: us-central1
+- execute_command:
+    command: privateca subordinates set-iam-policy my-ca policy.json --project=my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/my-project/locations/us-central1/certificateAuthorities/my-ca:setIamPolicy?alt=json
+          method: POST
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": []
+            }
+    - expect_stderr: |
+        Updated IAM policy for Certificate Authority [my-ca].
+    - expect_stdout:
+        matches: .*
     - expect_exit:
         code: 0

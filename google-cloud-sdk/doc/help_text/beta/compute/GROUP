@@ -103,7 +103,7 @@ GROUPS
         (BETA) Read and manipulate Compute Engine operations.
 
      org-security-policies
-        (BETA) Manage Google Compute Engine organization security policies.
+        (BETA) Manage Compute Engine organization security policies.
 
      os-config
         (BETA) Manage OS Config tasks for Compute Engine VM instances.
@@ -112,7 +112,7 @@ GROUPS
         (BETA) Create and manipulate Compute Engine OS Login resources.
 
      packet-mirrorings
-        (BETA) Manage Google Compute Engine packet mirroring resources.
+        (BETA) Manage Compute Engine packet mirroring resources.
 
      project-info
         (BETA) Read and manipulate project-level data like quotas and metadata.
@@ -151,7 +151,7 @@ GROUPS
         (BETA) List, create, delete and update Compute Engine SSL policies.
 
      target-grpc-proxies
-        (BETA) Manage Google Compute Engine target gRPC proxy resources.
+        (BETA) Manage Compute Engine target gRPC proxy resources.
 
      target-http-proxies
         (BETA) List, create, and delete target HTTP proxies.

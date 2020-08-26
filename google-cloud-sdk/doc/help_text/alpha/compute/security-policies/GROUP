@@ -31,20 +31,19 @@ GROUPS
     GROUP is one of the following:
 
      rules
-        (ALPHA) Read and manipulate Google Compute Engine security policies
-        rules.
+        (ALPHA) Read and manipulate Compute Engine security policies rules.
 
 COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine security policy.
+        (ALPHA) Create a Compute Engine security policy.
 
      delete
         (ALPHA) Delete security policies.
 
      describe
-        (ALPHA) Describe a Google Compute Engine security policy.
+        (ALPHA) Describe a Compute Engine security policy.
 
      export
         (ALPHA) Export security policy configs into yaml files.
@@ -59,13 +58,13 @@ COMMANDS
         (ALPHA) List all available preconfigured expression sets.
 
      update
-        (ALPHA) Update a Google Compute Engine security policy.
+        (ALPHA) Update a Compute Engine security policy.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute security-policies
         $ gcloud beta compute security-policies

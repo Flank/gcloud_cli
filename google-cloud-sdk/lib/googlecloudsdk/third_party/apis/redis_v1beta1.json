@@ -312,35 +312,29 @@
         },
         "host": {
           "description": "Output only. Hostname or IP address of the exposed Redis endpoint used by clients to connect to the service.",
+          "readOnly": true,
           "type": "string"
         },
         "port": {
           "description": "Output only. The port number of the exposed Redis endpoint.",
+          "readOnly": true,
           "type": "integer",
           "format": "int32"
         },
         "currentLocationId": {
           "description": "Output only. The current zone where the Redis endpoint is placed. For Basic Tier instances, this will always be the same as the location_id provided by the user at creation time. For Standard Tier instances, this can be either location_id or alternative_location_id and can change after a failover event.",
+          "readOnly": true,
           "type": "string"
         },
         "createTime": {
           "description": "Output only. The time the instance was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "state": {
           "description": "Output only. The current state of this instance.",
-          "enumDescriptions": [
-            "Not set.",
-            "Redis instance is being created.",
-            "Redis instance has been created and is fully usable.",
-            "Redis instance configuration is being updated. Certain kinds of updates may cause the instance to become unusable while the update is in progress.",
-            "Redis instance is being deleted.",
-            "Redis instance is being repaired and may be unusable.",
-            "Maintenance is being performed on this Redis instance.",
-            "Redis instance is importing data (availability may be affected).",
-            "Redis instance is failing over (availability may be affected)."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -367,6 +361,7 @@
         },
         "statusMessage": {
           "description": "Output only. Additional information about the current status of this instance, if available.",
+          "readOnly": true,
           "type": "string"
         },
         "redisConfigs": {
@@ -378,11 +373,6 @@
         },
         "tier": {
           "description": "Required. The service tier of the instance.",
-          "enumDescriptions": [
-            "Not set.",
-            "BASIC tier: standalone instance",
-            "STANDARD_HA tier: highly available primary\/replica instances"
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -406,15 +396,11 @@
         },
         "persistenceIamIdentity": {
           "description": "Output only. Cloud IAM identity used by import \/ export operations to transfer data to\/from Cloud Storage. Format is \"serviceAccount:\". The value may change over time for a given instance so should be checked before each import\/export operation.",
+          "readOnly": true,
           "type": "string"
         },
         "connectMode": {
           "description": "Optional. The network connect mode of the Redis instance. If not provided, the connect mode defaults to DIRECT_PEERING.",
-          "enumDescriptions": [
-            "Not set.",
-            "Connect via direct peering to the Memorystore for Redis hosted service.",
-            "Connect your Memorystore for Redis instance using Private Services Access. Private services access provides an IP address range for multiple Google Cloud services, including Memorystore."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -513,11 +499,6 @@
       "properties": {
         "dataProtectionMode": {
           "description": "Optional. Available data protection modes that the user can choose. If it's unspecified, data protection mode will be LIMITED_DATA_LOSS by default.",
-          "enumDescriptions": [
-            "Defaults to LIMITED_DATA_LOSS if a data protection mode is not specified.",
-            "Instance failover will be protected with data loss control. More specifically, the failover will only be performed if the current replication offset diff between master and replica is under a certain threshold.",
-            "Instance failover will be performed without data loss control."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Defaults to LIMITED_DATA_LOSS if a data protection mode is not specified.",
@@ -576,6 +557,7 @@
       "properties": {
         "availableZones": {
           "description": "Output only. The set of available zones in the location. The map is keyed by the lowercase ID of each zone, as defined by GCE. These keys can be specified in `location_id` or `alternative_location_id` fields when creating a Redis instance.",
+          "readOnly": true,
           "type": "object",
           "additionalProperties": {
             "$ref": "GoogleCloudRedisV1beta1ZoneMetadata"
@@ -600,11 +582,13 @@
         },
         "createTime": {
           "description": "Output only. Timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. Timestamp when the resource was last modified.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -617,15 +601,7 @@
         },
         "state": {
           "description": "Output only. Current lifecycle state of the resource (e.g. if it's being created or ready to use).",
-          "enumDescriptions": [
-            "Unspecified state.",
-            "Instance is being created.",
-            "Instance has been created and is ready to use.",
-            "Instance is being updated.",
-            "Instance is unheathy and under repair.",
-            "Instance is being deleted.",
-            "Instance encountered an error and is in indeterministic state."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Unspecified state.",
@@ -662,10 +638,12 @@
         },
         "tenantProjectId": {
           "description": "Output only. ID of the associated GCP tenant project. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "string"
         },
         "producerMetadata": {
           "description": "Output only. Custom string attributes used primarily to expose producer-specific information in monitoring dashboards. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -673,6 +651,7 @@
         },
         "provisionedResources": {
           "description": "Output only. The list of data plane resources provisioned for this instance, e.g. compute VMs. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource"
@@ -680,6 +659,7 @@
         },
         "sloMetadata": {
           "description": "Output only. SLO metadata for instance classification in the Standardized dataplane SLO platform. See go\/cloud-ssa-standard-slo for feature description.",
+          "readOnly": true,
           "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata"
         },
         "maintenanceSchedules": {

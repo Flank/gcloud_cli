@@ -32,7 +32,9 @@ OPTIONAL FLAGS
         this command invocation.
 
      --network=NETWORK
-        Network that this target instance applies to.
+        Network that this target instance applies to. This is only necessary if
+        the corresponding instance has multiple network interfaces. If not
+        specified, the default network interface will be used.
 
      --zone=ZONE
         Zone of the target instance to operate on. If not specified and the
@@ -66,7 +68,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute target-instances create
         $ gcloud beta compute target-instances create

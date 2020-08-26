@@ -49,7 +49,7 @@ class TriggersDescribeTestAlpha(base.EventsBase):
                                     'CloudPubSubSource',
                                     'sources.eventing.knative.dev')
     self.source.name = 'my-source'
-    self.source.set_sink('my-broker', 'v1alpha1')
+    self.source.set_sink('my-broker', self.api_version)
     self.source.spec.project = 'fake-project'
     self.source.spec.topic = 'my-topic'
     self.operations.GetSource.return_value = self.source
@@ -58,9 +58,14 @@ class TriggersDescribeTestAlpha(base.EventsBase):
     """Creates a trigger and assigns it as output to GetTrigger."""
     self.trigger = trigger.Trigger.New(self.mock_client, 'default')
     self.trigger.name = 'my-trigger'
-    self.trigger.status.conditions = [
-        self.messages.TriggerCondition(type='Ready', status='True')
-    ]
+    if self.api_name == 'anthosevents':
+      self.trigger.status.conditions = [
+          self.messages.Condition(type='Ready', status='True')
+      ]
+    else:
+      self.trigger.status.conditions = [
+          self.messages.TriggerCondition(type='Ready', status='True')
+      ]
     self.trigger.dependency = source_obj
     self.trigger.filter_attributes[
         trigger.EVENT_TYPE_FIELD] = 'com.google.event.type'
@@ -130,9 +135,9 @@ class TriggersDescribeTestAlpha(base.EventsBase):
     self.AssertOutputContains(
         """sink:
             ref:
-              apiVersion: eventing.knative.dev/v1alpha1
+              apiVersion: eventing.knative.dev/{}
               kind: Broker
-              name: my-broker""",
+              name: my-broker""".format(self.api_version),
         normalize_space=True)
     self.AssertOutputContains('topic: my-topic')
 
@@ -153,3 +158,14 @@ class TriggersDescribeTestAlpha(base.EventsBase):
     self.Run('events triggers describe my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.AssertErrContains('No matching event source')
+
+
+class TriggersDescribeTestAlphaAnthos(TriggersDescribeTestAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'anthosevents'
+    self.api_version = 'v1beta1'
+
+  def testDescribeManaged(self):
+    pass

@@ -7,22 +7,16 @@ summary:
   - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config
       root-ca --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
   - stderr: |
-      Creating the initial Certificate Revocation List.
-  - stderr: |
       Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-ca].
 - execute:
   - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config
       root-ca --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-west1
       --bucket my-bucket
   - stderr: |
-      Creating the initial Certificate Revocation List.
-  - stderr: |
       Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/new-ca].
 - execute:
   - command: privateca roots create new-ca --from-ca source-root --from-ca-location
       us-east1 --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
-  - stderr: |
-      Creating the initial Certificate Revocation List.
   - stderr: |
       Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-ca].
 - execute:
@@ -313,32 +307,6 @@ actions:
             response:
               name: projects/foo/locations/us-east1/certificateAuthorities/new-ca
     - expect_stderr: |
-        Creating the initial Certificate Revocation List.
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities/new-ca:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            pem_crl: |
-              -----BEGIN X509 CRL-----
-              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
-              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
-              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
-              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
-              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
-              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
-              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
-              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
-              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
-              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
-              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
-              -----END X509 CRL-----
-    - expect_stderr: |
         Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-ca].
     - expect_exit:
         code: 0
@@ -608,32 +576,6 @@ actions:
             done: true
             response:
               name: projects/foo/locations/us-west1/certificateAuthorities/new-ca
-    - expect_stderr: |
-        Creating the initial Certificate Revocation List.
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities/new-ca:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            pem_crl: |
-              -----BEGIN X509 CRL-----
-              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
-              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
-              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
-              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
-              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
-              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
-              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
-              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
-              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
-              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
-              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
-              -----END X509 CRL-----
     - expect_stderr: |
         Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/new-ca].
     - expect_exit:
@@ -954,32 +896,6 @@ actions:
             done: true
             response:
               name: projects/foo/locations/us-east1/certificateAuthorities/new-ca
-    - expect_stderr: |
-        Creating the initial Certificate Revocation List.
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities/new-ca:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            pem_crl: |
-              -----BEGIN X509 CRL-----
-              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
-              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
-              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
-              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
-              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
-              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
-              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
-              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
-              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
-              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
-              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
-              -----END X509 CRL-----
     - expect_stderr: |
         Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-ca].
     - expect_exit:

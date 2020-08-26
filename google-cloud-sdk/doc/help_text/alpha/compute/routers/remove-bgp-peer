@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute routers remove-bgp-peer - remove a BGP peer from a
-        Google Compute Engine router
+        Compute Engine router
 
 SYNOPSIS
     gcloud alpha compute routers remove-bgp-peer NAME --peer-name=PEER_NAME
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute routers remove-bgp-peer removes a BGP peer
-    from a Google Compute Engine router.
+    from a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -51,7 +51,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers remove-bgp-peer
         $ gcloud beta compute routers remove-bgp-peer

@@ -1,14 +1,14 @@
 NAME
-    gcloud compute routers nats describe - describe a NAT in a Google Compute
-        Engine router
+    gcloud compute routers nats describe - describe a NAT in a Compute Engine
+        router
 
 SYNOPSIS
     gcloud compute routers nats describe NAME --router=ROUTER [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routers nats describe is used to describe a NAT in a Google
-    Compute Engine router.
+    gcloud compute routers nats describe is used to describe a NAT in a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

@@ -215,6 +215,9 @@ GROUPS
      functions
         Manage Google Cloud Functions.
 
+     game
+        Managed Cloud Game Services.
+
      healthcare
         Manage Cloud Healthcare resources.
 
@@ -268,6 +271,9 @@ GROUPS
 
      run
         Manage your Cloud Run applications.
+
+     scc
+        Manage Cloud SCC resources.
 
      scheduler
         Manage Cloud Scheduler jobs and schedules.

@@ -111,7 +111,7 @@ class WindowsDiagnosticsTest(e2e_test_base.BaseTest):
              '/iam.serviceAccountTokenCreator'.format(
                  _PROJECT_NAME,
                  _SERVICE_ACCOUNT))
-    self.Run('beta compute diagnose export-logs {0} '
+    self.Run('compute diagnose export-logs {0} '
              '--zone {1}'.format(self.instance_name, self.zone))
 
     connection_info = self.GetNewOutput()

@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute snapshots add-iam-policy-binding - add IAM policy
-        binding to a Google Compute Engine snapshot
+        binding to a Compute Engine snapshot
 
 SYNOPSIS
     gcloud beta compute snapshots add-iam-policy-binding SNAPSHOT_NAME
@@ -9,8 +9,8 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Add an IAM policy binding to the IAM policy of a Google Compute
-    Engine snapshot. One binding consists of a member, a role, and an optional
+    (BETA) Add an IAM policy binding to the IAM policy of a Compute Engine
+    snapshot. One binding consists of a member, a role, and an optional
     condition.
 
 POSITIONAL ARGUMENTS

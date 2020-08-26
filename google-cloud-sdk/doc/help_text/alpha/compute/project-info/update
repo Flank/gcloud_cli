@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute project-info update - update a Google Compute Engine
-        project resource
+    gcloud alpha compute project-info update - update a Compute Engine project
+        resource
 
 SYNOPSIS
     gcloud alpha compute project-info update
         [--default-network-tier=DEFAULT_NETWORK_TIER] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute project-info update is used to update a Google
+    (ALPHA) gcloud alpha compute project-info update is used to update a
     Compute Engine project resource.
 
 FLAGS
@@ -27,7 +27,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute project-info update
         $ gcloud beta compute project-info update

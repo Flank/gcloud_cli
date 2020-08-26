@@ -2,9 +2,10 @@ NAME
     gcloud alpha builds list - list builds
 
 SYNOPSIS
-    gcloud alpha builds list [--ongoing] [--filter=EXPRESSION]
-        [--limit=LIMIT; default=50] [--page-size=PAGE_SIZE; default=20]
-        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha builds list [--ongoing] [--region=REGION]
+        [--filter=EXPRESSION] [--limit=LIMIT; default=50]
+        [--page-size=PAGE_SIZE; default=20] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List builds.
@@ -12,6 +13,11 @@ DESCRIPTION
 FLAGS
      --ongoing
         Only list builds that are currently QUEUED or WORKING.
+
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -62,7 +68,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud builds list
         $ gcloud beta builds list

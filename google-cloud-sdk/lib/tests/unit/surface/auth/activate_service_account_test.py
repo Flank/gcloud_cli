@@ -23,7 +23,6 @@ import os
 
 from googlecloudsdk.api_lib.auth import service_account as auth_service_account
 from googlecloudsdk.calliope import exceptions as c_exc
-from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import creds as c_creds
@@ -114,12 +113,6 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase,
 
     self.refresh_mock = self.StartObjectPatch(
         store, 'Refresh', side_effect=_Refresh)
-
-    # TODO(b/157745076): Activating service account via google-auth is enabled
-    # only for Googlers at the moment. We need to mock IsHostGoogleDomain() to
-    # to return True so that google-auth will invoked in the tests.
-    # Remove this mock once it is enabled for everyone.
-    self.StartObjectPatch(auth_util, 'IsHostGoogleDomain', return_value=True)
 
   def _GetTestDataPathFor(self, filename):
     return self.Resource(
@@ -466,13 +459,6 @@ gs_service_key_file = {0}
 
 class BadServiceAccountTest(cli_test_base.CliTestBase):
 
-  def SetUp(self):
-    # TODO(b/157745076): Activating service account via google-auth is enabled
-    # only for Googlers at the moment. We need to mock IsHostGoogleDomain() to
-    # to return True so that google-auth will invoked in the tests.
-    # Remove this mock once it is enabled for everyone.
-    self.StartObjectPatch(auth_util, 'IsHostGoogleDomain', return_value=True)
-
   @TestOauth2clientAndGoogleAuth
   def testNonExistentFile(self):
     with self.assertRaises(files.Error):
@@ -494,8 +480,7 @@ class BadServiceAccountTest(cli_test_base.CliTestBase):
                .format(key_file=key_file))
 
 
-# TODO(b/157745076): Removes this test class once activating service account
-# via google-auth is enabled for everyone.
+# TODO(b/161992086): Removes this test class once oauth2client is deprecated.
 class GoogleAuthServiceAccountActivationEnableTest(cli_test_base.CliTestBase,
                                                    parameterized.TestCase):
   """Tests of enabling google-auth for service account activation."""
@@ -508,17 +493,13 @@ class GoogleAuthServiceAccountActivationEnableTest(cli_test_base.CliTestBase,
     self.activate_creds_mock = self.StartObjectPatch(store,
                                                      'ActivateCredentials')
 
-  @parameterized.parameters((False, True, True), (False, False, False),
-                            (True, True, False), (True, False, False))
-  def testEnableGoogleAuth(self, google_auth_disabled, is_host_google_domain,
-                           expect_use_google_auth):
+  @parameterized.parameters((False, True), (True, False))
+  def testEnableGoogleAuth(self, google_auth_disabled, expect_use_google_auth):
     """Test google-auth enabling logic.
 
     Args:
       google_auth_disabled: bool, True if google-auth is disabled for service
         account activation.
-      is_host_google_domain: bool, whether the host on which gcloud runs is on
-        Google domain.
       expect_use_google_auth: bool, True to expect google-auth is used to
         activate service account.
     """
@@ -526,8 +507,6 @@ class GoogleAuthServiceAccountActivationEnableTest(cli_test_base.CliTestBase,
         properties.VALUES.auth.disable_activate_service_account_google_auth,
         'GetBool',
         return_value=google_auth_disabled)
-    self.StartObjectPatch(
-        auth_util, 'IsHostGoogleDomain', return_value=is_host_google_domain)
 
     # pylint:disable=unused-argument
     # This function must match the signature of store.ActivateCredentials.

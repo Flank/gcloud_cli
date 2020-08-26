@@ -6,9 +6,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute security-policies delete deletes Google
-    Compute Engine security policies. Security policies can only be deleted
-    when no other resources (e.g., backend services) refer to them.
+    (ALPHA) gcloud alpha compute security-policies delete deletes Compute
+    Engine security policies. Security policies can only be deleted when no
+    other resources (e.g., backend services) refer to them.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -26,7 +26,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute security-policies delete
         $ gcloud beta compute security-policies delete

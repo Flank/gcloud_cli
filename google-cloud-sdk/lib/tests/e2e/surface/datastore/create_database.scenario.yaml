@@ -1,0 +1,211 @@
+title: firestore database create
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      datastore databases create --region us-east1 --project=firestore-gcloud-create-test
+  - stderr: |
+      Success! The Google Cloud Firestore in Datastore Mode database was already created for firestore-gcloud-create-test
+- execute:
+  - command: |
+      firestore databases create --region us-east1 --project=firestore-gcloud-create-test
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Success! The Google Cloud Firestore Native database has been created for firestore-gcloud-create-test
+- execute:
+  - command: |
+      firestore databases create --region us-east1 --project=firestore-gcloud-create-test
+  - stderr: |
+      Success! The Google Cloud Firestore Native database was already created for firestore-gcloud-create-test
+- execute:
+  - command: |
+      datastore databases create --region us-east1 --project=firestore-gcloud-create-test
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Success! The Google Cloud Firestore in Datastore Mode database has been created for firestore-gcloud-create-test
+actions:
+- execute_command:
+    command: |
+      datastore databases create --region us-east1 --project=firestore-gcloud-create-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/firestore-gcloud-create-test?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '552'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: apps/firestore-gcloud-create-test
+            id: firestore-gcloud-create-test
+            authDomain: gmail.com
+            locationId: us-east1
+            codeBucket: staging.firestore-gcloud-create-test.appspot.com
+            servingStatus: SERVING
+            defaultHostname: firestore-gcloud-create-test.ue.r.appspot.com
+            defaultBucket: firestore-gcloud-create-test.appspot.com
+            gcrDomain: us.gcr.io
+            databaseType: CLOUD_DATASTORE_COMPATIBILITY
+            featureSettings:
+              splitHealthChecks: true
+              useContainerOptimizedOs: true
+    - expect_stderr: |
+        Success! The Google Cloud Firestore in Datastore Mode database was already created for firestore-gcloud-create-test
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      firestore databases create --region us-east1 --project=firestore-gcloud-create-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/firestore-gcloud-create-test?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '552'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: apps/firestore-gcloud-create-test
+            id: firestore-gcloud-create-test
+            authDomain: gmail.com
+            locationId: us-east1
+            codeBucket: staging.firestore-gcloud-create-test.appspot.com
+            servingStatus: SERVING
+            defaultHostname: firestore-gcloud-create-test.ue.r.appspot.com
+            defaultBucket: firestore-gcloud-create-test.appspot.com
+            gcrDomain: us.gcr.io
+            databaseType: CLOUD_DATASTORE_COMPATIBILITY
+            featureSettings:
+              splitHealthChecks: true
+              useContainerOptimizedOs: true
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/firestore-gcloud-create-test?alt=json&updateMask=databaseType
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              databaseType: CLOUD_FIRESTORE
+        return_response:
+          omit_fields:
+          - metadata
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '450'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: apps/firestore-gcloud-create-test/operations/df623226-492e-4e84-b64b-4b3c33be6403
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Success! The Google Cloud Firestore Native database has been created for firestore-gcloud-create-test
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      firestore databases create --region us-east1 --project=firestore-gcloud-create-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/firestore-gcloud-create-test?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '538'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: apps/firestore-gcloud-create-test
+            id: firestore-gcloud-create-test
+            authDomain: gmail.com
+            locationId: us-east1
+            codeBucket: staging.firestore-gcloud-create-test.appspot.com
+            servingStatus: SERVING
+            defaultHostname: firestore-gcloud-create-test.ue.r.appspot.com
+            defaultBucket: firestore-gcloud-create-test.appspot.com
+            gcrDomain: us.gcr.io
+            databaseType: CLOUD_FIRESTORE
+            featureSettings:
+              splitHealthChecks: true
+              useContainerOptimizedOs: true
+    - expect_stderr: |
+        Success! The Google Cloud Firestore Native database was already created for firestore-gcloud-create-test
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      datastore databases create --region us-east1 --project=firestore-gcloud-create-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/firestore-gcloud-create-test?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '538'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: apps/firestore-gcloud-create-test
+            id: firestore-gcloud-create-test
+            authDomain: gmail.com
+            locationId: us-east1
+            codeBucket: staging.firestore-gcloud-create-test.appspot.com
+            servingStatus: SERVING
+            defaultHostname: firestore-gcloud-create-test.ue.r.appspot.com
+            defaultBucket: firestore-gcloud-create-test.appspot.com
+            gcrDomain: us.gcr.io
+            databaseType: CLOUD_FIRESTORE
+            featureSettings:
+              splitHealthChecks: true
+              useContainerOptimizedOs: true
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/firestore-gcloud-create-test?alt=json&updateMask=databaseType
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              databaseType: CLOUD_DATASTORE_COMPATIBILITY
+        return_response:
+          omit_fields:
+          - metadata
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '450'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: apps/firestore-gcloud-create-test/operations/25a57ab7-ecbb-49b2-b3b0-a8e003aa41d8
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Success! The Google Cloud Firestore in Datastore Mode database has been created for firestore-gcloud-create-test
+    - expect_exit:
+        code: 0

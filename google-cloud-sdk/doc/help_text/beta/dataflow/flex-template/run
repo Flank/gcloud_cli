@@ -50,5 +50,8 @@ EXAMPLES
         max_num_workers=5
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataflow flex-template run
 

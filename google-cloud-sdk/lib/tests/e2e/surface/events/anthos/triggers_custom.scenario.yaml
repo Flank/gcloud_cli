@@ -193,7 +193,7 @@ actions:
           # The uri hostname varies. With python2 it would be kubernetes.default. With
           # python3 it would be monkey patched into IP address of the gke cluster.
           uri:
-            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$\?alt=json
+            matches: https://.*/apis/eventing.knative.dev/v1beta1/namespaces/default/triggers/$$my-trigger$$\?alt=json
           method: GET
           headers: {}
           body: null
@@ -218,12 +218,12 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers\?alt=json
+            matches: https://.*/apis/eventing.knative.dev/v1beta1/namespaces/default/triggers\?alt=json
           method: POST
           headers: {}
           body:
             json:
-              apiVersion: eventing.knative.dev/v1alpha1
+              apiVersion: eventing.knative.dev/v1beta1
               kind: Trigger
               metadata:
                 annotations:
@@ -249,7 +249,7 @@ actions:
             content-type: application/json
             status: '201'
           body:
-            apiVersion: eventing.knative.dev/v1alpha1
+            apiVersion: eventing.knative.dev/v1beta1
             kind: Trigger
             metadata:
               annotations:
@@ -263,7 +263,7 @@ actions:
               name: $$my-trigger$$
               namespace: default
               resourceVersion: '15389992'
-              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$
+              selfLink: /apis/eventing.knative.dev/v1beta1/namespaces/default/triggers/$$my-trigger$$
               uid: a9387132-d7d6-414c-a4d1-78d6feb68b60
             spec:
               broker: default
@@ -278,7 +278,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$\?alt=json
+            matches: https://.*/apis/eventing.knative.dev/v1beta1/namespaces/default/triggers/$$my-trigger$$\?alt=json
           method: GET
           headers: {}
           body: null
@@ -289,7 +289,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: eventing.knative.dev/v1alpha1
+            apiVersion: eventing.knative.dev/v1beta1
             kind: Trigger
             metadata:
               annotations:
@@ -303,7 +303,7 @@ actions:
               name: $$my-trigger$$
               namespace: default
               resourceVersion: '15390028'
-              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$
+              selfLink: /apis/eventing.knative.dev/v1beta1/namespaces/default/triggers/$$my-trigger$$
               uid: a9387132-d7d6-414c-a4d1-78d6feb68b60
             spec:
               broker: default
@@ -455,7 +455,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/eventing.knative.dev/v1alpha1/namespaces/default/triggers/$$my-trigger$$\?alt=json
+            matches: https://.*/apis/eventing.knative.dev/v1beta1/namespaces/default/triggers/$$my-trigger$$\?alt=json
           method: DELETE
           headers: {}
           body: null

@@ -174,6 +174,38 @@ class PerimetersCreateTestAlpha(PerimetersCreateTestBeta):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def testCreateDirectionalPolicies(self):
+    self.SetUpForAPI(self.api_version)
+    ingress_policies = self._MakeIngressPolicies()
+    egress_policies = self._MakeEgressPolicies()
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description=None,
+        type_='PERIMETER_TYPE_REGULAR',
+        ingress_policies=ingress_policies,
+        egress_policies=egress_policies,
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    ingress_policies_spec_path = self.Touch(
+        self.temp_path, 'ingress.yaml', contents=self.INGRESS_POLICIES_SPECS)
+
+    egress_policies_spec_path = self.Touch(
+        self.temp_path, 'egress.yaml', contents=self.EGRESS_POLICIES_SPECS)
+
+    self._ExpectCreate(expected_perimeter, '123')
+
+    result = self.Run('access-context-manager perimeters create MY_PERIMETER '
+                      '   --policy 123 '
+                      '   --title "My Perimeter Title" '
+                      '   --ingress-policies {} --egress-policies {}'.format(
+                          ingress_policies_spec_path,
+                          egress_policies_spec_path))
+
+    self.assertEqual(result, expected_perimeter)
+
 
 if __name__ == '__main__':
   test_case.main()

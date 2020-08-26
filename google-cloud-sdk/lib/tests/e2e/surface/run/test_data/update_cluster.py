@@ -24,6 +24,8 @@ VERSION_BLACKLIST = ('1.14.6-gke.2', '1.14.6-gke.1', '1.14.3-gke.11')
 
 CLUSTER_NAME = 'do-not-delete-knative-test-latest'
 
+IS_GT_PY3 = sys.version_info.major >= 3
+
 
 def Run(cmd):
   """Run a process.
@@ -50,7 +52,7 @@ def GetLatestVersion():
     print(err, file=sys.stderr)
     raise Exception(err)
 
-  if sys.version_info.major >= 3:
+  if IS_GT_PY3:
     out = out.decode('utf-8')
   versions = out.strip().split(';')
   for version in versions:
@@ -95,7 +97,8 @@ def GetCurrentAccount():
     print(err, file=sys.stderr)
     raise Exception(err)
 
-  return out.strip()
+  account = out.strip()
+  return account.decode('utf-8') if IS_GT_PY3 else account
 
 
 def main():

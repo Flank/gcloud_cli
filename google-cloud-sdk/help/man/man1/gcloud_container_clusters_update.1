@@ -11,7 +11,7 @@ gcloud container clusters update \- update cluster settings for an existing cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-disable\-workload\-identity\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-shielded\-nodes\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-release\-channel\fR=\fICHANNEL\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-workload\-pool\fR=\fIWORKLOAD_POOL\fR\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-max\-surge\-upgrade\fR=\fIAUTOPROVISIONING_MAX_SURGE_UPGRADE\fR\ \fB\-\-autoprovisioning\-max\-unavailable\-upgrade\fR=\fIAUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ \fB\-\-enable\-autoprovisioning\-autorepair\fR\ \fB\-\-enable\-autoprovisioning\-autoupgrade\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-disable\-default\-snat\fR\ |\ \fB\-\-disable\-workload\-identity\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-master\-global\-access\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-shielded\-nodes\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-release\-channel\fR=\fICHANNEL\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-workload\-pool\fR=\fIWORKLOAD_POOL\fR\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-max\-surge\-upgrade\fR=\fIAUTOPROVISIONING_MAX_SURGE_UPGRADE\fR\ \fB\-\-autoprovisioning\-max\-unavailable\-upgrade\fR=\fIAUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ \fB\-\-enable\-autoprovisioning\-autorepair\fR\ \fB\-\-enable\-autoprovisioning\-autoupgrade\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -84,6 +84,17 @@ layer. For more information, see
 https://cloud.google.com/kubernetes\-engine/docs/how\-to/encrypting\-secrets.
 
 .TP 2m
+\fB\-\-disable\-default\-snat\fR
+Disable default source NAT rules applied in cluster nodes.
+
+By default, network traffic sending from Pods to outside of VPC will get
+masqueraded by the node external IP. When this flag is set, no default sNAT will
+be enforced on the cluster. The flag must be set if the cluster uses privately
+used public IPs.
+
+Can only be used with private cluster in VPC Native network mode.
+
+.TP 2m
 \fB\-\-disable\-workload\-identity\fR
 Disable Workload Identity on the cluster.
 
@@ -140,6 +151,12 @@ specified.
 Use \f5\-\-no\-enable\-master\-authorized\-networks\fR to disable. When
 disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes master
 through HTTPS.
+
+.TP 2m
+\fB\-\-enable\-master\-global\-access\fR
+Use with private clusters to allow access to the master's private endpoint from
+any Google Cloud region or on\-premises environment regardless of the private
+cluster's region.
 
 .TP 2m
 \fB\-\-enable\-network\-policy\fR
@@ -292,7 +309,8 @@ point to the new IP.
 Cluster addons to enable or disable. Options are
 HorizontalPodAutoscaling=ENABLED|DISABLED HttpLoadBalancing=ENABLED|DISABLED
 KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
-CloudRun=ENABLED|DISABLED NodeLocalDNS=ENABLED|DISABLED
+CloudRun=ENABLED|DISABLED ConfigConnector=ENABLED|DISABLED
+NodeLocalDNS=ENABLED|DISABLED
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]

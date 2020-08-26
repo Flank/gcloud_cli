@@ -102,21 +102,14 @@ run:
 
 .RS 2m
 $ gcloud beta pubsub topics list\-subscriptions mytopic \e
-    \-\-filter=subscriptionId:mysubs
+    \-\-filter=mysubs
 .RE
 
 To combine multiple filters (with AND or OR), run:
 
 .RS 2m
 $ gcloud beta pubsub topics list\-subscriptions mytopic \e
-    \-\-filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
-.RE
-
-To filter subscriptions that match an expression:
-
-.RS 2m
-$ gcloud beta pubsub topics list\-subscriptions mytopic \e
-    \-\-filter="subscriptionId:subs_*"
+    \-\-filter="mysubs1 OR mysubs2"
 .RE
 
 

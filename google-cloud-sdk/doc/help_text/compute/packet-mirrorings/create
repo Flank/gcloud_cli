@@ -1,6 +1,6 @@
 NAME
-    gcloud compute packet-mirrorings create - create a Google Compute Engine
-        packet mirroring policy
+    gcloud compute packet-mirrorings create - create a Compute Engine packet
+        mirroring policy
 
 SYNOPSIS
     gcloud compute packet-mirrorings create NAME --collector-ilb=COLLECTOR_ILB
@@ -11,7 +11,7 @@ SYNOPSIS
         [--mirrored-tags=[TAG,...]] [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create a Google Compute Engine packet mirroring policy.
+    Create a Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME

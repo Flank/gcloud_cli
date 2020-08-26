@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute packet-mirrorings create - create a Google Compute
-        Engine packet mirroring policy
+    gcloud beta compute packet-mirrorings create - create a Compute Engine
+        packet mirroring policy
 
 SYNOPSIS
     gcloud beta compute packet-mirrorings create NAME
@@ -12,7 +12,7 @@ SYNOPSIS
         [--mirrored-tags=[TAG,...]] [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create a Google Compute Engine packet mirroring policy.
+    (BETA) Create a Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME

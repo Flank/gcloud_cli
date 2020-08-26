@@ -5,20 +5,25 @@
 
 .SH "NAME"
 .HP
-gcloud compute instance\-groups managed create\-instance \- create a new virtual machine instance in a managed instance group with a defined name
+gcloud compute instance\-groups managed create\-instance \- create a new virtual machine instance in a managed instance group with a defined name and optionally its stateful configuration
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-groups managed create\-instance\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-groups managed create\-instance\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fBgcloud compute instance\-groups managed create\-instance\fR creates a virtual
-machine instance with a defined name.
+machine instance with a defined name and optionally its stateful configuration:
+stateful disk and stateful metadata key\-values. Stateful configuration is
+stored in the corresponding newly created per\-instance config. An instance with
+a per\-instance config will preserve its given name, specified disks, and
+specified metadata key\-values during instance recreation, auto\-healing, and
+updates and any other lifecycle transitions of the instance.
 
 
 
@@ -47,6 +52,39 @@ Name of the new instance to create.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]
+Disks considered stateful by the instance group. Managed instance groups
+preserve and reattach stateful disks on VM autohealing, update, and recreate
+events.
+
+You can also attach and preserve disks, not defined in the group's instance
+template, to a given instance.
+
+The same disk can be attached to more than one instance but only in read\-only
+mode.
+
+.TP 2m
+\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+Additional metadata to be made available to the guest operating system in
+addition to the metadata defined in the instance template.
+
+Stateful metadata may be used to define a key/value pair specific for the one
+given instance to differentiate it from the other instances in the managed
+instance group.
+
+Stateful metadata key/value pairs are preserved on instance recreation,
+autohealing, updates, and any other lifecycle transitions of the instance.
+
+Stateful metadata have priority over the metadata defined in the instance
+template. This means that stateful metadata that is defined for a key that
+already exists in the instance template overrides the instance template value.
+
+Each metadata entry is a key/value pair separated by an equals sign. Metadata
+keys must be unique and less than 128 bytes in length. Multiple entries can be
+passed to this flag, e.g., \f5\fI\-\-stateful\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+
 .TP 2m
 
 At most one of these may be specified:
@@ -99,11 +137,15 @@ Run \fB$ gcloud help\fR for details.
 .SH "EXAMPLES"
 
 To create an instance \f5instance\-1\fR in \f5my\-group\fR (in region
-europe\-west4), run:
+europe\-west4) with metadata \f5my\-key: my\-value\fR and a disk disk\-1
+attached to it as the device \f5device\-1\fR, run:
 
 .RS 2m
 $ gcloud compute instance\-groups managed create\-instance \e
-      my\-group \-\-region=europe\-west4 \-\-instance=instance\-1
+      my\-group \-\-region=europe\-west4 \e
+      \-\-instance=instance\-1 \e
+      \-\-stateful\-disk='device\-name=foo,source=https://compute.googleapis.com/compute/alpha/projects/my\-project/zones/europe\-west4/disks/disk\-1,mode=rw,auto\-delete=on\-permanent\-instance\-deletion' \e
+      \-\-stateful\-metadata='my\-key=my\-value'
 .RE
 
 

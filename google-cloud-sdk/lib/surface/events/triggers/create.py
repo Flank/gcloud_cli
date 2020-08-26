@@ -30,6 +30,7 @@ from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import flags as serverless_flags
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
+from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import progress_tracker
 
 
@@ -86,6 +87,13 @@ class Create(base.Command):
     trigger_ref = args.CONCEPTS.trigger.Parse()
     namespace_ref = trigger_ref.Parent()
     with eventflow_operations.Connect(conn_context) as client:
+      if client.IsCluster():
+        trigger_ref = resources.REGISTRY.Parse(
+            trigger_ref.RelativeName(),
+            collection=util.ANTHOS_TRIGGER_COLLECTION_NAME,
+            api_version=client.api_version)
+
+        namespace_ref = trigger_ref.Parent()
       if args.custom_type:
         event_type = args.type
         source_obj = None
@@ -120,8 +128,8 @@ class Create(base.Command):
                 'matching this event type.'.format(trigger_obj.name))
           # If the trigger has the right attributes, check if there's already
           # a source that matches the attributes as well.
-          source_ref = util.GetSourceRef(
-              source_obj.name, source_obj.namespace, event_type.crd)
+          source_ref = util.GetSourceRef(source_obj.name, source_obj.namespace,
+                                         event_type.crd, client.IsCluster())
           if client.GetSource(source_ref, event_type.crd) is not None:
             raise exceptions.TriggerCreationError(
                 'Trigger [{}] already exists.'.format(trigger_obj.name))

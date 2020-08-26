@@ -19,7 +19,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Show metadata for a Memorystore Memcached region.
+        (ALPHA) Display metadata for a Memorystore Memcached region.
 
      list
         (ALPHA) List Memorystore Memcached regions.
@@ -28,7 +28,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta memcache regions
 

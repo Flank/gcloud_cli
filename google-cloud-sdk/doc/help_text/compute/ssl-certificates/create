@@ -1,5 +1,5 @@
 NAME
-    gcloud compute ssl-certificates create - create a Google Compute Engine SSL
+    gcloud compute ssl-certificates create - create a Compute Engine SSL
         certificate
 
 SYNOPSIS

@@ -1408,6 +1408,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     zone = 'foo-zone'
     master_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
+    dataproc_metastore = 'projects/foo-project/locations/foo-region/services/foo-service'
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         projectId=project,
@@ -1428,6 +1429,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     self.AddEncryptionConfig(expected_request_cluster,
                              'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
     self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
+    self.AddMetastoreConfig(expected_request_cluster, dataproc_metastore)
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
@@ -1449,13 +1451,15 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                '--optional-components=anaconda,zeppelin '
                '--zone {zone} '
                '--autoscaling-policy {autoscaling_policy_uri} '
-               '--enable-component-gateway ').format(
+               '--enable-component-gateway '
+               '--dataproc-metastore {dataproc_metastore} ').format(
                    project=project,
                    cluster=cluster_name,
                    master_machine_type=master_machine_type,
                    worker_machine_type=worker_machine_type,
                    zone=zone,
-                   autoscaling_policy_uri=autoscaling_policy_uri)
+                   autoscaling_policy_uri=autoscaling_policy_uri,
+                   dataproc_metastore=dataproc_metastore)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,

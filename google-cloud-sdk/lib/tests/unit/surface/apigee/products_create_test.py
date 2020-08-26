@@ -136,6 +136,16 @@ class ProductsCreateTest(base.ApigeeSurfaceTest, base.WithJSONBodyValidation):
       self.RunApigee("products create testprod --public-access --format=json "
                      "--organization=test-org --all-environments")
 
+  def testConflictingProxies(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunApigee("products create testprod --public-access --format=json "
+                     "--organization=test-org --all-environments "
+                     "--apis=api-name --all-proxies")
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunApigee("products create testprod --public-access --format=json "
+                     "--organization=test-org --all-environments "
+                     "--resources=/resource/path --all-proxies")
+
   def testPartialProxyInfoAPIsOnly(self):
     fields = {
         "proxies": ["prox", "proy", "proz"],

@@ -11,7 +11,7 @@ gcloud beta game servers realms create \- create a Realm
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta game servers realms create\fR (\fIREALM\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta game servers realms create\fR (\fIREALM\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-time\-zone\fR=\fITIME_ZONE\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,8 +22,8 @@ gcloud beta game servers realms create \- create a Realm
 
 .SH "EXAMPLES"
 
-To create Realm 'my\-realm' in project 'my\-project' and location in
-\'my\-location' run:
+To create Realm 'my\-realm' in project 'my\-project' with location in
+\'my\-location' and time zone 'UTC', run:
 
 .RS 2m
 $ gcloud beta game servers realms create my\-realm \e
@@ -60,7 +60,20 @@ Google Cloud location.
 .RE
 .sp
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-time\-zone\fR=\fITIME_ZONE\fR
+Time zone where all realm\-specific policies are evaluated. The value of this
+field must be from the IANA time zone database:
+https://www.iana.org/time\-zones.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
 
 .RS 2m
 .TP 2m
@@ -79,12 +92,6 @@ Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
-
-.TP 2m
-\fB\-\-time\-zone\fR=\fITIME_ZONE\fR
-Time zone where all realm\-specific policies are evaluated. The value of this
-field must be from the IANA time zone database:
-https://www.iana.org/time\-zones. If not specified, UTC is assumed by default.
 
 
 .RE
@@ -110,10 +117,11 @@ this API can be found at: https://cloud.google.com/solutions/gaming/
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud game servers realms create
 $ gcloud alpha game servers realms create
 .RE
 

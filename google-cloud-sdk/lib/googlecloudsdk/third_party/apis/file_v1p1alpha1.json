@@ -235,7 +235,8 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. The resource name of the instance, in the format projects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}.",
+          "description": "Output only. The resource name of the instance, in the format projects\/{project_number}\/locations\/{location_id}\/instances\/{instance_id}.",
+          "readOnly": true,
           "type": "string"
         },
         "description": {
@@ -244,15 +245,7 @@
         },
         "state": {
           "description": "Output only. The instance state.",
-          "enumDescriptions": [
-            "State not set.",
-            "The instance is being created.",
-            "The instance is available for use.",
-            "Work is being done on the instance. You can get further details from the `statusMessage` field of the `Instance` resource.",
-            "The instance is shutting down.",
-            "The instance is experiencing an issue and might be unusable. You can get further details from the `statusMessage` field of the `Instance` resource.",
-            "The instance is restoring a snapshot or backup to an existing file share and may be unusable during this time."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "State not set.",
@@ -275,23 +268,17 @@
         },
         "statusMessage": {
           "description": "Output only. Additional information about the instance state, if available.",
+          "readOnly": true,
           "type": "string"
         },
         "createTime": {
           "description": "Output only. The time when the instance was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "tier": {
           "description": "The service tier of the instance.",
-          "enumDescriptions": [
-            "Not set.",
-            "STANDARD tier. BASIC_HDD is the preferred term for this tier.",
-            "PREMIUM tier. BASIC_SSD is the preferred term for this tier.",
-            "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_HDD is an alias for STANDARD Tier, offering economical performance backed by HDD.",
-            "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_SSD is an alias for PREMIUM Tier, and offers improved performance backed by SSD.",
-            "HIGH_SCALE instances offer expanded capacity and performance scaling capabilities."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -403,11 +390,6 @@
         },
         "accessMode": {
           "description": "Either READ_ONLY, for allowing only read requests on the exported directory, or READ_WRITE, for allowing both read and write requests. The default is READ_WRITE.",
-          "enumDescriptions": [
-            "AccessMode not set.",
-            "The client can only read the file share.",
-            "The client can read and write the file share (default)."
-          ],
           "type": "string",
           "enumDescriptions": [
             "AccessMode not set.",
@@ -422,11 +404,6 @@
         },
         "squashMode": {
           "description": "Either NO_ROOT_SQUASH, for allowing root access on the exported directory, or ROOT_SQUASH, for not allowing root access. The default is NO_ROOT_SQUASH.",
-          "enumDescriptions": [
-            "SquashMode not set.",
-            "The Root user has root access to the file share (default).",
-            "The Root user has squashed access to the anonymous uid\/gid."
-          ],
           "type": "string",
           "enumDescriptions": [
             "SquashMode not set.",
@@ -462,10 +439,6 @@
         },
         "modes": {
           "description": "Internet protocol versions for which the instance has IP addresses assigned. For this version, only MODE_IPV4 is supported.",
-          "enumDescriptions": [
-            "Internet protocol not set.",
-            "Use the IPv4 internet protocol."
-          ],
           "type": "array",
           "items": {
             "type": "string",
@@ -485,6 +458,7 @@
         },
         "ipAddresses": {
           "description": "Output only. IPv4 addresses in the format {octet 1}.{octet 2}.{octet 3}.{octet 4} or IPv6 addresses in the format {block 1}:{block 2}:{block 3}:{block 4}:{block 5}:{block 6}:{block 7}:{block 8}.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "type": "string"
@@ -543,6 +517,7 @@
       "properties": {
         "name": {
           "description": "Output only. The resource name of the snapshot, in the format projects\/{project_id}\/locations\/{location_id}\/snapshots\/{snapshot_id}.",
+          "readOnly": true,
           "type": "string"
         },
         "description": {
@@ -551,13 +526,7 @@
         },
         "state": {
           "description": "Output only. The snapshot state.",
-          "enumDescriptions": [
-            "State not set.",
-            "Point-in-time snapshot is being created.",
-            "Point-in-time snapshot has been taken and the operation is being finalized. At this point, changes to the file share will not be reflected in the snapshot.",
-            "Snapshot is available for use.",
-            "Snapshot is being deleted."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "State not set.",
@@ -576,6 +545,7 @@
         },
         "createTime": {
           "description": "Output only. The time when the snapshot was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -588,11 +558,13 @@
         },
         "capacityGb": {
           "description": "Output only. Capacity of the snapshot. This would be the size of the file share when the snapshot is restored.",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         },
         "storageBytes": {
           "description": "Output only. The size of the storage used by the snapshot. As snapshots share storage, this number is expected to change with snapshot creation\/deletion. Always equals to capacityGb for local snapshots.",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         },
@@ -606,14 +578,7 @@
         },
         "sourceInstanceTier": {
           "description": "Output only. The service tier of the source Cloud Filestore instance that this snapshot is created from.",
-          "enumDescriptions": [
-            "Not set.",
-            "STANDARD tier. BASIC_HDD is the preferred term for this tier.",
-            "PREMIUM tier. BASIC_SSD is the preferred term for this tier.",
-            "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_HDD is an alias for STANDARD Tier, offering economical performance backed by HDD.",
-            "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_SSD is an alias for PREMIUM Tier, and offers improved performance backed by SSD.",
-            "HIGH_SCALE instances offer expanded capacity and performance scaling capabilities."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -634,12 +599,6 @@
         },
         "type": {
           "description": "The Type of the Snapshot.",
-          "enumDescriptions": [
-            "Not set, will use the default value of BACKUP.",
-            "Backup snapshots are standalone and replicated regionally. Basic Instances can be created or restored from this snapshot variant (Backup snapshots are not supported for Advanced instances at this time).",
-            "Local snapshots are standalone, zonal resources. Basic Instances can be created or restored from this snapshot variant (Local snapshots are not supported for Advanced instances at this time).",
-            "In place snapshots are part of the Instance storage system and occupy Instance storage space. They are also tied to the Instance lifecycle and are deleted at Instance deletion time. Instances cannot be restored or created from this snapshot variant. In Place snapshots are only supported for Advanced Instances at this time."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not set, will use the default value of BACKUP.",
@@ -688,6 +647,7 @@
       "properties": {
         "name": {
           "description": "Output only. The resource name of the backup, in the format projects\/{project_id}\/locations\/{location_id}\/backups\/{backup_id}.",
+          "readOnly": true,
           "type": "string"
         },
         "description": {
@@ -696,13 +656,7 @@
         },
         "state": {
           "description": "Output only. The backup state.",
-          "enumDescriptions": [
-            "State not set.",
-            "Backup is being created.",
-            "Backup has been taken and the operation is being finalized. At this point, changes to the file share will not be reflected in the backup.",
-            "Backup is available for use.",
-            "Backup is being deleted."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "State not set.",
@@ -721,6 +675,7 @@
         },
         "createTime": {
           "description": "Output only. The time when the backup was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -733,11 +688,13 @@
         },
         "capacityGb": {
           "description": "Output only. Capacity of the backup. This would be the size of the file share when the backup is restored.",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         },
         "storageBytes": {
           "description": "Output only. The size of the storage used by the backup. As backups share storage, this number is expected to change with backup creation\/deletion.",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         },
@@ -751,14 +708,7 @@
         },
         "sourceInstanceTier": {
           "description": "Output only. The service tier of the source Cloud Filestore instance that this backup is created from.",
-          "enumDescriptions": [
-            "Not set.",
-            "STANDARD tier. BASIC_HDD is the preferred term for this tier.",
-            "PREMIUM tier. BASIC_SSD is the preferred term for this tier.",
-            "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_HDD is an alias for STANDARD Tier, offering economical performance backed by HDD.",
-            "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_SSD is an alias for PREMIUM Tier, and offers improved performance backed by SSD.",
-            "HIGH_SCALE instances offer expanded capacity and performance scaling capabilities."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -779,6 +729,7 @@
         },
         "downloadBytes": {
           "description": "Output only. Amount of bytes that will be downloaded if the backup is restored",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         }
@@ -883,11 +834,13 @@
         },
         "createTime": {
           "description": "Output only. Timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. Timestamp when the resource was last modified.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -900,15 +853,7 @@
         },
         "state": {
           "description": "Output only. Current lifecycle state of the resource (e.g. if it's being created or ready to use).",
-          "enumDescriptions": [
-            "Unspecified state.",
-            "Instance is being created.",
-            "Instance has been created and is ready to use.",
-            "Instance is being updated.",
-            "Instance is unheathy and under repair.",
-            "Instance is being deleted.",
-            "Instance encountered an error and is in indeterministic state."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Unspecified state.",
@@ -945,10 +890,12 @@
         },
         "tenantProjectId": {
           "description": "Output only. ID of the associated GCP tenant project. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "string"
         },
         "producerMetadata": {
           "description": "Output only. Custom string attributes used primarily to expose producer-specific information in monitoring dashboards. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -956,6 +903,7 @@
         },
         "provisionedResources": {
           "description": "Output only. The list of data plane resources provisioned for this instance, e.g. compute VMs. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource"
@@ -963,6 +911,7 @@
         },
         "sloMetadata": {
           "description": "Output only. SLO metadata for instance classification in the Standardized dataplane SLO platform. See go\/cloud-ssa-standard-slo for feature description.",
+          "readOnly": true,
           "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata"
         },
         "maintenanceSchedules": {
@@ -1340,7 +1289,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The project and location for which to retrieve instance information, in the format projects\/{project_id}\/locations\/{location}. In Cloud Filestore, locations map to GCP zones, for example **us-west1-b**. To retrieve instance information for all locations, use \"-\" for the {location} value.",
+                      "description": "Required. The project and location for which to retrieve instance information, in the format projects\/{project_number}\/locations\/{location}. In Cloud Filestore, locations map to GCP zones, for example **us-west1-b**. To retrieve instance information for all locations, use \"-\" for the {location} value.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1386,7 +1335,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The instance resource name, in the format projects\/{project_id}\/locations\/{location}\/instances\/{instance_id}.",
+                      "description": "Required. The instance resource name, in the format projects\/{project_number}\/locations\/{location}\/instances\/{instance_id}.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
@@ -1411,7 +1360,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The instance's project and location, in the format projects\/{project_id}\/locations\/{location}. In Cloud Filestore, locations map to GCP zones, for example **us-west1-b**.",
+                      "description": "Required. The instance's project and location, in the format projects\/{project_number}\/locations\/{location}. In Cloud Filestore, locations map to GCP zones, for example **us-west1-b**.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1444,7 +1393,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Output only. The resource name of the instance, in the format projects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}.",
+                      "description": "Output only. The resource name of the instance, in the format projects\/{project_number}\/locations\/{location_id}\/instances\/{instance_id}.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
@@ -1506,7 +1455,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The instance resource name, in the format projects\/{project_id}\/locations\/{location}\/instances\/{instance_id}",
+                      "description": "Required. The instance resource name, in the format projects\/{project_number}\/locations\/{location}\/instances\/{instance_id}",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
@@ -1535,7 +1484,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The project and location for which to retrieve snapshot information, in the format projects\/{project_id}\/locations\/{location}. In Cloud Filestore, snapshot locations map to GCP zones, for example **us-west1-b**, for local snapshots and to GCP regions, for example **us-west1**, otherwise. To retrieve snapshot information for all locations, use \"-\" for the {location} value.",
+                      "description": "Required. The project and location for which to retrieve snapshot information, in the format projects\/{project_number}\/locations\/{location}. In Cloud Filestore, snapshot locations map to GCP zones, for example **us-west1-b**, for local snapshots and to GCP regions, for example **us-west1**, otherwise. To retrieve snapshot information for all locations, use \"-\" for the {location} value.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1581,7 +1530,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The snapshot resource name, in the format projects\/{project_id}\/locations\/{location}\/snapshots\/{snapshot_id}.",
+                      "description": "Required. The snapshot resource name, in the format projects\/{project_number}\/locations\/{location}\/snapshots\/{snapshot_id}.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/snapshots\/[^\/]+$",
@@ -1606,7 +1555,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The snapshot's project and location, in the format projects\/{project_id}\/locations\/{location}. In Cloud Filestore, snapshot locations map to GCP zones, for example **us-west1-b**, for local snapshots and to GCP regions, for example **us-west1**, otherwise.",
+                      "description": "Required. The snapshot's project and location, in the format projects\/{project_number}\/locations\/{location}. In Cloud Filestore, snapshot locations map to GCP zones, for example **us-west1-b**, for local snapshots and to GCP regions, for example **us-west1**, otherwise.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1639,7 +1588,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The snapshot resource name, in the format projects\/{project_id}\/locations\/{location}\/snapshots\/{snapshot_id}",
+                      "description": "Required. The snapshot resource name, in the format projects\/{project_number}\/locations\/{location}\/snapshots\/{snapshot_id}",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/snapshots\/[^\/]+$",
@@ -1702,7 +1651,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The project and location for which to retrieve backup information, in the format projects\/{project_id}\/locations\/{location}. In Cloud Filestore, backup locations map to GCP regions, for example **us-west1**. To retrieve backup information for all locations, use \"-\" for the {location} value.",
+                      "description": "Required. The project and location for which to retrieve backup information, in the format projects\/{project_number}\/locations\/{location}. In Cloud Filestore, backup locations map to GCP regions, for example **us-west1**. To retrieve backup information for all locations, use \"-\" for the {location} value.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1748,7 +1697,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The backup resource name, in the format projects\/{project_id}\/locations\/{location}\/backups\/{backup_id}.",
+                      "description": "Required. The backup resource name, in the format projects\/{project_number}\/locations\/{location}\/backups\/{backup_id}.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/backups\/[^\/]+$",
@@ -1773,7 +1722,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The backup's project and location, in the format projects\/{project_id}\/locations\/{location}. In Cloud Filestore, backup locations map to GCP regions, for example **us-west1**.",
+                      "description": "Required. The backup's project and location, in the format projects\/{project_number}\/locations\/{location}. In Cloud Filestore, backup locations map to GCP regions, for example **us-west1**.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1806,7 +1755,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The backup resource name, in the format projects\/{project_id}\/locations\/{location}\/backups\/{backup_id}",
+                      "description": "Required. The backup resource name, in the format projects\/{project_number}\/locations\/{location}\/backups\/{backup_id}",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/backups\/[^\/]+$",

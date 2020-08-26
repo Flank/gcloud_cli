@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute target-instances create NAME --instance=INSTANCE
         [--description=DESCRIPTION] [--instance-zone=INSTANCE_ZONE]
-        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--network=NETWORK] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute target-instances create is used to create a
@@ -30,6 +30,11 @@ OPTIONAL FLAGS
         Zone of the instance to operate on. If not specified, it will be set to
         the same as zone. Overrides the default compute/zone property value for
         this command invocation.
+
+     --network=NETWORK
+        Network that this target instance applies to. This is only necessary if
+        the corresponding instance has multiple network interfaces. If not
+        specified, the default network interface will be used.
 
      --zone=ZONE
         Zone of the target instance to operate on. If not specified and the

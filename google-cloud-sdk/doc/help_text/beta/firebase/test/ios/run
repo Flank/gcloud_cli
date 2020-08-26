@@ -6,10 +6,10 @@ SYNOPSIS
     gcloud beta firebase test ios run [ARGSPEC]
         [--device=DIMENSION=VALUE,[...]] [--test=XCTEST_ZIP]
         [--timeout=TIMEOUT] [--type=TYPE] [--xcode-version=XCODE_VERSION]
-        [--xctestrun-file=XCTESTRUN_FILE] [--app=APP] [--async]
-        [--client-details=[KEY=VALUE,...]] [--num-flaky-test-attempts=int]
-        [--record-video] [--results-bucket=RESULTS_BUCKET]
-        [--results-dir=RESULTS_DIR]
+        [--xctestrun-file=XCTESTRUN_FILE] [--additional-ipas=IPA,[IPA,...]]
+        [--app=APP] [--async] [--client-details=[KEY=VALUE,...]]
+        [--num-flaky-test-attempts=int] [--record-video]
+        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
         [--scenario-numbers=int,[int,...]] [--test-special-entitlements]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
@@ -99,6 +99,11 @@ COMMONLY USED FLAGS
         URL beginning with gs://.
 
 FLAGS
+     --additional-ipas=IPA,[IPA,...]
+        List of up to 100 additional IPAs to install, in addition to the one
+        being directly tested. The path may be in the local filesystem or in
+        Google Cloud Storage using gs:// notation.
+
      --app=APP
         The path to the application archive (.ipa file) for game-loop testing.
         The path may be in the local filesystem or in Google Cloud Storage

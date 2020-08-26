@@ -28,7 +28,7 @@ from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import ssl_policies_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.ssl_policies import test_resources
 
 
 class SslPoliciesImportTestAlpha(ssl_policies_test_base.SslPoliciesTestBase):

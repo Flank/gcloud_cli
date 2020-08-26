@@ -111,3 +111,67 @@ actions:
         name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
     - expect_exit:
         code: 0
+- execute_command:
+    label: evaluate-user-consents
+    command: |
+      healthcare consent-stores evaluate-user-consents my-store --location=us-central1
+      --dataset=my-dataset --user-id=my-user-id
+      --resource-attributes anonymity=identified,type=genomics
+      --request-attributes role=researcher
+      --consent-list consent1,consent2
+      --response-view=FULL
+      --page-size=99
+      --page-token=next-page-token
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:evaluateUserConsents?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              userId: my-user-id
+              resourceAttributes:
+                anonymity: identified
+                type: genomics
+              requestAttributes:
+                role: researcher
+              consentList:
+                consents:
+                  [consent1, consent2]
+              responseView: FULL
+              pageSize: 99
+              pageToken: next-page-token
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "results": [
+                {"data_id": "data1", "consented": true,
+                 "consent_details": {"consent1": {"evaluation_result": "NO_MATCHING_POLICY"},
+                                     "consent2": {"evaluation_result": "HAS_SATISFIED_POLICY"}}},
+                {"data_id": "data2", "consented": false,
+                 "consent_details": {"consent1": {"evaluation_result": "NOT_APPLICABLE"},
+                                     "consent2": {"evaluation_result": "NO_MATCHING_POLICY"}}}
+              ]
+            }
+    - expect_stdout: |
+        ---
+        results:
+        - consent_details:
+            consent1:
+              evaluation_result: NO_MATCHING_POLICY
+            consent2:
+              evaluation_result: HAS_SATISFIED_POLICY
+          consented: true
+          data_id: data1
+        - consent_details:
+            consent1:
+              evaluation_result: NOT_APPLICABLE
+            consent2:
+              evaluation_result: NO_MATCHING_POLICY
+          consented: false
+          data_id: data2
+    - expect_exit:
+        code: 0

@@ -1,0 +1,60 @@
+title: iam workload-identity-pools providers describe test
+release_tracks: [ALPHA, BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam workload-identity-pools providers describe my-provider
+      --workload-identity-pool='my-workload-identity-pool' --location='global'
+  - stderr: |
+      Describe WorkloadIdentityPoolProvider my-provider.
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1beta
+      BETA: v1beta
+- execute_command:
+    label: describe a WorkloadIdentityPoolProvider
+    command: iam workload-identity-pools providers describe my-provider
+      --workload-identity-pool my-workload-identity-pool --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/$$api-version$$/projects/fake-project/locations/global/workloadIdentityPools/my-workload-identity-pool/providers/my-provider?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/providers/my-provider",
+              "displayName": "My workload pool",
+              "description": "My workload pool description",
+              "state": "ACTIVE",
+              "disabled": true,
+              "attributeMapping": {
+                "google.subject": "assertion.arn"
+              },
+              "attributeCondition": "true",
+              "aws": {
+                "accountId": "1234567890",
+                "stsUri": "https://sts.amazonaws.com"
+              }
+            }
+    - expect_stdout: |
+        attributeCondition: 'true'
+        attributeMapping:
+          google.subject: assertion.arn
+        aws:
+          accountId: '1234567890'
+          stsUri:
+          - https://sts.amazonaws.com
+        description: My workload pool description
+        disabled: true
+        displayName: My workload pool
+        name: projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/providers/my-provider
+        state: ACTIVE
+    - expect_exit:
+        code: 0

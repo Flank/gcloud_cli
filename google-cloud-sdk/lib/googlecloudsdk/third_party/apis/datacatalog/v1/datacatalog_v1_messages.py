@@ -1173,10 +1173,11 @@ class GoogleCloudDatacatalogV1SearchCatalogRequest(_messages.Message):
       continuation of a prior SearchCatalogRequest call, and that the system
       should return the next page of data. If empty, the first page is
       returned.
-    query: Required. The query string in search query syntax. The query must
-      be non-empty. Query strings can be simple as "x" or more qualified as: *
-      name:x * column:x * description:y Note: Query tokens need to have a
-      minimum of 3 characters for substring matching to work correctly. See
+    query: Optional. The query string in search query syntax. An empty query
+      string will result in all data assets (in the specified scope) that the
+      user has access to. Query strings can be simple as "x" or more qualified
+      as: * name:x * column:x * description:y Note: Query tokens need to have
+      a minimum of 3 characters for substring matching to work correctly. See
       [Data Catalog Search Syntax](https://cloud.google.com/data-
       catalog/docs/how-to/search-reference) for more information.
     scope: Required. The scope of this search request. A `scope` that has

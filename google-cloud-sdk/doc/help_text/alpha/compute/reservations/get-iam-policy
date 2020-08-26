@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute reservations get-iam-policy - get the IAM policy for a
-        Google Compute Engine reservation
+        Compute Engine reservation
 
 SYNOPSIS
     gcloud alpha compute reservations get-iam-policy
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute reservations get-iam-policy displays the IAM
-    policy associated with a Google Compute Engine reservation in a project. If
+    policy associated with a Compute Engine reservation in a project. If
     formatted as JSON, the output can be edited and used as a policy file for
     set-iam-policy. The output includes an "etag" field identifying the version
     emitted and allowing detection of concurrent policy updates; see $ {parent}
@@ -81,7 +81,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute reservations get-iam-policy
         $ gcloud beta compute reservations get-iam-policy

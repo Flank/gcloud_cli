@@ -1,13 +1,12 @@
 NAME
-    gcloud compute ssl-policies describe - describe a Google Compute Engine ssl
-        policy
+    gcloud compute ssl-policies describe - describe a Compute Engine ssl policy
 
 SYNOPSIS
     gcloud compute ssl-policies describe SSL_POLICY [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute ssl-policies describe is used to display all data associated
-    with a Google Compute Engine SSL policy in a project.
+    with a Compute Engine SSL policy in a project.
 
     An SSL policy specifies the server-side support for SSL features. An SSL
     policy can be attached to a TargetHttpsProxy or a TargetSslProxy. This

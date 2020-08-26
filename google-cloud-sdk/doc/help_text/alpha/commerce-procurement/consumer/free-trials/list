@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha commerce-procurement consumer free-trials list - outputs the
-        List of Free Trial object resulting from the List API
+    gcloud alpha commerce-procurement consumer free-trials list - returns the
+        List of Free Trial objects resulting from the List API
 
 SYNOPSIS
     gcloud alpha commerce-procurement consumer free-trials list
@@ -8,17 +8,17 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Outputs the List of Free Trial object resulting from the List API.
+    (ALPHA) Returns the List of Free Trial objects resulting from the List API.
 
 FLAGS
      --filter=FILTER
-        The filter that can be used to limit the list request.
+        Filter that limits the list request.
 
      --page-size=PAGE_SIZE
         Maximum number of resources per page.
 
      --page-token=PAGE_TOKEN
-        Token to specify next page in the list.
+        Token that specifies the next page in the list.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -30,38 +30,38 @@ GCLOUD WIDE FLAGS
 
 EXAMPLES
     The filter is a query string that can match a selected set of attributes
-    with string values. For example
+    with string values. For example:
 
         $ gcloud alpha commerce-procurement consumer free-trials list \
           --filter "product_external_name=1234-5678-ABCD-EFG"
 
-    Supported query attributes are
+    Supported query attributes are the following:
 
       o product_external_name
-      o provider
+      o provider (in the naming format of "provider/{provider-id}")
 
     If the query contains some special characters other than letters,
     underscore, or digits, the phrase must be quoted with double quotes. For
-    example, where the product name needs to be quoted because it contains
-    special character colon.
+    example, where the product name needs to be quoted because it contains the
+    special character colon:
 
         $ gcloud alpha commerce-procurement consumer free-trials list \
           --filter "product_external_name=\"foo:bar\""
 
     Queries can be combined with AND, OR, and NOT to form more complex queries.
-    They can also be grouped to force a desired evaluation order. For example,
+    They can also be grouped to force a desired evaluation order. For example:
 
         $ gcloud alpha commerce-procurement consumer free-trials list \
           --filter \
           "provider=providers/E-1234 OR provider=providers/5678 AND NOT\
         (product_external_name=foo-product)"
 
-    Connective AND can be omitted between two predicates. For example
+    Connective AND can be omitted between two predicates. For example:
 
         $ gcloud alpha commerce-procurement consumer free-trials list \
           --filter "provider=providers/E-1234 product_external_name=foo"
 
-    is equivalent to
+    is equivalent to:
 
         $ gcloud alpha commerce-procurement consumer free-trials list \
           --filter \
@@ -72,5 +72,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

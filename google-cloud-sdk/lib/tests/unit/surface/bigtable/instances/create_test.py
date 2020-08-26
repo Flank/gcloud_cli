@@ -31,31 +31,50 @@ class CreateCommandTestGA(base.BigtableV2TestBase,
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  def buildRequest(self, is_prod=False, serve_nodes=None, kms_key=None):
+  def buildCluster(self, zone, nodes=None, kms_key=None):
+    cluster = self.msgs.Cluster(
+        serveNodes=nodes,
+        defaultStorageType=(
+            self.msgs.Cluster.DefaultStorageTypeValueValuesEnum.SSD),
+        location='projects/{0}/locations/{1}'.format(self.Project(), zone))
+    if kms_key:
+      cluster.encryptionConfig = self.msgs.EncryptionConfig(kmsKeyName=kms_key)
+    return cluster
+
+  def buildMultiClusterRequest(self,
+                               ids,
+                               zones,
+                               nodes=None,
+                               kms_keys=None,
+                               is_prod=True):
+    if nodes is None:
+      nodes = [None] * len(ids)
+    if kms_keys is None:
+      kms_keys = [None] * len(ids)
+
     instance = self.msgs.Instance(
         displayName='thedisplayname',
         type=self.msgs.Instance.TypeValueValuesEnum.DEVELOPMENT)
     if is_prod:
       instance.type = self.msgs.Instance.TypeValueValuesEnum.PRODUCTION
 
-    cluster = self.msgs.Cluster(
-        serveNodes=serve_nodes,
-        defaultStorageType=(
-            self.msgs.Cluster.DefaultStorageTypeValueValuesEnum.SSD),
-        location='projects/{0}/locations/us-central1-b'.format(self.Project()))
-    if kms_key:
-      cluster.encryptionConfig = self.msgs.EncryptionConfig(
-          kmsKeyName=kms_key)
+    clusters = []
+    for idx in range(len(ids)):
+      cluster = self.buildCluster(zones[idx], nodes[idx], kms_keys[idx])
+      clusters.append(
+          self.msgs.CreateInstanceRequest.ClustersValue.AdditionalProperty(
+              key=ids[idx], value=cluster))
 
     return self.msgs.CreateInstanceRequest(
         instanceId='theinstance',
         parent='projects/{0}'.format(self.Project()),
         instance=instance,
         clusters=self.msgs.CreateInstanceRequest.ClustersValue(
-            additionalProperties=[
-                self.msgs.CreateInstanceRequest.ClustersValue
-                .AdditionalProperty(key='thecluster', value=cluster)
-            ]))
+            additionalProperties=clusters))
+
+  def buildRequest(self, is_prod=False, nodes=None, kms_key=None):
+    return self.buildMultiClusterRequest(['thecluster'], ['us-central1-b'],
+                                         [nodes], [kms_key], is_prod)
 
   def SetUp(self):
     self.svc = self.client.projects_instances.Create
@@ -144,43 +163,81 @@ class CreateCommandTestAlpha(CreateCommandTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testKmsKeySucceeds(self):
-    kms_key = 'projects/p/locations/l/keyRings/r/cryptoKeys/k'
-    self.svc.Expect(
-        request=self.buildRequest(True, 5, kms_key),
-        response=self.msgs.Operation(name='operations/theop'))
-
-    self.Run(
-        'bigtable instances create theinstance --cluster thecluster '
-        '--cluster-num-nodes 5 --cluster-zone us-central1-b --display-name '
-        'thedisplayname --async --kms-key %s' % kms_key)
-    self.AssertErrContains(
-        'Create in progress for bigtable instance theinstance '
-        '[operations/theop].\n')
-    self.AssertOutputEquals('')
-
-  def testSplitKmsFlagsSucceeds(self):
-    kms_key = 'projects/p/locations/l/keyRings/r/cryptoKeys/k'
-    self.svc.Expect(
-        request=self.buildRequest(True, 5, kms_key),
-        response=self.msgs.Operation(name='operations/theop'))
-
-    self.Run(
-        'bigtable instances create theinstance --cluster thecluster '
-        '--cluster-num-nodes 5 --cluster-zone us-central1-b '
-        '--display-name thedisplayname --async --kms-project p '
-        '--kms-location l --kms-keyring r --kms-key k')
-    self.AssertErrContains(
-        'Create in progress for bigtable instance theinstance '
-        '[operations/theop].\n')
-    self.AssertOutputEquals('')
-
-  def testInvalidKmsKeyFails(self):
+  def testClusterNotSpecifiedFails(self):
     with self.assertRaises(exceptions.InvalidArgumentException):
       self.Run(
-          'bigtable instances create theinstance --cluster thecluster '
-          '--cluster-num-nodes 5 --cluster-zone us-central1-b --display-name '
-          'thedisplayname --kms-key invalid/k')
+          'bigtable instances create theinstance --display-name thedisplayname '
+          '--async')
+
+  def testClusterZoneMissingFails(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          'bigtable instances create theinstance --display-name thedisplayname '
+          '--cluster my-cluster --async')
+
+  def testMultipleClustersSucceeds(self):
+    self.svc.Expect(
+        request=self.buildMultiClusterRequest(
+            ['thecluster1', 'thecluster2'], ['us-central1-b', 'us-central1-c'],
+            [1, 1]),
+        response=self.msgs.Operation(name='operations/theop'))
+    self.Run(
+        'bigtable instances create theinstance --display-name thedisplayname '
+        '--cluster-config id=thecluster1,zone=us-central1-b '
+        '--cluster-config id=thecluster2,zone=us-central1-c '
+        '--async')
+    self.AssertErrContains(
+        'Create in progress for bigtable instance theinstance '
+        '[operations/theop].\n')
+    self.AssertOutputEquals('')
+
+  def testDeprecatedClusterArgumentsFails(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          'bigtable instances create theinstance --display-name thedisplayname '
+          '--cluster-config id=thecluster,zone=us-central1-b '
+          '--cluster my-cluster')
+
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          'bigtable instances create theinstance --display-name thedisplayname '
+          '--cluster-config id=thecluster,zone=us-central1-b '
+          '--cluster-zone us-central1-b')
+
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          'bigtable instances create theinstance --display-name thedisplayname '
+          '--cluster-config id=thecluster,zone=us-central1-b '
+          '--cluster-num-nodes 5')
+
+  def testMultipleClustersCmekSucceeds(self):
+    kms_key = 'projects/p/locations/l/keyRings/r/cryptoKeys/k'
+    self.svc.Expect(
+        request=self.buildMultiClusterRequest(
+            ['thecluster1', 'thecluster2'], ['us-central1-b', 'us-central1-c'],
+            [3, 1], [kms_key, kms_key]),
+        response=self.msgs.Operation(name='operations/theop'))
+    self.Run(
+        'bigtable instances create theinstance --display-name thedisplayname '
+        '--cluster-config id=thecluster1,zone=us-central1-b,kms-key=%s,nodes=3 '
+        '--cluster-config id=thecluster2,zone=us-central1-c,kms-key=%s '
+        '--async' % (kms_key, kms_key))
+    self.AssertErrContains(
+        'Create in progress for bigtable instance theinstance '
+        '[operations/theop].\n')
+    self.AssertOutputEquals('')
+
+  def testMultipleClustersFails(self):
+    """Cluster id and zone is required."""
+
+    with self.AssertRaisesArgumentErrorMatches(
+        'Key [id] required in dict arg but not provided'):
+      self.Run('bigtable instances create theinstance --cluster-config nodes=5')
+
+    with self.AssertRaisesArgumentErrorMatches(
+        'Key [zone] required in dict arg but not provided'):
+      self.Run('bigtable instances create theinstance '
+               '--cluster-config id=cluster1,nodes=5')
 
 
 if __name__ == '__main__':

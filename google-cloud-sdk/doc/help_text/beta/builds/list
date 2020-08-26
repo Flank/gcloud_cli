@@ -2,7 +2,7 @@ NAME
     gcloud beta builds list - list builds
 
 SYNOPSIS
-    gcloud beta builds list [--ongoing] [--filter=EXPRESSION]
+    gcloud beta builds list [--ongoing] [--region=REGION] [--filter=EXPRESSION]
         [--limit=LIMIT; default=50] [--page-size=PAGE_SIZE; default=20]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
@@ -12,6 +12,11 @@ DESCRIPTION
 FLAGS
      --ongoing
         Only list builds that are currently QUEUED or WORKING.
+
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

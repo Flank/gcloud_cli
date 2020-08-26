@@ -299,7 +299,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     reusable_config_id = 'projects/foo/locations/us-west1/reusableConfigs/rc1'
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
@@ -310,12 +310,12 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     reusable_config_wrapper = flags.ParseReusableConfig(
         args, 'us-central1', is_ca=True)
     self.assertEqual(reusable_config_wrapper.reusableConfig, reusable_config_id)
-    self.assertEqual(reusable_config_wrapper.reusableConfigValues, None)
+    self.assertIsNone(reusable_config_wrapper.reusableConfigValues)
 
   def testParseReusableConfigShortResourceArg(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
@@ -325,53 +325,53 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     self.assertEqual(
         reusable_config_wrapper.reusableConfig,
         'projects/privateca-data/locations/us-central1/reusableConfigs/rc1')
-    self.assertEqual(reusable_config_wrapper.reusableConfigValues, None)
+    self.assertIsNone(reusable_config_wrapper.reusableConfigValues)
 
   def testParseReusableConfigMaxChainLength(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
     args = self.parser.parse_args(['--max-chain-length', '1'])
     reusable_config_wrapper = flags.ParseReusableConfig(
         args, 'us-west1', is_ca=True)
-    self.assertEqual(
-        reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
+    self.assertTrue(
+        reusable_config_wrapper.reusableConfigValues.caOptions.isCa)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions
         .maxIssuerPathLength, 1)
-    self.assertEqual(
+    self.assertTrue(
         reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
-        .certSign, True)
-    self.assertEqual(
+        .certSign)
+    self.assertTrue(
         reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
-        .crlSign, True)
+        .crlSign)
 
   def testParseReusableConfigIsCa(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
     args = self.parser.parse_args([])
     reusable_config_wrapper = flags.ParseReusableConfig(
         args, 'us-west1', is_ca=True)
-    self.assertEqual(
-        reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
-    self.assertEqual(
+    self.assertTrue(
+        reusable_config_wrapper.reusableConfigValues.caOptions.isCa)
+    self.assertTrue(
         reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
-        .certSign, True)
-    self.assertEqual(
+        .certSign)
+    self.assertTrue(
         reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
-        .crlSign, True)
+        .crlSign)
 
   def testParseReusableConfigMaxChainLengthIgnored(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)
@@ -381,14 +381,14 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         args, 'us-west1', is_ca=False)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, False)
-    self.assertEqual(
+    self.assertIsNone(
         reusable_config_wrapper.reusableConfigValues.caOptions
-        .maxIssuerPathLength, None)
+        .maxIssuerPathLength)
 
   def testParseReusableConfigResourceAndInlineValues(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
@@ -402,7 +402,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
   def testParseReusableConfigNoResourceAndNoInlineValues(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
@@ -411,13 +411,13 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         args, 'us-west', is_ca=True)
 
     self.assertIsNone(reusable_config_wrapper.reusableConfig)
-    self.assertEqual(
-        reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
+    self.assertTrue(
+        reusable_config_wrapper.reusableConfigValues.caOptions.isCa)
 
   def testParseReusableConfigNoResourceAndNoInlineCertificateValues(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)
@@ -432,7 +432,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
   def testParseReusableConfigInlineValues(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('CA'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
@@ -442,32 +442,32 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     ])
     reusable_config_wrapper = flags.ParseReusableConfig(
         args, 'us-west1', is_ca=True)
-    self.assertEqual(reusable_config_wrapper.reusableConfig, None)
+    self.assertIsNone(reusable_config_wrapper.reusableConfig)
     values = reusable_config_wrapper.reusableConfigValues
-    self.assertEqual(values.keyUsage.baseKeyUsage.certSign, True)
-    self.assertEqual(values.keyUsage.baseKeyUsage.crlSign, True)
-    self.assertEqual(values.keyUsage.baseKeyUsage.digitalSignature, None)
-    self.assertEqual(values.keyUsage.baseKeyUsage.contentCommitment, None)
-    self.assertEqual(values.keyUsage.baseKeyUsage.keyEncipherment, None)
-    self.assertEqual(values.keyUsage.baseKeyUsage.dataEncipherment, None)
-    self.assertEqual(values.keyUsage.baseKeyUsage.keyAgreement, None)
-    self.assertEqual(values.keyUsage.baseKeyUsage.encipherOnly, None)
-    self.assertEqual(values.keyUsage.baseKeyUsage.decipherOnly, None)
+    self.assertTrue(values.keyUsage.baseKeyUsage.certSign)
+    self.assertTrue(values.keyUsage.baseKeyUsage.crlSign)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.digitalSignature)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.contentCommitment)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.keyEncipherment)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.dataEncipherment)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.keyAgreement)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.encipherOnly)
+    self.assertIsNone(values.keyUsage.baseKeyUsage.decipherOnly)
 
-    self.assertEqual(values.keyUsage.extendedKeyUsage.serverAuth, True)
-    self.assertEqual(values.keyUsage.extendedKeyUsage.clientAuth, True)
-    self.assertEqual(values.keyUsage.extendedKeyUsage.codeSigning, None)
-    self.assertEqual(values.keyUsage.extendedKeyUsage.emailProtection, None)
-    self.assertEqual(values.keyUsage.extendedKeyUsage.timeStamping, None)
-    self.assertEqual(values.keyUsage.extendedKeyUsage.ocspSigning, None)
+    self.assertTrue(values.keyUsage.extendedKeyUsage.serverAuth)
+    self.assertTrue(values.keyUsage.extendedKeyUsage.clientAuth)
+    self.assertIsNone(values.keyUsage.extendedKeyUsage.codeSigning)
+    self.assertIsNone(values.keyUsage.extendedKeyUsage.emailProtection)
+    self.assertIsNone(values.keyUsage.extendedKeyUsage.timeStamping)
+    self.assertIsNone(values.keyUsage.extendedKeyUsage.ocspSigning)
 
     self.assertEqual(values.caOptions.maxIssuerPathLength, 2)
-    self.assertEqual(values.caOptions.isCa, True)
+    self.assertTrue(values.caOptions.isCa)
 
   def testParseReusableConfigInlineCertificateValues(self):
     concept_parsers.ConceptParser.ForResource(
         '--reusable-config',
-        resource_args.CreateReusableConfigResourceSpec('certificate'),
+        resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this certificate.',
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)

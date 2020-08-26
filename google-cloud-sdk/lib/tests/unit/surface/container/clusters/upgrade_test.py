@@ -23,7 +23,6 @@ from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
-from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.container import base
@@ -370,37 +369,6 @@ class UpgradeTestBeta(base.BetaTestBase, UpgradeTestGA):
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpgradeTestAlpha(base.AlphaTestBase, UpgradeTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  @parameterized.parameters(
-      0, -1, 21
-  )
-  def testUpgradeNodesWithConcurrentNodeCountError(self, concurrent_node_count):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' upgrade {0} --concurrent-node-count={1}'.format(
-                   self.CLUSTER_NAME,
-                   concurrent_node_count))
-    self.AssertErrContains('argument --concurrent-node-count:')
-
-  def testUpgradeNodesWithConcurrentNodeCountTwoNodes(self):
-    self._TestUpgrade(
-        update=self.msgs.ClusterUpdate(desiredNodeVersion='-',
-                                       concurrentNodeCount=2),
-        flags='--concurrent-node-count=2')
-    self.AssertErrContains(' nodes will be upgraded at a time.')
-
-  def testUpgradeNodesWithNodePoolWithConcurrentNodeCountFourNodes(self):
-    self._TestUpgrade(
-        update=self.msgs.ClusterUpdate(desiredNodeVersion='1.2.3',
-                                       desiredNodePoolId='NodePoolName',
-                                       concurrentNodeCount=4),
-        flags=('--node-pool=NodePoolName --cluster-version=1.2.3 '
-               '--concurrent-node-count=4'),
-        cluster_kwargs={
-            'nodePools': [{'name': 'default-pool', 'version': '1.1.2'},
-                          {'name': 'NodePoolName', 'version': '1.1.4'}]
-        })
-    self.AssertErrContains(' nodes will be upgraded at a time.')
 
   @parameterized.parameters(
       ('--security-profile=test-profile-1', 'test-profile-1', None),

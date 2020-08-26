@@ -133,11 +133,17 @@ class TargetHttpsProxiesListTest(test_base.BaseTest,
         ],
         cli=self.cli,
     )
+
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.messages.ComputeTargetHttpsProxiesAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
     self.list_json.assert_called_with(
         requests=[
             (self._compute_api.targetHttpsProxies, 'AggregatedList',
              self.messages.ComputeTargetHttpsProxiesAggregatedListRequest(
-                 project='my-project', includeAllScopes=True)),
+                 project='my-project', **request_params)),
         ],
         http=self.mock_http(),
         batch_url=self.batch_url,
@@ -262,10 +268,6 @@ class TargetHttpsProxiesListBetaTest(TargetHttpsProxiesListTest):
     self.SelectApi('beta')
     self._compute_api = self.compute_beta
 
-  def _getListRequestMessage(self, project):
-    return self.messages.ComputeTargetHttpsProxiesAggregatedListRequest(
-        project=project, includeAllScopes=True)
-
 
 class TargetHttpsProxiesListAlphaTest(TargetHttpsProxiesListBetaTest):
 
@@ -275,6 +277,14 @@ class TargetHttpsProxiesListAlphaTest(TargetHttpsProxiesListBetaTest):
     self._api = 'alpha'
     self.SelectApi('alpha')
     self._compute_api = self.compute_alpha
+
+  def _getListRequestMessage(self, project):
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.messages.ComputeTargetHttpsProxiesAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+    return self.messages.ComputeTargetHttpsProxiesAggregatedListRequest(
+        project=project, **request_params)
 
 
 if __name__ == '__main__':

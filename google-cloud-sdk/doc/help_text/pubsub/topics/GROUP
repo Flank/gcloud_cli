@@ -30,6 +30,9 @@ COMMANDS
      describe
         Describes a Cloud Pub/Sub topic.
 
+     detach-subscription
+        Detaches one or more Cloud Pub/Sub subscriptions.
+
      get-iam-policy
         Get the IAM policy for a Cloud Pub/Sub Topic.
 

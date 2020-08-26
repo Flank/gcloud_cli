@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute target-grpc-proxies describe displays all data
-    associated with a Google Compute Engine target gRPC proxy.
+    associated with a Compute Engine target gRPC proxy.
 
 POSITIONAL ARGUMENTS
      NAME

@@ -1,6 +1,6 @@
 NAME
     gcloud compute reservations set-iam-policy - set the IAM policy for a
-        Google Compute Engine reservation
+        Compute Engine reservation
 
 SYNOPSIS
     gcloud compute reservations set-iam-policy (RESERVATION : --zone=ZONE)

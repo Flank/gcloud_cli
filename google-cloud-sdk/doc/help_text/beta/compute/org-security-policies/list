@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute org-security-policies list - list Google Compute Engine
+    gcloud beta compute org-security-policies list - list Compute Engine
         organization security policies
 
 SYNOPSIS

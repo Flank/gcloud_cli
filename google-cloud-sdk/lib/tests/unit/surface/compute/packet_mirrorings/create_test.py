@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import utils
@@ -134,6 +135,14 @@ class CreateTest(test_base.BaseTest):
         'status of this operation.\n')
     api_mock.Stop()
 
+  def testCreateWithDirection(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run("""
+          compute packet-mirrorings creates my-pm --region us-central1
+          --filter-direction ingress
+          """)
+    self.CheckRequests()
+
 
 class CreateTestBeta(CreateTest):
 
@@ -153,6 +162,62 @@ class CreateTestAlpha(CreateTestBeta):
     self.api_version = 'alpha'
     self.messages = core_apis.GetMessagesModule('compute', self.api_version)
     self.compute = self.compute_alpha
+
+  def testCreateWithDirection(self):
+    expected = self.messages.PacketMirroring(
+        name='my-pm',
+        network=self.messages.PacketMirroringNetworkInfo(
+            url=('https://compute.googleapis.com/compute/{0}/'
+                 'projects/my-project/global/networks/default'
+                ).format(self.api_version)),
+        collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
+            url=('https://compute.googleapis.com/compute/{0}/'
+                 'projects/my-project/regions/us-central1/'
+                 'forwardingRules/fr1').format(self.api_version)),
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
+            tags=['t1', 't2'],
+            instances=[
+                self.messages.PacketMirroringMirroredResourceInfoInstanceInfo(
+                    url=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/my-project/zones/us-central1-a/'
+                         'instances/i1').format(self.api_version))
+            ],
+            subnetworks=[
+                self.messages.PacketMirroringMirroredResourceInfoSubnetInfo(
+                    url=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/my-project/regions/us-central1/'
+                         'subnetworks/subnet1').format(self.api_version)),
+                self.messages.PacketMirroringMirroredResourceInfoSubnetInfo(
+                    url=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/other-project/regions/us-central1/'
+                         'subnetworks/subnet2').format(self.api_version))
+            ],
+        ),
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
+            cidrRanges=['1.2.3.0/24', '4.5.0.0/16'],
+            IPProtocols=['udp', 'tcp'],
+            direction=self.messages.PacketMirroringFilter
+            .DirectionValueValuesEnum.EGRESS))
+
+    self.Run("""\
+        compute packet-mirrorings create my-pm --region us-central1
+        --network default --mirrored-tags t1,t2
+        --mirrored-instances
+        projects/my-project/zones/us-central1-a/instances/i1
+        --mirrored-subnets
+        subnet1,projects/other-project/regions/us-central1/subnetworks/subnet2
+        --filter-cidr-ranges 1.2.3.0/24,4.5.0.0/16 --filter-protocols udp,tcp
+        --filter-direction egress
+        --enable --collector-ilb fr1
+        """)
+
+    self.CheckRequests([(self.compute.packetMirrorings, 'Insert',
+                         self.messages.ComputePacketMirroringsInsertRequest(
+                             packetMirroring=expected,
+                             project='my-project',
+                             region='us-central1',
+                         ))])
 
 
 if __name__ == '__main__':

@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -85,6 +87,22 @@ class NamespacesUpdateTestBeta(base.ServiceDirectoryUnitTestBase):
 
     self.assertEqual(actual, expected)
     self.AssertErrContains('Updated namespace [my-namespace].')
+
+  def testUpdate_InvliadRequest_Fails(self):
+    req = self.msgs.ServicedirectoryProjectsLocationsNamespacesPatchRequest(
+        namespace=self._Namespace(
+            labels=self._Labels([self._AdditionalProperty('a', 'b')])),
+        name=self.namespace_name,
+        updateMask='labels')
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces.Patch.Expect(
+        request=req, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run('service-directory namespaces update my-namespace '
+               '--location my-location '
+               '--labels a=b')
+    self.AssertErrNotContains('Updated namespace')
 
 
 class NamespacesUpdateTestAlpha(NamespacesUpdateTestBeta):

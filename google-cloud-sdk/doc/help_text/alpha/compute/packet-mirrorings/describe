@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute packet-mirrorings describe - describe a Google Compute
-        Engine packet mirroring policy
+    gcloud alpha compute packet-mirrorings describe - describe a Compute Engine
+        packet mirroring policy
 
 SYNOPSIS
     gcloud alpha compute packet-mirrorings describe NAME [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a Google Compute Engine Packet Mirroring policy.
+    (ALPHA) Describe a Compute Engine Packet Mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -36,7 +36,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute packet-mirrorings describe
         $ gcloud beta compute packet-mirrorings describe

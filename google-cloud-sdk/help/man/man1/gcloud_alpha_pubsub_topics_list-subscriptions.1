@@ -102,21 +102,14 @@ run:
 
 .RS 2m
 $ gcloud alpha pubsub topics list\-subscriptions mytopic \e
-    \-\-filter=subscriptionId:mysubs
+    \-\-filter=mysubs
 .RE
 
 To combine multiple filters (with AND or OR), run:
 
 .RS 2m
 $ gcloud alpha pubsub topics list\-subscriptions mytopic \e
-    \-\-filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
-.RE
-
-To filter subscriptions that match an expression:
-
-.RS 2m
-$ gcloud alpha pubsub topics list\-subscriptions mytopic \e
-    \-\-filter="subscriptionId:subs_*"
+    \-\-filter="mysubs1 OR mysubs2"
 .RE
 
 
@@ -126,7 +119,7 @@ $ gcloud alpha pubsub topics list\-subscriptions mytopic \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud pubsub topics list\-subscriptions

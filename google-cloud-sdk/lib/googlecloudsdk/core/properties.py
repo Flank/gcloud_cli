@@ -18,11 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import enum
 import functools
 import os
 import re
 import sys
-import enum
 
 from googlecloudsdk.core import argv_utils
 from googlecloudsdk.core import config
@@ -282,6 +282,8 @@ class _Sections(object):
       Cloud SDK.
     emulator: Section, The section containing emulator properties for the Cloud
       SDK.
+    eventarc: Section, The section containing eventarc properties for the Cloud
+      SDK.
     experimental: Section, The section containing experimental properties for
       the Cloud SDK.
     filestore: Section, The section containing filestore properties for the
@@ -305,6 +307,8 @@ class _Sections(object):
     ml_engine: Section, The section containing ml_engine properties for the
       Cloud SDK.
     notebooks: Section, The section containing notebook properties for the
+      Cloud SDK.
+    privateca: Section, The section containing privateca properties for the
       Cloud SDK.
     proxy: Section, The section containing proxy properties for the Cloud SDK.
     pubsub: Section, The section containing pubsub properties for the Cloud SDK.
@@ -353,6 +357,7 @@ class _Sections(object):
     self.devshell = _SectionDevshell()
     self.diagnostics = _SectionDiagnostics()
     self.emulator = _SectionEmulator()
+    self.eventarc = _SectionEventarc()
     self.experimental = _SectionExperimental()
     self.filestore = _SectionFilestore()
     self.functions = _SectionFunctions()
@@ -365,6 +370,7 @@ class _Sections(object):
     self.metrics = _SectionMetrics()
     self.ml_engine = _SectionMlEngine()
     self.notebooks = _SectionNotebooks()
+    self.privateca = _SectionPrivateCa()
     self.proxy = _SectionProxy()
     self.pubsub = _SectionPubsub()
     self.redis = _SectionRedis()
@@ -401,6 +407,7 @@ class _Sections(object):
         self.devshell,
         self.diagnostics,
         self.emulator,
+        self.eventarc,
         self.experimental,
         self.filestore,
         self.functions,
@@ -414,6 +421,7 @@ class _Sections(object):
         self.ml_engine,
         self.notebooks,
         self.pubsub,
+        self.privateca,
         self.proxy,
         self.redis,
         self.run,
@@ -1695,6 +1703,18 @@ class _SectionInteractive(_Section):
         help_text='If True, add command line suggestions based on history.')
 
 
+class _SectionPrivateCa(_Section):
+  """Contains the properties for the 'privateca' section."""
+
+  def __init__(self):
+    super(_SectionPrivateCa, self).__init__('privateca')
+    self.location = self._Add(
+        'location',
+        help_text='Default location to use when working with Private CA '
+        'resources. When a `--location` flag is required but not provided, the '
+        'command will fall back to this value, if set.')
+
+
 class _SectionProxy(_Section):
   """Contains the properties for the 'proxy' section."""
 
@@ -1777,6 +1797,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.remotebuildexecution = self._Add('remotebuildexecution')
     self.accessapproval = self._Add('accessapproval')
     self.accesscontextmanager = self._Add('accesscontextmanager')
+    self.anthosevents = self._Add('anthosevents')
     self.apigateway = self._Add('apigateway')
     self.apigee = self._Add('apigee')
     self.appengine = self._Add('appengine')
@@ -1788,6 +1809,8 @@ class _SectionApiEndpointOverrides(_Section):
     self.cloudasset = self._Add('cloudasset')
     self.cloudbilling = self._Add('cloudbilling')
     self.cloudbuild = self._Add('cloudbuild')
+    self.cloudcommerceconsumerprocurement = self._Add(
+        'cloudcommerceconsumerprocurement')
     self.clouddebugger = self._Add('clouddebugger')
     self.clouderrorreporting = self._Add('clouderrorreporting')
     self.cloudfunctions = self._Add('cloudfunctions')
@@ -1805,6 +1828,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.datacatalog = self._Add('datacatalog')
     self.dataflow = self._Add('dataflow')
     self.datafusion = self._Add('datafusion')
+    self.datamigration = self._Add('datamigration')
     self.datapol = self._Add('datapol')
     self.dataproc = self._Add('dataproc')
     self.datastore = self._Add('datastore')
@@ -1812,6 +1836,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.discovery = self._Add('discovery')
     self.dns = self._Add('dns')
     self.domains = self._Add('domains')
+    self.eventarc = self._Add('eventarc')
     self.events = self._Add('events')
     self.file = self._Add('file')
     self.firestore = self._Add('firestore')
@@ -1835,6 +1860,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.networkservices = self._Add('networkservices')
     self.networksecurity = self._Add('networksecurity')
     self.notebooks = self._Add('notebooks')
+    self.ondemandscanning = self._Add('ondemandscanning')
     self.orgpolicy = self._Add('orgpolicy')
     self.osconfig = self._Add('osconfig')
     self.oslogin = self._Add('oslogin')
@@ -1848,7 +1874,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.runtimeconfig = self._Add('runtimeconfig')
     self.redis = self._Add('redis')
     self.run = self._Add('run')
-    self.scc = self._Add('scc')
+    self.scc = self._Add('securitycenter')
     self.servicemanagement = self._Add('servicemanagement')
     self.serviceregistry = self._Add('serviceregistry')
     self.serviceusage = self._Add('serviceusage')
@@ -1904,6 +1930,7 @@ class _SectionApiClientOverrides(_Section):
     self.speech = self._Add('speech')
     self.sql = self._Add('sql')
     self.run = self._Add('run')
+    self.scc = self._Add('securitycenter')
 
 
 class _SectionEmulator(_Section):
@@ -1969,6 +1996,18 @@ class _SectionContextAware(_Section):
         validator=ExistingAbsoluteFilepathValidator,
         help_text='File path for auto discovery configuration file.',
         hidden=True)
+
+
+class _SectionEventarc(_Section):
+  """Contains the properties for the 'eventarc' section."""
+
+  def __init__(self):
+    super(_SectionEventarc, self).__init__('eventarc', hidden=True)
+    self.location = self._Add(
+        'location',
+        help_text='The default location to use when working with Eventarc '
+        'resources. When a `--location` flag is required but not provided, the '
+        'command will fall back to this value, if set.')
 
 
 class _SectionMemcache(_Section):

@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute operations describe - describe a Google Compute Engine
+    gcloud beta compute operations describe - describe a Compute Engine
         operation
 
 SYNOPSIS
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute operations describe displays all data associated
-    with a Google Compute Engine operation in a project.
+    with a Compute Engine operation in a project.
 
 POSITIONAL ARGUMENTS
      NAME

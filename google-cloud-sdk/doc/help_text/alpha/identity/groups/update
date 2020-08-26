@@ -3,6 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha identity groups update EMAIL
+        [--add-posix-group=POSIX_GROUP | --clear-posix-groups
+          | --remove-posix-groups=[POSIX_GROUP,...]]
         [--clear-description | --description=DESCRIPTION]
         [--clear-display-name | --display-name=DISPLAY_NAME]
         [GCLOUD_WIDE_FLAG ...]
@@ -15,6 +17,30 @@ POSITIONAL ARGUMENTS
         The email address of the group to be updated.
 
 FLAGS
+     At most one of these may be specified:
+
+       --add-posix-group=POSIX_GROUP
+          Group id (gid) and a name for a POSIX group that you want to add to
+          the specified Cloud Identity group. You can specify multiple POSIX
+          groups to add with multiple instances of this flag.
+
+          For example, use '--add-posix-group=gid=1005,name=eng' to add a
+          single group, or '--add-posix-group=gid=1005,name=eng
+          --add-posix-group=gid=1006,name=docs' to add multiple groups.
+
+       --clear-posix-groups
+          Clear all POSIX groups from the specified Cloud Identity group.
+
+       --remove-posix-groups=[POSIX_GROUP,...]
+          Remove POSIX groups from the specified Cloud Identity group. You can
+          specify multiple POSIX groups by either name or gid by using a
+          comma-separated list.
+
+          For example, use '--remove-posix-groups=1005,1006' to remove POSIX
+          groups with group ids '1005' and '1006', or use
+          '--remove-posix-groups=eng,docs' to remove POSIX groups named 'eng'
+          and 'docs'.
+
      At most one of these may be specified:
 
        --clear-description
@@ -54,7 +80,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta identity groups update
 

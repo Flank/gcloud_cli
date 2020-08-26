@@ -39,10 +39,10 @@ _PROJECTS_API_IMPORT = ('googlecloudsdk.api_lib.cloudresourcemanager.'
 _PROJECT_NUM = 12345
 
 
-class ExportLogsTestBeta(test_base.BaseTest):
+class ExportLogsTestGA(test_base.BaseTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     """Called by base class's SetUp() method, which does additional mocking."""
@@ -171,7 +171,13 @@ class ExportLogsTestBeta(test_base.BaseTest):
     self.assertEqual(4, self._mock_insert_bucket.call_count)
 
 
-class ExportLogsTestAlpha(ExportLogsTestBeta):
+class ExportLogsTestBeta(ExportLogsTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ExportLogsTestAlpha(ExportLogsTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

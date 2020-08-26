@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import collections
 import datetime
 import functools
+
 from apitools.base.protorpclite import messages
 from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.run import condition
@@ -31,6 +32,7 @@ from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.util import waiter
+from googlecloudsdk.calliope import base as launch_stage_base
 from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import name_generator
@@ -46,7 +48,6 @@ from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.run import base
-
 import mock as unittest_mock
 
 
@@ -960,16 +961,24 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
             url='https://dummy_url.com/',
             content={
                 'error': {
-                    'code': 400,
-                    'message': 'The request has errors.',
-                    'status': 'INVALID_ARGUMENT',
+                    'code':
+                        400,
+                    'message': ('spec.revisionTemplate.spec.container.image: '
+                                'standin error string'),
+                    'status':
+                        'INVALID_ARGUMENT',
                     'details': [{
-                        '@type': 'type.googleapis.com/google.rpc.BadRequest',
+                        '@type':
+                            'type.googleapis.com/google.rpc.BadRequest',
                         'fieldViolations': [{
                             'field':
                                 'spec.revisionTemplate.spec.container.image',
-                            'description': 'standin error string',
-                        }]}]}}),
+                            'description':
+                                'standin error string',
+                        }]
+                    }]
+                }
+            }),
         image='badimage',
         annotations={'client.knative.dev/user-image': 'badimage'})
 
@@ -1065,8 +1074,10 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self.mock_serverless_client.namespaces_domainmappings.Get.Expect(
         get_request,
         response=gotten_domain_mapping.Message())
+    fake_launch_stage = config_changes.SetLaunchStageAnnotationChange(
+        launch_stage_base.ReleaseTrack.GA)
     mapping = self.serverless_client.CreateDomainMapping(
-        self._DomainmappingRef('foo'), 'myapp')
+        self._DomainmappingRef('foo'), 'myapp', [fake_launch_stage])
     self.assertEqual(mapping.records[0].rrdata, '216.239.32.21')
 
   def testUpdateLabels(self):
@@ -1108,7 +1119,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
             content={
                 'error': {
                     'code': 400,
-                    'message': 'The request has errors.',
+                    'message': 'label: standin error string',
                     'status': 'INVALID_ARGUMENT',
                     'details': [{
                         '@type': 'type.googleapis.com/google.rpc.BadRequest',

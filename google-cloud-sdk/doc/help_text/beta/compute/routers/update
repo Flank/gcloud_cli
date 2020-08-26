@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute routers update - update a Google Compute Engine router
+    gcloud beta compute routers update - update a Compute Engine router
 
 SYNOPSIS
     gcloud beta compute routers update NAME [--advertisement-mode=MODE]
@@ -12,8 +12,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute routers update is used to update a Google
-    Compute Engine router.
+    (BETA) gcloud beta compute routers update is used to update a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

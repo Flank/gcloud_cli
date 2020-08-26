@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute org-security-policies associations delete - delete a
-        Google Compute Engine organization security policy association
+        Compute Engine organization security policy association
 
 SYNOPSIS
     gcloud beta compute org-security-policies associations delete NAME

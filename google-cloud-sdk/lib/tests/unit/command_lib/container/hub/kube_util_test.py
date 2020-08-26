@@ -58,8 +58,7 @@ class MembershipCRTest(sdk_test_base.SdkBase, parameterized.TestCase):
 
   def testMissingMembershipCRD(self):
     self.mock_client.MembershipCRDExists.return_value = False
-    self.assertEqual(
-        exclusivity_util.GetMembershipCROwnerID(self.mock_client), None)
+    self.assertIsNone(exclusivity_util.GetMembershipCROwnerID(self.mock_client))
 
   def testMalformedMembershipOwnerID(self):
     self.mock_client._RunKubectl.return_value = ('invalid', None)
@@ -73,8 +72,7 @@ class MembershipCRTest(sdk_test_base.SdkBase, parameterized.TestCase):
 
   def testMissingMembership(self):
     self.mock_client._RunKubectl.return_value = (None, 'NotFound')
-    self.assertEqual(None,
-                     exclusivity_util.GetMembershipCROwnerID(self.mock_client))
+    self.assertIsNone(exclusivity_util.GetMembershipCROwnerID(self.mock_client))
 
 
 class ISGKEClusterTest(sdk_test_base.SdkBase, parameterized.TestCase):

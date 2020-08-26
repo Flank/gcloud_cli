@@ -48,7 +48,8 @@ FLAGS
 
      --purpose=PURPOSE
         The purpose of the address resource. This field is not applicable to
-        external addresses. PURPOSE must be one of: VPC_PEERING, GCE_ENDPOINT.
+        external addresses. PURPOSE must be one of: VPC_PEERING,
+        SHARED_LOADBALANCER_VIP, GCE_ENDPOINT.
 
      --subnet=SUBNET
         If specified, the subnet name in which the address(es) should be

@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute target-vpn-gateways update - update a Google Compute
-        Engine Cloud VPN Classic Target VPN Gateway
+    gcloud beta compute target-vpn-gateways update - update a Compute Engine
+        Cloud VPN Classic Target VPN Gateway
 
 SYNOPSIS
     gcloud beta compute target-vpn-gateways update NAME [--region=REGION]
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute target-vpn-gateways update updates labels for a
-    Google Compute Engine Cloud VPN Classic Target VPN gateway. For example:
+    Compute Engine Cloud VPN Classic Target VPN gateway. For example:
 
         $ gcloud beta compute target-vpn-gateways update example-gateway \
             --region us-central1 \

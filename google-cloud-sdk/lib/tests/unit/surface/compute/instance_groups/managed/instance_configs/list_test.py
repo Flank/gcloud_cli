@@ -25,13 +25,12 @@ from tests.lib.surface.compute import test_base
 from mock import patch
 
 
-class _InstanceGroupsManagedInstancesConfigsListBetaTestBase(
-    test_base.BaseTest):
+class _InstanceGroupsManagedInstancesConfigsListGATestBase(test_base.BaseTest):
 
-  API_VERSION = 'beta'
+  API_VERSION = 'v1'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SelectApi(self.API_VERSION)
@@ -86,8 +85,8 @@ class _InstanceGroupsManagedInstancesConfigsListBetaTestBase(
     )
 
 
-class InstanceGroupsManagedInstancesConfigsListBetaZonalTest(
-    _InstanceGroupsManagedInstancesConfigsListBetaTestBase):
+class InstanceGroupsManagedInstancesConfigsListGAZonalTest(
+    _InstanceGroupsManagedInstancesConfigsListGATestBase):
 
   def SetUp(self):
     self.make_requests.side_effect = iter([
@@ -268,8 +267,8 @@ class InstanceGroupsManagedInstancesConfigsListBetaZonalTest(
         """)
 
 
-class InstanceGroupsManagedInstancesConfigsListBetaRegionalTest(
-    _InstanceGroupsManagedInstancesConfigsListBetaTestBase):
+class InstanceGroupsManagedInstancesConfigsListGARegionalTest(
+    _InstanceGroupsManagedInstancesConfigsListGATestBase):
 
   def SetUp(self):
     self.make_requests.side_effect = iter([
@@ -442,6 +441,27 @@ class InstanceGroupsManagedInstancesConfigsListBetaRegionalTest(
         key3: value3
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains('metadata: {}', normalize_space=True)
+
+
+class _InstanceGroupsManagedInstancesConfigsListBetaTestBase(
+    test_base.BaseTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupsManagedInstancesConfigsListBetaZonalTest(
+    _InstanceGroupsManagedInstancesConfigsListBetaTestBase,
+    InstanceGroupsManagedInstancesConfigsListGAZonalTest):
+  pass
+
+
+class InstanceGroupsManagedInstancesConfigsListBetaRegionalTest(
+    _InstanceGroupsManagedInstancesConfigsListBetaTestBase,
+    InstanceGroupsManagedInstancesConfigsListGARegionalTest):
+  pass
 
 
 class _InstanceGroupsManagedInstancesConfigsListAlphaTestBase(

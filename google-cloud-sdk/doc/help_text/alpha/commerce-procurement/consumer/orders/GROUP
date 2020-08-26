@@ -22,24 +22,24 @@ COMMANDS
     COMMAND is one of the following:
 
      cancel
-        (ALPHA) Cancels the order resource from Cancel API.
+        (ALPHA) Cancels the order resource from the Cancel API.
 
      create
-        (ALPHA) Creates the order resource from place API.
+        (ALPHA) Creates the order resource from the Place API.
 
      describe
-        (ALPHA) Outputs the Order object resulting from the Get API.
+        (ALPHA) Returns the Order object resulting from the Get API.
 
      list
-        (ALPHA) Outputs the List of Order object resulting from the List API.
+        (ALPHA) Returns the List of Order objects resulting from the List API.
 
      modify
-        (ALPHA) Modify the order resource from modify API.
+        (ALPHA) Modifies the order resource from the Modify API.
 
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

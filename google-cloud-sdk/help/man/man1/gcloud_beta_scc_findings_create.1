@@ -1,0 +1,153 @@
+
+.TH "GCLOUD_BETA_SCC_FINDINGS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta scc findings create \- create a Cloud Security Command Center finding
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta scc findings create\fR (\fIFINDING\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR\ \fB\-\-source\fR=\fISOURCE\fR) \fB\-\-category\fR=\fICATEGORY\fR \fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR [\fB\-\-event\-time\fR=\fIEVENT_TIME\fR] [\fB\-\-external\-uri\fR=\fIEXTERNAL_URI\fR] [\fB\-\-source\-properties\fR=[\fISOURCE_PROPERTIES\fR,...]] [\fB\-\-state\fR=\fISTATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a Cloud Security Command Center finding.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Finding resource \- The finding you want to create. The arguments in this group
+can be used to specify the attributes of this resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIFINDING\fR
+ID of the finding or fully qualified identifier for the finding. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+(Optional) If the full resource name isn't provided e.g. organizations/123, then
+provide the organization id which is the suffix of the organization. Example:
+organizations/123, the id is 123.
+
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+(Optional) If the full resource name isn't provided e.g.
+organizations/123/sources/456, then provide the source id which is the suffix of
+the source. Example: organizations/123/sources/456, the id is 456.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-category\fR=\fICATEGORY\fR
+Taxonomy group within findings from a given source. Example: XSS_FLASH_INJECTION
+
+.TP 2m
+\fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR
+Full resource name of the Google Cloud Platform resource this finding is for.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-event\-time\fR=\fIEVENT_TIME\fR
+Time at which the event took place. For example, if the finding represents an
+open firewall it would capture the time the open firewall was detected. If
+event\-time is not provided, it will default to UTC version of NOW. For example
+2019\-02\-28T07:00:00Z
+
+.TP 2m
+\fB\-\-external\-uri\fR=\fIEXTERNAL_URI\fR
+URI that, if available, points to a web page outside of Cloud SCC (Security
+Command Center) where additional information about the finding can be found.
+This field is guaranteed to be either empty or a well formed URL.
+
+.TP 2m
+\fB\-\-source\-properties\fR=[\fISOURCE_PROPERTIES\fR,...]
+Source specific properties. These properties are managed by the source that
+writes the finding. The key names in the source_properties map must be between 1
+and 255 characters, and must start with a letter and contain alphanumeric
+characters or underscores only. For example "key1=val1,key2=val2"
+
+.TP 2m
+\fB\-\-state\fR=\fISTATE\fR
+State is one of: [ACTIVE, INACTIVE]. \fISTATE\fR must be one of: \fBactive\fR,
+\fBinactive\fR, \fBstate\-unspecified\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBsecuritycenter/v1\fR API. The full documentation for
+this API can be found at:
+https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
+
+
+
+.SH "EXAMPLES"
+
+Create an ACTIVE my\-finding attached to example\-project under organization
+123456 and source 5678:
+
+.RS 2m
+$ gcloud beta scc findings create my\-finding \-\-organization=123456 \e
+    \-\-source=5678 \-\-state ACTIVE \e
+    \-\-resource\-name \e
+    '//cloudresourcemanager.googleapis.com/v1/projects/example\-proje\e
+ct'
+.RE
+
+Create an ACTIVE my\-finding with category: XSS_SCRIPTING under organization
+123456 and source 5678:
+
+.RS 2m
+$ gcloud beta scc findings create my\-finding \-\-organization=123456 \e
+    \-\-source=5678 \-\-state ACTIVE \-\-category 'XSS_SCRIPTING'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud scc findings create
+$ gcloud alpha scc findings create
+.RE
+

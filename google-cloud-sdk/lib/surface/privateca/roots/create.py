@@ -112,12 +112,12 @@ class Create(base.CreateCommand):
         presentation_specs.ResourcePresentationSpec(
             '--reusable-config',
             privateca_resource_args.CreateReusableConfigResourceSpec(
-                location_fallthrough=deps.Fallthrough(
+                location_fallthroughs=[deps.Fallthrough(
                     function=lambda: '',
                     hint=('location will default to the same location as '
                           'the CA'),
                     active=False,
-                    plural=False)),
+                    plural=False)]),
             'The Reusable Config containing X.509 values for this CA.',
             flag_name_overrides={
                 'location': '',
@@ -174,13 +174,5 @@ class Create(base.CreateCommand):
     ca_response = operations.Await(operation, 'Creating Certificate Authority.')
     ca = operations.GetMessageFromResponse(ca_response,
                                            self.messages.CertificateAuthority)
-
-    log.status.Print('Creating the initial Certificate Revocation List.')
-    self.client.projects_locations_certificateAuthorities.PublishCrl(
-        self.messages
-        .PrivatecaProjectsLocationsCertificateAuthoritiesPublishCrlRequest(
-            name=ca.name,
-            publishCertificateRevocationListRequest=self.messages
-            .PublishCertificateRevocationListRequest()))
 
     log.status.Print('Created Certificate Authority [{}].'.format(ca.name))

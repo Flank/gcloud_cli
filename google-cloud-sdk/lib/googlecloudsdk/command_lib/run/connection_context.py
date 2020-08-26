@@ -42,8 +42,8 @@ import six
 from six.moves.urllib import parse as urlparse
 
 
-_CLUSTER_EVENTS_API_NAME = global_methods.SERVERLESS_API_NAME
-_CLUSTER_EVENTS_API_VERSION = 'v1alpha1'
+_CLUSTER_EVENTS_API_NAME = 'anthosevents'
+_CLUSTER_EVENTS_API_VERSION = 'v1beta1'
 
 _MANAGED_EVENTS_API_NAME = 'events'
 _MANAGED_EVENTS_API_VERSION = 'v1beta1'
@@ -191,8 +191,8 @@ class _GKEConnectionContext(ConnectionInfo):
     # Import http only when needed, as it depends on credential infrastructure
     # which is not needed in all cases.
     assert self.active
-    from googlecloudsdk.core.credentials import http as http_creds  # pylint: disable=g-import-not-at-top
-    http_client = http_creds.Http(
+    from googlecloudsdk.core.credentials import transports  # pylint: disable=g-import-not-at-top
+    http_client = transports.GetApitoolsTransport(
         response_encoding=transport.ENCODING,
         ca_certs=self.ca_certs)
     return http_client
@@ -278,8 +278,8 @@ class _KubeconfigConnectionContext(ConnectionInfo):
       http_client.add_certificate(
           self.client_key, self.client_cert, self.client_cert_domain)
       return http_client
-    from googlecloudsdk.core.credentials import http as http_creds  # pylint: disable=g-import-not-at-top
-    http_client = http_creds.Http(
+    from googlecloudsdk.core.credentials import transports  # pylint: disable=g-import-not-at-top
+    http_client = transports.GetApitoolsTransport(
         response_encoding=transport.ENCODING,
         ca_certs=self.ca_certs)
     return http_client

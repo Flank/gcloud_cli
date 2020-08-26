@@ -287,6 +287,9 @@ GROUPS
      runtime-config
         (BETA) Manage runtime configuration resources.
 
+     scc
+        (BETA) Manage Cloud SCC resources.
+
      scheduler
         (BETA) Manage Cloud Scheduler jobs and schedules.
 
@@ -310,6 +313,9 @@ GROUPS
 
      tasks
         (BETA) Manage Cloud Tasks queues and tasks.
+
+     workflows
+        (BETA) Manage your Cloud Workflows resources.
 
 COMMANDS
     COMMAND is one of the following:

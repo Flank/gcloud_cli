@@ -19,10 +19,10 @@ COMMANDS
     COMMAND is one of the following:
 
      deploy
-        (ALPHA) Deploys an Apigee API proxy.
+        (ALPHA) Deploy an API proxy to an environment.
 
      describe
-        (ALPHA) Describes an Apigee API proxy.
+        (ALPHA) Describe an Apigee API proxy.
 
      list
         (ALPHA) List Apigee API proxies.
@@ -34,5 +34,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

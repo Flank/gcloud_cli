@@ -25,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        Describe a Google Compute Engine region.
+        Describe a Compute Engine region.
 
      list
         List Google Compute Engine regions.

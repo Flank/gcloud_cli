@@ -178,13 +178,14 @@ Example:
 \fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]
 A list of paths that will be copied from the device's storage to the designated
 results bucket after the test is complete. These must be absolute paths under
-\f5/sdcard\fR or \f5/data/local/tmp\fR (for example,
+\f5/sdcard\fR, \f5/storage\fR, or \f5/data/local/tmp\fR (for example,
 \f5\-\-directories\-to\-pull /sdcard/tempDir1,/data/local/tmp/tempDir2\fR). Path
 names are restricted to the characters \f5a\-zA\-Z0\-9_\-./+\fR. The paths
 \f5/sdcard\fR and \f5/data\fR will be made available and treated as implicit
 path substitutions. E.g. if \f5/sdcard\fR on a particular device does not map to
 external storage, the system will replace it with the external storage path
-prefix for that device.
+prefix for that device. Note that access to some directories on API levels 29
+and later may also be limited by scoped storage rules.
 
 .TP 2m
 \fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -246,14 +247,14 @@ conform to the format as specified by Android (e.g.
 A list of device\-path=file\-path pairs that indicate the device paths to push
 files to the device before starting tests, and the paths of files to push.
 
-Device paths must be under absolute, whitelisted paths (${EXTERNAL_STORAGE}, or
+Device paths must be under absolute, approved paths (${EXTERNAL_STORAGE}, or
 ${ANDROID_DATA}/local/tmp). Source file paths may be in the local filesystem or
 in Google Cloud Storage (gs://...).
 
 Examples:
 
 .RS 2m
-\-\-other\-files /sdcard/dir1/file1.txt=local/file.txt,/sdcard/dir2/file2.jpg=gs://bucket/file.jpg
+\-\-other\-files /sdcard/dir1/file1.txt=local/file.txt,/storage/dir2/file2.jpg=gs://bucket/file.jpg
 .RE
 
 This flag only copies files to the device. To install files, like OBB or APK

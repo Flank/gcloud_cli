@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud spanner databases ddl update (DATABASE : --instance=INSTANCE)
-        --ddl=DDL [--async] [GCLOUD_WIDE_FLAG ...]
+        [--async] [--ddl=DDL] [--ddl-file=DDL_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update the DDL for a Cloud Spanner database.
@@ -26,16 +26,21 @@ POSITIONAL ARGUMENTS
        --instance=INSTANCE
           The Cloud Spanner instance for the database.
 
-REQUIRED FLAGS
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
      --ddl=DDL
         Semi-colon separated DDL (data definition language) statements to run
         inside the database. If a statement fails, all subsequent statements in
         the batch are automatically cancelled.
 
-OPTIONAL FLAGS
-     --async
-        Return immediately, without waiting for the operation in progress to
-        complete.
+     --ddl-file=DDL_FILE
+        Path of a file containing semi-colon separated DDL (data definition
+        language) statements to run inside the database. If a statement fails,
+        all subsequent statements in the batch are automatically cancelled. If
+        --ddl_file is set, --ddl is ignored.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

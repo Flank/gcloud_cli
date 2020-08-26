@@ -27,7 +27,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.disks import test_resources
 import mock
 
 
@@ -166,16 +166,21 @@ class RegionalDisksListTestBeta(RegionalDisksListTestGA):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
 
-  def _getListRequestMessage(self, project):
-    return self.messages.ComputeDisksAggregatedListRequest(
-        project=project, includeAllScopes=True)
-
 
 class RegionalDisksListTestAlpha(RegionalDisksListTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
+
+  def _getListRequestMessage(self, project):
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.messages.ComputeDisksAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
+    return self.messages.ComputeDisksAggregatedListRequest(
+        project=project, **request_params)
 
 
 if __name__ == '__main__':

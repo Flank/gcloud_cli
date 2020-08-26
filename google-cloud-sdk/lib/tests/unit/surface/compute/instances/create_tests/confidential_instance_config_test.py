@@ -142,8 +142,10 @@ class InstancesCreateConfidentialInstanceConfigBetaTest(
              '  --zone central2-a {}'.format(cmd_flag))
 
     expected_image = self._default_image
+    expected_machine_type = self._default_machine_type
     if enable_confidential_compute:
       expected_image = self._default_confidential_vm_image
+      expected_machine_type = self._default_confidential_vm_machine_type
 
     self.CheckRequests(self.zone_get_request, self.project_get_request, [
         (self.compute.instances, 'Insert',
@@ -160,7 +162,7 @@ class InstancesCreateConfidentialInstanceConfigBetaTest(
                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
                  ],
-                 machineType=self._default_machine_type,
+                 machineType=expected_machine_type,
                  metadata=m.Metadata(),
                  minCpuPlatform=None,
                  name='instance-1',

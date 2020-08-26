@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: Likely GCR related
+    bug: b/163030401
 title: Test import
 release_tracks: [GA]
 summary:
@@ -22,15 +26,17 @@ summary:
       name:   $$image$$
       status: READY
 - execute:
-  - command: compute images import $$import-image$$ --source-image $$image$$ --custom-workflow
-      dummy.wf.json --timeout 30s --quiet
+  - command: compute images import $$import-image$$ --source-image
+      dummy-image-123 --custom-workflow dummy.wf.json  --timeout 30s --quiet
   - stderr: |-
       .*WARNING: Importing image\. This may take up to 2 hours.*
       .*Created.*
       $
   - stdout: |-
-      .*\[Daisy\] Running workflow "import-from-image".*
-      .*"translate-disk": open /workflows/image_import/dummy.wf.json: no such file or directory.*
+      .*starting build.*
+      .*\[import-image\].*Validating workflow.*
+      .*validation error: cannot create disk.*
+      .*ERROR: build step 0 "gcr.io\/compute-image-tools\/gce_vm_image_import:release" failed.*
       $
   - error: '1: .*completed with status "FAILURE".*$'
 - execute:
@@ -99,8 +105,8 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute images import $$import-image$$ --source-image $$image$$ --custom-workflow
-      dummy.wf.json --timeout 30s --quiet
+    command: compute images import $$import-image$$  --source-image
+      dummy-image-123 --custom-workflow dummy.wf.json --timeout 30s --quiet
     validation_only: true
     events:
     - expect_stderr:
@@ -110,6 +116,8 @@ actions:
     - expect_stdout:
         matches: |
           .*starting build.*
+          .*\[import-image\].*Validating workflow.*
+          .*validation error: cannot create disk.*
           .*ERROR: build step 0 "gcr.io\/compute-image-tools\/gce_vm_image_import:release" failed.*
     - expect_exit:
         code: 1

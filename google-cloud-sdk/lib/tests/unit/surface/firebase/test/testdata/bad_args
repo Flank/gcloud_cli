@@ -58,6 +58,9 @@ robo-script.multiple:
 additional-apks.empty:
   additional-apks: []
 
+additional-ipas.empty:
+  additional-ipas: []
+
 other-files.list:
   other-files: ["/sdcard/dir1/file.txt","local/dir/file1.txt"]
 

@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute operations list - list Google Compute Engine operations
+    gcloud beta compute operations list - list Compute Engine operations
 
 SYNOPSIS
     gcloud beta compute operations list [NAME ...] [--global]
@@ -9,8 +9,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute operations list displays all Google Compute
-    Engine operations in a project.
+    (BETA) gcloud beta compute operations list displays all Compute Engine
+    operations in a project.
 
     By default, all global, regional, and zonal operations are listed. The
     results can be narrowed by providing combinations of the --zones,

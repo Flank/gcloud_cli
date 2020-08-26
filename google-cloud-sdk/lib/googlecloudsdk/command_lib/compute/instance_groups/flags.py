@@ -18,11 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import textwrap
 import enum
+import textwrap
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.api_lib.compute import utils
-from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
@@ -490,7 +489,6 @@ def AddMigStatefulFlagsForUpdateInstanceConfigs(parser):
 
   # Add stateful disk update args
   stateful_disk_argument_name = '--stateful-disk'
-  stateful_disk_argument_name_old = '--update-stateful-disk'
   disk_help_text = textwrap.dedent(
       (STATEFUL_DISKS_HELP_INSTANCE_CONFIGS_UPDATE +
        STATEFUL_DISK_DEVICE_NAME_ARG_HELP + STATEFUL_DISK_SOURCE_ARG_HELP +
@@ -512,29 +510,6 @@ def AddMigStatefulFlagsForUpdateInstanceConfigs(parser):
       action='append',
       help=disk_help_text,
   )
-  # DEPRECATED: --update-stateful-disk
-  parser.add_argument(
-      stateful_disk_argument_name_old,
-      type=arg_parsers.ArgDict(
-          spec={
-              'device-name':
-                  str,
-              'source':
-                  str,
-              'mode':
-                  str,
-              'auto-delete':
-                  AutoDeleteFlag.ValidatorWithFlagName(
-                      stateful_disk_argument_name_old)
-          }),
-      action=actions.DeprecationAction(
-          stateful_disk_argument_name_old,
-          warn='The {flag_name} option is deprecated; '
-          'use --stateful-disk instead.',
-          removed=False,
-          action='append'),
-      dest='stateful_disk',
-      help=disk_help_text)
   # Add remove disk args
   parser.add_argument(
       '--remove-stateful-disks',
@@ -545,7 +520,6 @@ def AddMigStatefulFlagsForUpdateInstanceConfigs(parser):
 
   # Add stateful metadata args
   stateful_metadata_argument_name = '--stateful-metadata'
-  stateful_metadata_argument_name_old = '--update-stateful-metadata'
   metadata_help_text = textwrap.dedent(
       (STATEFUL_METADATA_HELP + STATEFUL_METADATA_HELP_UPDATE).format(
           argument_name=stateful_metadata_argument_name))
@@ -555,20 +529,6 @@ def AddMigStatefulFlagsForUpdateInstanceConfigs(parser):
       default={},
       action=arg_parsers.StoreOnceAction,
       metavar='KEY=VALUE',
-      help=textwrap.dedent(metadata_help_text))
-  # DEPRECATED: --update-stateful-metadata
-  parser.add_argument(
-      stateful_metadata_argument_name_old,
-      type=arg_parsers.ArgDict(min_length=1),
-      default={},
-      action=actions.DeprecationAction(
-          stateful_metadata_argument_name_old,
-          warn='The {flag_name} option is deprecated; '
-          'use --stateful-metadata instead.',
-          removed=False,
-          action=arg_parsers.StoreOnceAction),
-      metavar='KEY=VALUE',
-      dest='stateful_metadata',
       help=textwrap.dedent(metadata_help_text))
   parser.add_argument(
       '--remove-stateful-metadata',
@@ -622,39 +582,38 @@ def AddMigStatefulFlagsForInstanceConfigs(parser):
       help=metadata_help_text)
 
 
-def AddCreateInstancesFlags(parser, add_stateful_args=True):
+def AddCreateInstancesFlags(parser):
   """Adding stateful flags for creating and updating instance configs."""
   parser.add_argument(
       '--instance',
       required=True,
       help="""Name of the new instance to create.""")
-  if add_stateful_args:
-    parser.add_argument(
-        '--stateful-disk',
-        type=arg_parsers.ArgDict(
-            spec={
-                'device-name':
-                    str,
-                'source':
-                    str,
-                'mode':
-                    str,
-                'auto-delete':
-                    AutoDeleteFlag.ValidatorWithFlagName('--stateful-disk'),
-            }),
-        action='append',
-        help=textwrap.dedent(STATEFUL_DISKS_HELP_INSTANCE_CONFIGS),
-    )
-    stateful_metadata_argument_name = '--stateful-metadata'
-    parser.add_argument(
-        stateful_metadata_argument_name,
-        type=arg_parsers.ArgDict(min_length=1),
-        default={},
-        action=arg_parsers.StoreOnceAction,
-        metavar='KEY=VALUE',
-        help=textwrap.dedent(
-            STATEFUL_METADATA_HELP.format(
-                argument_name=stateful_metadata_argument_name)))
+  parser.add_argument(
+      '--stateful-disk',
+      type=arg_parsers.ArgDict(
+          spec={
+              'device-name':
+                  str,
+              'source':
+                  str,
+              'mode':
+                  str,
+              'auto-delete':
+                  AutoDeleteFlag.ValidatorWithFlagName('--stateful-disk'),
+          }),
+      action='append',
+      help=textwrap.dedent(STATEFUL_DISKS_HELP_INSTANCE_CONFIGS),
+  )
+  stateful_metadata_argument_name = '--stateful-metadata'
+  parser.add_argument(
+      stateful_metadata_argument_name,
+      type=arg_parsers.ArgDict(min_length=1),
+      default={},
+      action=arg_parsers.StoreOnceAction,
+      metavar='KEY=VALUE',
+      help=textwrap.dedent(
+          STATEFUL_METADATA_HELP.format(
+              argument_name=stateful_metadata_argument_name)))
 
 
 def AddMigStatefulUpdateInstanceFlag(parser):
@@ -752,15 +711,14 @@ def AddMigUpdateStatefulFlags(parser):
   stateful_disks_help = textwrap.dedent(STATEFUL_DISKS_HELP_BASE + """
       Use this argument multiple times to update more disks.
 
-      If stateful disk with given `device-name` exists in current instance
-      config, its properties will be replaced by the newly provided ones. In
-      other case new stateful disk definition will be added to the instance
-      config.
+      If a stateful disk with the given device name already exists in the
+      current instance config, its properties will be replaced by the newly
+      provided ones. Otherwise, a new stateful disk definition will be added to
+      the instance config.
 
       *device-name*::: (Requied) Device name of the disk to mark stateful.
       """ + STATEFUL_DISK_AUTO_DELETE_ARG_HELP)
   stateful_disk_flag_name = '--stateful-disk'
-  stateful_disk_flag_name_old = '--update-stateful-disk'
   parser.add_argument(
       stateful_disk_flag_name,
       type=arg_parsers.ArgDict(
@@ -774,26 +732,6 @@ def AddMigUpdateStatefulFlags(parser):
       help=stateful_disks_help,
   )
 
-  # DEPRECATED: --update-stateful-disk
-  parser.add_argument(
-      stateful_disk_flag_name_old,
-      type=arg_parsers.ArgDict(
-          spec={
-              'device-name':
-                  str,
-              'auto-delete':
-                  AutoDeleteFlag.ValidatorWithFlagName(
-                      stateful_disk_flag_name_old)
-          }),
-      action=actions.DeprecationAction(
-          stateful_disk_flag_name_old,
-          warn='The {flag_name} option is deprecated; '
-          'use --stateful-disk instead.',
-          removed=False,
-          action='append'),
-      dest='stateful_disk',
-      help=stateful_disks_help,
-  )
   parser.add_argument(
       '--remove-stateful-disks',
       metavar='DEVICE_NAME',
@@ -884,7 +822,7 @@ def ValidateMigInstanceRedistributionTypeFlag(instance_redistribution_type,
             'managed instance groups only.'))
 
 
-DISTRIBUTION_POLICY_TARGET_SHAPES = ['EVEN', 'ANY']
+DISTRIBUTION_POLICY_TARGET_SHAPES = ['EVEN', 'ANY', 'BALANCED']
 
 
 def AddMigDistributionPolicyTargetShapeFlag(parser):
@@ -902,12 +840,17 @@ def AddMigDistributionPolicyTargetShapeFlag(parser):
 
       The following target shapes are available:
 
-       * EVEN - managed instance group will create and delete instances
-         in a manner preserving or converging to even distribution.
+       * EVEN - The managed instance group creates the same number of managed
+         instances in each zone without consideration for resource availability.
 
-       * ANY - managed instance group will create instances based on present
-         capacity constraints and will not attempt to converge to even
-         distribution.
+       * ANY - The managed instance group creates managed instances in zones
+         that have available resources - such as specialized hardware - and will
+         not attempt to converge to even distribution. All VMs might end up in a
+         single zone.
+
+       * BALANCED - The managed instance group creates managed instances in
+         zones as evenly as possible given availability of resources in each
+         zone, such as availability of specialized hardware.
       """)
 
 

@@ -64,8 +64,8 @@ are additional Kubernetes cluster components. Addons specified by this flag will
 be enabled. The others will be disabled. Default addons: HttpLoadBalancing,
 HorizontalPodAutoscaling. \fIADDON\fR must be one of: \fBHttpLoadBalancing\fR,
 \fBHorizontalPodAutoscaling\fR, \fBKubernetesDashboard\fR, \fBNetworkPolicy\fR,
-\fBCloudRun\fR, \fBNodeLocalDNS\fR, \fBIstio\fR, \fBApplicationManager\fR,
-\fBGcePersistentDiskCsiDriver\fR, \fBConfigConnector\fR.
+\fBCloudRun\fR, \fBNodeLocalDNS\fR, \fBConfigConnector\fR, \fBIstio\fR,
+\fBApplicationManager\fR, \fBGcePersistentDiskCsiDriver\fR.
 
 .TP 2m
 \fB\-\-allow\-route\-overlap\fR
@@ -333,6 +333,9 @@ Use with private clusters to allow access to the master's private endpoint from
 any Google Cloud region or on\-premises environment regardless of the private
 cluster's region.
 
+Must be used in conjunction with '\-\-enable\-ip\-alias' and
+\'\-\-enable\-private\-nodes'.
+
 .TP 2m
 \fB\-\-enable\-network\-policy\fR
 Enable network policy enforcement for this cluster. If you are enabling network
@@ -431,7 +434,7 @@ https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR, \fB\-m\fR \fIMACHINE_TYPE\fR
-The type of machine to use for nodes. Defaults to n1\-standard\-1. The list of
+The type of machine to use for nodes. Defaults to e2\-medium. The list of
 predefined machine types is available using the following command:
 
 .RS 2m
@@ -454,8 +457,8 @@ $ gcloud beta container clusters create high\-mem\-pool \e
 \fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR
 The maximum number of nodes to allocate per default initial node pool.
 Kubernetes Engine will automatically create enough nodes pools such that each
-node pool contains less than \-\-max\-nodes\-per\-pool nodes. Defaults to 1000
-nodes, but can be set as low as 100 nodes per pool on initial create.
+node pool contains less than \f5\-\-max\-nodes\-per\-pool\fR nodes. Defaults to
+1000 nodes, but can be set as low as 100 nodes per pool on initial create.
 
 .TP 2m
 \fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR
@@ -539,6 +542,14 @@ Additionally, the following keys are reserved for use by Kubernetes Engine:
 \f5\fIuser\-data\fR\fR
 
 .RE
+.RE
+.sp
+Google Kubernetes Engine sets the following keys by default:
+
+.RS 2m
+.IP "\(bu" 2m
+\f5\fIserial\-port\-logging\-enable\fR\fR
+
 .RE
 .sp
 See also Compute Engine's documentation
@@ -819,10 +830,10 @@ App Engine Metadata Servers. This feature can only be enabled if Workload
 Identity is enabled at the cluster level.
 .TP 2m
 \fBSECURE\fR
-[DPRECATED] Prevents pods not in hostNetwork from accessing certain VM metadata,
-specifically kube\-env, which contains Kubelet credentials, and the instance
-identity token. This is a temporary security solution available while the
-bootstrapping process for cluster nodes is being redesigned with significant
+[DEPRECATED] Prevents pods not in hostNetwork from accessing certain VM
+metadata, specifically kube\-env, which contains Kubelet credentials, and the
+instance identity token. This is a temporary security solution available while
+the bootstrapping process for cluster nodes is being redesigned with significant
 security improvements. This feature is scheduled to be deprecated in the future
 and later removed.
 .RE

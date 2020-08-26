@@ -26,7 +26,7 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.addresses import test_resources
 
 import mock
 
@@ -379,16 +379,21 @@ class AddressesListBetaTest(AddressesListTest):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
 
-  def _getListRequestMessage(self, project):
-    return self.messages.ComputeAddressesAggregatedListRequest(
-        project=project, includeAllScopes=True)
-
 
 class AddressesListAlphaTest(AddressesListBetaTest):
 
   def PreSetUp(self):
     self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def _getListRequestMessage(self, project, include_scopes=True):
+    request_params = {'includeAllScopes': include_scopes}
+    if hasattr(self.messages.ComputeAddressesAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
+    return self.messages.ComputeAddressesAggregatedListRequest(
+        project=project, **request_params)
 
 
 if __name__ == '__main__':

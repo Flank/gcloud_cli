@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute target-vpn-gateways delete deletes one or more
-    Google Compute Engine Cloud VPN Classic Target VPN Gateways.
+    Compute Engine Cloud VPN Classic Target VPN Gateways.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

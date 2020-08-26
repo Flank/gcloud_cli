@@ -322,10 +322,6 @@ class RegionURLMapsListBetaTest(RegionURLMapsListTest):
                       'regions/region-2/url-maps/region-url-map2'))
     ]
 
-  def _getListRequestMessage(self, project):
-    return self.messages.ComputeUrlMapsAggregatedListRequest(
-        project=project, includeAllScopes=True)
-
 
 class RegionURLMapsListAlphaTest(RegionURLMapsListBetaTest):
 
@@ -369,6 +365,15 @@ class RegionURLMapsListAlphaTest(RegionURLMapsListBetaTest):
             selfLink=(self.URI_PREFIX +
                       'regions/region-2/url-maps/region-url-map2'))
     ]
+
+  def _getListRequestMessage(self, project):
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.messages.ComputeUrlMapsAggregatedListRequest,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
+    return self.messages.ComputeUrlMapsAggregatedListRequest(
+        project=project, **request_params)
 
 
 if __name__ == '__main__':

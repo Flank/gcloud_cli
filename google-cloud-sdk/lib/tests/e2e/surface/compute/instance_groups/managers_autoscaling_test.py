@@ -107,6 +107,7 @@ class InstanceGroupsAutoscalingTest(e2e_test_base.BaseTest):
              '--description whatever '
              '--min-num-replicas 5 '
              '--max-num-replicas 10 '
+             '--scale-in-control max-scaled-in-replicas=5,time-window=60 '
              '--scale-based-on-cpu --target-cpu-utilization 0.5 '
              '--scale-based-on-load-balancing '
              '--target-load-balancing-utilization 0.8 '
@@ -146,6 +147,10 @@ class InstanceGroupsAutoscalingTest(e2e_test_base.BaseTest):
     self.AssertOutputContains('minNumReplicas: 5', normalize_space=True)
     self.AssertOutputContains('maxNumReplicas: 10', normalize_space=True)
     self.AssertOutputContains('description: whatever', normalize_space=True)
+    self.AssertOutputContains('scaleInControl:\n'
+                              'maxScaledInReplicas:\n'
+                              'fixed: 5', normalize_space=True)
+    self.AssertOutputContains('timeWindowSec: 60', normalize_space=True)
     self.ClearErr()
     self.ClearOutput()
 

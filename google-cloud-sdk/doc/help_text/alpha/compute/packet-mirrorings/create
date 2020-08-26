@@ -6,13 +6,13 @@ SYNOPSIS
     gcloud alpha compute packet-mirrorings create NAME
         --collector-ilb=COLLECTOR_ILB --network=NETWORK [--async]
         [--description=DESCRIPTION] [--no-enable]
-        [--filter-cidr-ranges=[CIDR_RANGE,...]]
+        [--filter-cidr-ranges=[CIDR_RANGE,...]] [--filter-direction=DIRECTION]
         [--filter-protocols=[PROTOCOL,...]]
         [--mirrored-instances=[INSTANCE,...]] [--mirrored-subnets=[SUBNET,...]]
         [--mirrored-tags=[TAG,...]] [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a Google Compute Engine packet mirroring policy.
+    (ALPHA) Create a Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -62,6 +62,13 @@ OPTIONAL FLAGS
         traffic between the VM and the IPs listed here will be mirrored using
         this configuration. This can be a Public IP as well. If unspecified,
         the config applies to all traffic.
+
+     --filter-direction=DIRECTION
+        DIRECTION must be one of INGRESS, EGRESS, BOTH. For INGRESS, only
+        ingress traffic is mirrored. For EGRESS, only egress traffic is
+        mirrored. For BOTH (or in case the filter-direction option is not
+        specified), both directions are mirrored. This is the default option.
+        DIRECTION must be one of: both, egress, ingress.
 
      --filter-protocols=[PROTOCOL,...]
         List of IP protocols that apply as filters for packet mirroring
@@ -129,7 +136,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute packet-mirrorings create
         $ gcloud beta compute packet-mirrorings create

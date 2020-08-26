@@ -1,12 +1,12 @@
 NAME
-    gcloud compute regions describe - describe a Google Compute Engine region
+    gcloud compute regions describe - describe a Compute Engine region
 
 SYNOPSIS
     gcloud compute regions describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute regions describe displays all data associated with a Google
-    Compute Engine region.
+    gcloud compute regions describe displays all data associated with a Compute
+    Engine region.
 
 POSITIONAL ARGUMENTS
      NAME

@@ -58,9 +58,22 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To create a commitment called commitment-1 in the us-central1 region with
+    36-month plan, sles-sap-12 license, 1-2 cores, run:
+
+        $ gcloud alpha compute commitments create-license commitment-1 \
+            --plan=36-month \
+            --license=https://www.googleapis.com/compute/v1/projects/\
+        suse-sap-cloud/global/licenses/sles-sap-12 --region=us-central1 \
+            --amount=1 --cores-per-license=1-2
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist. These variants are also available:
+
+        $ gcloud compute commitments create-license
+        $ gcloud beta compute commitments create-license
 

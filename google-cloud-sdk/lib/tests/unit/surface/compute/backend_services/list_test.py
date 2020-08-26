@@ -204,8 +204,11 @@ class BackendServicesListAlphaTest(BackendServicesListGATest):
     self.SelectApi(self._API_VERSION)
 
   def _getListRequestMessage(self, project):
-    return self.default_list_request(project=project, includeAllScopes=True)
-
+    request_params = {'includeAllScopes': True}
+    if hasattr(self.default_list_request,
+               'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+    return self.default_list_request(project=project, **request_params)
 
 if __name__ == '__main__':
   test_case.main()

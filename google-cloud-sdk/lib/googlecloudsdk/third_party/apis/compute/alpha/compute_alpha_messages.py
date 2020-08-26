@@ -731,6 +731,7 @@ class Address(_messages.Message):
     Values:
       DNS_RESOLVER: <no description>
       GCE_ENDPOINT: <no description>
+      IPSEC_INTERCONNECT: <no description>
       NAT_AUTO: <no description>
       PRIVATE_SERVICE_CONNECT: <no description>
       PSC_PRODUCER_NAT_RANGE: <no description>
@@ -739,11 +740,12 @@ class Address(_messages.Message):
     """
     DNS_RESOLVER = 0
     GCE_ENDPOINT = 1
-    NAT_AUTO = 2
-    PRIVATE_SERVICE_CONNECT = 3
-    PSC_PRODUCER_NAT_RANGE = 4
-    SHARED_LOADBALANCER_VIP = 5
-    VPC_PEERING = 6
+    IPSEC_INTERCONNECT = 2
+    NAT_AUTO = 3
+    PRIVATE_SERVICE_CONNECT = 4
+    PSC_PRODUCER_NAT_RANGE = 5
+    SHARED_LOADBALANCER_VIP = 6
+    VPC_PEERING = 7
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The status of the address, which can be one of
@@ -1217,9 +1219,14 @@ class AdvancedMachineFeatures(_messages.Message):
   Fields:
     enableNestedVirtualization: Whether to enable nested virtualization or not
       (default is false).
+    threadsPerCore: The number of threads per physical core. To disable
+      simultaneous multithreading (SMT) set this to 1. If unset, the maximum
+      number of threads supported per core by the underlying processor is
+      assumed.
   """
 
   enableNestedVirtualization = _messages.BooleanField(1)
+  threadsPerCore = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class AliasIpRange(_messages.Message):
@@ -3082,6 +3089,10 @@ class BackendBucketCdnPolicy(_messages.Message):
     CacheModeValueValuesEnum:
 
   Fields:
+    bypassCacheOnRequestHeaders: Bypass the cache when the specified request
+      headers are matched - e.g. Pragma or Authorization headers. Up to 5
+      headers can be specified. The cache is bypassed for all
+      cdnPolicy.cacheMode settings.
     cacheMode: A CacheModeValueValuesEnum attribute.
     clientTtl: Specifies a separate client (e.g. browser client) TTL, separate
       from the TTL for Cloud CDN's edge caches. Leaving this empty will use
@@ -3114,7 +3125,7 @@ class BackendBucketCdnPolicy(_messages.Message):
       (Gone), 451 (Unavailable For Legal Reasons): 120s HTTP 405 (Method Not
       Found), 414 (URI Too Long), 501 (Not Implemented): 60s These defaults
       can be overridden in negative_caching_policy
-    negativeCachingPolicys: Sets a cache TTL for the specified HTTP status
+    negativeCachingPolicy: Sets a cache TTL for the specified HTTP status
       code. negative_caching must be enabled to configure
       negative_caching_policy. Omitting the policy and leaving
       negative_caching enabled will use Cloud CDN's default cache TTLs. Note
@@ -3124,6 +3135,15 @@ class BackendBucketCdnPolicy(_messages.Message):
       policy exists.
     requestCoalescing: If true then Cloud CDN will combine multiple concurrent
       cache fill requests into a small number of requests to the origin.
+    serveWhileStale: Serve existing content from the cache (if available) when
+      revalidating content with the origin, or when an error is encountered
+      when refreshing the cache. This setting defines the default "max-stale"
+      duration for any cached responses that do not specify a max-stale
+      directive. Stale responses that exceed the TTL configured here will not
+      be served. The default limit (max-stale) is 86400s (1 day), which will
+      allow stale content to be served up to this limit beyond the max-age (or
+      s-max-age) of a cached response. The maximum allowed value is 604800(1
+      week). Set this to zero (0) to disable serve-while-stale.
     signedUrlCacheMaxAgeSec: Maximum number of seconds the response to a
       signed URL request will be considered fresh. After this time period, the
       response will be revalidated before being served. Defaults to 1hr
@@ -3150,15 +3170,30 @@ class BackendBucketCdnPolicy(_messages.Message):
     INVALID_CACHE_MODE = 2
     USE_ORIGIN_HEADERS = 3
 
-  cacheMode = _messages.EnumField('CacheModeValueValuesEnum', 1)
-  clientTtl = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  defaultTtl = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  maxTtl = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  negativeCaching = _messages.BooleanField(5)
-  negativeCachingPolicys = _messages.MessageField('BackendBucketCdnPolicyNegativeCachingPolicy', 6, repeated=True)
-  requestCoalescing = _messages.BooleanField(7)
-  signedUrlCacheMaxAgeSec = _messages.IntegerField(8)
-  signedUrlKeyNames = _messages.StringField(9, repeated=True)
+  bypassCacheOnRequestHeaders = _messages.MessageField('BackendBucketCdnPolicyBypassCacheOnRequestHeader', 1, repeated=True)
+  cacheMode = _messages.EnumField('CacheModeValueValuesEnum', 2)
+  clientTtl = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  defaultTtl = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  maxTtl = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  negativeCaching = _messages.BooleanField(6)
+  negativeCachingPolicy = _messages.MessageField('BackendBucketCdnPolicyNegativeCachingPolicy', 7, repeated=True)
+  requestCoalescing = _messages.BooleanField(8)
+  serveWhileStale = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  signedUrlCacheMaxAgeSec = _messages.IntegerField(10)
+  signedUrlKeyNames = _messages.StringField(11, repeated=True)
+
+
+class BackendBucketCdnPolicyBypassCacheOnRequestHeader(_messages.Message):
+  r"""Bypass the cache when the specified request headers are present, e.g.
+  Pragma or Authorization headers. Values are case insensitive. The presence
+  of such a header overrides the cache_mode setting.
+
+  Fields:
+    headerName: The header field name to match on when bypassing cache. Values
+      are case-insensitive.
+  """
+
+  headerName = _messages.StringField(1)
 
 
 class BackendBucketCdnPolicyNegativeCachingPolicy(_messages.Message):
@@ -3348,13 +3383,18 @@ class BackendService(_messages.Message):
       HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to
       INTERNAL_MANAGED.  - A global backend service with the
       load_balancing_scheme set to INTERNAL_SELF_MANAGED.    If
-      sessionAffinity is not NONE, and this field is not set to >MAGLEV or
-      RING_HASH, session affinity settings will not take effect.
+      sessionAffinity is not NONE, and this field is not set to MAGLEV or
+      RING_HASH, session affinity settings will not take effect.  Only the
+      default ROUND_ROBIN policy is supported when the backend service is
+      referenced by a URL map that is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     ProtocolValueValuesEnum: The protocol this BackendService uses to
       communicate with backends.  Possible values are HTTP, HTTPS, HTTP2, TCP,
       SSL, UDP or GRPC. depending on the chosen load balancer or Traffic
       Director configuration. Refer to the documentation for the load balancer
-      or for Traffic Director for more information.
+      or for Traffic Director for more information.  Must be set to GRPC when
+      the backend service is referenced by a URL map that is bound to target
+      gRPC proxy.
     SessionAffinityValueValuesEnum: Type of session affinity to use. The
       default is NONE. Session affinity is not applicable if the --protocol is
       UDP.  When the loadBalancingScheme is EXTERNAL, possible values are
@@ -3363,12 +3403,17 @@ class BackendService(_messages.Message):
       INTERNAL, possible values are NONE, CLIENT_IP, CLIENT_IP_PROTO, or
       CLIENT_IP_PORT_PROTO.  When the loadBalancingScheme is
       INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED, possible values are NONE,
-      CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
+      CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.  Not
+      supported when the backend service is referenced by a URL map that is
+      bound to target gRPC proxy that has validateForProxyless field set to
+      true.
 
   Fields:
     affinityCookieTtlSec: If set to 0, the cookie is non-persistent and lasts
       only until the end of the browser session (or equivalent). The maximum
-      allowed value is one day (86,400).
+      allowed value is one day (86,400).  Not supported when the backend
+      service is referenced by a URL map that is bound to target gRPC proxy
+      that has validateForProxyless field set to true.
     backends: The list of backends that serve this BackendService.
     cdnPolicy: Cloud CDN configuration for this BackendService.
     circuitBreakers: Settings controlling the volume of connections to a
@@ -3376,7 +3421,9 @@ class BackendService(_messages.Message):
       field is applicable to either:   - A regional backend service with the
       service_protocol set to HTTP, HTTPS, or HTTP2, and load_balancing_scheme
       set to INTERNAL_MANAGED.  - A global backend service with the
-      load_balancing_scheme set to INTERNAL_SELF_MANAGED.
+      load_balancing_scheme set to INTERNAL_SELF_MANAGED.    Not supported
+      when the backend service is referenced by a URL map that is bound to
+      target gRPC proxy that has validateForProxyless field set to true.
     connectionDraining: A ConnectionDraining attribute.
     consistentHash: Consistent Hash-based load balancing can be used to
       provide soft session affinity based on HTTP headers, cookies or other
@@ -3389,6 +3436,9 @@ class BackendService(_messages.Message):
       service with the service_protocol set to HTTP, HTTPS, or HTTP2, and
       load_balancing_scheme set to INTERNAL_MANAGED.  - A global backend
       service with the load_balancing_scheme set to INTERNAL_SELF_MANAGED.
+      Not supported when the backend service is referenced by a URL map that
+      is bound to target gRPC proxy that has validateForProxyless field set to
+      true.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     customRequestHeaders: Headers that the HTTP/S load balancer should add to
@@ -3451,8 +3501,11 @@ class BackendService(_messages.Message):
       HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to
       INTERNAL_MANAGED.  - A global backend service with the
       load_balancing_scheme set to INTERNAL_SELF_MANAGED.    If
-      sessionAffinity is not NONE, and this field is not set to >MAGLEV or
-      RING_HASH, session affinity settings will not take effect.
+      sessionAffinity is not NONE, and this field is not set to MAGLEV or
+      RING_HASH, session affinity settings will not take effect.  Only the
+      default ROUND_ROBIN policy is supported when the backend service is
+      referenced by a URL map that is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     logConfig: This field denotes the logging options for the load balancer
       traffic served by this backend service. If logging is enabled, logs will
       be exported to Stackdriver.
@@ -3472,7 +3525,9 @@ class BackendService(_messages.Message):
       A regional backend service with the service_protocol set to HTTP, HTTPS,
       or HTTP2, and load_balancing_scheme set to INTERNAL_MANAGED.  - A global
       backend service with the load_balancing_scheme set to
-      INTERNAL_SELF_MANAGED.
+      INTERNAL_SELF_MANAGED.    Not supported when the backend service is
+      referenced by a URL map that is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     port: Deprecated in favor of portName. The TCP port to connect on the
       backend. The default value is 80.  This cannot be used if the
       loadBalancingScheme is INTERNAL (Internal TCP/UDP Load Balancing).
@@ -3487,7 +3542,9 @@ class BackendService(_messages.Message):
       backends.  Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, UDP or
       GRPC. depending on the chosen load balancer or Traffic Director
       configuration. Refer to the documentation for the load balancer or for
-      Traffic Director for more information.
+      Traffic Director for more information.  Must be set to GRPC when the
+      backend service is referenced by a URL map that is bound to target gRPC
+      proxy.
     region: [Output Only] URL of the region where the regional backend service
       resides. This field is not applicable to global backend services. You
       must specify this field as part of the HTTP request URL. It is not
@@ -3510,7 +3567,10 @@ class BackendService(_messages.Message):
       NONE, CLIENT_IP, CLIENT_IP_PROTO, or CLIENT_IP_PORT_PROTO.  When the
       loadBalancingScheme is INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED,
       possible values are NONE, CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or
-      HTTP_COOKIE.
+      HTTP_COOKIE.  Not supported when the backend service is referenced by a
+      URL map that is bound to target gRPC proxy that has validateForProxyless
+      field set to true.
+    subsetting: A Subsetting attribute.
     timeoutSec: The backend service timeout has a different meaning depending
       on the type of load balancer. For more information see,  Backend service
       settings The default is 30 seconds.
@@ -3559,8 +3619,10 @@ class BackendService(_messages.Message):
     HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to INTERNAL_MANAGED.
     - A global backend service with the load_balancing_scheme set to
     INTERNAL_SELF_MANAGED.    If sessionAffinity is not NONE, and this field
-    is not set to >MAGLEV or RING_HASH, session affinity settings will not
-    take effect.
+    is not set to MAGLEV or RING_HASH, session affinity settings will not take
+    effect.  Only the default ROUND_ROBIN policy is supported when the backend
+    service is referenced by a URL map that is bound to target gRPC proxy that
+    has validateForProxyless field set to true.
 
     Values:
       INVALID_LB_POLICY: <no description>
@@ -3584,9 +3646,11 @@ class BackendService(_messages.Message):
     Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, UDP or GRPC. depending
     on the chosen load balancer or Traffic Director configuration. Refer to
     the documentation for the load balancer or for Traffic Director for more
-    information.
+    information.  Must be set to GRPC when the backend service is referenced
+    by a URL map that is bound to target gRPC proxy.
 
     Values:
+      ALL: <no description>
       GRPC: <no description>
       HTTP: <no description>
       HTTP2: <no description>
@@ -3595,13 +3659,14 @@ class BackendService(_messages.Message):
       TCP: <no description>
       UDP: <no description>
     """
-    GRPC = 0
-    HTTP = 1
-    HTTP2 = 2
-    HTTPS = 3
-    SSL = 4
-    TCP = 5
-    UDP = 6
+    ALL = 0
+    GRPC = 1
+    HTTP = 2
+    HTTP2 = 3
+    HTTPS = 4
+    SSL = 5
+    TCP = 6
+    UDP = 7
 
   class SessionAffinityValueValuesEnum(_messages.Enum):
     r"""Type of session affinity to use. The default is NONE. Session affinity
@@ -3611,7 +3676,9 @@ class BackendService(_messages.Message):
     loadBalancingScheme is INTERNAL, possible values are NONE, CLIENT_IP,
     CLIENT_IP_PROTO, or CLIENT_IP_PORT_PROTO.  When the loadBalancingScheme is
     INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED, possible values are NONE,
-    CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
+    CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.  Not supported
+    when the backend service is referenced by a URL map that is bound to
+    target gRPC proxy that has validateForProxyless field set to true.
 
     Values:
       CLIENT_IP: <no description>
@@ -3664,7 +3731,8 @@ class BackendService(_messages.Message):
   selfLink = _messages.StringField(30)
   selfLinkWithId = _messages.StringField(31)
   sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 32)
-  timeoutSec = _messages.IntegerField(33, variant=_messages.Variant.INT32)
+  subsetting = _messages.MessageField('Subsetting', 33)
+  timeoutSec = _messages.IntegerField(34, variant=_messages.Variant.INT32)
 
 
 class BackendServiceAggregatedList(_messages.Message):
@@ -3828,6 +3896,10 @@ class BackendServiceCdnPolicy(_messages.Message):
     CacheModeValueValuesEnum:
 
   Fields:
+    bypassCacheOnRequestHeaders: Bypass the cache when the specified request
+      headers are matched - e.g. Pragma or Authorization headers. Up to 5
+      headers can be specified. The cache is bypassed for all
+      cdnPolicy.cacheMode settings.
     cacheKeyPolicy: The CacheKeyPolicy for this CdnPolicy.
     cacheMode: A CacheModeValueValuesEnum attribute.
     clientTtl: Specifies a separate client (e.g. browser client) TTL, separate
@@ -3861,7 +3933,7 @@ class BackendServiceCdnPolicy(_messages.Message):
       (Gone), 451 (Unavailable For Legal Reasons): 120s HTTP 405 (Method Not
       Found), 414 (URI Too Long), 501 (Not Implemented): 60s These defaults
       can be overridden in negative_caching_policy
-    negativeCachingPolicys: Sets a cache TTL for the specified HTTP status
+    negativeCachingPolicy: Sets a cache TTL for the specified HTTP status
       code. negative_caching must be enabled to configure
       negative_caching_policy. Omitting the policy and leaving
       negative_caching enabled will use Cloud CDN's default cache TTLs. Note
@@ -3871,6 +3943,15 @@ class BackendServiceCdnPolicy(_messages.Message):
       policy exists.
     requestCoalescing: If true then Cloud CDN will combine multiple concurrent
       cache fill requests into a small number of requests to the origin.
+    serveWhileStale: Serve existing content from the cache (if available) when
+      revalidating content with the origin, or when an error is encountered
+      when refreshing the cache. This setting defines the default "max-stale"
+      duration for any cached responses that do not specify a max-stale
+      directive. Stale responses that exceed the TTL configured here will not
+      be served. The default limit (max-stale) is 86400s (1 day), which will
+      allow stale content to be served up to this limit beyond the max-age (or
+      s-max-age) of a cached response. The maximum allowed value is 604800(1
+      week). Set this to zero (0) to disable serve-while-stale.
     signedUrlCacheMaxAgeSec: Maximum number of seconds the response to a
       signed URL request will be considered fresh. After this time period, the
       response will be revalidated before being served. Defaults to 1hr
@@ -3897,16 +3978,31 @@ class BackendServiceCdnPolicy(_messages.Message):
     INVALID_CACHE_MODE = 2
     USE_ORIGIN_HEADERS = 3
 
-  cacheKeyPolicy = _messages.MessageField('CacheKeyPolicy', 1)
-  cacheMode = _messages.EnumField('CacheModeValueValuesEnum', 2)
-  clientTtl = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  defaultTtl = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  maxTtl = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  negativeCaching = _messages.BooleanField(6)
-  negativeCachingPolicys = _messages.MessageField('BackendServiceCdnPolicyNegativeCachingPolicy', 7, repeated=True)
-  requestCoalescing = _messages.BooleanField(8)
-  signedUrlCacheMaxAgeSec = _messages.IntegerField(9)
-  signedUrlKeyNames = _messages.StringField(10, repeated=True)
+  bypassCacheOnRequestHeaders = _messages.MessageField('BackendServiceCdnPolicyBypassCacheOnRequestHeader', 1, repeated=True)
+  cacheKeyPolicy = _messages.MessageField('CacheKeyPolicy', 2)
+  cacheMode = _messages.EnumField('CacheModeValueValuesEnum', 3)
+  clientTtl = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  defaultTtl = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  maxTtl = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  negativeCaching = _messages.BooleanField(7)
+  negativeCachingPolicy = _messages.MessageField('BackendServiceCdnPolicyNegativeCachingPolicy', 8, repeated=True)
+  requestCoalescing = _messages.BooleanField(9)
+  serveWhileStale = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  signedUrlCacheMaxAgeSec = _messages.IntegerField(11)
+  signedUrlKeyNames = _messages.StringField(12, repeated=True)
+
+
+class BackendServiceCdnPolicyBypassCacheOnRequestHeader(_messages.Message):
+  r"""Bypass the cache when the specified request headers are present, e.g.
+  Pragma or Authorization headers. Values are case insensitive. The presence
+  of such a header overrides the cache_mode setting.
+
+  Fields:
+    headerName: The header field name to match on when bypassing cache. Values
+      are case-insensitive.
+  """
+
+  headerName = _messages.StringField(1)
 
 
 class BackendServiceCdnPolicyNegativeCachingPolicy(_messages.Message):
@@ -15180,7 +15276,9 @@ class ComputeOrganizationSecurityPoliciesInsertRequest(_messages.Message):
   r"""A ComputeOrganizationSecurityPoliciesInsertRequest object.
 
   Fields:
-    parentId: Parent ID for this request.
+    parentId: Parent ID for this request. The ID can be either be
+      "folders/[FOLDER_ID]" if the parent is a folder or
+      "organizations/[ORGANIZATION_ID]" if the parent is an organization.
     requestId: An optional request ID to identify requests. Specify a unique
       request ID so that if you must retry your request, the server will know
       to ignore the request if it has already been completed.  For example,
@@ -18741,6 +18839,202 @@ class ComputeRegionInstancesBulkInsertRequest(_messages.Message):
   project = _messages.StringField(2, required=True)
   region = _messages.StringField(3, required=True)
   requestId = _messages.StringField(4)
+
+
+class ComputeRegionInstantSnapshotsDeleteRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsDeleteRequest object.
+
+  Fields:
+    instantSnapshot: Name of the InstantSnapshot resource to delete.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  instantSnapshot = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeRegionInstantSnapshotsGetIamPolicyRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsGetIamPolicyRequest object.
+
+  Fields:
+    optionsRequestedPolicyVersion: Requested IAM Policy version.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    resource: Name or id of the resource for this request.
+  """
+
+  optionsRequestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  resource = _messages.StringField(4, required=True)
+
+
+class ComputeRegionInstantSnapshotsGetRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsGetRequest object.
+
+  Fields:
+    instantSnapshot: Name of the InstantSnapshot resource to return.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+  """
+
+  instantSnapshot = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+
+
+class ComputeRegionInstantSnapshotsInsertRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsInsertRequest object.
+
+  Fields:
+    instantSnapshot: A InstantSnapshot resource to be passed as the request
+      body.
+    project: Project ID for this request.
+    region: Name of the region for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  instantSnapshot = _messages.MessageField('InstantSnapshot', 1)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeRegionInstantSnapshotsListRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    returnPartialSuccess: Opt-in for partial success behavior which provides
+      partial results in case of failure. The default value is false and the
+      logic is the same as today.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  region = _messages.StringField(6, required=True)
+  returnPartialSuccess = _messages.BooleanField(7)
+
+
+class ComputeRegionInstantSnapshotsSetIamPolicyRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsSetIamPolicyRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    regionSetPolicyRequest: A RegionSetPolicyRequest resource to be passed as
+      the request body.
+    resource: Name or id of the resource for this request.
+  """
+
+  project = _messages.StringField(1, required=True)
+  region = _messages.StringField(2, required=True)
+  regionSetPolicyRequest = _messages.MessageField('RegionSetPolicyRequest', 3)
+  resource = _messages.StringField(4, required=True)
+
+
+class ComputeRegionInstantSnapshotsSetLabelsRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsSetLabelsRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    region: The region for this request.
+    regionSetLabelsRequest: A RegionSetLabelsRequest resource to be passed as
+      the request body.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    resource: Name or id of the resource for this request.
+  """
+
+  project = _messages.StringField(1, required=True)
+  region = _messages.StringField(2, required=True)
+  regionSetLabelsRequest = _messages.MessageField('RegionSetLabelsRequest', 3)
+  requestId = _messages.StringField(4)
+  resource = _messages.StringField(5, required=True)
+
+
+class ComputeRegionInstantSnapshotsTestIamPermissionsRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsTestIamPermissionsRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    resource: Name or id of the resource for this request.
+    testPermissionsRequest: A TestPermissionsRequest resource to be passed as
+      the request body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  region = _messages.StringField(2, required=True)
+  resource = _messages.StringField(3, required=True)
+  testPermissionsRequest = _messages.MessageField('TestPermissionsRequest', 4)
 
 
 class ComputeRegionNetworkEndpointGroupsDeleteRequest(_messages.Message):
@@ -22465,6 +22759,32 @@ class ComputeTargetHttpProxiesListRequest(_messages.Message):
   returnPartialSuccess = _messages.BooleanField(6)
 
 
+class ComputeTargetHttpProxiesPatchRequest(_messages.Message):
+  r"""A ComputeTargetHttpProxiesPatchRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    targetHttpProxy: Name of the TargetHttpProxy resource to patch.
+    targetHttpProxyResource: A TargetHttpProxy resource to be passed as the
+      request body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  targetHttpProxy = _messages.StringField(3, required=True)
+  targetHttpProxyResource = _messages.MessageField('TargetHttpProxy', 4)
+
+
 class ComputeTargetHttpProxiesSetUrlMapRequest(_messages.Message):
   r"""A ComputeTargetHttpProxiesSetUrlMapRequest object.
 
@@ -24971,6 +25291,202 @@ class ComputeZoneInPlaceSnapshotsTestIamPermissionsRequest(_messages.Message):
   zone = _messages.StringField(4, required=True)
 
 
+class ComputeZoneInstantSnapshotsDeleteRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsDeleteRequest object.
+
+  Fields:
+    instantSnapshot: Name of the InstantSnapshot resource to delete.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  instantSnapshot = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  zone = _messages.StringField(4, required=True)
+
+
+class ComputeZoneInstantSnapshotsGetIamPolicyRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsGetIamPolicyRequest object.
+
+  Fields:
+    optionsRequestedPolicyVersion: Requested IAM Policy version.
+    project: Project ID for this request.
+    resource: Name or id of the resource for this request.
+    zone: The name of the zone for this request.
+  """
+
+  optionsRequestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  project = _messages.StringField(2, required=True)
+  resource = _messages.StringField(3, required=True)
+  zone = _messages.StringField(4, required=True)
+
+
+class ComputeZoneInstantSnapshotsGetRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsGetRequest object.
+
+  Fields:
+    instantSnapshot: Name of the InstantSnapshot resource to return.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  instantSnapshot = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
+
+
+class ComputeZoneInstantSnapshotsInsertRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsInsertRequest object.
+
+  Fields:
+    instantSnapshot: A InstantSnapshot resource to be passed as the request
+      body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: Name of the zone for this request.
+  """
+
+  instantSnapshot = _messages.MessageField('InstantSnapshot', 1)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  zone = _messages.StringField(4, required=True)
+
+
+class ComputeZoneInstantSnapshotsListRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    returnPartialSuccess: Opt-in for partial success behavior which provides
+      partial results in case of failure. The default value is false and the
+      logic is the same as today.
+    zone: The name of the zone for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  returnPartialSuccess = _messages.BooleanField(6)
+  zone = _messages.StringField(7, required=True)
+
+
+class ComputeZoneInstantSnapshotsSetIamPolicyRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsSetIamPolicyRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    resource: Name or id of the resource for this request.
+    zone: The name of the zone for this request.
+    zoneSetPolicyRequest: A ZoneSetPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  resource = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
+  zoneSetPolicyRequest = _messages.MessageField('ZoneSetPolicyRequest', 4)
+
+
+class ComputeZoneInstantSnapshotsSetLabelsRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsSetLabelsRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    resource: Name or id of the resource for this request.
+    zone: The name of the zone for this request.
+    zoneSetLabelsRequest: A ZoneSetLabelsRequest resource to be passed as the
+      request body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  resource = _messages.StringField(3, required=True)
+  zone = _messages.StringField(4, required=True)
+  zoneSetLabelsRequest = _messages.MessageField('ZoneSetLabelsRequest', 5)
+
+
+class ComputeZoneInstantSnapshotsTestIamPermissionsRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsTestIamPermissionsRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    resource: Name or id of the resource for this request.
+    testPermissionsRequest: A TestPermissionsRequest resource to be passed as
+      the request body.
+    zone: The name of the zone for this request.
+  """
+
+  project = _messages.StringField(1, required=True)
+  resource = _messages.StringField(2, required=True)
+  testPermissionsRequest = _messages.MessageField('TestPermissionsRequest', 3)
+  zone = _messages.StringField(4, required=True)
+
+
 class ComputeZoneOperationsDeleteRequest(_messages.Message):
   r"""A ComputeZoneOperationsDeleteRequest object.
 
@@ -25314,7 +25830,7 @@ class CorsPolicy(_messages.Message):
 
 
 class CustomerEncryptionKey(_messages.Message):
-  r"""Represents a customer-supplied encryption key
+  r"""A CustomerEncryptionKey object.
 
   Fields:
     kmsKeyName: The name of the encryption key that is stored in Google Cloud
@@ -25512,6 +26028,8 @@ class Disk(_messages.Message):
       Only applicable for regional resources.
     resourcePolicies: Resource policies applied to this disk for automatic
       snapshot creations.
+    satisfiesPhysicalZoneSeparation: [Output Only] Specifies whether this disk
+      satisfies zone separation.
     selfLink: [Output Only] Server-defined fully-qualified URL for this
       resource.
     selfLinkWithId: [Output Only] Server-defined URL for this resource's
@@ -25567,6 +26085,19 @@ class Disk(_messages.Message):
       snapshot that was later deleted and recreated under the same name, the
       source in-place snapshot ID would identify the exact version of the in-
       place snapshot that was used.
+    sourceInstantSnapshot: The source instant snapshot used to create this
+      disk. You can provide this as a partial or full URL to the resource. For
+      example, the following are valid values:   - https://www.googleapis.com/
+      compute/v1/projects/project/zones/zone/instantSnapshots/instantSnapshot
+      - projects/project/zones/zone/instantSnapshots/instantSnapshot  -
+      zones/zone/instantSnapshots/instantSnapshot
+    sourceInstantSnapshotId: [Output Only] The unique ID of the instant
+      snapshot used to create this disk. This value identifies the exact
+      instant snapshot that was used to create this persistent disk. For
+      example, if you created the persistent disk from an instant snapshot
+      that was later deleted and recreated under the same name, the source
+      instant snapshot ID would identify the exact version of the instant
+      snapshot that was used.
     sourceSnapshot: The source snapshot used to create this disk. You can
       provide this as a partial or full URL to the resource. For example, the
       following are valid values:   - https://www.googleapis.com/compute/v1/pr
@@ -25689,25 +26220,28 @@ class Disk(_messages.Message):
   region = _messages.StringField(20)
   replicaZones = _messages.StringField(21, repeated=True)
   resourcePolicies = _messages.StringField(22, repeated=True)
-  selfLink = _messages.StringField(23)
-  selfLinkWithId = _messages.StringField(24)
-  sizeGb = _messages.IntegerField(25)
-  sourceDisk = _messages.StringField(26)
-  sourceDiskId = _messages.StringField(27)
-  sourceImage = _messages.StringField(28)
-  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 29)
-  sourceImageId = _messages.StringField(30)
-  sourceInPlaceSnapshot = _messages.StringField(31)
-  sourceInPlaceSnapshotId = _messages.StringField(32)
-  sourceSnapshot = _messages.StringField(33)
-  sourceSnapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 34)
-  sourceSnapshotId = _messages.StringField(35)
-  sourceStorageObject = _messages.StringField(36)
-  status = _messages.EnumField('StatusValueValuesEnum', 37)
-  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 38)
-  type = _messages.StringField(39)
-  users = _messages.StringField(40, repeated=True)
-  zone = _messages.StringField(41)
+  satisfiesPhysicalZoneSeparation = _messages.BooleanField(23)
+  selfLink = _messages.StringField(24)
+  selfLinkWithId = _messages.StringField(25)
+  sizeGb = _messages.IntegerField(26)
+  sourceDisk = _messages.StringField(27)
+  sourceDiskId = _messages.StringField(28)
+  sourceImage = _messages.StringField(29)
+  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 30)
+  sourceImageId = _messages.StringField(31)
+  sourceInPlaceSnapshot = _messages.StringField(32)
+  sourceInPlaceSnapshotId = _messages.StringField(33)
+  sourceInstantSnapshot = _messages.StringField(34)
+  sourceInstantSnapshotId = _messages.StringField(35)
+  sourceSnapshot = _messages.StringField(36)
+  sourceSnapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 37)
+  sourceSnapshotId = _messages.StringField(38)
+  sourceStorageObject = _messages.StringField(39)
+  status = _messages.EnumField('StatusValueValuesEnum', 40)
+  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 41)
+  type = _messages.StringField(42)
+  users = _messages.StringField(43, repeated=True)
+  zone = _messages.StringField(44)
 
 
 class DiskAggregatedList(_messages.Message):
@@ -27987,6 +28521,8 @@ class ForwardingRule(_messages.Message):
       determine the type of IP address that you can use. For detailed
       information, refer to [IP address specifications](/load-
       balancing/docs/forwarding-rule-concepts#ip_address_specifications).
+      Must be set to `0.0.0.0` when the target is targetGrpcProxy that has
+      validateForProxyless field set to true.
     IPProtocol: The IP protocol to which this rule applies. For protocol
       forwarding, valid options are TCP, UDP, ESP, AH, SCTP or ICMP.  For
       Internal TCP/UDP Load Balancing, the load balancing scheme is INTERNAL,
@@ -28057,7 +28593,7 @@ class ForwardingRule(_messages.Message):
     metadataFilters: Opaque filter criteria used by Loadbalancer to restrict
       routing configuration to a limited set of xDS compliant clients. In
       their xDS requests to Loadbalancer, xDS clients present node metadata.
-      If a match takes place, the relevant configuration is made available to
+      When there is a match, the relevant configuration is made available to
       those proxies. Otherwise, all the resources (e.g. TargetHttpProxy,
       UrlMap) referenced by the ForwardingRule will not be visible to those
       proxies. For each metadataFilter in this list, if its
@@ -28065,10 +28601,12 @@ class ForwardingRule(_messages.Message):
       filterLabels must match the corresponding label provided in the
       metadata. If its filterMatchCriteria is set to MATCH_ALL, then all of
       its filterLabels must match with corresponding labels provided in the
-      metadata. metadataFilters specified here will be applifed before those
-      specified in the UrlMap that this ForwardingRule references.
-      metadataFilters only applies to Loadbalancers that have their
-      loadBalancingScheme set to INTERNAL_SELF_MANAGED.
+      metadata. If multiple metadataFilters are specified, all of them need to
+      be satisfied in order to be considered a match. metadataFilters
+      specified here will be applifed before those specified in the UrlMap
+      that this ForwardingRule references. metadataFilters only applies to
+      Loadbalancers that have their loadBalancingScheme set to
+      INTERNAL_SELF_MANAGED.
     name: Name of the resource; provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -28076,10 +28614,10 @@ class ForwardingRule(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
-    network: This field is not used for external load balancing.  For INTERNAL
-      and INTERNAL_SELF_MANAGED load balancing, this field identifies the
-      network that the load balanced IP should belong to for this Forwarding
-      Rule. If this field is not specified, the default network will be used.
+    network: This field is not used for external load balancing.  For internal
+      load balancing, this field identifies the network that the load balanced
+      IP should belong to for this Forwarding Rule. If this field is not
+      specified, the default network will be used.
     networkTier: This signifies the networking tier used for configuring this
       load balancer and can only take the following values: PREMIUM, STANDARD.
       For regional ForwardingRule, the valid values are PREMIUM and STANDARD.
@@ -28118,6 +28656,9 @@ class ForwardingRule(_messages.Message):
     selfLink: [Output Only] Server-defined URL for the resource.
     selfLinkWithId: [Output Only] Server-defined URL for this resource with
       the resource id.
+    serviceDirectoryRegistrations: Service Directory resources to register
+      this forwarding rule with. Currently, only supports a single Service
+      Directory resource.
     serviceLabel: An optional prefix to the service name for this Forwarding
       Rule. If specified, the prefix is the first label of the fully qualified
       service name.  The label must be 1-63 characters long, and comply with
@@ -28130,7 +28671,7 @@ class ForwardingRule(_messages.Message):
     serviceName: [Output Only] The internal fully qualified service name for
       this Forwarding Rule.  This field is only used for internal load
       balancing.
-    subnetwork: This field is only used for INTERNAL load balancing.  For
+    subnetwork: This field is only used for internal load balancing.  For
       internal load balancing, this field identifies the subnetwork that the
       load balanced IP should belong to for this Forwarding Rule.  If the
       network specified is in auto subnet mode, this field is optional.
@@ -28278,10 +28819,11 @@ class ForwardingRule(_messages.Message):
   region = _messages.StringField(22)
   selfLink = _messages.StringField(23)
   selfLinkWithId = _messages.StringField(24)
-  serviceLabel = _messages.StringField(25)
-  serviceName = _messages.StringField(26)
-  subnetwork = _messages.StringField(27)
-  target = _messages.StringField(28)
+  serviceDirectoryRegistrations = _messages.MessageField('ForwardingRuleServiceDirectoryRegistration', 25, repeated=True)
+  serviceLabel = _messages.StringField(26)
+  serviceName = _messages.StringField(27)
+  subnetwork = _messages.StringField(28)
+  target = _messages.StringField(29)
 
 
 class ForwardingRuleAggregatedList(_messages.Message):
@@ -28573,6 +29115,21 @@ class ForwardingRuleReference(_messages.Message):
   """
 
   forwardingRule = _messages.StringField(1)
+
+
+class ForwardingRuleServiceDirectoryRegistration(_messages.Message):
+  r"""Describes the auto-registration of the Forwarding Rule to Service
+  Directory. The region and project of the Service Directory resource
+  generated from this registration will be the same as this Forwarding Rule.
+
+  Fields:
+    namespace: Service Directory namespace to register the forwarding rule
+      under.
+    service: Service Directory service to register the forwarding rule under.
+  """
+
+  namespace = _messages.StringField(1)
+  service = _messages.StringField(2)
 
 
 class ForwardingRulesScopedList(_messages.Message):
@@ -30128,7 +30685,9 @@ class HostRule(_messages.Message):
     hosts: The list of host patterns to match. They must be valid hostnames
       with optional port numbers in the format host:port. * matches any string
       of ([a-z0-9-.]*). In that case, * must be the first character and must
-      be followed in the pattern by either - or ..
+      be followed in the pattern by either - or ..  * based matching is not
+      supported when the URL map is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     pathMatcher: The name of the PathMatcher to use to match the path portion
       of the URL if the hostRule matches the URL's host portion.
   """
@@ -30768,17 +31327,18 @@ class HttpRouteRuleMatch(_messages.Message):
     metadataFilters: Opaque filter criteria used by Loadbalancer to restrict
       routing configuration to a limited set of xDS compliant clients. In
       their xDS requests to Loadbalancer, xDS clients present node metadata.
-      If a match takes place, the relevant routing configuration is made
+      When there is a match, the relevant routing configuration is made
       available to those proxies. For each metadataFilter in this list, if its
       filterMatchCriteria is set to MATCH_ANY, at least one of the
       filterLabels must match the corresponding label provided in the
       metadata. If its filterMatchCriteria is set to MATCH_ALL, then all of
       its filterLabels must match with corresponding labels provided in the
-      metadata. metadataFilters specified here will be applied after those
-      specified in ForwardingRule that refers to the UrlMap this
-      HttpRouteRuleMatch belongs to. metadataFilters only applies to
-      Loadbalancers that have their loadBalancingScheme set to
-      INTERNAL_SELF_MANAGED.
+      metadata. If multiple metadataFilters are specified, all of them need to
+      be satisfied in order to be considered a match. metadataFilters
+      specified here will be applied after those specified in ForwardingRule
+      that refers to the UrlMap this HttpRouteRuleMatch belongs to.
+      metadataFilters only applies to Loadbalancers that have their
+      loadBalancingScheme set to INTERNAL_SELF_MANAGED.
     prefixMatch: For satisfying the matchRule condition, the request's path
       must begin with the specified prefixMatch. prefixMatch must begin with a
       /. The value must be between 1 and 1024 characters. Only one of
@@ -31737,7 +32297,12 @@ class Instance(_messages.Message):
     reservationAffinity: Specifies the reservations that this instance can
       consume from.
     resourcePolicies: Resource policies applied to this instance.
+    satisfiesPhysicalZoneSeparation: [Output Only] Specifies whether this
+      instance satisfies zone separation.
     scheduling: Sets the scheduling options for this instance.
+    secureLabels: Secure labels to apply to this instance. These can be later
+      modified by the update method. Maximum number of secure labels allowed
+      is 300.
     selfLink: [Output Only] Server-defined URL for this resource.
     selfLinkWithId: [Output Only] Server-defined URL for this resource with
       the resource id.
@@ -31883,22 +32448,24 @@ class Instance(_messages.Message):
   privateIpv6GoogleAccess = _messages.EnumField('PrivateIpv6GoogleAccessValueValuesEnum', 29)
   reservationAffinity = _messages.MessageField('ReservationAffinity', 30)
   resourcePolicies = _messages.StringField(31, repeated=True)
-  scheduling = _messages.MessageField('Scheduling', 32)
-  selfLink = _messages.StringField(33)
-  selfLinkWithId = _messages.StringField(34)
-  serviceAccounts = _messages.MessageField('ServiceAccount', 35, repeated=True)
-  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 36)
-  shieldedInstanceIntegrityPolicy = _messages.MessageField('ShieldedInstanceIntegrityPolicy', 37)
-  shieldedVmConfig = _messages.MessageField('ShieldedVmConfig', 38)
-  shieldedVmIntegrityPolicy = _messages.MessageField('ShieldedVmIntegrityPolicy', 39)
-  sourceMachineImage = _messages.StringField(40)
-  sourceMachineImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 41)
-  startRestricted = _messages.BooleanField(42)
-  status = _messages.EnumField('StatusValueValuesEnum', 43)
-  statusMessage = _messages.StringField(44)
-  tags = _messages.MessageField('Tags', 45)
-  upcomingMaintenance = _messages.MessageField('UpcomingMaintenance', 46)
-  zone = _messages.StringField(47)
+  satisfiesPhysicalZoneSeparation = _messages.BooleanField(32)
+  scheduling = _messages.MessageField('Scheduling', 33)
+  secureLabels = _messages.StringField(34, repeated=True)
+  selfLink = _messages.StringField(35)
+  selfLinkWithId = _messages.StringField(36)
+  serviceAccounts = _messages.MessageField('ServiceAccount', 37, repeated=True)
+  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 38)
+  shieldedInstanceIntegrityPolicy = _messages.MessageField('ShieldedInstanceIntegrityPolicy', 39)
+  shieldedVmConfig = _messages.MessageField('ShieldedVmConfig', 40)
+  shieldedVmIntegrityPolicy = _messages.MessageField('ShieldedVmIntegrityPolicy', 41)
+  sourceMachineImage = _messages.StringField(42)
+  sourceMachineImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 43)
+  startRestricted = _messages.BooleanField(44)
+  status = _messages.EnumField('StatusValueValuesEnum', 45)
+  statusMessage = _messages.StringField(46)
+  tags = _messages.MessageField('Tags', 47)
+  upcomingMaintenance = _messages.MessageField('UpcomingMaintenance', 48)
+  zone = _messages.StringField(49)
 
 
 class InstanceAggregatedList(_messages.Message):
@@ -35034,6 +35601,257 @@ class InstancesStartWithEncryptionKeyRequest(_messages.Message):
   instanceEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 2)
 
 
+class InstantSnapshot(_messages.Message):
+  r"""Represents a InstantSnapshot resource.  You can use instant snapshots to
+  create disk rollback points quickly.. (== resource_for
+  {$api_version}.instantSnapshots ==)
+
+  Enums:
+    StatusValueValuesEnum: [Output Only] The status of the instantSnapshot.
+      This can be CREATING, DELETING, FAILED, or READY.
+
+  Messages:
+    LabelsValue: Labels to apply to this InstantSnapshot. These can be later
+      modified by the setLabels method. Label values may be empty.
+
+  Fields:
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    diskSizeGb: [Output Only] Size of the source disk, specified in GB.
+    guestFlush: Specifies to create an application consistent instant snapshot
+      by informing the OS to prepare for the snapshot process. Currently only
+      supported on Windows instances using the Volume Shadow Copy Service
+      (VSS).
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    kind: [Output Only] Type of the resource. Always compute#instantSnapshot
+      for InstantSnapshot resources.
+    labelFingerprint: A fingerprint for the labels being applied to this
+      InstantSnapshot, which is essentially a hash of the labels set used for
+      optimistic locking. The fingerprint is initially generated by Compute
+      Engine and changes after every request to modify or update labels. You
+      must always provide an up-to-date fingerprint hash in order to update or
+      change labels, otherwise the request will fail with error 412
+      conditionNotMet.  To see the latest fingerprint, make a get() request to
+      retrieve a InstantSnapshot.
+    labels: Labels to apply to this InstantSnapshot. These can be later
+      modified by the setLabels method. Label values may be empty.
+    name: Name of the resource; provided by the client when the resource is
+      created. The name must be 1-63 characters long, and comply with RFC1035.
+      Specifically, the name must be 1-63 characters long and match the
+      regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first
+      character must be a lowercase letter, and all following characters must
+      be a dash, lowercase letter, or digit, except the last character, which
+      cannot be a dash.
+    region: [Output Only] URL of the region where the instant snapshot
+      resides. You must specify this field as part of the HTTP request URL. It
+      is not settable as a field in the request body.
+    selfLink: [Output Only] Server-defined URL for the resource.
+    selfLinkWithId: [Output Only] Server-defined URL for this resource's
+      resource id.
+    sourceDisk: URL of the source disk used to create this instant snapshot.
+      Note that the source disk must be in the same zone/region as the instant
+      snapshot to be created. This can be a full or valid partial URL. For
+      example, the following are valid values:   - https://www.googleapis.com/
+      compute/v1/projects/project/zones/zone/disks/disk  -
+      projects/project/zones/zone/disks/disk  - zones/zone/disks/disk
+    sourceDiskId: [Output Only] The ID value of the disk used to create this
+      InstantSnapshot. This value may be used to determine whether the
+      InstantSnapshot was taken from the current or a previous instance of a
+      given disk name.
+    status: [Output Only] The status of the instantSnapshot. This can be
+      CREATING, DELETING, FAILED, or READY.
+    zone: [Output Only] URL of the zone where the instant snapshot resides.
+      You must specify this field as part of the HTTP request URL. It is not
+      settable as a field in the request body.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""[Output Only] The status of the instantSnapshot. This can be CREATING,
+    DELETING, FAILED, or READY.
+
+    Values:
+      CREATING: <no description>
+      DELETING: <no description>
+      FAILED: <no description>
+      READY: <no description>
+    """
+    CREATING = 0
+    DELETING = 1
+    FAILED = 2
+    READY = 3
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels to apply to this InstantSnapshot. These can be later modified
+    by the setLabels method. Label values may be empty.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  creationTimestamp = _messages.StringField(1)
+  description = _messages.StringField(2)
+  diskSizeGb = _messages.IntegerField(3)
+  guestFlush = _messages.BooleanField(4)
+  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(6, default='compute#instantSnapshot')
+  labelFingerprint = _messages.BytesField(7)
+  labels = _messages.MessageField('LabelsValue', 8)
+  name = _messages.StringField(9)
+  region = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  selfLinkWithId = _messages.StringField(12)
+  sourceDisk = _messages.StringField(13)
+  sourceDiskId = _messages.StringField(14)
+  status = _messages.EnumField('StatusValueValuesEnum', 15)
+  zone = _messages.StringField(16)
+
+
+class InstantSnapshotList(_messages.Message):
+  r"""Contains a list of InstantSnapshot resources.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of InstantSnapshot resources.
+    kind: Type of resource.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        PARTIAL_SUCCESS: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      PARTIAL_SUCCESS = 16
+      REQUIRED_TOS_AGREEMENT = 17
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
+      RESOURCE_NOT_DELETED = 19
+      SCHEMA_VALIDATION_IGNORED = 20
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
+      UNDECLARED_PROPERTIES = 22
+      UNREACHABLE = 23
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('InstantSnapshot', 2, repeated=True)
+  kind = _messages.StringField(3, default='compute#instantSnapshotList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
 class Int64RangeMatch(_messages.Message):
   r"""HttpRouteRuleMatch criteria for field values that must stay within the
   specified integer range.
@@ -35320,6 +36138,8 @@ class InterconnectAttachment(_messages.Message):
       via the pairing key, so that the provisioned circuit will lie in the
       specified domain. If not specified, the value will default to
       AVAILABILITY_DOMAIN_ANY.
+    EncryptionValueValuesEnum: Indicates the user-supplied encryption option
+      of this interconnect attachment.
     OperationalStatusValueValuesEnum: [Output Only] The current status of
       whether or not this interconnect attachment is functional, which can
       take one of the following values:  - OS_ACTIVE: The attachment has been
@@ -35391,6 +36211,8 @@ class InterconnectAttachment(_messages.Message):
       via the pairing key, so that the provisioned circuit will lie in the
       specified domain. If not specified, the value will default to
       AVAILABILITY_DOMAIN_ANY.
+    encryption: Indicates the user-supplied encryption option of this
+      interconnect attachment.
     googleReferenceId: [Output Only] Google reference ID, to be used when
       raising support tickets with Google or otherwise to debug backend
       connectivity issues. [Deprecated] This field is not used.
@@ -35398,6 +36220,20 @@ class InterconnectAttachment(_messages.Message):
       is defined by the server.
     interconnect: URL of the underlying Interconnect object that this
       attachment's traffic will traverse through.
+    ipsecInternalAddresses: URL of addresses that have been reserved for the
+      interconnect attachment, Used only for interconnect attachment that has
+      the encryption option as IPSEC. The addresses must be RFC 1918 IP
+      address ranges. When creating HA VPN gateway over the interconnect
+      attachment, if the attachment is configured to use an RFC 1918 IP
+      address, then the VPN gateway?s IP address will be allocated from the IP
+      address range specified here. For example, if the HA VPN gateway?s
+      interface 0 is paired to this interconnect attachment, then an RFC 1918
+      IP address for the VPN gateway interface 0 will be allocated from the IP
+      address specified for this interconnect attachment. If this field is not
+      specified for interconnect attachment that has encryption option as
+      IPSEC, later on when creating HA VPN gateway on this interconnect
+      attachment, the HA VPN gateway's IP address will be allocated from
+      regional external IP address pool.
     kind: [Output Only] Type of the resource. Always
       compute#interconnectAttachment for interconnect attachments.
     labelFingerprint: A fingerprint for the labels being applied to this
@@ -35533,6 +36369,17 @@ class InterconnectAttachment(_messages.Message):
     AVAILABILITY_DOMAIN_2 = 1
     AVAILABILITY_DOMAIN_ANY = 2
 
+  class EncryptionValueValuesEnum(_messages.Enum):
+    r"""Indicates the user-supplied encryption option of this interconnect
+    attachment.
+
+    Values:
+      IPSEC: <no description>
+      NONE: <no description>
+    """
+    IPSEC = 0
+    NONE = 1
+
   class OperationalStatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The current status of whether or not this interconnect
     attachment is functional, which can take one of the following values:  -
@@ -35632,26 +36479,28 @@ class InterconnectAttachment(_messages.Message):
   customerRouterIpAddress = _messages.StringField(6)
   description = _messages.StringField(7)
   edgeAvailabilityDomain = _messages.EnumField('EdgeAvailabilityDomainValueValuesEnum', 8)
-  googleReferenceId = _messages.StringField(9)
-  id = _messages.IntegerField(10, variant=_messages.Variant.UINT64)
-  interconnect = _messages.StringField(11)
-  kind = _messages.StringField(12, default='compute#interconnectAttachment')
-  labelFingerprint = _messages.BytesField(13)
-  labels = _messages.MessageField('LabelsValue', 14)
-  mtu = _messages.IntegerField(15, variant=_messages.Variant.INT32)
-  name = _messages.StringField(16)
-  operationalStatus = _messages.EnumField('OperationalStatusValueValuesEnum', 17)
-  pairingKey = _messages.StringField(18)
-  partnerAsn = _messages.IntegerField(19)
-  partnerMetadata = _messages.MessageField('InterconnectAttachmentPartnerMetadata', 20)
-  privateInterconnectInfo = _messages.MessageField('InterconnectAttachmentPrivateInfo', 21)
-  region = _messages.StringField(22)
-  router = _messages.StringField(23)
-  selfLink = _messages.StringField(24)
-  selfLinkWithId = _messages.StringField(25)
-  state = _messages.EnumField('StateValueValuesEnum', 26)
-  type = _messages.EnumField('TypeValueValuesEnum', 27)
-  vlanTag8021q = _messages.IntegerField(28, variant=_messages.Variant.INT32)
+  encryption = _messages.EnumField('EncryptionValueValuesEnum', 9)
+  googleReferenceId = _messages.StringField(10)
+  id = _messages.IntegerField(11, variant=_messages.Variant.UINT64)
+  interconnect = _messages.StringField(12)
+  ipsecInternalAddresses = _messages.StringField(13, repeated=True)
+  kind = _messages.StringField(14, default='compute#interconnectAttachment')
+  labelFingerprint = _messages.BytesField(15)
+  labels = _messages.MessageField('LabelsValue', 16)
+  mtu = _messages.IntegerField(17, variant=_messages.Variant.INT32)
+  name = _messages.StringField(18)
+  operationalStatus = _messages.EnumField('OperationalStatusValueValuesEnum', 19)
+  pairingKey = _messages.StringField(20)
+  partnerAsn = _messages.IntegerField(21)
+  partnerMetadata = _messages.MessageField('InterconnectAttachmentPartnerMetadata', 22)
+  privateInterconnectInfo = _messages.MessageField('InterconnectAttachmentPrivateInfo', 23)
+  region = _messages.StringField(24)
+  router = _messages.StringField(25)
+  selfLink = _messages.StringField(26)
+  selfLinkWithId = _messages.StringField(27)
+  state = _messages.EnumField('StateValueValuesEnum', 28)
+  type = _messages.EnumField('TypeValueValuesEnum', 29)
+  vlanTag8021q = _messages.IntegerField(30, variant=_messages.Variant.INT32)
 
 
 class InterconnectAttachmentAggregatedList(_messages.Message):
@@ -37770,7 +38619,7 @@ class MachineType(_messages.Message):
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     deprecated: [Output Only] The deprecation status associated with this
-      machine type.
+      machine type. Only applicable if the machine type is unavailable.
     description: [Output Only] An optional textual description of the
       resource.
     guestCpus: [Output Only] The number of virtual CPUs that are available to
@@ -40026,7 +40875,9 @@ class NodeGroup(_messages.Message):
 
   Enums:
     MaintenancePolicyValueValuesEnum: Specifies how to handle instances when a
-      node in the group undergoes maintenance.
+      node in the group undergoes maintenance. Set to one of: DEFAULT,
+      RESTART_IN_PLACE, or MIGRATE_WITHIN_NODE_GROUP. The default value is
+      DEFAULT. For more information, see  Maintenance policies.
     StatusValueValuesEnum:
 
   Fields:
@@ -40045,7 +40896,9 @@ class NodeGroup(_messages.Message):
       public API. The location hint here on the NodeGroup overrides any
       location_hint present in the NodeTemplate.
     maintenancePolicy: Specifies how to handle instances when a node in the
-      group undergoes maintenance.
+      group undergoes maintenance. Set to one of: DEFAULT, RESTART_IN_PLACE,
+      or MIGRATE_WITHIN_NODE_GROUP. The default value is DEFAULT. For more
+      information, see  Maintenance policies.
     maintenanceWindow: A NodeGroupMaintenanceWindow attribute.
     name: The name of the resource, provided by the client when initially
       creating the resource. The resource name must be 1-63 characters long,
@@ -40066,7 +40919,9 @@ class NodeGroup(_messages.Message):
 
   class MaintenancePolicyValueValuesEnum(_messages.Enum):
     r"""Specifies how to handle instances when a node in the group undergoes
-    maintenance.
+    maintenance. Set to one of: DEFAULT, RESTART_IN_PLACE, or
+    MIGRATE_WITHIN_NODE_GROUP. The default value is DEFAULT. For more
+    information, see  Maintenance policies.
 
     Values:
       DEFAULT: <no description>
@@ -40270,16 +41125,19 @@ class NodeGroupAutoscalingPolicy(_messages.Message):
   r"""A NodeGroupAutoscalingPolicy object.
 
   Enums:
-    ModeValueValuesEnum: The autoscaling mode.
+    ModeValueValuesEnum: The autoscaling mode. Set to one of: ON, OFF, or
+      ONLY_SCALE_OUT. For more information, see  Autoscaler modes.
 
   Fields:
     maxNodes: The maximum number of nodes that the group should have.
     minNodes: The minimum number of nodes that the group should have.
-    mode: The autoscaling mode.
+    mode: The autoscaling mode. Set to one of: ON, OFF, or ONLY_SCALE_OUT. For
+      more information, see  Autoscaler modes.
   """
 
   class ModeValueValuesEnum(_messages.Enum):
-    r"""The autoscaling mode.
+    r"""The autoscaling mode. Set to one of: ON, OFF, or ONLY_SCALE_OUT. For
+    more information, see  Autoscaler modes.
 
     Values:
       MODE_UNSPECIFIED: <no description>
@@ -40454,6 +41312,8 @@ class NodeGroupNode(_messages.Message):
     instances: Instances scheduled on this node.
     name: The name of the node.
     nodeType: The type of this node.
+    satisfiesPhysicalZoneSeparation: [Output Only] Specifies whether this node
+      satisfies zone separation.
     serverBinding: Binding properties for the physical server.
     serverId: Server ID associated with this node.
     status: A StatusValueValuesEnum attribute.
@@ -40493,9 +41353,10 @@ class NodeGroupNode(_messages.Message):
   instances = _messages.StringField(4, repeated=True)
   name = _messages.StringField(5)
   nodeType = _messages.StringField(6)
-  serverBinding = _messages.MessageField('ServerBinding', 7)
-  serverId = _messages.StringField(8)
-  status = _messages.EnumField('StatusValueValuesEnum', 9)
+  satisfiesPhysicalZoneSeparation = _messages.BooleanField(7)
+  serverBinding = _messages.MessageField('ServerBinding', 8)
+  serverId = _messages.StringField(9)
+  status = _messages.EnumField('StatusValueValuesEnum', 10)
 
 
 class NodeGroupsAddNodesRequest(_messages.Message):
@@ -43357,7 +44218,9 @@ class PathMatcher(_messages.Message):
       any  weightedBackendServices. Only one of defaultRouteAction or
       defaultUrlRedirect must be set. UrlMaps for external HTTP(S) load
       balancers support only the urlRewrite action within a pathMatcher's
-      defaultRouteAction.
+      defaultRouteAction.  Not supported when the backend service is
+      referenced by a URL map that is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     defaultService: The full or partial URL to the BackendService resource.
       This will be used if none of the pathRules or routeRules defined by this
       PathMatcher are matched. For example, the following are all valid URLs
@@ -43374,11 +44237,14 @@ class PathMatcher(_messages.Message):
       defaultRouteAction.weightedBackendService must be set. Authorization
       requires one or more of the following Google IAM permissions on the
       specified resource default_service:   - compute.backendBuckets.use  -
-      compute.backendServices.use
+      compute.backendServices.use    pathMatchers[].defaultService is the only
+      option available when the URL map is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     defaultUrlRedirect: When none of the specified pathRules or routeRules
       match, the request is redirected to a URL specified by
       defaultUrlRedirect. If defaultUrlRedirect is specified, defaultService
-      or defaultRouteAction must not be set.
+      or defaultRouteAction must not be set.  Not supported when the backend
+      service is referenced by a URL map that is bound to target gRPC proxy.
     description: An optional description of this resource. Provide this
       property when you create the resource.
     headerAction: Specifies changes to request and response headers that need
@@ -43386,7 +44252,9 @@ class PathMatcher(_messages.Message):
       here are applied after the matching HttpRouteRule HeaderAction and
       before the HeaderAction in the UrlMap  Note that headerAction is not
       supported for Loadbalancers that have their loadBalancingScheme set to
-      EXTERNAL.
+      EXTERNAL.  Not supported when the backend service is referenced by a URL
+      map that is bound to target gRPC proxy that has validateForProxyless
+      field set to true.
     name: The name to which this PathMatcher is referred by the HostRule.
     pathRules: The list of path rules. Use this list instead of routeRules
       when routing based on simple path matching is all that's required. The
@@ -43394,12 +44262,16 @@ class PathMatcher(_messages.Message):
       always done on the longest-path-first basis. For example: a pathRule
       with a path /a/b/c/* will match before /a/b/* irrespective of the order
       in which those paths appear in this list. Within a given pathMatcher,
-      only one of pathRules or routeRules must be set.
+      only one of pathRules or routeRules must be set.  Not supported when the
+      backend service is referenced by a URL map that is bound to target gRPC
+      proxy that has validateForProxyless field set to true.
     routeRules: The list of HTTP route rules. Use this list instead of
       pathRules when advanced route matching and routing actions are desired.
       routeRules are evaluated in order of priority, from the lowest to
       highest number. Within a given pathMatcher, you can set only one of
-      pathRules or routeRules.
+      pathRules or routeRules.  Not supported when the backend service is
+      referenced by a URL map that is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
   """
 
   defaultRouteAction = _messages.MessageField('HttpRouteAction', 1)
@@ -43842,8 +44714,8 @@ class Project(_messages.Message):
       following values: PREMIUM, STANDARD. Initially the default network tier
       is PREMIUM.
     XpnProjectStatusValueValuesEnum: [Output Only] The role this project has
-      in a shared VPC configuration. Currently only HOST projects are
-      differentiated.
+      in a shared VPC configuration. Currently, only projects with the host
+      role, which is specified by the value HOST, are differentiated.
 
   Fields:
     commonInstanceMetadata: Metadata key/value pairs available to all
@@ -43871,7 +44743,8 @@ class Project(_messages.Message):
     usageExportLocation: The naming prefix for daily usage reports and the
       Google Cloud Storage bucket where they are stored.
     xpnProjectStatus: [Output Only] The role this project has in a shared VPC
-      configuration. Currently only HOST projects are differentiated.
+      configuration. Currently, only projects with the host role, which is
+      specified by the value HOST, are differentiated.
   """
 
   class DefaultNetworkTierValueValuesEnum(_messages.Enum):
@@ -43890,7 +44763,8 @@ class Project(_messages.Message):
 
   class XpnProjectStatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The role this project has in a shared VPC configuration.
-    Currently only HOST projects are differentiated.
+    Currently, only projects with the host role, which is specified by the
+    value HOST, are differentiated.
 
     Values:
       HOST: <no description>
@@ -44212,7 +45086,9 @@ class PublicAdvertisedPrefixPublicDelegatedPrefix(_messages.Message):
   r"""Represents a CIDR range which can be used to assign addresses.
 
   Fields:
+    ipRange: The IP address range of the public delegated prefix
     name: The name of the public delegated prefix
+    project: The project number of the public delegated prefix
     region: The region of the public delegated prefix if it is regional. If
       absent, the prefix is global.
     status: The status of the public delegated prefix. Possible values are:
@@ -44221,9 +45097,11 @@ class PublicAdvertisedPrefixPublicDelegatedPrefix(_messages.Message):
       is active.
   """
 
-  name = _messages.StringField(1)
-  region = _messages.StringField(2)
-  status = _messages.StringField(3)
+  ipRange = _messages.StringField(1)
+  name = _messages.StringField(2)
+  project = _messages.StringField(3)
+  region = _messages.StringField(4)
+  status = _messages.StringField(5)
 
 
 class PublicDelegatedPrefix(_messages.Message):
@@ -45063,6 +45941,8 @@ class Region(_messages.Message):
     selfLinkWithId: [Output Only] Server-defined URL for this resource with
       the resource id.
     status: [Output Only] Status of the region, either UP or DOWN.
+    supportsPhysicalZoneSeparation: [Output Only] Specifies whether this
+      region supports physical zone separation.
     zones: [Output Only] A list of zones available in this region, in the form
       of resource URLs.
   """
@@ -45087,7 +45967,8 @@ class Region(_messages.Message):
   selfLink = _messages.StringField(8)
   selfLinkWithId = _messages.StringField(9)
   status = _messages.EnumField('StatusValueValuesEnum', 10)
-  zones = _messages.StringField(11, repeated=True)
+  supportsPhysicalZoneSeparation = _messages.BooleanField(11)
+  zones = _messages.StringField(12, repeated=True)
 
 
 class RegionAutoscalerList(_messages.Message):
@@ -45685,7 +46566,7 @@ class RegionInstanceGroupManagersAbandonInstancesRequest(_messages.Message):
 
 
 class RegionInstanceGroupManagersApplyUpdatesRequest(_messages.Message):
-  r"""InstanceGroupManagers.applyUpdatesToInstances
+  r"""RegionInstanceGroupManagers.applyUpdatesToInstances
 
   Enums:
     MaximalActionValueValuesEnum: The maximal action that should be performed
@@ -50223,7 +51104,8 @@ class SecurityPolicyRuleMatcherConfig(_messages.Message):
       This field may only be specified when versioned_expr is set to FIREWALL.
     layer4Configs: Pairs of IP protocols and ports that the rule should match.
       This field may only be specified when versioned_expr is set to FIREWALL.
-    srcIpRanges: CIDR IP address range.
+    srcIpRanges: CIDR IP address range. Maximum number of src_ip_ranges
+      allowed is 10.
   """
 
   destIpRanges = _messages.StringField(1, repeated=True)
@@ -50282,7 +51164,7 @@ class SecurityPolicyRuleRateLimitOptions(_messages.Message):
       requests matching this rule.
 
   Fields:
-    blockDuration: Can only be specifed if the action for the rule is
+    blockDuration: Can only be specified if the action for the rule is
       "rate_based_blacklist" If specified, determines the time (in seconds)
       the traffic will continue to be blocked by the rate limit after the rate
       falls below the threshold. The default value is 0 seconds.
@@ -50336,6 +51218,7 @@ class SecuritySettings(_messages.Message):
       should authenticate with this service's backends. clientTlsPolicy only
       applies to a global BackendService with the loadBalancingScheme set to
       INTERNAL_SELF_MANAGED. If left blank, communications are not encrypted.
+      Note: This field currently has no impact.
     clientTlsSettings: [Deprecated] TLS Settings for the backend service.
     subjectAltNames: Optional. A list of Subject Alternative Names (SANs) that
       the client verifies during a mutual TLS handshake with an
@@ -50349,7 +51232,7 @@ class SecuritySettings(_messages.Message):
       which provisions server identities. Only applies to a global
       BackendService with loadBalancingScheme set to INTERNAL_SELF_MANAGED.
       Only applies when BackendService has an attached clientTlsPolicy with
-      clientCertificate (mTLS mode).
+      clientCertificate (mTLS mode). Note: This field currently has no impact.
   """
 
   authentication = _messages.StringField(1)
@@ -50877,6 +51760,8 @@ class Snapshot(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    satisfiesPhysicalZoneSeparation: [Output Only] Specifies whether this
+      snapshot satisfies zone separation.
     selfLink: [Output Only] Server-defined URL for the resource.
     selfLinkWithId: [Output Only] Server-defined URL for this resource's
       resource id.
@@ -50979,16 +51864,17 @@ class Snapshot(_messages.Message):
   licenseCodes = _messages.IntegerField(12, repeated=True)
   licenses = _messages.StringField(13, repeated=True)
   name = _messages.StringField(14)
-  selfLink = _messages.StringField(15)
-  selfLinkWithId = _messages.StringField(16)
-  snapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 17)
-  sourceDisk = _messages.StringField(18)
-  sourceDiskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 19)
-  sourceDiskId = _messages.StringField(20)
-  status = _messages.EnumField('StatusValueValuesEnum', 21)
-  storageBytes = _messages.IntegerField(22)
-  storageBytesStatus = _messages.EnumField('StorageBytesStatusValueValuesEnum', 23)
-  storageLocations = _messages.StringField(24, repeated=True)
+  satisfiesPhysicalZoneSeparation = _messages.BooleanField(15)
+  selfLink = _messages.StringField(16)
+  selfLinkWithId = _messages.StringField(17)
+  snapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 18)
+  sourceDisk = _messages.StringField(19)
+  sourceDiskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 20)
+  sourceDiskId = _messages.StringField(21)
+  status = _messages.EnumField('StatusValueValuesEnum', 22)
+  storageBytes = _messages.IntegerField(23)
+  storageBytesStatus = _messages.EnumField('StorageBytesStatusValueValuesEnum', 24)
+  storageLocations = _messages.StringField(25, repeated=True)
 
 
 class SnapshotList(_messages.Message):
@@ -53133,6 +54019,30 @@ class SubnetworksSetPrivateIpGoogleAccessRequest(_messages.Message):
   privateIpGoogleAccess = _messages.BooleanField(1)
 
 
+class Subsetting(_messages.Message):
+  r"""Subsetting options to make L4 ILB support any number of backend
+  instances
+
+  Enums:
+    PolicyValueValuesEnum:
+
+  Fields:
+    policy: A PolicyValueValuesEnum attribute.
+  """
+
+  class PolicyValueValuesEnum(_messages.Enum):
+    r"""PolicyValueValuesEnum enum type.
+
+    Values:
+      CONSISTENT_HASH_SUBSETTING: <no description>
+      NONE: <no description>
+    """
+    CONSISTENT_HASH_SUBSETTING = 0
+    NONE = 1
+
+  policy = _messages.EnumField('PolicyValueValuesEnum', 1)
+
+
 class TCPHealthCheck(_messages.Message):
   r"""A TCPHealthCheck object.
 
@@ -53552,6 +54462,13 @@ class TargetHttpProxy(_messages.Message):
       format.
     description: An optional description of this resource. Provide this
       property when you create the resource.
+    fingerprint: Fingerprint of this resource. A hash of the contents stored
+      in this object. This field is used in optimistic locking. This field
+      will be ignored when inserting a TargetHttpProxy. An up-to-date
+      fingerprint must be provided in order to patch/update the
+      TargetHttpProxy; otherwise, the request will fail with error 412
+      conditionNotMet. To see the latest fingerprint, make a get() request to
+      retrieve the TargetHttpProxy.
     httpFilters: Urls to networkservices.HttpFilter resources enabled for xDS
       clients using this configuration. For example, https://networkservices.g
       oogleapis.com/v1alpha1/projects/project/locations/locationhttpFilters/ht
@@ -53590,15 +54507,16 @@ class TargetHttpProxy(_messages.Message):
 
   creationTimestamp = _messages.StringField(1)
   description = _messages.StringField(2)
-  httpFilters = _messages.StringField(3, repeated=True)
-  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(5, default='compute#targetHttpProxy')
-  name = _messages.StringField(6)
-  proxyBind = _messages.BooleanField(7)
-  region = _messages.StringField(8)
-  selfLink = _messages.StringField(9)
-  selfLinkWithId = _messages.StringField(10)
-  urlMap = _messages.StringField(11)
+  fingerprint = _messages.BytesField(3)
+  httpFilters = _messages.StringField(4, repeated=True)
+  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(6, default='compute#targetHttpProxy')
+  name = _messages.StringField(7)
+  proxyBind = _messages.BooleanField(8)
+  region = _messages.StringField(9)
+  selfLink = _messages.StringField(10)
+  selfLinkWithId = _messages.StringField(11)
+  urlMap = _messages.StringField(12)
 
 
 class TargetHttpProxyAggregatedList(_messages.Message):
@@ -54081,7 +54999,7 @@ class TargetHttpsProxy(_messages.Message):
       AuthorizationPolicy resource for additional details. authorizationPolicy
       only applies to a global TargetHttpsProxy attached to
       globalForwardingRules with the loadBalancingScheme set to
-      INTERNAL_SELF_MANAGED.
+      INTERNAL_SELF_MANAGED. Note: This field currently has no impact.
     certificateMap: URL of a certificate map that identifies a certificate map
       associated with the given target proxy. This field can only be set for
       global target proxies. If set, sslCertificates will be ignored.
@@ -54122,7 +55040,8 @@ class TargetHttpsProxy(_messages.Message):
       should authenticate inbound traffic. serverTlsPolicy only applies to a
       global TargetHttpsProxy attached to globalForwardingRules with the
       loadBalancingScheme set to INTERNAL_SELF_MANAGED. If left blank,
-      communications are not encrypted.
+      communications are not encrypted. Note: This field currently has no
+      impact.
     sslCertificates: URLs to SslCertificate resources that are used to
       authenticate connections between users and the load balancer. At least
       one SSL certificate must be specified. Currently, you may specify up to
@@ -56660,9 +57579,11 @@ class UpcomingMaintenance(_messages.Message):
 
   Fields:
     date: [Output Only] The date when the maintenance will take place. This
-      value is in RFC3339 text format.
+      value is in RFC3339 text format. DEPRECATED: Use start_time_window
+      instead.
     time: [Output Only] The time when the maintenance will take place. This
-      value is in RFC3339 text format.
+      value is in RFC3339 text format. DEPRECATED: Use start_time_window
+      instead.
     type: Defines the type of maintenance.
   """
 
@@ -56690,12 +57611,16 @@ class UrlMap(_messages.Message):
   URL map resource is a component of certain types of GCP load balancers and
   Traffic Director.  * urlMaps are used by external HTTP(S) load balancers and
   Traffic Director. * regionUrlMaps are used by internal HTTP(S) load
-  balancers.  This resource defines mappings from host names and URL paths to
-  either a backend service or a backend bucket.  To use the global urlMaps
-  resource, the backend service must have a loadBalancingScheme of either
-  EXTERNAL or INTERNAL_SELF_MANAGED. To use the regionUrlMaps resource, the
-  backend service must have a loadBalancingScheme of INTERNAL_MANAGED. For
-  more information, read URL Map Concepts.
+  balancers.  For a list of supported URL map features by load balancer type,
+  see the  Load balancing features: Routing and traffic management table.  For
+  a list of supported URL map features for Traffic Director, see the  Traffic
+  Director features: Routing and traffic management table.  This resource
+  defines mappings from host names and URL paths to either a backend service
+  or a backend bucket.  To use the global urlMaps resource, the backend
+  service must have a loadBalancingScheme of either EXTERNAL or
+  INTERNAL_SELF_MANAGED. To use the regionUrlMaps resource, the backend
+  service must have a loadBalancingScheme of INTERNAL_MANAGED. For more
+  information, read URL Map Concepts.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -56709,6 +57634,9 @@ class UrlMap(_messages.Message):
       weightedBackendServices. Only one of defaultRouteAction or
       defaultUrlRedirect must be set. UrlMaps for external HTTP(S) load
       balancers support only the urlRewrite action within defaultRouteAction.
+      defaultRouteAction has no effect when the backend service is referenced
+      by a URL map that is bound to target gRPC proxy that has
+      validateForProxyless field set to true.
     defaultService: The full or partial URL of the defaultService resource to
       which traffic is directed if none of the hostRules match. If
       defaultRouteAction is additionally specified, advanced routing actions
@@ -56717,11 +57645,15 @@ class UrlMap(_messages.Message):
       cannot contain any weightedBackendServices. Conversely, if routeAction
       specifies any weightedBackendServices, service must not be specified.
       Only one of defaultService, defaultUrlRedirect  or
-      defaultRouteAction.weightedBackendService must be set.
+      defaultRouteAction.weightedBackendService must be set.  defaultService
+      has no effect when the backend service is referenced by a URL map that
+      is bound to target gRPC proxy that has validateForProxyless field set to
+      true.
     defaultUrlRedirect: When none of the specified hostRules match, the
       request is redirected to a URL specified by defaultUrlRedirect. If
       defaultUrlRedirect is specified, defaultService or defaultRouteAction
-      must not be set.
+      must not be set.  Not supported when the backend service is referenced
+      by a URL map that is bound to target gRPC proxy.
     description: An optional description of this resource. Provide this
       property when you create the resource.
     fingerprint: Fingerprint of this resource. A hash of the contents stored
@@ -56733,7 +57665,9 @@ class UrlMap(_messages.Message):
     headerAction: Specifies changes to request and response headers that need
       to take effect for the selected backendService. The headerAction
       specified here take effect after headerAction specified under
-      pathMatcher.
+      pathMatcher.  Not supported when the backend service is referenced by a
+      URL map that is bound to target gRPC proxy that has validateForProxyless
+      field set to true.
     hostRules: The list of HostRules to use against the URL.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
@@ -56754,7 +57688,9 @@ class UrlMap(_messages.Message):
     selfLink: [Output Only] Server-defined URL for the resource.
     tests: The list of expected URL mapping tests. Request to update this
       UrlMap will succeed only if all of the test cases pass. You can specify
-      a maximum of 100 tests per UrlMap.
+      a maximum of 100 tests per UrlMap.  Not supported when the backend
+      service is referenced by a URL map that is bound to target gRPC proxy
+      that has validateForProxyless field set to true.
   """
 
   creationTimestamp = _messages.StringField(1)
@@ -56918,11 +57854,14 @@ class UrlMapTest(_messages.Message):
       when using advanced routing rules that involve traffic splitting.
     description: Description of this test case.
     expectedUrlRedirect: The expected URL that should be redirected to for the
-      host and path being tested.
-    host: Host portion of the URL.
+      host and path being tested. [Deprecated] This field is deprecated. Use
+      expected_output_url instead.
+    host: Host portion of the URL. If headers contains a host header, then
+      host must also match the header value.
     path: Path portion of the URL.
-    service: Expected BackendService resource the given URL should be mapped
-      to.
+    service: Expected BackendService or BackendBucket resource the given URL
+      should be mapped to. service cannot be set if
+      expectedRedirectResponseCode is set.
   """
 
   backendServiceWeight = _messages.IntegerField(1, variant=_messages.Variant.UINT32)
@@ -58113,12 +59052,18 @@ class VpnGatewayVpnGatewayInterface(_messages.Message):
 
   Fields:
     id: The numeric ID of this VPN gateway interface.
+    interconnectAttachment: URL of the interconnect attachment resource. When
+      the value of this field is present, the VPN Gateway will be used for
+      IPsec over Interconnect; all Egress or Ingress traffic for this VPN
+      Gateway interface will go through the specified interconnect attachment
+      resource.
     ipAddress: [Output Only] The external IP address for this VPN gateway
       interface.
   """
 
   id = _messages.IntegerField(1, variant=_messages.Variant.UINT32)
-  ipAddress = _messages.StringField(2)
+  interconnectAttachment = _messages.StringField(2)
+  ipAddress = _messages.StringField(3)
 
 
 class VpnGatewaysGetStatusResponse(_messages.Message):
@@ -59113,6 +60058,8 @@ class Zone(_messages.Message):
       zone.
     selfLink: [Output Only] Server-defined URL for the resource.
     status: [Output Only] Status of the zone, either UP or DOWN.
+    supportsPhysicalZoneSeparation: [Output Only] Specifies whether this zone
+      supports physical zone separation.
   """
 
   class StatusValueValuesEnum(_messages.Enum):
@@ -59135,6 +60082,7 @@ class Zone(_messages.Message):
   region = _messages.StringField(8)
   selfLink = _messages.StringField(9)
   status = _messages.EnumField('StatusValueValuesEnum', 10)
+  supportsPhysicalZoneSeparation = _messages.BooleanField(11)
 
 
 class ZoneList(_messages.Message):

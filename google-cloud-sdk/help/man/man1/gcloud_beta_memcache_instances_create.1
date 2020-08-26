@@ -19,6 +19,15 @@ gcloud beta memcache instances create \- create a Memorystore Memcached instance
 
 \fB(BETA)\fR Create a new Memorystore Memcached instance with the given name.
 
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+An instance with the same name already exists.
+.IP "\(bu" 2m
+The active account does not have the necessary permissions to create instances.
+.RE
+.sp
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -26,14 +35,13 @@ gcloud beta memcache instances create \- create a Memorystore Memcached instance
 .RS 2m
 .TP 2m
 
-Instance resource \- Arguments and flags that specify the Memcached instance you
-want to create. The arguments in this group can be used to specify the
-attributes of this resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: provide
-the argument [instance] on the command line with a fully specified name; provide
-the argument [\-\-project] on the command line; set the property [core/project].
-This must be specified.
-
+Instance resource \- Arguments and flags that specify the Memcached instance to
+create. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[instance] on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
 
 .RS 2m
 .TP 2m
@@ -56,7 +64,7 @@ The name of the Memcached region of the instance.
 .RS 2m
 .TP 2m
 \fB\-\-node\-count\fR=\fINODE_COUNT\fR
-Number of memcache nodes in this instance.
+Number of memcache nodes in this instance. Valid values range from 1 to 20.
 
 .TP 2m
 \fB\-\-node\-cpu\fR=\fINODE_CPU\fR
@@ -65,9 +73,9 @@ between 2\-16.
 
 .TP 2m
 \fB\-\-node\-memory\fR=\fINODE_MEMORY\fR
-A whole number value indicating how much memory is desired per node. The value
-must be a whole number followed by a size unit of 'MB' for megabyte, or 'GB' for
-gigabyte, ie '3072MB' or '9GB'. The value must be between 1,024MB and 307,200MB.
+Amount of memory allocated per node in this instance. The value must be a whole
+number followed by a size unit of 'MB' for megabyte, or 'GB' for gigabyte, ie
+\'3072MB' or '9GB'. The value must be between 1024MB and 307200MB.
 
 
 .RE
@@ -82,7 +90,7 @@ Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-authorized\-network\fR=\fIAUTHORIZED_NETWORK\fR
-The full name of the Google Compute Engine network to which the instance is
+Full name of the Google Compute Engine network to which the instance is
 connected. If unspecified, the default network will be used.
 
 .TP 2m
@@ -91,7 +99,7 @@ An arbitrary and optional user provided name for the instance.
 
 .TP 2m
 \fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 .TP 2m
 \fB\-\-memcached\-version\fR=\fIMEMCACHED_VERSION\fR
@@ -214,16 +222,13 @@ this API can be found at: https://cloud.google.com/memorystore/
 
 .SH "EXAMPLES"
 
-The following command creates a Memcached instance with the name
-\'my\-memcache\-instance' in region 'us\-central1' using a non default network,
-requesting 3 nodes each with 2 CPUs and 2GB of RAM.
+To create a Memcached instance named 'my\-memcache\-instance' in region
+\'us\-central1' with 3 nodes, each with 2 CPUs and 2GB of memory, run:
 
 .RS 2m
 $ gcloud beta memcache instances create my\-memcache\-instance \e
-    \-\-display\-name="Example MC Instance" \e
-    \-\-authorized\-network=projects/project1/global/networks/network_mc \e
-    \-\-node\-count=3 \-\-node\-cpu=2 \-\-node\-memory=2GB \e
-    \-\-region=us\-central1
+    \-\-region=us\-central1 \e
+    \-\-node\-count=3 \-\-node\-cpu=2 \-\-node\-memory=2GB
 .RE
 
 

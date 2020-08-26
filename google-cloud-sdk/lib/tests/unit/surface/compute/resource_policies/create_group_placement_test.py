@@ -87,5 +87,42 @@ class CreateGroupPlacementAlphaTest(CreateGroupPlacementBetaTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def testCreate_clustered(self):
+    policy = self.messages.ResourcePolicy(
+        name='pol1',
+        region=self.region,
+        groupPlacementPolicy=self.messages.ResourcePolicyGroupPlacementPolicy(
+            vmCount=2,
+            collocation=self.messages.ResourcePolicyGroupPlacementPolicy
+            .CollocationValueValuesEnum.CLUSTERED))
+
+    request = self._ExpectCreate(policy)
+
+    result = self.Run(
+        'compute resource-policies create group-placement pol1 --vm-count 2'
+        ' --collocation clustered --region {}'.format(self.region))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, policy)
+
+  def testCreate_hostLevelSpread(self):
+    policy = self.messages.ResourcePolicy(
+        name='pol1',
+        region=self.region,
+        groupPlacementPolicy=self.messages.ResourcePolicyGroupPlacementPolicy(
+            availabilityDomainCount=2,
+            scope=self.messages.ResourcePolicyGroupPlacementPolicy
+            .ScopeValueValuesEnum.HOST))
+
+    request = self._ExpectCreate(policy)
+
+    result = self.Run('compute resource-policies create group-placement pol1 '
+                      '--availability-domain-count 2 --scope HOST '
+                      '--region {}'.format(self.region))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, policy)
+
+
 if __name__ == '__main__':
   test_case.main()

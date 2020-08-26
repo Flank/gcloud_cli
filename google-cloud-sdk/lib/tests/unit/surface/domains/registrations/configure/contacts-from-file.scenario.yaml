@@ -22,6 +22,7 @@ summary:
       This info will be publicly available:
       adminContact:
         email: admin@example.com
+        faxNumber: '+48.123456789'
         phoneNumber: '+48.123456789'
         postalAddress:
           addressLines:
@@ -33,6 +34,7 @@ summary:
           regionCode: PL
       registrantContact:
         email: registrant@example.com
+        faxNumber: '+48.123456789'
         phoneNumber: '+48.123456789'
         postalAddress:
           addressLines:
@@ -44,6 +46,7 @@ summary:
           regionCode: PL
       technicalContact:
         email: technical@example.com
+        faxNumber: '+48.123456789'
         phoneNumber: '+48.123456789'
         postalAddress:
           addressLines:
@@ -103,6 +106,7 @@ actions:
       registrantContact:
         email: 'registrant@example.com'
         phoneNumber: '+48.123456789'
+        faxNumber: '+48.123456789'
         postalAddress:
           regionCode: 'PL'
           postalCode: '00-113'
@@ -112,6 +116,7 @@ actions:
       adminContact:
         email: 'admin@example.com'
         phoneNumber: '+48.123456789'
+        faxNumber: '+48.123456789'
         postalAddress:
           regionCode: 'PL'
           postalCode: '00-113'
@@ -121,6 +126,7 @@ actions:
       technicalContact:
         email: 'technical@example.com'
         phoneNumber: '+48.123456789'
+        faxNumber: '+48.123456789'
         postalAddress:
           regionCode: 'PL'
           postalCode: '00-113'
@@ -297,6 +303,7 @@ actions:
         This info will be publicly available:
         adminContact:
           email: admin@example.com
+          faxNumber: '+48.123456789'
           phoneNumber: '+48.123456789'
           postalAddress:
             addressLines:
@@ -308,6 +315,7 @@ actions:
             regionCode: PL
         registrantContact:
           email: registrant@example.com
+          faxNumber: '+48.123456789'
           phoneNumber: '+48.123456789'
           postalAddress:
             addressLines:
@@ -319,6 +327,7 @@ actions:
             regionCode: PL
         technicalContact:
           email: technical@example.com
+          faxNumber: '+48.123456789'
           phoneNumber: '+48.123456789'
           postalAddress:
             addressLines:
@@ -343,6 +352,7 @@ actions:
                 adminContact:
                   email: admin@example.com
                   phoneNumber: '+48.123456789'
+                  faxNumber: '+48.123456789'
                   postalAddress:
                     addressLines:
                     - Emilii Plater 53
@@ -354,6 +364,7 @@ actions:
                 registrantContact:
                   email: registrant@example.com
                   phoneNumber: '+48.123456789'
+                  faxNumber: '+48.123456789'
                   postalAddress:
                     addressLines:
                     - Emilii Plater 53
@@ -365,6 +376,7 @@ actions:
                 technicalContact:
                   email: technical@example.com
                   phoneNumber: '+48.123456789'
+                  faxNumber: '+48.123456789'
                   postalAddress:
                     addressLines:
                     - Emilii Plater 53

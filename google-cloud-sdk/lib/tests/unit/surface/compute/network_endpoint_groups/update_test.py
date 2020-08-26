@@ -300,23 +300,6 @@ class NetworkEndpointGroupsUpdateTest(sdk_test_base.WithFakeAuth,
              '--remove-endpoint fqdn=example.com --global')
     self.AssertErrContains('Detaching 1 endpoints from [my-global-neg].')
 
-
-class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-    self.client = mock.Client(
-        core_apis.GetClientClass('compute', self.api_version))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', self.api_version)
-    self.messages = self.client.MESSAGES_MODULE
-
-    self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
-    self.neg_type_enum = self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
-
   def testUpdate_NonGcpPrivateIpPortType_AddEndpointSimple(self):
     endpoints = [
         self.messages.NetworkEndpoint(ipAddress='127.0.0.1', port=8888)
@@ -362,6 +345,23 @@ class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
     self.Run('compute network-endpoint-groups update my-neg '
              '--remove-endpoint ip=127.0.0.1,port=8888 '
              '--remove-endpoint ip=127.0.0.2 --zone ' + self.zone)
+
+
+class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version))
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.messages = self.client.MESSAGES_MODULE
+
+    self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
+    self.neg_type_enum = self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
 
   def testUpdate_GceVmPrimaryIpType_AddEndpointSimple(self):
     endpoints = [self.messages.NetworkEndpoint(ipAddress='127.0.0.1')]

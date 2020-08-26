@@ -18,83 +18,90 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-ALERT_POLICY = """\
-{
-    "displayName": "Instance health",
-    "combiner": "OR",
-    "conditions": [
+import json
+
+from tests.lib import e2e_utils
+
+
+cleanup_name_generator = e2e_utils.GetResourceNameGenerator('instance-health')
+
+ALERT_POLICY = json.dumps({
+    'displayName': next(cleanup_name_generator),
+    'combiner': 'OR',
+    'conditions': [
         {
-            "displayName": "CPU usage is extremely high",
-            "conditionThreshold": {
-                "aggregations": [
+            'displayName': 'CPU usage is extremely high',
+            'conditionThreshold': {
+                'aggregations': [
                     {
-                        "alignmentPeriod": "60s",
-                        "crossSeriesReducer": "REDUCE_MEAN",
-                        "groupByFields": [
-                            "project",
-                            "resource.label.instance_id",
-                            "resource.label.zone"
+                        'alignmentPeriod': '60s',
+                        'crossSeriesReducer': 'REDUCE_MEAN',
+                        'groupByFields': [
+                            'project',
+                            'resource.label.instance_id',
+                            'resource.label.zone'
                         ],
-                        "perSeriesAligner": "ALIGN_MEAN"
+                        'perSeriesAligner': 'ALIGN_MEAN'
                     }
                 ],
-                "comparison": "COMPARISON_GT",
-                "duration": "900s",
-                "filter": 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"',
-                "thresholdValue": 0.9,
-                "trigger": {
-                    "count": 1
+                'comparison': 'COMPARISON_GT',
+                'duration': '900s',
+                'filter': 'metric.type='
+                          '"compute.googleapis.com/instance/cpu/utilization"'
+                          ' AND resource.type="gce_instance"',
+                'thresholdValue': 0.9,
+                'trigger': {
+                    'count': 1
                 }
             }
         }
     ],
-}
-"""
+})
 
-ALERT_POLICY_NO_AGGREGATIONS = """\
-{
-    "displayName": "Instance health",
-    "combiner": "OR",
-    "conditions": [
+ALERT_POLICY_NO_AGGREGATIONS = json.dumps({
+    'displayName': next(cleanup_name_generator),
+    'combiner': 'OR',
+    'conditions': [
         {
-            "displayName": "CPU usage is extremely high",
-            "conditionThreshold": {
-                "comparison": "COMPARISON_GT",
-                "duration": "900s",
-                "filter": 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"',
-                "thresholdValue": 0.9,
-                "trigger": {
-                    "count": 1
+            'displayName': 'CPU usage is extremely high',
+            'conditionThreshold': {
+                'comparison': 'COMPARISON_GT',
+                'duration': '900s',
+                'filter': 'metric.type='
+                          '"compute.googleapis.com/instance/cpu/utilization"'
+                          ' AND resource.type="gce_instance"',
+                'thresholdValue': 0.9,
+                'trigger': {
+                    'count': 1
                 }
             }
         }
     ],
-}
-"""
+})
 
-CONDITION = """\
-{
-    "displayName": "cores",
-    "conditionThreshold": {
-        "aggregations": [
+CONDITION = json.dumps({
+    'displayName': 'cores',
+    'conditionThreshold': {
+        'aggregations': [
             {
-                "alignmentPeriod": "60s",
-                "crossSeriesReducer": "REDUCE_SUM",
-                "groupByFields": [
-                    "project",
-                    "resource.label.instance_id",
-                    "resource.label.zone"
+                'alignmentPeriod': '60s',
+                'crossSeriesReducer': 'REDUCE_SUM',
+                'groupByFields': [
+                    'project',
+                    'resource.label.instance_id',
+                    'resource.label.zone'
                 ],
-                "perSeriesAligner": "ALIGN_SUM"
+                'perSeriesAligner': 'ALIGN_SUM'
             }
         ],
-        "comparison": "COMPARISON_GT",
-        "duration": "900s",
-        "filter": 'metric.type="compute.googleapis.com/instance/cpu/reserved_cores"  AND resource.type="gce_instance"',
-        "thresholdValue": 500,
-        "trigger": {
-            "count": 1
+        'comparison': 'COMPARISON_GT',
+        'duration': '900s',
+        'filter': 'metric.type='
+                  '"compute.googleapis.com/instance/cpu/reserved_cores"'
+                  ' AND resource.type="gce_instance"',
+        'thresholdValue': 500,
+        'trigger': {
+            'count': 1
         }
     }
-}
-"""
+})

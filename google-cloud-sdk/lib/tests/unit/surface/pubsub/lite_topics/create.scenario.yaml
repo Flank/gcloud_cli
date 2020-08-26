@@ -38,7 +38,9 @@ actions:
             json:
               partitionConfig:
                 count: '1'
-                scale: 1
+                capacity:
+                  publishMibPerSec: 4
+                  subscribeMibPerSec: 8
               retentionConfig:
                 perPartitionBytes: '32212254720'
         return_response:
@@ -49,7 +51,10 @@ actions:
               "name": "projects/12345/locations/us-central1-a/topics/topic1",
               "partitionConfig": {
                 "count": "1",
-                "scale": 1
+                "capacity": {
+                  "publishMibPerSec": 4,
+                  "subscribeMibPerSec": 8
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "32212254720"
@@ -63,7 +68,7 @@ actions:
 # Set all flags for create command.
 - execute_command:
     command: |
-      pubsub lite-topics create topic1 --zone us-central1-a --partitions 2 --scale 2 --per-partition-bytes 40GiB --message-retention-period 2w
+      pubsub lite-topics create topic1 --zone us-central1-a --partitions 2 --per-partition-publish-mib 7 --per-partition-subscribe-mib 15 --per-partition-bytes 40GiB --message-retention-period 2w
     events:
     - api_call:
         expect_request:
@@ -94,7 +99,9 @@ actions:
             json:
               partitionConfig:
                 count: '2'
-                scale: 2
+                capacity:
+                  publishMibPerSec: 7
+                  subscribeMibPerSec: 15
               retentionConfig:
                 perPartitionBytes: '42949672960'
                 period: '1209600s'
@@ -106,7 +113,10 @@ actions:
               "name": "projects/12345/locations/us-central1-a/topics/topic1",
               "partitionConfig": {
                 "count": "2",
-                "scale": 2
+                "capacity": {
+                  "publishMibPerSec": 7,
+                  "subscribeMibPerSec": 15
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "42949672960",
@@ -152,7 +162,9 @@ actions:
             json:
               partitionConfig:
                 count: '1'
-                scale: 1
+                capacity:
+                  publishMibPerSec: 4
+                  subscribeMibPerSec: 8
               retentionConfig:
                 perPartitionBytes: '32212254720'
         return_response:
@@ -163,7 +175,10 @@ actions:
               "name": "projects/12345/locations/us-central1-a/topics/topic1",
               "partitionConfig": {
                 "count": "1",
-                "scale": 1
+                "capacity": {
+                  "publishMibPerSec": 4,
+                  "subscribeMibPerSec": 8
+                }
               },
               "retentionConfig": {
                 "perPartitionBytes": "32212254720"

@@ -19,6 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import json
+import re
+
 from googlecloudsdk.command_lib.apigee import errors
 from googlecloudsdk.command_lib.apigee import request
 from googlecloudsdk.core import properties
@@ -95,6 +97,64 @@ class RequestTest(base.ApigeeIsolatedTest):
         body=json.dumps(test_data)[3:])
     self.AssertRaisesExceptionMatches(errors.ResponseNotJSONError,
                                       "Failed to parse api",
+                                      request.ResponseToApiRequest,
+                                      self._sample_identifiers, ["environment"],
+                                      "api")
+
+  def testDetailedError(self):
+    test_data = {
+        "error": {
+            "code": 400,
+            "status": "INVALID_ARGUMENT",
+            "details": [
+                {
+                    "@type":
+                        "type.googleapis.com/edge.configstore.bundle.BadBundle",
+                    "violations": [{
+                        "description": "Error foo in somefile.xml",
+                        "filename": "somefile.xml"
+                    }, {
+                        "description": "Bar violation in resource file blah",
+                        "filename": "resources/java/blah.jar"
+                    }]
+                },
+                {
+                    "@type":
+                        "type.googleapis.com/google.rpc.QuotaFailure",
+                    "violations": [{
+                        "description":
+                            "Limit of Data Collectors used in a single "
+                            "environment (100) exceeded.",
+                        "subject": "apigee.googleapis.com/bling/blong"
+                    }]
+                },
+            ],
+            "message": "very generic error"
+        }
+    }
+    self.AddHTTPResponse(
+        "https://apigee.googleapis.com/v1/environments/a/apis",
+        body=json.dumps(test_data),
+        status=400)
+
+    expected_text = ".*".join([
+        "Error foo in somefile.xml", "Bar violation in resource file blah",
+        r"Limit of Data Collectors used in a single environment \(100\)"
+    ])
+    expected_pattern = re.compile(expected_text, re.DOTALL)
+    self.AssertRaisesExceptionRegexp(errors.RequestError, expected_pattern,
+                                     request.ResponseToApiRequest,
+                                     self._sample_identifiers, ["environment"],
+                                     "api")
+
+  def testUnparseableError(self):
+    test_data = {"what": ["a", "B", 3], "test": "testUnparseableResponse"}
+    self.AddHTTPResponse(
+        "https://apigee.googleapis.com/v1/environments/a/apis",
+        status=404,
+        body=json.dumps(test_data)[3:])
+    self.AssertRaisesExceptionMatches(errors.EntityNotFoundError,
+                                      "does not exist",
                                       request.ResponseToApiRequest,
                                       self._sample_identifiers, ["environment"],
                                       "api")

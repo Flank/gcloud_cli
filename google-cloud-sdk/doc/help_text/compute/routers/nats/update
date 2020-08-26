@@ -1,6 +1,6 @@
 NAME
-    gcloud compute routers nats update - update a NAT on a Google Compute
-        Engine router
+    gcloud compute routers nats update - update a NAT on a Compute Engine
+        router
 
 SYNOPSIS
     gcloud compute routers nats update NAME --router=ROUTER [--async]
@@ -21,8 +21,8 @@ SYNOPSIS
           | --nat-primary-subnet-ip-ranges] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routers nats update is used to update a NAT in a Google
-    Compute Engine router.
+    gcloud compute routers nats update is used to update a NAT in a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

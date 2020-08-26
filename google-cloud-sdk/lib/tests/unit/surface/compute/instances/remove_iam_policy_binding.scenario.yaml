@@ -1,5 +1,5 @@
 title: compute instances remove-iam-policy-binding scenario test
-release_tracks: [GA, BETA]
+release_tracks: [GA, BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -22,20 +22,6 @@ actions:
       BETA: beta
       ALPHA: alpha
 
-- define_reference:
-    reference: policy-version-parameter
-    track_values:
-      GA: ''
-      BETA: '&optionsRequestedPolicyVersion=3'
-      ALPHA: '&optionsRequestedPolicyVersion=3'
-
-- define_reference:
-    reference: policy-version
-    track_values:
-      GA: '1'
-      BETA: '3'
-      ALPHA: '3'
-
 # remove binding without condition to a policy without condition
 - execute_command:
     command: compute instances remove-iam-policy-binding my-instance --zone=ZONE --member=user:owner@gmail.com
@@ -43,7 +29,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json$$policy-version-parameter$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -69,7 +55,7 @@ actions:
           method: POST
           body:
             text: |-
-              {"policy": {"bindings": [{"members": ["user:newowner@gmail.com"], "role": "roles/owner"}], "etag": "etag", "version": $$policy-version$$}}
+              {"policy": {"bindings": [{"members": ["user:newowner@gmail.com"], "role": "roles/owner"}], "etag": "etag", "version": 3}}
         return_response:
           headers:
             status: '200'

@@ -24,6 +24,7 @@ import os
 import signal
 import time
 
+from googlecloudsdk.command_lib.code import skaffold_events
 from googlecloudsdk.core.util import retry
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
@@ -41,54 +42,9 @@ class SkaffoldContext(object):
 
   def GetLocalPort(self, service_name):
     """Get the local port of a port-forwarded kubernetes service."""
-    url = 'http://localhost:%s/v1/events' % self._events_port
-    with contextlib.closing(six.moves.urllib.request.urlopen(url)) as response:
-      for line in _ReadStreamingLines(response):
-        try:
-          payload = json.loads(line)
-          if not isinstance(payload, dict):
-            continue
-          event = payload['result']['event']
-          if ('portEvent' in event and
-              event['portEvent']['resourceName'] == service_name):
-            return event['portEvent']['localPort']
-        except ValueError:
-          # Some of the output will not be json. We don't care about those
-          # lines. Ignore the line if the line is invalid json.
-          pass
-      return None
-
-
-def _ReadStreamingLines(response, chunk_size_bytes=50):
-  # The standard http response readline waits until either the buffer is full
-  # or the connection closes. The connection to read the event stream
-  # stays open forever until the client closes it. As a result, we can get
-  # into a state where http readline() never returns because the buffer
-  # is not full but the server is waiting for the test to do something
-  # to generate more events.
-  # This function will not block a buffer not being full. os.read() will
-  # return data of any size if a response is received. This allows the test
-  # to make progress.
-  pending = None
-
-  while True:
-    chunk = six.ensure_text(os.read(response.fp.fileno(), chunk_size_bytes))
-    if not chunk:
-      break
-
-    if pending is not None:
-      chunk = pending + chunk
-      pending = None
-
-    lines = chunk.split('\n')
-    if lines and lines[-1]:
-      pending = lines.pop()
-
-    for line in lines:
-      yield line
-
-  if pending:
-    yield pending
+    with contextlib.closing(
+        skaffold_events.OpenEventsStream(self._events_port)) as response:
+      return next(skaffold_events.GetServiceLocalPort(response, service_name))
 
 
 class TerminateWithSigInt(object):
@@ -169,33 +125,28 @@ class DevOnMinikubeTest(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
 
   @contextlib.contextmanager
   def _RunDevelopmentServer(self,
-                            dockerfile,
                             service_name,
                             local_port,
                             additional_gcloud_flags=None):
     skaffold_event_port = self.GetPort()
 
     with e2e_base.RefreshTokenAuth() as auth:
-      additional_skaffold_flags = ('--enable-rpc,--rpc-http-port=%s' %
-                                   skaffold_event_port)
       gcloud_args = [
           'alpha',
           'code',
           'dev',
           '--service-name=' + service_name,
           '--image=fake-image-name',
-          '--dockerfile=' + dockerfile,
           '--stop-cluster',
-          '--source=%s' % os.path.dirname(dockerfile),
           '--minikube-profile=%s' % self.ClusterName(),
-          '--additional-skaffold-flags=%s' % additional_skaffold_flags,
+          '--skaffold-events-port=%s' % skaffold_event_port,
           '--account=%s' % auth.Account(),
-          '--local-port=%s' % str(local_port),
       ]
+      gcloud_args.append('--local-port=%s' % local_port)
       if additional_gcloud_flags:
         gcloud_args += additional_gcloud_flags
 
-      match_strings = ['Serving Flask app']
+      match_strings = ['Service available at http://localhost']
 
       with self.ExecuteLegacyScriptAsync(
           'gcloud', gcloud_args, match_strings=match_strings,
@@ -204,34 +155,51 @@ class DevOnMinikubeTest(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
             process_context.p, timeout=datetime.timedelta(minutes=2)):
           yield SkaffoldContext(skaffold_event_port)
 
-  @test_case.Filters.RunOnlyOnLinux
+  @test_case.Filters.RunOnlyOnLinux("other platforms don't support minikube")
   def testNamespace(self):
     dockerfile = os.path.relpath(
         self.Resource('tests', 'e2e', 'surface', 'code', 'testdata', 'hello',
                       'Dockerfile'), os.getcwd())
 
-    gcloud_flags = ['--namespace', 'my-namespace']
     local_port = self.GetPort()
-    with self._RunDevelopmentServer(
-        dockerfile,
-        'myservice',
-        local_port=local_port,
-        additional_gcloud_flags=gcloud_flags):
+    gcloud_flags = [
+        '--namespace=my-namespace',
+        '--dockerfile=%s' % dockerfile,
+        '--source=%s' % os.path.dirname(dockerfile),
+    ]
+    with self._RunDevelopmentServer('myservice', local_port, gcloud_flags):
       self.assertIsUp(local_port)
 
       kube_context_name = self.ClusterName()
       self.assertIn('service/myservice',
                     self._GetServices(kube_context_name, 'my-namespace'))
 
-  @test_case.Filters.RunOnlyOnLinux
+  @test_case.Filters.RunOnlyOnLinux("other platforms don't support minikube")
   def testDev(self):
     dockerfile = os.path.relpath(
         self.Resource('tests', 'e2e', 'surface', 'code', 'testdata', 'hello',
                       'Dockerfile'), os.getcwd())
+    local_port = self.GetPort()
+    gcloud_flags = [
+        '--dockerfile=%s' % dockerfile,
+        '--source=%s' % os.path.dirname(dockerfile),
+    ]
+    with self._RunDevelopmentServer('myservice', local_port, gcloud_flags):
+      self.assertIsUp(local_port)
+
+  @test_case.Filters.RunOnlyOnLinux("other platforms don't support minikube")
+  def testAppengineBuilder(self):
+    app_root = os.path.relpath(
+        os.path.dirname(
+            self.Resource('tests', 'e2e', 'surface', 'code', 'testdata',
+                          'hello_appengine', 'app.yaml')), os.getcwd())
 
     local_port = self.GetPort()
-    with self._RunDevelopmentServer(
-        dockerfile, 'myservice', local_port=local_port):
+    gcloud_flags = [
+        '--appengine',
+        '--source=%s' % app_root,
+    ]
+    with self._RunDevelopmentServer('myservice', local_port, gcloud_flags):
       self.assertIsUp(local_port)
 
 

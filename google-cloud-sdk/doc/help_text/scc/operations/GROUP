@@ -1,0 +1,29 @@
+NAME
+    gcloud scc operations - manage Cloud SCC operations
+
+SYNOPSIS
+    gcloud scc operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Cloud SCC operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Describe a Cloud SCC's long running scan operation.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha scc operations
+        $ gcloud beta scc operations
+

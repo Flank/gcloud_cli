@@ -1143,6 +1143,7 @@ class InstanceGroupManagersSetAutoscalingTest(test_base.BaseTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
+    self.custom_metric = []
 
   def SetUp(self):
     self.SelectApi(self.track.prefix if self.track.prefix else 'v1')
@@ -1245,17 +1246,6 @@ class InstanceGroupManagersSetAutoscalingTest(test_base.BaseTest):
         [(self.compute.autoscalers, 'Insert', request)],
     )
 
-
-class InstanceGroupManagersSetAutoscalingBetaTest(
-    InstanceGroupManagersSetAutoscalingTest):
-
-  INSTANCE_GROUP_MANAGERS = (
-      test_resources.MakeInstanceGroupManagers('beta'))
-  AUTOSCALERS = test_resources.MakeAutoscalers('beta')
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testUpdateAutoscaler_Mode(self):
     self.make_requests.side_effect = iter([
         [self.INSTANCE_GROUP_MANAGERS[0]],
@@ -1266,20 +1256,12 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 --mode only-up')
 
-    custom_metric_utilization = (
-        self.messages.AutoscalingPolicyCustomMetricUtilization(
-            metric='custom.cloudmonitoring.googleapis.com/seconds',
-            utilizationTarget=60.,
-            utilizationTargetType=(
-                self.messages.AutoscalingPolicyCustomMetricUtilization.
-                UtilizationTargetTypeValueValuesEnum.
-                DELTA_PER_MINUTE)))
     mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
     request = self.messages.ComputeAutoscalersUpdateRequest(
         autoscaler='autoscaler-1',
         autoscalerResource=self.messages.Autoscaler(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
-                customMetricUtilizations=[custom_metric_utilization],
+                customMetricUtilizations=self.custom_metric,
                 maxNumReplicas=10,
                 mode=mode_cls.ONLY_UP
             ),
@@ -1296,7 +1278,9 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
     )
 
   def testUpdateAutoscaler_PreservesMode(self):
-    autoscalers = test_resources.MakeAutoscalers(self.track.prefix)
+    autoscalers = test_resources.MakeAutoscalers(self.track.prefix
+                                                 if self.track.prefix
+                                                 else 'v1')
     autoscalers[0].autoscalingPolicy.mode = (
         autoscalers[0].autoscalingPolicy.ModeValueValuesEnum.ONLY_UP)
     self.make_requests.side_effect = iter([
@@ -1308,19 +1292,11 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1')
 
-    custom_metric_utilization = (
-        self.messages.AutoscalingPolicyCustomMetricUtilization(
-            metric='custom.cloudmonitoring.googleapis.com/seconds',
-            utilizationTarget=60.,
-            utilizationTargetType=(
-                self.messages.AutoscalingPolicyCustomMetricUtilization.
-                UtilizationTargetTypeValueValuesEnum.
-                DELTA_PER_MINUTE)))
     request = self.messages.ComputeAutoscalersUpdateRequest(
         autoscaler='autoscaler-1',
         autoscalerResource=self.messages.Autoscaler(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
-                customMetricUtilizations=[custom_metric_utilization],
+                customMetricUtilizations=self.custom_metric,
                 maxNumReplicas=10,
                 mode=self.messages.AutoscalingPolicy.ModeValueValuesEnum.ONLY_UP
             ),
@@ -1376,19 +1352,11 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
              '--max-num-replicas 10 --zone zone-1 '
              '--scale-in-control max-scaled-in-replicas=5,time-window=30')
 
-    custom_metric_utilization = (
-        self.messages.AutoscalingPolicyCustomMetricUtilization(
-            metric='custom.cloudmonitoring.googleapis.com/seconds',
-            utilizationTarget=60.,
-            utilizationTargetType=(
-                self.messages.AutoscalingPolicyCustomMetricUtilization.
-                UtilizationTargetTypeValueValuesEnum.DELTA_PER_MINUTE)))
-
     request = self.messages.ComputeAutoscalersUpdateRequest(
         autoscaler='autoscaler-1',
         autoscalerResource=self.messages.Autoscaler(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
-                customMetricUtilizations=[custom_metric_utilization],
+                customMetricUtilizations=self.custom_metric,
                 maxNumReplicas=10,
                 scaleInControl=scale_in),
             name='autoscaler-1',
@@ -1402,6 +1370,27 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
         self.autoscalers_list_request,
         [(self.compute.autoscalers, 'Update', request)],
     )
+
+
+class InstanceGroupManagersSetAutoscalingBetaTest(
+    InstanceGroupManagersSetAutoscalingTest):
+
+  INSTANCE_GROUP_MANAGERS = (
+      test_resources.MakeInstanceGroupManagers('beta'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('beta')
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    super(InstanceGroupManagersSetAutoscalingBetaTest, self).SetUp()
+    self.custom_metric = [(
+        self.messages.AutoscalingPolicyCustomMetricUtilization(
+            metric='custom.cloudmonitoring.googleapis.com/seconds',
+            utilizationTarget=60.,
+            utilizationTargetType=(
+                self.messages.AutoscalingPolicyCustomMetricUtilization.
+                UtilizationTargetTypeValueValuesEnum.DELTA_PER_MINUTE)))]
 
 
 class InstanceGroupManagersSetAutoscalingAlphaTest(
@@ -1433,17 +1422,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
                     predictiveMethod=self.messages
                     .AutoscalingPolicyCpuUtilization
                     .PredictiveMethodValueValuesEnum.STANDARD,),
-                customMetricUtilizations=[
-                    self.messages.AutoscalingPolicyCustomMetricUtilization(
-                        metric='custom.cloudmonitoring.googleapis.com/seconds',
-                        utilizationTarget=60.,
-                        utilizationTargetType=(
-                            self.messages
-                            .AutoscalingPolicyCustomMetricUtilization
-                            .UtilizationTargetTypeValueValuesEnum
-                            .DELTA_PER_MINUTE),
-                    ),
-                ],
+                customMetricUtilizations=self.custom_metric
             ),
             target=self.managed_instance_group_self_link,
         ),

@@ -66,7 +66,7 @@ gcloud_dir=$1
 if [[ $gcloud_dir != '' ]]; then
   completion_script="$gcloud_dir"/completion.$shell.inc
 else
-  echo "No argument specfied for directory of $shell completion file" >&2
+  echo "No argument specified for directory of $shell completion file" >&2
   exit 2
 fi
 unset IFS
@@ -75,16 +75,17 @@ if [[ ! -r $completion_script ]]; then
   exit 2
 fi
 
-if [[ $test_shell != "$SHELL" ]]; then
+current_shell=$(ps -o "command=" -p "$$" | cut -d " " -f 1)
+
+if [[ "$test_shell" != "$current_shell" ]]; then
     export SHELL=$test_shell
     $test_shell "$0" --shell="$test_shell" $gcloud_dir
     exitval=$?
     unset -f gsutil
     exit $exitval
 fi
-[[ $SHELL == *zsh ]] && emulate sh
 
-space=' '
+[[ $current_shell == *zsh ]] && emulate sh
 
 
 run_test() {
@@ -126,7 +127,7 @@ run_test() {
       actual=$*$tail
     fi
     if [[ $expected != "$actual" ]]; then
-      echo FAIL test $test_count "'$line' : '$expected' != '$actual'" >&2
+      echo FAIL test $test_count "'$COMP_LINE' : '$expected' != '$actual'" >&2
       return 1
     fi
   fi
@@ -169,12 +170,12 @@ function gsutil {
     echo '/tmp/foobar ' >&8
 }
 
-# name of the gcloud completion functon
+# name of the gcloud completion function
 fname=_python_argcomplete
 path=$HOME/.config/gcloud/completion_cache/$LOGNAME@google.com
-[[ $SHELL == *zsh ]] && emulate zsh
+[[ $current_shell == *zsh ]] && emulate zsh
 source "$completion_script"
-[[ $SHELL == *zsh ]] && emulate sh
+[[ $current_shell == *zsh ]] && emulate sh
 source $test_dir/testcases
 (( test_passed == test_count )) && exit 0
 exit 1

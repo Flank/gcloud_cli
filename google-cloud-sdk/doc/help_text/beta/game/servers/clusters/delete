@@ -66,8 +66,9 @@ EXAMPLES
             --dry-run
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud game servers clusters delete
         $ gcloud alpha game servers clusters delete
 

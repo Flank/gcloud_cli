@@ -1,0 +1,257 @@
+
+.TH "GCLOUD_COMPUTE_INSTANCE\-GROUPS_MANAGED_INSTANCE\-CONFIGS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute instance\-groups managed instance\-configs update \- update per\-instance config of a managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute instance\-groups managed instance\-configs update\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-instance\-update\-minimal\-action\fR=\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR;\ default="none"] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-remove\-stateful\-metadata\fR=\fIKEY\fR,[\fIKEY\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-no\-update\-instance\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute instance\-groups managed instance\-configs update\fR updates
+the per\-instance config of an instance controlled by a Compute Engine managed
+instance group. The command lets you change the list of instance\-specific
+stateful resources, that is, the list of resources that are preserved during
+instance restarts and recreations.
+
+Changes are applied immediately to the corresponding instances, by performing
+the necessary action (for example, REFRESH), unless overridden by providing the
+\f5\fI\-\-no\-update\-instance\fR\fR flag.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to update per\-instance config for.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+URI/name of an existing instance in the managed instance group.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\-update\-minimal\-action\fR=\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR; default="none"
+Perform at least this action on the instance while updating, if
+\f5\-\-update\-instance\fR is set to \f5true\fR.
+\fIINSTANCE_UPDATE_MINIMAL_ACTION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBnone\fR
+No action
+.TP 2m
+\fBrefresh\fR
+Apply properties that are possible to apply without stopping the instance
+.TP 2m
+\fBreplace\fR
+Delete the instance and create it again
+.TP 2m
+\fBrestart\fR
+Stop the instance and start it again
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]
+List all device names to remove from the instance's config.
+
+.TP 2m
+\fB\-\-remove\-stateful\-metadata\fR=\fIKEY\fR,[\fIKEY\fR,...]
+List all stateful metadata keys to remove from theinstance's config.
+
+.TP 2m
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]
+Disks considered stateful by the instance group. Managed instance groups
+preserve and reattach stateful disks on VM autohealing, update, and recreate
+events.
+
+You can also attach and preserve disks, not defined in the group's instance
+template, to a given instance.
+
+The same disk can be attached to more than one instance but only in read\-only
+mode.
+
+Use this argument multiple times to update multiple disks.
+
+If stateful disk with given \f5device\-name\fR exists in current instance
+config, its properties will be replaced by the newly provided ones. In other
+case new stateful disk definition will be added to the instance config.
+
+.RS 2m
+.TP 2m
+\fBdevice\-name\fR
+Name under which disk is or will be attached.
+
+.TP 2m
+\fBsource\fR
+Optional argument used to specify the URI of an existing persistent disk to
+attach under specified \f5device\-name\fR.
+
+.TP 2m
+\fBmode\fR
+Specifies the mode of the disk to attach. Supported options are \f5ro\fR for
+read\-only and \f5rw\fR for read\-write. If omitted when source is specified,
+\f5rw\fR is used as a default. \f5mode\fR can only be specified if \f5source\fR
+is given.
+
+.TP 2m
+\fBauto\-delete\fR
+(Optional) Specifies the auto deletion policy of the stateful disk. Supported
+values are \f5\fInever\fR\fR (never delete this disk) and
+\f5\fIon\-permanent\-instance\-deletion\fR\fR (delete the stateful disk when the
+given instance is permanently deleted from the instance group; for example when
+the group is resized down). If omitted, \f5\fInever\fR\fR is used as the
+default.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+Additional metadata to be made available to the guest operating system in
+addition to the metadata defined in the instance template.
+
+Stateful metadata may be used to define a key/value pair specific for the one
+given instance to differentiate it from the other instances in the managed
+instance group.
+
+Stateful metadata key/value pairs are preserved on instance recreation,
+autohealing, updates, and any other lifecycle transitions of the instance.
+
+Stateful metadata have priority over the metadata defined in the instance
+template. This means that stateful metadata that is defined for a key that
+already exists in the instance template overrides the instance template value.
+
+Each metadata entry is a key/value pair separated by an equals sign. Metadata
+keys must be unique and less than 128 bytes in length. Multiple entries can be
+passed to this flag, e.g., \f5\fI\-\-stateful\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+
+If stateful metadata with the given key exists in current instance config, its
+value will be overridden with the newly provided one. If the key does not exist
+in the current instance config, a new key/value pair will be added.
+
+.TP 2m
+\fB\-\-update\-instance\fR
+Apply the configuration changes immediately to the instance. If you disable this
+flag, the managed instance group will apply the config update when you next
+recreate or update the instance.
+
+Example: say you have an instance with a disk attached to it and you created a
+stateful config for the disk. If you decide to delete the stateful config for
+the disk and you provide this flag, the MIG immediately refreshes the instance
+and removes the stateful config for the disk. Similarly if you have attached a
+new disk or changed its definition, with this flag the MIG immediately refreshes
+the instance with the new config.
+
+Enabled by default, use \fB\-\-no\-update\-instance\fR to disable.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to update per\-instance config for. If not
+specified, you may be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to update per\-instance config for. If not
+specified, you may be prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To updates the stateful disk \f5\fImy\-disk\-3\fR\fR to the image provided by
+\f5\fIsource\fR\fR, and clear \f5\fImy\-disk1\fR\fR and \f5\fImy\-disk2\fR\fR as
+stateful disks, and to add stateful metadata \f5\fImy\-key\fR\fR:
+\f5\fImy\-value\fR\fR, on instance \f5\fImy\-instance\fR\fR, run:
+
+.RS 2m
+$ gcloud compute instance\-groups managed instance\-configs update \e
+    my\-group \-\-region=europe\-west4 \-\-instance=my\-instance \e
+    \-\-stateful\-disk=device\-name=my\-disk\-3,source=projects/\e
+my\-project/zones/us\-central1\-a/disks/my\-disk\-3 \e
+    \-\-remove\-stateful\-disks=my\-disk\-1,my\-disk\-2 \e
+    \-\-stateful\-metadata='my\-key=my\-value'
+.RE
+
+If \f5\fImy\-disk\-3\fR\fR did not exist previously in the per\-instance config,
+and if it does not exist in the group's instance template, then the command adds
+\f5\fImy\-disk\-3\fR\fR to \f5\fImy\-instance\fR\fR. The command also removes
+stateful configuration for \f5\fImy\-disk\-1\fR\fR and \f5\fImy\-disk\-2\fR\fR;
+if these disk are not defined in the group's instance template, then they are
+detached.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed instance\-configs \e
+    update
+$ gcloud beta compute instance\-groups managed instance\-configs update
+.RE
+

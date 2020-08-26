@@ -1,6 +1,5 @@
 NAME
-    gcloud compute operations describe - describe a Google Compute Engine
-        operation
+    gcloud compute operations describe - describe a Compute Engine operation
 
 SYNOPSIS
     gcloud compute operations describe NAME
@@ -8,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute operations describe displays all data associated with a
-    Google Compute Engine operation in a project.
+    Compute Engine operation in a project.
 
 POSITIONAL ARGUMENTS
      NAME

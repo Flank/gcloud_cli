@@ -45,6 +45,9 @@ COMMANDS
      remove-iam-policy-binding
         (ALPHA) Remove IAM policy binding for a root Certificate Authority.
 
+     restore
+        (ALPHA) Restore a root Certificate Authority.
+
      set-iam-policy
         (ALPHA) Set the IAM policy for a root Certificate Authority.
 
@@ -56,5 +59,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

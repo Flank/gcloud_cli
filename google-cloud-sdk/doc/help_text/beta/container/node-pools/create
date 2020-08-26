@@ -16,11 +16,12 @@ SYNOPSIS
         [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
-        [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
-        [--node-locations=ZONE,[ZONE,...]] [--node-taints=[NODE_TAINT,...]]
-        [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
-        [--preemptible] [--sandbox=[type=TYPE]]
-        [--shielded-integrity-monitoring] [--shielded-secure-boot]
+        [--min-cpu-platform=PLATFORM] [--node-group=NODE_GROUP]
+        [--node-labels=[NODE_LABEL,...]] [--node-locations=ZONE,[ZONE,...]]
+        [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
+        [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--sandbox=[type=TYPE]] [--shielded-integrity-monitoring]
+        [--shielded-secure-boot]
         [--system-config-from-file=SYSTEM_CONFIG_FROM_FILE]
         [--tags=TAG,[TAG,...]] [--workload-metadata=WORKLOAD_METADATA]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
@@ -126,9 +127,8 @@ FLAGS
         information.
 
      --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
-        The type of machine to use for nodes. Defaults to n1-standard-1. The
-        list of predefined machine types is available using the following
-        command:
+        The type of machine to use for nodes. Defaults to e2-medium. The list
+        of predefined machine types is available using the following command:
 
             $ gcloud compute machine-types list
 
@@ -208,6 +208,10 @@ FLAGS
         * startup-script
         * user-data
 
+    Google Kubernetes Engine sets the following keys by default:
+
+      o serial-port-logging-enable
+
     See also Compute Engine's documentation
     (https://cloud.google.com/compute/docs/storing-retrieving-metadata) on
     storing and retrieving instance metadata.
@@ -231,6 +235,24 @@ FLAGS
                 --format="value(availableCpuPlatforms)"
 
         CPU platform selection is available only in selected zones.
+
+     --node-group=NODE_GROUP
+        Assign instances of this pool to run on the specified Google Compute
+        Engine node group. This is useful for running workloads on sole tenant
+        nodes.
+
+        To see available sole tenant node-groups, run:
+
+            $ gcloud compute sole-tenancy node-groups list
+
+        To create a sole tenant node group, run:
+
+            $ gcloud compute sole-tenancy node-groups create [GROUP_NAME]     \
+                --zone [ZONE] --node-template [TEMPLATE_NAME] \
+                --target-size [TARGET_SIZE]
+
+        See https://cloud.google.com/compute/docs/nodes for more information on
+        sole tenancy and node groups.
 
      --node-labels=[NODE_LABEL,...]
         Applies the given kubernetes labels on all nodes in the new node pool.
@@ -391,8 +413,8 @@ FLAGS
             feature can only be enabled if Workload Identity is enabled at the
             cluster level.
          SECURE
-            [DPRECATED] Prevents pods not in hostNetwork from accessing certain
-            VM metadata, specifically kube-env, which contains Kubelet
+            [DEPRECATED] Prevents pods not in hostNetwork from accessing
+            certain VM metadata, specifically kube-env, which contains Kubelet
             credentials, and the instance identity token. This is a temporary
             security solution available while the bootstrapping process for
             cluster nodes is being redesigned with significant security

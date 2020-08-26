@@ -32,43 +32,43 @@ COMMANDS
     COMMAND is one of the following:
 
      add-bgp-peer
-        Add a BGP peer to a Google Compute Engine router.
+        Add a BGP peer to a Compute Engine router.
 
      add-interface
-        Add an interface to a Google Compute Engine router.
+        Add an interface to a Compute Engine router.
 
      create
-        Create a Google Compute Engine router.
+        Create a Compute Engine router.
 
      delete
-        Delete Google Compute Engine routers.
+        Delete Compute Engine routers.
 
      describe
-        Describe a Google Compute Engine router.
+        Describe a Compute Engine router.
 
      get-nat-mapping-info
         Display NAT Mapping information in a router.
 
      get-status
-        Get status of a Google Compute Engine router.
+        Get status of a Compute Engine router.
 
      list
         List Google Compute Engine routers.
 
      remove-bgp-peer
-        Remove a BGP peer from a Google Compute Engine router.
+        Remove a BGP peer from a Compute Engine router.
 
      remove-interface
-        Remove an interface from a Google Compute Engine router.
+        Remove an interface from a Compute Engine router.
 
      update
-        Update a Google Compute Engine router.
+        Update a Compute Engine router.
 
      update-bgp-peer
-        Update a BGP peer on a Google Compute Engine router.
+        Update a BGP peer on a Compute Engine router.
 
      update-interface
-        Update an interface on a Google Compute Engine router.
+        Update an interface on a Compute Engine router.
 
 NOTES
     These variants are also available:

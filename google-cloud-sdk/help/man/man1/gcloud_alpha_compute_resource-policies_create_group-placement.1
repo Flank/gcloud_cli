@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute resource\-policies create group\-placement \- create a Google Compute Engine group placement resource policy
+gcloud alpha compute resource\-policies create group\-placement \- create a Compute Engine group placement resource policy
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute resource\-policies create group\-placement\fR \fINAME\fR [\fB\-\-availability\-domain\-count\fR=\fIAVAILABILITY_DOMAIN_COUNT\fR] [\fB\-\-collocation\fR=\fICOLLOCATION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vm\-count\fR=\fIVM_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute resource\-policies create group\-placement\fR \fINAME\fR [\fB\-\-availability\-domain\-count\fR=\fIAVAILABILITY_DOMAIN_COUNT\fR] [\fB\-\-collocation\fR=\fICOLLOCATION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-scope\fR=\fISCOPE\fR] [\fB\-\-vm\-count\fR=\fIVM_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a Google Compute Engine Group Placement Resource Policy.
+\fB(ALPHA)\fR Create a Compute Engine Group Placement Resource Policy.
 
 
 
@@ -46,11 +46,14 @@ the same low\-latency network. \fICOLLOCATION\fR must be one of:
 
 .RS 2m
 .TP 2m
+\fBclustered\fR
+Lowest network latency between VMs placed on the same availability domain.
+.TP 2m
 \fBcollocated\fR
-Low network latency between VMs placed on the sameavailability domain.
+Low network latency between more VMs placed on the same availability domain.
 .TP 2m
 \fBunspecified\-collocation\fR
-Unspecified network latency between VMs placed on the sameavailability domain.
+Unspecified network latency between VMs placed on the same availability domain.
 This is the default behavior.
 .RE
 .sp
@@ -88,6 +91,24 @@ Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
+\fB\-\-scope\fR=\fISCOPE\fR
+Scope specifies the availability domain to which the VMs should be spread.
+\fISCOPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBhost\fR
+Specifies availability domain scope across hosts. Instances will be spread
+across different hosts.
+.TP 2m
+\fBunspecified\-scope\fR
+Instances will be spread across different instrastructure to not share power,
+host and networking.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-vm\-count\fR=\fIVM_COUNT\fR
 Number of instances targeted by the group placement policy.
 
@@ -108,8 +129,8 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a Google Compute Engine group placement policy with two availability
-domains, run:.RS 2m
+To create a Compute Engine group placement policy with two availability domains,
+run:.RS 2m
 $ gcloud alpha compute resource\-policies create group\-placement \e
     my\-resource\-policy \-\-region=REGION \-\-availability\-domain\-count=2
 
@@ -122,7 +143,7 @@ $ gcloud alpha compute resource\-policies create group\-placement \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud compute resource\-policies create group\-placement

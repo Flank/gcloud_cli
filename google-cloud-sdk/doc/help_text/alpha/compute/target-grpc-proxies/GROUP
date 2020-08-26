@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute target-grpc-proxies - manage Google Compute Engine
-        target gRPC proxy resources
+    gcloud alpha compute target-grpc-proxies - manage Compute Engine target
+        gRPC proxy resources
 
 SYNOPSIS
     gcloud alpha compute target-grpc-proxies COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -41,7 +41,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute target-grpc-proxies
         $ gcloud beta compute target-grpc-proxies

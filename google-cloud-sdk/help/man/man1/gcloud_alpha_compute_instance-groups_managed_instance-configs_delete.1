@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instance\-groups managed instance\-configs delete \- delete per instance configs from managed instance group
+gcloud alpha compute instance\-groups managed instance\-configs delete \- delete per\-instance configs from a managed instance group
 
 
 
@@ -18,7 +18,7 @@ gcloud alpha compute instance\-groups managed instance\-configs delete \- delete
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed instance\-configs
-delete\fR deletes one or more per instance configs from a Google Compute Engine
+delete\fR deletes one or more per\-instance configs from a Google Compute Engine
 managed instance group.
 
 Changes are applied immediately to the corresponding instances, by performing
@@ -148,9 +148,9 @@ $ gcloud alpha compute instance\-groups managed instance\-configs \e
     delete my\-group \-\-region=europe\-west4 \-\-instances=my\-instance
 .RE
 
-This will remove all metadata and detach all disks that were defined in
-per\-instance config (unless also defined in the instance template, in which
-case it remains attached).
+This removes all metadata and detaches all disks that were defined in the
+per\-instance config (except for disks that are also defined in the instance
+template, which remain attached).
 
 
 
@@ -159,9 +159,10 @@ case it remains attached).
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. These variants are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed instance\-configs delete
 $ gcloud beta compute instance\-groups managed instance\-configs delete
 .RE
 

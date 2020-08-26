@@ -10,8 +10,6 @@ summary:
     - message: You are about to revoke Certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert]
     - input: y
   - stderr: |
-      Publishing a new Certificate Revocation List.
-  - stderr: |
       Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
 - execute:
   - command: |
@@ -19,8 +17,6 @@ summary:
   - prompt:
     - message: You are about to revoke Certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert]
     - input: y
-  - stderr: |
-      Publishing a new Certificate Revocation List.
   - stderr: |
       Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
 - execute:
@@ -36,6 +32,23 @@ summary:
     - input: n
   - stderr: |
       Aborted by user.
+- set_property: privateca/location us-central1
+- execute:
+  - command: |
+      privateca certificates revoke --serial-number FFF --issuer my-ca
+  - prompt:
+    - message: You are about to revoke Certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert]
+    - input: y
+  - stderr: |
+      Revoked certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
+- execute:
+  - command: |
+      privateca certificates revoke --certificate my-cert --issuer my-ca
+  - prompt:
+    - message: You are about to revoke Certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert]
+    - input: y
+  - stderr: |
+      Revoked certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
 actions:
 - set_property:
     core/project: foo
@@ -63,30 +76,6 @@ actions:
                 revocationState: REVOCATION_REASON_UNSPECIFIED
                 revocationTime: '2020-04-17T15:14:00.105-07:00'
               name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-    - expect_stderr: |
-        Publishing a new Certificate Revocation List.
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          body:
-            pem_crl: |
-              -----BEGIN X509 CRL-----
-              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
-              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
-              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
-              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
-              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
-              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
-              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
-              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
-              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
-              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
-              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
-              -----END X509 CRL-----
     - expect_stderr: |
         Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
     - expect_exit:
@@ -129,30 +118,6 @@ actions:
                 revocationTime: '2020-04-17T15:14:00.105-07:00'
               name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
     - expect_stderr: |
-        Publishing a new Certificate Revocation List.
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          body:
-            pem_crl: |
-              -----BEGIN X509 CRL-----
-              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
-              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
-              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
-              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
-              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
-              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
-              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
-              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
-              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
-              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
-              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
-              -----END X509 CRL-----
-    - expect_stderr: |
         Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
     - expect_exit:
         code: 0
@@ -181,5 +146,72 @@ actions:
         user_input: n
     - expect_stderr: |
         Aborted by user.
+    - expect_exit:
+        code: 0
+- set_property:
+    privateca/location: us-central1
+- execute_command:
+    command: |
+      privateca certificates revoke --serial-number FFF --issuer my-ca
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates?alt=json&filter=certificate_description.subject_description.hex_serial_number%3AFFF
+          method: GET
+          body: null
+        return_response:
+          body:
+            certificates:
+            - name: projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert
+              certificate_description:
+                subject_description:
+                  hex_serial_number: FFF
+    - expect_prompt_continue:
+        message: You are about to revoke Certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert:revoke?alt=json
+          method: POST
+          body:
+            json: {}
+        return_response:
+          body:
+            name: projects/foo/locations/us-central1/operations/operation-123
+            done: true
+            response:
+              revocationDetails:
+                revocationState: REVOCATION_REASON_UNSPECIFIED
+                revocationTime: '2020-04-17T15:14:00.105-07:00'
+              name: projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert
+    - expect_stderr: |
+        Revoked certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      privateca certificates revoke --certificate my-cert --issuer my-ca
+    events:
+    - expect_prompt_continue:
+        message: You are about to revoke Certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert:revoke?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          body:
+            name: projects/foo/locations/us-central1/operations/operation-123
+            done: true
+            response:
+              revocationDetails:
+                revocationState: REVOCATION_REASON_UNSPECIFIED
+                revocationTime: '2020-04-17T15:14:00.105-07:00'
+              name: projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert
+    - expect_stderr: |
+        Revoked certificate [projects/foo/locations/us-central1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
     - expect_exit:
         code: 0

@@ -11,7 +11,7 @@ gcloud alpha builds list \- list builds
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds list\fR [\fB\-\-ongoing\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=50] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=20] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds list\fR [\fB\-\-ongoing\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=50] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=20] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,6 +27,12 @@ gcloud alpha builds list \- list builds
 .TP 2m
 \fB\-\-ongoing\fR
 Only list builds that are currently QUEUED or WORKING.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
 
 
 .RE
@@ -103,7 +109,7 @@ $ gcloud alpha builds list \-\-ongoing
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud builds list

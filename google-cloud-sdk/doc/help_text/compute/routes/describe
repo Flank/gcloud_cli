@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud compute routes describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routes describe displays all data associated with a Google
-    Compute Engine route in a project.
+    gcloud compute routes describe displays all data associated with a Compute
+    Engine route in a project.
 
 POSITIONAL ARGUMENTS
      NAME

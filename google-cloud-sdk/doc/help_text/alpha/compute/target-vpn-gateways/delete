@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute target-vpn-gateways delete deletes one or more
-    Google Compute Engine Cloud VPN Classic Target VPN Gateways.
+    Compute Engine Cloud VPN Classic Target VPN Gateways.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -47,7 +47,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute target-vpn-gateways delete
         $ gcloud beta compute target-vpn-gateways delete

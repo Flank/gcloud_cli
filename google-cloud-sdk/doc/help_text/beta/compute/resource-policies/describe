@@ -1,13 +1,13 @@
 NAME
-    gcloud beta compute resource-policies describe - describe a Google Compute
-        Engine resource policy
+    gcloud beta compute resource-policies describe - describe a Compute Engine
+        resource policy
 
 SYNOPSIS
     gcloud beta compute resource-policies describe NAME [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Describe a Google Compute Engine resource policy.
+    (BETA) Describe a Compute Engine resource policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -43,7 +43,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command shows the details of a Google Compute Engine resource
+    The following command shows the details of a Compute Engine resource
     policy.
 
         $ gcloud beta compute resource-policies describe \

@@ -6,7 +6,7 @@ SYNOPSIS
     gcloud alpha dataproc workflow-templates set-managed-cluster
         (TEMPLATE : --region=REGION) --autoscaling-policy=AUTOSCALING_POLICY
         [--no-address] [--bucket=BUCKET] [--cluster-name=CLUSTER_NAME]
-        [--enable-component-gateway]
+        [--dataproc-metastore=DATAPROC_METASTORE] [--enable-component-gateway]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
@@ -90,6 +90,11 @@ FLAGS
      --cluster-name=CLUSTER_NAME
         The name of the managed dataproc cluster. If unspecified, the workflow
         template ID will be used.
+
+     --dataproc-metastore=DATAPROC_METASTORE
+        Specify the name of a Dataproc Metastore service to be used as an
+        external metastore in the format:
+        "projects/{project-id}/locations/{region}/services/{service-name}".
 
      --enable-component-gateway
         Enable access to the web UIs of selected components on the cluster
@@ -566,7 +571,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud dataproc workflow-templates set-managed-cluster
         $ gcloud beta dataproc workflow-templates set-managed-cluster

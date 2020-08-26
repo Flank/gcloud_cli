@@ -142,7 +142,8 @@ DESCRIPTION
             value.
 
     For more about regular expression syntax, see:
-    https://docs.python.org/3/library/re.html#re-syntax
+    https://docs.python.org/3/library/re.html#re-syntax which follows the PCRE
+    dialect.
 
 EXAMPLES
     List all Google Compute Engine instance resources:

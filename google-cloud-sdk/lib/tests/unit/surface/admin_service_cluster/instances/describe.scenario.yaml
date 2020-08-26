@@ -1,0 +1,68 @@
+title: admin-service-cluster describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      admin-service-cluster instances describe foo --location=us-central1
+  - stdout: |
+      clusterCidrBlock: /20
+      gitBranch: master
+      gitEndpoint: git@git-server.git-server:/git-volume/repos/configs.git
+      gitPolicyDir: /
+      gitSecretKey: |
+        -----BEGIN OPENSSH PRIVATE KEY-----
+        xxxxxxxxxxxxxxxxxxxxxx
+        -----END OPENSSH PRIVATE KEY-----
+      gitSecretType: ssh
+      manBlock: 0.0.0.0/0
+      masterIpv4CidrBlock: 172.16.0.128/28
+      name: projects/fake-project/locations/us-central1/anthosApiEndpoints/foo
+      network: default
+      servicesCidrBlock: /27
+actions:
+- execute_command:
+    command: |
+      admin-service-cluster instances describe foo --location=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://krmapihosting.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/anthosApiEndpoints/foo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/anthosApiEndpoints/foo",
+              "manBlock": "0.0.0.0/0",
+              "network": "default",
+              "masterIpv4CidrBlock": "172.16.0.128/28",
+              "gitEndpoint": "git@git-server.git-server:/git-volume/repos/configs.git",
+              "gitBranch": "master",
+              "gitSecretType": "ssh",
+              "gitPolicyDir": "/",
+              "gitSecretKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nxxxxxxxxxxxxxxxxxxxxxx\n-----END OPENSSH PRIVATE KEY-----\n",
+              "clusterCidrBlock": "/20",
+              "servicesCidrBlock": "/27"
+            }
+    - expect_stdout: |
+        clusterCidrBlock: /20
+        gitBranch: master
+        gitEndpoint: git@git-server.git-server:/git-volume/repos/configs.git
+        gitPolicyDir: /
+        gitSecretKey: |
+          -----BEGIN OPENSSH PRIVATE KEY-----
+          xxxxxxxxxxxxxxxxxxxxxx
+          -----END OPENSSH PRIVATE KEY-----
+        gitSecretType: ssh
+        manBlock: 0.0.0.0/0
+        masterIpv4CidrBlock: 172.16.0.128/28
+        name: projects/fake-project/locations/us-central1/anthosApiEndpoints/foo
+        network: default
+        servicesCidrBlock: /27
+    - expect_exit:
+        code: 0

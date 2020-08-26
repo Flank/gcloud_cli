@@ -149,6 +149,101 @@ class DryRunUpdateTestAlpha(DryRunUpdateTestBeta):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def testUpdate_SetDirectionalPolicies(self):
+    self.SetUpForAPI(self.api_version)
+    perimeter_before = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        type_=self._GetPerimeterType('regular'),
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    ingress_policies = self._MakeIngressPolicies()
+    egress_policies = self._MakeEgressPolicies()
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        type_=self._GetPerimeterType('regular'),
+        ingress_policies=ingress_policies,
+        egress_policies=egress_policies,
+        dry_run=True,
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    perimeter_in_update_request = self.messages.ServicePerimeter(
+        spec=self.messages.ServicePerimeterConfig(
+            ingressPolicies=ingress_policies, egressPolicies=egress_policies),
+        useExplicitDryRunSpec=True)
+
+    self._ExpectPatch(
+        'accessPolicies/123/servicePerimeters/MY_PERIMETER',
+        perimeter_before,
+        perimeter_in_update_request,
+        expected_perimeter,
+        # Currently, dry run will update repeated fields no matter what.
+        'spec.accessLevels,spec.egressPolicies,spec.ingressPolicies,spec.resources,spec.restrictedServices,useExplicitDryRunSpec'
+    )
+
+    ingress_policies_spec_path = self.Touch(
+        self.temp_path, 'ingress.yaml', contents=self.INGRESS_POLICIES_SPECS)
+
+    egress_policies_spec_path = self.Touch(
+        self.temp_path, 'egress.yaml', contents=self.EGRESS_POLICIES_SPECS)
+
+    result = self.Run(
+        'access-context-manager perimeters dry-run update MY_PERIMETER '
+        '   --policy 123 '
+        '   --set-ingress-policies {} --set-egress-policies {}'.format(
+            ingress_policies_spec_path, egress_policies_spec_path))
+    self.assertEqual(result, expected_perimeter)
+
+  def testUpdate_clearDirectionalPolicies(self):
+    self.SetUpForAPI(self.api_version)
+
+    perimeter_before = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        type_=self._GetPerimeterType('regular'),
+        access_levels=None,
+        resources=None,
+        restricted_services=None,
+        ingress_policies=self._MakeIngressPolicies(),
+        egress_policies=self._MakeEgressPolicies())
+
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        type_='PERIMETER_TYPE_REGULAR',
+        ingress_policies=[],
+        egress_policies=[],
+        dry_run=True,
+        access_levels=None,
+        resources=None,
+        restricted_services=None)
+
+    perimeter_in_update_request = self.messages.ServicePerimeter(
+        spec=self.messages.ServicePerimeterConfig(
+            ingressPolicies=[], egressPolicies=[]),
+        useExplicitDryRunSpec=True)
+    self._ExpectPatch(
+        'accessPolicies/123/servicePerimeters/MY_PERIMETER',
+        perimeter_before,
+        perimeter_in_update_request,
+        expected_perimeter,
+        # Currently, dry run will update repeated fields no matter what.
+        'spec.accessLevels,spec.egressPolicies,spec.ingressPolicies,spec.resources,spec.restrictedServices,useExplicitDryRunSpec'
+    )
+
+    result = self.Run(
+        'access-context-manager perimeters dry-run update MY_PERIMETER '
+        '   --policy 123 --clear-ingress-policies --clear-egress-policies')
+
+    self.assertEqual(result, expected_perimeter)
+
 
 if __name__ == '__main__':
   test_case.main()

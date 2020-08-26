@@ -36,7 +36,7 @@ COMMANDS
         (ALPHA) Add or update project-wide metadata.
 
      describe
-        (ALPHA) Describe the Google Compute Engine project resource.
+        (ALPHA) Describe the Compute Engine project resource.
 
      remove-metadata
         (ALPHA) Remove project-wide metadata entries.
@@ -48,13 +48,13 @@ COMMANDS
         (ALPHA) Set usage reporting bucket for a project.
 
      update
-        (ALPHA) Update a Google Compute Engine project resource.
+        (ALPHA) Update a Compute Engine project resource.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute project-info
         $ gcloud beta compute project-info

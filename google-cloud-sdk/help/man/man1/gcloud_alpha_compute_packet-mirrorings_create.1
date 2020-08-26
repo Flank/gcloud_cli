@@ -11,13 +11,13 @@ gcloud alpha compute packet\-mirrorings create \- create a Google Compute Engine
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute packet\-mirrorings create\fR \fINAME\fR \fB\-\-collector\-ilb\fR=\fICOLLECTOR_ILB\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-enable\fR] [\fB\-\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]] [\fB\-\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]] [\fB\-\-mirrored\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-mirrored\-tags\fR=[\fITAG\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute packet\-mirrorings create\fR \fINAME\fR \fB\-\-collector\-ilb\fR=\fICOLLECTOR_ILB\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-enable\fR] [\fB\-\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-filter\-direction\fR=\fIDIRECTION\fR] [\fB\-\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]] [\fB\-\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]] [\fB\-\-mirrored\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-mirrored\-tags\fR=[\fITAG\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a Google Compute Engine packet mirroring policy.
+\fB(ALPHA)\fR Create a Compute Engine packet mirroring policy.
 
 
 
@@ -101,6 +101,14 @@ List of IP CIDR ranges that apply as filters on the source or destination IP in
 the IP header for packet mirroring traffic. All traffic between the VM and the
 IPs listed here will be mirrored using this configuration. This can be a Public
 IP as well. If unspecified, the config applies to all traffic.
+
+.TP 2m
+\fB\-\-filter\-direction\fR=\fIDIRECTION\fR
+DIRECTION must be one of INGRESS, EGRESS, BOTH. For INGRESS, only ingress
+traffic is mirrored. For EGRESS, only egress traffic is mirrored. For BOTH (or
+in case the filter\-direction option is not specified), both directions are
+mirrored. This is the default option. \fIDIRECTION\fR must be one of:
+\fBboth\fR, \fBegress\fR, \fBingress\fR.
 
 .TP 2m
 \fB\-\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]
@@ -201,7 +209,7 @@ $ gcloud alpha compute packet\-mirrorings create my\-pm
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud compute packet\-mirrorings create

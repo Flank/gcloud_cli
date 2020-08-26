@@ -96,8 +96,8 @@ class AuthorizedDomain(_messages.Message):
   Fields:
     id: Relative name of the domain authorized for use. Example:
       `example.com`.
-    name: Read only. Full path to the `AuthorizedDomain` resource in the API.
-      Example: `apps/myapp/authorizedDomains/example.com`.
+    name: Deprecated Read only. Full path to the `AuthorizedDomain` resource
+      in the API. Example: `projects/myproject/authorizedDomains/example.com`.
   """
 
   id = _messages.StringField(1)
@@ -576,7 +576,7 @@ class ExecAction(_messages.Message):
       status of 0 is treated as live/healthy and non-zero is unhealthy.
   """
 
-  command = _messages.StringField(1)
+  command = _messages.StringField(1, repeated=True)
 
 
 class Expr(_messages.Message):
@@ -1102,8 +1102,8 @@ class ObjectMeta(_messages.Message):
       Clients must treat these values as opaque and passed unmodified back to
       the server. They may only be valid for a particular resource or set of
       resources. Populated by the system. Read-only. Value must be treated as
-      opaque by clients and . More info:
-      https://git.k8s.io/community/contributors/devel/api-
+      opaque by clients. More info:
+      https://git.k8s.io/community/contributors/devel/sig-architecture/api-
       conventions.md#concurrency-control-and-consistency
     selfLink: (Optional) SelfLink is a URL representing this object. Populated
       by the system. Read-only. string selfLink = 4;
@@ -1731,7 +1731,8 @@ class RunNamespacesAuthorizeddomainsListRequest(_messages.Message):
   Fields:
     pageSize: Maximum results to return per page.
     pageToken: Continuation token for fetching the next page of results.
-    parent: Name of the parent Application resource. Example: `apps/myapp`.
+    parent: Name of the parent Project resource. Example:
+      `projects/myproject`.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -2050,13 +2051,29 @@ class RunNamespacesServicesReplaceServiceRequest(_messages.Message):
   service = _messages.MessageField('Service', 2)
 
 
+class RunProjectsAuthorizeddomainsListRequest(_messages.Message):
+  r"""A RunProjectsAuthorizeddomainsListRequest object.
+
+  Fields:
+    pageSize: Maximum results to return per page.
+    pageToken: Continuation token for fetching the next page of results.
+    parent: Name of the parent Project resource. Example:
+      `projects/myproject`.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
 class RunProjectsLocationsAuthorizeddomainsListRequest(_messages.Message):
   r"""A RunProjectsLocationsAuthorizeddomainsListRequest object.
 
   Fields:
     pageSize: Maximum results to return per page.
     pageToken: Continuation token for fetching the next page of results.
-    parent: Name of the parent Application resource. Example: `apps/myapp`.
+    parent: Name of the parent Project resource. Example:
+      `projects/myproject`.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)

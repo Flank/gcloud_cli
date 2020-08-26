@@ -41,6 +41,7 @@ from tests.lib.surface.container.hub.memberships import base
 TEST_CONTAINER_IMAGE = 'gcr.io/test/test'
 TEST_UID = 'fake-uid'
 TEST_ISSUER_URL = 'https://issuer.example.com/v1'
+TEST_ANOTHER_ISSUER_URL = 'https://issuer.com/v1'
 TEST_BUCKET_ISSUER_URL = 'https://storage.googleapis.com/gke-issuer-0'
 
 
@@ -182,7 +183,7 @@ class RegisterTest(base.MembershipsTestBase):
     mock_create_membership.return_value = membership
     return mock_create_membership
 
-  def MockOutCreateMembershipAlreadyExists(self):
+  def MockOutCreateMembershipAlreadyExists(self, issuer_url=None):
     name = 'projects/fake-project/locations/global/memberships/my-cluster'
     description = 'my-cluster'
     # Mock GetMembership for:
@@ -191,7 +192,8 @@ class RegisterTest(base.MembershipsTestBase):
     mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
     membership = self._MakeMembership(name=name,
                                       description=description,
-                                      external_id=TEST_UID)
+                                      external_id=TEST_UID,
+                                      issuer_url=issuer_url)
     membership_not_found_return_value = apitools_exceptions.HttpNotFoundError(
         None, None, None)
     membership_found_return_value = membership
@@ -1322,6 +1324,127 @@ class RegisterTestAlpha(RegisterTestBeta):
       ])
 
     mock_create_membership.assert_not_called()
+
+  def testUpdateEnableWIMembershipGKEPublicIssuer(self):
+    self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
+    self.mock_kubernetes_client.__enter__.return_value.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_kubernetes_client.__enter__.return_value.Apply.return_value = (
+        'some output', None)
+    self.mock_kubernetes_client.__enter__.return_value.Logs.return_value = (
+        'Fake log', None)
+    self.mock_kubernetes_client.__enter__.return_value.Delete.return_value = None
+    self.mock_kubernetes_client.__enter__.return_value.NamespacesWithLabelSelector.return_value = [
+        'gke-connect'
+    ]
+
+    # Setup Mock to create an existing membership.
+    self.MockOutCreateMembershipAlreadyExists()
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+    mock_delete_membership_resource = self.StartObjectPatch(
+        exclusivity_util, 'DeleteMembershipResources')
+    self.mockValidateExclusivitySucceed()
+    # Mock to GenerateConnectAgentManifest.
+    self.MockOutGenerateConnectAgentManifestSucceed()
+
+    self.StartObjectPatch(p_util, 'GetProjectNumber')
+    self.StartObjectPatch(kube_util, 'DeleteNamespace')
+    mock_update_membership = self.StartObjectPatch(api_util, 'UpdateMembership')
+
+    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
+        {'issuer': TEST_ISSUER_URL})
+
+    # The prompt is for membership deletion.
+    self.WriteInput('Y')
+    self.RunCommand([
+        'my-cluster',
+        '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context',
+        '--project=fake-project',
+        '--enable-workload-identity',
+        '--public-issuer-url=' + TEST_ISSUER_URL
+    ])
+    mock_delete_membership.assert_not_called()
+    mock_delete_membership_resource.assert_not_called()
+    mock_update_membership.assert_called_once()
+
+  def testUpdateDisableWIMembershipGKEPublicIssuer(self):
+    self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
+    self.mock_kubernetes_client.__enter__.return_value.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_kubernetes_client.__enter__.return_value.Apply.return_value = (
+        'some output', None)
+    self.mock_kubernetes_client.__enter__.return_value.Logs.return_value = (
+        'Fake log', None)
+    self.mock_kubernetes_client.__enter__.return_value.Delete.return_value = None
+    self.mock_kubernetes_client.__enter__.return_value.NamespacesWithLabelSelector.return_value = [
+        'gke-connect'
+    ]
+
+    # Setup Mock to create an existing membership.
+    self.MockOutCreateMembershipAlreadyExists(issuer_url=TEST_ISSUER_URL)
+
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+    mock_delete_membership_resource = self.StartObjectPatch(
+        exclusivity_util, 'DeleteMembershipResources')
+    self.mockValidateExclusivitySucceed()
+    # Mock to GenerateConnectAgentManifest.
+    self.MockOutGenerateConnectAgentManifestSucceed()
+
+    self.StartObjectPatch(p_util, 'GetProjectNumber')
+    self.StartObjectPatch(kube_util, 'DeleteNamespace')
+    mock_update_membership = self.StartObjectPatch(api_util, 'UpdateMembership')
+
+    # The prompt is for membership deletion.
+    self.WriteInput('Y')
+    self.RunCommand([
+        'my-cluster', '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context',
+        '--service-account-key-file=' + self.serviceaccount_file
+    ])
+
+    mock_delete_membership.assert_not_called()
+    mock_delete_membership_resource.assert_not_called()
+    mock_update_membership.assert_called_once()
+
+  def testUpdateModifyGKEPublicIssuerUnsuccessful(self):
+    self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
+    self.mock_kubernetes_client.__enter__.return_value.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_kubernetes_client.__enter__.return_value.Apply.return_value = (
+        'some output', None)
+    self.mock_kubernetes_client.__enter__.return_value.Logs.return_value = (
+        'Fake log', None)
+    self.mock_kubernetes_client.__enter__.return_value.Delete.return_value = None
+    self.mock_kubernetes_client.__enter__.return_value.NamespacesWithLabelSelector.return_value = [
+        'gke-connect'
+    ]
+
+    # Setup Mock to create an existing membership.
+    self.MockOutCreateMembershipAlreadyExists(issuer_url=TEST_ISSUER_URL)
+
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+    self.mockValidateExclusivitySucceed()
+    # Mock to GenerateConnectAgentManifest.
+    self.MockOutGenerateConnectAgentManifestSucceed()
+
+    self.StartObjectPatch(p_util, 'GetProjectNumber')
+    self.StartObjectPatch(kube_util, 'DeleteNamespace')
+
+    with self.assertRaises(Exception):
+      self.RunCommand([
+          'my-cluster',
+          '--kubeconfig=' + self.kubeconfig,
+          '--context=test-context',
+          '--project=fake-project',
+          '--enable-workload-identity',
+          '--public-issuer-url=' + TEST_ANOTHER_ISSUER_URL
+      ])
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: exceeding quota for peeringZonesPerTargetNetwork
-    bug: b/158315036
 title: Create and update a managed zone with a peering config
 release_tracks: [BETA]
 summary:

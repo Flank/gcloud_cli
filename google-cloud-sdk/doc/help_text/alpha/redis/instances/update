@@ -103,8 +103,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 API REFERENCE
-    This command uses the redis/v1 API. The full documentation for this API can
-    be found at: https://cloud.google.com/memorystore/docs/redis/
+    This command uses the redis/v1alpha1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/memorystore/docs/redis/
 
 EXAMPLES
     To update a Redis instance with the name my-redis-instance to have the
@@ -119,7 +119,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud redis instances update
         $ gcloud beta redis instances update

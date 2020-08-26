@@ -18,10 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import itertools
 
+from argcomplete.completers import FilesCompleter
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.spanner import ddl_parser
 from googlecloudsdk.command_lib.util import completers
+from googlecloudsdk.core.util import files
 
 
 class BackupCompleter(completers.ListCommandCompleter):
@@ -116,22 +118,37 @@ def Backup(positional=True, required=True, text='Cloud Spanner backup ID.'):
         '--backup', required=required, completer=BackupCompleter, help=text)
 
 
-def Ddl(required=False, help_text=''):
+def Ddl(help_text=''):
   return base.Argument(
       '--ddl',
       action='append',
-      required=required,
-      help=help_text)
+      required=False,
+      help=help_text,
+  )
 
 
-def SplitDdlIntoStatements(ddl):
-  """Break DDL statements on semicolon to support multiple in one argument."""
+def DdlFile(help_text):
+  return base.Argument(
+      '--ddl-file',
+      required=False,
+      completer=FilesCompleter,
+      help=help_text,
+  )
+
+
+def GetDDLsFromArgs(args):
+  if args.ddl_file:
+    return [files.ReadFileContents(args.ddl_file)]
+  return args.ddl or []
+
+
+def SplitDdlIntoStatements(args):
+  """Break DDL statements on semicolon while preserving string literals."""
+  ddls = GetDDLsFromArgs(args)
   statements = []
-  for x in ddl:
-    # Disallow empty strings to allow for trailing semi-colons.
-    statements.append(s for s in x.split(';') if s)
-
-  return list(itertools.chain.from_iterable(statements))
+  for x in ddls:
+    statements.extend(ddl_parser.PreprocessDDLWithParser(x))
+  return statements
 
 
 def Config(required=True):

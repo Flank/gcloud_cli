@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute routers nats list - lists the NATs on a Google Compute
-        Engine router
+    gcloud alpha compute routers nats list - lists the NATs on a Compute Engine
+        router
 
 SYNOPSIS
     gcloud alpha compute routers nats list --router=ROUTER [--region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute routers nats list is used to list the NATs on
-    a Google Compute Engine router.
+    a Compute Engine router.
 
 REQUIRED FLAGS
      --router=ROUTER
@@ -53,7 +53,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers nats list
         $ gcloud beta compute routers nats list

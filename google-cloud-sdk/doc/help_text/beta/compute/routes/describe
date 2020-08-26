@@ -6,7 +6,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routes describe displays all data associated
-    with a Google Compute Engine route in a project.
+    with a Compute Engine route in a project.
 
 POSITIONAL ARGUMENTS
      NAME

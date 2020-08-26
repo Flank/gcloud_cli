@@ -245,6 +245,29 @@ class DeleteTestGA(base.GATestBase, base.ClustersTestBase):
       self.AssertErrContains(line)
     self.AssertErrContains('delete failed')
 
+  def testDelete404ButZoneCorrect(self):
+    # Like the WRONG_ZONE_ERROR_MSG case of testDeleteErrors, but the zone
+    # is correct, so we shouldn't show that.
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y')
+
+    cluster = self._MakeCluster(name='gets_unrelated_404', zone=self.ZONE)
+    self.ExpectDeleteCluster(cluster.name, exception=base.NOT_FOUND_ERROR)
+    self.ExpectListClusters([cluster])
+
+    self.ClearOutput()
+    self.ClearErr()
+    with self.assertRaises(exceptions.HttpException):
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' delete {0}'.format(cluster.name))
+
+    self.assertIsNone(c_util.ClusterConfig.Load(
+        cluster.name, self.ZONE, self.PROJECT_ID))
+    self.AssertErrContains('ResponseError: code=404')
+
+    # Shouldn't have any of the WRONG_ZONE_ERROR_MSG.
+    self.AssertErrNotContains('Did you mean [gets_unrelated_404]')
+
   def testDeleteHttpError(self):
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput('y')

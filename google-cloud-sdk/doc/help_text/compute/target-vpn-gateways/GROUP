@@ -33,7 +33,7 @@ COMMANDS
         Delete Cloud VPN Classic Target VPN Gateways.
 
      describe
-        Describe a Google Compute Engine Cloud VPN Classic Target VPN Gateway.
+        Describe a Compute Engine Cloud VPN Classic Target VPN Gateway.
 
      list
         List Google Compute Engine Cloud VPN Classic Target VPN Gateways.

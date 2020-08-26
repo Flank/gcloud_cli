@@ -42,7 +42,7 @@ summary:
           identities:
           - name: user:user1@foo.com
 actions:
-- execute_command:
+- execute_command:   # with_fully_explored_result
     command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
       --expand-groups --expand-roles --execution-timeout "60s"
@@ -58,6 +58,7 @@ actions:
             status: '200'
           body: |
             {
+              "fullyExplored": true,
               "mainAnalysis": {
                 "fullyExplored": true,
                 "analysisQuery": {
@@ -159,7 +160,7 @@ actions:
         Your analysis request is fully explored. The ACLs matching your requests are listed per IAM policy binding, so there could be duplications.
     - expect_exit:
         code: 0
-- execute_command:
+- execute_command:  # with_not_fully_explored_result
     command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
       --expand-groups --expand-roles --execution-timeout "60s"
@@ -195,7 +196,7 @@ actions:
         Your analysis request is NOT fully explored. You can use the --show-response option to see the unexplored part. No matching ACL is found.
     - expect_exit:
         code: 0
-- execute_command:
+- execute_command:  # with_output_group_edges_but_no_show_response
     command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
       --expand-groups --expand-roles --output-group-edges
@@ -203,7 +204,7 @@ actions:
     - expect_exit:
         code: 1
         message: 'Invalid value for [--output-group-edges]: Must be set together with --show-response to take effect.'
-- execute_command:
+- execute_command:  # with_output_resource_edges_but_no_show_response
     command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
       --expand-groups --expand-roles --output-resource-edges
@@ -211,7 +212,7 @@ actions:
     - expect_exit:
         code: 1
         message: 'Invalid value for [--output-resource-edges]: Must be set together with --show-response to take effect.'
-- execute_command:
+- execute_command:  # with_output_resource_edges
     command: asset analyze-iam-policy --folder "f1" --identity "user:user1@foo.com"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
       --expand-resources --output-resource-edges --execution-timeout "60s" --show-response
@@ -299,5 +300,347 @@ actions:
             identityList:
               identities:
               - name: user:user1@foo.com
+    - expect_exit:
+        code: 0
+- execute_command:  # with_analyze-service-account-impersonation
+    command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --analyze-service-account-impersonation --execution-timeout "60s"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy
+          method: POST
+          headers: {}
+          body: analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.analyzeServiceAccountImpersonation=True
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "fullyExplored": true,
+              "mainAnalysis": {
+                "fullyExplored": true,
+                "analysisQuery": {
+                  "parent": "organizations/o1",
+                  "resourceSelector": {
+                    "fullResourceName": "//o1/f/p/r1"
+                  }
+                },
+                "analysisResults": [
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/cloudasset.r1",
+                      "members": [
+                        "serviceAccount:sa1@proj-xyz.iam.gserviceaccount.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//o1/f/p/r1"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/cloudasset.r1"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "serviceAccount:sa1@proj-xyz.iam.gserviceaccount.com"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/cloudasset.r2",
+                      "members": [
+                        "user:user1@example.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//o1/f/p/r1"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/cloudasset.r2"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "user:user1@example.com"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "serviceAccountImpersonationAnalysis": [
+              {
+                "fullyExplored": true,
+                "analysisQuery": {
+                  "parent": "organizations/o1",
+                  "resourceSelector": {
+                    "fullResourceName": "//iam.googleapis.com/projects/project-xyz/serviceAccounts/sa1@proj-xyz.iam.gserviceaccount.com"
+                  },
+                  "accessSelector": {
+                    "permissions": [
+                      "iam.serviceAccounts.actAs",
+                      "iam.serviceAccounts.getAccessToken"
+                    ]
+                  }
+                },
+                "analysisResults": [
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/impersonation",
+                      "members": [
+                        "serviceAccount:sa2@proj-xyz.iam.gserviceaccount.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//iam.googleapis.com/projects/project-xyz/serviceAccounts/sa1@proj-xyz.iam.gserviceaccount.com"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/impersonation",
+                            "permissions": "iam.serviceAccounts.actAs"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "serviceAccount:sa2@proj-xyz.iam.gserviceaccount.com"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/iam.serviceAccountUser",
+                      "members": [
+                        "user:user2@example.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//iam.googleapis.com/projects/project-xyz/serviceAccounts/sa1@proj-xyz.iam.gserviceaccount.com"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/iam.serviceAccountUser",
+                            "permissions": "iam.serviceAccounts.getAccessToken"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "user2@example.com"
+                        }
+                      ]
+                    }
+                  }
+                  ]
+              },
+              {
+                "fullyExplored": true,
+                "analysisQuery": {
+                  "parent": "organizations/o1",
+                  "resourceSelector": {
+                    "fullResourceName": "//iam.googleapis.com/projects/project-xyz/serviceAccounts/sa2@proj-xyz.iam.gserviceaccount.com"
+                  },
+                  "accessSelector": {
+                    "permissions": [
+                      "iam.serviceAccounts.actAs",
+                      "iam.serviceAccounts.getAccessToken"
+                    ]
+                  }
+                },
+                "analysisResults": [
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/iam.serviceAccountUser",
+                      "members": [
+                        "user:user2@example.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//iam.googleapis.com/projects/project-xyz/serviceAccounts/sa2@proj-xyz.iam.gserviceaccount.com"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/iam.serviceAccountUser",
+                            "permissions": "iam.serviceAccounts.getAccessToken"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "user2@example.com"
+                        }
+                      ]
+                    }
+                  }
+                  ]
+              }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        ACLs:
+        - accesses:
+          - role: roles/cloudasset.r1
+          identities:
+          - name: serviceAccount:sa1@proj-xyz.iam.gserviceaccount.com
+          resources:
+          - fullResourceName: //o1/f/p/r1
+        policy:
+          attachedResource: //cloudresourcemanager.googleapis.com/o1
+          binding:
+            members:
+            - serviceAccount:sa1@proj-xyz.iam.gserviceaccount.com
+            role: roles/cloudasset.r1
+        ---
+        ACLs:
+        - accesses:
+          - role: roles/cloudasset.r2
+          identities:
+          - name: user:user1@example.com
+          resources:
+          - fullResourceName: //o1/f/p/r1
+        policy:
+          attachedResource: //cloudresourcemanager.googleapis.com/o1
+          binding:
+            members:
+            - user:user1@example.com
+            role: roles/cloudasset.r2
+        ---
+        Service Account Impersonation Analysis Query:
+          accessSelector:
+            permissions:
+            - iam.serviceAccounts.actAs
+            - iam.serviceAccounts.getAccessToken
+          parent: organizations/o1
+          resourceSelector:
+            fullResourceName: //iam.googleapis.com/projects/project-xyz/serviceAccounts/sa1@proj-xyz.iam.gserviceaccount.com
+        ---
+        ACLs:
+        - accesses:
+          - permissions: iam.serviceAccounts.actAs
+            role: roles/impersonation
+          identities:
+          - name: serviceAccount:sa2@proj-xyz.iam.gserviceaccount.com
+          resources:
+          - fullResourceName: //iam.googleapis.com/projects/project-xyz/serviceAccounts/sa1@proj-xyz.iam.gserviceaccount.com
+        policy:
+          attachedResource: //cloudresourcemanager.googleapis.com/o1
+          binding:
+            members:
+            - serviceAccount:sa2@proj-xyz.iam.gserviceaccount.com
+            role: roles/impersonation
+        ---
+        ACLs:
+        - accesses:
+          - permissions: iam.serviceAccounts.getAccessToken
+            role: roles/iam.serviceAccountUser
+          identities:
+          - name: user2@example.com
+          resources:
+          - fullResourceName: //iam.googleapis.com/projects/project-xyz/serviceAccounts/sa1@proj-xyz.iam.gserviceaccount.com
+        policy:
+          attachedResource: //cloudresourcemanager.googleapis.com/o1
+          binding:
+            members:
+            - user:user2@example.com
+            role: roles/iam.serviceAccountUser
+        ---
+        Service Account Impersonation Analysis Query:
+          accessSelector:
+            permissions:
+            - iam.serviceAccounts.actAs
+            - iam.serviceAccounts.getAccessToken
+          parent: organizations/o1
+          resourceSelector:
+            fullResourceName: //iam.googleapis.com/projects/project-xyz/serviceAccounts/sa2@proj-xyz.iam.gserviceaccount.com
+        ---
+        ACLs:
+        - accesses:
+          - permissions: iam.serviceAccounts.getAccessToken
+            role: roles/iam.serviceAccountUser
+          identities:
+          - name: user2@example.com
+          resources:
+          - fullResourceName: //iam.googleapis.com/projects/project-xyz/serviceAccounts/sa2@proj-xyz.iam.gserviceaccount.com
+        policy:
+          attachedResource: //cloudresourcemanager.googleapis.com/o1
+          binding:
+            members:
+            - user:user2@example.com
+            role: roles/iam.serviceAccountUser
+    - expect_stderr: |
+        Your analysis request is fully explored. The ACLs matching your requests are listed per IAM policy binding, so there could be duplications.
+    - expect_exit:
+        code: 0
+- execute_command:  # with_project_parent
+    command: asset analyze-iam-policy --project "p1" --full-resource-name "//o1/f/p/r1"
+      --expand-groups --expand-roles --execution-timeout "60s"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/projects/p1:analyzeIamPolicy
+          method: POST
+          headers: {}
+          body: analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "mainAnalysis": {
+                "fullyExplored": false,
+                "analysisQuery": {
+                  "parent": "projects/p1",
+                  "resourceSelector": {
+                    "fullResourceName": "//o1/f/p/r1"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Your analysis request is NOT fully explored. You can use the --show-response option to see the unexplored part. No matching ACL is found.
     - expect_exit:
         code: 0

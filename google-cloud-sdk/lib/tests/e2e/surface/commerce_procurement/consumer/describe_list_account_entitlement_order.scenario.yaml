@@ -1,0 +1,290 @@
+title: commerce procurement consumer account entitlement and order e2e test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: commerce-procurement consumer accounts describe E-C6D5-AD22-8F52-B12D
+      --billing-account 00602F-437E9C-7FC710
+  - stdout: |-
+      .*name: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+      .*provider: providers/e2e-testing.*
+      $
+- execute:
+  - command: commerce-procurement consumer accounts list --billing-account 00602F-437E9C-7FC710
+  - stdout: |-
+      .*name: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+      .*provider: providers/e2e-testing.*
+      $
+- execute:
+  - command: commerce-procurement consumer entitlements describe c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+  - stdout: |-
+      .*name: projects/462803083913/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+      .*order: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+      $
+- execute:
+  - command: commerce-procurement consumer entitlements list
+  - stdout: |-
+      .*name: projects/462803083913/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+      .*order: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+      $
+- execute:
+  - command: commerce-procurement consumer orders describe d8813726-7ad7-4da4-90e1-9bc8e5842d6b
+      --billing-account 00602F-437E9C-7FC710
+  - stdout: |-
+      .*account: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+      .*id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+      .*name: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+      $
+- execute:
+  - command: commerce-procurement consumer orders list --billing-account 00602F-437E9C-7FC710
+  - stdout: |-
+      .*account: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+      .*id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+      .*name: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+      $
+actions:
+- execute_command:
+    command: commerce-procurement consumer accounts describe E-C6D5-AD22-8F52-B12D
+      --billing-account 00602F-437E9C-7FC710
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '343'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D
+            provider: providers/e2e-testing
+            approvals:
+            - name: signup
+              state: APPROVED
+              updateTime: '2020-07-24T16:28:47.230Z'
+            createTime: '2020-07-23T23:47:13.316Z'
+            updateTime: '2020-07-24T16:28:47.230Z'
+    - expect_stdout:
+        matches: |
+          .*name: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+          .*provider: providers/e2e-testing.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: commerce-procurement consumer accounts list --billing-account 00602F-437E9C-7FC710
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/00602F-437E9C-7FC710/accounts?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '419'
+            content-type: application/json; charset=UTF-8
+          body:
+            accounts:
+            - name: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D
+              provider: providers/e2e-testing
+              approvals:
+              - name: signup
+                state: APPROVED
+                updateTime: '2020-07-24T16:28:47.230Z'
+              createTime: '2020-07-23T23:47:13.316Z'
+              updateTime: '2020-07-24T16:28:47.230Z'
+    - expect_stdout:
+        matches: |
+          .*name: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+          .*provider: providers/e2e-testing.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: commerce-procurement consumer entitlements describe c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '601'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: projects/462803083913/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+            order: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b
+            productExternalName: srv-solution
+            flavorExternalName: Pro
+            state: ENTITLEMENT_STATE_ENABLED
+            createTime: '2020-07-23T23:47:13.316Z'
+            updateTime: '2020-07-24T16:28:52.536Z'
+            changeHistory:
+            - newFlavorExternalName: Pro
+              changeState: CHANGE_STATE_COMPLETED
+              changeEffectiveTime: '2020-07-24T16:28:52.536Z'
+            provider: providers/e2e-testing
+    - expect_stdout:
+        matches: |
+          .*name: projects/462803083913/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+          .*order: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: commerce-procurement consumer entitlements list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/entitlements?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '697'
+            content-type: application/json; charset=UTF-8
+          body:
+            entitlements:
+            - name: projects/462803083913/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+              order: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b
+              productExternalName: srv-solution
+              flavorExternalName: Pro
+              state: ENTITLEMENT_STATE_ENABLED
+              createTime: '2020-07-23T23:47:13.316Z'
+              updateTime: '2020-07-24T16:28:52.536Z'
+              changeHistory:
+              - newFlavorExternalName: Pro
+                changeState: CHANGE_STATE_COMPLETED
+                changeEffectiveTime: '2020-07-24T16:28:52.536Z'
+              provider: providers/e2e-testing
+    - expect_stdout:
+        matches: |
+          .*name: projects/462803083913/entitlements/c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+          .*order: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: commerce-procurement consumer orders describe d8813726-7ad7-4da4-90e1-9bc8e5842d6b
+      --billing-account 00602F-437E9C-7FC710
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '1625'
+            content-type: application/json; charset=UTF-8
+          body:
+            name: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b
+            provider: providers/e2e-testing
+            account: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D
+            orderState: ORDER_STATE_ACTIVE
+            lineItems:
+            - lineItemId: b37ff52e-db1d-4729-907a-65ea8b71459f
+              lineItemInfo:
+                productExternalName: srv-solution
+                flavorExternalName: Pro
+                subscription:
+                  endTime: '2020-08-01T07:00:00Z'
+                  autoRenewalEnabled: true
+                entitlementInfo:
+                  id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+              changeHistory:
+              - changeId: d4dd5b58-96f8-46ad-9148-f64ea1314c7e
+                changeType: LINE_ITEM_CHANGE_TYPE_CREATE
+                newLineItemInfo:
+                  productExternalName: srv-solution
+                  flavorExternalName: Pro
+                  subscription:
+                    endTime: '2020-08-01T07:00:00Z'
+                    autoRenewalEnabled: true
+                  entitlementInfo:
+                    id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+                changeState: LINE_ITEM_CHANGE_STATE_COMPLETED
+                changeEffectiveTime: '2020-07-24T16:28:52.536Z'
+                createTime: '2020-07-23T23:47:14.069Z'
+                updateTime: '2020-07-24T16:28:52.536Z'
+            createTime: '2020-07-23T23:47:13.316Z'
+            updateTime: '2020-07-24T16:28:52.536Z'
+            displayName: do-not-delete-cp-order
+            etag: W/"8335229616422086407"
+    - expect_stdout:
+        matches: |
+          .*account: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+          .*id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+          .*name: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: commerce-procurement consumer orders list --billing-account 00602F-437E9C-7FC710
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudcommerceconsumerprocurement.googleapis.com/v1alpha1/billingAccounts/00602F-437E9C-7FC710/orders?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            cache-control: private
+            content-length: '1835'
+            content-type: application/json; charset=UTF-8
+          body:
+            orders:
+            - name: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b
+              provider: providers/e2e-testing
+              account: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D
+              orderState: ORDER_STATE_ACTIVE
+              lineItems:
+              - lineItemId: b37ff52e-db1d-4729-907a-65ea8b71459f
+                lineItemInfo:
+                  productExternalName: srv-solution
+                  flavorExternalName: Pro
+                  subscription:
+                    endTime: '2020-08-01T07:00:00Z'
+                    autoRenewalEnabled: true
+                  entitlementInfo:
+                    id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+                changeHistory:
+                - changeId: d4dd5b58-96f8-46ad-9148-f64ea1314c7e
+                  changeType: LINE_ITEM_CHANGE_TYPE_CREATE
+                  newLineItemInfo:
+                    productExternalName: srv-solution
+                    flavorExternalName: Pro
+                    subscription:
+                      endTime: '2020-08-01T07:00:00Z'
+                      autoRenewalEnabled: true
+                    entitlementInfo:
+                      id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192
+                  changeState: LINE_ITEM_CHANGE_STATE_COMPLETED
+                  changeEffectiveTime: '2020-07-24T16:28:52.536Z'
+                  createTime: '2020-07-23T23:47:14.069Z'
+                  updateTime: '2020-07-24T16:28:52.536Z'
+              createTime: '2020-07-23T23:47:13.316Z'
+              updateTime: '2020-07-24T16:28:52.536Z'
+              displayName: do-not-delete-cp-order
+              etag: W/"8335229616422086407"
+    - expect_stdout:
+        matches: |
+          .*account: billingAccounts/00602F-437E9C-7FC710/accounts/E-C6D5-AD22-8F52-B12D.*
+          .*id: c492cf4a-ab5d-4ef4-a370-ac25fd9ad192.*
+          .*name: billingAccounts/00602F-437E9C-7FC710/orders/d8813726-7ad7-4da4-90e1-9bc8e5842d6b.*
+    - expect_exit:
+        code: 0

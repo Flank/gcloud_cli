@@ -30,7 +30,7 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
   def SetUp(self):
     self.prefix = 'mig-instance-configs-zonal'
     self.scope = e2e_test_base.ZONAL
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ListInstanceConfigs(self, group_name):
     self.Run("""\

@@ -353,6 +353,14 @@ CLOUD_SQL_MACHINE_TYPE = base.Argument(
     Cloud SQL machine type used by the Airflow database.
     """)
 
+WEB_SERVER_MACHINE_TYPE = base.Argument(
+    '--web-server-machine-type',
+    type=str,
+    help="""\
+    machine type used by the Airflow web server. The list of available machine
+    types is available here: https://cloud.google.com/composer/pricing.
+    """)
+
 
 def _IsValidIpv4CidrBlock(ipv4_cidr_block):
   """Validates that IPV4 CIDR block arg has valid format.
@@ -522,6 +530,27 @@ CLOUD_SQL_IPV4_CIDR_FLAG = base.Argument(
     Cannot be specified unless '--enable-private-environment' is also
     specified.
     """)
+
+
+def GetAndValidateKmsEncryptionKey(args):
+  """Validates the KMS key name.
+
+  Args:
+    args: list of all the arguments
+
+  Returns:
+    string, a fully qualified KMS resource name
+
+  Raises:
+    exceptions.InvalidArgumentException: key name not fully specified
+  """
+  kms_ref = args.CONCEPTS.kms_key.Parse()
+  if kms_ref:
+    return kms_ref.RelativeName()
+  for keyword in ['kms-key', 'kms-keyring', 'kms-location', 'kms-project']:
+    if getattr(args, keyword.replace('-', '_'), None):
+      raise exceptions.InvalidArgumentException(
+          '--kms-key', 'Encryption key not fully specified.')
 
 
 def AddImportSourceFlag(parser, folder):

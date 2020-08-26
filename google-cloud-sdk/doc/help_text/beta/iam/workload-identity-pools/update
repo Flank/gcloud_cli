@@ -1,0 +1,70 @@
+NAME
+    gcloud beta iam workload-identity-pools update - update a new
+        WorkloadIdentityPool
+
+SYNOPSIS
+    gcloud beta iam workload-identity-pools update
+        (WORKLOAD_IDENTITY_POOL : --location=LOCATION)
+        [--description=DESCRIPTION] [--disabled] [--display-name=DISPLAY_NAME]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update a new WorkloadIdentityPool.
+
+POSITIONAL ARGUMENTS
+     Workload identity pool resource - The WorkloadIdentityPool to update. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [workload_identity_pool] on the command line with a fully
+     specified name; set the property [core/project]; provide the argument
+     [--project] on the command line. This must be specified.
+
+       WORKLOAD_IDENTITY_POOL
+          ID of the workload_identity_pool or fully qualified identifier for
+          the workload_identity_pool. This positional must be specified if any
+          of the other arguments in this group are specified.
+
+       --location=LOCATION
+          The location name.
+
+FLAGS
+     --description=DESCRIPTION
+        A description of the pool. Cannot exceed 256 characters.
+
+     --disabled
+        Whether the pool is disabled. You cannot use a disabled pool to
+        exchange tokens, or use existing tokens to access resources. If the
+        pool is re-enabled, existing tokens grant access again.
+
+     --display-name=DISPLAY_NAME
+        A display name for the pool. Cannot exceed 32 characters.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the iam/v1beta API. The full documentation for this API
+    can be found at: https://cloud.google.com/iam/
+
+EXAMPLES
+    The following command updates the WorkloadIdentityPool with the ID
+    'my-workload-identity-pool':
+
+        $ gcloud beta iam workload-identity-pools update \
+            my-workload-identity-pool \
+            --location='global'
+            --display-name='My workload pool' \
+            --description='My workload pool description' \
+            --disabled
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

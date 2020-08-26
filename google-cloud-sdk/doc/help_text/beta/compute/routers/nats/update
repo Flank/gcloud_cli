@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute routers nats update - update a NAT on a Google Compute
-        Engine router
+    gcloud beta compute routers nats update - update a NAT on a Compute Engine
+        router
 
 SYNOPSIS
     gcloud beta compute routers nats update NAME --router=ROUTER [--async]
@@ -22,7 +22,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers nats update is used to update a NAT in a
-    Google Compute Engine router.
+    Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

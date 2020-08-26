@@ -1,0 +1,172 @@
+
+.TH "GCLOUD_ALPHA_HEALTHCARE_HL7V2\-STORES_EXPORT_GCS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha healthcare hl7v2\-stores export gcs \- export Cloud Healthcare API HL7v2 messages to Google Cloud Storage
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha healthcare hl7v2\-stores export gcs\fR (\fIHL7V2_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-gcs\-uri\fR=\fIGCS_URI\fR [\fB\-\-async\fR] [\fB\-\-end\-time\fR=\fIEND_TIME\fR] [\fB\-\-message\-view\fR=\fIMESSAGE_VIEW\fR] [\fB\-\-start\-time\fR=\fISTART_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Export Cloud Healthcare API HL7v2 messages to Google Cloud
+Storage.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Hl7v2Store resource \- Cloud Healthcare API HL7v2 store to export messages from.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[hl7v2_store] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIHL7V2_STORE\fR
+ID of the hl7v2Store or fully qualified identifier for the hl7v2Store. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+Cloud Healthcare dataset.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-gcs\-uri\fR=\fIGCS_URI\fR
+The Cloud Storage destination location. Specify a path to a Cloud Storage bucket
+or folder rather than a concrete object. The exported messages are ordered by
+the message send_time (MSH.7) in ascending order. The server will create one or
+more objects. Each object contains newline delimited JSON, and each line is an
+HL7v2 message.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-end\-time\fR=\fIEND_TIME\fR
+The end of the range in message send_time (MSH.7) to process. If not specified,
+the time when the export is scheduled is used.
+
+.TP 2m
+\fB\-\-message\-view\fR=\fIMESSAGE_VIEW\fR
+Specifies the parts of the Message resource to include in the export. The
+default is FULL. \fIMESSAGE_VIEW\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBbasic\fR
+Exported resources include only the name field.
+
+.TP 2m
+\fBfull\fR
+Exported resources include all the message fields.
+
+.TP 2m
+\fBparsed\-only\fR
+Exported resources include all the message fields except data and
+schematizedData fields.
+
+.TP 2m
+\fBraw\-only\fR
+Exported resources include all the message fields except parsedData and
+schematizedData fields.
+
+.TP 2m
+\fBschematized\-only\fR
+Exported resources include all the message fields except data and parsedData
+fields.
+
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-start\-time\fR=\fISTART_TIME\fR
+The start of the range in message send_time (MSH.7) to process. If not
+specified, the UNIX epoch (1970\-01\-01T00:00:00Z) is used.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBhealthcare/v1alpha2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/healthcare
+
+
+
+.SH "EXAMPLES"
+
+To export the hl7v2\-store 'test\-hl7v2\-store' to the existing bucket
+\'testGcsBucket' in the folder 'someFolder', run:
+
+.RS 2m
+$ gcloud alpha healthcare hl7v2\-stores export gcs test\-hl7v2\-store \e
+    \-\-gcs\-uri=gs://testGcsBucket/someFolder \-\-dataset=test\-dataset
+.RE
+
+To perform the same export, but exporting messages with the message view of
+\'RAW_ONLY', run:
+
+.RS 2m
+$ gcloud alpha healthcare hl7v2\-stores export gcs test\-hl7v2\-store \e
+    \-\-gcs\-uri=gs://testGcsBucket/someFolder \-\-dataset=test\-dataset \e
+    \-\-message\-view=RAW_ONLY
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist.
+

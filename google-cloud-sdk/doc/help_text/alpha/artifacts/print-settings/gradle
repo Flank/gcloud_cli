@@ -3,7 +3,7 @@ NAME
         repository to the Gradle build.gradle file
 
 SYNOPSIS
-    gcloud alpha artifacts print-settings gradle
+    gcloud alpha artifacts print-settings gradle [--json-key=JSON_KEY]
         [--repository=REPOSITORY : --location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -11,6 +11,11 @@ DESCRIPTION
     file.
 
 FLAGS
+     --json-key=JSON_KEY
+        Path to service account JSON key. If not specified, current active
+        service account credentials or a placeholder for gcloud credentials is
+        used.
+
      Repository resource - The Artifact Registry repository. If not specified,
      the current artifacts/repository is used. The arguments in this group can
      be used to specify the attributes of this resource. (NOTE) Some attributes
@@ -46,11 +51,16 @@ EXAMPLES
         $ gcloud alpha artifacts print-settings gradle \
             --repository="my-repository"
 
+    To print a snippet using service account key:
+
+        $ gcloud alpha artifacts print-settings gradle \
+            --json-key=path/to/key.json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta artifacts print-settings gradle
 

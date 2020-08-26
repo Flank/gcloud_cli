@@ -1,13 +1,13 @@
 NAME
-    gcloud compute resource-policies delete - delete a Google Compute Engine
-        resource policy
+    gcloud compute resource-policies delete - delete a Compute Engine resource
+        policy
 
 SYNOPSIS
     gcloud compute resource-policies delete NAME [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Delete a Google Compute Engine resource policy.
+    Delete a Compute Engine resource policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -43,7 +43,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command deletes a Google Compute Engine resource policy.
+    The following command deletes a Compute Engine resource policy.
 
         $ gcloud compute resource-policies delete my-resource-policy \
             --region=REGION

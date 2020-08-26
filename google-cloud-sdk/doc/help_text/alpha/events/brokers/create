@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha events brokers create BROKER [--namespace=NAMESPACE]
-        [--platform=PLATFORM] [--service-account=SERVICE_ACCOUNT]
+        [--platform=PLATFORM]
         [--region=REGION
           | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
           | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
@@ -42,11 +42,6 @@ FLAGS
             Use a Knative-compatible kubernetes cluster. Use with the
             --kubeconfig and --context flags to specify a kubeconfig file and
             the context for connecting.
-
-     --service-account=SERVICE_ACCOUNT
-        Email address of an existing IAM service account which represents the
-        identity of the internal events operator. If no service account is
-        provided, a default service account (cloud-run-events) will be created.
 
      Arguments to locate resources, depending on the platform used. At most one
      of these may be specified:
@@ -109,5 +104,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

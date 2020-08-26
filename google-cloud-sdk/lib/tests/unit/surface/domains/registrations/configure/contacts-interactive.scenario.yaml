@@ -49,6 +49,11 @@ summary:
     - message: 'Phone number:  '
     - input: '+1.1234567890'
   - stderr: |
+      Enter fax number with country code, e.g. "+1.8005550123".
+  - prompt:
+    - message: 'Fax number (if applicable):  '
+    - input: '+1.1234567890'
+  - stderr: |
       Enter two-letter country code, e.g. "US" or "PL".
   - prompt:
     - message: 'Country code:  '
@@ -190,6 +195,11 @@ actions:
         message: 'Phone number:  '
         user_input: '+1.1234567890'
     - expect_stderr: |
+        Enter fax number with country code, e.g. "+1.8005550123".
+    - expect_prompt_response:
+        message: 'Fax number (if applicable):  '
+        user_input: '+1.1234567890'
+    - expect_stderr: |
         Enter two-letter country code, e.g. "US" or "PL".
     - expect_prompt_response:
         message: 'Country code:  '
@@ -223,6 +233,7 @@ actions:
                 adminContact:
                   email: user@example.com
                   phoneNumber: '+1.1234567890'
+                  faxNumber: '+1.1234567890'
                   postalAddress:
                     addressLines:
                     - WFC

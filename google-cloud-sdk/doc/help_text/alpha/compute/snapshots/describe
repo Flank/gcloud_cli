@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute snapshots describe - describe a Google Compute Engine
+    gcloud alpha compute snapshots describe - describe a Compute Engine
         snapshot
 
 SYNOPSIS
@@ -54,7 +54,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute snapshots describe
         $ gcloud beta compute snapshots describe

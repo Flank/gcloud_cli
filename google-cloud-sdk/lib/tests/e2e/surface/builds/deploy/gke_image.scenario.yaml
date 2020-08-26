@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: Likely GCR related
+    bug: b/163030401
 title: Execute a deployment to a GKE cluster
 release_tracks: [ALPHA]
 summary:
@@ -63,12 +67,7 @@ summary:
       Deleted bucket \[gs://$$bucket$$\].
       $
 - execute:
-  - command: container clusters delete $$cluster$$ --zone=$$location$$ --async
-  - prompt:
-    - message: |
-        The following clusters will be deleted.
-         - [$$cluster$$] in [$$location$$]
-    - input: y
+  - command: container clusters delete $$cluster$$ --zone=$$location$$ --async -q
 actions:
 - define_reference:
     reference: project
@@ -467,14 +466,9 @@ actions:
         code: 0
 
 - execute_command:
-    command: container clusters delete $$cluster$$ --zone=$$location$$ --async
+    command: container clusters delete $$cluster$$ --zone=$$location$$ --async -q
     validation_only: true
     cleanup_for: cluster
     events:
-    - expect_prompt_continue:
-        message: |
-          The following clusters will be deleted.
-           - [$$cluster$$] in [$$location$$]
-        user_input: y
     - expect_exit:
         code: 0

@@ -1,6 +1,6 @@
 NAME
     gcloud alpha commerce-procurement consumer free-trials create - creates the
-        free trial resource from Create API
+        Free Trial resource from the Create API
 
 SYNOPSIS
     gcloud alpha commerce-procurement consumer free-trials create
@@ -8,14 +8,14 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Creates the free trial resource from Create API.
+    (ALPHA) Creates the Free Trial resource from the Create API.
 
 REQUIRED FLAGS
      --product-external-name=PRODUCT_EXTERNAL_NAME
-        Product external name to create free trial against.
+        Product external name to offer the free trial of.
 
      --provider-id=PROVIDER_ID
-        Id of the provider under which the product belongs.
+        ID of the provider to which the product belongs.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -30,5 +30,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

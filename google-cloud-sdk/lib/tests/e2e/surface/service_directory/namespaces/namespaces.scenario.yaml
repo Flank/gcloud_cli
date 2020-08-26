@@ -34,8 +34,6 @@ actions:
     command: |
       service-directory namespaces create $$my-namespace$$ --location us-east1
     events:
-    - expect_stderr: |
-        Created namespace [$$my-namespace$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces?alt=json&namespaceId=$$my-namespace$$
@@ -50,6 +48,8 @@ actions:
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$
+    - expect_stderr: |
+        Created namespace [$$my-namespace$$].
     - expect_exit:
         code: 0
 
@@ -105,8 +105,6 @@ actions:
       service-directory namespaces delete $$my-namespace$$ --location us-east1
     cleanup_for: my-namespace
     events:
-    - expect_stderr: |
-        Deleted namespace [$$my-namespace$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$?alt=json
@@ -121,5 +119,7 @@ actions:
             status: '200'
           body: |
             {}
+    - expect_stderr: |
+        Deleted namespace [$$my-namespace$$].
     - expect_exit:
         code: 0

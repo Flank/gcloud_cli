@@ -59,9 +59,7 @@ summary:
 actions:
 - define_reference:
     reference: api-version
-    track_values:
-      BETA: v1beta1
-      ALPHA: v1beta1
+    value: v1beta1
 
 - generate_resource_id:
     reference: my-namespace
@@ -99,8 +97,6 @@ actions:
     command: |
       service-directory endpoints create $$my-endpoint$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$ --address 10.0.0.1 --port 8888
     events:
-    - expect_stderr: |
-        Created endpoint [$$my-endpoint$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints?alt=json&endpointId=$$my-endpoint$$
@@ -120,6 +116,8 @@ actions:
             name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint$$
             address: 10.0.0.1
             port: 8888
+    - expect_stderr: |
+        Created endpoint [$$my-endpoint$$].
     - expect_exit:
         code: 0
 
@@ -183,8 +181,6 @@ actions:
     command: |
       service-directory endpoints update $$my-endpoint$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$ --address 1.2.3.4 --port 5 --format 'yaml'
     events:
-    - expect_stderr: |
-        Updated endpoint [$$my-endpoint$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint$$?alt=json&updateMask=address%2Cport
@@ -204,6 +200,8 @@ actions:
             name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint$$
             address: 1.2.3.4
             port: 5
+    - expect_stderr: |
+        Updated endpoint [$$my-endpoint$$].
     - expect_stdout: |
         address: 1.2.3.4
         name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint$$
@@ -216,8 +214,6 @@ actions:
       service-directory endpoints delete $$my-endpoint$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$
     cleanup_for: my-endpoint
     events:
-    - expect_stderr: |
-        Deleted endpoint [$$my-endpoint$$].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint$$?alt=json
@@ -232,6 +228,8 @@ actions:
             status: '200'
           body: |
             {}
+    - expect_stderr: |
+        Deleted endpoint [$$my-endpoint$$].
     - expect_exit:
         code: 0
 

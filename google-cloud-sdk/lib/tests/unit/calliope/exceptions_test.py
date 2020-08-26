@@ -85,7 +85,13 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     self.assertIsInstance(new_err, exceptions.HttpException)
     self.assertTrue(print_exc)
 
+  def testConvertKnownErrorNetworkIssue(self):
     err = socket.error(errno.ECONNREFUSED, 'error')
+    new_err, print_exc = exceptions.ConvertKnownError(err)
+    self.assertIsInstance(new_err, core_exceptions.NetworkIssueError)
+    self.assertTrue(print_exc)
+
+    err = socket.timeout('timed out')
     new_err, print_exc = exceptions.ConvertKnownError(err)
     self.assertIsInstance(new_err, core_exceptions.NetworkIssueError)
     self.assertTrue(print_exc)

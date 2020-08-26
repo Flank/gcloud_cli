@@ -11,7 +11,7 @@ gcloud beta artifacts print\-settings mvn \- print a snippet to add a Maven repo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta artifacts print\-settings mvn\fR [\fB\-\-repository\fR=\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta artifacts print\-settings mvn\fR [\fB\-\-json\-key\fR=\fIJSON_KEY\fR] [\fB\-\-repository\fR=\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,6 +24,11 @@ gcloud beta artifacts print\-settings mvn \- print a snippet to add a Maven repo
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-json\-key\fR=\fIJSON_KEY\fR
+Path to service account JSON key. If not specified, current active service
+account credentials or a placeholder for gcloud credentials is used.
+
 .TP 2m
 
 Repository resource \- The Artifact Registry repository. If not specified, the
@@ -74,6 +79,13 @@ To print a snippet for repository \f5my\-repository\fR in the default location:
 .RS 2m
 $ gcloud beta artifacts print\-settings mvn \e
     \-\-repository="my\-repository"
+.RE
+
+To print a snippet using service account key:
+
+.RS 2m
+$ gcloud beta artifacts print\-settings mvn \e
+    \-\-json\-key=path/to/key.json
 .RE
 
 

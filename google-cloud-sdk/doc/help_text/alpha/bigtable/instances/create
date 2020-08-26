@@ -2,10 +2,12 @@ NAME
     gcloud alpha bigtable instances create - create a new Bigtable instance
 
 SYNOPSIS
-    gcloud alpha bigtable instances create INSTANCE --cluster=CLUSTER
-        --cluster-zone=CLUSTER_ZONE --display-name=DISPLAY_NAME [--async]
+    gcloud alpha bigtable instances create INSTANCE --display-name=DISPLAY_NAME
+        [--async] [--cluster=CLUSTER]
+        [--cluster-config=[id=ID,zone=ZONE,nodes=NODES,...]]
         [--cluster-num-nodes=CLUSTER_NUM_NODES]
         [--cluster-storage-type=CLUSTER_STORAGE_TYPE; default="ssd"]
+        [--cluster-zone=CLUSTER_ZONE]
         [--instance-type=INSTANCE_TYPE; default="PRODUCTION"]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -24,13 +26,6 @@ POSITIONAL ARGUMENTS
           ID of the instance or fully qualified identifier for the instance.
 
 REQUIRED FLAGS
-     --cluster=CLUSTER
-        ID of the cluster.
-
-     --cluster-zone=CLUSTER_ZONE
-        ID of the zone where the cluster is located. Supported zones are listed
-        at https://cloud.google.com/bigtable/docs/locations.
-
      --display-name=DISPLAY_NAME
         Friendly name of the instance.
 
@@ -39,23 +34,62 @@ OPTIONAL FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
+     --cluster=CLUSTER
+        (DEPRECATED) ID of the cluster
+
+        The --cluster argument is deprecated; use --cluster-config instead.
+
+     --cluster-config=[id=ID,zone=ZONE,nodes=NODES,...]
+        Repeatable. Specify cluster config as a key-value dictionary.
+
+        This is the recommended argument for specifying cluster configurations.
+
+        Keys can be:
+
+            *id*: Required. The ID of the cluster.
+
+            *zone*: Required. ID of the zone where the cluster is located. Supported zones are listed at https://cloud.google.com/bigtable/docs/locations.
+
+            *nodes*: The number of nodes of the cluster. Default=1.
+
+        If this argument is specified, the deprecated arguments for configuring
+        a single cluster will be ignored, including --cluster, --cluster-zone,
+        --cluster-num-nodes.
+
+        See EXAMPLES section.
+
      --cluster-num-nodes=CLUSTER_NUM_NODES
-        Number of nodes to serve.
+        (DEPRECATED) Number of nodes to serve.
+
+        The --cluster-num-nodes argument is deprecated; use --cluster-config
+        instead.
 
      --cluster-storage-type=CLUSTER_STORAGE_TYPE; default="ssd"
         Storage class for the cluster. CLUSTER_STORAGE_TYPE must be one of:
         hdd, ssd.
 
+     --cluster-zone=CLUSTER_ZONE
+        (DEPRECATED) ID of the zone where the cluster is located. Supported
+        zones are listed at https://cloud.google.com/bigtable/docs/locations.
+
+        The --cluster-zone argument is deprecated; use --cluster-config
+        instead.
+
      --instance-type=INSTANCE_TYPE; default="PRODUCTION"
-        The type of instance to create. INSTANCE_TYPE must be one of:
+        (DEPRECATED) The type of instance to create.
+
+        The --instance-type argument is deprecated. DEVELOPMENT instances are
+        no longer offered. All instances are of type PRODUCTION. INSTANCE_TYPE
+        must be one of:
 
          DEVELOPMENT
             Development instances are low-cost instances meant for development
             and testing only. They do not provide high availability and no
             service level agreement applies.
          PRODUCTION
-            Production instances have a minimum of three nodes, provide high
-            availability, and are suitable for applications in production.
+            Production instances provide high availability, and are suitable
+            for applications in production. For backward compatibility, default
+            have 3 nodes if --cluster-num-nodes is not specified.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -70,27 +104,27 @@ EXAMPLES
     us-east1-c, run:
 
         $ gcloud alpha bigtable instances create my-instance-id \
-            --display-name="My Instance" --cluster=my-cluster-id \
-            --cluster-zone=us-east1-c
+            --display-name="My Instance" \
+            --cluster-config=id=my-cluster-id,zone=us-east1-c
 
-    To create a DEVELOPMENT instance, run:
+    To create an instance with multiple clusters, run:
 
-        $ gcloud alpha bigtable instances create my-dev-instance \
-            --display-name="Dev Instance" --instance-type=DEVELOPMENT \
-            --cluster=my-cluster-id --cluster-zone=us-east1-c
+        $ gcloud alpha bigtable instances create my-instance-id \
+            --display-name="My Instance" \
+            --cluster-config=id=my-cluster-id-1,zone=us-east1-c \
+            --cluster-config=id=my-cluster-id-2,zone=us-west1-c,nodes=3
 
     To create an instance with HDD storage and 10 nodes, run:
 
         $ gcloud alpha bigtable instances create my-hdd-instance \
             --display-name="HDD Instance" --cluster-storage-type=HDD \
-            --cluster-num-nodes=10 --cluster=my-cluster-id \
-            --cluster-zone=us-east1-c
+            --cluster-config=id=my-cluster-id,zone=us-east1-c,nodes=10
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud bigtable instances create
         $ gcloud beta bigtable instances create

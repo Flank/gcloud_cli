@@ -6,9 +6,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute security-policies delete deletes Google Compute
-    Engine security policies. Security policies can only be deleted when no
-    other resources (e.g., backend services) refer to them.
+    (BETA) gcloud beta compute security-policies delete deletes Compute Engine
+    security policies. Security policies can only be deleted when no other
+    resources (e.g., backend services) refer to them.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

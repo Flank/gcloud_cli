@@ -1,13 +1,13 @@
 NAME
-    gcloud compute security-policies describe - describe a Google Compute
-        Engine security policy
+    gcloud compute security-policies describe - describe a Compute Engine
+        security policy
 
 SYNOPSIS
     gcloud compute security-policies describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute security-policies describe displays all data associated with
-    Google Compute Engine security policy in a project.
+    Compute Engine security policy in a project.
 
 POSITIONAL ARGUMENTS
      NAME

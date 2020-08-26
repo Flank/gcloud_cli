@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: Likely GCR related
+    bug: b/163030401
 title: Test export
 release_tracks: [GA]
 summary:

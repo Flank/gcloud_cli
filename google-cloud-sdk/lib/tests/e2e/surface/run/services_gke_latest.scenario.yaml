@@ -1,4 +1,4 @@
-title: Serverless deploy to gke cluster with knative addon.
+title: Serverless deploy to a GKE cluster with the knative addon.
 release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.

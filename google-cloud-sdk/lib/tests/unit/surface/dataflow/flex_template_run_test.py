@@ -38,19 +38,19 @@ class RunUnitTest(base.DataflowMockingTestBase,
         cli_test_base.MockArgumentError,
         """Must begin with 'gs://'"""):
       self.Run(
-          'beta dataflow flex-template run myjob '
+          'dataflow flex-template run myjob '
           '--template-file-gcs-location=foo')
 
   def testRunBetaNoTemplateFile(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --template-file-gcs-location: Must be specified.'):
-      self.Run('beta dataflow flex-template run myjob')
+      self.Run('dataflow flex-template run myjob')
 
   def testRunBetaNoJobName(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument JOB_NAME: Must be specified.'):
       self.Run(
-          'beta dataflow flex-template run '
+          'dataflow flex-template run '
           '--template-file-gcs-location=gs://foo')
 
   def testRunBetaWithFlexTemplate(self):
@@ -70,7 +70,7 @@ class RunUnitTest(base.DataflowMockingTestBase,
         parameters=params,
         job_name='myjob')
     result = self.Run(
-        'beta dataflow flex-template run myjob '
+        'dataflow flex-template run myjob '
         '--template-file-gcs-location=gs://foo '
         '--region=europe-west1 '
         '--parameters=zone="us-foo1-a",max_num_workers=5,'
@@ -89,7 +89,7 @@ class RunUnitTest(base.DataflowMockingTestBase,
         gcs_location='gs://foo',
         job_name='myjob')
     result = self.Run(
-        'beta dataflow flex-template run myjob '
+        'dataflow flex-template run myjob '
         '--template-file-gcs-location=gs://foo')
     self.assertEqual(JOB_1_ID, result.job.id)
     self.assertEqual('myjob', result.job.name)

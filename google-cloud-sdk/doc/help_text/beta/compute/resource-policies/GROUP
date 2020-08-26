@@ -28,29 +28,29 @@ GROUPS
     GROUP is one of the following:
 
      create
-        (BETA) Create Google Compute Engine Resource Policies.
+        (BETA) Create Compute Engine Resource Policies.
 
 COMMANDS
     COMMAND is one of the following:
 
      create-snapshot-schedule
-        (BETA) (DEPRECATED) Create a Google Compute Engine Snapshot Schedule
-        Resource Policy.
+        (BETA) (DEPRECATED) Create a Compute Engine Snapshot Schedule Resource
+        Policy.
 
      delete
-        (BETA) Delete a Google Compute Engine resource policy.
+        (BETA) Delete a Compute Engine resource policy.
 
      describe
-        (BETA) Describe a Google Compute Engine resource policy.
+        (BETA) Describe a Compute Engine resource policy.
 
      get-iam-policy
-        (BETA) Get the IAM policy for a Google Compute Engine resource policy.
+        (BETA) Get the IAM policy for a Compute Engine resource policy.
 
      list
         (BETA) List Google Compute Engine resource policies.
 
      set-iam-policy
-        (BETA) Set the IAM policy for a Google Compute Engine resource policy.
+        (BETA) Set the IAM policy for a Compute Engine resource policy.
 
 NOTES
     This command is currently in BETA and may change without notice. These

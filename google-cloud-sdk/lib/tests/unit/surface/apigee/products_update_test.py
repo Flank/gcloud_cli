@@ -294,7 +294,7 @@ class ProductsUpdateTest(base.ApigeeSurfaceTest, base.WithJSONBodyValidation):
     self._AddDummyPutResponse(product)
     self._RunUpdate("--clear-quota")
 
-  def testPartialQuotaCreate(self):
+  def testQuotaWithMissingInterval(self):
     product = self.canned_product()
     del product["quota"]
     del product["quotaInterval"]
@@ -302,6 +302,24 @@ class ProductsUpdateTest(base.ApigeeSurfaceTest, base.WithJSONBodyValidation):
     self._AddDummyGetResponse(product)
     with self.assertRaises(exceptions.RequiredArgumentException):
       self._RunUpdate("--quota=100 --quota-unit=hour")
+
+  def testQuotaWithMissingAmount(self):
+    product = self.canned_product()
+    del product["quota"]
+    del product["quotaInterval"]
+    del product["quotaTimeUnit"]
+    self._AddDummyGetResponse(product)
+    with self.assertRaises(exceptions.RequiredArgumentException):
+      self._RunUpdate("--quota-interval=100 --quota-unit=hour")
+
+  def testQuotaWithMissingUnits(self):
+    product = self.canned_product()
+    del product["quota"]
+    del product["quotaInterval"]
+    del product["quotaTimeUnit"]
+    self._AddDummyGetResponse(product)
+    with self.assertRaises(exceptions.RequiredArgumentException):
+      self._RunUpdate("--quota-interval=100 --quota=1")
 
   def testDescriptionUpdate(self):
     self._AddDummyGetResponse()

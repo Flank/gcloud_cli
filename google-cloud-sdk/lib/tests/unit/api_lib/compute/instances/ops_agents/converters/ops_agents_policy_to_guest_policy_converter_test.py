@@ -88,6 +88,7 @@ LOGGING_AGENT_RULE = agent_policy.OpsAgentPolicy.AgentRule(
     agent_policy.OpsAgentPolicy.AgentRule.Type.LOGGING, '1.6.35',
     agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, True)
 OPS_AGENT_RULE_POLICY_AGENT_RULES = [LOGGING_AGENT_RULE, METRICS_AGENT_RULE]
+ETAG = 'd9a52b84-2169-46ea-95e7-eb826c9fbc5f'
 
 # TODO(b/160016059): Fix the indentation in AGENT_RULE_RUN_SCRIPT.
 AGENT_RULE_RUN_SCRIPT = textwrap.dedent("""\
@@ -113,6 +114,7 @@ APT_GUEST_POLICY_YAML = textwrap.dedent("""\
       zones:
       - us-central1-a
     description: '{{"type": "ops-agents", "description": "some desc", "agentRules": [{{"enableAutoupgrade": {logging_enable_autoupgrade}, "packageState": "{logging_package_state}", "type": "logging", "version": "{logging_version}"}},{{"enableAutoupgrade": {metrics_enable_autoupgrade}, "packageState": "{metrics_package_state}", "type": "metrics", "version": "{metrics_version}"}}]}}'
+    etag: {etag}
     packageRepositories:
     - apt:
         components:
@@ -162,6 +164,7 @@ YUM_GUEST_POLICY_YAML = textwrap.dedent("""\
       zones:
       - us-central1-a
     description: '{{"type": "ops-agents", "description": "some desc", "agentRules": [{{"enableAutoupgrade": {logging_enable_autoupgrade}, "packageState": "{logging_package_state}", "type": "logging", "version": "{logging_version}"}},{{"enableAutoupgrade": {metrics_enable_autoupgrade}, "packageState": "{metrics_package_state}", "type": "metrics", "version": "{metrics_version}"}}]}}'
+    etag: {etag}
     packageRepositories:
     - yum:
         baseUrl: https://packages.cloud.google.com/yum/repos/google-cloud-logging-el7-x86_64{logging_repo_suffix}
@@ -217,6 +220,7 @@ ZYPPER_GUEST_POLICY_YAML = textwrap.dedent("""\
       zones:
       - us-central1-a
     description: '{{"type": "ops-agents", "description": "some desc", "agentRules": [{{"enableAutoupgrade": {logging_enable_autoupgrade}, "packageState": "{logging_package_state}", "type": "logging", "version": "{logging_version}"}},{{"enableAutoupgrade": {metrics_enable_autoupgrade}, "packageState": "{metrics_package_state}", "type": "metrics", "version": "{metrics_version}"}}]}}'
+    etag: {etag}
     packageRepositories:
     - zypper:
         baseUrl: https://packages.cloud.google.com/yum/repos/google-cloud-logging-sles12-x86_64{logging_repo_suffix}
@@ -293,6 +297,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -314,7 +319,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -332,6 +337,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='INSTALLED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -359,7 +365,8 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION)
+        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION,
+        ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -377,6 +384,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -405,7 +413,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types), agents_latest,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -423,6 +431,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-1',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -451,7 +460,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types), agents,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self.assertEqual(
@@ -472,6 +481,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/zypp/repos.d',
                 repo_name='google-cloud-logging',
@@ -493,7 +503,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
             _GUEST_POLICY_TEMPLATES['sles'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -511,6 +521,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='INSTALLED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/zypp/repos.d',
                 repo_name='google-cloud-logging',
@@ -538,7 +549,8 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
             _GUEST_POLICY_TEMPLATES['sles'].os_types),
-        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION)
+        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION,
+        ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -556,6 +568,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/zypp/repos.d',
                 repo_name='google-cloud-logging',
@@ -584,7 +597,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
             _GUEST_POLICY_TEMPLATES['sles'].os_types), agent_rules_latest,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -602,6 +615,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -629,8 +643,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['rhel'].instances,
             _GUEST_POLICY_TEMPLATES['rhel'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -648,6 +661,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/apt/sources.list.d',
                 repo_name='google-cloud-logging',
@@ -669,7 +683,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
             _GUEST_POLICY_TEMPLATES['debian'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -687,6 +701,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='INSTALLED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/apt/sources.list.d',
                 repo_name='google-cloud-logging',
@@ -714,7 +729,8 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
             _GUEST_POLICY_TEMPLATES['debian'].os_types),
-        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION)
+        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION,
+        ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -732,6 +748,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/apt/sources.list.d',
                 repo_name='google-cloud-logging',
@@ -766,7 +783,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
             _GUEST_POLICY_TEMPLATES['debian'].os_types), agent_rules_latest,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -784,6 +801,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-1',
             metrics_repo_suffix='-6',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/apt/sources.list.d',
                 repo_name='google-cloud-logging',
@@ -812,7 +830,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
             _GUEST_POLICY_TEMPLATES['debian'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self.assertEqual(
@@ -840,6 +858,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-1',
             metrics_repo_suffix='-6',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -861,7 +880,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -886,6 +905,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-1',
             metrics_repo_suffix='-6',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/apt/sources.list.d',
                 repo_name='google-cloud-logging',
@@ -907,7 +927,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
             _GUEST_POLICY_TEMPLATES['debian'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -932,6 +952,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-1',
             metrics_repo_suffix='-6',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/zypp/repos.d',
                 repo_name='google-cloud-logging',
@@ -953,7 +974,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
             _GUEST_POLICY_TEMPLATES['sles'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -971,6 +992,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='INSTALLED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -999,7 +1021,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -1017,6 +1039,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='REMOVED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=textwrap.dedent("""\
                 #!/bin/bash
                         echo 'Skipping as the package state is [removed].'"""),
@@ -1035,7 +1058,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -1053,6 +1076,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -1074,7 +1098,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy, expected_guest_policy.recipes)
     for recipe in expected_guest_policy.recipes:
@@ -1095,6 +1119,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             metrics_desired_state='UPDATED',
             logging_repo_suffix='-all',
             metrics_repo_suffix='-all',
+            etag=ETAG,
             logging_run_script=AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-logging',
@@ -1116,7 +1141,7 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.Assignment(
             GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
             _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION)
+        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
 
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy, [expected_guest_policy.recipes[0]])

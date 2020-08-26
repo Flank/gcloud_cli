@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute public-delegated-prefixes delegated-sub-prefixes
-        delete - deletes a Google Compute Engine delegated sub prefix
+        delete - deletes a Compute Engine delegated sub prefix
 
 SYNOPSIS
     gcloud alpha compute public-delegated-prefixes delegated-sub-prefixes
@@ -71,5 +71,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

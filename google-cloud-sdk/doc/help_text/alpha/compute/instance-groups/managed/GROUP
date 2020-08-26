@@ -21,7 +21,7 @@ GROUPS
     GROUP is one of the following:
 
      instance-configs
-        (ALPHA) Manage instance-specific settings of managed instance group.
+        (ALPHA) Manage instance-specific settings in a managed instance group.
 
      rolling-action
         (ALPHA) Manipulate rolling actions on Compute Engine managed instance
@@ -93,7 +93,7 @@ COMMANDS
         (ALPHA) Stop autoscaling a managed instance group.
 
      update
-        (ALPHA) Update Compute Engine managed instance groups.
+        (ALPHA) Update a Compute Engine managed instance group.
 
      update-autoscaling
         (ALPHA) Update autoscaling parameters of a managed instance group.
@@ -114,7 +114,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute instance-groups managed
         $ gcloud beta compute instance-groups managed

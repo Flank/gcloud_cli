@@ -1,0 +1,74 @@
+title: database-migration migration-jobs list scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration migration-jobs list --region=us-central1
+  - stdout: |
+      NAME  STATUS       SOURCE   DESTINATION
+      job1  DRAFT        source1  dest1
+      job2  NOT_STARTED  source2  dest2
+actions:
+- execute_command:
+    command: database-migration migration-jobs list --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/migrationJobs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "migrationJobs": [
+                {
+                  "name": "projects/fake-project/locations/us-central1/migrationJobs/job1",
+                  "createTime": "2020-07-21T17:05:19.211441641Z",
+                  "updateTime": "2020-07-21T17:13:32.327720380Z",
+                  "displayName": "job1",
+                  "state": "DRAFT",
+                  "type": "ONE_TIME",
+                  "source": "projects/cloudsdktest/locations/us-central1/connectionProfiles/source1",
+                  "destination": "projects/cloudsdktest/locations/us-central1/connectionProfiles/dest1",
+                  "sourceDatabase": {
+                    "provider": "CLOUDSQL",
+                    "engine": "MYSQL"
+                  },
+                  "destinationDatabase": {
+                    "provider": "CLOUDSQL"
+                  },
+                  "vpcPeeringConnectivity": {
+                    "vpc": "projects/fake-project/global/networks/test-network"
+                  }
+                },
+                {
+                  "name": "projects/fake-project/locations/us-central1/migrationJobs/job2",
+                  "createTime": "2020-07-21T17:05:19.211441641Z",
+                  "updateTime": "2020-07-21T17:13:32.327720380Z",
+                  "displayName": "job2",
+                  "state": "NOT_STARTED",
+                  "type": "ONE_TIME",
+                  "source": "projects/cloudsdktest/locations/us-central1/connectionProfiles/source2",
+                  "destination": "projects/cloudsdktest/locations/us-central1/connectionProfiles/dest2",
+                  "sourceDatabase": {
+                    "provider": "CLOUDSQL",
+                    "engine": "MYSQL"
+                  },
+                  "destinationDatabase": {
+                    "provider": "CLOUDSQL"
+                  },
+                  "vpcPeeringConnectivity": {
+                    "vpc": "projects/fake-project/global/networks/test-network"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME  STATUS       SOURCE   DESTINATION
+        job1  DRAFT        source1  dest1
+        job2  NOT_STARTED  source2  dest2
+    - expect_exit:
+        code: 0

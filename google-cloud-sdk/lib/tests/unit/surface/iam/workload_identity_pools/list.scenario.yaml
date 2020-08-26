@@ -1,0 +1,85 @@
+title: iam workload-identity-pools list test
+release_tracks: [ALPHA, BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam workload-identity-pools list --location global
+  - stderr: |
+      List WorkloadIdentityPools.
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1beta
+      BETA: v1beta
+- execute_command:
+    label: list WorkloadIdentityPools
+    command: iam workload-identity-pools list --location global --show-deleted --page-size 2
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/$$api-version$$/projects/fake-project/locations/global/workloadIdentityPools?alt=json&pageSize=2&showDeleted=True
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "workloadIdentityPools": [
+                {
+                  "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool",
+                  "displayName": "My workload pool",
+                  "description": "My workload pool description",
+                  "state": "ACTIVE",
+                  "disabled": true
+                },
+                {
+                  "name": "projects/fake-project/locations/global/workoadIdentityPools/my-other-workload-identity-pool",
+                  "displayName": "My other workload pool",
+                  "description": "My other workload pool description",
+                  "state": "DELETED"
+                }
+              ],
+              "nextPageToken": "next-page-token-string"
+            }
+    - expect_stdout: |
+        ---
+        description: My workload pool description
+        disabled: true
+        displayName: My workload pool
+        name: projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool
+        state: ACTIVE
+        ---
+        description: My other workload pool description
+        displayName: My other workload pool
+        name: projects/fake-project/locations/global/workoadIdentityPools/my-other-workload-identity-pool
+        state: DELETED
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1beta/projects/fake-project/locations/global/workloadIdentityPools?alt=json&pageSize=2&pageToken=next-page-token-string&showDeleted=True
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "workloadIdentityPools": [
+                {
+                  "name": "projects/fake-project/locations/global/workoadIdentityPools/my-final-workload-identity-pool",
+                  "displayName": "My final workload pool",
+                  "description": "My final workload pool description",
+                  "state": "ACTIVE"
+                }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        description: My final workload pool description
+        displayName: My final workload pool
+        name: projects/fake-project/locations/global/workoadIdentityPools/my-final-workload-identity-pool
+        state: ACTIVE
+    - expect_exit:
+        code: 0

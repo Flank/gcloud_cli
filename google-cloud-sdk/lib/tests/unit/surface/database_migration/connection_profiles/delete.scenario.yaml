@@ -1,0 +1,44 @@
+title: database-migration connection-profiles delete scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration connection-profiles delete test-profile --region=us-central1
+  - prompt:
+    - message: You are about to delete connection_profile [test-profile]
+    - input: y
+  - stderr: |
+      Deleted connection_profile [test-profile].
+actions:
+- execute_command:
+    command: database-migration connection-profiles delete test-profile --region=us-central1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete connection_profile [test-profile]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/connectionProfiles/test-profile?alt=json&force=False
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1595349769779-5aaf65051f983-8ae43a89-443d2a07",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-07-21T16:42:50.135942020Z",
+                "target": "projects/fake-project/locations/us-central1/connectionProfiles/test-profile",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Deleted connection_profile [test-profile].
+    - expect_exit:
+        code: 0

@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute routers nats update - update a NAT on a Google Compute
-        Engine router
+    gcloud alpha compute routers nats update - update a NAT on a Compute Engine
+        router
 
 SYNOPSIS
     gcloud alpha compute routers nats update NAME --router=ROUTER [--async]
@@ -22,7 +22,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute routers nats update is used to update a NAT in
-    a Google Compute Engine router.
+    a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -200,7 +200,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers nats update
         $ gcloud beta compute routers nats update

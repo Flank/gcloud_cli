@@ -4,7 +4,259 @@ Copyright 2014-2020 Google Inc. All rights reserved.
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+
+## 307.0.0 (2020-08-25)
+
+### App Engine
+
+* Updated the Java SDK to version 1.9.82.
+  Please visit the following release notes for details:
+  <https://cloud.google.com/appengine/docs/java/release-notes>.
+
+### Cloud Dataflow
+
+* Promoted `gcloud dataflow flex-template build` to GA.
+Promoted `gcloud dataflow flex-template run` to GA.
+
+### Cloud Run
+
+* Changed the generation of revision names. If the generated revision name
+  is longer than the knative resource name length limit (63 characters), shorten
+  the part of the service name used as a prefix until the revision name is no
+  longer than the maximum knative resource name.
+
+### Cloud SQL
+
+* Promoted MySQL 8 to GA.
+
+### Cloud Security Command Center
+
+* Promoted `gcloud scc notifications` command group to beta and GA.
+* Promote `gcloud scc [operations|sources|findings]` to beta and GA.
+
+### Cloud Storage
+
+* Updated gsutil component to 4.53.
+
+### Compute Engine
+
+* Promoted 'SHARED_LOADBALANCER_VIP' option of  `--purpose` flag of `gcloud compute addresses create` to GA.
+* Promoted `--logging-metadata` flag to GA for
+  * `gcloud compute firewall-rules create`
+  * `gcloud compute firewall-rules update`.
+* Promoted `--network`, `--subnetwork`, and `--private-network-ip` flags of
+`gcloud compute instances network-interfaces update` to beta.
+
+### Firebase Test Lab
+
+*   Added `--additional-ipas` flag to `gcloud beta firebase test ios run`. This
+    flag allows you to specify additional iOS apps that should be installed on
+    the device prior to testing.
+
+### Kpt
+
+* Updated kpt from v0.30.1 to v0.33.0.
+* Updated import of cli-utils from v0.15.0 to v0.18.1.
+* Updated import of kyaml from v0.3.1 to v0.6.0.
+* Updated import of cmd/config from v0.3.0 to v0.6.0.
+
+### Kubernetes Engine
+
+* Promoted `--enable-master-global-access` flag of `gcloud container clusters
+  <create|update>` to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+
+## 306.0.0 (2020-08-18)
+
+### BigQuery
+
+* Fixed issue where `ls --reservation` command randomly failed with internal error.
+* Added `add-iam-policy-binding` and `remove-iam-policy-binding` commands, with support for modifying IAM policies for tables and views.
+
+### Cloud Dataproc
+
+*   Added `--dataproc-metastore` flag to `gcloud beta dataproc clusters create`
+    to allow clusters to be created with a Dataproc Metastore service.
+*   Added `--dataproc-metastore` flag to `gcloud beta dataproc
+    workflow-templates set-managed-cluster` to allow managed clusters to be
+    created with a Dataproc Metastore service.
+
+### Cloud Firestore Emulator
+
+* Release Cloud Firestore emulator v1.11.7
+  * Includes latest features and improvements from production.
+
+### Cloud Key Management Service
+
+*   Added `gcloud beta kms keys versions get-certificate-chain` to retrieve
+    HSM attestation certificate chains.
+
+### Cloud Pub/Sub
+
+* Promoted `gcloud pubsub topics detach-subscription` to GA.
+
+### Cloud Resource Manager
+
+* Fixed issue where `gcloud resource-manager org-policies <allow|deny>` gave an error when a restore default policy exists.
+
+### Cloud Security Command Center
+
+* Promoted `gcloud scc notifications` command group to beta and GA.
+
+### Cloud TPU
+
+* Added `--use-service-networking` flag to `gcloud beta compute tpus create`.
+
+### Compute Engine
+
+* Added `gcloud beta compute os-config os-upgrade` to enable major OS version updates on support distributions.
+* Promoted `--condition` flag to GA for
+  * `gcloud compute instances add-iam-policy-binding`
+  * `gcloud compute instances remove-iam-policy-binding`.
+* Promoted Regional Network Endpoint Groups to GA.
+* Promoted Hybrid Network Endpoint Groups to GA.
+* Promoted `gcloud compute commitments create-license` to beta and GA.
+* Promoted the following commands to GA:
+  * `gcloud compute instance-groups managed instance-configs create`
+  * `gcloud compute instance-groups managed instance-configs update`
+  * `gcloud compute instance-groups managed instance-configs list`
+  * `gcloud compute instance-groups managed instance-configs delete`
+* Promoted `--stateful-disk` and `--stateful-metadata` for `gcloud compute instance-groups managed create-instance` to GA.
+* Added `--network` flag to `gcloud beta compute target-instances create`.
+
+### Game Servers
+
+* Promoted `gcloud game servers` to GA.
+
+### Notebooks
+
+* Added `n1-standard-1` as the default for notebook instances.
+* Added `deeplearning-platform` as the default for notebook instance project and environment project.
+
+### Secret Manager
+
+* Updated `gcloud secrets versions access` command to redact the output from logs produced by the gcloud command-line tool. For more information, see <https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#secretmanager-access-secret-version-cli>.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+
+## 305.0.0 (2020-08-11)
+
+### Artifact Registry
+
+* Added `--json-key flag` to `gcloud beta artifacts print-settings`.
+* Added bearer auth for npm support to `gcloud beta artifacts print-settings`.
+
+### Cloud Build
+
+* Added the flag `--worker-pool` to the command `gcloud builds submit`.
+
+### Cloud Dataflow
+
+* Added flex template docker container building support in build command `gcloud beta dataflow flex-template build`.
+
+### Cloud Pub/Sub
+
+* Replaced `--scale` in `gcloud beta pubsub lite-topics create` and `gcloud beta
+  pubsub lite-topics update` with `--per-partition-publish-mib` and
+  `--per-partition-subscribe-mib` flags.
+
+### Cloud Run
+
+*   Added `--image` flag to `gcloud run services update` command in beta and GA
+    to support updating container image.
+
+### Cloud Security Command Center
+
+* Promoted `gcloud scc assets` command group to beta and GA.
+
+### Compute Engine
+
+* Promoted `cpu-overcommit-type` flag of `gcloud beta compute sole-tenancy node-templates create` to GA.
+* Promoted `--stateful-disk` flag for `gcloud compute instance-groups managed create` to GA.
+* Promoted `--stateful-disk`, `--remove-stateful-disk` flags for `gcloud compute instance-groups managed update` to GA.
+* Promoted `--scale-in-control` flag of `gcloud compute instance-groups managed set-autoscaling` to GA.
+* Promoted `--scale-in-control` and `--clear-scale-in-control` flags of `gcloud compute instance-groups managed update-autoscaling` to GA.
+
+### Deployment Manager
+
+* Added `--custom-certificate-authority-roots` flag to `gcloud
+  deployment-manager type-providers <create|update>`.
+
+### Kubernetes Engine
+
+* Promoted the GKE add-on `ConfigConnector` of `gcloud container clusters
+  <create|update>` to GA. This add-on is disabled by default.
+  * Use `--addons=ConfigConnector` to enable the add-on during cluster
+    creation.
+  * Use `--update-addons=ConfigConnector=ENABLED|DISABLED` to
+    enable/disable the add-on for existing GKE clusters.
+* Updates default kubectl from 1.15 to 1.16.
+* Additional kubectl versions:
+  * kubectl.1.14 (1.14.10)
+  * kubectl.1.15 (1.15.12)
+  * kubectl.1.16 (1.16.13)
+  * kubectl.1.17 (1.17.9)
+  * kubectl.1.18 (1.18.6)
+* Promoted `--disable-default-snat` flag of `gcloud container clusters
+  <create|update>` to GA.
+* Modified GKE nodes to have serial port output logging enabled by default. To disable, use `--metadata serial-port-logging-enable=false`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
 Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+
+## 304.0.0 (2020-08-04)
+
+### Cloud Build
+
+* Modifed the command group `gcloud beta builds worker-pools` such that all underlying commands now use a regional Cloud Build API endpoint (instead of the global one).
+* Modifed the command group `gcloud builds` such that all underlying commands may optionally use a regional Cloud Build API endpoint (instead of the global one). This is controlled by the new flag `--region`, as well as the configuration of submitted builds.
+
+### Cloud Composer
+
+* Fixed a bug where an argument added to `backfill` subcommand of
+`gcloud composer environments run` fails in older Airflow versions.
+* Added `--web-server-machine-type` flag to `gcloud beta composer environments`
+commands to specify the machine type used by the Airflow web server.
+
+### Cloud IAM
+
+* Promoted  `gcloud iam service-accounts keys upload` to GA.
+
+### Compute Engine
+
+* Added `gcloud beta compute os-config os-upgrade` to enable major OS version updates on support distributions.
+* Promoted `gcloud compute diagnose export-logs` to GA.
+
+### Firebase Test Lab
+
+*   Added the command `gcloud [alpha|beta] firebase test ip-blocks list`, which
+    retrieves a catalog of IP blocks used by Firebase Test Lab devices.
+
+### Kubernetes Engine
+
+* Added `--node-group` to `gcloud container node-pools create`. This flag is used to enable the Compute Engine sole tenant node feature on Kubernetes Engine node pools.
+
+### Secret Manager
+
+* Updated the following commands to better support IAM Conditions:
+  * `gcloud secrets get-iam-policy` outputs conditions associated with each binding.
+  * `gcloud secrets set-iam-policy` accepts policies with conditional bindings.
+  * `gcloud secrets <add|remove>-iam-policy-binding` accepts conditional bindings.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 303.0.0 (2020-07-28)
 
@@ -53,7 +305,7 @@ commands to specify the Cloud SQL machine type used by the Airflow database.
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 302.0.0 (2020-07-21)
 
@@ -140,7 +392,7 @@ Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 301.0.0 (2020-07-14)
 
@@ -184,7 +436,7 @@ Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 300.0.0 (2020-07-08)
 
@@ -231,7 +483,7 @@ Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 299.0.0 (2020-06-30)
 
@@ -292,7 +544,7 @@ NodeLocalDNS addons with `gcloud container clusters create` and
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 298.0.0 (2020-06-23)
 
@@ -341,7 +593,7 @@ Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 297.0.1 (2020-06-17)
 
@@ -370,7 +622,7 @@ Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 296.0.1 (2020-06-10)
 
@@ -432,7 +684,7 @@ and `gcloud beta filestore instances update` to include:
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 295.0.0 (2020-06-02)
 
@@ -478,7 +730,7 @@ Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
-Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on July 31, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
+Note: Cloud SDK introduced support for Python 3 in release 274.0.0 and users are strongly encouraged to migrate to Python 3. Support for Python 2 will be deprecated on September 30, 2020. See also [Python 2 Sunset](https://cloud.google.com/python/docs/python2-sunset/) and [Using Python 3](https://cloud.google.com/sdk/gcloud/reference/topic/startup).
 
 ## 294.0.0 (2020-05-27)
 

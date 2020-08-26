@@ -263,6 +263,7 @@
       "properties": {
         "name": {
           "description": "Output only. The unique name of the domain using the form: `projects\/{project_id}\/locations\/global\/domains\/{domain_name}`.",
+          "readOnly": true,
           "type": "string"
         },
         "labels": {
@@ -296,30 +297,24 @@
         },
         "fqdn": {
           "description": "Output only. The fully-qualified domain name of the exposed domain used by clients to connect to the service. Similar to what would be chosen for an Active Directory set up on an internal network.",
+          "readOnly": true,
           "type": "string"
         },
         "createTime": {
           "description": "Output only. The time the instance was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The last update time.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "state": {
           "description": "Output only. The current state of this domain.",
-          "enumDescriptions": [
-            "Not set.",
-            "The domain is being created.",
-            "The domain has been created and is fully usable.",
-            "The domain's configuration is being updated.",
-            "The domain is being deleted.",
-            "The domain is being repaired and may be unusable. Details can be found in the `status_message` field.",
-            "The domain is undergoing maintenance.",
-            "The domain is not serving requests."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -344,10 +339,12 @@
         },
         "statusMessage": {
           "description": "Output only. Additional information about the current status of this domain, if available.",
+          "readOnly": true,
           "type": "string"
         },
         "trusts": {
           "description": "Output only. The current trusts associated with the domain.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "$ref": "Trust"
@@ -366,11 +363,6 @@
         },
         "trustType": {
           "description": "The type of trust represented by the trust resource.",
-          "enumDescriptions": [
-            "Not set.",
-            "The forest trust.",
-            "The external domain trust."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -385,12 +377,6 @@
         },
         "trustDirection": {
           "description": "The trust direction, which decides if the current domain is trusted, trusting, or both.",
-          "enumDescriptions": [
-            "Not set.",
-            "The inbound direction represents the trusting side.",
-            "The outboud direction represents the trusted side.",
-            "The bidirectional direction represents the trusted \/ trusting side."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -417,29 +403,24 @@
           }
         },
         "trustHandshakeSecret": {
-          "description": "Input only, and will not be stored. The trust secret used for the handshake with the target domain.",
+          "description": "Input only. The trust secret used for the handshake with the target domain. It will not be stored.",
           "type": "string"
         },
         "createTime": {
           "description": "Output only. The time the instance was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The last update time.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "state": {
           "description": "Output only. The current state of the trust.",
-          "enumDescriptions": [
-            "Not set.",
-            "The domain trust is being created.",
-            "The domain trust is being updated.",
-            "The domain trust is being deleted.",
-            "The domain trust is connected.",
-            "The domain trust is disconnected."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not set.",
@@ -460,10 +441,12 @@
         },
         "stateDescription": {
           "description": "Output only. Additional information about the current state of the trust, if available.",
+          "readOnly": true,
           "type": "string"
         },
         "lastTrustHeartbeatTime": {
           "description": "Output only. The last heartbeat time when the trust was known to be connected.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         }
@@ -560,6 +543,75 @@
         "trust": {
           "description": "Required. The domain trust to validate trust state for.",
           "$ref": "Trust"
+        }
+      }
+    },
+    "ListSQLIntegrationsResponse": {
+      "id": "ListSQLIntegrationsResponse",
+      "description": "ListSQLIntegrationsResponse is the response message for ListSQLIntegrations method.",
+      "type": "object",
+      "properties": {
+        "sqlIntegrations": {
+          "description": "A list of SQLIntegrations of a domain.",
+          "type": "array",
+          "items": {
+            "$ref": "SQLIntegration"
+          }
+        },
+        "nextPageToken": {
+          "description": "Token to retrieve the next page of results, or empty if there are no more results in the list.",
+          "type": "string"
+        },
+        "unreachable": {
+          "description": "A list of locations that could not be reached.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SQLIntegration": {
+      "id": "SQLIntegration",
+      "description": "Represents the SQL instance integrated with AD.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The unique name of the sql integration in the form of `projects\/{project_id}\/locations\/global\/domains\/{domain_name}\/sqlIntegrations\/{sql_integration}`",
+          "type": "string"
+        },
+        "sqlInstance": {
+          "description": "The full resource name of an integrated sql instance TODO(b\/161918255) Add resource type annotation post CloudSQL API fix.",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. The time sql integration was created. Synthetic field is populated automatically by CCFE.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "updateTime": {
+          "description": "Output only. The time sql integration was updated. Synthetic field is populated automatically by CCFE.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "state": {
+          "description": "Output only. The current state of the sql integration.",
+          "readOnly": true,
+          "type": "string",
+          "enumDescriptions": [
+            "Not Set",
+            "The sqlIntegration is being created.",
+            "The sqlIntegration is being deleted.",
+            "The sqlIntegration is ready."
+          ],
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "CREATING",
+            "DELETING",
+            "READY"
+          ]
         }
       }
     },
@@ -715,28 +767,34 @@
       "properties": {
         "createTime": {
           "description": "Output only. The time the operation was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
           "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
           "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "verb": {
           "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "requestedCancellation": {
           "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
           "type": "boolean"
         },
         "apiVersion": {
           "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -748,28 +806,34 @@
       "properties": {
         "createTime": {
           "description": "Output only. The time the operation was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
           "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
           "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "verb": {
           "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "requestedCancellation": {
           "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
           "type": "boolean"
         },
         "apiVersion": {
           "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -781,28 +845,34 @@
       "properties": {
         "createTime": {
           "description": "Output only. The time the operation was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
           "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
           "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "verb": {
           "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "requestedCancellation": {
           "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
           "type": "boolean"
         },
         "apiVersion": {
           "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -817,11 +887,13 @@
         },
         "createTime": {
           "description": "Output only. Timestamp when the resource was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. Timestamp when the resource was last modified.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -834,15 +906,7 @@
         },
         "state": {
           "description": "Output only. Current lifecycle state of the resource (e.g. if it's being created or ready to use).",
-          "enumDescriptions": [
-            "Unspecified state.",
-            "Instance is being created.",
-            "Instance has been created and is ready to use.",
-            "Instance is being updated.",
-            "Instance is unheathy and under repair.",
-            "Instance is being deleted.",
-            "Instance encountered an error and is in indeterministic state."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Unspecified state.",
@@ -879,10 +943,12 @@
         },
         "tenantProjectId": {
           "description": "Output only. ID of the associated GCP tenant project. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "string"
         },
         "producerMetadata": {
           "description": "Output only. Custom string attributes used primarily to expose producer-specific information in monitoring dashboards. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -890,6 +956,7 @@
         },
         "provisionedResources": {
           "description": "Output only. The list of data plane resources provisioned for this instance, e.g. compute VMs. See go\/get-instance-metadata.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource"
@@ -897,6 +964,7 @@
         },
         "sloMetadata": {
           "description": "Output only. SLO metadata for instance classification in the Standardized dataplane SLO platform. See go\/cloud-ssa-standard-slo for feature description.",
+          "readOnly": true,
           "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata"
         },
         "maintenanceSchedules": {
@@ -1658,6 +1726,84 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
                       "description": "Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may \"fail open\" without warning."
+                    }
+                  }
+                  ,
+                  "resources": {
+                    "sqlIntegrations": {
+                      "methods": {
+                        "list": {
+                          "id": "managedidentities.projects.locations.global.domains.sqlIntegrations.list",
+                          "path": "v1beta1/{+parent}/sqlIntegrations",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/global/domains/{domainsId}/sqlIntegrations",
+                          "httpMethod": "GET",
+                          "parameters": {
+                            "parent": {
+                              "description": "Required. The resource name of the SQLIntegrations using the form: `projects\/{project_id}\/locations\/global\/domains\/*`",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/global\/domains\/[^\/]+$",
+                              "type": "string"
+                            },
+                            "pageSize": {
+                              "description": "Optional. The maximum number of items to return. If not specified, a default value of 1000 will be used by the service. Regardless of the page_size value, the response may include a partial list and a caller should only rely on response'ANIZATIONs next_page_token to determine if there are more instances left to be queried.",
+                              "location": "query",
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "pageToken": {
+                              "description": "Optional. The next_page_token value returned from a previous List request, if any.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "filter": {
+                              "description": "Optional. Filter specifying constraints of a list operation. For example, `SQLIntegration.name=\"sql\"`.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "orderBy": {
+                              "description": "Optional. Specifies the ordering of results following syntax at https:\/\/cloud.google.com\/apis\/design\/design_patterns#sorting_order.",
+                              "location": "query",
+                              "type": "string"
+                            }
+                          },
+                          "parameterOrder": [
+                            "parent"
+                          ],
+                          "response": {
+                            "$ref": "ListSQLIntegrationsResponse"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Lists SQLIntegrations in a given domain."
+                        },
+                        "get": {
+                          "id": "managedidentities.projects.locations.global.domains.sqlIntegrations.get",
+                          "path": "v1beta1/{+name}",
+                          "flatPath": "v1beta1/projects/{projectsId}/locations/global/domains/{domainsId}/sqlIntegrations/{sqlIntegrationsId}",
+                          "httpMethod": "GET",
+                          "parameters": {
+                            "name": {
+                              "description": "Required. SQLIntegration resource name using the form: `projects\/{project_id}\/locations\/global\/domains\/*\/sqlIntegrations\/{name}`",
+                              "location": "path",
+                              "required": true,
+                              "pattern": "^projects\/[^\/]+\/locations\/global\/domains\/[^\/]+\/sqlIntegrations\/[^\/]+$",
+                              "type": "string"
+                            }
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "response": {
+                            "$ref": "SQLIntegration"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Gets details of a single sqlIntegration."
+                        }
+                      }
                     }
                   }
                 }

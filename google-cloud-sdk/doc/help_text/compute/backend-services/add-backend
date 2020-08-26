@@ -9,6 +9,7 @@ SYNOPSIS
           | --instance-group-zone=INSTANCE_GROUP_ZONE]
           | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
           : --global-network-endpoint-group
+          | --network-endpoint-group-region=NETWORK_ENDPOINT_GROUP_REGION
           | --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
         [--balancing-mode=BALANCING_MODE] [--capacity-scaler=CAPACITY_SCALER]
         [--description=DESCRIPTION] [--failover]
@@ -104,6 +105,27 @@ REQUIRED FLAGS
            --global-network-endpoint-group
               If set, the network endpoint group is global.
 
+           --network-endpoint-group-region=NETWORK_ENDPOINT_GROUP_REGION
+              Region of the network endpoint group to add to the backend
+              service. If not specified, you may be prompted to select a
+              region.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/region property:
+
+                  $ gcloud config set compute/region REGION
+
+              A list of regions can be fetched by running:
+
+                  $ gcloud compute regions list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/region
+
+              Alternatively, the region can be stored in the environment
+              variable CLOUDSDK_COMPUTE_REGION.
+
            --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
               Zone of the network endpoint group to add to the backend service.
               If not specified and the compute/zone property isn't set, you may
@@ -132,7 +154,7 @@ OPTIONAL FLAGS
         https://cloud.google.com/load-balancing/docs/backend-service#balancing-mode.
 
         This cannot be used when the endpoint type of an attached network
-        endpoint group is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+        endpoint group is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
         BALANCING_MODE must be one of:
 
@@ -189,7 +211,7 @@ OPTIONAL FLAGS
         close by normal means. This cannot be used for internal load balancing.
 
         This cannot be used when the endpoint type of an attached network
-        endpoint group is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+        endpoint group is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
      --description=DESCRIPTION
         An optional, textual description for the backend.
@@ -255,7 +277,8 @@ OPTIONAL FLAGS
           regional managed instance groups).
 
           This cannot be used when the endpoint type of an attached network
-          endpoint group is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+          endpoint group is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or
+          SERVERLESS.
 
        --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
           Only valid for network endpoint group backends. Defines a maximum
@@ -267,7 +290,8 @@ OPTIONAL FLAGS
           endpoints.
 
           This cannot be used when the endpoint type of an attached network
-          endpoint group is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+          endpoint group is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or
+          SERVERLESS.
 
        --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
           Only valid for instance group backends. Defines a maximum number of
@@ -286,7 +310,8 @@ OPTIONAL FLAGS
           autoscaling.
 
           This cannot be used when the endpoint type of an attached network
-          endpoint group is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+          endpoint group is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or
+          SERVERLESS.
 
        --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
           Only valid for network endpoint group backends. Defines a maximum
@@ -298,7 +323,8 @@ OPTIONAL FLAGS
           endpoints.
 
           This cannot be used when the endpoint type of an attached network
-          endpoint group is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+          endpoint group is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or
+          SERVERLESS.
 
        --max-rate-per-instance=MAX_RATE_PER_INSTANCE
           Only valid for instance group backends. Defines a maximum number of

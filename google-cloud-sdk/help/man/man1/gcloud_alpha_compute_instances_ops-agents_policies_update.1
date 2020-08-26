@@ -11,7 +11,7 @@ gcloud alpha compute instances ops\-agents policies update \- update a Google Cl
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances ops\-agents policies update\fR \fIPOLICY_ID\fR [\fB\-\-agent\-rules\fR=[\fItype\fR=\fITYPE\fR,\fIversion\fR=\fIVERSION\fR,\fIpackage\-state\fR=\fIPACKAGE\-STATE\fR,\fIenable\-autoupgrade\fR=\fIENABLE\-AUTOUPGRADE\fR;...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-os\-types\fR=[\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;...]] [\fB\-\-clear\-group\-labels\fR\ |\ \fB\-\-group\-labels\fR=[\fILABEL_NAME\fR=\fILABEL_VALUE\fR,\fILABEL_NAME\fR=\fILABEL_VALUE\fR,...;...]] [\fB\-\-clear\-instances\fR\ |\ \fB\-\-instances\fR=[\fIzones\fR/\fIZONE_NAME\fR/\fIinstances\fR/\fIINSTANCE_NAME\fR,...]] [\fB\-\-clear\-zones\fR\ |\ \fB\-\-zones\fR=[\fIZONE_NAME\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances ops\-agents policies update\fR \fIPOLICY_ID\fR [\fB\-\-agent\-rules\fR=[\fItype\fR=\fITYPE\fR,\fIversion\fR=\fIVERSION\fR,\fIpackage\-state\fR=\fIPACKAGE\-STATE\fR,\fIenable\-autoupgrade\fR=\fIENABLE\-AUTOUPGRADE\fR;...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-etag\fR=\fIETAG\fR] [\fB\-\-os\-types\fR=[\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;...]] [\fB\-\-clear\-group\-labels\fR\ |\ \fB\-\-group\-labels\fR=[\fILABEL_NAME\fR=\fILABEL_VALUE\fR,\fILABEL_NAME\fR=\fILABEL_VALUE\fR,...;...]] [\fB\-\-clear\-instances\fR\ |\ \fB\-\-instances\fR=[\fIzones\fR/\fIZONE_NAME\fR/\fIinstances\fR/\fIINSTANCE_NAME\fR,...]] [\fB\-\-clear\-zones\fR\ |\ \fB\-\-zones\fR=[\fIZONE_NAME\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -214,6 +214,19 @@ agent version is set to a specific patch version in the format of
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Description of the policy.
+
+.TP 2m
+\fB\-\-etag\fR=\fIETAG\fR
+Etag of the policy.
+
+\f5\fIetag\fR\fR is used for optimistic concurrency control as a way to help
+prevent simultaneous updates of a policy from overwriting each other. It is
+strongly suggested that systems make use of the \f5\fIetag\fR\fR in the
+read\-modify\-write cycle to perform policy updates in order to avoid race
+conditions: an \f5\fIetag\fR\fR is returned in the response of a
+\f5\fIdescribe\fR\fR command, and systems are expected to put that
+\f5\fIetag\fR\fR in the request to an \f5\fIupdate\fR\fR command to ensure that
+their change will be applied to the same version of the policy.
 
 .TP 2m
 \fB\-\-os\-types\fR=[\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;...]
@@ -427,6 +440,17 @@ $ gcloud alpha compute instances ops\-agents policies update \e
 "
 .RE
 
+To perform the same update as above, conditionally on the fact that the policy's
+etag (retrieved by an earlier command) is
+\f5\fIf59741c8\-bb5e\-4ee6\-bf6f\-c4ebeb6b06e0\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha compute instances ops\-agents policies update \e
+    ops\-agents\-labels\-policy \-\-clear\-instances \e
+    \-\-group\-labels="env=prod,product=myapp;env=staging,product=myapp\e
+" \-\-etag f59741c8\-bb5e\-4ee6\-bf6f\-c4ebeb6b06e0
+.RE
+
 
 
 .SH "NOTES"
@@ -434,5 +458,5 @@ $ gcloud alpha compute instances ops\-agents policies update \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+allowlist.
 

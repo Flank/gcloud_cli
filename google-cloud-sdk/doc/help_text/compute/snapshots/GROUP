@@ -26,34 +26,34 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding to a Google Compute Engine snapshot.
+        Add IAM policy binding to a Compute Engine snapshot.
 
      add-labels
         Add labels to Google Compute Engine snapshots.
 
      delete
-        Delete Google Compute Engine snapshots.
+        Delete Compute Engine snapshots.
 
      describe
-        Describe a Google Compute Engine snapshot.
+        Describe a Compute Engine snapshot.
 
      get-iam-policy
-        Get the IAM policy for a Google Compute Engine snapshot.
+        Get the IAM policy for a Compute Engine snapshot.
 
      list
         List Google Compute Engine snapshots.
 
      remove-iam-policy-binding
-        Remove IAM policy binding from a Google Compute Engine snapshot.
+        Remove IAM policy binding from a Compute Engine snapshot.
 
      remove-labels
         Remove labels from Google Compute Engine snapshots.
 
      set-iam-policy
-        Set the IAM policy for a Google Compute Engine snapshot.
+        Set the IAM policy for a Compute Engine snapshot.
 
      update
-        Update a Google Compute Engine snapshot.
+        Update a Compute Engine snapshot.
 
 NOTES
     These variants are also available:

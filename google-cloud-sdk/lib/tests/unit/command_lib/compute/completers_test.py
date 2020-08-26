@@ -23,9 +23,9 @@ import os
 from googlecloudsdk.command_lib.compute import completers
 from tests.lib import completer_test_base
 from tests.lib import completer_test_data
-from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute.health_checks import test_resources as health_check_resources
 from tests.lib.surface.compute.instance_templates import test_resources as instance_template_resources
+from tests.lib.surface.compute.machine_images import test_resources as machine_image_resources
 
 
 def _Uris(resources):
@@ -44,7 +44,7 @@ _COMMAND_RESOURCES = {
     'compute.instance-templates.list':
         _Uris(instance_template_resources.INSTANCE_TEMPLATES_V1),
     'compute.machine-images.list':
-        _Uris(test_resources.MACHINE_IMAGES),
+        _Uris(machine_image_resources.MACHINE_IMAGES),
 }
 
 _SEARCH_RESOURCES = {

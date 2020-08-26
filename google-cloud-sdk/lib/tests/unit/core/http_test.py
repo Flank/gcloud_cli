@@ -490,10 +490,10 @@ total round trip time (request+response): 4.000 secs
     pi = http_proxy.GetHttpProxyInfo()
     self.assertTrue(callable(pi))
     self.assertEqual((socks.PROXY_TYPE_HTTP, 'awesome_proxy', 8080, True,
-                      b'user', b'pass', None),
+                      'user', 'pass', None),
                      pi('http').astuple())
     self.assertEqual((socks.PROXY_TYPE_HTTP, 'secure_proxy', 8081, True,
-                      b'suser', b'spass', None),
+                      'suser', 'spass', None),
                      pi('https').astuple())
     self.assertTrue(pi('http').isgood())
     self.assertTrue(pi('https').isgood())

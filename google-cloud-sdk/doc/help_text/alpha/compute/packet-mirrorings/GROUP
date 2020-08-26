@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha compute packet-mirrorings - manage Google Compute Engine
-        packet mirroring resources
+    gcloud alpha compute packet-mirrorings - manage Compute Engine packet
+        mirroring resources
 
 SYNOPSIS
     gcloud alpha compute packet-mirrorings COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Google Compute Engine packet mirroring resources.
+    (ALPHA) Manage Compute Engine packet mirroring resources.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -23,10 +23,10 @@ COMMANDS
         (ALPHA) Create a Google Compute Engine packet mirroring policy.
 
      delete
-        (ALPHA) Delete a Google Compute Engine packet mirroring policy.
+        (ALPHA) Delete a Compute Engine packet mirroring policy.
 
      describe
-        (ALPHA) Describe a Google Compute Engine packet mirroring policy.
+        (ALPHA) Describe a Compute Engine packet mirroring policy.
 
      list
         (ALPHA) List Google Compute Engine packet mirroring policies.
@@ -38,7 +38,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute packet-mirrorings
         $ gcloud beta compute packet-mirrorings

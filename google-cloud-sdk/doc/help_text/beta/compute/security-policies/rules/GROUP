@@ -1,12 +1,12 @@
 NAME
-    gcloud beta compute security-policies rules - read and manipulate Google
-        Compute Engine security policies rules
+    gcloud beta compute security-policies rules - read and manipulate Compute
+        Engine security policies rules
 
 SYNOPSIS
     gcloud beta compute security-policies rules COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read and manipulate Google Compute Engine security policies rules.
+    (BETA) Read and manipulate Compute Engine security policies rules.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,16 +20,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create a Google Compute Engine security policy rule.
+        (BETA) Create a Compute Engine security policy rule.
 
      delete
-        (BETA) Delete Google Compute Engine security policy rules.
+        (BETA) Delete Compute Engine security policy rules.
 
      describe
-        (BETA) Describe a Google Compute Engine security policy rule.
+        (BETA) Describe a Compute Engine security policy rule.
 
      update
-        (BETA) Update a Google Compute Engine security policy rule.
+        (BETA) Update a Compute Engine security policy rule.
 
 NOTES
     This command is currently in BETA and may change without notice. These

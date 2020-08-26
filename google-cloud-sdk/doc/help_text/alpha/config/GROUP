@@ -422,6 +422,12 @@ AVAILABLE PROPERTIES
             a location value is required but not provided, the command will
             fall back to this value, if set.
 
+     privateca
+         location
+            Default location to use when working with Private CA resources.
+            When a --location flag is required but not provided, the command
+            will fall back to this value, if set.
+
      proxy
          address
             Hostname or IP address of proxy server.
@@ -501,7 +507,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud config
         $ gcloud beta config

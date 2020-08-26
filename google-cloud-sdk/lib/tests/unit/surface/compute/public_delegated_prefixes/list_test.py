@@ -22,7 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.public_prefixes import test_resources
 import mock
 
 
@@ -41,12 +41,19 @@ class PublicDelegatedPrefixesListTest(test_base.BaseTest,
     self.list_json.side_effect = iter(
         [test_resources.PUBLIC_DELEGATED_PREFIXES_ALPHA])
     self.Run('compute public-delegated-prefixes list')
+
+    request_params = {'includeAllScopes': True}
+    if hasattr(
+        self.messages.ComputePublicDelegatedPrefixesAggregatedListRequest,
+        'returnPartialSuccess'):
+      request_params['returnPartialSuccess'] = True
+
+    aggregated_list_request = self.messages.ComputePublicDelegatedPrefixesAggregatedListRequest(
+        project='my-project', **request_params)
+
     self.list_json.assert_called_once_with(
-        requests=[(
-            self.compute.publicDelegatedPrefixes,
-            'AggregatedList',
-            self.messages.ComputePublicDelegatedPrefixesAggregatedListRequest(
-                project='my-project', includeAllScopes=True))],
+        requests=[(self.compute.publicDelegatedPrefixes, 'AggregatedList',
+                   aggregated_list_request)],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -57,7 +64,8 @@ NAME     LOCATION     PARENT_PREFIX  RANGE
 my-pdp1  global       my-pap1        1.2.3.128/25
 my-pdp2  us-central1  my-pap1        1.2.3.12/30
 my-pdp3  us-east1     my-pap1        1.2.3.40/30
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 NAME
-    gcloud compute resource-policies create snapshot-schedule - create a Google
+    gcloud compute resource-policies create snapshot-schedule - create a
         Compute Engine Snapshot Schedule Resource Policy
 
 SYNOPSIS
@@ -14,7 +14,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create a Google Compute Engine Snapshot Schedule Resource Policy.
+    Create a Compute Engine Snapshot Schedule Resource Policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -121,9 +121,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command creates a Google Compute Engine Snapshot Schedule
-    Resource Policy with a daily snapshot taken at 13:00Z and a one day
-    snapshot retention policy.
+    The following command creates a Compute Engine Snapshot Schedule Resource
+    Policy with a daily snapshot taken at 13:00Z and a one day snapshot
+    retention policy.
 
         $ gcloud compute resource-policies create snapshot-schedule \
             my-resource-policy --region=REGION --start-time=13:00 \

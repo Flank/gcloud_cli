@@ -1,5 +1,5 @@
 title: scc findings list scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

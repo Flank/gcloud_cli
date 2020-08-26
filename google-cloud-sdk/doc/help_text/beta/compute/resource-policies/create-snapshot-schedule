@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute resource-policies create-snapshot-schedule - create a
-        Google Compute Engine Snapshot Schedule Resource Policy
+        Compute Engine Snapshot Schedule Resource Policy
 
 SYNOPSIS
     gcloud beta compute resource-policies create-snapshot-schedule NAME
@@ -17,7 +17,7 @@ DESCRIPTION
     (BETA) (DEPRECATED) create-snapshot-schedule is deprecated. Use compute
     resource-policies create snapshot-schedule instead.
 
-    Create a Google Compute Engine Snapshot Schedule Resource Policy.
+    Create a Compute Engine Snapshot Schedule Resource Policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -125,9 +125,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command creates a Google Compute Engine Snapshot Schedule
-    Resource Policy with a daily snapshot and a one day snapshot retention
-    policy.
+    The following command creates a Compute Engine Snapshot Schedule Resource
+    Policy with a daily snapshot and a one day snapshot retention policy.
 
         $ gcloud beta compute resource-policies create-snapshot-schedule \
             my-resource-policy --region=REGION --start-time=04:00Z \

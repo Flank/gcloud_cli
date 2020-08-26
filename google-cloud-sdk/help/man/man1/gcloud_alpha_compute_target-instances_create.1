@@ -62,7 +62,9 @@ command invocation.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
-Network that this target instance applies to.
+Network that this target instance applies to. This is only necessary if the
+corresponding instance has multiple network interfaces. If not specified, the
+default network interface will be used.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -112,7 +114,7 @@ Run \fB$ gcloud help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud compute target\-instances create

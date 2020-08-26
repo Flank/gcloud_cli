@@ -1,6 +1,6 @@
 NAME
-    gcloud compute snapshots set-iam-policy - set the IAM policy for a Google
-        Compute Engine snapshot
+    gcloud compute snapshots set-iam-policy - set the IAM policy for a Compute
+        Engine snapshot
 
 SYNOPSIS
     gcloud compute snapshots set-iam-policy SNAPSHOT_NAME POLICY_FILE

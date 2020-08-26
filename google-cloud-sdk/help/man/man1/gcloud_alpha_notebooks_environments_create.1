@@ -11,7 +11,7 @@ gcloud alpha notebooks environments create \- request for creating environments
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha notebooks environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) ([\fB\-\-container\-repository\fR=\fICONTAINER_REPOSITORY\fR\ :\ \fB\-\-container\-tag\fR=\fICONTAINER_TAG\fR]\ |\ \fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR\ (\fB\-\-vm\-image\-family\fR=\fIVM_IMAGE_FAMILY\fR\ |\ \fB\-\-vm\-image\-name\fR=\fIVM_IMAGE_NAME\fR)) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-post\-startup\-script\fR=\fIPOST_STARTUP_SCRIPT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha notebooks environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) ([\fB\-\-container\-repository\fR=\fICONTAINER_REPOSITORY\fR\ :\ \fB\-\-container\-tag\fR=\fICONTAINER_TAG\fR]\ |\ [(\fB\-\-vm\-image\-family\fR=\fIVM_IMAGE_FAMILY\fR\ |\ \fB\-\-vm\-image\-name\fR=\fIVM_IMAGE_NAME\fR)\ :\ \fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR;\ default="deeplearning\-platform\-release"]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-post\-startup\-script\fR=\fIPOST_STARTUP_SCRIPT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -73,10 +73,9 @@ The tag of the container image. If not specified, this defaults to the latest
 tag.
 
 .TP 2m
-\fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR
+\fB\-\-vm\-image\-project\fR=\fIVM_IMAGE_PROJECT\fR; default="deeplearning\-platform\-release"
 The ID of the Google Cloud project that this VM image belongs to.Format:
-projects/\f5{project_id}\fR. This flag must be specified if any of the other
-arguments in this group are specified.
+projects/\f5{project_id}\fR.
 
 .TP 2m
 
@@ -175,7 +174,7 @@ $ gcloud alpha notebooks environments create example\-environment \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta notebooks environments create

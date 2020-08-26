@@ -1,0 +1,77 @@
+title: admin-service-cluster delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      admin-service-cluster instances delete foo --location=us-central1
+  - prompt:
+    - message: You are about to delete instance [foo]
+    - input: y
+  - stderr: |
+      Delete request issued for: [foo]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1596734248115-5ac38a9a8dc86-de6c2265-4947bdea]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted instance [foo].
+actions:
+- execute_command:
+    command: |
+      admin-service-cluster instances delete foo --location=us-central1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete instance [foo]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://krmapihosting.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/anthosApiEndpoints/foo?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1596734248115-5ac38a9a8dc86-de6c2265-4947bdea",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.krmapihosting.v1alpha1.OperationMetadata",
+                "createTime": "2020-08-06T17:17:28.125610551Z",
+                "target": "projects/fake-project/locations/us-central1/anthosApiEndpoints/foo",
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Delete request issued for: [foo]
+    - api_call:
+        expect_request:
+          uri: https://krmapihosting.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/operations/operation-1596734248115-5ac38a9a8dc86-de6c2265-4947bdea?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1596734248115-5ac38a9a8dc86-de6c2265-4947bdea",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.krmapihosting.v1alpha1.OperationMetadata",
+                "createTime": "2020-08-06T17:17:28.125610551Z",
+                "target": "projects/fake-project/locations/us-central1/anthosApiEndpoints/foo",
+                "apiVersion": "v1alpha1"
+              },
+              "done": true
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1596734248115-5ac38a9a8dc86-de6c2265-4947bdea]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted instance [foo].
+    - expect_exit:
+        code: 0

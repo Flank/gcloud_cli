@@ -64,6 +64,15 @@ REQUIRED FLAGS
               well known port for the backend protocol will be used instead
               (80 for http, 443 for https or http2).
 
+          non-gcp-private-ip-port
+
+              *ip* - Required IP address of the network endpoint to attach. The
+              IP address must belong to a VM not in Google Compute Engine and
+              must be routable using a cloud router over VPN or an Interconnect.
+
+              *port* - Required port of the network endpoint to attach unless
+              NEG default port is set.
+
        --remove-endpoint=[fqdn=FQDN],[instance=INSTANCE],[ip=IP],[port=PORT]
           The network endpoint to detach from the network endpoint group. Keys
           used depend on the endpoint type of the NEG.
@@ -93,6 +102,13 @@ REQUIRED FLAGS
 
               *port* - Optional port of the network endpoint to detach if the
               endpoint has a port specified.
+
+          non-gcp-private-ip-port
+
+              *ip* - Required IP address of the network endpoint to detach.
+
+              *port* - Required port of the network endpoint to detach unless
+              NEG default port is set.
 
 OPTIONAL FLAGS
      At most one of these may be specified:

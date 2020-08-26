@@ -11,7 +11,7 @@ gcloud alpha firebase test ios run \- invoke a test in Firebase Test Lab for iOS
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-xcode\-version\fR=\fIXCODE_VERSION\fR] [\fB\-\-xctestrun\-file\fR=\fIXCTESTRUN_FILE\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-async\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-special\-entitlements\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-xcode\-version\fR=\fIXCODE_VERSION\fR] [\fB\-\-xctestrun\-file\fR=\fIXCTESTRUN_FILE\fR] [\fB\-\-additional\-ipas\fR=\fIIPA\fR,[\fIIPA\fR,...]] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-async\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-special\-entitlements\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -138,6 +138,12 @@ filesystem or in Google Cloud Storage using a URL beginning with \f5gs://\fR.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-additional\-ipas\fR=\fIIPA\fR,[\fIIPA\fR,...]
+List of up to 100 additional IPAs to install, in addition to the one being
+directly tested. The path may be in the local filesystem or in Google Cloud
+Storage using gs:// notation.
+
 .TP 2m
 \fB\-\-app\fR=\fIAPP\fR
 The path to the application archive (.ipa file) for game\-loop testing. The path
@@ -336,7 +342,7 @@ $ gcloud alpha firebase test ios run \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud firebase test ios run

@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute reservations remove-iam-policy-binding - remove IAM
-        policy binding from a Google Compute Engine reservation
+        policy binding from a Compute Engine reservation
 
 SYNOPSIS
     gcloud alpha compute reservations remove-iam-policy-binding
@@ -9,9 +9,9 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Remove an IAM policy binding from the IAM policy of a Google
-    Compute Engine reservation. One binding consists of a member, a role, and
-    an optional condition.
+    (ALPHA) Remove an IAM policy binding from the IAM policy of a Compute
+    Engine reservation. One binding consists of a member, a role, and an
+    optional condition.
 
 POSITIONAL ARGUMENTS
      Reservation resource - The reservation for which to remove IAM policy
@@ -120,7 +120,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute reservations remove-iam-policy-binding
         $ gcloud beta compute reservations remove-iam-policy-binding

@@ -817,14 +817,13 @@ class BundledBase(SdkBase):
     Returns:
       A copy of env with Python specific path vars added.
     """
-    env_with_pythonpaths = encoding.EncodeEnv(dict(env if env else os.environ))
     # sys.path was initialized from PYTHONPATH at startup so we don't have to
     # check PYTHONPATH here. The result will be the original PYTHONPATH dirs
     # plus and dirs inserted/appened by Python startup and test runner
     # initialization.
     encoding.SetEncodedValue(
-        env_with_pythonpaths, 'PYTHONPATH', os.pathsep.join(sys.path))
-    return env_with_pythonpaths
+        env, 'PYTHONPATH', os.pathsep.join(sys.path))
+    return env
 
   @classmethod
   def ExecuteScript(cls, script_name, args, timeout=None, stdin=None,
@@ -847,6 +846,7 @@ class BundledBase(SdkBase):
       An ExecutionResult object.
     """
     args = exec_utils.GetArgsForScript(script_name, args)
+    env = encoding.EncodeEnv(dict(env if env else os.environ.copy()))
     if add_python_paths:
       env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
@@ -876,6 +876,7 @@ class BundledBase(SdkBase):
     """
     args = exec_utils.GetArgsForLegacyScript(
         script_name, args, interpreter=interpreter)
+    env = encoding.EncodeEnv(dict(env if env else os.environ.copy()))
     if add_python_paths:
       env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
@@ -911,6 +912,7 @@ class BundledBase(SdkBase):
       A context manager that will kill the process once the scope exists.
     """
     args = exec_utils.GetArgsForScript(script_name, args)
+    env = encoding.EncodeEnv(dict(env if env else os.environ.copy()))
     if add_python_paths:
       env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
@@ -948,6 +950,7 @@ class BundledBase(SdkBase):
     """
     args = exec_utils.GetArgsForLegacyScript(
         script_name, args, interpreter=interpreter)
+    env = encoding.EncodeEnv(dict(env if env else os.environ.copy()))
     if add_python_paths:
       env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access

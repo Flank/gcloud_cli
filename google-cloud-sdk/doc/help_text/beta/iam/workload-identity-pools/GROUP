@@ -1,0 +1,50 @@
+NAME
+    gcloud beta iam workload-identity-pools - manage IAM WorkloadIdentityPools
+
+SYNOPSIS
+    gcloud beta iam workload-identity-pools GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Commands for managing IAM WorkloadIdentityPools.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     providers
+        (BETA) Manage IAM WorkloadIdentityPoolProviders.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a new WorkloadIdentityPool.
+
+     delete
+        (BETA) Delete a WorkloadIdentityPool.
+
+     describe
+        (BETA) Describe a WorkloadIdentityPool.
+
+     list
+        (BETA) List WorkloadIdentityPools.
+
+     undelete
+        (BETA) Undelete a WorkloadIdentityPool.
+
+     update
+        (BETA) Update a new WorkloadIdentityPool.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

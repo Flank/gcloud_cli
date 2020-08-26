@@ -10,13 +10,13 @@ summary:
     - status: SUCCESS
   - stdout: |
       name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
-      sourceContents: "- return:\n    Return: 1\n"
+      sourceContents: "- return:\n    return: 1\n"
       state:          ACTIVE
 - execute:
   - command: workflows describe $$test-workflow$$ --location us-central1 --format="text(name,sourceContents,state)"
   - stdout: |
       name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
-      sourceContents: "- return:\n    Return: 1\n"
+      sourceContents: "- return:\n    return: 1\n"
       state:          ACTIVE
 - execute:
   - command: workflows execute $$test-workflow$$
@@ -50,7 +50,7 @@ actions:
     path: workflow_source.yaml
     contents: |
       - return:
-          Return: 1
+          return: 1
 
 - execute_command:
     command: workflows deploy $$test-workflow$$ --location us-central1 --source=workflow_source.yaml
@@ -80,7 +80,7 @@ actions:
             json:
               sourceContents: |
                 - return:
-                    Return: 1
+                    return: 1
         return_response:
           headers:
             status: '200'
@@ -111,14 +111,14 @@ actions:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
             sourceContents: |
               - return:
-                  Return: 1
+                  return: 1
             state: ACTIVE
             versionId: '1'
             createTime: '2019-08-12T12:56:51.841192008Z'
             updateTime: '2019-08-12T12:56:51.902102760Z'
     - expect_stdout: |
         name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
-        sourceContents: "- return:\n    Return: 1\n"
+        sourceContents: "- return:\n    return: 1\n"
         state:          ACTIVE
     - expect_exit:
         code: 0
@@ -139,14 +139,14 @@ actions:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
             sourceContents: |
               - return:
-                  Return: 1
+                  return: 1
             state: ACTIVE
             versionId: '1'
             createTime: '2019-08-12T12:56:51.841192008Z'
             updateTime: '2019-08-12T12:56:51.902102760Z'
     - expect_stdout: |
         name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
-        sourceContents: "- return:\n    Return: 1\n"
+        sourceContents: "- return:\n    return: 1\n"
         state:          ACTIVE
     - expect_exit:
         code: 0

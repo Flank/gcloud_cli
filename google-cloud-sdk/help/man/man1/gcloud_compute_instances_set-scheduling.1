@@ -11,7 +11,7 @@ gcloud compute instances set\-scheduling \- set scheduling options for Google Co
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-preemptible\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-node\-affinities\fR\ |\ \fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-clear\-min\-node\-cpu\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-preemptible\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-node\-affinities\fR\ |\ \fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,6 +39,12 @@ https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 .RS 2m
 .TP 2m
+\fB\-\-clear\-min\-node\-cpu\fR
+Removes the min\-node\-cpu field from the instance. If specified, the instance
+min\-node\-cpu will be cleared. The instance will not be overcommitted and
+utilize the full CPU count assigned.
+
+.TP 2m
 \fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR
 Specifies the behavior of the instances when their host machines undergo
 maintenance. The default is MIGRATE. \fIMAINTENANCE_POLICY\fR must be one of:
@@ -54,6 +60,11 @@ The instances should be terminated.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR
+Minimum number of virtual CPUs this instance will consume when running on a
+sole\-tenant node.
 
 .TP 2m
 \fB\-\-preemptible\fR

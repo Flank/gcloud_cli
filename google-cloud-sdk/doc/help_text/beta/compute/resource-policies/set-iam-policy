@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute resource-policies set-iam-policy - set the IAM policy
-        for a Google Compute Engine resource policy
+        for a Compute Engine resource policy
 
 SYNOPSIS
     gcloud beta compute resource-policies set-iam-policy

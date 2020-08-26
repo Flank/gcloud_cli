@@ -174,7 +174,7 @@ def AddSnapshotScheduleArgs(parser, messages):
   compute_flags.AddStorageLocationFlag(snapshot_properties_group, 'snapshot')
 
 
-def AddGroupPlacementArgs(parser, messages):
+def AddGroupPlacementArgs(parser, messages, track):
   """Adds flags specific to snapshot schedule resource policies."""
   parser.add_argument(
       '--vm-count',
@@ -184,25 +184,55 @@ def AddGroupPlacementArgs(parser, messages):
       '--availability-domain-count',
       type=arg_parsers.BoundedInt(lower_bound=1),
       help='Number of availability domain in the group placement policy.')
-  GetCollocationFlagMapper(messages).choice_arg.AddToParser(parser)
+  GetCollocationFlagMapper(messages, track).choice_arg.AddToParser(parser)
+  if track == base.ReleaseTrack.ALPHA:
+    GetAvailabilityDomainScopeFlagMapper(messages).choice_arg.AddToParser(
+        parser)
 
 
-def GetCollocationFlagMapper(messages):
+def GetCollocationFlagMapper(messages, track):
+  """Gets collocation flag mapper for resource policies."""
+  custom_mappings = {
+      'UNSPECIFIED_COLLOCATION':
+          ('unspecified-collocation',
+           'Unspecified network latency between VMs placed on the same '
+           'availability domain. This is the default behavior.'),
+      'COLLOCATED':
+          ('collocated', 'Low network latency between more VMs placed on the '
+           'same availability domain.')
+  }
+  if track == base.ReleaseTrack.ALPHA:
+    custom_mappings.update({
+        'CLUSTERED':
+            ('clustered', 'Lowest network latency between VMs placed on the '
+             'same availability domain.')
+    })
   return arg_utils.ChoiceEnumMapper(
       '--collocation',
       messages.ResourcePolicyGroupPlacementPolicy.CollocationValueValuesEnum,
-      custom_mappings={
-          'UNSPECIFIED_COLLOCATION':
-              ('unspecified-collocation',
-               'Unspecified network latency between VMs placed on the same'
-               'availability domain. This is the default behavior.'),
-          'COLLOCATED': ('collocated',
-                         'Low network latency between VMs placed on the same'
-                         'availability domain.')
-      },
+      custom_mappings=custom_mappings,
       default=None,
       help_str='Collocation specifies whether to place VMs inside the same'
       'availability domain on the same low-latency network.')
+
+
+def GetAvailabilityDomainScopeFlagMapper(messages):
+  """Gets availability domain scope flag mapper for resource policies."""
+  custom_mappings = {
+      'UNSPECIFIED_SCOPE':
+          ('unspecified-scope',
+           'Instances will be spread across different instrastructure to not '
+           'share power, host and networking.'),
+      'HOST': ('host', 'Specifies availability domain scope across hosts. '
+               'Instances will be spread across different hosts.')
+  }
+  return arg_utils.ChoiceEnumMapper(
+      '--scope',
+      messages.ResourcePolicyGroupPlacementPolicy.ScopeValueValuesEnum,
+      custom_mappings=custom_mappings,
+      default=None,
+      help_str='Scope specifies the availability domain to which the VMs '
+      'should be spread.')
 
 
 def AddResourcePoliciesArgs(parser, action, resource, required=False):

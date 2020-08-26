@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute routers update - update a Google Compute Engine router
+    gcloud alpha compute routers update - update a Compute Engine router
 
 SYNOPSIS
     gcloud alpha compute routers update NAME [--advertisement-mode=MODE]
@@ -12,8 +12,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute routers update is used to update a Google
-    Compute Engine router.
+    (ALPHA) gcloud alpha compute routers update is used to update a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -120,7 +120,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers update
         $ gcloud beta compute routers update

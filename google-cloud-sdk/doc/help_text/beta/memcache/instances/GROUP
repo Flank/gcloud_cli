@@ -20,7 +20,8 @@ COMMANDS
     COMMAND is one of the following:
 
      apply-parameters
-        (BETA) Apply updated parameters to a Memorystore Memcached instance.
+        (BETA) Apply parameter update to nodes in a Memorystore Memcached
+        instance.
 
      create
         (BETA) Create a Memorystore Memcached instance.
@@ -29,7 +30,7 @@ COMMANDS
         (BETA) Delete a Memorystore Memcached instance.
 
      describe
-        (BETA) Show metadata for a Memorystore Memcached instance.
+        (BETA) Display metadata for a Memorystore Memcached instance.
 
      list
         (BETA) List Memorystore Memcached instances.

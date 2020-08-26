@@ -1,15 +1,18 @@
 NAME
-    gcloud alpha apigee apis describe - describes an Apigee API proxy
+    gcloud alpha apigee apis describe - describe an Apigee API proxy
 
 SYNOPSIS
     gcloud alpha apigee apis describe (API : --organization=ORGANIZATION)
         [--verbose] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describes an Apigee API proxy.
+    (ALPHA) Describe an Apigee API proxy.
+
+    gcloud alpha apigee apis describe shows metadata about an API proxy and its
+    revisions.
 
 POSITIONAL ARGUMENTS
-     API proxy resource - The API proxy to be described. The arguments in this
+     API proxy resource - API proxy to be described. The arguments in this
      group can be used to specify the attributes of this resource. This must be
      specified.
 
@@ -19,7 +22,8 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --organization=ORGANIZATION
-          The organization for the API proxy.
+          Apigee organization containing the API proxy. If unspecified, the
+          Cloud Platform project's associated organization will be used.
 
 FLAGS
      --verbose
@@ -58,5 +62,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

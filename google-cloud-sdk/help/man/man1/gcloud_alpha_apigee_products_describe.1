@@ -39,7 +39,8 @@ specified.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
-The organization for the API product.
+Apigee organization containing the API product. If unspecified, the Cloud
+Platform project's associated organization will be used.
 
 
 .RE
@@ -88,5 +89,5 @@ $ gcloud alpha apigee products describe product\-name \-\-format=json
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+allowlist.
 

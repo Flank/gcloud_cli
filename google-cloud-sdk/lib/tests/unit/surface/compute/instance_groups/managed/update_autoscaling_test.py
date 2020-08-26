@@ -214,15 +214,6 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-
-@parameterized.parameters(scope_util.ScopeEnum.REGION,
-                          scope_util.ScopeEnum.ZONE)
-class InstanceGroupManagersSetAutoscalingZonalTestBeta(
-    InstanceGroupManagersSetAutoscalingZonalTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testUpdateScaleInNumbers(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
@@ -312,6 +303,15 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(
         .format(self.location_flag, self.location))
 
     self.CheckRequests(*self.expected_requests)
+
+
+@parameterized.parameters(scope_util.ScopeEnum.REGION,
+                          scope_util.ScopeEnum.ZONE)
+class InstanceGroupManagersSetAutoscalingZonalTestBeta(
+    InstanceGroupManagersSetAutoscalingZonalTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 @parameterized.parameters(scope_util.ScopeEnum.REGION,

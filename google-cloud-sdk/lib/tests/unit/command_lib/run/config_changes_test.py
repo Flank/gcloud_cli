@@ -323,6 +323,12 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource = revision_name_change.Adjust(self.resource)
     self.assertEqual(self.template.name, 'myservice-newsuffix')
 
+  def testRevisionSuffixSetWithLongServiceName(self):
+    self.resource.name = 'x' * 63
+    revision_name_change = config_changes.RevisionNameChanges('newsuffix')
+    self.resource = revision_name_change.Adjust(self.resource)
+    self.assertEqual(self.template.name, ('x' * 53) + '-newsuffix')
+
   def _MakeSecretVolumeSource(self, name, *items):
     source = self.serverless_messages.SecretVolumeSource(secretName=name)
     for key, path in items:

@@ -5,31 +5,37 @@
 
 .SH "NAME"
 .HP
-gcloud compute instance\-groups managed update \- update Compute Engine managed instance groups
+gcloud compute instance\-groups managed update \- update a Compute Engine managed instance group
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute instance\-groups managed update\fR lets you specify or modify
-AutoHealingPolicy for an existing managed instance group.
+Update a Compute Engine managed instance group.
 
-When updating the AutoHealingPolicy, you can specify the health check, initial
-delay, or both. If the field is unspecified, its value won't be modified. If
-\f5\-\-health\-check\fR is specified, the health check is used to monitor the
-health of your application. Whenever the health check signal for the instance
-becomes \f5UNHEALTHY\fR, the autohealing action (\f5RECREATE\fR) on an instance
-is performed.
+\fBgcloud compute instance\-groups managed update\fR allows you to specify or
+modify the stateful policy and autohealing policy for an existing managed
+instance group.
 
-If no health check is specified, the instance autohealing is triggered by the
-instance status only (i.e., the autohealing action (\f5RECREATE\fR) on an
-instance will be performed if \f5instance.status\fR is not \f5RUNNING\fR).
+A stateful policy defines which resources should be preserved across the group.
+When instances in the group are recreated, stateful resources are preserved.
+This command allows you to update stateful resources, specifically to add or
+remove stateful disks.
+
+When updating the autohealing policy, you can specify the health check, initial
+delay, or both. If either field is unspecified, its value won't be modified. If
+\f5\-\-health\-check\fR is specified, the health check monitors the health of
+your application. Whenever the health check signal for an instance becomes
+\f5UNHEALTHY\fR, the autohealer recreates the instance.
+
+If no health check exists, instance autohealing is triggered only by instance
+status: if an instance is not \f5RUNNING\fR, the group recreates it.
 
 
 
@@ -74,6 +80,38 @@ meet its target distribution.
 \fITYPE\fR must be one of: \fBNONE\fR, \fBPROACTIVE\fR.
 
 .RS 2m
+.TP 2m
+\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]
+Stop considering the disks stateful by the instance group.
+
+.TP 2m
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]
+Disks considered stateful by the instance group. Managed instance groups
+preserve and reattach stateful disks on VM autohealing, update, and recreate
+events.
+
+Use this argument multiple times to update more disks.
+
+If a stateful disk with the given device name already exists in the current
+instance config, its properties will be replaced by the newly provided ones.
+Otherwise, a new stateful disk definition will be added to the instance config.
+
+.RS 2m
+.TP 2m
+\fBdevice\-name\fR
+(Requied) Device name of the disk to mark stateful.
+
+.TP 2m
+\fBauto\-delete\fR
+(Optional) Specifies the auto deletion policy of the stateful disk. Supported
+values are \f5\fInever\fR\fR (never delete this disk) and
+\f5\fIon\-permanent\-instance\-deletion\fR\fR (delete the stateful disk when the
+given instance is permanently deleted from the instance group; for example when
+the group is resized down). If omitted, \f5\fInever\fR\fR is used as the
+default.
+
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:

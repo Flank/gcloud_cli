@@ -233,12 +233,41 @@ class CreateTestBeta(CreateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
 
 class CreateTestAlpha(CreateTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
+
+  def testCreate_TlsMode(self):
+    instance_to_create = self.MakeAllOptionsInstance(
+        redis_version='REDIS_4_0',
+        connect_mode='PRIVATE_SERVICE_ACCESS',
+        tls_mode='BASIC_TLS')
+    expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
+                                           self.instance_relative_name)
+
+    network = 'projects/{}/global/networks/my-network'.format(self.Project())
+    actual_instance = self.Run(
+        'redis instances create {} --region {}'
+        ' --alternative-zone zone2'
+        ' --display-name my-display-name'
+        ' --labels a=1,b=2'
+        ' --connect-mode "PRIVATE_SERVICE_ACCESS"'
+        ' --network {}'
+        ' --redis-config maxmemory-policy=allkeys-lfu,notify-keyspace-events=El'
+        ',activedefrag=yes,lfu-log-factor=2,lfu-decay-time=10'
+        ' --redis-version redis_4_0'
+        ' --size 4'
+        ' --tier standard'
+        ' --connect-mode private_service_access'
+        ' --tls-mode basic_tls'
+        ' --zone zone1'.format(self.instance_id, self.region_id, network))
+
+    self.assertEqual(actual_instance, expected_instance)
 
 
 if __name__ == '__main__':

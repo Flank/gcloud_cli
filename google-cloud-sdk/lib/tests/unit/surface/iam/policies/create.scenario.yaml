@@ -1,0 +1,125 @@
+title: iam policies create scenario tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam policies create my-deny-policy --attachment-point=cloudresourcemanager.googleapis.com/projects/123
+      --kind=denypolicies --policy-file=policy.yaml
+- execute:
+  - command: iam policies create my-deny-policy --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%2F123
+      --kind=denypolicies --policy-file=policy.json
+actions:
+- write_file:
+    path: policy.yaml
+    contents: |
+      rules:
+      - denyRule:
+          deniedPermissions:
+          - storage.buckets.*
+          - storage.objects.*
+          deniedPrincipals:
+          - principalSet://goog/public:all
+          exceptionPrincipals:
+          - principal://goog/subject/abc@google.com
+
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "rules": [
+           {
+             "denyRule": {
+               "deniedPrincipals": [
+                 "principalSet://goog/public:all"
+               ],
+               "exceptionPrincipals": [
+                 "principal://goog/subject/abc@google.com",
+               ],
+               "deniedPermissions": [
+                 "storage.buckets.*",
+                 "storage.objects.*"
+               ]
+             }
+           }
+         ]
+       }
+
+- execute_command:
+    command: iam policies create my-deny-policy --attachment-point=cloudresourcemanager.googleapis.com/projects/123
+      --kind=denypolicies --policy-file=policy.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v2alpha1/policies/cloudresourcemanager.googleapis.com%252Fprojects%252F123/denypolicies?alt=json&policyId=my-deny-policy
+          method: POST
+          headers: {}
+          body:
+            json:
+              rules:
+              - denyRule:
+                  deniedPermissions:
+                  - storage.buckets.*
+                  - storage.objects.*
+                  deniedPrincipals:
+                  - principalSet://goog/public:all
+                  exceptionPrincipals:
+                  - principal://goog/subject/abc@google.com
+        return_response:
+          status: 200
+          headers: {}
+          body:
+            description: second deny policy
+            etag: MTg0NDI1OTcyNzY1NjIzMzM2OTY=
+            kind: DenyPolicy
+            name: policies/cloudresourcemanager.googleapis.com%2Fprojects%2F123/denypolicies/my-deny-policy
+            rules:
+            - denyRule:
+                deniedPermissions:
+                - storage.buckets.*
+                - storage.objects.*
+                deniedPrincipals:
+                - principalSet://goog/public:all
+                exceptionPrincipals:
+                - principal://goog/subject/abc@google.com
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iam policies create my-deny-policy --attachment-point=cloudresourcemanager.googleapis.com%2Fprojects%2F123
+      --kind=denypolicies --policy-file=policy.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v2alpha1/policies/cloudresourcemanager.googleapis.com%252Fprojects%252F123/denypolicies?alt=json&policyId=my-deny-policy
+          method: POST
+          headers: {}
+          body:
+            json:
+              rules:
+              - denyRule:
+                  deniedPermissions:
+                  - storage.buckets.*
+                  - storage.objects.*
+                  deniedPrincipals:
+                  - principalSet://goog/public:all
+                  exceptionPrincipals:
+                  - principal://goog/subject/abc@google.com
+        return_response:
+          status: 200
+          headers: {}
+          body:
+            description: second deny policy
+            etag: MTg0NDI1OTcyNzY1NjIzMzM2OTY=
+            kind: DenyPolicy
+            name: policies/cloudresourcemanager.googleapis.com%2Fprojects%2F123/denypolicies/my-deny-policy
+            rules:
+            - denyRule:
+                deniedPermissions:
+                - storage.buckets.*
+                - storage.objects.*
+                deniedPrincipals:
+                - principalSet://goog/public:all
+                exceptionPrincipals:
+                - principal://goog/subject/abc@google.com
+    - expect_exit:
+        code: 0

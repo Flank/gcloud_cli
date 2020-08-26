@@ -187,6 +187,22 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
                 cloudRunConfig=self.msgs.CloudRunConfig(disabled=True))),
         flags='--update-addons CloudRun=DISABLED')
 
+  def testUpdateAddonsConfigConnector(self):
+    # test disabling ConfigConnector
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=False))),
+        flags='--update-addons ConfigConnector=DISABLED')
+    # test enabling ConfigConnector
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=True))),
+        flags='--update-addons ConfigConnector=ENABLED')
+
   def testUpdateAddonsNodeLocalDNS(self):
     self.WriteInput('y')
     self._TestUpdate(
@@ -2019,6 +2035,19 @@ resourceLimits:
           self.clusters_command_base.format(self.ZONE) +
           ' update test-cluster --release-channel={0}'.format(channel_name))
 
+  @parameterized.parameters(
+      ('--enable-master-global-access ', True),
+      ('--no-enable-master-global-access ', False),
+  )
+  def testMasterGlobalAccess(self, flags, enabled):
+    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+        enabled=enabled)
+    desired = self.msgs.PrivateClusterConfig(
+        masterGlobalAccessConfig=master_global_access_config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
+        flags=flags)
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -2445,22 +2474,6 @@ resourceLimits:
                 kalmConfig=self.msgs.KalmConfig(enabled=True))),
         flags='--update-addons ApplicationManager=ENABLED')
 
-  def testUpdateAddonsConfigConnector(self):
-    # test disabling ConfigConnector
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                configConnectorConfig=self.msgs.ConfigConnectorConfig(
-                    enabled=False))),
-        flags='--update-addons ConfigConnector=DISABLED')
-    # test enabling ConfigConnector
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                configConnectorConfig=self.msgs.ConfigConnectorConfig(
-                    enabled=True))),
-        flags='--update-addons ConfigConnector=ENABLED')
-
   @parameterized.parameters(True, False)
   def testTpuUpdate(self, enabled):
     self._TestUpdate(
@@ -2496,19 +2509,6 @@ resourceLimits:
     self._TestUpdate(
         update=self.msgs.ClusterUpdate(desiredClusterTelemetry=desired),
         flags='--no-enable-stackdriver-kubernetes')
-
-  @parameterized.parameters(
-      ('--enable-master-global-access ', True),
-      ('--no-enable-master-global-access ', False),
-  )
-  def testMasterGlobalAccess(self, flags, enabled):
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
-        enabled=enabled)
-    desired = self.msgs.PrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config)
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
-        flags=flags)
 
   def testEnableGvnic(self):
     self._TestUpdate(
@@ -2591,6 +2591,43 @@ resourceLimits:
         ])
     master = self.msgs.Master(signalsConfig=config)
     self._TestUpdate(self.msgs.ClusterUpdate(desiredMaster=master), flags=flags)
+
+  def testSendingKubernetesObjectsSnapshots(self):
+    config = self.msgs.KubernetesObjectsExportConfig(
+        kubernetesObjectsSnapshotsTarget='CLOUD_LOGGING')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredKubernetesObjectsExportConfig=config),
+        flags='--kubernetes-objects-snapshots-target CLOUD_LOGGING')
+
+  def testSendingKubernetesObjectsChanges(self):
+    config = self.msgs.KubernetesObjectsExportConfig(
+        kubernetesObjectsChangesTarget='CLOUD_LOGGING')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredKubernetesObjectsExportConfig=config),
+        flags='--kubernetes-objects-changes-target CLOUD_LOGGING')
+
+  def testSendingKubernetesObjectsSnapshotAndChanges(self):
+    config = self.msgs.KubernetesObjectsExportConfig(
+        kubernetesObjectsChangesTarget='CLOUD_LOGGING',
+        kubernetesObjectsSnapshotsTarget='CLOUD_LOGGING')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredKubernetesObjectsExportConfig=config),
+        flags='--kubernetes-objects-changes-target CLOUD_LOGGING --kubernetes-objects-snapshots-target CLOUD_LOGGING'
+    )
+
+  def testDisableSendingKubernetesObjectsChanges(self):
+    config = self.msgs.KubernetesObjectsExportConfig(
+        kubernetesObjectsChangesTarget='')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredKubernetesObjectsExportConfig=config),
+        flags='--kubernetes-objects-changes-target NONE')
+
+  def testDisableSendingKubernetesObjectsSnapshots(self):
+    config = self.msgs.KubernetesObjectsExportConfig(
+        kubernetesObjectsSnapshotsTarget='')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredKubernetesObjectsExportConfig=config),
+        flags='--kubernetes-objects-snapshots-target NONE')
 
   @parameterized.parameters('rapid', 'regular', 'stable', 'None')
   def testUpdateReleaseChannel(self, channel):
@@ -2711,18 +2748,17 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
     self._TestUpdate(update=update, flags=flags)
 
   def testUpdateAddonsCloudRun(self):
-    unspecified = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_UNSPECIFIED
     internal = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
     external = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
-                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False, loadBalancerType=unspecified))),
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False))),
         flags='--update-addons CloudRun=ENABLED')
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
-                cloudRunConfig=self.msgs.CloudRunConfig(disabled=True, loadBalancerType=unspecified))),
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=True))),
         flags='--update-addons CloudRun=DISABLED')
     self._TestUpdate(
         self.msgs.ClusterUpdate(
@@ -2737,7 +2773,8 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
             desiredAddonsConfig=self.msgs.AddonsConfig(
                 cloudRunConfig=self.msgs.CloudRunConfig(
                     disabled=False, loadBalancerType=external))),
-        flags='--update-addons CloudRun=ENABLED --cloud-run-config load-balancer-type=EXTERNAL')
+        flags='--update-addons CloudRun=ENABLED --cloud-run-config load-balancer-type=EXTERNAL'
+    )
 
   def testUpdateAddonsApplicationManager(self):
     # test disabling ApplicationManager
@@ -2789,19 +2826,6 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
       self.Run(
           self.clusters_command_base.format(self.ZONE) +
           ' update test-cluster --release-channel={0}'.format(channel_name))
-
-  @parameterized.parameters(
-      ('--enable-master-global-access ', True),
-      ('--no-enable-master-global-access ', False),
-  )
-  def testMasterGlobalAccess(self, flags, enabled):
-    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
-        enabled=enabled)
-    desired = self.msgs.PrivateClusterConfig(
-        masterGlobalAccessConfig=master_global_access_config)
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
-        flags=flags)
 
   @parameterized.parameters('disabled', 'outbound-only', 'bidirectional')
   def testUpdatePrivateIPv6AccessType(self, access_type):

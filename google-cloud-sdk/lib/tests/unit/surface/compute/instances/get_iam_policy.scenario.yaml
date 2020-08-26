@@ -32,19 +32,12 @@ actions:
       BETA: beta
       ALPHA: alpha
 
-- define_reference:
-    reference: query-params
-    track_values:
-      GA: alt=json
-      BETA: alt=json&optionsRequestedPolicyVersion=3
-      ALPHA: alt=json&optionsRequestedPolicyVersion=3
-
 - execute_command:
     command: compute instances get-iam-policy my-instance --zone=ZONE
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -65,7 +58,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -107,7 +100,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?$$query-params$$
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           body: null
         return_response:

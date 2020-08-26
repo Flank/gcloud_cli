@@ -120,14 +120,15 @@ https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances#databaseVer
 
 .TP 2m
 \fB\-\-enable\-bin\-log\fR
-Specified if binary log should be enabled. If backup configuration is disabled,
-binary log must be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second. Must have automatic backups enabled to use. Make sure storage can
+support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-enable\-point\-in\-time\-recovery\fR
-Specifies if point\-in\-time recovery (using write\-ahead log archiving) should
-be enabled. If backup configuration is disabled, point\-in\-time recovery must
-be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second, via write\-ahead logs. Must have automatic backups enabled to use. Make
+sure storage can support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR

@@ -6,6 +6,7 @@ SYNOPSIS
     gcloud alpha access-context-manager perimeters create
         (PERIMETER : --policy=POLICY) --title=TITLE
         [--access-levels=[LEVEL,...]] [--async] [--description=DESCRIPTION]
+        [--egress-policies=YAML_FILE] [--ingress-policies=YAML_FILE]
         [--perimeter-type=PERIMETER_TYPE; default="regular"]
         [--resources=[RESOURCES,...]] [--restricted-services=[SERVICE,...]]
         [--enable-vpc-accessible-services
@@ -42,6 +43,24 @@ OPTIONAL FLAGS
 
      --description=DESCRIPTION
         Long-form description of service perimeter.
+
+     --egress-policies=YAML_FILE
+        Path to a file containing a list of Engress Policies.
+
+        This file contains a list of YAML-compliant objects representing
+        Engress Policies described in the API reference.
+
+        For more information about the alpha version, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+
+     --ingress-policies=YAML_FILE
+        Path to a file containing a list of Ingress Policies.
+
+        This file contains a list of YAML-compliant objects representing
+        Ingress Policies described in the API reference.
+
+        For more information about the alpha version, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
 
      --perimeter-type=PERIMETER_TYPE; default="regular"
         Type of the perimeter. PERIMETER_TYPE must be one of:
@@ -95,7 +114,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud access-context-manager perimeters create
         $ gcloud beta access-context-manager perimeters create

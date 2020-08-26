@@ -37,74 +37,178 @@ class InitTestAlpha(base.EventsBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def SetUp(self):
-    self.service_account = 'svcacc@gserviceaccount.com'
-    self.service_account_ref = self._registry.Parse(
-        self.service_account,
-        params={'projectsId': '-'},
-        collection=core_iam_util.SERVICE_ACCOUNTS_COLLECTION)
-    self.service_account_key_ref = self._registry.Parse(
-        'somehexvalue',
-        params={
-            'projectsId': 'fake-project',
-            'serviceAccountsId': self.service_account
-        },
-        collection='iam.projects.serviceAccounts.keys')
-    self.operations.CreateOrReplaceServiceAccountSecret.return_value = (
-        None, self.service_account_key_ref)
+    self.get_or_create_service_account = self.StartObjectPatch(
+        iam_util,
+        'GetOrCreateServiceAccountWithPrompt',
+        side_effect=_MockGetOrCreateServiceAccount
+    )
+    self.operations.CreateOrReplaceServiceAccountSecret.side_effect = (
+        self._MockCreateOrReplaceServiceAccountSecret)
     self.bind_missing_roles = self.StartObjectPatch(
         iam_util,
-        'BindMissingRolesWithPrompt',
+        'PrintOrBindMissingRolesWithPrompt',
     )
     self.mock_list_services = self.StartObjectPatch(
         serviceusage,
         'ListServices',
-        return_value=[_mock_service(name) for name
+        return_value=[_MockService(name) for name
                       in init._CONTROL_PLANE_REQUIRED_SERVICES],
     )
+    self.operations.IsClusterInitialized.return_value = False
 
-  def runCommandAndAssertComplete(self):
-    self.Run('events init --service-account=svcacc@gserviceaccount.com '
-             '--platform=gke --cluster=cluster-1 '
-             '--cluster-location=us-central1-a')
+  def _MockCreateOrReplaceServiceAccountSecret(self, secret_ref,
+                                               service_account_ref):
+    key_ref = self._registry.Parse(
+        'somehexvalue',
+        params={
+            'projectsId': 'fake-project',
+            'serviceAccountsId': service_account_ref,
+        },
+        collection='iam.projects.serviceAccounts.keys')
+    return None, key_ref
+
+  def runCommand(self, control_plane_sa=None, broker_sa=None, sources_sa=None):
+    args = [
+        '--platform=gke',
+        '--cluster=cluster-1',
+        '--cluster-location=us-central1-a',
+    ]
+    if control_plane_sa:
+      args.append('--service-account={}'.format(control_plane_sa))
+    if broker_sa:
+      args.append('--broker-service-account={}'.format(broker_sa))
+    if sources_sa:
+      args.append('--sources-service-account={}'.format(sources_sa))
+    self.Run('events init {}'.format(' '.join(args)))
+
+  def assertCommandSucceeded(self, control_plane_sa=None, broker_sa=None,
+                             sources_sa=None):
+    # This method contains general assertions that should hold true for
+    # all successful invocations.
     self.AssertErrContains(
         'Initialized cluster [cluster-1] for Cloud Run eventing')
-    self.AssertErrContains(self.service_account)
-    self.AssertErrContains(self.service_account_key_ref.Name())
-    self.bind_missing_roles.assert_called_once_with(
-        self.service_account_ref,
-        [
-            'roles/cloudscheduler.admin',
-            'roles/logging.configWriter',
-            'roles/logging.privateLogViewer',
-            'roles/pubsub.admin',
-            'roles/storage.admin',
-        ])
+
+    self.assertOnlyDefaultServiceAccountsCreated(
+        control_plane_sa, broker_sa, sources_sa)
+    self.assertOnlyDefaultServiceAccountsHadRolesBound(
+        control_plane_sa, broker_sa, sources_sa)
+    self.assertKeysAdded(
+        control_plane_sa, broker_sa, sources_sa)
+    self.operations.MarkClusterInitialized.assert_called_once_with()
+
+  def assertOnlyDefaultServiceAccountsCreated(
+      self, control_plane_sa=None, broker_sa=None, sources_sa=None):
+
+    expected_creations = []
+    if control_plane_sa is None:
+      expected_creations.append(
+          mock.call('cloud-run-events',
+                    'Cloud Run Events',
+                    'Cloud Run Events on-cluster Infrastructure')
+      )
+
+    if broker_sa is None:
+      expected_creations.append(
+          mock.call('cloud-run-events-broker',
+                    'Cloud Run Events Broker',
+                    'Cloud Run Events on-cluster Broker')
+      )
+
+    if sources_sa is None:
+      expected_creations.append(
+          mock.call('cloud-run-events-sources',
+                    'Cloud Run Events Sources',
+                    'Cloud Run Events on-cluster Sources')
+      )
+
+    self.get_or_create_service_account.assert_has_calls(expected_creations)
+    self.assertEqual(self.get_or_create_service_account.call_count,
+                     len(expected_creations))
+
+  def assertOnlyDefaultServiceAccountsHadRolesBound(
+      self, control_plane_sa=None, broker_sa=None, sources_sa=None):
+
+    control_plane_ref = self._registry.Parse(
+        control_plane_sa or _AccountToEmail('cloud-run-events'),
+        params={'projectsId': '-'},
+        collection=core_iam_util.SERVICE_ACCOUNTS_COLLECTION)
+    broker_ref = self._registry.Parse(
+        broker_sa or _AccountToEmail('cloud-run-events-broker'),
+        params={'projectsId': '-'},
+        collection=core_iam_util.SERVICE_ACCOUNTS_COLLECTION)
+    sources_ref = self._registry.Parse(
+        sources_sa or _AccountToEmail('cloud-run-events-sources'),
+        params={'projectsId': '-'},
+        collection=core_iam_util.SERVICE_ACCOUNTS_COLLECTION)
+
+    # A binding call is always made, but when a default service account is
+    # used, the last arg is True to indicate bind, otherwise False.
+    expected_bindings = [
+        mock.call(
+            control_plane_ref,
+            [
+                'roles/cloudscheduler.admin',
+                'roles/logging.configWriter',
+                'roles/logging.privateLogViewer',
+                'roles/pubsub.admin',
+                'roles/storage.admin',
+            ],
+            control_plane_sa is None,
+        ),
+        mock.call(
+            broker_ref,
+            [
+                'roles/pubsub.editor',
+            ],
+            broker_sa is None,
+        ),
+        mock.call(
+            sources_ref,
+            [
+                'roles/pubsub.editor',
+            ],
+            sources_sa is None,
+        ),
+    ]
+    self.bind_missing_roles.assert_has_calls(expected_bindings)
+    self.assertEqual(self.bind_missing_roles.call_count, len(expected_bindings))
+
+  def assertKeysAdded(
+      self, control_plane_sa=None, broker_sa=None, sources_sa=None):
+    self.AssertErrContains(
+        'Added key [somehexvalue] to cluster for [{}]'.format(
+            control_plane_sa or _AccountToEmail('cloud-run-events')))
+    self.AssertErrContains(
+        'Added key [somehexvalue] to cluster for [{}]'.format(
+            broker_sa or _AccountToEmail('cloud-run-events-broker')))
+    self.AssertErrContains(
+        'Added key [somehexvalue] to cluster for [{}]'.format(
+            sources_sa or _AccountToEmail('cloud-run-events-sources')))
 
   def testEventTypesFailFailNonGKE(self):
     """This command is only for initializing a cluster."""
     with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events init --service-account=svcacc@gserviceaccount.com '
-               '--platform=managed --region=us-central1')
+      self.Run('events init --platform=managed --region=us-central1')
     self.AssertErrContains(
         'This command is only available with Cloud Run for Anthos.')
 
   def testInitWithPromptYes(self):
     """Tests successful init with success message on prompt confirmation."""
     self.WriteInput('y\n')
-    self.runCommandAndAssertComplete()
+    self.runCommand()
+    self.assertCommandSucceeded()
 
   def testInitWithPromptNoFails(self):
     """Tests failed init without prompt confirmation."""
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
-      self.Run('events init --service-account=svcacc@gserviceaccount.com '
-               '--platform=gke --cluster=cluster-1 '
-               '--cluster-location=us-central1-a')
+      self.runCommand()
 
   def testInitNoPrompt(self):
     """Tests successful init with success message on no prompting allowed."""
     self.is_interactive.return_value = False
-    self.runCommandAndAssertComplete()
+    self.runCommand()
+    self.assertCommandSucceeded()
 
   def testMissingServicesAreEnabledEnablesOneService(self):
     # ListServices has been mocked out to return all required services as
@@ -118,7 +222,8 @@ class InitTestAlpha(base.EventsBase):
     mock_enable_api_call.return_value.done = True
     self.WriteInput('y\n')
     self.WriteInput('y\n')
-    self.runCommandAndAssertComplete()
+    self.runCommand()
+    self.assertCommandSucceeded()
     mock_enable_api_call.assert_called_once_with(
         'fake-project', 'cloudresourcemanager.googleapis.com')
 
@@ -140,30 +245,67 @@ class InitTestAlpha(base.EventsBase):
     )
     self.WriteInput('y\n')
     self.WriteInput('y\n')
-    self.runCommandAndAssertComplete()
+    self.runCommand()
+    self.assertCommandSucceeded()
     mock_batch_enable_api_call.assert_called_once_with(
         'fake-project', ['cloudresourcemanager.googleapis.com',
                          'cloudscheduler.googleapis.com'])
     mock_wait_operation.assert_called_once_with(
         mock_batch_enable_api_call.return_value.name, serviceusage.GetOperation)
 
-  def testServiceAccountNotProvidedUsesDefault(self):
-    service_account = 'existing-account@gserviceaccount.com'
-    self.StartObjectPatch(
-        iam_util,
-        'GetOrCreateEventingServiceAccountWithPrompt',
-        return_value=service_account,
-    )
-    self.WriteInput('y\n')
-    self.WriteInput('y\n')
-    self.Run('events init --platform=gke --cluster=cluster-1 '
-             '--cluster-location=us-central1-a')
-    self.AssertErrContains(
-        'Initialized cluster [cluster-1] for Cloud Run eventing')
+  def testControlPlaneServiceAccountCanBeOverridden(self):
+    service_account = 'existing-control-plane@gserviceaccount.com'
+    self.runCommand(control_plane_sa=service_account)
+    self.assertCommandSucceeded(control_plane_sa=service_account)
     self.AssertErrContains(service_account)
 
+  def testBrokerServiceAccountCanBeOverridden(self):
+    service_account = 'existing-broker@gserviceaccount.com'
+    self.runCommand(broker_sa=service_account)
+    self.assertCommandSucceeded(broker_sa=service_account)
+    self.AssertErrContains(service_account)
 
-def _mock_service(name):
+  def testSourcesServiceAccountCanBeOverridden(self):
+    service_account = 'existing-sources@gserviceaccount.com'
+    self.runCommand(sources_sa=service_account)
+    self.assertCommandSucceeded(sources_sa=service_account)
+    self.AssertErrContains(service_account)
+
+  def testUserPromptedIfAlreadyInitializedNoReinit(self):
+    self.operations.IsClusterInitialized.return_value = True
+    self.WriteInput('n\n')
+    with self.assertRaises(console_io.OperationCancelledError):
+      self.runCommand()
+    self.AssertErrContains('Would you like to re-run initialization?')
+
+  def testUserPromptedIfAlreadyInitializedWithReinit(self):
+    self.operations.IsClusterInitialized.return_value = True
+    self.WriteInput('y\n')
+    self.runCommand()
+    self.AssertErrContains('Would you like to re-run initialization?')
+    self.assertCommandSucceeded()
+
+  def testInitializedMessage(self):
+    message = init._InitializedMessage(self.track, 'my-cluster')
+    self.assertEqual(
+        message,
+        ('Initialized cluster [my-cluster] for Cloud Run eventing. '
+         'Next, initialize the namespace(s) you plan to use and create a '
+         'broker via `gcloud alpha events namespaces init` and `gcloud alpha '
+         'events brokers create`.'))
+
+
+def _MockService(name):
   service = mock.Mock()
   service.config.name = name
   return service
+
+
+def _MockGetOrCreateServiceAccount(name, display_name, description):
+  del display_name
+  del description
+  return _AccountToEmail(name)
+
+
+def _AccountToEmail(name):
+  return '{}@fake-project.iam.gserviceaccount.com'.format(name)

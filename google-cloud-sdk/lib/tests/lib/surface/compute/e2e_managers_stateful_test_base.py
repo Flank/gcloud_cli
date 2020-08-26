@@ -90,7 +90,7 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
     if add_stateful_disks:
       for device_name in add_stateful_disks:
         command += """\
-          --update-stateful-disk device-name={0}""".format(device_name)
+          --stateful-disk device-name={0}""".format(device_name)
     if remove_stateful_disks:
       command += """\
         --remove-stateful-disks {0}""".format(','.join(remove_stateful_disks))

@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute packet-mirrorings update NAME [--async]
         [--collector-ilb=COLLECTOR_ILB] [--description=DESCRIPTION] [--enable]
-        [--region=REGION]
+        [--filter-direction=DIRECTION] [--region=REGION]
         [--add-filter-cidr-ranges=[CIDR_RANGE,...] | --clear-filter-cidr-ranges
           | --remove-filter-cidr-ranges=[CIDR_RANGE,...]
           | --set-filter-cidr-ranges=[CIDR_RANGE,...]]
@@ -23,7 +23,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update a Google Compute Engine packet mirroring policy.
+    (ALPHA) Update a Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -51,6 +51,13 @@ FLAGS
 
      --enable
         Enable or disable the packet-mirroring.
+
+     --filter-direction=DIRECTION
+        DIRECTION must be one of INGRESS, EGRESS, BOTH. For INGRESS, only
+        ingress traffic is mirrored. For EGRESS, only egress traffic is
+        mirrored. For BOTH (or in case the filter-direction option is not
+        specified), both directions are mirrored. This is the default option.
+        DIRECTION must be one of: both, egress, ingress.
 
      --region=REGION
         Region of the packet mirroring to update. Overrides the default
@@ -175,7 +182,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute packet-mirrorings update
         $ gcloud beta compute packet-mirrorings update

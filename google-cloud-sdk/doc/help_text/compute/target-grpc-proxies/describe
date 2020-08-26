@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute target-grpc-proxies describe displays all data associated
-    with a Google Compute Engine target gRPC proxy.
+    with a Compute Engine target gRPC proxy.
 
 POSITIONAL ARGUMENTS
      NAME

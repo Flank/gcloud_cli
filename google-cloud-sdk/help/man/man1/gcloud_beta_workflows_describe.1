@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_BETA_WORKFLOWS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta workflows describe \- show metadata for a workflow
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta workflows describe\fR (\fIWORKFLOW\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Display all metadata associated with a workflow of given name.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Workflow resource \- The name of the workflow to describe. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [workflow] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIWORKFLOW\fR
+ID of the workflow or fully qualified identifier for the workflow. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The Cloud location for the workflow. Alternatively, set the property
+[workflows/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBworkflows/v1beta\fR API. The full documentation for
+this API can be found at:
+https://sites.google.com/corp/google.com/cloudworkflows
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

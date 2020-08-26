@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: different operation IDs for the same operation
+    bug: b/163053392
 title: Create, describe, list, and delete a composite index
 release_tracks: [GA]
 summary:

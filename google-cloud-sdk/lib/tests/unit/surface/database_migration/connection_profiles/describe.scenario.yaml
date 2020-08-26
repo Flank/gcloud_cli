@@ -1,0 +1,70 @@
+title: database-migration connection-profiles describe scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration connection-profiles describe test-profile --region=us-central1
+  - stdout: |
+      createTime: '2020-04-24T18:15:24.696346992Z'
+      displayName: test-profile
+      mysql:
+        cloudSqlId: cloudSqlId
+        hasPassword: true
+        host: 35.188.150.50
+        port: 3306
+        ssl:
+          type: SERVER_CLIENT
+        username: username
+      name: projects/fake-project/locations/us-central1/connectionProfiles/test-profile
+      provider: CLOUDSQL
+      state: READY
+      updateTime: '2020-04-24T18:15:25.958884840Z'
+actions:
+- execute_command:
+    command: database-migration connection-profiles describe test-profile --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/connectionProfiles/test-profile?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/connectionProfiles/test-profile",
+              "createTime": "2020-04-24T18:15:24.696346992Z",
+              "updateTime": "2020-04-24T18:15:25.958884840Z",
+              "state": "READY",
+              "displayName": "test-profile",
+              "provider": "CLOUDSQL",
+              "mysql": {
+                "host": "35.188.150.50",
+                "port": 3306,
+                "username": "username",
+                "ssl": {
+                  "type": "SERVER_CLIENT"
+                },
+                "cloudSqlId": "cloudSqlId",
+                "hasPassword": true
+              }
+            }
+    - expect_stdout: |
+        createTime: '2020-04-24T18:15:24.696346992Z'
+        displayName: test-profile
+        mysql:
+          cloudSqlId: cloudSqlId
+          hasPassword: true
+          host: 35.188.150.50
+          port: 3306
+          ssl:
+            type: SERVER_CLIENT
+          username: username
+        name: projects/fake-project/locations/us-central1/connectionProfiles/test-profile
+        provider: CLOUDSQL
+        state: READY
+        updateTime: '2020-04-24T18:15:25.958884840Z'
+    - expect_exit:
+        code: 0

@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: etag value changed
+    bug: b/162305110
 title: LabelManager - LabelValues - Describe test
 release_tracks: [ALPHA]
 

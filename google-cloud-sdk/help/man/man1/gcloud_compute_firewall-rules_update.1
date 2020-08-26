@@ -11,7 +11,7 @@ gcloud compute firewall\-rules update \- update a firewall rule
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute firewall\-rules update\fR \fINAME\fR [\fB\-\-allow\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-disabled\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute firewall\-rules update\fR \fINAME\fR [\fB\-\-allow\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-disabled\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -130,6 +130,12 @@ $ gcloud compute firewall\-rules update MY\-RULE \-\-no\-enable\-logging
 
 Use \fB\-\-enable\-logging\fR to enable and \fB\-\-no\-enable\-logging\fR to
 disable.
+
+.TP 2m
+\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR
+Adds or removes metadata fields to or from the reported firewall logs. Can only
+be specified if \-\-enable\-logging is true. \fILOGGING_METADATA\fR must be one
+of: \fBexclude\-all\fR, \fBinclude\-all\fR.
 
 .TP 2m
 \fB\-\-priority\fR=\fIPRIORITY\fR

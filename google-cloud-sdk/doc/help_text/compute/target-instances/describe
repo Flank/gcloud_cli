@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute target-instances describe displays all data associated with
-    a Google Compute Engine target instance in a project.
+    a Compute Engine target instance in a project.
 
 POSITIONAL ARGUMENTS
      NAME

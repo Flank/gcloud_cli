@@ -30,19 +30,19 @@ GROUPS
     GROUP is one of the following:
 
      rules
-        Read and manipulate Google Compute Engine security policies rules.
+        Read and manipulate Compute Engine security policies rules.
 
 COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a Google Compute Engine security policy.
+        Create a Compute Engine security policy.
 
      delete
         Delete security policies.
 
      describe
-        Describe a Google Compute Engine security policy.
+        Describe a Compute Engine security policy.
 
      export
         Export security policy configs into yaml files.

@@ -11,7 +11,7 @@ gcloud alpha composer environments update \- update properties of a Cloud Compos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-cloud\-sql\-machine\-type\fR=\fICLOUD_SQL_MACHINE_TYPE\fR\ |\ \fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-cloud\-sql\-machine\-type\fR=\fICLOUD_SQL_MACHINE_TYPE\fR\ |\ \fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-web\-server\-machine\-type\fR=\fIWEB_SERVER_MACHINE_TYPE\fR\ |\ \fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,6 +64,11 @@ Cloud SQL machine type used by the Airflow database.
 .TP 2m
 \fB\-\-node\-count\fR=\fINODE_COUNT\fR
 The new number of nodes running the environment. Must be >= 3.
+
+.TP 2m
+\fB\-\-web\-server\-machine\-type\fR=\fIWEB_SERVER_MACHINE_TYPE\fR
+machine type used by the Airflow web server. The list of available machine types
+is available here: https://cloud.google.com/composer/pricing.
 
 .TP 2m
 
@@ -316,7 +321,7 @@ $ gcloud alpha composer environments update env\-1 \-\-node\-count=8 \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud composer environments update

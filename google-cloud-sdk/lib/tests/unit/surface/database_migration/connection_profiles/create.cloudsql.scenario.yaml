@@ -1,0 +1,358 @@
+title: database-migration connection-profiles create cloudsql scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration connection-profiles create cloudsql my-profile --region=us-central1
+      --display-name=my-profile --provider=CLOUDSQL --database-version=MYSQL_5_6 --user-labels=testkey=testval
+      --tier=db-n1-standard-1 --storage-auto-resize-limit=0 --activation-policy=ALWAYS
+      --enable-ip-v4=false --private-network=default --require-ssl=false --authorized-networks=0.0.0.0/0
+      --auto-storage-increase=true --database-flags=testkey=testval --data-disk-type=PD_SSD
+      --data-disk-size=10 --zone=us-central1-a --source-id=fake-source
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata
+        apiVersion: v1alpha2
+        createTime: '2020-08-17T16:02:26.719717722Z'
+        endTime: '2020-08-17T16:07:00.257294026Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+        verb: create
+      name: projects/fake-project/locations/us-central1/operations/operation-1597680146593-5ad14e59a37e2-5a0cc518-bd6475f4
+      response:
+        '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.ConnectionProfile
+        cloudsql:
+          cloudSqlId: my-profile
+          publicIp: 35.222.40.18
+          settings:
+            activationPolicy: ALWAYS
+            autoStorageIncrease: true
+            dataDiskSizeGb: '10'
+            dataDiskType: PD_SSD
+            databaseFlags:
+              testkey: testval
+            databaseVersion: MYSQL_5_6
+            ipConfig:
+              authorizedNetworks:
+              - value: 0.0.0.0/0
+              enableIpv4: true
+              requireSsl: true
+            sourceId: projects/fake-project/locations/us-central1/connectionProfiles/fake-source
+            storageAutoResizeLimit: '0'
+            tier: db-n1-standard-1
+            userLabels:
+              testkey: testval
+            zone: us-central1-a
+        createTime: '2020-08-17T16:02:26.713745814Z'
+        displayName: my-profile
+        name: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+        provider: CLOUDSQL
+        state: READY
+        updateTime: '2020-08-17T16:02:26.713745814Z'
+- execute:
+  - command: database-migration connection-profiles create cloudsql my-profile --region=us-central1
+      --display-name=my-profile --database-version=MYSQL_5_6 --tier=db-n1-standard-1
+      --source-id=fake-source
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata
+        apiVersion: v1alpha2
+        createTime: '2020-08-17T18:46:45.943725586Z'
+        endTime: '2020-08-17T18:51:20.158019993Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+        verb: create
+      name: projects/fake-project/locations/us-central1/operations/operation-1597689881738-5ad1729dcbe6c-f6d85b7f-375f2d7d
+      response:
+        '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.ConnectionProfile
+        cloudsql:
+          cloudSqlId: my-profile
+          publicIp: 35.188.102.86
+          settings:
+            databaseVersion: MYSQL_5_6
+            ipConfig: {}
+            sourceId: projects/fake-project/locations/us-central1/connectionProfiles/fake-source
+            tier: db-n1-standard-1
+            zone: us-central1-a
+        createTime: '2020-08-17T18:46:45.937765295Z'
+        displayName: my-profile
+        name: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+        state: READY
+        updateTime: '2020-08-17T18:46:45.937765295Z'
+actions:
+- execute_command:
+    command: database-migration connection-profiles create cloudsql my-profile --region=us-central1
+      --display-name=my-profile --provider=CLOUDSQL --database-version=MYSQL_5_6 --user-labels=testkey=testval
+      --tier=db-n1-standard-1 --storage-auto-resize-limit=0 --activation-policy=ALWAYS
+      --enable-ip-v4=false --private-network=default --require-ssl=false --authorized-networks=0.0.0.0/0
+      --auto-storage-increase=true --database-flags=testkey=testval --data-disk-type=PD_SSD
+      --data-disk-size=10 --zone=us-central1-a --source-id=fake-source
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/connectionProfiles\?alt=json&connectionProfileId=my-profile&requestId=.*
+          method: POST
+          headers: {}
+          body:
+            json:
+              cloudsql:
+                settings:
+                  activationPolicy: ALWAYS
+                  autoStorageIncrease: true
+                  dataDiskSizeGb: '10'
+                  dataDiskType: PD_SSD
+                  databaseFlags:
+                    testkey: testval
+                  databaseVersion: MYSQL_5_6
+                  ipConfig:
+                    authorizedNetworks:
+                    - value: 0.0.0.0/0
+                    enableIpv4: true
+                    privateNetwork: default
+                    requireSsl: true
+                  sourceId: projects/fake-project/locations/us-central1/connectionProfiles/fake-source
+                  storageAutoResizeLimit: '0'
+                  tier: db-n1-standard-1
+                  userLabels:
+                    testkey: testval
+                  zone: us-central1-a
+              displayName: my-profile
+              name: my-profile
+              provider: CLOUDSQL
+              state: CREATING
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1597680146593-5ad14e59a37e2-5a0cc518-bd6475f4",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-08-17T16:02:26.719717722Z",
+                "target": "projects/fake-project/locations/us-central1/connectionProfiles/my-profile",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/operations/operation-1597680146593-5ad14e59a37e2-5a0cc518-bd6475f4?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |-
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1597680146593-5ad14e59a37e2-5a0cc518-bd6475f4",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-08-17T16:02:26.719717722Z",
+                "endTime": "2020-08-17T16:07:00.257294026Z",
+                "target": "projects/fake-project/locations/us-central1/connectionProfiles/my-profile",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.ConnectionProfile",
+                "name": "projects/fake-project/locations/us-central1/connectionProfiles/my-profile",
+                "createTime": "2020-08-17T16:02:26.713745814Z",
+                "updateTime": "2020-08-17T16:02:26.713745814Z",
+                "state": "READY",
+                "displayName": "my-profile",
+                "provider": "CLOUDSQL",
+                "cloudsql": {
+                  "cloudSqlId": "my-profile",
+                  "settings": {
+                    "databaseVersion": "MYSQL_5_6",
+                    "userLabels": {
+                      "testkey": "testval"
+                    },
+                    "tier": "db-n1-standard-1",
+                    "storageAutoResizeLimit": "0",
+                    "activationPolicy": "ALWAYS",
+                    "ipConfig": {
+                      "enableIpv4": true,
+                      "requireSsl": true,
+                      "authorizedNetworks": [
+                        {"value": "0.0.0.0/0"}
+                      ]
+                    },
+                    "autoStorageIncrease": true,
+                    "databaseFlags": {
+                      "testkey": "testval"
+                    },
+                    "dataDiskType": "PD_SSD",
+                    "dataDiskSizeGb": "10",
+                    "zone": "us-central1-a",
+                    "sourceId": "projects/fake-project/locations/us-central1/connectionProfiles/fake-source"
+                  },
+                  "publicIp": "35.222.40.18"
+                }
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata
+          apiVersion: v1alpha2
+          createTime: '2020-08-17T16:02:26.719717722Z'
+          endTime: '2020-08-17T16:07:00.257294026Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+          verb: create
+        name: projects/fake-project/locations/us-central1/operations/operation-1597680146593-5ad14e59a37e2-5a0cc518-bd6475f4
+        response:
+          '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.ConnectionProfile
+          cloudsql:
+            cloudSqlId: my-profile
+            publicIp: 35.222.40.18
+            settings:
+              activationPolicy: ALWAYS
+              autoStorageIncrease: true
+              dataDiskSizeGb: '10'
+              dataDiskType: PD_SSD
+              databaseFlags:
+                testkey: testval
+              databaseVersion: MYSQL_5_6
+              ipConfig:
+                authorizedNetworks:
+                - value: 0.0.0.0/0
+                enableIpv4: true
+                requireSsl: true
+              sourceId: projects/fake-project/locations/us-central1/connectionProfiles/fake-source
+              storageAutoResizeLimit: '0'
+              tier: db-n1-standard-1
+              userLabels:
+                testkey: testval
+              zone: us-central1-a
+          createTime: '2020-08-17T16:02:26.713745814Z'
+          displayName: my-profile
+          name: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+          provider: CLOUDSQL
+          state: READY
+          updateTime: '2020-08-17T16:02:26.713745814Z'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: database-migration connection-profiles create cloudsql my-profile --region=us-central1
+      --display-name=my-profile --database-version=MYSQL_5_6 --tier=db-n1-standard-1
+      --source-id=fake-source
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/connectionProfiles\?alt=json&connectionProfileId=my-profile&requestId=.*
+          method: POST
+          headers: {}
+          body:
+            json:
+              cloudsql:
+                settings:
+                  activationPolicy: SQL_ACTIVATION_POLICY_UNSPECIFIED
+                  dataDiskType: SQL_DATA_DISK_TYPE_UNSPECIFIED
+                  databaseVersion: MYSQL_5_6
+                  ipConfig: {}
+                  sourceId: projects/fake-project/locations/us-central1/connectionProfiles/fake-source
+                  tier: db-n1-standard-1
+              displayName: my-profile
+              name: my-profile
+              provider: DATABASE_PROVIDER_UNSPECIFIED
+              state: CREATING
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1597689881738-5ad1729dcbe6c-f6d85b7f-375f2d7d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-08-17T18:44:41.833632800Z",
+                "target": "projects/fake-project/locations/us-central1/connectionProfiles/my-profile",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/operations/operation-1597689881738-5ad1729dcbe6c-f6d85b7f-375f2d7d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1597689881738-5ad1729dcbe6c-f6d85b7f-375f2d7d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                "createTime": "2020-08-17T18:46:45.943725586Z",
+                "endTime": "2020-08-17T18:51:20.158019993Z",
+                "target": "projects/fake-project/locations/us-central1/connectionProfiles/my-profile",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha2"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.ConnectionProfile",
+                "name": "projects/fake-project/locations/us-central1/connectionProfiles/my-profile",
+                "createTime": "2020-08-17T18:46:45.937765295Z",
+                "updateTime": "2020-08-17T18:46:45.937765295Z",
+                "state": "READY",
+                "displayName": "my-profile",
+                "cloudsql": {
+                  "cloudSqlId": "my-profile",
+                  "settings": {
+                    "databaseVersion": "MYSQL_5_6",
+                    "tier": "db-n1-standard-1",
+                    "ipConfig": {},
+                    "zone": "us-central1-a",
+                    "sourceId": "projects/fake-project/locations/us-central1/connectionProfiles/fake-source"
+                  },
+                  "publicIp": "35.188.102.86"
+                }
+              }
+            }
+
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata
+          apiVersion: v1alpha2
+          createTime: '2020-08-17T18:46:45.943725586Z'
+          endTime: '2020-08-17T18:51:20.158019993Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+          verb: create
+        name: projects/fake-project/locations/us-central1/operations/operation-1597689881738-5ad1729dcbe6c-f6d85b7f-375f2d7d
+        response:
+          '@type': type.googleapis.com/google.cloud.clouddms.v1alpha2.ConnectionProfile
+          cloudsql:
+            cloudSqlId: my-profile
+            publicIp: 35.188.102.86
+            settings:
+              databaseVersion: MYSQL_5_6
+              ipConfig: {}
+              sourceId: projects/fake-project/locations/us-central1/connectionProfiles/fake-source
+              tier: db-n1-standard-1
+              zone: us-central1-a
+          createTime: '2020-08-17T18:46:45.937765295Z'
+          displayName: my-profile
+          name: projects/fake-project/locations/us-central1/connectionProfiles/my-profile
+          state: READY
+          updateTime: '2020-08-17T18:46:45.937765295Z'
+    - expect_exit:
+        code: 0

@@ -11,7 +11,7 @@ gcloud beta spanner databases ddl update \- update the DDL for a Cloud Spanner d
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta spanner databases ddl update\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-ddl\fR=\fIDDL\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta spanner databases ddl update\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-ddl\fR=\fIDDL\fR] [\fB\-\-ddl\-file\fR=\fIDDL_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,25 +49,25 @@ The Cloud Spanner instance for the database.
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
+.SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
 .TP 2m
 \fB\-\-ddl\fR=\fIDDL\fR
 Semi\-colon separated DDL (data definition language) statements to run inside
 the database. If a statement fails, all subsequent statements in the batch are
 automatically cancelled.
 
-
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
 .TP 2m
-\fB\-\-async\fR
-Return immediately, without waiting for the operation in progress to complete.
+\fB\-\-ddl\-file\fR=\fIDDL_FILE\fR
+Path of a file containing semi\-colon separated DDL (data definition language)
+statements to run inside the database. If a statement fails, all subsequent
+statements in the batch are automatically cancelled. If \-\-ddl_file is set,
+\-\-ddl is ignored.
 
 
 .RE

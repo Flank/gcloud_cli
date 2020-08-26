@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha commerce-procurement consumer operations describe - outputs
-        the operation object resulting from the Get API
+    gcloud alpha commerce-procurement consumer operations describe - returns
+        the Operation object resulting from the Get API
 
 SYNOPSIS
     gcloud alpha commerce-procurement consumer operations describe
@@ -10,7 +10,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Outputs the operation object resulting from the Get API.
+    (ALPHA) Returns the Operation object resulting from the Get API.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
@@ -29,7 +29,7 @@ REQUIRED FLAGS
             other arguments in this group are specified.
 
          --free-trial=FREE_TRIAL
-            Procurement Free Trial for the free-trial-operation.
+            Procurement free trial for the free-trial-operation.
 
        Order operation resource - Order operation to describe. The arguments in
        this group can be used to specify the attributes of this resource.
@@ -40,7 +40,7 @@ REQUIRED FLAGS
             arguments in this group are specified.
 
          --billing-account=BILLING_ACCOUNT
-            Billing Account for the order-operation.
+            Cloud Billing account for the Procurement order-operation.
 
          --order=ORDER
             Procurement Order for the order-operation.
@@ -58,5 +58,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha commerce-procurement consumer orders modify - modify the order
-        resource from modify API
+    gcloud alpha commerce-procurement consumer orders modify - modifies the
+        order resource from the Modify API
 
 SYNOPSIS
     gcloud alpha commerce-procurement consumer orders modify
@@ -11,7 +11,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Modify the order resource from modify API.
+    (ALPHA) Modifies the order resource from the Modify API.
 
 POSITIONAL ARGUMENTS
      Order resource - Order to modify. The arguments in this group can be used
@@ -23,26 +23,26 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --billing-account=BILLING_ACCOUNT
-          Billing Account for the order.
+          Cloud Billing account for the Procurement order.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
 
        --product-request=[KEY=VALUE,...]
-          Request about product info to place order against.
+          Request about product info to modify order against.
 
-       Quote related modification.
+       Quote-related modification.
 
          --quote-change-type=QUOTE_CHANGE_TYPE
-            Display name of the order. This flag must be specified if any of
-            the other arguments in this group are specified.
+            Change type on quote based purchase. This flag must be specified if
+            any of the other arguments in this group are specified.
 
          --new-quote-external-name=NEW_QUOTE_EXTERNAL_NAME
-            Display name of the order.
+            The external name of the quote the order will use.
 
 OPTIONAL FLAGS
      --etag=ETAG
-        The weak etag for validation check if specified.
+        The weak etag for validation check, if specified.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -53,9 +53,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To modify an order to another product plan or update parameters, you will
-    need to specify product request. To specify parameters, you should follow
-    the pattern "ParameterName=ParameterType:ParameterValue". For example
+    To modify an order to another product plan or update parameters, you must
+    specify product request. To specify parameters, you must follow the pattern
+    "ParameterName=ParameterType:ParameterValue". For example:
 
         $ gcloud alpha commerce-procurement consumer orders modify \
           --product-request \
@@ -63,35 +63,35 @@ EXAMPLES
         product-external-name=productId,flavor-external-name=flavorId,\
         region=str:us-west-1
 
-    To cancel a product plan based order, you will need to specify product
-    request. For example
+    To cancel a product plan-based order, you must specify the product request.
+    For example:
 
         $ gcloud alpha commerce-procurement consumer orders modify \
           --product-request \
           line-item-id=lineItemId,line-item-change-type=CANCEL
 
-    To revert cancellation on a product plan based order, you will need to
-    specify product request. For example
+    To revert cancellation on a product plan-based order, you must specify the
+    product request. For example:
 
         $ gcloud alpha commerce-procurement consumer orders modify \
           --product-request \
           line-item-id=lineItemId,\
         line-item-change-type=REVERT_CANCELLATION
 
-    To update an order to another quote, you will need to specify quote related
-    fields. For example
+    To update an order to another quote, you must specify the fields that are
+    related to the quote. For example:
 
         $ gcloud alpha commerce-procurement consumer orders modify \
           --quote-change-type UPDATE --new-quote-external-name quoteId
 
-    To cancel a quote based order, you will need to specify quote change type.
-    For example
+    To cancel a quote-based order, you must specify the quote change type. For
+    example:
 
         $ gcloud alpha commerce-procurement consumer orders modify \
           --quote-change-type CANCEL
 
-    To revert cancellation on a quote based order, you will need to specify
-    quote change type. For example
+    To revert cancellation on a quote-based order, you must specify the quote
+    change type. For example:
 
         $ gcloud alpha commerce-procurement consumer orders modify \
           --quote-change-type REVERT_CANCELLATION
@@ -101,5 +101,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

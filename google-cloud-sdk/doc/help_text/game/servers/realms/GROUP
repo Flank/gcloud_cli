@@ -1,0 +1,41 @@
+NAME
+    gcloud game servers realms - deploy and manage Cloud Game Server Realms
+
+SYNOPSIS
+    gcloud game servers realms COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Deploy and manage Cloud Game Server Realms.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Realm.
+
+     delete
+        Delete a Realm.
+
+     describe
+        Describe a Realm.
+
+     list
+        List Realms.
+
+     update
+        Update a Realm.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha game servers realms
+        $ gcloud beta game servers realms
+

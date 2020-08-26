@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+
 import os
 import subprocess
 import sys
@@ -114,7 +115,7 @@ def GetArgsForLegacyScript(script_name, args, interpreter=None):
   # .exe, windows only
   if ext == 'exe':
     if not _IsOnWindows():
-      raise ValueError('Extention for {0} is only valid for WINDOWS'.format(
+      raise ValueError('Extension for {0} is only valid for WINDOWS'.format(
           script_name))
     return execution_utils.ArgsForExecutableTool(FullPath(script_name), *args)
 

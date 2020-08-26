@@ -415,6 +415,12 @@ AVAILABLE PROPERTIES
             a location value is required but not provided, the command will
             fall back to this value, if set.
 
+     privateca
+         location
+            Default location to use when working with Private CA resources.
+            When a --location flag is required but not provided, the command
+            will fall back to this value, if set.
+
      proxy
          address
             Hostname or IP address of proxy server.

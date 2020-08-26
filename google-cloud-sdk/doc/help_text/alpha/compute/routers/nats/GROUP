@@ -23,25 +23,25 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Add a NAT to a Google Compute Engine router.
+        (ALPHA) Add a NAT to a Compute Engine router.
 
      delete
-        (ALPHA) Remove a NAT from a Google Compute Engine router.
+        (ALPHA) Remove a NAT from a Compute Engine router.
 
      describe
-        (ALPHA) Describe a NAT in a Google Compute Engine router.
+        (ALPHA) Describe a NAT in a Compute Engine router.
 
      list
-        (ALPHA) Lists the NATs on a Google Compute Engine router.
+        (ALPHA) Lists the NATs on a Compute Engine router.
 
      update
-        (ALPHA) Update a NAT on a Google Compute Engine router.
+        (ALPHA) Update a NAT on a Compute Engine router.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers nats
         $ gcloud beta compute routers nats

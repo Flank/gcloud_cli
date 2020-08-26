@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import flags
@@ -86,6 +87,7 @@ class Update(base.Command):
     flags.AddCpuFlag(parser)
     flags.AddNoTrafficFlag(parser)
     flags.AddServiceAccountFlag(parser)
+    flags.AddImageArg(parser, required=False)
     concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
 
   @staticmethod
@@ -97,9 +99,10 @@ class Update(base.Command):
     flags.AddMinInstancesFlag(cluster_group)
 
   def Run(self, args):
-    """Update configuration information about the service.
+    """Update the service resource.
 
-    Does not change the running code.
+       Different from `deploy` in that it can only update the service spec but
+       no IAM or Cloud build changes.
 
     Args:
       args: Args!
@@ -109,7 +112,10 @@ class Update(base.Command):
       raise exceptions.NoConfigurationChangeError(
           'No configuration change requested. '
           'Did you mean to include the flags `--update-env-vars`, '
-          '`--memory`, `--concurrency`, `--timeout`, `--connectivity`?')
+          '`--memory`, `--concurrency`, `--timeout`, `--connectivity`, '
+          '`--image`?')
+    changes.append(
+        config_changes.SetLaunchStageAnnotationChange(self.ReleaseTrack()))
 
     conn_context = connection_context.GetConnectionContext(
         args, flags.Product.RUN, self.ReleaseTrack())

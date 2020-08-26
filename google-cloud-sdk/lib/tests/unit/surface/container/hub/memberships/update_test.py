@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 
 import copy
 
+from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.container.hub import api_util
 from tests.lib import test_case
 from tests.lib.surface.container.hub.memberships import base
 
@@ -140,6 +142,25 @@ class UpdateTest(base.MembershipsTestBase):
         'foo=baz,new=bar',
     ])
 
+  def testUpdateMembership(self):
+    membership = self._MakeMembership(
+        name='projects/fake-project/locations/global/memberships/12345-abcde',
+        external_id='my-external_id')
+    response = encoding.PyValueToMessage(self.messages.Operation.ResponseValue,
+                                         encoding.MessageToPyValue(membership))
+    operation = self._MakeOperation(done=True, response=response)
+    self.mocked_client.projects_locations_memberships.Patch.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsPatchRequest(
+            name=self.membership,
+            membership=membership,
+            updateMask='external_id'),
+        response=operation)
+
+    self.ExpectGetOperation(operation)
+    self.ExpectGetMembership(membership)
+    api_util.UpdateMembership(self.membership, membership, 'external_id',
+                              calliope_base.ReleaseTrack.GA)
+
 
 class UpdateTestBeta(UpdateTest):
   """gcloud Beta track using GKE Hub API."""
@@ -190,12 +211,50 @@ class UpdateTestBeta(UpdateTest):
         'foo=baz,new=bar',
     ])
 
+  def testUpdateMembership(self):
+    membership = self._MakeMembership(
+        name='projects/fake-project/locations/global/memberships/12345-abcde',
+        external_id='my-external_id')
+    response = encoding.PyValueToMessage(self.messages.Operation.ResponseValue,
+                                         encoding.MessageToPyValue(membership))
+    operation = self._MakeOperation(done=True, response=response)
+    self.mocked_client.projects_locations_memberships.Patch.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsPatchRequest(
+            name=self.membership,
+            membership=membership,
+            updateMask='external_id'),
+        response=operation)
+
+    self.ExpectGetOperation(operation)
+    self.ExpectGetMembership(membership)
+    api_util.UpdateMembership(self.membership, membership, 'external_id',
+                              calliope_base.ReleaseTrack.BETA)
+
 
 class UpdateTestAlpha(UpdateTest):
   """gcloud Alpha track using GKE Hub API."""
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdateMembership(self):
+    membership = self._MakeMembership(
+        name='projects/fake-project/locations/global/memberships/12345-abcde',
+        external_id='my-external_id')
+    response = encoding.PyValueToMessage(self.messages.Operation.ResponseValue,
+                                         encoding.MessageToPyValue(membership))
+    operation = self._MakeOperation(done=True, response=response)
+    self.mocked_client.projects_locations_memberships.Patch.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsPatchRequest(
+            name=self.membership,
+            membership=membership,
+            updateMask='external_id'),
+        response=operation)
+
+    self.ExpectGetOperation(operation)
+    self.ExpectGetMembership(membership)
+    api_util.UpdateMembership(self.membership, membership, 'external_id',
+                              calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

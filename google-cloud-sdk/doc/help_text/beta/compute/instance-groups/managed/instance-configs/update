@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute instance-groups managed instance-configs update -
-        update per instance config of a managed instance group
+        update per-instance config of a managed instance group
 
 SYNOPSIS
     gcloud beta compute instance-groups managed instance-configs update NAME
@@ -16,7 +16,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instance-groups managed instance-configs update
-    updates the per instance config of an instance controlled by a Compute
+    updates the per-instance config of an instance controlled by a Compute
     Engine managed instance group. The command lets you change the list of
     instance-specific stateful resources, that is, the list of resources that
     are preserved during instance restarts and recreations.
@@ -27,7 +27,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        Name of the managed instance group to update per instance config for.
+        Name of the managed instance group to update per-instance config for.
 
 REQUIRED FLAGS
      --instance=INSTANCE
@@ -139,7 +139,7 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          Region of the managed instance group to update per instance config
+          Region of the managed instance group to update per-instance config
           for. If not specified, you may be prompted to select a region.
 
           A list of regions can be fetched by running:
@@ -150,7 +150,7 @@ OPTIONAL FLAGS
           invocation.
 
        --zone=ZONE
-          Zone of the managed instance group to update per instance config for.
+          Zone of the managed instance group to update per-instance config for.
           If not specified, you may be prompted to select a zone.
 
           A list of zones can be fetched by running:
@@ -180,16 +180,17 @@ EXAMPLES
             --remove-stateful-disks=my-disk-1,my-disk-2 \
             --stateful-metadata='my-key=my-value'
 
-    If my-disk-3 did not exist previously in the per instance config, and if it
+    If my-disk-3 did not exist previously in the per-instance config, and if it
     does not exist in the group's instance template, then the command adds
     my-disk-3 to my-instance. The command also removes stateful configuration
     for my-disk-1 and my-disk-2; if these disk are not defined in the group's
     instance template, then they are detached.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed instance-configs update
         $ gcloud alpha compute instance-groups managed instance-configs \
             update
 

@@ -102,6 +102,19 @@ well known port for the backend protocol will be used instead
 (80 for http, 443 for https or http2).
 .RE
 
+\f5non\-gcp\-private\-ip\-port\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to attach. The
+IP address must belong to a VM not in Google Compute Engine and
+must be routable using a cloud router over VPN or an Interconnect.
+.RE
+
+.RS 2m
+*port* \- Required port of the network endpoint to attach unless
+NEG default port is set.
+.RE
+
 .TP 2m
 \fB\-\-remove\-endpoint\fR=[\fIfqdn\fR=\fIFQDN\fR],[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]
 The network endpoint to detach from the network endpoint group. Keys used depend
@@ -145,6 +158,17 @@ detach.
 .RS 2m
 *port* \- Optional port of the network endpoint to detach if the
 endpoint has a port specified.
+.RE
+
+\f5non\-gcp\-private\-ip\-port\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to detach.
+.RE
+
+.RS 2m
+*port* \- Required port of the network endpoint to detach unless
+NEG default port is set.
 .RE
 
 

@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute org-security-policies rules delete - delete a Google
-        Compute Engine organization security policy rule
+    gcloud beta compute org-security-policies rules delete - delete a Compute
+        Engine organization security policy rule
 
 SYNOPSIS
     gcloud beta compute org-security-policies rules delete PRIORITY

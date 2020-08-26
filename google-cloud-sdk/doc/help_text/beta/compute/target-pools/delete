@@ -6,8 +6,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute target-pools delete deletes one or more Google
-    Compute Engine target pools.
+    (BETA) gcloud beta compute target-pools delete deletes one or more Compute
+    Engine target pools.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

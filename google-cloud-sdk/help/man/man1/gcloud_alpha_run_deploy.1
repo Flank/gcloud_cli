@@ -11,7 +11,7 @@ gcloud alpha run deploy \- deploy a container to Cloud Run
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-pack\fR=[\fIbuilder\fR=\fIBUILDER\fR],[\fIenv\fR=\fIENV\fR],[\fIimage\fR=\fIIMAGE\fR]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,10 +74,6 @@ unset this field, provide the special value \f5default\fR.
 Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
 
 .TP 2m
-\fB\-\-image\fR=\fIIMAGE\fR
-Name of the container image to deploy (e.g. \f5gcr.io/cloudrun/hello:latest\fR).
-
-.TP 2m
 \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR
 The maximum number of container instances of the Service to run. Use 'default'
 to unset the limit and use the platform default.
@@ -131,6 +127,18 @@ service account. For the Kubernetes\-based platforms (gke, kubernetes), this is
 the name of a Kubernetes service account in the same namespace as the service.
 If not provided, the revision will use the default service account of the
 project, or default Kubernetes namespace service account respectively.
+
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+The location of the source to build. The location can be a directory on a local
+disk or a gzipped archive file (.tar.gz) in Google Cloud Storage. If the source
+is a local directory, this command skips the files specified in the
+\f5\-\-ignore\-file\fR. If \f5\-\-ignore\-file\fR is not specified,
+use\f5.gcloudignore\fR file. If a \f5.gcloudignore\fR file is absent and a
+\f5.gitignore\fR file is present in the local source directory, gcloud will use
+a generated Git\-compatible \f5.gcloudignore\fR file that respects your
+.gitignored files. The global \f5.gitignore\fR is not respected. For more
+information on \f5.gcloudignore\fR, see \f5gcloud topic gcloudignore\fR.
 
 .TP 2m
 \fB\-\-tag\fR=\fITAG\fR
@@ -232,32 +240,53 @@ modified, otherwise a new label is created.
 .sp
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+Name of the container image to deploy (e.g. \f5gcr.io/cloudrun/hello:latest\fR).
+
+.TP 2m
+\fB\-\-pack\fR=[\fIbuilder\fR=\fIBUILDER\fR],[\fIenv\fR=\fIENV\fR],[\fIimage\fR=\fIIMAGE\fR]
+Uses CNCF buildpack (https://buildpacks.io/) to create image. The "image"
+key/value must be provided. The image name must be in the gcr.io/\fB, *.gcr.io,
+or pkg.dev namespaces. By default gcr.io/buildpacks/builder will be used. To
+specify your own builder image use the optional "builder" key/value argument. To
+pass environment variables to the builder use the optional "env" key/value
+argument where value is a list of key values using escaping
+(https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if neccessary.
+
+.RE
+.sp
+.TP 2m
+
 Only applicable if connecting to Cloud Run for Anthos deployed on Google Cloud
 or Cloud Run for Anthos deployed on VMware. Specify \f5\-\-platform=gke\fR or
 \f5\-\-platform=kubernetes\fR to use:
 
 .RS 2m
 .TP 2m
-\fB\-\-connectivity\fR=\fICONNECTIVITY\fR
+\fR\-\-connectivity\fB=\fICONNECTIVITY\fR
 Defaults to 'external'. If 'external', the service can be invoked through the
 internet, in addition to through the cluster network. \fICONNECTIVITY\fR must be
 one of:
 
 .RS 2m
 .TP 2m
-\fBexternal\fR
+\fRexternal\fB
 Visible from outside the cluster.
 .TP 2m
-\fBinternal\fR
+\fRinternal\fB
 Visible only within the cluster.
 .RE
 .sp
 
 
 .TP 2m
-\fB\-\-[no\-]use\-http2\fR
-Whether to use HTTP/2 for connections to the service. Use \fB\-\-use\-http2\fR
-to enable and \fB\-\-no\-use\-http2\fR to disable.
+\fR\-\-[no\-]use\-http2\fB
+Whether to use HTTP/2 for connections to the service. Use \fR\-\-use\-http2\fB
+to enable and \fR\-\-no\-use\-http2\fB to disable.
 
 .TP 2m
 
@@ -274,11 +303,11 @@ the value of 'key.json' in 'otherconfig'. At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-clear\-config\-maps\fR
+\fR\-\-clear\-config\-maps\fB
 Remove all config\-maps.
 
 .TP 2m
-\fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+\fR\-\-set\-config\-maps\fB=[\fIKEY\fR=\fIVALUE\fR,...]
 List of key\-value pairs to set as config\-maps. All existing config\-maps will
 be removed first.
 
@@ -289,11 +318,11 @@ If both are specified, \-\-remove\-config\-maps will be applied first.
 
 .RS 2m
 .TP 2m
-\fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]
+\fR\-\-remove\-config\-maps\fB=[\fIKEY\fR,...]
 List of config\-maps to be removed.
 
 .TP 2m
-\fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+\fR\-\-update\-config\-maps\fB=[\fIKEY\fR=\fIVALUE\fR,...]
 List of key\-value pairs to set as config\-maps.
 
 .RE
@@ -314,11 +343,11 @@ environment variable named ENV will also be created whose value is the value of
 
 .RS 2m
 .TP 2m
-\fB\-\-clear\-secrets\fR
+\fR\-\-clear\-secrets\fB
 Remove all secrets.
 
 .TP 2m
-\fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+\fR\-\-set\-secrets\fB=[\fIKEY\fR=\fIVALUE\fR,...]
 List of key\-value pairs to set as secrets. All existing secrets will be removed
 first.
 
@@ -329,11 +358,11 @@ are specified, \-\-remove\-secrets will be applied first.
 
 .RS 2m
 .TP 2m
-\fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]
+\fR\-\-remove\-secrets\fB=[\fIKEY\fR,...]
 List of secrets to be removed.
 
 .TP 2m
-\fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+\fR\-\-update\-secrets\fB=[\fIKEY\fR=\fIVALUE\fR,...]
 List of key\-value pairs to set as secrets.
 
 .RE
@@ -347,38 +376,38 @@ Only applicable if connecting to Cloud Run (fully managed). Specify
 
 .RS 2m
 .TP 2m
-\fB\-\-[no\-]allow\-unauthenticated\fR
+\fR\-\-[no\-]allow\-unauthenticated\fB
 Whether to enable allowing unauthenticated access to the service. This may take
-a few moments to take effect. Use \fB\-\-allow\-unauthenticated\fR to enable and
-\fB\-\-no\-allow\-unauthenticated\fR to disable.
+a few moments to take effect. Use \fR\-\-allow\-unauthenticated\fB to enable and
+\fR\-\-no\-allow\-unauthenticated\fB to disable.
 
 .TP 2m
-\fB\-\-clear\-vpc\-connector\fR
+\fR\-\-clear\-vpc\-connector\fB
 Remove the VPC connector for this Service.
 
 .TP 2m
-\fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR
+\fR\-\-revision\-suffix\fB=\fIREVISION_SUFFIX\fR
 Specify the suffix of the revision name. Revision names always start with the
 service name automatically. For example, specifying [\-\-revision\-suffix=v1]
 for a service named 'helloworld', would lead to a revision named
 \'helloworld\-v1'.
 
 .TP 2m
-\fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR
+\fR\-\-vpc\-connector\fB=\fIVPC_CONNECTOR\fR
 Set a VPC connector for this Service.
 
 .TP 2m
-\fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR
+\fR\-\-vpc\-egress\fB=\fIVPC_EGRESS\fR
 The outbound traffic to send through the VPC connector for this Service. This
 Service must have a VPC connector to set VPC egress. \fIVPC_EGRESS\fR must be
 one of:
 
 .RS 2m
 .TP 2m
-\fBall\fR
+\fRall\fB
 Sends all outbound traffic through the VPC connector.
 .TP 2m
-\fBprivate\-ranges\-only\fR
+\fRprivate\-ranges\-only\fB
 Default option. Sends outbound traffic to private IP addresses defined by
 RFC1918 through the VPC connector.
 .RE
@@ -394,19 +423,19 @@ instance. At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]
+\fR\-\-add\-cloudsql\-instances\fB=[\fICLOUDSQL\-INSTANCES\fR,...]
 Append the given values to the current Cloud SQL instances.
 
 .TP 2m
-\fB\-\-clear\-cloudsql\-instances\fR
+\fR\-\-clear\-cloudsql\-instances\fB
 Empty the current Cloud SQL instances.
 
 .TP 2m
-\fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]
+\fR\-\-remove\-cloudsql\-instances\fB=[\fICLOUDSQL\-INSTANCES\fR,...]
 Remove the given values from the current Cloud SQL instances.
 
 .TP 2m
-\fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]
+\fR\-\-set\-cloudsql\-instances\fB=[\fICLOUDSQL\-INSTANCES\fR,...]
 Completely replace the current Cloud SQL instances with the given values.
 
 .RE
@@ -425,7 +454,7 @@ Only applicable if connecting to Cloud Run (fully managed). Specify
 
 .RS 2m
 .TP 2m
-\fB\-\-region\fR=\fIREGION\fR
+\fR\-\-region\fB=\fIREGION\fR
 Region in which the resource can be found. Alternatively, set the property
 [run/region].
 
@@ -450,11 +479,11 @@ set the property [core/project].
 
 .RS 2m
 .TP 2m
-\fB\-\-cluster\fR=\fICLUSTER\fR
+\fR\-\-cluster\fB=\fICLUSTER\fR
 ID of the cluster or fully qualified identifier for the cluster.
 
 .TP 2m
-\fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR
+\fR\-\-cluster\-location\fB=\fICLUSTER_LOCATION\fR
 Zone in which the cluster is located. Alternatively, set the property
 [run/cluster_location].
 
@@ -468,16 +497,17 @@ Specify \f5\-\-platform=kubernetes\fR to use:
 
 .RS 2m
 .TP 2m
-\fB\-\-context\fR=\fICONTEXT\fR
+\fR\-\-context\fB=\fICONTEXT\fR
 The name of the context in your kubectl config file to use for connecting.
 
 .TP 2m
-\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
+\fR\-\-kubeconfig\fB=\fIKUBECONFIG\fR
 The absolute path to your kubectl config file. If not specified, the colon\- or
 semicolon\-delimited list of paths specified by $KUBECONFIG will be used. If
 $KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
 
 
+\fR
 .RE
 .RE
 .RE
@@ -523,7 +553,7 @@ $ gcloud alpha run deploy \-\-image=gcr.io/my/image \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud run deploy

@@ -75,10 +75,6 @@ GROUPS
      images
         (ALPHA) List, create, and delete Compute Engine images.
 
-     in-place-snapshots
-        (ALPHA) Create, list and delete Google Compute Engine in place
-        snapshots.
-
      instance-groups
         (ALPHA) Read and manipulate Compute Engine instance groups.
 
@@ -87,6 +83,9 @@ GROUPS
 
      instances
         (ALPHA) Read and manipulate Compute Engine virtual machine instances.
+
+     instant-snapshots
+        (ALPHA) Create, list and delete Compute Engine instant snapshots.
 
      interconnects
         (ALPHA) Read and manipulate Compute Engine interconnects.
@@ -107,7 +106,7 @@ GROUPS
         (ALPHA) Read and manipulate Compute Engine operations.
 
      org-security-policies
-        (ALPHA) Manage Google Compute Engine organization security policies.
+        (ALPHA) Manage Compute Engine organization security policies.
 
      os-config
         (ALPHA) Manage OS Config tasks for Compute Engine VM instances.
@@ -116,7 +115,7 @@ GROUPS
         (ALPHA) Create and manipulate Compute Engine OS Login resources.
 
      packet-mirrorings
-        (ALPHA) Manage Google Compute Engine packet mirroring resources.
+        (ALPHA) Manage Compute Engine packet mirroring resources.
 
      project-info
         (ALPHA) Read and manipulate project-level data like quotas and
@@ -162,7 +161,7 @@ GROUPS
         (ALPHA) List, create, delete and update Compute Engine SSL policies.
 
      target-grpc-proxies
-        (ALPHA) Manage Google Compute Engine target gRPC proxy resources.
+        (ALPHA) Manage Compute Engine target gRPC proxy resources.
 
      target-http-proxies
         (ALPHA) List, create, and delete target HTTP proxies.
@@ -233,7 +232,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute
         $ gcloud beta compute

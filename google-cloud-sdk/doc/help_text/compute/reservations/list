@@ -1,5 +1,5 @@
 NAME
-    gcloud compute reservations list - list Google Compute Engine reservations
+    gcloud compute reservations list - list Compute Engine reservations
 
 SYNOPSIS
     gcloud compute reservations list [--filter=EXPRESSION] [--limit=LIMIT]
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List Google Compute Engine reservations.
+    List Compute Engine reservations.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

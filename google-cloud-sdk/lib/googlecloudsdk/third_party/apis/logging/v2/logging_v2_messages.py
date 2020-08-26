@@ -79,8 +79,8 @@ class CmekSettings(_messages.Message):
 
   Fields:
     kmsKeyName: The resource name for the configured Cloud KMS key.KMS key
-      name format:  "projects/PROJECT_ID/locations/LOCATION/keyRings/KEYRING/c
-      ryptoKeys/KEY"For example:  "projects/my-project-id/locations/my-
+      name format: "projects/PROJECT_ID/locations/LOCATION/keyRings/KEYRING/cr
+      yptoKeys/KEY"For example: "projects/my-project-id/locations/my-
       region/keyRings/key-ring-name/cryptoKeys/key-name"To enable CMEK for the
       Logs Router, set this field to a valid kms_key_name for which the
       associated service account has the required
@@ -128,7 +128,7 @@ class DlpOptions(_messages.Message):
       fields are specified, payload and http_request fields will be included
       in the de-identification. Specifying included fields is useful for
       limiting the amount of billable data sent to the DLP API. For
-      example:"httpRequest.remoteIp"  "jsonPayload.user.phoneNumber"
+      example:"httpRequest.remoteIp" "jsonPayload.user.phoneNumber"
       "jsonPayload.person.socialSecurityNumber"
     inspectTemplateName: Required. DLP template used to specify what types of
       data within a log to inspect. See Creating Cloud DLP inspection
@@ -144,7 +144,7 @@ class DlpOptions(_messages.Message):
 class Empty(_messages.Message):
   r"""A generic empty message that you can re-use to avoid defining duplicated
   empty messages in your APIs. A typical example is to use it as the request
-  or the response type of an API method. For instance: service Foo {   rpc
+  or the response type of an API method. For instance: service Foo { rpc
   Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON
   representation for Empty is empty JSON object {}.
   """
@@ -154,7 +154,7 @@ class Empty(_messages.Message):
 class Explicit(_messages.Message):
   r"""Specifies a set of buckets with arbitrary widths.There are size(bounds)
   + 1 (= N) buckets. Bucket i has the following boundaries:Upper bound (0 <= i
-  < N-1): boundsi  Lower bound (1 <= i < N); boundsi - 1The bounds field must
+  < N-1): boundsi Lower bound (1 <= i < N); boundsi - 1The bounds field must
   contain at least one element. If bounds has only one element, then there are
   no finite buckets, and that single element is the common boundary of the
   overflow and underflow buckets.
@@ -171,7 +171,7 @@ class Exponential(_messages.Message):
   proportional to the value of the lower bound. Each bucket represents a
   constant relative uncertainty on a specific value in the bucket.There are
   num_finite_buckets + 2 (= N) buckets. Bucket i has the following
-  boundaries:Upper bound (0 <= i < N-1): scale * (growth_factor ^ i).  Lower
+  boundaries:Upper bound (0 <= i < N-1): scale * (growth_factor ^ i). Lower
   bound (1 <= i < N): scale * (growth_factor ^ (i - 1)).
 
   Fields:
@@ -276,8 +276,8 @@ class Linear(_messages.Message):
   (except overflow and underflow). Each bucket represents a constant absolute
   uncertainty on the specific value in the bucket.There are num_finite_buckets
   + 2 (= N) buckets. Bucket i has the following boundaries:Upper bound (0 <= i
-  < N-1): offset + (width * i).  Lower bound (1 <= i < N): offset + (width *
-  (i - 1)).
+  < N-1): offset + (width * i). Lower bound (1 <= i < N): offset + (width * (i
+  - 1)).
 
   Fields:
     numFiniteBuckets: Must be greater than 0.
@@ -394,13 +394,10 @@ class ListLogEntriesResponse(_messages.Message):
       Alternatively, consider speeding up the search by changing your filter
       to specify a single log name or resource type, or to narrow the time
       range of the search.
-    viewNames: The list of views that were examined. e.g. "projects/my-
-      project/locations/my-location/buckets/my-bucket/views/my-view".
   """
 
   entries = _messages.MessageField('LogEntry', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
-  viewNames = _messages.StringField(3, repeated=True)
 
 
 class ListLogMetricsResponse(_messages.Message):
@@ -570,24 +567,15 @@ class LogBucket(_messages.Message):
     createTime: Output only. The creation timestamp of the bucket. This is not
       set for any of the default buckets.
     description: Describes this bucket.
-    etag: etag is used for optimistic concurrency control as a way to help
-      prevent simultaneous updates of a bucket from overwriting each other. It
-      is strongly suggested that systems make use of the etag in the read-
-      modify-write cycle to perform bucket updates in order to avoid race
-      conditions: An etag is returned in the response to getBucket, and
-      systems are expected to put that etag in the request to setIamPolicy to
-      ensure that their change will be applied to the same version of the
-      bucket.If no etag is provided in the call to UpdateBucket, then the
-      existing bucket is overwritten blindly.
     lifecycleState: Output only. The bucket lifecycle state.
     locked: Whether the bucket has been locked. The retention period on a
-      locked bucket may not be changed. A locked bucket may not have any
-      retention rules. Logs may not be deleted from a locked bucket.
+      locked bucket may not be changed. Locked buckets may only be deleted if
+      they are empty.
     name: The resource name of the bucket. For example: "projects/my-project-
       id/locations/my-location/buckets/my-bucket-id The supported locations
-      are:  "global"  "us-central1"For the location of global it is
-      unspecified where logs are actually stored. Once a bucket has been
-      created, the location can not be changed.
+      are: "global"For the location of global it is unspecified where logs are
+      actually stored. Once a bucket has been created, the location can not be
+      changed.
     retentionDays: Logs will be retained by default for this amount of time,
       after which they will automatically be deleted. The minimum retention
       period is 1 day. If this value is set to zero at bucket creation time,
@@ -610,12 +598,11 @@ class LogBucket(_messages.Message):
 
   createTime = _messages.StringField(1)
   description = _messages.StringField(2)
-  etag = _messages.BytesField(3)
-  lifecycleState = _messages.EnumField('LifecycleStateValueValuesEnum', 4)
-  locked = _messages.BooleanField(5)
-  name = _messages.StringField(6)
-  retentionDays = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  updateTime = _messages.StringField(8)
+  lifecycleState = _messages.EnumField('LifecycleStateValueValuesEnum', 3)
+  locked = _messages.BooleanField(4)
+  name = _messages.StringField(5)
+  retentionDays = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  updateTime = _messages.StringField(7)
 
 
 class LogEntry(_messages.Message):
@@ -645,9 +632,9 @@ class LogEntry(_messages.Message):
       with the same timestamp, and with the same insert_id to be duplicates
       which are removed in a single query result. However, there are no
       guarantees of de-duplication in the export of logs.If the insert_id is
-      omitted when writing a log entry, the Logging API  assigns its own
-      unique identifier in this field.In queries, the insert_id is also used
-      to order log entries that have the same log_name and timestamp values.
+      omitted when writing a log entry, the Logging API assigns its own unique
+      identifier in this field.In queries, the insert_id is also used to order
+      log entries that have the same log_name and timestamp values.
     jsonPayload: The log entry payload, represented as a structure that is
       expressed as a JSON object.
     labels: Optional. A set of user-defined (key, value) data that provides
@@ -687,8 +674,6 @@ class LogEntry(_messages.Message):
       "type.googleapis.com/google.appengine.logging.v1.RequestLog"
     receiveTimestamp: Output only. The time the log entry was received by
       Logging.
-    receivedLocation: Output only. The cloud region that this LogEntry was
-      received in, such as "us-east1".
     resource: Required. The monitored resource that produced this log
       entry.Example: a log entry that reports a database error would be
       associated with the monitored resource designating the particular
@@ -841,15 +826,14 @@ class LogEntry(_messages.Message):
   operation = _messages.MessageField('LogEntryOperation', 7)
   protoPayload = _messages.MessageField('ProtoPayloadValue', 8)
   receiveTimestamp = _messages.StringField(9)
-  receivedLocation = _messages.StringField(10)
-  resource = _messages.MessageField('MonitoredResource', 11)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 12)
-  sourceLocation = _messages.MessageField('LogEntrySourceLocation', 13)
-  spanId = _messages.StringField(14)
-  textPayload = _messages.StringField(15)
-  timestamp = _messages.StringField(16)
-  trace = _messages.StringField(17)
-  traceSampled = _messages.BooleanField(18)
+  resource = _messages.MessageField('MonitoredResource', 10)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 11)
+  sourceLocation = _messages.MessageField('LogEntrySourceLocation', 12)
+  spanId = _messages.StringField(13)
+  textPayload = _messages.StringField(14)
+  timestamp = _messages.StringField(15)
+  trace = _messages.StringField(16)
+  traceSampled = _messages.BooleanField(17)
 
 
 class LogEntryOperation(_messages.Message):
@@ -1014,8 +998,6 @@ class LogMetric(_messages.Message):
       may not be present for older metrics.
     description: Optional. A description of this metric, which is used in
       documentation. The maximum length of the description is 8000 characters.
-    disabled: Optional. If set to True, then this metric is disabled and it
-      does not generate any points.
     filter: Required. An advanced logs filter
       (https://cloud.google.com/logging/docs/view/advanced_filters) which is
       used to match log entries. Example: "resource.type=gae_app AND
@@ -1062,18 +1044,18 @@ class LogMetric(_messages.Message):
     valueExtractor: Optional. A value_extractor is required when using a
       distribution logs-based metric to extract the values to record from a
       log entry. Two functions are supported for value extraction:
-      EXTRACT(field) or REGEXP_EXTRACT(field, regex). The argument are:  1.
+      EXTRACT(field) or REGEXP_EXTRACT(field, regex). The argument are: 1.
       field: The name of the log entry field from which the value is to be
-      extracted.  2. regex: A regular expression using the Google RE2 syntax
-      (https://github.com/google/re2/wiki/Syntax) with a single capture  group
-      to extract data from the specified log entry field. The value  of the
-      field is converted to a string before applying the regex.  It is an
-      error to specify a regex that does not include exactly one  capture
-      group.The result of the extraction must be convertible to a double type,
-      as the distribution always records double values. If either the
-      extraction or the conversion to double fails, then those values are not
-      recorded in the distribution.Example:
-      REGEXP_EXTRACT(jsonPayload.request, ".*quantity=(\d+).*")
+      extracted. 2. regex: A regular expression using the Google RE2 syntax
+      (https://github.com/google/re2/wiki/Syntax) with a single capture group
+      to extract data from the specified log entry field. The value of the
+      field is converted to a string before applying the regex. It is an error
+      to specify a regex that does not include exactly one capture group.The
+      result of the extraction must be convertible to a double type, as the
+      distribution always records double values. If either the extraction or
+      the conversion to double fails, then those values are not recorded in
+      the distribution.Example: REGEXP_EXTRACT(jsonPayload.request,
+      ".*quantity=(\d+).*")
     version: Deprecated. The API version that created or updated this metric.
       The v2 format is used by default and cannot be changed.
   """
@@ -1127,14 +1109,13 @@ class LogMetric(_messages.Message):
   bucketOptions = _messages.MessageField('BucketOptions', 1)
   createTime = _messages.StringField(2)
   description = _messages.StringField(3)
-  disabled = _messages.BooleanField(4)
-  filter = _messages.StringField(5)
-  labelExtractors = _messages.MessageField('LabelExtractorsValue', 6)
-  metricDescriptor = _messages.MessageField('MetricDescriptor', 7)
-  name = _messages.StringField(8)
-  updateTime = _messages.StringField(9)
-  valueExtractor = _messages.StringField(10)
-  version = _messages.EnumField('VersionValueValuesEnum', 11)
+  filter = _messages.StringField(4)
+  labelExtractors = _messages.MessageField('LabelExtractorsValue', 5)
+  metricDescriptor = _messages.MessageField('MetricDescriptor', 6)
+  name = _messages.StringField(7)
+  updateTime = _messages.StringField(8)
+  valueExtractor = _messages.StringField(9)
+  version = _messages.EnumField('VersionValueValuesEnum', 10)
 
 
 class LogSink(_messages.Message):
@@ -1194,13 +1175,13 @@ class LogSink(_messages.Message):
     outputVersionFormat: Deprecated. This field is unused.
     updateTime: Output only. The last update timestamp of the sink.This field
       may not be present for older sinks.
-    writerIdentity: Output only. An IAM identity&mdash;a service account or
-      group&mdash;under which Logging writes the exported log entries to the
-      sink's destination. This field is set by sinks.create and sinks.update
-      based on the value of unique_writer_identity in those methods.Until you
-      grant this identity write-access to the destination, log entry exports
-      from this sink will fail. For more information, see Granting Access for
-      a Resource (https://cloud.google.com/iam/docs/granting-roles-to-service-
+    writerIdentity: Output only. An IAM identity-a service account or group-
+      under which Logging writes the exported log entries to the sink's
+      destination. This field is set by sinks.create and sinks.update based on
+      the value of unique_writer_identity in those methods.Until you grant
+      this identity write-access to the destination, log entry exports from
+      this sink will fail. For more information, see Granting Access for a
+      Resource (https://cloud.google.com/iam/docs/granting-roles-to-service-
       accounts#granting_access_to_a_service_account_for_a_resource). Consult
       the destination service's documentation to determine the appropriate IAM
       roles to assign to the identity.
@@ -1242,8 +1223,8 @@ class LogView(_messages.Message):
     description: Describes this view.
     filter: Filter that restricts which log entries in a bucket are visible in
       this view. Filters are restricted to be a logical AND of ==/!= of any of
-      the following:  originating project/folder/organization/billing account.
-      resource type  log id
+      the following: originating project/folder/organization/billing account.
+      resource type log id
     name: The resource name of the view. For example "projects/my-project-
       id/locations/my-location/buckets/my-bucket-id/views/my-view
     updateTime: Output only. The last update timestamp of the view.
@@ -1385,10 +1366,7 @@ class LoggingBillingAccountsLocationsBucketsCreateRequest(_messages.Message):
       digits, underscores, hyphens, and periods.
     logBucket: A LogBucket resource to be passed as the request body.
     parent: Required. The resource in which to create the bucket:
-      "projects/[PROJECT_ID]/locations/[LOCATION_ID]"
-      "organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]"
-      "billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]"
-      "folders/[FOLDER_ID]/locations/[LOCATION_ID]" Example: "projects/my-
+      "projects/[PROJECT_ID]/locations/[LOCATION_ID]" Example: "projects/my-
       logging-project/locations/global"
   """
 
@@ -1510,7 +1488,7 @@ class LoggingBillingAccountsLocationsBucketsViewsDeleteRequest(_messages.Message
   Fields:
     name: Required. The full resource name of the view to delete: "projects/[P
       ROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
   """
 
@@ -1544,7 +1522,7 @@ class LoggingBillingAccountsLocationsBucketsViewsPatchRequest(_messages.Message)
     logView: A LogView resource to be passed as the request body.
     name: Required. The full resource name of the view to update "projects/[PR
       OJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
@@ -1617,26 +1595,11 @@ class LoggingBillingAccountsLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Optional. NOT IMPLEMENTED YET. The resource name that owns
-      the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/v
-      iews/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCATION_ID/buckets
-      /BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT_ID/locations/L
-      OCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDER_ID/locations/
-      LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support legacy queries, it
-      could also be:  "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"Note: It is not
-      supported for query across multiple
-      projects/orgs/folders/billingAccounts
-    sourceResource: Optional. NOT IMPLEMENTED YET. It should be in format of:
-      "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
-  resourceNames = _messages.StringField(4, repeated=True)
-  sourceResource = _messages.StringField(5, repeated=True)
 
 
 class LoggingBillingAccountsSinksCreateRequest(_messages.Message):
@@ -1742,7 +1705,7 @@ class LoggingBillingAccountsSinksPatchRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -1781,7 +1744,7 @@ class LoggingBillingAccountsSinksUpdateRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -1984,10 +1947,7 @@ class LoggingFoldersLocationsBucketsCreateRequest(_messages.Message):
       digits, underscores, hyphens, and periods.
     logBucket: A LogBucket resource to be passed as the request body.
     parent: Required. The resource in which to create the bucket:
-      "projects/[PROJECT_ID]/locations/[LOCATION_ID]"
-      "organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]"
-      "billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]"
-      "folders/[FOLDER_ID]/locations/[LOCATION_ID]" Example: "projects/my-
+      "projects/[PROJECT_ID]/locations/[LOCATION_ID]" Example: "projects/my-
       logging-project/locations/global"
   """
 
@@ -2126,7 +2086,7 @@ class LoggingFoldersLocationsBucketsViewsDeleteRequest(_messages.Message):
   Fields:
     name: Required. The full resource name of the view to delete: "projects/[P
       ROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
   """
 
@@ -2173,7 +2133,7 @@ class LoggingFoldersLocationsBucketsViewsPatchRequest(_messages.Message):
     logView: A LogView resource to be passed as the request body.
     name: Required. The full resource name of the view to update "projects/[PR
       OJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
@@ -2246,26 +2206,11 @@ class LoggingFoldersLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Optional. NOT IMPLEMENTED YET. The resource name that owns
-      the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/v
-      iews/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCATION_ID/buckets
-      /BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT_ID/locations/L
-      OCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDER_ID/locations/
-      LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support legacy queries, it
-      could also be:  "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"Note: It is not
-      supported for query across multiple
-      projects/orgs/folders/billingAccounts
-    sourceResource: Optional. NOT IMPLEMENTED YET. It should be in format of:
-      "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
-  resourceNames = _messages.StringField(4, repeated=True)
-  sourceResource = _messages.StringField(5, repeated=True)
 
 
 class LoggingFoldersSinksCreateRequest(_messages.Message):
@@ -2371,7 +2316,7 @@ class LoggingFoldersSinksPatchRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -2410,7 +2355,7 @@ class LoggingFoldersSinksUpdateRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -2450,10 +2395,7 @@ class LoggingLocationsBucketsCreateRequest(_messages.Message):
       digits, underscores, hyphens, and periods.
     logBucket: A LogBucket resource to be passed as the request body.
     parent: Required. The resource in which to create the bucket:
-      "projects/[PROJECT_ID]/locations/[LOCATION_ID]"
-      "organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]"
-      "billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]"
-      "folders/[FOLDER_ID]/locations/[LOCATION_ID]" Example: "projects/my-
+      "projects/[PROJECT_ID]/locations/[LOCATION_ID]" Example: "projects/my-
       logging-project/locations/global"
   """
 
@@ -2592,7 +2534,7 @@ class LoggingLocationsBucketsViewsDeleteRequest(_messages.Message):
   Fields:
     name: Required. The full resource name of the view to delete: "projects/[P
       ROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
   """
 
@@ -2639,7 +2581,7 @@ class LoggingLocationsBucketsViewsPatchRequest(_messages.Message):
     logView: A LogView resource to be passed as the request body.
     name: Required. The full resource name of the view to update "projects/[PR
       OJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
@@ -2712,26 +2654,11 @@ class LoggingLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Optional. NOT IMPLEMENTED YET. The resource name that owns
-      the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/v
-      iews/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCATION_ID/buckets
-      /BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT_ID/locations/L
-      OCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDER_ID/locations/
-      LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support legacy queries, it
-      could also be:  "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"Note: It is not
-      supported for query across multiple
-      projects/orgs/folders/billingAccounts
-    sourceResource: Optional. NOT IMPLEMENTED YET. It should be in format of:
-      "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
-  resourceNames = _messages.StringField(4, repeated=True)
-  sourceResource = _messages.StringField(5, repeated=True)
 
 
 class LoggingMonitoredResourceDescriptorsListRequest(_messages.Message):
@@ -2867,10 +2794,7 @@ class LoggingOrganizationsLocationsBucketsCreateRequest(_messages.Message):
       digits, underscores, hyphens, and periods.
     logBucket: A LogBucket resource to be passed as the request body.
     parent: Required. The resource in which to create the bucket:
-      "projects/[PROJECT_ID]/locations/[LOCATION_ID]"
-      "organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]"
-      "billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]"
-      "folders/[FOLDER_ID]/locations/[LOCATION_ID]" Example: "projects/my-
+      "projects/[PROJECT_ID]/locations/[LOCATION_ID]" Example: "projects/my-
       logging-project/locations/global"
   """
 
@@ -3009,7 +2933,7 @@ class LoggingOrganizationsLocationsBucketsViewsDeleteRequest(_messages.Message):
   Fields:
     name: Required. The full resource name of the view to delete: "projects/[P
       ROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
   """
 
@@ -3056,7 +2980,7 @@ class LoggingOrganizationsLocationsBucketsViewsPatchRequest(_messages.Message):
     logView: A LogView resource to be passed as the request body.
     name: Required. The full resource name of the view to update "projects/[PR
       OJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
@@ -3129,26 +3053,11 @@ class LoggingOrganizationsLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Optional. NOT IMPLEMENTED YET. The resource name that owns
-      the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/v
-      iews/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCATION_ID/buckets
-      /BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT_ID/locations/L
-      OCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDER_ID/locations/
-      LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support legacy queries, it
-      could also be:  "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"Note: It is not
-      supported for query across multiple
-      projects/orgs/folders/billingAccounts
-    sourceResource: Optional. NOT IMPLEMENTED YET. It should be in format of:
-      "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
-  resourceNames = _messages.StringField(4, repeated=True)
-  sourceResource = _messages.StringField(5, repeated=True)
 
 
 class LoggingOrganizationsSinksCreateRequest(_messages.Message):
@@ -3254,7 +3163,7 @@ class LoggingOrganizationsSinksPatchRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -3293,7 +3202,7 @@ class LoggingOrganizationsSinksUpdateRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -3430,10 +3339,7 @@ class LoggingProjectsLocationsBucketsCreateRequest(_messages.Message):
       digits, underscores, hyphens, and periods.
     logBucket: A LogBucket resource to be passed as the request body.
     parent: Required. The resource in which to create the bucket:
-      "projects/[PROJECT_ID]/locations/[LOCATION_ID]"
-      "organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]"
-      "billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]"
-      "folders/[FOLDER_ID]/locations/[LOCATION_ID]" Example: "projects/my-
+      "projects/[PROJECT_ID]/locations/[LOCATION_ID]" Example: "projects/my-
       logging-project/locations/global"
   """
 
@@ -3572,7 +3478,7 @@ class LoggingProjectsLocationsBucketsViewsDeleteRequest(_messages.Message):
   Fields:
     name: Required. The full resource name of the view to delete: "projects/[P
       ROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
   """
 
@@ -3619,7 +3525,7 @@ class LoggingProjectsLocationsBucketsViewsPatchRequest(_messages.Message):
     logView: A LogView resource to be passed as the request body.
     name: Required. The full resource name of the view to update "projects/[PR
       OJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]"
-      Example:  "projects/my-project-id/locations/my-location/buckets/my-
+      Example: "projects/my-project-id/locations/my-location/buckets/my-
       bucket-id/views/my-view-id".
     updateMask: Optional. Field mask that specifies the fields in view that
       need an update. A field will be overwritten if, and only if, it is in
@@ -3692,26 +3598,11 @@ class LoggingProjectsLogsListRequest(_messages.Message):
     parent: Required. The resource name that owns the logs:
       "projects/[PROJECT_ID]" "organizations/[ORGANIZATION_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]" "folders/[FOLDER_ID]"
-    resourceNames: Optional. NOT IMPLEMENTED YET. The resource name that owns
-      the logs:  projects/PROJECT_ID/locations/LOCATION_ID/buckets/BUCKET_ID/v
-      iews/VIEW_ID  organization/ORGANIZATION_ID/locations/LOCATION_ID/buckets
-      /BUCKET_ID/views/VIEW_ID  billingAccounts/BILLING_ACCOUNT_ID/locations/L
-      OCATION_ID/buckets/BUCKET_ID/views/VIEW_ID  folders/FOLDER_ID/locations/
-      LOCATION_ID/buckets/BUCKET_ID/views/VIEW_IDTo support legacy queries, it
-      could also be:  "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"Note: It is not
-      supported for query across multiple
-      projects/orgs/folders/billingAccounts
-    sourceResource: Optional. NOT IMPLEMENTED YET. It should be in format of:
-      "projects/PROJECT_ID"  "organizations/ORGANIZATION_ID"
-      "billingAccounts/BILLING_ACCOUNT_ID"  "folders/FOLDER_ID"
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
-  resourceNames = _messages.StringField(4, repeated=True)
-  sourceResource = _messages.StringField(5, repeated=True)
 
 
 class LoggingProjectsMetricsCreateRequest(_messages.Message):
@@ -3889,7 +3780,7 @@ class LoggingProjectsSinksPatchRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -3928,7 +3819,7 @@ class LoggingProjectsSinksUpdateRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -4045,7 +3936,7 @@ class LoggingSinksUpdateRequest(_messages.Message):
       need an update. A sink field will be overwritten if, and only if, it is
       in the update mask. name and output only fields cannot be updated.An
       empty updateMask is temporarily treated as using the following mask for
-      backwards compatibility purposes:  destination,filter,includeChildren At
+      backwards compatibility purposes: destination,filter,includeChildren At
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
@@ -4086,13 +3977,7 @@ class LoggingUpdateCmekSettingsRequest(_messages.Message):
 class MetricDescriptor(_messages.Message):
   r"""Defines a metric type and its schema. Once a metric descriptor is
   created, deleting or altering it stops data collection and makes the metric
-  type's existing data unusable.The following are specific rules for service
-  defined Monitoring metric descriptors: type, metric_kind, value_type and
-  description  fields are all required. The unit field must be specified  if
-  the value_type is any of DOUBLE, INT64, DISTRIBUTION. Maximum of default 500
-  metric descriptors per service is allowed. Maximum of default 10 labels per
-  metric descriptor is allowed.The default maximum limit can be overridden.
-  Please follow https://cloud.google.com/monitoring/quotas
+  type's existing data unusable.
 
   Enums:
     LaunchStageValueValuesEnum: Optional. The launch stage of the metric
@@ -4112,10 +3997,7 @@ class MetricDescriptor(_messages.Message):
       "Request count". This field is optional but it is recommended to be set
       for any metrics associated with user-visible concepts, such as Quota.
     labels: The set of labels that can be used to describe a specific instance
-      of this metric type.The label key name must follow: Only upper and
-      lower-case letters, digits and underscores (_) are  allowed. Label name
-      must start with a letter or digit. The maximum length of a label name is
-      100 characters.For example, the
+      of this metric type. For example, the
       appengine.googleapis.com/http/server/response_latencies metric type has
       a label for the HTTP response code, response_code, so you can look at
       latencies for successful responses or just for responses that failed.
@@ -4132,15 +4014,9 @@ class MetricDescriptor(_messages.Message):
       here.
     name: The resource name of the metric descriptor.
     type: The metric type, including its DNS name prefix. The type is not URL-
-      encoded.All service defined metrics must be prefixed with the service
-      name, in the format of {service name}/{relative metric name}, such as
-      cloudsql.googleapis.com/database/cpu/utilization. The relative metric
-      name must follow: Only upper and lower-case letters, digits, '/' and
-      underscores '_' are  allowed. The maximum number of characters allowed
-      for the relative_metric_name is  100.All user-defined metric types have
-      the DNS name custom.googleapis.com, external.googleapis.com, or
-      logging.googleapis.com/user/.Metric types should use a natural
-      hierarchical grouping. For example:
+      encoded. All user-defined metric types have the DNS name
+      custom.googleapis.com or external.googleapis.com. Metric types should
+      use a natural hierarchical grouping. For example:
       "custom.googleapis.com/invoice/paid/amount"
       "external.googleapis.com/prometheus/up"
       "appengine.googleapis.com/http/server/response_latencies"
@@ -4167,31 +4043,30 @@ class MetricDescriptor(_messages.Message):
       femto (10^-15) a atto (10^-18) z zepto (10^-21) y yocto (10^-24) Ki kibi
       (2^10) Mi mebi (2^20) Gi gibi (2^30) Ti tebi (2^40) Pi pebi
       (2^50)GrammarThe grammar also includes these connectors: / division or
-      ratio (as an infix operator). For examples,  kBy/{email} or MiBy/10ms
-      (although you should almost never  have /s in a metric unit; rates
-      should always be computed at  query time from the underlying cumulative
-      or delta value). . multiplication or composition (as an infix operator).
-      For  examples, GBy.d or k{watt}.h.The grammar for a unit is as follows:
-      Expression = Component { "." Component } { "/" Component } ;  Component
-      = ( [ PREFIX ] UNIT | "%" ) [ Annotation ]           | Annotation
-      | "1"           ;  Annotation = "{" NAME "}" ; Notes: Annotation is just
-      a comment if it follows a UNIT. If the annotation  is used alone, then
-      the unit is equivalent to 1. For examples,  {request}/s == 1/s,
-      By{transmitted}/s == By/s. NAME is a sequence of non-blank printable
-      ASCII characters not  containing { or }. 1 represents a unitary
-      dimensionless  unit
-      (https://en.wikipedia.org/wiki/Dimensionless_quantity) of 1, such  as in
-      1/s. It is typically used when none of the basic units are  appropriate.
-      For example, "new users per day" can be represented as  1/d or {new-
-      users}/d (and a metric value 5 would mean "5 new  users). Alternatively,
-      "thousands of page views per day" would be  represented as 1000/d or
-      k1/d or k{page_views}/d (and a metric  value of 5.3 would mean "5300
-      page views per day"). % represents dimensionless value of 1/100, and
-      annotates values giving  a percentage (so the metric values are
-      typically in the range of 0..100,  and a metric value 3 means "3
-      percent"). 10^2.% indicates a metric contains a ratio, typically in the
-      range  0..1, that will be multiplied by 100 and displayed as a
-      percentage  (so a metric value 0.03 means "3 percent").
+      ratio (as an infix operator). For examples, kBy/{email} or MiBy/10ms
+      (although you should almost never have /s in a metric unit; rates should
+      always be computed at query time from the underlying cumulative or delta
+      value). . multiplication or composition (as an infix operator). For
+      examples, GBy.d or k{watt}.h.The grammar for a unit is as follows:
+      Expression = Component { "." Component } { "/" Component } ; Component =
+      ( [ PREFIX ] UNIT | "%" ) [ Annotation ] | Annotation | "1" ; Annotation
+      = "{" NAME "}" ; Notes: Annotation is just a comment if it follows a
+      UNIT. If the annotation is used alone, then the unit is equivalent to 1.
+      For examples, {request}/s == 1/s, By{transmitted}/s == By/s. NAME is a
+      sequence of non-blank printable ASCII characters not containing { or }.
+      1 represents a unitary dimensionless unit
+      (https://en.wikipedia.org/wiki/Dimensionless_quantity) of 1, such as in
+      1/s. It is typically used when none of the basic units are appropriate.
+      For example, "new users per day" can be represented as 1/d or {new-
+      users}/d (and a metric value 5 would mean "5 new users). Alternatively,
+      "thousands of page views per day" would be represented as 1000/d or k1/d
+      or k{page_views}/d (and a metric value of 5.3 would mean "5300 page
+      views per day"). % represents dimensionless value of 1/100, and
+      annotates values giving a percentage (so the metric values are typically
+      in the range of 0..100, and a metric value 3 means "3 percent"). 10^2.%
+      indicates a metric contains a ratio, typically in the range 0..1, that
+      will be multiplied by 100 and displayed as a percentage (so a metric
+      value 0.03 means "3 percent").
     valueType: Whether the measurement is an integer, a floating-point number,
       etc. Some combinations of metric_kind and value_type might not be
       supported.
@@ -4373,8 +4248,8 @@ class MonitoredResource(_messages.Message):
   resource and its attributes according to the schema. For example, a
   particular Compute Engine VM instance could be represented by the following
   object, because the MonitoredResourceDescriptor for "gce_instance" has
-  labels "instance_id" and "zone": { "type": "gce_instance",   "labels": {
-  "instance_id": "12345678901234",               "zone": "us-central1-a" }}
+  labels "instance_id" and "zone": { "type": "gce_instance", "labels": {
+  "instance_id": "12345678901234", "zone": "us-central1-a" }}
 
   Messages:
     LabelsValue: Required. Values for all of the labels listed in the
@@ -4425,16 +4300,9 @@ class MonitoredResourceDescriptor(_messages.Message):
   a type name and a set of labels. For example, the monitored resource
   descriptor for Google Compute Engine VM instances has a type of
   "gce_instance" and specifies the use of the labels "instance_id" and "zone"
-  to identify particular VM instances.Different services can support different
-  monitored resource types.The following are specific rules to service defined
-  monitored resources for Monitoring and Logging: The type, display_name,
-  description, labels and launch_stage  fields are all required. The first
-  label of the monitored resource descriptor must be  resource_container.
-  There are legacy monitored resource descritptors  start with project_id. It
-  must include a location label. Maximum of default 5 service defined
-  monitored resource descriptors  is allowed per service. Maximum of default
-  10 labels per monitored resource is allowed.The default maximum limit can be
-  overridden. Please follow https://cloud.google.com/monitoring/quotas
+  to identify particular VM instances.Different APIs can support different
+  monitored resource types. APIs generally provide a list method that returns
+  the monitored resource descriptors used by the API.
 
   Enums:
     LaunchStageValueValuesEnum: Optional. The launch stage of the monitored
@@ -4448,11 +4316,9 @@ class MonitoredResourceDescriptor(_messages.Message):
       Phrase, without any article or other determiners. For example, "Google
       Cloud SQL Database".
     labels: Required. A set of labels used to describe instances of this
-      monitored resource type. The label key name must follow: Only upper and
-      lower-case letters, digits and underscores (_) are  allowed. Label name
-      must start with a letter or digit. The maximum length of a label name is
-      100 characters.For example, an individual Google Cloud SQL database is
-      identified by values for the labels database_id and location.
+      monitored resource type. For example, an individual Google Cloud SQL
+      database is identified by values for the labels "database_id" and
+      "zone".
     launchStage: Optional. The launch stage of the monitored resource
       definition.
     name: Optional. The resource name of the monitored resource descriptor:
@@ -4462,14 +4328,7 @@ class MonitoredResourceDescriptor(_messages.Message):
       APIs that do not use project information can use the resource name
       format "monitoredResourceDescriptors/{type}".
     type: Required. The monitored resource type. For example, the type
-      cloudsql_database represents databases in Google Cloud SQL.All service
-      defined monitored resource types must be prefixed with the service name,
-      in the format of {service name}/{relative resource name}. The relative
-      resource name must follow: Only upper and lower-case letters and digits
-      are allowed. It must start with upper case character and is recommended
-      to use Upper  Camel Case style. The maximum number of characters allowed
-      for the relative_resource_name  is 100.Note there are legacy service
-      monitored resources not following this rule.
+      "cloudsql_database" represents databases in Google Cloud SQL.
   """
 
   class LaunchStageValueValuesEnum(_messages.Enum):
@@ -4536,8 +4395,8 @@ class MonitoredResourceMetadata(_messages.Message):
       labels. System labels are a kind of metadata extracted by Google,
       including "machine_image", "vpc", "subnet_id", "security_group", "name",
       etc. System label values can be only strings, Boolean values, or a list
-      of strings. For example: { "name": "my-test-instance",
-      "security_group": ["a", "b", "c"],   "spot_instance": false }
+      of strings. For example: { "name": "my-test-instance", "security_group":
+      ["a", "b", "c"], "spot_instance": false }
     UserLabelsValue: Output only. A map of user-defined metadata labels.
 
   Fields:
@@ -4545,8 +4404,8 @@ class MonitoredResourceMetadata(_messages.Message):
       System labels are a kind of metadata extracted by Google, including
       "machine_image", "vpc", "subnet_id", "security_group", "name", etc.
       System label values can be only strings, Boolean values, or a list of
-      strings. For example: { "name": "my-test-instance",   "security_group":
-      ["a", "b", "c"],   "spot_instance": false }
+      strings. For example: { "name": "my-test-instance", "security_group":
+      ["a", "b", "c"], "spot_instance": false }
     userLabels: Output only. A map of user-defined metadata labels.
   """
 
@@ -4556,8 +4415,8 @@ class MonitoredResourceMetadata(_messages.Message):
     labels are a kind of metadata extracted by Google, including
     "machine_image", "vpc", "subnet_id", "security_group", "name", etc. System
     label values can be only strings, Boolean values, or a list of strings.
-    For example: { "name": "my-test-instance",   "security_group": ["a", "b",
-    "c"],   "spot_instance": false }
+    For example: { "name": "my-test-instance", "security_group": ["a", "b",
+    "c"], "spot_instance": false }
 
     Messages:
       AdditionalProperty: An additional property for a SystemLabelsValue
@@ -4862,8 +4721,8 @@ class WriteLogEntriesRequest(_messages.Message):
       entries.write method.
     resource: Optional. A default monitored resource object that is assigned
       to all log entries in entries that do not specify a value for resource.
-      Example: { "type": "gce_instance",   "labels": {     "zone": "us-
-      central1-a", "instance_id": "00000000000000000000" }} See LogEntry.
+      Example: { "type": "gce_instance", "labels": { "zone": "us-central1-a",
+      "instance_id": "00000000000000000000" }} See LogEntry.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')

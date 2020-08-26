@@ -33,22 +33,20 @@ COMMANDS
         (ALPHA) Delete Cloud VPN Classic Target VPN Gateways.
 
      describe
-        (ALPHA) Describe a Google Compute Engine Cloud VPN Classic Target VPN
-        Gateway.
+        (ALPHA) Describe a Compute Engine Cloud VPN Classic Target VPN Gateway.
 
      list
         (ALPHA) List Google Compute Engine Cloud VPN Classic Target VPN
         Gateways.
 
      update
-        (ALPHA) Update a Google Compute Engine Cloud VPN Classic Target VPN
-        Gateway.
+        (ALPHA) Update a Compute Engine Cloud VPN Classic Target VPN Gateway.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute target-vpn-gateways
         $ gcloud beta compute target-vpn-gateways

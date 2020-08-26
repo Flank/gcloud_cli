@@ -842,25 +842,35 @@ Invalid request API reason: Precondition check failed.
         url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
         content={
             'error': {
-                'code': 400,
-                'message': 'The request has errors.',
-                'status': 'INVALID_ARGUMENT',
+                'code':
+                    400,
+                'message': ('spec.revisionTemplate.spec.container.image: '
+                            'Invalid image provided in the revision'
+                            ' template. Expected [region.]gcr.io/repo-path[:tag'
+                            ' or @digest], obtained really/bad/image'),
+                'status':
+                    'INVALID_ARGUMENT',
                 'details': [{
-                    '@type': 'type.googleapis.com/google.rpc.BadRequest',
+                    '@type':
+                        'type.googleapis.com/google.rpc.BadRequest',
                     'fieldViolations': [{
                         'field': 'spec.revisionTemplate.spec.container.image',
                         'description':
                             'Invalid image provided in the revision'
                             ' template. Expected [region.]gcr.io/repo-path[:tag'
                             ' or @digest], obtained really/bad/image',
-                    }]}]}},
+                    }]
+                }]
+            }
+        },
         details=http_error.ExampleErrorDetails())
     self.assertEqual(
-        self._GetFieldViolations(err),
-        {'spec.revisionTemplate.spec.container.image':
-             'Invalid image provided in the revision'
-             ' template. Expected [region.]gcr.io/repo-path[:tag'
-             ' or @digest], obtained really/bad/image'})
+        self._GetFieldViolations(err), {
+            'spec.revisionTemplate.spec.container.image':
+                'Invalid image provided in the revision'
+                ' template. Expected [region.]gcr.io/repo-path[:tag'
+                ' or @digest], obtained really/bad/image'
+        })
 
   def testGetSeveralFieldViolations(self):
     err = http_error.MakeDetailedHttpError(
@@ -869,7 +879,7 @@ Invalid request API reason: Precondition check failed.
         content={
             'error': {
                 'code': 400,
-                'message': 'The request has errors.',
+                'message': 'blog.blug: hahaha; doop.doop: lol',
                 'status': 'INVALID_ARGUMENT',
                 'details': [{
                     '@type': 'type.googleapis.com/google.rpc.BadRequest',

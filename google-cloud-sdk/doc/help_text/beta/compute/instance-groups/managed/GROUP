@@ -21,7 +21,7 @@ GROUPS
     GROUP is one of the following:
 
      instance-configs
-        (BETA) Manage instance-specific settings of managed instance group.
+        (BETA) Manage instance-specific settings in a managed instance group.
 
      rolling-action
         (BETA) Manipulate rolling actions on Compute Engine managed instance
@@ -93,7 +93,7 @@ COMMANDS
         (BETA) Stop autoscaling a managed instance group.
 
      update
-        (BETA) Update Compute Engine managed instance groups.
+        (BETA) Update a Compute Engine managed instance group.
 
      update-autoscaling
         (BETA) Update autoscaling parameters of a managed instance group.

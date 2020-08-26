@@ -227,8 +227,6 @@ Cannot specify --tpu-ipv4-cidr with --enable-tpu-service-networking."""
 
 MAX_NODES_PER_POOL = 1000
 
-MAX_CONCURRENT_NODE_COUNT = 20
-
 MAX_AUTHORIZED_NETWORKS_CIDRS_PRIVATE = 100
 MAX_AUTHORIZED_NETWORKS_CIDRS_PUBLIC = 50
 
@@ -260,12 +258,12 @@ ADDONS_OPTIONS = DEFAULT_ADDONS + [
     NETWORK_POLICY,
     CLOUDRUN,
     NODELOCALDNS,
+    CONFIGCONNECTOR,
 ]
 BETA_ADDONS_OPTIONS = ADDONS_OPTIONS + [
     ISTIO,
     APPLICATIONMANAGER,
     GCEPDCSIDRIVER,
-    CONFIGCONNECTOR,
 ]
 ALPHA_ADDONS_OPTIONS = BETA_ADDONS_OPTIONS + [CLOUDBUILD]
 
@@ -523,6 +521,8 @@ class CreateClusterOptions(object):
       cluster_dns=None,
       cluster_dns_scope=None,
       cluster_dns_domain=None,
+      kubernetes_objects_changes_target=None,
+      kubernetes_objects_snapshots_target=None,
   ):
     self.node_machine_type = node_machine_type
     self.node_source_image = node_source_image
@@ -651,6 +651,8 @@ class CreateClusterOptions(object):
     self.cluster_dns = cluster_dns
     self.cluster_dns_scope = cluster_dns_scope
     self.cluster_dns_domain = cluster_dns_domain
+    self.kubernetes_objects_changes_target = kubernetes_objects_changes_target
+    self.kubernetes_objects_snapshots_target = kubernetes_objects_snapshots_target
 
 
 class UpdateClusterOptions(object):
@@ -682,7 +684,6 @@ class UpdateClusterOptions(object):
                master_authorized_networks=None,
                enable_pod_security_policy=None,
                enable_binauthz=None,
-               concurrent_node_count=None,
                enable_vertical_pod_autoscaling=None,
                enable_intra_node_visibility=None,
                security_profile=None,
@@ -723,7 +724,9 @@ class UpdateClusterOptions(object):
                enable_tpu_service_networking=None,
                enable_gvnic=None,
                notification_config=None,
-               private_ipv6_google_access_type=None):
+               private_ipv6_google_access_type=None,
+               kubernetes_objects_changes_target=None,
+               kubernetes_objects_snapshots_target=None):
     self.version = version
     self.update_master = bool(update_master)
     self.update_nodes = bool(update_nodes)
@@ -749,7 +752,6 @@ class UpdateClusterOptions(object):
     self.master_authorized_networks = master_authorized_networks
     self.enable_pod_security_policy = enable_pod_security_policy
     self.enable_binauthz = enable_binauthz
-    self.concurrent_node_count = concurrent_node_count
     self.enable_vertical_pod_autoscaling = enable_vertical_pod_autoscaling
     self.security_profile = security_profile
     self.security_profile_runtime_rules = security_profile_runtime_rules
@@ -792,6 +794,8 @@ class UpdateClusterOptions(object):
     self.enable_gvnic = enable_gvnic
     self.notification_config = notification_config
     self.private_ipv6_google_access_type = private_ipv6_google_access_type
+    self.kubernetes_objects_changes_target = kubernetes_objects_changes_target
+    self.kubernetes_objects_snapshots_target = kubernetes_objects_snapshots_target
 
 
 class SetMasterAuthOptions(object):
@@ -856,7 +860,8 @@ class CreateNodePoolOptions(object):
                shielded_integrity_monitoring=None,
                system_config_from_file=None,
                reservation_affinity=None,
-               reservation=None):
+               reservation=None,
+               node_group=None):
     self.machine_type = machine_type
     self.disk_size_gb = disk_size_gb
     self.scopes = scopes
@@ -897,6 +902,7 @@ class CreateNodePoolOptions(object):
     self.system_config_from_file = system_config_from_file
     self.reservation_affinity = reservation_affinity
     self.reservation = reservation
+    self.node_group = node_group
 
 
 class UpdateNodePoolOptions(object):
@@ -1017,10 +1023,11 @@ class APIAdapter(object):
       raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
 
   def CheckClusterOtherZones(self, cluster_ref, api_error):
-    """Searches for similar cluster in other zones and reports via error.
+    """Searches for similar clusters in other locations and reports via error.
 
     Args:
-      cluster_ref: cluster Resource to look for others with the same id.
+      cluster_ref: cluster Resource to look for others with the same ID in
+        different locations.
       api_error: current error from original request.
 
     Raises:
@@ -1042,6 +1049,12 @@ class APIAdapter(object):
       raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
     for cluster in clusters:
       if cluster.name == cluster_ref.clusterId:
+        # Fall back to generic not found error if we *did* have the zone right.
+        # Don't allow the case of a same-name cluster in a different zone to
+        # be hinted (confusing!).
+        if cluster.zone == cluster_ref.zone:
+          raise api_error
+
         # User likely got zone wrong.
         raise util.Error(
             WRONG_ZONE_ERROR_MSG.format(
@@ -1507,6 +1520,10 @@ class APIAdapter(object):
         policy.tpuIpv4CidrBlock = options.tpu_ipv4_cidr
       cluster.clusterIpv4Cidr = None
       cluster.ipAllocationPolicy = policy
+    elif options.enable_ip_alias is not None:
+      cluster.ipAllocationPolicy = self.messages.IPAllocationPolicy(
+          useRoutes=True)
+
     return cluster
 
   def ParseAllowRouteOverlapOptions(self, options, cluster):
@@ -1678,6 +1695,16 @@ class APIAdapter(object):
     if options.workload_pool:
       cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
           workloadPool=options.workload_pool)
+
+    if options.enable_master_global_access is not None:
+      if not options.enable_private_nodes:
+        raise util.Error(
+            PREREQUISITE_OPTION_ERROR_MSG.format(
+                prerequisite='enable-private-nodes',
+                opt='enable-master-global-access'))
+      cluster.privateClusterConfig.masterGlobalAccessConfig = \
+          self.messages.PrivateClusterMasterGlobalAccessConfig(
+              enabled=options.enable_master_global_access)
 
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
@@ -2047,7 +2074,6 @@ class APIAdapter(object):
             self.messages.CloudRunConfig(
                 disabled=options.disable_addons.get(CLOUDRUN)))
 
-
     op = self.client.projects_locations_clusters.Update(
         self.messages.UpdateClusterRequest(
             name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
@@ -2391,6 +2417,9 @@ class APIAdapter(object):
 
     if options.min_cpu_platform is not None:
       node_config.minCpuPlatform = options.min_cpu_platform
+
+    if options.node_group is not None:
+      node_config.nodeGroup = options.node_group
 
     self._AddWorkloadMetadataToNodeConfig(node_config, options, self.messages)
     _AddLinuxNodeConfigToNodeConfig(node_config, options, self.messages)
@@ -3005,13 +3034,6 @@ class V1Beta1Adapter(V1Adapter):
     else:
       cluster.clusterTelemetry = None
 
-    if not options.enable_ip_alias and options.enable_ip_alias is not None:
-      if cluster.ipAllocationPolicy is None:
-        cluster.ipAllocationPolicy = self.messages.IPAllocationPolicy(
-            useRoutes=True)
-      else:
-        cluster.ipAllocationPolicy.useRoutes = True
-
     if options.datapath_provider is not None:
       if cluster.networkConfig is None:
         cluster.networkConfig = self.messages.NetworkConfig()
@@ -3040,6 +3062,9 @@ class V1Beta1Adapter(V1Adapter):
           hidden=True).GetEnumForChoice(options.private_ipv6_google_access_type)
 
     cluster.master = _GetMasterForClusterCreate(options, self.messages)
+
+    cluster.kubernetesObjectsExportConfig = _GetKubernetesObjectsExportConfigForClusterCreate(
+        options, self.messages)
 
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
@@ -3092,6 +3117,12 @@ class V1Beta1Adapter(V1Adapter):
     master = _GetMasterForClusterUpdate(options, self.messages)
     if master is not None:
       update = self.messages.ClusterUpdate(desiredMaster=master)
+
+    kubernetes_objects_export_config = _GetKubernetesObjectsExportConfigForClusterUpdate(
+        options, self.messages)
+    if kubernetes_objects_export_config is not None:
+      update = self.messages.ClusterUpdate(
+          desiredKubernetesObjectsExportConfig=kubernetes_objects_export_config)
 
     if not update:
       # if reached here, it's possible:
@@ -3427,13 +3458,6 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       cluster.networkConfig.datapathProvider = \
             self.messages.NetworkConfig.DatapathProviderValueValuesEnum.ADVANCED_DATAPATH
 
-    if not options.enable_ip_alias and options.enable_ip_alias is not None:
-      if cluster.ipAllocationPolicy is None:
-        cluster.ipAllocationPolicy = self.messages.IPAllocationPolicy(
-            useRoutes=True)
-      else:
-        cluster.ipAllocationPolicy.useRoutes = True
-
     if options.private_ipv6_google_access_type is not None:
       if cluster.networkConfig is None:
         cluster.networkConfig = self.messages.NetworkConfig()
@@ -3442,6 +3466,9 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           hidden=True).GetEnumForChoice(options.private_ipv6_google_access_type)
 
     cluster.master = _GetMasterForClusterCreate(options, self.messages)
+
+    cluster.kubernetesObjectsExportConfig = _GetKubernetesObjectsExportConfigForClusterCreate(
+        options, self.messages)
 
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
@@ -3511,6 +3538,12 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     if master is not None:
       update = self.messages.ClusterUpdate(desiredMaster=master)
 
+    kubernetes_objects_export_config = _GetKubernetesObjectsExportConfigForClusterUpdate(
+        options, self.messages)
+    if kubernetes_objects_export_config is not None:
+      update = self.messages.ClusterUpdate(
+          desiredKubernetesObjectsExportConfig=kubernetes_objects_export_config)
+
     if not update:
       # if reached here, it's possible:
       # - someone added update flags but not handled
@@ -3551,8 +3584,6 @@ class V1Alpha1Adapter(V1Beta1Adapter):
         update.desiredAddonsConfig.gcePersistentDiskCsiDriverConfig = (
             self.messages.GcePersistentDiskCsiDriverConfig(
                 enabled=not options.disable_addons.get(GCEPDCSIDRIVER)))
-    if options.update_nodes and options.concurrent_node_count:
-      update.concurrentNodeCount = options.concurrent_node_count
 
     op = self.client.projects_locations_clusters.Update(
         self.messages.UpdateClusterRequest(
@@ -3567,8 +3598,6 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
     if options.enable_autoprovisioning is not None:
       pool.autoscaling.autoprovisioned = options.enable_autoprovisioning
-    if options.node_group is not None:
-      pool.config.nodeGroup = options.node_group
     req = self.messages.CreateNodePoolRequest(
         nodePool=pool,
         parent=ProjectLocationCluster(node_pool_ref.projectId,
@@ -3744,7 +3773,7 @@ def _GetCloudRunLoadBalancerType(options, messages):
       if input_load_balancer_type == 'INTERNAL':
         return messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
       return messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
-  return messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_UNSPECIFIED
+  return None
 
 
 def _AddMetadataToNodeConfig(node_config, options):
@@ -3972,6 +4001,35 @@ def _GetMasterForClusterUpdate(options, messages):
             .LogEnabledComponentsValueListEntryValuesEnum.COMPONENT_UNSPECIFIED
         ])
     return messages.Master(signalsConfig=config)
+
+
+def _GetKubernetesObjectsExportConfigForClusterCreate(options, messages):
+  """Gets the KubernetesObjectsExportConfig from create options."""
+  if options.kubernetes_objects_changes_target is not None or options.kubernetes_objects_snapshots_target is not None:
+    config = messages.KubernetesObjectsExportConfig()
+    if options.kubernetes_objects_changes_target is not None:
+      config.kubernetesObjectsChangesTarget = options.kubernetes_objects_changes_target
+    if options.kubernetes_objects_snapshots_target is not None:
+      config.kubernetesObjectsSnapshotsTarget = options.kubernetes_objects_snapshots_target
+    return config
+
+
+def _GetKubernetesObjectsExportConfigForClusterUpdate(options, messages):
+  """Gets the KubernetesObjectsExportConfig from update options."""
+  if options.kubernetes_objects_changes_target is not None or options.kubernetes_objects_snapshots_target is not None:
+    changes_target = None
+    snapshots_target = None
+    if options.kubernetes_objects_changes_target is not None:
+      changes_target = options.kubernetes_objects_changes_target
+      if changes_target == 'NONE':
+        changes_target = ''
+    if options.kubernetes_objects_snapshots_target is not None:
+      snapshots_target = options.kubernetes_objects_snapshots_target
+      if snapshots_target == 'NONE':
+        snapshots_target = ''
+    return messages.KubernetesObjectsExportConfig(
+        kubernetesObjectsSnapshotsTarget=snapshots_target,
+        kubernetesObjectsChangesTarget=changes_target)
 
 
 def ProjectLocation(project, location):

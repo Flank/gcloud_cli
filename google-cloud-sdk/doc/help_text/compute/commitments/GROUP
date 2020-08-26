@@ -27,6 +27,9 @@ COMMANDS
      create
         Create Compute Engine commitments.
 
+     create-license
+        Create Compute Engine license-based commitments.
+
      describe
         Describe a Compute Engine commitment.
 

@@ -3,7 +3,7 @@ NAME
         stores
 
 SYNOPSIS
-    gcloud alpha healthcare hl7v2-stores COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha healthcare hl7v2-stores GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Cloud Healthcare API HL7v2 stores.
@@ -15,6 +15,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     export
+        (ALPHA) Manage Cloud Healthcare API HL7v2 store exports.
+
+     import
+        (ALPHA) Manage Cloud Healthcare API HL7v2 store imports.
 
 COMMANDS
     COMMAND is one of the following:
@@ -52,7 +61,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud healthcare hl7v2-stores
         $ gcloud beta healthcare hl7v2-stores

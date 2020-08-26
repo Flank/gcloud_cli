@@ -52,7 +52,7 @@ class CreateTestBeta(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     self.msg = core_apis.GetMessagesModule('cloudbuild', self.api_version)
 
     self.project_id = 'my-project'
-    self.workerpool_location = 'my-location'
+    self.workerpool_location = cloudbuild_util.SERVICE_REGIONS[0]
     properties.VALUES.core.project.Set(self.project_id)
 
     self.frozen_time_str = '2018-11-12T00:10:00+00:00'

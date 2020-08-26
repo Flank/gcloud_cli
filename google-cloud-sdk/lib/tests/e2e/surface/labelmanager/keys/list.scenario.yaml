@@ -6,11 +6,12 @@ summary:
   - command: labelmanager keys list "organizations/961309089256"
   - stdout: |
       NAME                    DISPLAY_NAME
-      labelKeys/889673984972  env
+      labelKeys/952766012010  do-not-delete-list-test-key
 
 actions:
 - execute_command:
     command: labelmanager keys list --label-parent="organizations/961309089256"
+      --filter displayName=do-not-delete-list-test-key
     events:
     - api_call:
         expect_request:
@@ -25,15 +26,15 @@ actions:
             status: '200'
           body:
             keys:
-            - name: labelKeys/889673984972
+            - name: labelKeys/952766012010
               parent: organizations/961309089256
-              displayName: env
+              displayName: do-not-delete-list-test-key
               description: gcloud test key environment
               etag: 4JUfEiYOn6pNfcKf0oZVcw==
               state: ACTIVE
               createTime: '2019-10-10T22:06:52.891Z'
     - expect_stdout: |
         NAME                    DISPLAY_NAME
-        labelKeys/889673984972  env
+        labelKeys/952766012010  do-not-delete-list-test-key
     - expect_exit:
         code: 0

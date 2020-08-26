@@ -1,6 +1,5 @@
 NAME
-    gcloud compute ssl-policies create - create a new Google Compute Engine SSL
-        policy
+    gcloud compute ssl-policies create - create a new Compute Engine SSL policy
 
 SYNOPSIS
     gcloud compute ssl-policies create SSL_POLICY

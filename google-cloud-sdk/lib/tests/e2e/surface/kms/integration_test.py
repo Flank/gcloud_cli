@@ -88,8 +88,8 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
 
   def testIamCommandsKeyrings(self):
     # Test keyring getIamPolicy
-    self.RunKms('keyrings', 'get-iam-policy', self.keyring,
-                '--location', self.glbl)
+    self.RunKms('keyrings', 'get-iam-policy', self.keyring, '--location',
+                self.glbl)
 
     # Expect the default etag value "ACAB" when no policy is set.
     self.AssertOutputContains('etag: ACAB')
@@ -102,8 +102,8 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
   "bindings": [ {{ "members": ["serviceAccount:{0}"], "role": "roles/owner" }} ]
 }}
 """.format(self.Account()))
-    self.RunKms('keyrings', 'set-iam-policy', self.keyring,
-                '--location', self.glbl, policy_file)
+    self.RunKms('keyrings', 'set-iam-policy', self.keyring, '--location',
+                self.glbl, policy_file)
     etag = yaml.load(self.GetOutput())['etag']
     self.ClearOutput()
 
@@ -111,8 +111,8 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
   "etag": "{0}"
 }}
 """.format(etag))
-    self.RunKms('keyrings', 'set-iam-policy', self.keyring,
-                '--location', self.glbl, policy_file)
+    self.RunKms('keyrings', 'set-iam-policy', self.keyring, '--location',
+                self.glbl, policy_file)
 
     self.AssertOutputContains("""bindings:
 - members:
@@ -122,13 +122,14 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
     etag = yaml.load(self.GetOutput())['etag']
     self.ClearOutput()
 
-    files.WriteFileContents(policy_file, """{{
+    files.WriteFileContents(
+        policy_file, """{{
   "etag": "{0}",
   "bindings": []
 }}
 """.format(etag))
-    self.RunKms('keyrings', 'set-iam-policy', self.keyring,
-                '--location', self.glbl, policy_file)
+    self.RunKms('keyrings', 'set-iam-policy', self.keyring, '--location',
+                self.glbl, policy_file)
     # "bindings" is set to [], so all entries should be removed.
     self.AssertOutputNotContains('bindings:')
 
@@ -171,7 +172,8 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
     etag = yaml.load(self.GetOutput())['etag']
     self.ClearOutput()
 
-    files.WriteFileContents(policy_file, """{{
+    files.WriteFileContents(
+        policy_file, """{{
   "etag": "{0}",
   "bindings": []
 }}
@@ -392,7 +394,6 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
 
   def testEncryptDecryptWithHsmKey(self):
     kr = next(self.keyring_namer)
-    # Right now creating hsm keys is only supported in us-east1 and us-west1.
     hsm_location = 'us-east1'
     self.RunKms('keyrings', 'create', kr, '--location', hsm_location)
     self.keyrings_to_clean.append({'name': kr, 'location': hsm_location})
@@ -408,19 +409,38 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
 
     # The key should be usable with GA commands, even though it was created with
     # "alpha kms keys create".
-    self.RunKms('encrypt', '--keyring', kr, '--location', 'us-east1',
-                '--key', ck, '--plaintext-file', pt_path, '--ciphertext-file',
-                ct_path, '--additional-authenticated-data-file', aad_path)
+    self.RunKms('encrypt', '--keyring', kr, '--location', 'us-east1', '--key',
+                ck, '--plaintext-file', pt_path, '--ciphertext-file', ct_path,
+                '--additional-authenticated-data-file', aad_path)
 
-    self.RunKms('decrypt', '--keyring', kr, '--location', 'us-east1',
-                '--key', ck, '--ciphertext-file', ct_path, '--plaintext-file',
-                dc_path, '--additional-authenticated-data-file', aad_path)
+    self.RunKms('decrypt', '--keyring', kr, '--location', 'us-east1', '--key',
+                ck, '--ciphertext-file', ct_path, '--plaintext-file', dc_path,
+                '--additional-authenticated-data-file', aad_path)
 
     # AssertFileEquals opens the file in text mode, which causes issues on
     # Windows.
     with open(dc_path, 'rb') as f:
       decrypted = f.read()
     self.assertEqual(plaintext, decrypted)
+
+  @parameterized.parameters('cavium', 'google-card', 'google-partition', 'all')
+  def testGetCertificateChain(self, chain_type):
+    kr = next(self.keyring_namer)
+    hsm_location = 'us-east1'
+    self.RunKms('keyrings', 'create', kr, '--location', hsm_location)
+    self.keyrings_to_clean.append({'name': kr, 'location': hsm_location})
+    ck = next(self.cryptokey_namer)
+    self.RunKms('keys', 'create', ck, '--keyring', kr, '--location',
+                hsm_location, '--purpose', 'encryption', '--protection-level',
+                'hsm')
+
+    output_file = self.Touch(self.temp_path, 'output_file')
+    self.RunKmsBeta('keys', 'versions', 'get-certificate-chain', '1',
+                    '--location', hsm_location, '--keyring', kr, '--key', ck,
+                    '--certificate-chain-type', chain_type, '--output-file',
+                    output_file)
+    self.AssertFileContains('-----BEGIN CERTIFICATE-----', output_file)
+    self.AssertFileContains('-----END CERTIFICATE-----', output_file)
 
   @parameterized.parameters(
       ('asymmetric-signing', 'ec-sign-p256-sha256'),

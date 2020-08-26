@@ -1,6 +1,5 @@
 NAME
-    gcloud compute snapshots describe - describe a Google Compute Engine
-        snapshot
+    gcloud compute snapshots describe - describe a Compute Engine snapshot
 
 SYNOPSIS
     gcloud compute snapshots describe SNAPSHOT_NAME [GCLOUD_WIDE_FLAG ...]

@@ -1,14 +1,14 @@
 NAME
     gcloud alpha compute org-security-policies rules - read and manipulate
-        Google Compute Engine organization security policy rules
+        Compute Engine organization security policy rules
 
 SYNOPSIS
     gcloud alpha compute org-security-policies rules COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine organization security
-    policy rules.
+    (ALPHA) Read and manipulate Compute Engine organization security policy
+    rules.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -22,24 +22,22 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Compute Engine security policy rule.
+        (ALPHA) Create a Compute Engine security policy rule.
 
      delete
-        (ALPHA) Delete a Google Compute Engine organization security policy
-        rule.
+        (ALPHA) Delete a Compute Engine organization security policy rule.
 
      describe
-        (ALPHA) Describe a Google Compute Engine organization security policy
-        rule.
+        (ALPHA) Describe a Compute Engine organization security policy rule.
 
      update
-        (ALPHA) Update a Google Compute Engine security policy rule.
+        (ALPHA) Update a Compute Engine security policy rule.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta compute org-security-policies rules
 

@@ -19,9 +19,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import json
+import os
 
 from googlecloudsdk.command_lib.apigee import defaults
 from googlecloudsdk.command_lib.apigee import resource_args
+from googlecloudsdk.core import config
+from googlecloudsdk.core.util import files
 from tests.lib.calliope import util
 from tests.lib.surface.apigee import base
 
@@ -81,3 +84,24 @@ class DefaultsTest(base.ApigeeSurfaceTest):
         "organizations/my-project/environments",
         body=json.dumps(["test"]))
     self.RunApigee("environments list --project=new-project")
+
+  def testCorruptedCache(self):
+    # Set cache to something that can't be parsed as YAML
+    config_dir = config.Paths().global_config_dir
+    cache_file = os.path.join(config_dir, ".apigee-cached-project-mapping")
+    files.WriteFileContents(cache_file, "data: {{ unparseable }}")
+
+    canned_organization_response = {
+        "organizations": [{
+            "organization": "my-project",
+            "projectIds": ["my-project"]
+        },]
+    }
+    self.AddHTTPResponse(
+        "https://apigee.googleapis.com/v1/organizations",
+        body=json.dumps(canned_organization_response))
+    self.AddHTTPResponse(
+        "https://apigee.googleapis.com/v1/"
+        "organizations/my-project/environments",
+        body=json.dumps(["test"]))
+    self.RunApigee("environments list --project=my-project")

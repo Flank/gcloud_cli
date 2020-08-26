@@ -11,7 +11,7 @@ gcloud alpha artifacts print\-settings npm \- print credential settings to add t
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha artifacts print\-settings npm\fR [\fB\-\-scope\fR=\fISCOPE\fR] [\fB\-\-repository\fR=\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha artifacts print\-settings npm\fR [\fB\-\-json\-key\fR=\fIJSON_KEY\fR] [\fB\-\-scope\fR=\fISCOPE\fR] [\fB\-\-repository\fR=\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,6 +25,11 @@ to an npm repository.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-json\-key\fR=\fIJSON_KEY\fR
+Path to service account JSON key. If not specified, current active service
+account credentials or a placeholder for gcloud credentials is used.
+
 .TP 2m
 \fB\-\-scope\fR=\fISCOPE\fR
 The scope to associate with the Artifact Registry registry. If not specified,
@@ -82,6 +87,13 @@ $ gcloud alpha artifacts print\-settings npm \e
     \-\-repository="my\-repository"
 .RE
 
+To print a snippet using service account key:
+
+.RS 2m
+$ gcloud alpha artifacts print\-settings npm \e
+    \-\-json\-key=path/to/key.json
+.RE
+
 To print a snippet for the repository set in the \f5artifacts/repository\fR
 property with scope @my\-company:
 
@@ -96,7 +108,7 @@ $ gcloud alpha artifacts print\-settings npm \-\-scope=@my\-company
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta artifacts print\-settings npm

@@ -103,6 +103,9 @@ Display the dictionary as a list of system specific environment unset commands.
 Comma Separated Values (http://www.ietf.org/rfc/rfc4180.txt) with no keys. This
 format requires a projection to define the values to be printed.
 
+To use \fB\en\fR or \fB\et\fR as an attribute value please escape the \fB\e\fR
+with your shell's escape sequence, example \fBseparator="\e\en"\fR for bash.
+
 The format attributes are:
 
 .RS 2m
@@ -294,6 +297,9 @@ An alias for the \fBflattened\fR format.
 CSV with no heading and <TAB> separator instead of <COMMA>. Used to retrieve
 individual resource values. This format requires a projection to define the
 value(s) to be printed.
+
+To use \fB\en\fR or \fB\et\fR as an attribute value please escape the \fB\e\fR
+with your shell's escape sequence, example \fBseparator="\e\en"\fR for bash.
 
 The format attributes are:
 

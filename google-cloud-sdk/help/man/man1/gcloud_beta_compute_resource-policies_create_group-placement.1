@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute resource\-policies create group\-placement \- create a Google Compute Engine group placement resource policy
+gcloud beta compute resource\-policies create group\-placement \- create a Compute Engine group placement resource policy
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute resource\-policies create group\-placement \- create a Googl
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Create a Google Compute Engine Group Placement Resource Policy.
+\fB(BETA)\fR Create a Compute Engine Group Placement Resource Policy.
 
 
 
@@ -47,10 +47,10 @@ the same low\-latency network. \fICOLLOCATION\fR must be one of:
 .RS 2m
 .TP 2m
 \fBcollocated\fR
-Low network latency between VMs placed on the sameavailability domain.
+Low network latency between more VMs placed on the same availability domain.
 .TP 2m
 \fBunspecified\-collocation\fR
-Unspecified network latency between VMs placed on the sameavailability domain.
+Unspecified network latency between VMs placed on the same availability domain.
 This is the default behavior.
 .RE
 .sp
@@ -108,8 +108,8 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a Google Compute Engine group placement policy with two availability
-domains, run:.RS 2m
+To create a Compute Engine group placement policy with two availability domains,
+run:.RS 2m
 $ gcloud beta compute resource\-policies create group\-placement \e
     my\-resource\-policy \-\-region=REGION \-\-availability\-domain\-count=2
 

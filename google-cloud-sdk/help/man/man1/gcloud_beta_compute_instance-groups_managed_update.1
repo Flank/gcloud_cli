@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute instance\-groups managed update \- update Compute Engine managed instance groups
+gcloud beta compute instance\-groups managed update \- update a Compute Engine managed instance group
 
 
 
@@ -17,28 +17,25 @@ gcloud beta compute instance\-groups managed update \- update Compute Engine man
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Update Compute Engine managed instance groups.
+\fB(BETA)\fR Update a Compute Engine managed instance group.
 
 \fBgcloud beta compute instance\-groups managed update\fR allows you to specify
-or modify the StatefulPolicy and AutoHealingPolicy for an existing managed
+or modify the stateful policy and autohealing policy for an existing managed
 instance group.
 
-Stateful Policy defines what stateful resources should be preserved for the
-group. When instances in the group are removed or recreated, those stateful
-properties are always applied to them. This command allows you to change the
-preserved resources by adding more disks or removing existing disks and allows
-you to turn on and off preserving instance names.
+A stateful policy defines which resources should be preserved across the group.
+When instances in the group are recreated, stateful resources are preserved.
+This command allows you to update stateful resources, specifically to add or
+remove stateful disks.
 
-When updating the AutoHealingPolicy, you may specify the health check, initial
-delay, or both. If the field is unspecified, its value won't be modified. If
-\f5\-\-health\-check\fR is specified, the health check will be used to monitor
-the health of your application. Whenever the health check signal for the
-instance becomes \f5UNHEALTHY\fR, the autohealing action (\f5RECREATE\fR) on an
-instance will be performed.
+When updating the autohealing policy, you can specify the health check, initial
+delay, or both. If either field is unspecified, its value won't be modified. If
+\f5\-\-health\-check\fR is specified, the health check monitors the health of
+your application. Whenever the health check signal for an instance becomes
+\f5UNHEALTHY\fR, the autohealer recreates the instance.
 
-If no health check is specified, the instance autohealing will be triggered by
-the instance status only (i.e. the autohealing action (\f5RECREATE\fR) on an
-instance will be performed if \f5instance.status\fR is not \f5RUNNING\fR).
+If no health check exists, instance autohealing is triggered only by instance
+status: if an instance is not \f5RUNNING\fR, the group recreates it.
 
 
 
@@ -95,9 +92,9 @@ events.
 
 Use this argument multiple times to update more disks.
 
-If stateful disk with given \f5device\-name\fR exists in current instance
-config, its properties will be replaced by the newly provided ones. In other
-case new stateful disk definition will be added to the instance config.
+If a stateful disk with the given device name already exists in the current
+instance config, its properties will be replaced by the newly provided ones.
+Otherwise, a new stateful disk definition will be added to the instance config.
 
 .RS 2m
 .TP 2m

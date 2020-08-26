@@ -1,6 +1,6 @@
 NAME
-    gcloud compute security-policies rules update - update a Google Compute
-        Engine security policy rule
+    gcloud compute security-policies rules update - update a Compute Engine
+        security policy rule
 
 SYNOPSIS
     gcloud compute security-policies rules update PRIORITY [--action=ACTION]

@@ -180,6 +180,27 @@ class CsvPrinterAttributeTest(resource_printer_test_base.Base):
         2
         """))
 
+  def testSeparatorDelimiterNewlineEscaped(self):
+    self.Print(
+        style='csv',
+        attributes='[no-heading,separator="\\n",delimiter="\\n"]',
+        resource=self.CreateObjectResourceList(3))
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        B0
+        a=0
+        b=0.1
+        0
+        B1
+        a=1
+        b=1.2
+        1
+        B2
+        a=2
+        b=2.3
+        2
+        """))
+
   def testTerminator(self):
     self.Print(style='csv',
                attributes='[no-heading,terminator="..."]',

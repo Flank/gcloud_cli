@@ -50,6 +50,10 @@ summary:
         - allUsers
         role: roles/viewer
       version: 1
+- execute:
+  - command: |
+      service-directory namespaces set-iam-policy my-namespace --location us-east1 policy.json
+  - error: '1: HTTPError 400'
 actions:
 - write_file:
     path: policy.json
@@ -83,8 +87,6 @@ actions:
     command: |
       service-directory namespaces set-iam-policy my-namespace --location us-east1 policy.json
     events:
-    - expect_stderr: |
-        Updated IAM policy for namespace [my-namespace].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace:setIamPolicy?alt=json
@@ -103,8 +105,8 @@ actions:
                 etag: etag
                 version: 1
         return_response:
-          headers:
-            status: '200'
+          status: 200
+          headers: {}
           body: |
             {
               "version": 1,
@@ -118,6 +120,8 @@ actions:
                   "members": ["allUsers"]
                 }]
             }
+    - expect_stderr: |
+        Updated IAM policy for namespace [my-namespace].
     - expect_stdout: |
         bindings:
         - members:
@@ -139,8 +143,6 @@ actions:
           concurrent policy changes.
         prompt_string: Replace existing policy
         user_input: y
-    - expect_stderr: |
-        Updated IAM policy for namespace [my-namespace].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace:setIamPolicy?alt=json
@@ -158,8 +160,8 @@ actions:
                   role: roles/viewer
                 version: 1
         return_response:
-          headers:
-            status: '200'
+          status: 200
+          headers: {}
           body: |
             {
               "version": 1,
@@ -173,6 +175,8 @@ actions:
                   "members": ["allUsers"]
                 }]
             }
+    - expect_stderr: |
+        Updated IAM policy for namespace [my-namespace].
     - expect_stdout: |
         bindings:
         - members:
@@ -188,8 +192,6 @@ actions:
     command: |
       service-directory namespaces set-iam-policy projects/fake-project/locations/us-east1/namespaces/my-namespace policy.json
     events:
-    - expect_stderr: |
-        Updated IAM policy for namespace [my-namespace].
     - api_call:
         expect_request:
           uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace:setIamPolicy?alt=json
@@ -208,8 +210,8 @@ actions:
                 etag: etag
                 version: 1
         return_response:
-          headers:
-            status: '200'
+          status: 200
+          headers: {}
           body: |
             {
               "version": 1,
@@ -223,6 +225,8 @@ actions:
                   "members": ["allUsers"]
                 }]
             }
+    - expect_stderr: |
+        Updated IAM policy for namespace [my-namespace].
     - expect_stdout: |
         bindings:
         - members:
@@ -234,3 +238,31 @@ actions:
         version: 1
     - expect_exit:
         code: 0
+- execute_command:
+    command: |
+      service-directory namespaces set-iam-policy my-namespace --location us-east1 policy.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:test-user@gmail.com
+                  role: roles/owner
+                - members:
+                  - allUsers
+                  role: roles/viewer
+                etag: etag
+                version: 1
+        return_response:
+          status: 400
+          headers: {}
+          body: null
+    - expect_exit:
+        code: 1
+        message: HTTPError 400

@@ -17,8 +17,8 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) gcloud alpha compute health-checks create ssl is used to create a
     non-legacy health check using the SSL protocol. You can use this health
-    check for Google Cloud Platform load balancers or for managed instance
-    group autohealing. For more information, see the health checks overview at:
+    check for Google Cloud load balancers or for managed instance group
+    autohealing. For more information, see the health checks overview at:
     https://cloud.google.com/load-balancing/docs/health-check-concepts
 
 POSITIONAL ARGUMENTS
@@ -143,7 +143,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute health-checks create ssl
         $ gcloud beta compute health-checks create ssl

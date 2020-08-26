@@ -60,6 +60,8 @@ apis:
     v1:
       discovery_doc: anthosevents_v1.json
       default: true
+    v1alpha1:
+      discovery_doc: anthosevents_v1alpha1.json
     v1beta1:
       discovery_doc: anthosevents_v1beta1.json
   apikeys:
@@ -146,8 +148,6 @@ apis:
       discovery_doc: cloudasset_v1p4alpha1.json
     v1p4beta1:
       discovery_doc: cloudasset_v1p4beta1.json
-    v1p5alpha1:
-      discovery_doc: cloudasset_v1p5alpha1.json
     v1p5beta1:
       discovery_doc: cloudasset_v1p5beta1.json
   cloudbilling:
@@ -213,7 +213,6 @@ apis:
   cloudidentity:
     v1alpha1:
       discovery_doc: cloudidentity_v1alpha1.json
-      resources:
     v1beta1:
       discovery_doc: cloudidentity_v1beta1.json
       default: true
@@ -542,6 +541,8 @@ apis:
       discovery_doc: osconfig_v1.json
       default: true
   iam:
+    v1beta:
+      discovery_doc: iam_v1beta.json
     v1:
       discovery_doc: iam_v1.json
       default: true
@@ -590,6 +591,10 @@ apis:
           path: projects/{project}/iap_web/{iapWebId}/services/{serviceId}
         projects.iap_web.services.versions:
           path: projects/{project}/iap_web/{iapWebId}/services/{serviceId}/versions/{versionId}
+  krmapihosting:
+    v1alpha1:
+      discovery_doc: krmapihosting_v1alpha1.json
+      default: true
   labelmanager:
     v1alpha1:
       discovery_doc: labelmanager_v1alpha1.json
@@ -624,6 +629,10 @@ apis:
   memcache:
     v1beta2:
       discovery_doc: memcache_v1beta2.json
+      default: true
+  metastore:
+    v1alpha:
+      discovery_doc: metastore_v1alpha.json
       default: true
   ml:
     v1:
@@ -683,7 +692,10 @@ apis:
       discovery_doc: policytroubleshooter_v2alpha1.json
   privateca:
     v1alpha1:
+      default: true
       discovery_doc: privateca_v1alpha1.json
+    v1beta1:
+      discovery_doc: privateca_v1beta1.json
   pubsub:
     v1:
       discovery_doc: pubsub_v1.json
@@ -818,6 +830,10 @@ apis:
   toolresults:
     v1beta3:
       discovery_doc: toolresults_v1beta3.json
+  transcoder:
+    v1beta1:
+      discovery_doc: transcoder_v1beta1.json
+      default: true
   tpu:
     v1alpha1:
       discovery_doc: tpu_v1alpha1.json
@@ -911,6 +927,8 @@ apis:
       discovery_doc: gameservices_v1alpha.json
     v1beta:
       discovery_doc: gameservices_v1beta.json
+    v1:
+      discovery_doc: gameservices_v1.json
       default: true
   translate:
     v3beta1:
@@ -933,3 +951,12 @@ apis:
   sddc:
     v1alpha1:
       discovery_doc: sddc_v1alpha1.json
+  ondemandscanning:
+    v1beta1:
+      discovery_doc: ondemandscanning_v1beta1.json
+      default: true
+      resources:
+        projects.locations.scans:
+          path: projects/{projectsId}/locations/{locationsId}/scans/{scansId}
+        projects.locations.scans.vulnerabilities:
+          path: projects/{projectsId}/locations/{locationsId}/scans/{scansId}/vulnerabilities

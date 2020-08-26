@@ -15,6 +15,12 @@ summary:
   - write_file: cert_out.pem
   - stderr: |
       Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/cert].
+- set_property: privateca/location us-central1
+- execute:
+  - command: |
+      privateca certificates create --issuer ca --csr test_csr.pem
+  - stderr: |
+      Created Certificate [projects/foo/locations/us-central1/certificateAuthorities/ca/certificates/20200220-ABC-DEF].
 actions:
 - load_resource:
     path: tests/unit/surface/privateca/test_data/test_csr.pem
@@ -280,5 +286,29 @@ actions:
           -----END CERTIFICATE-----
     - expect_stderr: |
         Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/cert].
+    - expect_exit:
+        code: 0
+- set_property:
+    privateca/location: us-central1
+- execute_command:
+    command: |
+      privateca certificates create --issuer ca --csr test_csr.pem
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/us-central1/certificateAuthorities/ca/certificates.*
+          method: POST
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/foo/locations/us-central1/certificateAuthorities/ca/certificates/20200220-ABC-DEF
+    - expect_stderr: |
+        Created Certificate [projects/foo/locations/us-central1/certificateAuthorities/ca/certificates/20200220-ABC-DEF].
     - expect_exit:
         code: 0

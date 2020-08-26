@@ -19,6 +19,10 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     export-logs
+        Triggers instance to gather logs and upload them to a Cloud Storage
+        Bucket.
+
      routes
         Routes to/from Compute Engine virtual machine instances.
 

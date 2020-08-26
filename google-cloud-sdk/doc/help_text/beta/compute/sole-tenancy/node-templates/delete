@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute sole-tenancy node-templates delete - delete a Google
-        Compute Engine node template
+    gcloud beta compute sole-tenancy node-templates delete - delete a Compute
+        Engine node template
 
 SYNOPSIS
     gcloud beta compute sole-tenancy node-templates delete NAME

@@ -26,10 +26,13 @@ from googlecloudsdk.command_lib.compute.packet_mirrorings import flags
 from googlecloudsdk.command_lib.compute.packet_mirrorings import utils
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
-  """Update a Google Compute Engine packet mirroring policy."""
+  """Update a Compute Engine packet mirroring policy."""
 
   PACKET_MIRRORING_ARG = None
+
+  enable_filter_direction = False
 
   @classmethod
   def Args(cls, parser):
@@ -38,7 +41,8 @@ class Update(base.UpdateCommand):
     cls.PACKET_MIRRORING_ARG = flags.PacketMirroringArgument()
     cls.PACKET_MIRRORING_ARG.AddArgument(parser, operation_type='update')
 
-    flags.AddUpdateArgs(parser)
+    flags.AddUpdateArgs(
+        parser, enable_filter_direction=cls.enable_filter_direction)
 
   def Collection(self):
     return 'compute.packetMirrorings'
@@ -188,10 +192,14 @@ class Update(base.UpdateCommand):
           if x not in args.remove_filter_cidr_ranges
       ]
 
+    if self.enable_filter_direction and args.filter_direction:
+      resource.filter.direction = messages.PacketMirroringFilter.DirectionValueValuesEnum(
+          args.filter_direction.upper())
+
 
 Update.detailed_help = {
     'DESCRIPTION':
-        'Update a Google Compute Engine packet mirroring policy.',
+        'Update a Compute Engine packet mirroring policy.',
     'EXAMPLES':
         """\
     Stop mirroring by tags, add subnet-1 as a mirrored subnet.
@@ -216,3 +224,10 @@ Update.detailed_help = {
           --region us-central1 --enable
     """,
 }
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class UpdateAlpha(Update):
+  """Update a Google Compute Engine packet mirroring policy."""
+
+  enable_filter_direction = True

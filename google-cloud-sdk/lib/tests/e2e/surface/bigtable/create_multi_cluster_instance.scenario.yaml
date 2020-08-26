@@ -1,0 +1,209 @@
+# Integ test for multi-cluster instance creation with CMEK.
+title: Test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: bigtable instances create $$auto-clean$$ --display-name="Test Instance Auto Cleanup"
+      --cluster-config=id=$$test-cluster-us$$,zone=us-east1-c
+      --cluster-config=id=$$test-cluster-asia$$,zone=asia-east1-c
+  - progress_tracker:
+    - message: Creating bigtable instance $$auto-clean$$
+    - status: SUCCESS
+- execute:
+  - command: bigtable instances describe $$auto-clean$$
+  - stdout: |
+      displayName: Test Instance Auto Cleanup
+      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$
+      state: READY
+      type: PRODUCTION
+- execute:
+  - command: bigtable clusters describe $$test-cluster-us$$ --instance $$auto-clean$$
+  - stdout: |
+      defaultStorageType: SSD
+      location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-us$$
+      serveNodes: 1
+      state: READY
+- execute:
+  - command: bigtable clusters describe $$test-cluster-asia$$ --instance $$auto-clean$$
+  - stdout: |
+      defaultStorageType: SSD
+      location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$
+      serveNodes: 1
+      state: READY
+- execute:
+  - command: bigtable instances delete $$auto-clean$$
+  - prompt:
+    - message: Delete instance $$auto-clean$$. Are you sure?
+    - input: y
+actions:
+- generate_resource_id:
+    reference: auto-clean
+    prefix: auto-clean
+- generate_resource_id:
+    reference: test-cluster-us
+    prefix: cluster
+    requires_cleanup: false
+- generate_resource_id:
+    reference: test-cluster-asia
+    prefix: cluster
+    requires_cleanup: false
+- execute_command:
+    command: bigtable instances create $$auto-clean$$ --display-name="Test Instance Auto Cleanup"
+      --cluster-config=id=$$test-cluster-us$$,zone=us-east1-c
+      --cluster-config=id=$$test-cluster-asia$$,zone=asia-east1-c
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              instance:
+                displayName: Test Instance Auto Cleanup
+                type: PRODUCTION
+              instanceId: $$auto-clean$$
+              parent: projects/cloud-sdk-integration-testing
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1002'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200711-215306-lu01/locations/us-east1-c/operations/3779325000926188073
+            metadata:
+              '@type': type.googleapis.com/google.bigtable.admin.v2.CreateInstanceMetadata
+              originalRequest:
+                parent: projects/cloud-sdk-integration-testing
+                instanceId: $$auto-clean$$
+                instance:
+                  displayName: Test Instance Auto Cleanup
+                  type: PRODUCTION
+                clusters:
+                  cluster-20200711-215306-g5nn:
+                    location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+                    serveNodes: 1
+                    defaultStorageType: SSD
+                  cluster-20200711-215306-lbit:
+                    location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+                    serveNodes: 1
+                    defaultStorageType: SSD
+              requestTime: '2020-07-11T21:53:06.469290062Z'
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1343'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200711-215306-lu01/locations/us-east1-c/operations/3779325000926188073
+            metadata:
+              '@type': type.googleapis.com/google.bigtable.admin.v2.CreateInstanceMetadata
+              originalRequest:
+                parent: projects/cloud-sdk-integration-testing
+                instanceId: $$auto-clean$$
+                instance:
+                  displayName: Test Instance Auto Cleanup
+                  type: PRODUCTION
+                clusters:
+                  cluster-20200711-215306-lbit:
+                    location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+                    serveNodes: 1
+                    defaultStorageType: SSD
+                  cluster-20200711-215306-g5nn:
+                    location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+                    serveNodes: 1
+                    defaultStorageType: SSD
+              requestTime: '2020-07-11T21:53:06.469290062Z'
+              finishTime: '2020-07-11T21:53:12.892269736Z'
+            done: true
+            response:
+              '@type': type.googleapis.com/google.bigtable.admin.v2.Instance
+              name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$
+              displayName: Test Instance Auto Cleanup
+              state: READY
+              type: PRODUCTION
+        repeatable: true
+    - expect_progress_tracker:
+        message: Creating bigtable instance $$auto-clean$$
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '178'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$
+            displayName: Test Instance Auto Cleanup
+            state: READY
+            type: PRODUCTION
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable instances describe $$auto-clean$$
+    validation_only: true
+    events:
+    - expect_stdout: |
+        displayName: Test Instance Auto Cleanup
+        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$
+        state: READY
+        type: PRODUCTION
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable clusters describe $$test-cluster-us$$ --instance $$auto-clean$$
+    validation_only: true
+    events:
+    - expect_stdout: |
+        defaultStorageType: SSD
+        location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-us$$
+        serveNodes: 1
+        state: READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable clusters describe $$test-cluster-asia$$ --instance $$auto-clean$$
+    validation_only: true
+    events:
+    - expect_stdout: |
+        defaultStorageType: SSD
+        location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$
+        serveNodes: 1
+        state: READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable instances delete $$auto-clean$$
+    cleanup_for: auto-clean
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: Delete instance $$auto-clean$$. Are you sure?
+        user_input: y
+    - expect_exit:
+        code: 0

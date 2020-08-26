@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute routers nats delete - remove a NAT from a Google
-        Compute Engine router
+    gcloud beta compute routers nats delete - remove a NAT from a Compute
+        Engine router
 
 SYNOPSIS
     gcloud beta compute routers nats delete NAME [NAME ...] --router=ROUTER
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute routers nats delete is used to delete a NAT on a
-    Google Compute Engine router.
+    Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

@@ -1,5 +1,5 @@
 NAME
-    gcloud compute routers remove-interface - remove an interface from a Google
+    gcloud compute routers remove-interface - remove an interface from a
         Compute Engine router
 
 SYNOPSIS
@@ -8,8 +8,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routers remove-interface removes an interface from a Google
-    Compute Engine router.
+    gcloud compute routers remove-interface removes an interface from a Compute
+    Engine router.
 
 POSITIONAL ARGUMENTS
      NAME

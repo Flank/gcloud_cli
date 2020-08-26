@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha memcache operations describe - show metadata for a Memorystore
-        Memcached operation
+    gcloud alpha memcache operations describe - display metadata for a
+        Memorystore Memcached operation
 
 SYNOPSIS
     gcloud alpha memcache operations describe (OPERATION : --region=REGION)
@@ -17,11 +17,11 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      Operation resource - Arguments and flags that specify the Memorystore
-     Memcached operation you want to describe. The arguments in this group can
-     be used to specify the attributes of this resource. (NOTE) Some attributes
-     are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: provide the argument [operation] on the command
-     line with a fully specified name; provide the argument [--project] on the
+     Memcached operation to describe. The arguments in this group can be used
+     to specify the attributes of this resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the argument [operation] on the command line
+     with a fully specified name; provide the argument [--project] on the
      command line; set the property [core/project]. This must be specified.
 
        OPERATION
@@ -45,17 +45,17 @@ API REFERENCE
     API can be found at: https://cloud.google.com/memorystore/
 
 EXAMPLES
-    The following command prints metadata for an operation.
+    To display the metadata for an operation named my-memcache-operation in
+    region us-central1, run:
 
-        $ gcloud alpha memcache operations describe \
-            operation-1484002552235-425b144f8c3f8-81aa4b49-0830d1e9 \
+        $ gcloud alpha memcache operations describe my-memcache-operation \
             --region=us-central1
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta memcache operations describe
 

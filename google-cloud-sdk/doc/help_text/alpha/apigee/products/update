@@ -35,7 +35,8 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --organization=ORGANIZATION
-          The organization for the API product.
+          Apigee organization containing the API product. If unspecified, the
+          Cloud Platform project's associated organization will be used.
 
 FLAGS
      --display-name=SET_DISPLAYNAME
@@ -265,5 +266,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

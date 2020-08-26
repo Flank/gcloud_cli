@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from googlecloudsdk.command_lib.spanner import flags
 from googlecloudsdk.core import resources
 from tests.lib import completer_test_base
@@ -235,16 +237,32 @@ class CompletionTest(base.SpannerTestBase, completer_test_base.CompleterBase):
 
 class HelperTest(base.SpannerTestBase):
 
+  def MakeArgs(self, ddls=None, ddl_file=None):
+    return collections.namedtuple(
+        'TestArgs', ['ddl', 'ddl_file'])(ddls, ddl_file)
+
+  # See full test in ddl_parser_test.py. This test is left to cover the simple
+  # wiring in SplitDdlIntoStatements.
   def testFixDdl(self):
     ddl_strings = [
         'CREATE TABLE MyTable;',
-        'CREATE TABLE anotherTable;CREATE TABLE oneMoreTable'
+        'CREATE TABLE anotherTable;CREATE TABLE oneMoreTable',
+        '--this is a test table\nCREATE TABLE T4;',
+        'CREATE TABLE T5(\n--comment \n);CREATE T6--this is a test table\n',
+        'CREATE--comment with no newline',
     ]
 
     self.assertEqual([
         'CREATE TABLE MyTable', 'CREATE TABLE anotherTable',
-        'CREATE TABLE oneMoreTable'
-    ], flags.SplitDdlIntoStatements(ddl_strings))
+        'CREATE TABLE oneMoreTable', '\nCREATE TABLE T4',
+        'CREATE TABLE T5(\n\n)', 'CREATE T6\n', 'CREATE',
+    ], flags.SplitDdlIntoStatements(self.MakeArgs(ddls=ddl_strings)))
+
+  def testFixDdlFile(self):
+    ddl_file = self.Touch(self.temp_path, contents='CREATE T1')
+    self.assertEqual(
+        flags.SplitDdlIntoStatements(
+            self.MakeArgs(ddls='CREATE T2', ddl_file=ddl_file)), ['CREATE T1'])
 
 
 if __name__ == '__main__':

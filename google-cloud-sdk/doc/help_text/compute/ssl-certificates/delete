@@ -1,5 +1,5 @@
 NAME
-    gcloud compute ssl-certificates delete - delete Google Compute Engine SSL
+    gcloud compute ssl-certificates delete - delete Compute Engine SSL
         certificates
 
 SYNOPSIS
@@ -7,8 +7,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute ssl-certificates delete deletes one or more Google Compute
-    Engine SSL certificates. SSL certificates can only be deleted when no other
+    gcloud compute ssl-certificates delete deletes one or more Compute Engine
+    SSL certificates. SSL certificates can only be deleted when no other
     resources (for example, target HTTPS proxies) refer to them.
 
 POSITIONAL ARGUMENTS

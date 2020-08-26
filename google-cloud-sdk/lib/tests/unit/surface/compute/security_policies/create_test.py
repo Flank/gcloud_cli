@@ -28,7 +28,7 @@ from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.security_policies import test_resources
 
 _JSON_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',

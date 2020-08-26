@@ -6,8 +6,8 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute health-checks delete deletes one or more Google Compute
-    Engine health checks.
+    gcloud compute health-checks delete deletes one or more Compute Engine
+    health checks.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

@@ -3,7 +3,7 @@ NAME
         VM instances
 
 SYNOPSIS
-    gcloud alpha compute os-config GROUP [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute os-config GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage OS Config tasks for Compute Engine VM instances.
@@ -29,11 +29,17 @@ GROUPS
      patch-jobs
         (ALPHA) Manage OS patches for Compute Engine VMs.
 
+COMMANDS
+    COMMAND is one of the following:
+
+     os-upgrade
+        (ALPHA) Upgrade the instances OS version.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute os-config
         $ gcloud beta compute os-config

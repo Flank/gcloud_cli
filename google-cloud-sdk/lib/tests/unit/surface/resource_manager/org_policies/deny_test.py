@@ -74,6 +74,19 @@ class OrgPoliciesDenyTest(testbase.OrgPoliciesUnitTestBase):
         self.DoRequest(self.PROJECT_ARG),
         self.BlacklistPolicy([self.VALUE_A, self.VALUE_B]))
 
+  def testAllowOrgPolicyRestoreDefault(self):
+    self.mock_projects.GetOrgPolicy.Expect(
+        self.ExpectedGetRequest(self.PROJECT_ARG, self.BLACKLIST_CONSTRAINT),
+        self.RestoreDefaultPolicy(self.BLACKLIST_CONSTRAINT))
+    self.mock_projects.SetOrgPolicy.Expect(
+        self.ExpectedSetRequest(
+            self.PROJECT_ARG, self.BlacklistPolicy([self.VALUE_A,
+                                                    self.VALUE_B])),
+        self.BlacklistPolicy([self.VALUE_A, self.VALUE_B]))
+    self.assertEqual(
+        self.DoRequest(self.PROJECT_ARG),
+        self.BlacklistPolicy([self.VALUE_A, self.VALUE_B]))
+
   def testDenyOrgPolicyAllowedValues(self):
     self.mock_projects.GetOrgPolicy.Expect(
         self.ExpectedGetRequest(self.PROJECT_ARG, self.WHITELIST_CONSTRAINT),

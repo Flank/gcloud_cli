@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute org-security-policies describe - describe a Google
-        Compute Engine organization security policy
+    gcloud beta compute org-security-policies describe - describe a Compute
+        Engine organization security policy
 
 SYNOPSIS
     gcloud beta compute org-security-policies describe SECURITY_POLICY

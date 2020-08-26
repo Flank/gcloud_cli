@@ -1,0 +1,67 @@
+title: eventarc triggers describe test scenario
+release_tracks: [BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      eventarc triggers describe fake-trigger --location global
+  - stdout: |
+      destination:
+        cloudRunService:
+          path: fake/destination/path
+          service: projects/fake-project/locations/us-central1/services/fake-service
+      matchingCriteria:
+      - attribute: type
+        value: google.cloud.audit.log.v1.written
+      - attribute: serviceName
+        value: storage.googleapis.com
+      - attribute: methodName
+        value: storage.buckets.create
+      name: projects/fake-project/locations/global/triggers/fake-trigger
+      serviceAccount: projects/fake-project/serviceAccounts/fake-service-account
+
+actions:
+- execute_command:
+    command: |
+      eventarc triggers describe fake-trigger --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://eventarc.googleapis.com/v1beta1/projects/fake-project/locations/global/triggers/fake-trigger?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            destination:
+              cloudRunService:
+                path: fake/destination/path
+                service: projects/fake-project/locations/us-central1/services/fake-service
+            matchingCriteria:
+            - attribute: type
+              value: google.cloud.audit.log.v1.written
+            - attribute: serviceName
+              value: storage.googleapis.com
+            - attribute: methodName
+              value: storage.buckets.create
+            name: projects/fake-project/locations/global/triggers/fake-trigger
+            serviceAccount: projects/fake-project/serviceAccounts/fake-service-account
+    - expect_stdout: |
+        destination:
+          cloudRunService:
+            path: fake/destination/path
+            service: projects/fake-project/locations/us-central1/services/fake-service
+        matchingCriteria:
+        - attribute: type
+          value: google.cloud.audit.log.v1.written
+        - attribute: serviceName
+          value: storage.googleapis.com
+        - attribute: methodName
+          value: storage.buckets.create
+        name: projects/fake-project/locations/global/triggers/fake-trigger
+        serviceAccount: projects/fake-project/serviceAccounts/fake-service-account
+    - expect_exit:
+        code: 0

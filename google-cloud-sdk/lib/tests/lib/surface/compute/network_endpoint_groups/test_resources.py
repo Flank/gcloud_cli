@@ -151,6 +151,8 @@ GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA = MakeGlobalNetworkEndpointGroups(
     alpha_messages, 'alpha')
 GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA = MakeGlobalNetworkEndpointGroups(
     beta_messages, 'beta')
+REGION_NETWORK_ENDPOINT_GROUPS = MakeRegionNetworkEndpointGroups(
+    alpha_messages, 'v1')
 REGION_NETWORK_ENDPOINT_GROUPS_ALPHA = MakeRegionNetworkEndpointGroups(
     alpha_messages, 'alpha')
 REGION_NETWORK_ENDPOINT_GROUPS_BETA = MakeRegionNetworkEndpointGroups(

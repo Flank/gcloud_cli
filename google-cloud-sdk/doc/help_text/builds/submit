@@ -6,7 +6,8 @@ SYNOPSIS
         [--disk-size=DISK_SIZE] [--gcs-log-dir=GCS_LOG_DIR]
         [--gcs-source-staging-dir=GCS_SOURCE_STAGING_DIR]
         [--ignore-file=IGNORE_FILE] [--machine-type=MACHINE_TYPE]
-        [--substitutions=[KEY=VALUE,...]] [--timeout=TIMEOUT]
+        [--region=REGION] [--substitutions=[KEY=VALUE,...]] [--timeout=TIMEOUT]
+        [--worker-pool=WORKER_POOL]
         [--config=CONFIG; default="cloudbuild.yaml" | --tag=TAG, -t TAG]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -72,6 +73,11 @@ FLAGS
         Machine type used to run the build. MACHINE_TYPE must be one of:
         n1-highcpu-32, n1-highcpu-8.
 
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
+
      --substitutions=[KEY=VALUE,...]
         Parameters to be substituted in the build specification.
 
@@ -98,6 +104,11 @@ FLAGS
         minutes, and five seconds. If you don't specify a unit, seconds is
         assumed. For example, "10" is 10 seconds. Overrides the default
         builds/timeout property value for this command invocation.
+
+     --worker-pool=WORKER_POOL
+        Specify a worker pool for the build to run in. Format:
+        projects/{project}/locations/{region}/workerPools/{workerPool}. This
+        field is restricted to custom workers beta users.
 
      At most one of these may be specified:
 

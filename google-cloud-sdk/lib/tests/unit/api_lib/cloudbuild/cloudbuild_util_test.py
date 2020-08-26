@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -85,6 +86,119 @@ class FieldMappingTest(sdk_test_base.WithTempCWD):
     self.assertEqual(
         set(cloudbuild_util.MessageToFieldPaths(b)),
         set(['project_id', 'options.disk_size_gb']))
+
+
+class DeriveRegionalEndpointTest(sdk_test_base.WithTempCWD):
+  """Test the correctness of the derived regional endpoints."""
+
+  def testProdHttpEndpoint(self):
+    global_endpoint = 'http://name.googleapis.com/'
+    regional_endpoint = cloudbuild_util.DeriveRegionalEndpoint(
+        global_endpoint, 'my-loc1')
+    self.assertEqual(regional_endpoint, 'http://my-loc1-name.googleapis.com/')
+
+  def testProdHttpsEndpoint(self):
+    global_endpoint = 'https://name.googleapis.com/'
+    regional_endpoint = cloudbuild_util.DeriveRegionalEndpoint(
+        global_endpoint, 'my-loc1')
+    self.assertEqual(regional_endpoint, 'https://my-loc1-name.googleapis.com/')
+
+  def testNonProdHttpEndpoint(self):
+    global_endpoint = 'http://name.sandbox.googleapis.com/'
+    regional_endpoint = cloudbuild_util.DeriveRegionalEndpoint(
+        global_endpoint, 'my-loc1')
+    self.assertEqual(regional_endpoint,
+                     'http://my-loc1-name.sandbox.googleapis.com/')
+
+  def testNonProdHttpsEndpoint(self):
+    global_endpoint = 'https://name.sandbox.googleapis.com/'
+    regional_endpoint = cloudbuild_util.DeriveRegionalEndpoint(
+        global_endpoint, 'my-loc1')
+    self.assertEqual(regional_endpoint,
+                     'https://my-loc1-name.sandbox.googleapis.com/')
+
+
+class OverrideEndpointOnceTest(sdk_test_base.WithTempCWD):
+  """Test the ability override endpoints only once."""
+
+  def SetUp(self):
+    # There should be no override
+    endpoint_property = properties.VALUES.api_endpoint_overrides.cloudbuild
+    self.old_endpoint = endpoint_property.Get()
+    endpoint_property.Set(None)
+
+  def TearDown(self):
+    # Restore the old override, just to be nice
+    properties.VALUES.api_endpoint_overrides.cloudbuild.Set(self.old_endpoint)
+
+  def testFirstOverrideWorks(self):
+    endpoint_property = properties.VALUES.api_endpoint_overrides.cloudbuild
+    self.assertIsNone(endpoint_property.Get())
+    with cloudbuild_util.OverrideEndpointOnce('cloudbuild',
+                                              'http://first.com/'):
+      self.assertEqual(endpoint_property.Get(), 'http://first.com/')
+    self.assertIsNone(endpoint_property.Get())
+
+  def testSecondOverrideFails(self):
+    endpoint_property = properties.VALUES.api_endpoint_overrides.cloudbuild
+    self.assertIsNone(endpoint_property.Get())
+    with cloudbuild_util.OverrideEndpointOnce('cloudbuild',
+                                              'http://first.com/'):
+      self.assertEqual(endpoint_property.Get(), 'http://first.com/')
+      with cloudbuild_util.OverrideEndpointOnce('cloudbuild',
+                                                'http://second.com/'):
+        # Second override should have silently failed
+        self.assertEqual(endpoint_property.Get(), 'http://first.com/')
+      self.assertEqual(endpoint_property.Get(), 'http://first.com/')
+    self.assertIsNone(endpoint_property.Get())
+
+
+class IsRegionalWorkerPoolTest(sdk_test_base.WithTempCWD):
+
+  def testRegionalWp(self):
+    self.assertTrue(
+        cloudbuild_util.IsRegionalWorkerPool(
+            'projects/abc/locations/def/workerPools/ghi'))
+
+  def testGlobalWp(self):
+    self.assertFalse(
+        cloudbuild_util.IsRegionalWorkerPool('projects/abc/workerPools/def'))
+
+
+class GlobalWorkerPoolShortNameTest(sdk_test_base.WithTempCWD):
+
+  def testValid(self):
+    self.assertEqual(
+        cloudbuild_util.GlobalWorkerPoolShortName(
+            'projects/abc/workerPools/def'), 'def')
+
+  def testInvalid(self):
+    with self.assertRaisesRegex(ValueError, '.*'):
+      cloudbuild_util.GlobalWorkerPoolShortName('badresource')
+
+
+class RegionalWorkerPoolShortNameTest(sdk_test_base.WithTempCWD):
+
+  def testValid(self):
+    self.assertEqual(
+        cloudbuild_util.RegionalWorkerPoolShortName(
+            'projects/abc/locations/def/workerPools/ghi'), 'ghi')
+
+  def testInvalid(self):
+    with self.assertRaisesRegex(ValueError, '.*'):
+      cloudbuild_util.RegionalWorkerPoolShortName('badresource')
+
+
+class RegionalWorkerPoolRegionTest(sdk_test_base.WithTempCWD):
+
+  def testValid(self):
+    self.assertEqual(
+        cloudbuild_util.RegionalWorkerPoolRegion(
+            'projects/abc/locations/def/workerPools/ghi'), 'def')
+
+  def testInvalid(self):
+    with self.assertRaisesRegex(ValueError, '.*'):
+      cloudbuild_util.RegionalWorkerPoolRegion('badresource')
 
 
 if __name__ == '__main__':

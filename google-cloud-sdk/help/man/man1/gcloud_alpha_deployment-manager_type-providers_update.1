@@ -11,7 +11,7 @@ gcloud alpha deployment\-manager type\-providers update \- update a type provide
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha deployment\-manager type\-providers update\fR \fIPROVIDER_NAME\fR \fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR [\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha deployment\-manager type\-providers update\fR \fIPROVIDER_NAME\fR \fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR [\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR] [\fB\-\-async\fR] [\fB\-\-custom\-certificate\-authority\-roots\fR=\fICA_ROOT\fR,[\fICA_ROOT\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,11 @@ YAML file with options for the API: e.g. options and collection overrides.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-custom\-certificate\-authority\-roots\fR=\fICA_ROOT\fR,[\fICA_ROOT\fR,...]
+Comma\-separated list of CA root certificates to use when connecting to the
+type's API by HTTPS.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -106,7 +111,7 @@ $ gcloud alpha deployment\-manager type\-providers update \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta deployment\-manager type\-providers update

@@ -24,6 +24,21 @@ from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute.instance_templates import create_test_base
 
+osconfig_metadata_value = (
+    '{"softwareRecipes": [{"name": "install-gce-service-proxy-agent", '
+    '"desired_state": "INSTALLED", "installSteps": [{"scriptRun": {"script": '
+    '"#! /bin/bash\\nZONE=$( curl --silent '
+    'http://metadata.google.internal/computeMetadata/v1/instance/zone -H '
+    'Metadata-Flavor:Google | cut -d/ -f4 )\\nexport '
+    'SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\nsudo gsutil cp   '
+    'gs://gce-service-proxy-${ZONE}/service-proxy-agent/releases/service-proxy-agent-0.2.tgz'
+    '   ${SERVICE_PROXY_AGENT_DIRECTORY}   || sudo gsutil cp     '
+    'gs://gce-service-proxy/service-proxy-agent/releases/service-proxy-agent-0.2.tgz'
+    '     ${SERVICE_PROXY_AGENT_DIRECTORY}\\nsudo tar -xzf '
+    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C '
+    '${SERVICE_PROXY_AGENT_DIRECTORY}\\n${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
+)
+
 
 class InstanceTemplatesCreateWithServiceProxyBeta(
     create_test_base.InstanceTemplatesCreateTestBase):
@@ -53,28 +68,14 @@ class InstanceTemplatesCreateWithServiceProxyBeta(
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"proxy-spec": {"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"proxy-spec": {"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
                 # Running service-proxy-agent installation script without
                 # interfering with user startup-script. See
                 # go/vm-instance-software-configurations for more info.
                 key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                value=osconfig_metadata_value),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
             m.InstanceProperties.LabelsValue.AdditionalProperty(
@@ -115,29 +116,15 @@ class InstanceTemplatesCreateWithServiceProxyBeta(
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"proxy-spec": {"proxy-port": 15002, '
-                    '"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"proxy-spec": {"proxy-port": 15002, '
+                       '"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
                 # Running service-proxy-agent installation script without
                 # interfering with user startup-script. See
                 # go/vm-instance-software-configurations for more info.
                 key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                value=osconfig_metadata_value),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
             m.InstanceProperties.LabelsValue.AdditionalProperty(
@@ -177,26 +164,11 @@ class InstanceTemplatesCreateWithServiceProxyBeta(
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"service": {"serving-ports": [80, 90, 70]}, '
-                    '"proxy-spec": {"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"service": {"serving-ports": [80, 90, 70]}, '
+                       '"proxy-spec": {"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
-                key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                key='gce-software-declaration', value=osconfig_metadata_value),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
             m.InstanceProperties.LabelsValue.AdditionalProperty(
@@ -252,25 +224,10 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"proxy-spec": {"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"proxy-spec": {"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
-                key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                key='gce-software-declaration', value=osconfig_metadata_value),
             m.Metadata.ItemsValueListEntry(
                 key='startup-script',
                 value=textwrap.dedent("""\
@@ -322,25 +279,10 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"proxy-spec": {"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"proxy-spec": {"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
-                key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                key='gce-software-declaration', value=osconfig_metadata_value),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
         ]),
@@ -384,26 +326,11 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"labels": {"myapp": "review", "version": "canary"}, '
-                    '"proxy-spec": {"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"labels": {"myapp": "review", "version": "canary"}, '
+                       '"proxy-spec": {"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
-                key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                key='gce-software-declaration', value=osconfig_metadata_value),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
         ]),
@@ -428,12 +355,11 @@ cat <<EOF > /var/www/html/index.html
 
   def testCreateWithUserLabels(self):
     m = self.messages
-    self.Run(
-        'compute instance-templates create template-1'
-        ' --service-proxy enabled'
-        ' --service-proxy-labels myapp=review,version=canary'
-        ' --metadata x=y,z=1,a=b,c=d'
-        ' --labels k-0=v-0,k-1=v-1')
+    self.Run('compute instance-templates create template-1'
+             ' --service-proxy enabled'
+             ' --service-proxy-labels myapp=review,version=canary'
+             ' --metadata x=y,z=1,a=b,c=d'
+             ' --labels k-0=v-0,k-1=v-1')
 
     labels_for_tracking_and_request = (('gce-service-proxy', 'on'),
                                        ('k-0', 'v-0'), ('k-1', 'v-1'))
@@ -450,26 +376,11 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"labels": {"myapp": "review", "version": "canary"}, '
-                    '"proxy-spec": {"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"labels": {"myapp": "review", "version": "canary"}, '
+                       '"proxy-spec": {"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
-                key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                key='gce-software-declaration', value=osconfig_metadata_value),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
         ]),
@@ -523,29 +434,15 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"proxy-spec": {"tracing": "ON", '
-                    '"network": ""}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"proxy-spec": {"tracing": "ON", '
+                       '"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
                 # Running service-proxy-agent installation script without
                 # interfering with user startup-script. See
                 # go/vm-instance-software-configurations for more info.
                 key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                value=osconfig_metadata_value),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
             m.InstanceProperties.LabelsValue.AdditionalProperty(
@@ -589,26 +486,13 @@ cat <<EOF > /var/www/html/index.html
                 value=(
                     '{"api-version": "0.2", '
                     '"proxy-spec": {"access-log": "/var/log/envoy/access.log", '
-                    '"network": ""}}'
-                    )),
+                    '"network": ""}}')),
             m.Metadata.ItemsValueListEntry(
                 # Running service-proxy-agent installation script without
                 # interfering with user startup-script. See
                 # go/vm-instance-software-configurations for more info.
                 key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                value=osconfig_metadata_value),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
             m.InstanceProperties.LabelsValue.AdditionalProperty(
@@ -649,28 +533,14 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"proxy-spec": {"network": "some-network"}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"proxy-spec": {"network": "some-network"}}')),
             m.Metadata.ItemsValueListEntry(
                 # Running service-proxy-agent installation script without
                 # interfering with user startup-script. See
                 # go/vm-instance-software-configurations for more info.
                 key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                value=osconfig_metadata_value),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
             m.InstanceProperties.LabelsValue.AdditionalProperty(
@@ -716,29 +586,14 @@ cat <<EOF > /var/www/html/index.html
             m.Metadata.ItemsValueListEntry(key='enable-osconfig', value='true'),
             m.Metadata.ItemsValueListEntry(
                 key='gce-service-proxy',
-                value=(
-                    '{"api-version": "0.2", '
-                    '"service": {"serving-ports": [80, 90, 70]}, '
-                    '"labels": {"myapp": "review", "version": "canary"}, '
-                    '"proxy-spec": {"proxy-port": 15002, "tracing": "OFF", '
-                    '"access-log": "/var/log/envoy/access.log", '
-                    '"network": "some-network"}}'
-                    )),
+                value=('{"api-version": "0.2", '
+                       '"service": {"serving-ports": [80, 90, 70]}, '
+                       '"labels": {"myapp": "review", "version": "canary"}, '
+                       '"proxy-spec": {"proxy-port": 15002, "tracing": "OFF", '
+                       '"access-log": "/var/log/envoy/access.log", '
+                       '"network": "some-network"}}')),
             m.Metadata.ItemsValueListEntry(
-                key='gce-software-declaration',
-                value=(
-                    '{'
-                    '"softwareRecipes": [{'
-                    '"name": "install-gce-service-proxy-agent", '
-                    '"desired_state": "INSTALLED", '
-                    '"installSteps": [{'
-                    '"scriptRun": {'
-                    '"script": "#! /bin/bash\\n'
-                    'export SERVICE_PROXY_AGENT_DIRECTORY=$(mktemp -d)\\n'
-                    'sudo gsutil cp gs://gce-mesh/service-proxy-agent/releases/service-proxy-agent-0.2.tgz ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    'sudo tar -xzf ${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent-0.2.tgz -C ${SERVICE_PROXY_AGENT_DIRECTORY}\\n'
-                    '${SERVICE_PROXY_AGENT_DIRECTORY}/service-proxy-agent/service-proxy-agent-bootstrap.sh"}}]}]}'
-                )),
+                key='gce-software-declaration', value=osconfig_metadata_value),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
         ]),
@@ -769,6 +624,7 @@ class InstanceTemplatesCreateWithServiceProxyAlpha(
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
+
 
 if __name__ == '__main__':
   test_case.main()

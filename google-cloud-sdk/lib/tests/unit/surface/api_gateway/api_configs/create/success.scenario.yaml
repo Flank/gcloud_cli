@@ -5,41 +5,15 @@ summary:
 - execute:
   - command: |
       api-gateway api-configs create testName --api fake-api --openapi-spec openapi.yaml
-  - stderr: |
-      Waiting for async operation smOp1 to complete...
   - progress_tracker:
     - message: Waiting for API [fake-api] to be created
     - status: SUCCESS
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
-  - stderr: |
-      Waiting for async operation smOp3 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp3
-
   - progress_tracker:
     - message: Waiting for API Config [testName] to be created for API [fake-api]
     - status: SUCCESS
 - execute:
   - command: |
       api-gateway api-configs create testName --api fake-api --openapi-spec openapi.yaml --async
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
-  - stderr: |
-      Waiting for async operation smOp3 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp3
-
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -48,18 +22,6 @@ summary:
 - execute:
   - command: |
       api-gateway api-configs create testName --display-name="Display Name" --api fake-api --openapi-spec openapi.yaml --async
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
-  - stderr: |
-      Waiting for async operation smOp3 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp3
-
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -68,18 +30,6 @@ summary:
 - execute:
   - command: |
       api-gateway api-configs create testName --labels="a_label=a_value" --api fake-api --openapi-spec openapi.yaml --async
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
-  - stderr: |
-      Waiting for async operation smOp3 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp3
-
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -88,18 +38,6 @@ summary:
 - execute:
   - command: |
       api-gateway api-configs create testName --backend-auth-service-account fake-account@google.com --api fake-api --openapi-spec openapi.yaml --async
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
-  - stderr: |
-      Waiting for async operation smOp3 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp3
-
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -107,56 +45,9 @@ summary:
 
 - execute:
   - command: |
-      api-gateway api-configs create rev1 --api api-name --grpc-files normalized.yaml --async
-  - stderr: |
-      Waiting for async operation smOp to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp
-
-  - stderr: |+
-      Asynchronous operation is in progress. Use the following command to wait for its completion:
-
-      gcloud api-gateway operations wait projects/fake-project/locations/global/operations/some-op
-
-- execute:
-  - command: |
-      api-gateway api-configs create rev1 --api api-name --grpc-files="google_api_service.yaml,raw.proto" --async
-  - stderr: |+
-      WARNING: Support for uploading uncompiled .proto files is deprecated and will soon be removed. Use compiled descriptor sets (.pb) instead.
-
-  - stderr: |
-      Waiting for async operation smOp to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp
-
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
-  - stderr: |+
-      Asynchronous operation is in progress. Use the following command to wait for its completion:
-
-      gcloud api-gateway operations wait projects/fake-project/locations/global/operations/some-op
-
-- execute:
-  - command: |
       api-gateway api-configs create rev1 --api api-name --grpc-files="google_api_service.yaml,proto_descriptor.pb" --async
   - stderr: |
-      Waiting for async operation smOp to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp
-
-  - stderr: |
-      Waiting for async operation smOp2 to complete...
-  - stderr: |+
-      Operation finished successfully. The following command can describe the Operation details:
-       gcloud endpoints operations describe smOp2
-
+      WARNING: Proto descriptor's source protos [google/protobuf/empty.proto] were not found on the file system and will not be included in the submitted GRPC service definition. If you meant to include these files, ensure the proto compiler was invoked in the same directory where the proto descriptor [proto_descriptor.pb] now resides.
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -196,75 +87,14 @@ actions:
       title: Fake API
       apis:
       - fakeapi.echo
-- write_file:
-    path: raw.proto
-    contents: |
-      syntax = "proto3";
-      package echo;
-
-      service Echo {
-        rpc Echo (EchoRequest) returns (EchoResponse) {}
-      }
-
-      message EchoRequest {
-        string message = 1;
-      }
-
-      message EchoResponse {
-        string message = 1;
-      }
-- write_file:
-    path: normalized.yaml
-    contents: |
-      name: Some name
-      other_properties: stuff
-- write_file:
-    path: proto_descriptor.pb
-    contents: |
-      Some contents
+- load_resource:
+    path: tests/unit/surface/api_gateway/api_configs/test_data/raw.proto
+- load_resource:
+    path: tests/unit/surface/api_gateway/api_configs/test_data/proto_descriptor.pb
 - execute_command:
     command: |
       api-gateway api-configs create testName --api fake-api --openapi-spec openapi.yaml
     events:
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '404'
-          body: null
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              producerProjectId: fake-project
-              serviceName: fake-api.apigateway.fake-project.cloud.goog
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp1
-            result: null
-    - expect_stderr: |
-        Waiting for async operation smOp1 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp1?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp1
-            done: true
     - api_call:
         expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api?alt=json
@@ -281,8 +111,6 @@ actions:
           headers: {}
           body:
             json:
-              apiController:
-                managedService: fake-api.apigateway.fake-project.cloud.goog
               name: projects/fake-project/locations/global/apis/fake-api
         return_response:
           headers:
@@ -307,91 +135,16 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
-                  filePath: openapi.yaml
-                  fileType: OPEN_API_YAML
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              serviceConfig:
-                id: 2018-11-04r1
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: fake-api.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages:
-                  2018-11-04r1: 100.0
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp3 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp3?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp3
-
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api/configs?alt=json&apiConfigId=testName
           method: POST
           headers: {}
           body:
             json:
               name: projects/fake-project/locations/global/apis/fake-api/configs/testName
-              serviceRollout:
-                rolloutId: someRolloutId
+              openapiDocuments:
+              - document:
+                  path: openapi.yaml
+                  contents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
         return_response:
           headers:
             status: '200'
@@ -437,16 +190,6 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api?alt=json
           method: GET
           headers: {}
@@ -456,91 +199,16 @@ actions:
             status: '200'
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
-                  filePath: openapi.yaml
-                  fileType: OPEN_API_YAML
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              serviceConfig:
-                id: testName
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: fake-api.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages:
-                  testName: 100.0
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp3 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp3?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp3
-
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api/configs?alt=json&apiConfigId=testName
           method: POST
           headers: {}
           body:
             json:
               name: projects/fake-project/locations/global/apis/fake-api/configs/testName
-              serviceRollout:
-                rolloutId: someRolloutId
+              openapiDocuments:
+              - document:
+                  path: openapi.yaml
+                  contents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
         return_response:
           headers:
             status: '200'
@@ -560,16 +228,6 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api?alt=json
           method: GET
           headers: {}
@@ -579,82 +237,6 @@ actions:
             status: '200'
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
-                  filePath: openapi.yaml
-                  fileType: OPEN_API_YAML
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              serviceConfig:
-                id: testName
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: fake-api.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages: {testName: 100.0}
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp3 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp3?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp3
-
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api/configs?alt=json&apiConfigId=testName
           method: POST
           headers: {}
@@ -662,8 +244,10 @@ actions:
             json:
               name: projects/fake-project/locations/global/apis/fake-api/configs/testName
               displayName: Display Name
-              serviceRollout:
-                rolloutId: someRolloutId
+              openapiDocuments:
+              - document:
+                  path: openapi.yaml
+                  contents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
         return_response:
           headers:
             status: '200'
@@ -683,16 +267,6 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api?alt=json
           method: GET
           headers: {}
@@ -703,92 +277,18 @@ actions:
           body: null
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
-                  filePath: openapi.yaml
-                  fileType: OPEN_API_YAML
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              serviceConfig:
-                id: testName
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: fake-api.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages: {testName: 100.0}
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp3 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp3?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp3
-
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api/configs?alt=json&apiConfigId=testName
           method: POST
           headers: {}
           body:
             json:
               name: projects/fake-project/locations/global/apis/fake-api/configs/testName
-              serviceRollout:
-                rolloutId: someRolloutId
               labels:
                 a_label: a_value
+              openapiDocuments:
+              - document:
+                  path: openapi.yaml
+                  contents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
         return_response:
           headers:
             status: '200'
@@ -808,16 +308,6 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api?alt=json
           method: GET
           headers: {}
@@ -828,93 +318,19 @@ actions:
           body: null
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
-                  filePath: openapi.yaml
-                  fileType: OPEN_API_YAML
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              serviceConfig:
-                id: testName
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: fake-api.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages: {testName: 100.0}
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp3 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp3?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp3
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp3
-
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api/configs?alt=json&apiConfigId=testName
           method: POST
           headers: {}
           body:
             json:
               name: projects/fake-project/locations/global/apis/fake-api/configs/testName
-              serviceRollout:
-                rolloutId: someRolloutId
               gatewayConfig:
                 backendConfig:
                   googleServiceAccount: fake-account@google.com
+              openapiDocuments:
+              - document:
+                  path: openapi.yaml
+                  contents: c3dhZ2dlcjogJzIuMCcKaW5mbzoKICB0aXRsZTogQ2xvdWQgRW5kcG9pbnRzICsgQ2xvdWQgUnVuCiAgZGVzY3JpcHRpb246IFNhbXBsZSBBUEkgb24gQ2xvdWQgRW5kcG9pbnRzIHdpdGggYSBDbG91ZCBSdW4gYmFja2VuZAogIHZlcnNpb246IDEuMC4wCnNjaGVtZXM6CiAgLSBodHRwcwpwcm9kdWNlczoKICAtIGFwcGxpY2F0aW9uL2pzb24KeC1nb29nbGUtYmFja2VuZDoKICBhZGRyZXNzOiBodHRwczovL2JhY2tlbmQtaGFzaC11Yy5hLnJ1bi5hcHAKcGF0aHM6CiAgL2hlbGxvOgogICAgZ2V0OgogICAgICBzdW1tYXJ5OiBHcmVldCBhIHVzZXIKICAgICAgb3BlcmF0aW9uSWQ6IGhlbGxvCiAgICAgIHJlc3BvbnNlczoKICAgICAgICAnMjAwJzoKICAgICAgICAgIGRlc2NyaXB0aW9uOiBBIHN1Y2Nlc3NmdWwgcmVzcG9uc2UKICAgICAgICAgIHNjaGVtYToKICAgICAgICAgICAgdHlwZTogc3RyaW5nCg==
         return_response:
           headers:
             status: '200'
@@ -930,248 +346,10 @@ actions:
         code: 0
 - execute_command:
     command: |
-      api-gateway api-configs create rev1 --api api-name --grpc-files normalized.yaml --async
-    events:
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog/configs?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: Some name
-              other_properties: stuff
-              producerProjectId: fake-project
-        return_response:
-          headers:
-            status: '200'
-          body:
-            id: rev1
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: api-name.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages: {rev1: 100.0}
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp
-
-    - api_call:
-        expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name/configs?alt=json&apiConfigId=rev1
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: projects/fake-project/locations/global/apis/api-name/configs/rev1
-              serviceRollout:
-                rolloutId: someRolloutId
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: projects/fake-project/locations/global/operations/some-op
-            done: false
-    - expect_stderr: |+
-        Asynchronous operation is in progress. Use the following command to wait for its completion:
-
-        gcloud api-gateway operations wait projects/fake-project/locations/global/operations/some-op
-
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      api-gateway api-configs create rev1 --api api-name --grpc-files="google_api_service.yaml,raw.proto" --async
-    events:
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - expect_stderr: |+
-        WARNING: Support for uploading uncompiled .proto files is deprecated and will soon be removed. Use compiled descriptor sets (.pb) instead.
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: dHlwZTogZ29vZ2xlLmFwaS5TZXJ2aWNlCmNvbmZpZ192ZXJzaW9uOiAzCm5hbWU6IGZha2UtYXBpLmFwaWdhdGV3YXkuZmFrZS1wcm9qZWN0LmNsb3VkLmdvb2QKdGl0bGU6IEZha2UgQVBJCmFwaXM6Ci0gZmFrZWFwaS5lY2hvCg==
-                  filePath: google_api_service.yaml
-                  fileType: SERVICE_CONFIG_YAML
-                - fileContents: c3ludGF4ID0gInByb3RvMyI7CnBhY2thZ2UgZWNobzsKCnNlcnZpY2UgRWNobyB7CiAgcnBjIEVjaG8gKEVjaG9SZXF1ZXN0KSByZXR1cm5zIChFY2hvUmVzcG9uc2UpIHt9Cn0KCm1lc3NhZ2UgRWNob1JlcXVlc3QgewogIHN0cmluZyBtZXNzYWdlID0gMTsKfQoKbWVzc2FnZSBFY2hvUmVzcG9uc2UgewogIHN0cmluZyBtZXNzYWdlID0gMTsKfQo=
-                  filePath: raw.proto
-                  fileType: PROTO_FILE
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp
-            done: true
-            response:
-              serviceConfig:
-                id: rev1
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: api-name.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages:
-                  rev1: 100.0
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
-    - api_call:
-        expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name/configs?alt=json&apiConfigId=rev1
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: projects/fake-project/locations/global/apis/api-name/configs/rev1
-              serviceRollout:
-                rolloutId: someRolloutId
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: projects/fake-project/locations/global/operations/some-op
-            done: false
-    - expect_stderr: |+
-        Asynchronous operation is in progress. Use the following command to wait for its completion:
-
-        gcloud api-gateway operations wait projects/fake-project/locations/global/operations/some-op
-
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
       api-gateway api-configs create rev1 --api api-name --grpc-files="google_api_service.yaml,proto_descriptor.pb" --async
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: null
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name?alt=json
           method: GET
           headers: {}
@@ -1180,87 +358,8 @@ actions:
           headers:
             status: '200'
           body: null
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog/configs:submit?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              configSource:
-                files:
-                - fileContents: dHlwZTogZ29vZ2xlLmFwaS5TZXJ2aWNlCmNvbmZpZ192ZXJzaW9uOiAzCm5hbWU6IGZha2UtYXBpLmFwaWdhdGV3YXkuZmFrZS1wcm9qZWN0LmNsb3VkLmdvb2QKdGl0bGU6IEZha2UgQVBJCmFwaXM6Ci0gZmFrZWFwaS5lY2hvCg==
-                  filePath: google_api_service.yaml
-                  fileType: SERVICE_CONFIG_YAML
-                # Note that this has file contents but they will change based on platform because
-                # it is a binary read, so we are ignoring them
-                - filePath: proto_descriptor.pb
-                  fileType: FILE_DESCRIPTOR_SET_PROTO
-              validateOnly: false
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp
-            done: false
     - expect_stderr: |
-        Waiting for async operation smOp to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp
-            done: true
-            response:
-              serviceConfig:
-                id: rev1
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp
-
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/api-name.apigateway.fake-project.cloud.goog/rollouts?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              serviceName: api-name.apigateway.fake-project.cloud.goog
-              trafficPercentStrategy:
-                percentages:
-                  rev1: 100.0
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: false
-    - expect_stderr: |
-        Waiting for async operation smOp2 to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/smOp2?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: smOp2
-            done: true
-            response:
-              rolloutId: someRolloutId
-    - expect_stderr: |+
-        Operation finished successfully. The following command can describe the Operation details:
-         gcloud endpoints operations describe smOp2
-
+        WARNING: Proto descriptor's source protos [google/protobuf/empty.proto] were not found on the file system and will not be included in the submitted GRPC service definition. If you meant to include these files, ensure the proto compiler was invoked in the same directory where the proto descriptor [proto_descriptor.pb] now resides.
     - api_call:
         expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name/configs?alt=json&apiConfigId=rev1
@@ -1269,8 +368,16 @@ actions:
           body:
             json:
               name: projects/fake-project/locations/global/apis/api-name/configs/rev1
-              serviceRollout:
-                rolloutId: someRolloutId
+              managedServiceConfigs:
+              - path: google_api_service.yaml
+                contents: dHlwZTogZ29vZ2xlLmFwaS5TZXJ2aWNlCmNvbmZpZ192ZXJzaW9uOiAzCm5hbWU6IGZha2UtYXBpLmFwaWdhdGV3YXkuZmFrZS1wcm9qZWN0LmNsb3VkLmdvb2QKdGl0bGU6IEZha2UgQVBJCmFwaXM6Ci0gZmFrZWFwaS5lY2hvCg==
+              grpcServices:
+              - fileDescriptorSet:
+                  contents: CrgSChtnb29nbGUvcHJvdG9idWYvZW1wdHkucHJvdG8SD2dvb2dsZS5wcm90b2J1ZiIHCgVFbXB0eUJ2ChNjb20uZ29vZ2xlLnByb3RvYnVmQgpFbXB0eVByb3RvUAFaJ2dpdGh1Yi5jb20vZ29sYW5nL3Byb3RvYnVmL3B0eXBlcy9lbXB0efgBAaICA0dQQqoCHkdvb2dsZS5Qcm90b2J1Zi5XZWxsS25vd25UeXBlc0r-EAoGEgQeADMQCswMCgEMEgMeABIywQwgUHJvdG9jb2wgQnVmZmVycyAtIEdvb2dsZSdzIGRhdGEgaW50ZXJjaGFuZ2UgZm9ybWF0CiBDb3B5cmlnaHQgMjAwOCBHb29nbGUgSW5jLiAgQWxsIHJpZ2h0cyByZXNlcnZlZC4KIGh0dHBzOi8vZGV2ZWxvcGVycy5nb29nbGUuY29tL3Byb3RvY29sLWJ1ZmZlcnMvCgogUmVkaXN0cmlidXRpb24gYW5kIHVzZSBpbiBzb3VyY2UgYW5kIGJpbmFyeSBmb3Jtcywgd2l0aCBvciB3aXRob3V0CiBtb2RpZmljYXRpb24sIGFyZSBwZXJtaXR0ZWQgcHJvdmlkZWQgdGhhdCB0aGUgZm9sbG93aW5nIGNvbmRpdGlvbnMgYXJlCiBtZXQ6CgogICAgICogUmVkaXN0cmlidXRpb25zIG9mIHNvdXJjZSBjb2RlIG11c3QgcmV0YWluIHRoZSBhYm92ZSBjb3B5cmlnaHQKIG5vdGljZSwgdGhpcyBsaXN0IG9mIGNvbmRpdGlvbnMgYW5kIHRoZSBmb2xsb3dpbmcgZGlzY2xhaW1lci4KICAgICAqIFJlZGlzdHJpYnV0aW9ucyBpbiBiaW5hcnkgZm9ybSBtdXN0IHJlcHJvZHVjZSB0aGUgYWJvdmUKIGNvcHlyaWdodCBub3RpY2UsIHRoaXMgbGlzdCBvZiBjb25kaXRpb25zIGFuZCB0aGUgZm9sbG93aW5nIGRpc2NsYWltZXIKIGluIHRoZSBkb2N1bWVudGF0aW9uIGFuZC9vciBvdGhlciBtYXRlcmlhbHMgcHJvdmlkZWQgd2l0aCB0aGUKIGRpc3RyaWJ1dGlvbi4KICAgICAqIE5laXRoZXIgdGhlIG5hbWUgb2YgR29vZ2xlIEluYy4gbm9yIHRoZSBuYW1lcyBvZiBpdHMKIGNvbnRyaWJ1dG9ycyBtYXkgYmUgdXNlZCB0byBlbmRvcnNlIG9yIHByb21vdGUgcHJvZHVjdHMgZGVyaXZlZCBmcm9tCiB0aGlzIHNvZnR3YXJlIHdpdGhvdXQgc3BlY2lmaWMgcHJpb3Igd3JpdHRlbiBwZXJtaXNzaW9uLgoKIFRISVMgU09GVFdBUkUgSVMgUFJPVklERUQgQlkgVEhFIENPUFlSSUdIVCBIT0xERVJTIEFORCBDT05UUklCVVRPUlMKICJBUyBJUyIgQU5EIEFOWSBFWFBSRVNTIE9SIElNUExJRUQgV0FSUkFOVElFUywgSU5DTFVESU5HLCBCVVQgTk9UCiBMSU1JVEVEIFRPLCBUSEUgSU1QTElFRCBXQVJSQU5USUVTIE9GIE1FUkNIQU5UQUJJTElUWSBBTkQgRklUTkVTUyBGT1IKIEEgUEFSVElDVUxBUiBQVVJQT1NFIEFSRSBESVNDTEFJTUVELiBJTiBOTyBFVkVOVCBTSEFMTCBUSEUgQ09QWVJJR0hUCiBPV05FUiBPUiBDT05UUklCVVRPUlMgQkUgTElBQkxFIEZPUiBBTlkgRElSRUNULCBJTkRJUkVDVCwgSU5DSURFTlRBTCwKIFNQRUNJQUwsIEVYRU1QTEFSWSwgT1IgQ09OU0VRVUVOVElBTCBEQU1BR0VTIChJTkNMVURJTkcsIEJVVCBOT1QKIExJTUlURUQgVE8sIFBST0NVUkVNRU5UIE9GIFNVQlNUSVRVVEUgR09PRFMgT1IgU0VSVklDRVM7IExPU1MgT0YgVVNFLAogREFUQSwgT1IgUFJPRklUUzsgT1IgQlVTSU5FU1MgSU5URVJSVVBUSU9OKSBIT1dFVkVSIENBVVNFRCBBTkQgT04gQU5ZCiBUSEVPUlkgT0YgTElBQklMSVRZLCBXSEVUSEVSIElOIENPTlRSQUNULCBTVFJJQ1QgTElBQklMSVRZLCBPUiBUT1JUCiAoSU5DTFVESU5HIE5FR0xJR0VOQ0UgT1IgT1RIRVJXSVNFKSBBUklTSU5HIElOIEFOWSBXQVkgT1VUIE9GIFRIRSBVU0UKIE9GIFRISVMgU09GVFdBUkUsIEVWRU4gSUYgQURWSVNFRCBPRiBUSEUgUE9TU0lCSUxJVFkgT0YgU1VDSCBEQU1BR0UuCgoICgECEgMgABgKCAoBCBIDIgA7CgkKAgglEgMiADsKCAoBCBIDIwA-CgkKAggLEgMjAD4KCAoBCBIDJAAsCgkKAggBEgMkACwKCAoBCBIDJQArCgkKAggIEgMlACsKCAoBCBIDJgAiCgkKAggKEgMmACIKCAoBCBIDJwAhCgkKAggkEgMnACEKCAoBCBIDKAAfCgkKAggfEgMoAB8K-wIKAgQAEgMzABAa7wIgQSBnZW5lcmljIGVtcHR5IG1lc3NhZ2UgdGhhdCB5b3UgY2FuIHJlLXVzZSB0byBhdm9pZCBkZWZpbmluZyBkdXBsaWNhdGVkCiBlbXB0eSBtZXNzYWdlcyBpbiB5b3VyIEFQSXMuIEEgdHlwaWNhbCBleGFtcGxlIGlzIHRvIHVzZSBpdCBhcyB0aGUgcmVxdWVzdAogb3IgdGhlIHJlc3BvbnNlIHR5cGUgb2YgYW4gQVBJIG1ldGhvZC4gRm9yIGluc3RhbmNlOgoKICAgICBzZXJ2aWNlIEZvbyB7CiAgICAgICBycGMgQmFyKGdvb2dsZS5wcm90b2J1Zi5FbXB0eSkgcmV0dXJucyAoZ29vZ2xlLnByb3RvYnVmLkVtcHR5KTsKICAgICB9CgogVGhlIEpTT04gcmVwcmVzZW50YXRpb24gZm9yIGBFbXB0eWAgaXMgZW1wdHkgSlNPTiBvYmplY3QgYHt9YC4KCgoKAwQAARIDMwgNYgZwcm90bzMKpQQKCXJhdy5wcm90bxIEZWNobxobZ29vZ2xlL3Byb3RvYnVmL2VtcHR5LnByb3RvIicKC0VjaG9SZXF1ZXN0EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2UiKAoMRWNob1Jlc3BvbnNlEhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2UyNwoERWNobxIvCgRFY2hvEhEuZWNoby5FY2hvUmVxdWVzdBoSLmVjaG8uRWNob1Jlc3BvbnNlIgBK4AIKBhIEAAAQAQoICgEMEgMAABIKCAoBAhIDAQANClUKAgMAEgMEACUaSiBJbXBvcnQgYW4gdW51c2VkIHByb3RvIHRvIHRlc3Qgbm9uLXJlc29sdmFibGUgc291cmNlIGRlcGVuZGVuY3kgd2FybmluZy4KCgoKAgYAEgQGAAgBCgoKAwYAARIDBggMCgsKBAYAAgASAwcCMgoMCgUGAAIAARIDBwYKCgwKBQYAAgACEgMHDBcKDAoFBgACAAMSAwciLgoKCgIEABIECgAMAQoKCgMEAAESAwoIEwoLCgQEAAIAEgMLAhUKDAoFBAACAAUSAwsCCAoMCgUEAAIAARIDCwkQCgwKBQQAAgADEgMLExQKCgoCBAESBA4AEAEKCgoDBAEBEgMOCBQKCwoEBAECABIDDwIVCgwKBQQBAgAFEgMPAggKDAoFBAECAAESAw8JEAoMCgUEAQIAAxIDDxMUYgZwcm90bzM=
+                  path: proto_descriptor.pb
+                source:
+                - contents: c3ludGF4ID0gInByb3RvMyI7CnBhY2thZ2UgZWNobzsKCi8vIEltcG9ydCBhbiB1bnVzZWQgcHJvdG8gdG8gdGVzdCBub24tcmVzb2x2YWJsZSBzb3VyY2UgZGVwZW5kZW5jeSB3YXJuaW5nLgppbXBvcnQgImdvb2dsZS9wcm90b2J1Zi9lbXB0eS5wcm90byI7CgpzZXJ2aWNlIEVjaG8gewogIHJwYyBFY2hvIChFY2hvUmVxdWVzdCkgcmV0dXJucyAoRWNob1Jlc3BvbnNlKSB7fQp9CgptZXNzYWdlIEVjaG9SZXF1ZXN0IHsKICBzdHJpbmcgbWVzc2FnZSA9IDE7Cn0KCm1lc3NhZ2UgRWNob1Jlc3BvbnNlIHsKICBzdHJpbmcgbWVzc2FnZSA9IDE7Cn0K
+                  path: raw.proto
         return_response:
           headers:
             status: '200'

@@ -57,6 +57,8 @@ def Create(environment_ref,
            cloud_sql_ipv4_cidr=None,
            web_server_access_control=None,
            cloud_sql_machine_type=None,
+           web_server_machine_type=None,
+           kms_key=None,
            release_track=base.ReleaseTrack.GA):
   """Calls the Composer Environments.Create method.
 
@@ -109,6 +111,10 @@ def Create(environment_ref,
         descriptions to allow access to the web server.
     cloud_sql_machine_type: str or None, Cloud SQL machine type used by the
         Airflow database.
+    web_server_machine_type: str or None, machine type used by the Airflow web
+        server
+    kms_key: str or None, the user-provided customer-managed
+        encryption key resource name
     release_track: base.ReleaseTrack, the release track of command. Will dictate
         which Composer client library will be used.
 
@@ -121,6 +127,9 @@ def Create(environment_ref,
   if node_count:
     is_config_empty = False
     config.nodeCount = node_count
+  if kms_key:
+    is_config_empty = False
+    config.encryptionConfig = messages.EncryptionConfig(kmsKeyName=kms_key)
   if (location or machine_type or network or subnetwork or service_account or
       oauth_scopes or tags or disk_size_gb):
     is_config_empty = False
@@ -197,6 +206,9 @@ def Create(environment_ref,
   if cloud_sql_machine_type:
     config.databaseConfig = messages.DatabaseConfig(
         machineType=cloud_sql_machine_type)
+  if web_server_machine_type:
+    config.webServerConfig = messages.WebServerConfig(
+        machineType=web_server_machine_type)
 
   # Builds environment message and attaches the configuration
   environment = messages.Environment(name=environment_ref.RelativeName())

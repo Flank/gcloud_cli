@@ -189,6 +189,9 @@ GROUPS
      data-catalog
         (ALPHA) Manage Cloud Data Catalog resources.
 
+     database-migration
+        (ALPHA) Manage Cloud Database Migration Service resources.
+
      dataflow
         (ALPHA) Manage Google Cloud Dataflow resources.
 
@@ -375,5 +378,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

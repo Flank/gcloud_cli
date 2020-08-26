@@ -11,7 +11,7 @@ gcloud beta compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-preemptible\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-reserved\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-preemptible\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-reserved\fR] [\fB\-\-use\-service\-networking\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -112,6 +112,15 @@ aggregated form. i.e., the user can make a reservation of 128 V2 TPUs and later
 on make another reservation of 128 V2 TPUs then creates a v2\-256 TPU instance.
 If there exists no reservation or not sufficient amount of reserved cores under
 the project, the request will fail due to lack of capacity.
+
+.TP 2m
+\fB\-\-use\-service\-networking\fR
+If provided, the TPU will be configured via the Service Networking (SN) API
+instead of using a CIDR range. The Service Networking API should be enabled on
+the project before creating the TPU.
+
+For more information on Service Networking see
+https://cloud.google.com/service\-infrastructure/docs/service\-networking/getting\-started.
 
 
 .RE

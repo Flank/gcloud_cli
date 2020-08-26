@@ -4,9 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha container clusters upgrade NAME [--async]
-        [--cluster-version=CLUSTER_VERSION]
-        [--concurrent-node-count=CONCURRENT_NODE_COUNT]
-        [--image-type=IMAGE_TYPE] [--master] [--node-pool=NODE_POOL]
+        [--cluster-version=CLUSTER_VERSION] [--image-type=IMAGE_TYPE]
+        [--master] [--node-pool=NODE_POOL]
         [--region=REGION | --zone=ZONE, -z ZONE]
         [--security-profile=SECURITY_PROFILE --security-profile-runtime-rules]
         [GCLOUD_WIDE_FLAG ...]
@@ -52,11 +51,6 @@ FLAGS
         You can find the list of allowed versions for upgrades by running:
 
             $ gcloud container get-server-config
-
-     --concurrent-node-count=CONCURRENT_NODE_COUNT
-        The number of nodes to upgrade concurrently. Valid values are [1, 20].
-        It is a recommended best practice to set this value to no higher than
-        3% of your cluster size.'
 
      --image-type=IMAGE_TYPE
         The image type to use for the cluster/node pool. Defaults to
@@ -139,7 +133,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud container clusters upgrade
         $ gcloud beta container clusters upgrade

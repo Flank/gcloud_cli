@@ -20,9 +20,9 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import domain_mapping
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions
 from tests.lib.surface.run import base
-
 import mock
 
 
@@ -33,6 +33,11 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
 
   def SetUp(self):
     self._SetDomainRef('www.example.com')
+    self.launch_stage_changes = mock.NonCallableMock()
+    self.StartObjectPatch(
+        config_changes,
+        'SetLaunchStageAnnotationChange',
+        return_value=self.launch_stage_changes)
 
   def _SetDomainRef(self, domain_name='www.example.com', project=None):
     self.domain_name = domain_name
@@ -72,7 +77,7 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
                  '--service myapp --domain www.example.com')
 
         self.operations.CreateDomainMapping.assert_called_once_with(
-            self.domain_ref, 'myapp', False)
+            self.domain_ref, 'myapp', [self.launch_stage_changes], False)
         self.AssertOutputContains(
             """NAME RECORD TYPE CONTENTS
             myapp A 216.239.32.21""",
@@ -138,7 +143,7 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
              '--service myapp --domain www.example.com')
 
     self.operations.CreateDomainMapping.assert_called_once_with(
-        self.domain_ref, 'myapp', False)
+        self.domain_ref, 'myapp', [self.launch_stage_changes], False)
     self.AssertOutputContains(
         """NAME RECORD TYPE CONTENTS
         myapp A 216.239.32.21""",

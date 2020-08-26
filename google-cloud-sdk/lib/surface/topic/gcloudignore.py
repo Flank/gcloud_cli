@@ -42,6 +42,7 @@ class GcloudignoreHelp(base.TopicCommand):
   * `gcloud composer environments storage {dags, data, plugins} import`
   * `gcloud container builds submit`
   * `gcloud beta debug source upload`
+  * `gcloud alpha run deploy`
 
   To globally disable `.gcloudignore` parsing (including default file-ignore
   behavior), run:
@@ -120,7 +121,7 @@ class GcloudignoreHelp(base.TopicCommand):
   This `.gcloudignore` would prevent the upload of the `node_modules/` directory
   and any files ending in `~`:
 
-    node_modules/
+    /node_modules/
     *~
 
   This `.gcloudignore` (similar to the one generated when Git files are

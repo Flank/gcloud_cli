@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: Can't create instance (permission denied on internal acc)
-    bug: b/161780031
 title: Create and delete a notebooks instance
 release_tracks: [BETA]
 summary:

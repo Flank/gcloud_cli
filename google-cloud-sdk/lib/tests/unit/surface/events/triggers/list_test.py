@@ -38,10 +38,18 @@ class TriggersListTestAlpha(base.EventsBase):
     ]
     for i, t in enumerate(self.triggers):
       t.name = 't{}'.format(i)
-      t.status.conditions = [
-          self.messages.TriggerCondition(
-              type='Ready', status=six.text_type(bool(i % 2)))
-      ]
+
+      if self.api_name == 'anthosevents':
+        t.status.conditions = [
+            self.messages.Condition(
+                type='Ready', status=six.text_type(bool(i % 2)))
+        ]
+      else:
+        t.status.conditions = [
+            self.messages.TriggerCondition(
+                type='Ready', status=six.text_type(bool(i % 2)))
+        ]
+
       t.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/triggers/{}'.format(
           self.namespace.Name(), t.name)
       t.filter_attributes[
@@ -114,3 +122,11 @@ class TriggersListTestAlpha(base.EventsBase):
         https://kubernetes.default/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/triggers/t1
         """,
         normalize_space=True)
+
+
+class TriggersListTestAlphaAnthos(TriggersListTestAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'anthosevents'
+    self.api_version = 'v1beta1'

@@ -5,9 +5,10 @@ NAME
 SYNOPSIS
     gcloud run services update [[SERVICE] --namespace=NAMESPACE]
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
-        [--memory=MEMORY] [--platform=PLATFORM] [--port=PORT]
-        [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT] [--no-traffic]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
+        [--max-instances=MAX_INSTANCES] [--memory=MEMORY] [--platform=PLATFORM]
+        [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT]
+        [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
@@ -66,6 +67,10 @@ FLAGS
 
      --cpu=CPU
         Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+     --image=IMAGE
+        Name of the container image to deploy (e.g.
+        gcr.io/cloudrun/hello:latest).
 
      --max-instances=MAX_INSTANCES
         The maximum number of container instances of the Service to run. Use

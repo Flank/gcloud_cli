@@ -788,6 +788,117 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
           '--pack=image=docker.io/image', '--async'
       ])
 
+  def testCreateConfigWithCluster(self):
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket='my-project_cloudbuild'),
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix='my-project_cloudbuild',
+        ),
+        response=self.storage_v1_messages.Buckets(
+            items=[self.storage_v1_messages.Bucket(
+                id='my-project_cloudbuild')]))
+    self.mocked_storage_v1.objects.Rewrite.Expect(
+        self.storage_v1_messages.StorageObjectsRewriteRequest(
+            destinationBucket='my-project_cloudbuild',
+            destinationObject=self.frozen_zip_filename,
+            sourceBucket='bucket',
+            sourceObject='object.zip',
+        ),
+        response=self.storage_v1_messages.RewriteResponse(
+            resource=self.storage_v1_messages.Object(
+                bucket='my-project_cloudbuild',
+                name=self.frozen_zip_filename,
+                generation=123,
+            ),
+            done=True,
+        ))
+
+    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
+        build=self.cloudbuild_v1_messages.Build(
+            createTime='2016-03-31T19:12:32.838111Z',
+            id='123-456-789',
+            images=[
+                'gcr.io/my-project/image',
+            ],
+            projectId='my-project',
+            status=self._statuses.QUEUED,
+            logsBucket='gs://my-project_cloudbuild/logs',
+            source=self.cloudbuild_v1_messages.Source(
+                storageSource=self.cloudbuild_v1_messages.StorageSource(
+                    bucket='my-project_cloudbuild',
+                    object=self.frozen_zip_filename,
+                    generation=123,
+                )),
+            steps=[
+                self.cloudbuild_v1_messages.BuildStep(
+                    name='gcr.io/cloud-builders/docker',
+                    args=['build', '-t', 'gcr.io/my-project/image', '.'],
+                ),
+            ],
+            options=self.cloudbuild_v1_messages.BuildOptions(
+                cluster=self.cloudbuild_v1_messages.ClusterOptions(
+                    name='projects/my-project/locations/us-east4-a/clusters/'
+                    'super-cool-cluster'))))
+
+    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
+            build=self.cloudbuild_v1_messages.Build(
+                images=[
+                    u'gcr.io/my-project/image',
+                ],
+                source=self.cloudbuild_v1_messages.Source(
+                    storageSource=self.cloudbuild_v1_messages.StorageSource(
+                        bucket='my-project_cloudbuild',
+                        object=self.frozen_zip_filename,
+                        generation=123,
+                    )),
+                steps=[
+                    self.cloudbuild_v1_messages.BuildStep(
+                        name='gcr.io/cloud-builders/docker',
+                        args=['build', '--network', 'cloudbuild', '--no-cache',
+                              '-t', 'gcr.io/my-project/image', '.'],
+                    ),
+                ],
+                options=self.cloudbuild_v1_messages.BuildOptions(
+                    cluster=self.cloudbuild_v1_messages.ClusterOptions(
+                        name='projects/my-project/locations/us-east4-a/'
+                        'clusters/super-cool-cluster')),
+            ),
+            projectId='my-project',
+        ),
+        response=self.cloudbuild_v1_messages.Operation(
+            metadata=encoding.JsonToMessage(
+                self.cloudbuild_v1_messages.Operation.MetadataValue,
+                encoding.MessageToJson(op_metadata))))
+
+    config_path = self.Touch(
+        '.',
+        'config.yaml',
+        contents=test_base.MakeConfig(
+            images=['gcr.io/my-project/image']))
+
+    self._Run([
+        'builds', 'submit', 'gs://bucket/object.zip',
+        '--cluster=super-cool-cluster', '--cluster-location=us-east4-a',
+        '--config', config_path,
+        '--async',
+    ])
+    self.AssertErrContains(
+        """\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename),
+        normalize_space=True)
+
 
 if __name__ == '__main__':
   test_case.main()

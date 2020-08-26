@@ -20,8 +20,7 @@ gcloud alpha memcache operations list \- list Memorystore Memcached operations
 \fB(ALPHA)\fR List all Memorystore Memcached operations under the specified
 project and region.
 
-You can specify the maximum number of operations to list using the
-\f5\-\-limit\fR flag.
+Specify the maximum number of operations to list using the \f5\-\-limit\fR flag.
 
 
 
@@ -30,9 +29,9 @@ You can specify the maximum number of operations to list using the
 .RS 2m
 .TP 2m
 
-Region resource \- The region of the operations to display. This represents a
-Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the argument
+Region resource \- Region of the operations to display. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
 [\-\-region] on the command line with a fully specified name; provide the
 argument [\-\-project] on the command line; set the property [core/project].
 This must be specified.
@@ -107,7 +106,13 @@ this API can be found at: https://cloud.google.com/memorystore/
 
 .SH "EXAMPLES"
 
-The following command lists a maximum of five operations:
+To list all operations in region \f5us\-central1\fR, run:
+
+.RS 2m
+$ gcloud alpha memcache operations list \-\-region=us\-central1
+.RE
+
+To list up to five operations in region \f5us\-central1\fR, run:
 
 .RS 2m
 $ gcloud alpha memcache operations list \-\-limit=5 \e
@@ -121,7 +126,7 @@ $ gcloud alpha memcache operations list \-\-limit=5 \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta memcache operations list

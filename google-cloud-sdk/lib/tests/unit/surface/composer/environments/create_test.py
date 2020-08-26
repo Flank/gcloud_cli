@@ -82,6 +82,12 @@ class _EnvironmentsCreateTestBase(base.EnvironmentsUnitTest):
     self.PYTHON_VERSION = '2'
     self.IMAGE_VERSION = 'composer-latest-airflow-7.8.9'
     self.AIRFLOW_VERSION = '7.8.9'
+    self.KMS_KEY = 'testkey'
+    self.KMS_KEYRING = 'testring'
+    self.KMS_LOCATION = 'us-east1'
+    self.KMS_PROJECT = 'testproject'
+    self.KMS_FULLY_QUALIFIED = ('projects/testproject/locations/us-east1/' +
+                                'keyRings/testring/cryptoKeys/testkey')
 
     self.running_op = self.MakeOperation(
         self.TEST_PROJECT,
@@ -1307,6 +1313,31 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
 
     self.assertEqual(self.running_op, actual_op)
 
+  def testWebServerMachineType(self):
+    """Test specifying web server machine type."""
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=self.messages.NodeConfig(
+            diskSizeGb=self.DEFAULT_DISK_SIZE_GB),
+        webServerConfig=self.messages
+        .WebServerConfig(machineType='n1-standard-2'))
+
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--async', '--web-server-machine-type',
+                                     'n1-standard-2',
+                                     self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+
 
 class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
 
@@ -1380,6 +1411,100 @@ class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
   def testWebServerAccessControlExclusiveFlags(self):
     # Feature available only in beta.
     pass
+
+  def testSuccessfulCreationWithSyntacticallyCorrectKmsKey(self):
+    """Tests that creation succeedes with a properly formatted KMS key."""
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        pythonVersion=self.PYTHON_VERSION)
+    encryption_config = self.messages.EncryptionConfig(
+        kmsKeyName=self.KMS_FULLY_QUALIFIED)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        softwareConfig=software_config,
+        encryptionConfig=encryption_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--python-version', self.PYTHON_VERSION,
+                                     '--async', self.TEST_ENVIRONMENT_ID,
+                                     '--kms-key', self.KMS_FULLY_QUALIFIED)
+    self.assertEqual(self.running_op, actual_op)
+
+  def testSuccessfulCreationWithKmsKeyAndKeyRing(self):
+    """Tests that creation succeedes with a properly formatted KMS key."""
+    expected_kms_full_key_name = (
+        'projects/{}/locations/{}/keyRings/testkeyring/cryptoKeys/testkeyname'
+        .format(self.TEST_PROJECT, self.TEST_LOCATION))
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        pythonVersion=self.PYTHON_VERSION)
+    encryption_config = self.messages.EncryptionConfig(
+        kmsKeyName=expected_kms_full_key_name)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        softwareConfig=software_config,
+        encryptionConfig=encryption_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+    actual_op = self.RunEnvironments(
+        'create', '--project', self.TEST_PROJECT, '--location',
+        self.TEST_LOCATION, '--python-version', self.PYTHON_VERSION, '--async',
+        self.TEST_ENVIRONMENT_ID, '--kms-key', 'testkeyname', '--kms-keyring',
+        'testkeyring', '--kms-project', self.TEST_PROJECT, '--kms-location',
+        self.TEST_LOCATION)
+    self.assertEqual(self.running_op, actual_op)
+
+  def testSuccessfulCreationWithFullKmsGroupSpecified(self):
+    """Tests that creation succeedes with a properly formatted KMS key."""
+    expected_kms_full_key_name = (
+        'projects/other-project/locations/us-central1/' +
+        'keyRings/testkeyring/cryptoKeys/testkeyname')
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        pythonVersion=self.PYTHON_VERSION)
+    encryption_config = self.messages.EncryptionConfig(
+        kmsKeyName=expected_kms_full_key_name)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        softwareConfig=software_config,
+        encryptionConfig=encryption_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+    actual_op = self.RunEnvironments(
+        'create', '--project', self.TEST_PROJECT, '--location',
+        self.TEST_LOCATION, '--python-version', self.PYTHON_VERSION, '--async',
+        self.TEST_ENVIRONMENT_ID, '--kms-key', 'testkeyname', '--kms-keyring',
+        'testkeyring', '--kms-location', 'us-central1', '--kms-project',
+        'other-project')
+    self.assertEqual(self.running_op, actual_op)
+
+  def testFailedCreationWithSyntacticallyIncorrectKmsKey(self):
+    """Tests that creation fails with an improperly formatted KMS key."""
+    self._SetTestMessages()
+    invalid_kms_key = 'test-project/test-key'
+    with self.AssertRaisesExceptionRegexp(exceptions.InvalidArgumentException,
+                                          'Encryption key not fully specified'):
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           self.TEST_ENVIRONMENT_ID, '--kms-key',
+                           invalid_kms_key)
 
 
 if __name__ == '__main__':

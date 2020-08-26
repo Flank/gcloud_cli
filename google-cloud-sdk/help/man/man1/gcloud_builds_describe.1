@@ -11,7 +11,7 @@ gcloud builds describe \- get information about a particular build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud builds describe\fR \fIBUILD\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud builds describe\fR \fIBUILD\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -28,6 +28,19 @@ Get information about a particular build.
 \fIBUILD\fR
 The build to describe. The ID of the build is printed at the end of the build
 submission process, or in the ID column when listing builds.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
 
 
 .RE

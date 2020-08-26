@@ -5,10 +5,11 @@ NAME
 SYNOPSIS
     gcloud alpha run services update [[SERVICE] --namespace=NAMESPACE]
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
-        [--memory=MEMORY] [--min-instances=MIN_INSTANCES] [--platform=PLATFORM]
-        [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--tag=TAG]
-        [--timeout=TIMEOUT] [--no-traffic]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
+        [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
+        [--min-instances=MIN_INSTANCES] [--platform=PLATFORM] [--port=PORT]
+        [--service-account=SERVICE_ACCOUNT] [--tag=TAG] [--timeout=TIMEOUT]
+        [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
@@ -67,6 +68,10 @@ FLAGS
 
      --cpu=CPU
         Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+     --image=IMAGE
+        Name of the container image to deploy (e.g.
+        gcr.io/cloudrun/hello:latest).
 
      --max-instances=MAX_INSTANCES
         The maximum number of container instances of the Service to run. Use
@@ -361,7 +366,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud run services update
         $ gcloud beta run services update

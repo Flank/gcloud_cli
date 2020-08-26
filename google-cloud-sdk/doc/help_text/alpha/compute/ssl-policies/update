@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute ssl-policies update - update a Google Compute Engine
-        SSL policy
+    gcloud alpha compute ssl-policies update - update a Compute Engine SSL
+        policy
 
 SYNOPSIS
     gcloud alpha compute ssl-policies update SSL_POLICY
@@ -79,7 +79,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute ssl-policies update
         $ gcloud beta compute ssl-policies update

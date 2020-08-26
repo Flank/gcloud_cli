@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha iam workload-identity-pools providers - manage IAM
+        WorkloadIdentityPoolProviders
+
+SYNOPSIS
+    gcloud alpha iam workload-identity-pools providers COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing IAM WorkloadIdentityPoolProviders.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create-aws
+        (ALPHA) Create a new AWS WorkloadIdentityPoolProvider.
+
+     create-oidc
+        (ALPHA) Create a new OIDC-type WorkloadIdentityPoolProvider.
+
+     delete
+        (ALPHA) Delete a WorkloadIdentityPoolProvider.
+
+     describe
+        (ALPHA) Describe a WorkloadIdentityPoolProvider.
+
+     list
+        (ALPHA) List WorkloadIdentityPoolProviders.
+
+     undelete
+        (ALPHA) Undelete a WorkloadIdentityPoolProvider.
+
+     update-aws
+        (ALPHA) Update a new AWS-type WorkloadIdentityPoolProvider.
+
+     update-oidc
+        (ALPHA) Update an OIDC WorkloadIdentityPoolProvider.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

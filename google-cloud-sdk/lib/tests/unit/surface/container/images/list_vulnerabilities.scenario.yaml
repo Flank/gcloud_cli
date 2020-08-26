@@ -1,0 +1,103 @@
+title: On-Demand Scanning list-vulnerabilities test scenario
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      container images list-vulnerabilities projects/fake-project/locations/europe/scans/iii-344-peq-645
+  - stdout: |
+      ---
+      createTime: '2020-08-03T15:40:07.420673Z'
+      kind: VULNERABILITY
+      name: projects/fake-project/locations/europe/occurrences/mff-95f-805-2sz
+      noteName: projects/goog-vulnz/notes/CVE-UH-OH
+      resourceUri: https://eu.gcr.io/fake-project/debian@sha256:123xyz
+      updateTime: '2020-08-03T15:40:07.420673Z'
+      vulnerability:
+        cvssScore: 7.5
+        effectiveSeverity: LOW
+        packageIssue:
+        - affectedCpeUri: cpe:/o:debian:debian_linux:10
+          affectedPackage: iptables
+          affectedVersion:
+            kind: NORMAL
+            name: 1.8.2
+            revision: '4'
+          fixedCpeUri: cpe:/o:debian:debian_linux:10
+          fixedPackage: iptables
+          fixedVersion:
+            kind: MAXIMUM
+        severity: HIGH
+actions:
+- execute_command:
+    command: |
+      container images list-vulnerabilities projects/fake-project/locations/europe/scans/iii-344-peq-645
+    events:
+    - api_call:
+        expect_request:
+          uri: https://ondemandscanning.googleapis.com/v1beta1/projects/fake-project/locations/europe/scans/iii-344-peq-645/vulnerabilities?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "occurrences": [
+                {
+                  "name": "projects/fake-project/locations/europe/occurrences/mff-95f-805-2sz",
+                  "resourceUri": "https://eu.gcr.io/fake-project/debian@sha256:123xyz",
+                  "noteName": "projects/goog-vulnz/notes/CVE-UH-OH",
+                  "kind": "VULNERABILITY",
+                  "createTime": "2020-08-03T15:40:07.420673Z",
+                  "updateTime": "2020-08-03T15:40:07.420673Z",
+                  "vulnerability": {
+                    "severity": "HIGH",
+                    "cvssScore": 7.5,
+                    "packageIssue": [
+                      {
+                        "affectedCpeUri": "cpe:/o:debian:debian_linux:10",
+                        "affectedPackage": "iptables",
+                        "affectedVersion": {
+                          "name": "1.8.2",
+                          "revision": "4",
+                          "kind": "NORMAL"
+                        },
+                        "fixedCpeUri": "cpe:/o:debian:debian_linux:10",
+                        "fixedPackage": "iptables",
+                        "fixedVersion": {
+                          "kind": "MAXIMUM"
+                        }
+                      }
+                    ],
+                    "effectiveSeverity": "LOW"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        createTime: '2020-08-03T15:40:07.420673Z'
+        kind: VULNERABILITY
+        name: projects/fake-project/locations/europe/occurrences/mff-95f-805-2sz
+        noteName: projects/goog-vulnz/notes/CVE-UH-OH
+        resourceUri: https://eu.gcr.io/fake-project/debian@sha256:123xyz
+        updateTime: '2020-08-03T15:40:07.420673Z'
+        vulnerability:
+          cvssScore: 7.5
+          effectiveSeverity: LOW
+          packageIssue:
+          - affectedCpeUri: cpe:/o:debian:debian_linux:10
+            affectedPackage: iptables
+            affectedVersion:
+              kind: NORMAL
+              name: 1.8.2
+              revision: '4'
+            fixedCpeUri: cpe:/o:debian:debian_linux:10
+            fixedPackage: iptables
+            fixedVersion:
+              kind: MAXIMUM
+          severity: HIGH
+    - expect_exit:
+        code: 0

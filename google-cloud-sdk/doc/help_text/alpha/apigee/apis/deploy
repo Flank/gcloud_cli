@@ -1,57 +1,62 @@
 NAME
-    gcloud alpha apigee apis deploy - deploys an Apigee API proxy
+    gcloud alpha apigee apis deploy - deploy an API proxy to an environment
 
 SYNOPSIS
     gcloud alpha apigee apis deploy
         [[REVISION]
           --api=API --environment=ENVIRONMENT --organization=ORGANIZATION]
-        [--basepath=BASEPATH] [--override] [GCLOUD_WIDE_FLAG ...]
+        [--override] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Deploy an Apigee API proxy to an environment.
+    (ALPHA) Deploy an API proxy to an environment.
 
-    This command expects the API proxy's base path to not already be in use by
-    a deployed proxy in the target environment. If it is in use, the deployment
-    will fail by default. To instead undeploy the existing API proxy as part of
-    the new deployment, use the --override command.
+    gcloud alpha apigee apis deploy installs an API proxy revision in an Apigee
+    runtime environment.
+
+    By default, the API proxy's base path must not already be in use by a
+    deployed proxy in the target environment. To allow Apigee to undeploy any
+    conflicting API proxy as part of the deployment, use the --override
+    command.
 
     Once a particular revision of an API proxy has been deployed, that revision
     can no longer be modified. Any updates to the API proxy must be saved as a
     new revision.
 
 POSITIONAL ARGUMENTS
-     Revision resource - The API proxy revision to be deployed, and the
-     environment in which to deploy it. The revision defaults to latest, a
-     special value which will use the latest revision of the API proxy. The
-     arguments in this group can be used to specify the attributes of this
-     resource.
+     Revision resource - API proxy revision to be deployed and environment in
+     which to deploy it. Revisions can either be a positive revision number, or
+     the special value latest, which will deploy the latest revision of the API
+     proxy. If revision is unspecified, the default is latest. The arguments in
+     this group can be used to specify the attributes of this resource.
 
        [REVISION]
           ID of the revision or fully qualified identifier for the revision.
 
        --api=API
-          The API proxy to be deployed.
+          API proxy to be deployed. To get a list of available API proxies, run
+          gcloud alpha apigee apis list.
 
        --environment=ENVIRONMENT
-          The environment in which to deploy the API proxy.
+          Environment in which to deploy the API proxy. To get a list of
+          available environments, run gcloud alpha apigee environments list.
 
        --organization=ORGANIZATION
-          The Apigee organization of the proxy and environment.
+          Apigee organization of the proxy and environment. If unspecified, the
+          Cloud Platform project's associated organization will be used.
 
 FLAGS
-     --basepath=BASEPATH
-        Base path where the API proxy revision should be deployed. Defaults to
-        / if not provided.
-
      --override
-        Whether to force the deployment of the new revision over the currently
-        deployed revision by overriding conflict checks.
+        Force the deployment of the new revision, overriding any currently
+        deployed revision that would conflict with it.
 
         If an existing API proxy revision is deployed, set this flag to ensure
         seamless deployment with zero downtime. In this case, the existing
-        revision remains deployed until the new revision is fully deployed. If
-        not set, you must undeploy the currently deployed revision before
-        deploying the new revision.
+        revision remains deployed until the new revision is fully deployed.
+
+        If unset, gcloud alpha apigee apis deploy will fail unless all
+        conflicting API proxies are first undeployed from the environment. To
+        do this, run gcloud alpha apigee apis undeploy on the conflicting
+        deployment.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -74,9 +79,15 @@ EXAMPLES
         $ gcloud alpha apigee apis deploy 3 --organization=my-org \
             --environment=test --api=demo --override
 
+    To deploy that proxy and print the resulting deployment as a JSON object,
+    run:
+
+        $ gcloud alpha apigee apis deploy 3 --organization=my-org \
+            --environment=test --api=demo --format=json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

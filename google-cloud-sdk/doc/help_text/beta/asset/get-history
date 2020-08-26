@@ -13,9 +13,9 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --asset-names=[ASSET_NAMES,...]
-        A list of full names of the assets to get the history for. See
+        A list of full names of the assets to get the history for. For more
+        information, see:
         https://cloud.google.com/apis/design/resource_names#full_resource_name
-        for name format.
 
      --content-type=CONTENT_TYPE
         Asset content type. Specifying resource will export resource metadata,
@@ -27,8 +27,8 @@ REQUIRED FLAGS
 
      --start-time=START_TIME
         Start time of the time window (inclusive) for the asset history. Must
-        be later than 2018-10-02T00:00:00Z. See $ gcloud topic datetimes for
-        information on time formats.
+        be after the current time minus 35 days. See $ gcloud topic datetimes
+        for information on time formats.
 
      Exactly one of these must be specified:
 

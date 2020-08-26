@@ -1,6 +1,6 @@
 NAME
-    gcloud compute target-pools describe - describe a Google Compute Engine
-        target pool
+    gcloud compute target-pools describe - describe a Compute Engine target
+        pool
 
 SYNOPSIS
     gcloud compute target-pools describe NAME [--region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute target-pools describe displays all data associated with a
-    Google Compute Engine target pool in a project.
+    Compute Engine target pool in a project.
 
 POSITIONAL ARGUMENTS
      NAME

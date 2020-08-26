@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha deployment-manager type-providers create PROVIDER_NAME
         --descriptor-url=DESCRIPTOR_URL [--api-options-file=API_OPTIONS_FILE]
-        [--async] [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
+        [--async] [--custom-certificate-authority-roots=CA_ROOT,[CA_ROOT,...]]
+        [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -28,6 +29,10 @@ OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --custom-certificate-authority-roots=CA_ROOT,[CA_ROOT,...]
+        Comma-separated list of CA root certificates to use when connecting to
+        the type's API by HTTPS.
 
      --description=DESCRIPTION
         Optional description of the type provider.
@@ -59,7 +64,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta deployment-manager type-providers create
 

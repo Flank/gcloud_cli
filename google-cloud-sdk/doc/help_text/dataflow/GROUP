@@ -27,6 +27,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     flex-template
+        A group of subcommands for working with Dataflow flex template.
+
      jobs
         A group of subcommands for working with Dataflow jobs.
 

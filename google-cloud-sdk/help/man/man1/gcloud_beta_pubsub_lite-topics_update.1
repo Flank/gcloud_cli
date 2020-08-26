@@ -11,7 +11,7 @@ gcloud beta pubsub lite\-topics update \- update a Pub/Sub Lite topic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta pubsub lite\-topics update\fR (\fITOPIC\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) (\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR\ \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR\ \fB\-\-scale\fR=\fISCALE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta pubsub lite\-topics update\fR (\fITOPIC\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) (\fB\-\-message\-retention\-period\fR=\fIMESSAGE_RETENTION_PERIOD\fR\ \fB\-\-per\-partition\-bytes\fR=\fIPER_PARTITION_BYTES\fR\ \fB\-\-per\-partition\-publish\-mib\fR=\fIPER_PARTITION_PUBLISH_MIB\fR\ \fB\-\-per\-partition\-subscribe\-mib\fR=\fIPER_PARTITION_SUBSCRIBE_MIB\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,12 +72,13 @@ to make room for newer ones, regardless of the value of
 \f5per\-partition\-bytes=30GiB\fR.
 
 .TP 2m
-\fB\-\-scale\fR=\fISCALE\fR
-Topic partition scale value. Every partition in the topic is allocated
-throughput equivalent to \f5scale\fR times the standard partition throughput (4
-MiB/s of publishing throughput and 8 MiB/s of subscribing throughput). This is
-also reflected in the cost of this topic; a topic with \f5scale\fR of 2 and
-count of 10 is charged for 20 partitions.
+\fB\-\-per\-partition\-publish\-mib\fR=\fIPER_PARTITION_PUBLISH_MIB\fR
+Topic partition publish throughput capacity in MiB/s. Must be between 4 and 16.
+
+.TP 2m
+\fB\-\-per\-partition\-subscribe\-mib\fR=\fIPER_PARTITION_SUBSCRIBE_MIB\fR
+Topic partition subscribe throughput capacity in MiB/s. Must be between 4 and
+32.
 
 
 .RE
@@ -109,7 +110,7 @@ To update a Pub/Sub Lite topic, run:
 .RS 2m
 $ gcloud beta pubsub lite\-topics update mytopic \e
     \-\-zone=us\-central1\-a \e
-    \-\-scale=2
+    \-\-per\-partition\-publish\-mib=10
 .RE
 
 

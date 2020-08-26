@@ -110,28 +110,31 @@ class _ValidateAgentTest(subtests.Base):
 
 class _ValidateAgentVersionTest(subtests.Base):
 
-  def RunSubTest(self, version, **kwargs):
+  def RunSubTest(self, agent_type, version, **kwargs):
     agent_rule = copy.deepcopy(GOOD_LOGGING_AGENT_RULE)
     agent_rule.version = version
+    agent_rule.type = agent_type
     agent_rule.enable_autoupgrade = False
     policy = copy.deepcopy(GOOD_POLICY)
     policy.agent_rules = [agent_rule]
     return validator.ValidateOpsAgentsPolicy(policy)
 
   def testValid(self):
-    for version in {
-        '1.2.33',
-        '6.0.3',
-        '999.9999.0000',
-        '5.*.*',
-        '6.*.*',
-        '5.5.2-1000',
-        agent_policy.OpsAgentPolicy.AgentRule.Version.LATEST_OF_ALL,
-        agent_policy.OpsAgentPolicy.AgentRule.Version.CURRENT_MAJOR,
-    }:
-      self.Run(None, version)
+    logging = agent_policy.OpsAgentPolicy.AgentRule.Type.LOGGING
+    metrics = agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS
+    latest = agent_policy.OpsAgentPolicy.AgentRule.Version.LATEST_OF_ALL
+    major = agent_policy.OpsAgentPolicy.AgentRule.Version.CURRENT_MAJOR
+    valid_versions = {
+        logging: {'1.2.33', '1.*.*', '1.9999.0000', latest, major},
+        metrics: {'6.0.3', '5.*.*', '6.*.*', '6.9999.0000',
+                  '5.5.2-1000', latest, major},
+    }
+    for agent_type, versions in valid_versions.items():
+      for version in versions:
+        self.Run(None, agent_type, version)
 
-  def testInvalid(self):
+  def testSyntaxInvalid(self):
+    logging = agent_policy.OpsAgentPolicy.AgentRule.Type.LOGGING
     for version in {
         '',
         '1.2',
@@ -146,14 +149,26 @@ class _ValidateAgentVersionTest(subtests.Base):
         '*&#Y57',
     }:
       self.Run(
-          None, version, exception=_WrapOneError(
+          None, logging, version, exception=_WrapOneError(
               validator.AgentVersionInvalidFormatError(version)))
+
+  def testMajorVersionInvalid(self):
+    logging = agent_policy.OpsAgentPolicy.AgentRule.Type.LOGGING
+    metrics = agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS
+    invalid_versions = {
+        logging: {'9999.1.2', '9999.*.*', '6.0.1', '6.*.*'},
+        metrics: {'9999.1.2', '9999.*.*', '1.1.2', '1.*.*'},
+    }
+    for agent_type, versions in invalid_versions.items():
+      for version in versions:
+        self.Run(None, agent_type, version, exception=_WrapOneError(
+            validator.AgentUnsupportedMajorVersionError(agent_type, version)))
 
 
 class _ValidateAgentVersionAndEnableAutoupgradeTest(subtests.Base):
 
   def RunSubTest(self, version, enable_autoupgrade, **kwargs):
-    agent_rule = copy.deepcopy(GOOD_LOGGING_AGENT_RULE)
+    agent_rule = copy.deepcopy(GOOD_METRICS_AGENT_RULE)
     agent_rule.version = version
     agent_rule.enable_autoupgrade = enable_autoupgrade
     policy = copy.deepcopy(GOOD_POLICY)
@@ -174,7 +189,7 @@ class _ValidateAgentVersionAndEnableAutoupgradeTest(subtests.Base):
   def testInvalid(self):
     for version, enable_autoupgrade in {
         ('6.0.3', True),
-        ('99.9999.999', True),
+        ('6.9999.999', True),
     }:
       self.Run(
           None,

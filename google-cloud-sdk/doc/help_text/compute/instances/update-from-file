@@ -75,6 +75,8 @@ EXAMPLES
             --source=<path-to-file>
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice.
+    These variants are also available:
+
+        $ gcloud alpha compute instances update-from-file
+        $ gcloud beta compute instances update-from-file
 

@@ -261,20 +261,20 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
   def testCreateZonal_InternetIpPortType_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
-        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
-        r'support network endpoints of type gce-vm-ip-port. Type '
-        r'internet-ip-port must be specified in the global scope.'):
+        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only support '
+        r'network endpoints of type gce-vm-ip-port or non-gcp-private-ip-port. '
+        r'Type internet-ip-port must be specified in the global scope.'):
       self.Run("""
-      compute network-endpoint-groups create my-neg1 --zone {0}
-        --network-endpoint-type INTERNET_IP_PORT
-      """.format(self.zone))
+    compute network-endpoint-groups create my-neg1 --zone {0}
+      --network-endpoint-type INTERNET_IP_PORT
+    """.format(self.zone))
 
   def testCreateZonal_InternetFqdnPortType_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
-        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
-        r'support network endpoints of type gce-vm-ip-port. Type '
-        r'internet-fqdn-port must be specified in the global scope.'):
+        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only support '
+        r'network endpoints of type gce-vm-ip-port or non-gcp-private-ip-port. '
+        r'Type internet-fqdn-port must be specified in the global scope.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_FQDN_PORT
@@ -290,15 +290,6 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
         --network-endpoint-type INTERNET_IP_PORT
         --network default
       """)
-
-
-class BetaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-    self.endpoint_type_enum = (
-        self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
 
   def testCreateRegional_CloudRun(self):
     network_endpoint_group = self._CreateNetworkEndpointGroup(
@@ -428,20 +419,21 @@ class BetaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
   def testCreateZonal_CloudFunction_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
-        r'Zonal NEGs only support network endpoints of type gce-vm-ip-port. '
-        r'Type serverless must be specified in the regional scope.'):
+        r'Zonal NEGs only support network endpoints of type gce-vm-ip-port or '
+        r'non-gcp-private-ip-port. Type serverless must be specified in the '
+        r'regional scope.'):
       self.Run('compute network-endpoint-groups create my-cloud-function-neg '
                '--zone ' + self.zone + ' --network-endpoint-type=serverless '
                '--cloud-function-name=function-name')
 
-
-class AlphaNetworkEndpointGroupsCreateTest(BetaNetworkEndpointGroupsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.endpoint_type_enum = (
-        self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
+  def testCreateRegional_InternetType_fails(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for \[--network-endpoint-type\]: Regional NEGs only '
+        r'support network endpoints of type serverless. Type '
+        r'internet-ip-port must be specified in the global scope.'):
+      self.Run('compute network-endpoint-groups create my-neg1 --region ' +
+               self.region + ' --network-endpoint-type=internet-ip-port')
 
   def testCreateZonal_NonGcpPrivateIpPortType_AllOptions(self):
     network_endpoint_group = self._CreateNetworkEndpointGroup(
@@ -460,6 +452,24 @@ class AlphaNetworkEndpointGroupsCreateTest(BetaNetworkEndpointGroupsCreateTest):
     self.CheckRequests([(self.compute.networkEndpointGroups, 'Insert', request)
                        ])
     self.assertEqual(result, network_endpoint_group)
+
+
+class BetaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.endpoint_type_enum = (
+        self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
+
+
+class AlphaNetworkEndpointGroupsCreateTest(BetaNetworkEndpointGroupsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.endpoint_type_enum = (
+        self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
 
   def testCreateZonal_GceVmPrimaryIpType_AllOptions(self):
     network_endpoint_group = self._CreateNetworkEndpointGroup(
@@ -488,15 +498,6 @@ class AlphaNetworkEndpointGroupsCreateTest(BetaNetworkEndpointGroupsCreateTest):
       self.Run('compute network-endpoint-groups create my-cloud-function-neg '
                '--zone ' + self.zone + ' --network-endpoint-type=serverless '
                '--cloud-function-name=function-name')
-
-  def testCreateRegional_InternetType_fails(self):
-    with self.assertRaisesRegex(
-        exceptions.InvalidArgumentException,
-        r'Invalid value for \[--network-endpoint-type\]: Regional NEGs only '
-        r'support network endpoints of type serverless. Type '
-        r'internet-ip-port must be specified in the global scope.'):
-      self.Run('compute network-endpoint-groups create my-neg1 --region ' +
-               self.region + ' --network-endpoint-type=internet-ip-port')
 
   def testCreateZonal_InternetIpPortType_fails(self):
     with self.assertRaisesRegex(

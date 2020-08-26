@@ -105,12 +105,38 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
                '--quiet'.format(backend_name))
 
   @contextlib.contextmanager
+  def _CreateBackendServiceForHybridNeg(self, health_check_name):
+    backend_name = self._GetResourceName()
+    try:
+      self.Run('compute backend-services create {0} --global '
+               '--load-balancing-scheme=INTERNAL_SELF_MANAGED '
+               '--health-checks {1}'.format(backend_name, health_check_name))
+      yield backend_name
+    finally:
+      self.Run('compute backend-services delete {0} --global '
+               '--quiet'.format(backend_name))
+
+  @contextlib.contextmanager
   def _CreateNetworkEndpointGroup(self, network_name, subnetwork_name):
     neg_name = self._GetResourceName()
     try:
       self.Run('compute network-endpoint-groups create {0} --zone {1} '
                '--network {2} --subnet {3}'
                .format(neg_name, self.zone, network_name, subnetwork_name))
+      self.Run('compute network-endpoint-groups list')
+      self.AssertNewOutputContains(neg_name)
+      yield neg_name
+    finally:
+      self.Run('compute network-endpoint-groups delete {0} --zone {1} '
+               '--quiet'.format(neg_name, self.zone))
+
+  @contextlib.contextmanager
+  def _CreateHybridNetworkEndpointGroup(self, network_name):
+    neg_name = self._GetResourceName()
+    try:
+      self.Run('compute network-endpoint-groups create {0} --zone {1} '
+               '--network {2} --network-endpoint-type non-gcp-private-ip-port'
+               .format(neg_name, self.zone, network_name))
       self.Run('compute network-endpoint-groups list')
       self.AssertNewOutputContains(neg_name)
       yield neg_name
@@ -177,14 +203,36 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
           backend_name))
       self.AssertNewOutputNotContains(neg_name)
 
+  def testHybridNetworkEndpointGroups(self):
+    health_check_name = self._GetResourceName()
+    with self._CreateNetwork() as network_name, \
+        self._CreateHealthCheck(health_check_name), \
+        self._CreateHybridNetworkEndpointGroup(network_name) as neg_name, \
+        self._CreateBackendServiceForHybridNeg(health_check_name) as backend_name:
+      self.Run('compute network-endpoint-groups update {0} --zone={1} '
+               '--add-endpoint ip=10.138.0.2,port=80'.format(
+                   neg_name, self.zone))
+      self.Run('compute network-endpoint-groups list-network-endpoints {0} '
+               '--zone {1}'.format(neg_name, self.zone))
+      self.AssertNewOutputContains('10.138.0.2')
 
-class NetworkEndpointGroupsBetaTest(NetworkEndpointGroupsTest):
-  """Network endpoint groups alpha tests."""
+      self.Run('compute backend-services add-backend {0} --global '
+               '--balancing-mode RATE --max-rate-per-endpoint 5 '
+               '--network-endpoint-group {1} '
+               '--network-endpoint-group-zone {2}'.format(
+                   backend_name, neg_name, self.zone))
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.registry = resources.REGISTRY.Clone()
-    self.registry.RegisterApiByName('compute', 'beta')
+      self.Run(
+          'compute backend-services describe {0} --global'.format(backend_name))
+      self.AssertNewOutputContains(neg_name)
+
+      self.Run('compute backend-services remove-backend {0} --global '
+               '--network-endpoint-group {1} '
+               '--network-endpoint-group-zone {2}'.format(
+                   backend_name, neg_name, self.zone))
+      self.Run(
+          'compute backend-services describe {0} --global'.format(backend_name))
+      self.AssertNewOutputNotContains(neg_name)
 
   def testRegionalNetworkEndpointGroups(self):
     with self._CreateRegionalNetworkEndpointGroup() as neg_name, \
@@ -206,6 +254,15 @@ class NetworkEndpointGroupsBetaTest(NetworkEndpointGroupsTest):
       self.Run(
           'compute backend-services describe {0} --global'.format(backend_name))
       self.AssertNewOutputNotContains(neg_name)
+
+
+class NetworkEndpointGroupsBetaTest(NetworkEndpointGroupsTest):
+  """Network endpoint groups alpha tests."""
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.registry = resources.REGISTRY.Clone()
+    self.registry.RegisterApiByName('compute', 'beta')
 
 
 class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsBetaTest):

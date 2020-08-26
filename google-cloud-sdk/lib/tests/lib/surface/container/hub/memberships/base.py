@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock as apimock
 from googlecloudsdk.api_lib.container.hub import gkehub_api_util
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.container.hub import api_util
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -39,6 +40,8 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
 
   def SetUp(self):
     self.api_version = gkehub_api_util.GetApiVersionForTrack(self.track)
+    self.exclusivity_msg = core_apis.GetMessagesModule(
+        self.MODULE_NAME, gkehub_api_util.GKEHUB_BETA_API_VERSION)
     self.messages = core_apis.GetMessagesModule(self.MODULE_NAME,
                                                 self.api_version)
     self.mocked_client = apimock.Client(
@@ -72,7 +75,8 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
                       description=None,
                       external_id=None,
                       gke_cluster_self_link=None,
-                      labels_dict=None):
+                      labels_dict=None,
+                      issuer_url=None):
     membership = self.messages.Membership(
         name=name,
         description=description,
@@ -82,6 +86,8 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
       membership.endpoint = self.messages.MembershipEndpoint(
           gkeCluster=self.messages.GkeCluster(
               resourceLink=gke_cluster_self_link))
+    if issuer_url:
+      membership.authority = self.messages.Authority(issuer=issuer_url)
     return membership
 
   def _MakeLabelsProto(self, labels_dict):
@@ -135,3 +141,13 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
         name=self.wait_operation_relative_name)
     self.mocked_client.projects_locations_operations.Get.Expect(
         req, response=operation, exception=exception)
+
+  def mockValidateExclusivitySucceed(self):
+    mock_validate_exclusivity = self.StartObjectPatch(api_util,
+                                                      'ValidateExclusivity')
+    mock_validate_exclusivity.return_value = self.exclusivity_msg.ValidateExclusivityResponse(
+        status=self.exclusivity_msg.GoogleRpcStatus(code=0))
+    mock_generate_exclusivity_manifest = self.StartObjectPatch(
+        api_util, 'GenerateExclusivityManifest')
+    mock_generate_exclusivity_manifest.return_value = self.exclusivity_msg.GenerateExclusivityManifestResponse(
+        crManifest='cr manifest', crdManifest='crd manifest')

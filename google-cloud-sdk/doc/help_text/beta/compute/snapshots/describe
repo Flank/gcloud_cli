@@ -1,6 +1,5 @@
 NAME
-    gcloud beta compute snapshots describe - describe a Google Compute Engine
-        snapshot
+    gcloud beta compute snapshots describe - describe a Compute Engine snapshot
 
 SYNOPSIS
     gcloud beta compute snapshots describe SNAPSHOT_NAME [GCLOUD_WIDE_FLAG ...]

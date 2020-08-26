@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.compute.images import flags
 from tests.lib import completer_test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.images import test_resources
 
 
 def _Uris(resources):

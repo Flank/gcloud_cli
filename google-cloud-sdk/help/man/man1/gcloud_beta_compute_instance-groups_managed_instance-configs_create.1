@@ -19,7 +19,7 @@ gcloud beta compute instance\-groups managed instance\-configs create \- create 
 
 \fB(BETA)\fR \fBgcloud beta compute instance\-groups managed instance\-configs
 create\fR creates a per\-instance config for an instance controlled by a Compute
-Engine managed instance group. An instance with a per instance config preserves
+Engine managed instance group. An instance with a per\-instance config preserves
 the specified metadata and/or disks during instance recreation and deletion.
 
 Once created, the config is applied immediately to the corresponding instance,
@@ -33,7 +33,7 @@ providing the \f5\fI\-\-no\-update\-instance\fR\fR flag.
 .RS 2m
 .TP 2m
 \fINAME\fR
-Name of the managed instance group to create a per instance config for.
+Name of the managed instance group to create a per\-instance config for.
 
 
 .RE
@@ -163,8 +163,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-Region of the managed instance group to create a per instance config for. If not
-specified, you may be prompted to select a region.
+Region of the managed instance group to create a per\-instance config for. If
+not specified, you may be prompted to select a region.
 
 A list of regions can be fetched by running:
 
@@ -177,7 +177,7 @@ invocation.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-Zone of the managed instance group to create a per instance config for. If not
+Zone of the managed instance group to create a per\-instance config for. If not
 specified, you may be prompted to select a zone.
 
 A list of zones can be fetched by running:
@@ -219,18 +219,19 @@ zones/us\-central1\-a/disks/my\-disk\-3 \e
     \-\-stateful\-metadata="my\-key=my\-value"
 .RE
 
-If \f5\fImy\-disk\fR\fR did not exist previously in the per instance config, and
-if it does not exist in the group's instance template, then the command adds
+If \f5\fImy\-disk\fR\fR did not exist previously in the per\-instance config,
+and if it does not exist in the group's instance template, then the command adds
 \f5\fImy\-disk\fR\fR to my\-instance.
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed instance\-configs create
 $ gcloud alpha compute instance\-groups managed instance\-configs \e
     create
 .RE

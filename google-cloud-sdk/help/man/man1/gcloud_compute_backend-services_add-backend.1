@@ -11,7 +11,7 @@ gcloud compute backend\-services add\-backend \- add a backend to a backend serv
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services add\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-global\-network\-endpoint\-group\fR\ |\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-balancing\-mode\fR=\fIBALANCING_MODE\fR] [\fB\-\-capacity\-scaler\fR=\fICAPACITY_SCALER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-failover\fR] [\fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR\ |\ \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR\ |\ \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR\ |\ \fB\-\-max\-rate\fR=\fIMAX_RATE\fR\ |\ \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR\ |\ \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services add\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-global\-network\-endpoint\-group\fR\ |\ \fB\-\-network\-endpoint\-group\-region\fR=\fINETWORK_ENDPOINT_GROUP_REGION\fR\ |\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-balancing\-mode\fR=\fIBALANCING_MODE\fR] [\fB\-\-capacity\-scaler\fR=\fICAPACITY_SCALER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-failover\fR] [\fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR\ |\ \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR\ |\ \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR\ |\ \fB\-\-max\-rate\fR=\fIMAX_RATE\fR\ |\ \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR\ |\ \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -144,6 +144,33 @@ At most one of these may be specified:
 If set, the network endpoint group is global.
 
 .TP 2m
+\fB\-\-network\-endpoint\-group\-region\fR=\fINETWORK_ENDPOINT_GROUP_REGION\fR
+Region of the network endpoint group to add to the backend service. If not
+specified, you may be prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
 \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR
 Zone of the network endpoint group to add to the backend service. If not
 specified and the \f5\fIcompute/zone\fR\fR property isn't set, you may be
@@ -188,7 +215,7 @@ fully loaded. For more information, see
 https://cloud.google.com/load\-balancing/docs/backend\-service#balancing\-mode.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 \fIBALANCING_MODE\fR must be one of:
 
@@ -255,7 +282,7 @@ allowed to continue until they close by normal means. This cannot be used for
 internal load balancing.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -355,7 +382,7 @@ endpoint group and instance group backends (except for regional managed instance
 groups).
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR
@@ -367,7 +394,7 @@ number of endpoints in the network endpoint group, then dividing by the number
 of healthy endpoints.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR
@@ -386,7 +413,7 @@ regional managed instance groups). Must not be defined if the backend is a
 managed instance group using load balancing\-based autoscaling.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR
@@ -397,7 +424,7 @@ calculated by multiplying \f5MAX_RATE_PER_ENDPOINT\fR by the number of endpoints
 in the network endpoint group, then dividing by the number of healthy endpoints.
 
 This cannot be used when the endpoint type of an attached network endpoint group
-is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+is INTERNET_IP_PORT, INTERNET_FQDN_PORT, or SERVERLESS.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR

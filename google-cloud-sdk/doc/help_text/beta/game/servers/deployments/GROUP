@@ -44,8 +44,9 @@ COMMANDS
         (BETA) Update a Deployment Rollout.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud game servers deployments
         $ gcloud alpha game servers deployments
 

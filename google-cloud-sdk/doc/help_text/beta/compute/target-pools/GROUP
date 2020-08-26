@@ -38,7 +38,7 @@ COMMANDS
         (BETA) Delete target pools.
 
      describe
-        (BETA) Describe a Google Compute Engine target pool.
+        (BETA) Describe a Compute Engine target pool.
 
      get-health
         (BETA) Get the health of instances in a target pool.

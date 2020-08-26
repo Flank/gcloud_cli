@@ -310,7 +310,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getIamPolicy?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           headers: {}
           body: null

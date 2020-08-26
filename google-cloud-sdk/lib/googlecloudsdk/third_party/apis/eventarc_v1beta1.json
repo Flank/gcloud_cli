@@ -3,7 +3,7 @@
   "discoveryVersion": "v1",
   "id": "eventarc:v1beta1",
   "name": "eventarc",
-  "canonicalName": "eventarc",
+  "canonicalName": "Eventarc",
   "version": "v1beta1",
   "revision": "0",
   "title": "Eventarc API",
@@ -515,12 +515,6 @@
       "properties": {
         "logType": {
           "description": "The log type that this config enables.",
-          "enumDescriptions": [
-            "Default case. Should never be this.",
-            "Admin reads. Example: CloudIAM getIamPolicy",
-            "Data writes. Example: CloudSQL Users create",
-            "Data reads. Example: CloudSQL Users list"
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default case. Should never be this.",

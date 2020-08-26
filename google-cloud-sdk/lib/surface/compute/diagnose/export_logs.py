@@ -45,7 +45,7 @@ It may take several minutes for this operation to complete.
 Logs will be made available shortly at:
 gs://{0}/{1}
 
-Status has be sent to the serial port and viewed by running:
+Status has been sent to the serial port and can be viewed by running:
 gcloud compute instances get-serial-port-output $VM-NAME$ \
 --project=$PROJECT$ --zone=$ZONE$"""
 DETAILED_HELP = {
@@ -63,7 +63,8 @@ For more information please refer to Collecting diagnostic information:
 """
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class ExportLogs(base_classes.BaseCommand):
   """Triggers instance to gather logs and upload them to a Cloud Storage Bucket.
 

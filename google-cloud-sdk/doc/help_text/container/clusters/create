@@ -12,15 +12,17 @@ SYNOPSIS
         [--create-subnetwork=[KEY=VALUE,...]]
         [--database-encryption-key=DATABASE_ENCRYPTION_KEY]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
-        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--no-enable-autoupgrade] [--enable-binauthz] [--enable-cloud-logging]
+        [--disable-default-snat] [--disk-size=DISK_SIZE]
+        [--disk-type=DISK_TYPE] [--enable-autorepair] [--no-enable-autoupgrade]
+        [--enable-binauthz] [--enable-cloud-logging]
         [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
-        [--enable-network-policy] [--enable-shielded-nodes]
-        [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
-        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
-        [--labels=[KEY=VALUE,...]] [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--enable-master-global-access] [--enable-network-policy]
+        [--enable-shielded-nodes] [--enable-stackdriver-kubernetes]
+        [--enable-vertical-pod-autoscaling] [--image-type=IMAGE_TYPE]
+        [--issue-client-certificate] [--labels=[KEY=VALUE,...]]
+        [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
@@ -120,7 +122,7 @@ FLAGS
         flag will be enabled. The others will be disabled. Default addons:
         HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
         HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        NetworkPolicy, CloudRun, NodeLocalDNS.
+        NetworkPolicy, CloudRun, NodeLocalDNS, ConfigConnector.
 
      --async
         Return immediately, without waiting for the operation in progress to
@@ -211,6 +213,17 @@ FLAGS
         pool, this flag value will be used.
 
         Must be used in conjunction with '--enable-ip-alias'.
+
+     --disable-default-snat
+        Disable default source NAT rules applied in cluster nodes.
+
+        By default, network traffic sending from Pods to outside of VPC will
+        get masqueraded by the node external IP. When this flag is set, no
+        default sNAT will be enforced on the cluster. The flag must be set if
+        the cluster uses privately used public IPs.
+
+        Must be used in conjunction with --enable-ip-alias and
+        --enable-private-nodes.
 
      --disk-size=DISK_SIZE
         Size for node VM boot disks. Defaults to 100GB.
@@ -311,6 +324,14 @@ FLAGS
         permissions instead, create or update your cluster with the option
         --no-enable-legacy-authorization.
 
+     --enable-master-global-access
+        Use with private clusters to allow access to the master's private
+        endpoint from any Google Cloud region or on-premises environment
+        regardless of the private cluster's region.
+
+        Must be used in conjunction with '--enable-ip-alias' and
+        '--enable-private-nodes'.
+
      --enable-network-policy
         Enable network policy enforcement for this cluster. If you are enabling
         network policy on an existing cluster the network policy addon must
@@ -367,9 +388,8 @@ FLAGS
         information.
 
      --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
-        The type of machine to use for nodes. Defaults to n1-standard-1. The
-        list of predefined machine types is available using the following
-        command:
+        The type of machine to use for nodes. Defaults to e2-medium. The list
+        of predefined machine types is available using the following command:
 
             $ gcloud compute machine-types list
 
@@ -453,6 +473,10 @@ FLAGS
         * kube-env
         * startup-script
         * user-data
+
+    Google Kubernetes Engine sets the following keys by default:
+
+      o serial-port-logging-enable
 
     See also Compute Engine's documentation
     (https://cloud.google.com/compute/docs/storing-retrieving-metadata) on

@@ -59,15 +59,12 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
           --zone central2-a
         """)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
 
   def testRestartMigrate(self):
     self.Run("""
@@ -78,16 +75,13 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(
-                  automaticRestart=True,
-                  onHostMaintenance=self.migrate),
+                  automaticRestart=True, onHostMaintenance=self.migrate),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testNoRestartMigrate(self):
     self.Run("""
@@ -98,16 +92,13 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(
-                  automaticRestart=False,
-                  onHostMaintenance=self.migrate),
+                  automaticRestart=False, onHostMaintenance=self.migrate),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testRestartTerminate(self):
     self.Run("""
@@ -118,16 +109,13 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(
-                  automaticRestart=True,
-                  onHostMaintenance=self.terminate),
+                  automaticRestart=True, onHostMaintenance=self.terminate),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testNoRestartTerminate(self):
     self.Run("""
@@ -138,16 +126,13 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(
-                  automaticRestart=False,
-                  onHostMaintenance=self.terminate),
+                  automaticRestart=False, onHostMaintenance=self.terminate),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testRestart(self):
     self.Run("""
@@ -157,14 +142,12 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(automaticRestart=True),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testNoRestart(self):
     self.Run("""
@@ -174,14 +157,12 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(automaticRestart=False),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testPreemptible(self):
     self.Run("""
@@ -191,14 +172,12 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
        """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(preemptible=True),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testPreemptibleOHMT(self):
     self.Run("""
@@ -209,18 +188,14 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
        """)
 
     expected = self.messages.Scheduling(
-        preemptible=True,
-        onHostMaintenance=self.terminate)
+        preemptible=True, onHostMaintenance=self.terminate)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=expected,
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=expected,
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
 
   def testMigrate(self):
     self.templateTestMigrate("""
@@ -239,16 +214,13 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
   def templateTestMigrate(self, cmd):
     self.Run(cmd)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(
-                  onHostMaintenance=self.migrate),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(
+                                 onHostMaintenance=self.migrate),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
 
   def testTerminate(self):
     self.Run("""
@@ -257,16 +229,13 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
           --zone central2-a
         """)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(
-                  onHostMaintenance=self.terminate),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(
+                                 onHostMaintenance=self.terminate),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
 
   def testUriSupport(self):
     self.Run("""
@@ -274,26 +243,22 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
           https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/instance-1
         """)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
 
   def testZonePrompting(self):
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.make_requests.side_effect = iter([
         [
             self.messages.Instance(name='instance-1', zone='central1-a'),
             self.messages.Instance(name='instance-1', zone='central1-b'),
             self.messages.Instance(name='instance-1', zone='central2-a'),
         ],
-
         [],
     ])
     self.WriteInput('3\n')
@@ -309,9 +274,7 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
     self.AssertErrContains('central2-a')
     self.CheckRequests(
         self.FilteredInstanceAggregateListRequest('instance-1'),
-
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(),
               instance='instance-1',
@@ -321,21 +284,22 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
 
   def _CheckNodeAffinityRequests(self, node_affinities):
     m = self.messages
-    self.CheckRequests([(
-        self.client.instances, 'SetScheduling',
-        m.ComputeInstancesSetSchedulingRequest(
-            instance='instance-1',
-            project='my-project',
-            scheduling=m.Scheduling(nodeAffinities=node_affinities),
-            zone='central2-a')
-    )])
+    self.CheckRequests([
+        (self.client.instances, 'SetScheduling',
+         m.ComputeInstancesSetSchedulingRequest(
+             instance='instance-1',
+             project='my-project',
+             scheduling=m.Scheduling(nodeAffinities=node_affinities),
+             zone='central2-a'))
+    ])
 
   def testSetSimpleNodeAffinityJson(self):
     node_affinities = [
         self.node_affinity(
             key='key1',
             operator=self.operator_enum.IN,
-            values=['value1', 'value2'])]
+            values=['value1', 'value2'])
+    ]
     contents = """\
 [{"operator": "IN", "values": ["value1", "value2"], "key": "key1"}]
     """
@@ -353,7 +317,8 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         self.node_affinity(
             key='key1',
             operator=self.operator_enum.IN,
-            values=['value1', 'value2'])]
+            values=['value1', 'value2'])
+    ]
     contents = """\
 - key: key1
   operator: IN
@@ -371,17 +336,14 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
   def testSetMultipleNodeAffinityMessages(self):
     node_affinities = [
         self.node_affinity(
-            key='key1',
-            operator=self.operator_enum.IN,
-            values=['value1']),
+            key='key1', operator=self.operator_enum.IN, values=['value1']),
         self.node_affinity(
             key='key2',
             operator=self.operator_enum.NOT_IN,
             values=['value2', 'value3']),
         self.node_affinity(
-            key='key3',
-            operator=self.operator_enum.IN,
-            values=[])]
+            key='key3', operator=self.operator_enum.IN, values=[])
+    ]
     contents = """\
 - key: key1
   operator: IN
@@ -478,7 +440,8 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
         self.node_affinity(
             key='compute.googleapis.com/node-group-name',
             operator=self.operator_enum.IN,
-            values=['my-node-group'])]
+            values=['my-node-group'])
+    ]
     self.Run("""
         compute instances set-scheduling instance-1 --zone central2-a
           --node-group my-node-group
@@ -510,12 +473,6 @@ class InstancesSetSchedulingTest(test_base.BaseTest, parameterized.TestCase):
 
     self._CheckNodeAffinityRequests(node_affinities)
 
-
-class InstancesSetSchedulingTestBeta(test_base.BaseTest):
-
-  def SetUp(self):
-    SetUp(self, 'beta')
-
   def testMinNodeCpuFlag(self):
     self.Run("""
         compute instances set-scheduling instance-1
@@ -524,15 +481,12 @@ class InstancesSetSchedulingTestBeta(test_base.BaseTest):
         """)
 
     self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
+        [(self.client.instances, 'SetScheduling',
           self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(
-                  minNodeCpus=10),
+              scheduling=self.messages.Scheduling(minNodeCpus=10),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
   def testClearMinNodeCpu(self):
     self.Run("""
@@ -541,15 +495,18 @@ class InstancesSetSchedulingTestBeta(test_base.BaseTest):
         --zone central2-a
       """)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
+
+
+class InstancesSetSchedulingTestBeta(test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'beta')
 
 
 class InstancesSetSchedulingTestAlpha(InstancesSetSchedulingTestBeta):
@@ -564,16 +521,13 @@ class InstancesSetSchedulingTestAlpha(InstancesSetSchedulingTestBeta):
           --zone central2-a
         """)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(
-                  onHostMaintenance=self.terminate),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(
+                                 onHostMaintenance=self.terminate),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
     self.AssertErrContains(
         'WARNING: The --maintenance-policy flag is now deprecated. '
         'Please use `--on-host-maintenance` instead')
@@ -585,16 +539,13 @@ class InstancesSetSchedulingTestAlpha(InstancesSetSchedulingTestBeta):
           --zone central2-a
         """)
 
-    self.CheckRequests(
-        [(self.client.instances,
-          'SetScheduling',
-          self.messages.ComputeInstancesSetSchedulingRequest(
-              scheduling=self.messages.Scheduling(
-                  onHostMaintenance=self.terminate),
-              instance='instance-1',
-              project='my-project',
-              zone='central2-a'))],
-    )
+    self.CheckRequests([(self.client.instances, 'SetScheduling',
+                         self.messages.ComputeInstancesSetSchedulingRequest(
+                             scheduling=self.messages.Scheduling(
+                                 onHostMaintenance=self.terminate),
+                             instance='instance-1',
+                             project='my-project',
+                             zone='central2-a'))],)
 
 
 if __name__ == '__main__':

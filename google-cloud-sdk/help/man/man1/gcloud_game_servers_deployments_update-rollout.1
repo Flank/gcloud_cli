@@ -1,0 +1,187 @@
+
+.TH "GCLOUD_GAME_SERVERS_DEPLOYMENTS_UPDATE\-ROLLOUT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud game servers deployments update\-rollout \- update a Deployment Rollout
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud game servers deployments update\-rollout\fR (\fIDEPLOYMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-dry\-run\fR [\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR] [\fB\-\-clear\-config\-overrides\fR\ |\ \fB\-\-config\-overrides\-file\fR=\fICONFIG_OVERRIDES_FILE\fR] [\fB\-\-clear\-default\-config\fR\ |\ \fB\-\-default\-config\fR=\fIDEFAULT_CONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update a Cloud Game Server Deployment Rollout.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Deployment resource \- Cloud Game Server Deployment Resource to update. The
+arguments in this group can be used to specify the attributes of this resource.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[deployment] on the command line with a fully specified name; set the property
+[core/project]; provide the argument [\-\-project] on the command line. This
+must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIDEPLOYMENT\fR
+ID of the deployment or fully qualified identifier for the deployment. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-dry\-run\fR
+Validate the rollout changes, but do not execute it.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR
+This attribute is only relevant for preview (\-\-dry\-run). It is used to
+validate the state for a future time.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-config\-overrides\fR
+Clear the config overrides.
+
+.TP 2m
+\fB\-\-config\-overrides\-file\fR=\fICONFIG_OVERRIDES_FILE\fR
+JSON/YAML file that specifies the Game Server config overrides. This file can be
+used to gradually rollout a new config version. The following sample file
+indicates that the version2 config is rolled out to realm\-1 and realm\-2 while
+the version3 config is deployed to realm\-3. The rest of the realms are deployed
+with the default config version (if one is specified). Contents of a sample yaml
+file:
+
+.RS 2m
+   \- realmsSelector:
+       realms:
+       \- projects/test\-project\-1/locations/us\-west1/realms/realm\-1
+       \- projects/test\-project\-1/locations/us\-west1/realms/realm\-2
+     configVersion: version2
+   \- realmsSelector:
+       realms:
+       \- projects/test\-project\-1/locations/us\-west1/realms/realm\-3
+     configVersion: version3
+.RE
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-default\-config\fR
+Clear the default config.
+
+.TP 2m
+\fB\-\-default\-config\fR=\fIDEFAULT_CONFIG\fR
+Game Server config to be deployed to all clusters. The value of this field must
+match an existing game server config that is a sub\-resource to the given game
+server deployment. If not specified, there won't be a default config which means
+only the clusters specified in the config overrides will have configs applied.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBgameservices/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/solutions/gaming/
+
+
+
+.SH "EXAMPLES"
+
+To update a rollout target with new default game server config:
+
+.RS 2m
+$ gcloud game servers deployments update\-rollout \e
+    example\-deployment \-\-default\-config=version1 \-\-no\-dry\-run
+.RE
+
+To set a rollout target gradually by setting overrides in a YAML file using the
+\f5\-\-config\-overrides\-file\fR flag:
+
+.RS 2m
+$ gcloud game servers deployments update\-rollout \e
+    example\-deployment \e
+    \-\-config\-overrides\-file=gs\-cfg\-overrides.yaml \-\-no\-dry\-run
+.RE
+
+Contents of gs\-cfg\-overrides.yaml:
+
+.RS 2m
+  \- realmsSelector:
+      realms:
+      \- projects/test\-project\-1/locations/us\-west1/realms/realm\-1
+      \- projects/test\-project\-1/locations/us\-west1/realms/realm\-2
+    configVersion: version2
+  \- realmsSelector:
+      realms:
+      \- projects/test\-project\-1/locations/us\-west1/realms/realm\-3
+    configVersion: version3
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha game servers deployments update\-rollout
+$ gcloud beta game servers deployments update\-rollout
+.RE
+

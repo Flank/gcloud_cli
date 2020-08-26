@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute org-security-policies create - create a Google Compute
-        Engine organization security policy
+    gcloud beta compute org-security-policies create - create a Compute Engine
+        organization security policy
 
 SYNOPSIS
     gcloud beta compute org-security-policies create

@@ -135,10 +135,10 @@ App Engine Metadata Servers. This feature can only be enabled if Workload
 Identity is enabled at the cluster level.
 .TP 2m
 \fBSECURE\fR
-[DPRECATED] Prevents pods not in hostNetwork from accessing certain VM metadata,
-specifically kube\-env, which contains Kubelet credentials, and the instance
-identity token. This is a temporary security solution available while the
-bootstrapping process for cluster nodes is being redesigned with significant
+[DEPRECATED] Prevents pods not in hostNetwork from accessing certain VM
+metadata, specifically kube\-env, which contains Kubelet credentials, and the
+instance identity token. This is a temporary security solution available while
+the bootstrapping process for cluster nodes is being redesigned with significant
 security improvements. This feature is scheduled to be deprecated in the future
 and later removed.
 .RE
@@ -313,7 +313,7 @@ $ gcloud alpha container node\-pools update node\-pool\-1 \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud container node\-pools update

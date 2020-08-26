@@ -84,9 +84,10 @@ Show what changed as a result of the update.
 
 .TP 2m
 \fB\-\-[no\-]enable\-bin\-log\fR
-Specified if binary log should be enabled. If backup configuration is disabled,
-binary log must be disabled as well. Use \fB\-\-enable\-bin\-log\fR to enable
-and \fB\-\-no\-enable\-bin\-log\fR to disable.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second. Must have automatic backups enabled to use. Make sure storage can
+support at least 7 days of logs. Use \fB\-\-enable\-bin\-log\fR to enable and
+\fB\-\-no\-enable\-bin\-log\fR to disable.
 
 .TP 2m
 \fB\-\-[no\-]enable\-database\-replication\fR
@@ -96,9 +97,9 @@ to enable and \fB\-\-no\-enable\-database\-replication\fR to disable.
 
 .TP 2m
 \fB\-\-enable\-point\-in\-time\-recovery\fR
-Specifies if point\-in\-time recovery (using write\-ahead log archiving) should
-be enabled. If backup configuration is disabled, point\-in\-time recovery must
-be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second, via write\-ahead logs. Must have automatic backups enabled to use. Make
+sure storage can support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR

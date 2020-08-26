@@ -56,6 +56,7 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
     mock_context = mock.Mock()
     mock_context.__enter__ = mock.Mock(return_value=mock_context)
     mock_context.__exit__ = mock.Mock(return_value=False)
+    mock_context.IsCluster = mock.Mock(return_value=False)
     mock_context.supports_one_platform = False
     mock_context.api_version = api_version
     mock_context.region = None
@@ -64,7 +65,6 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
       self.assertEqual(eventflow_client._client, self.mock_client)
       self.assertEqual(eventflow_client._core_client, self.mock_client)
       self.assertEqual(eventflow_client._crd_client, self.mock_client)
-      self.assertEqual(eventflow_client._op_client, self.mock_client)
       self.assertEqual(eventflow_client._api_version, api_version)
       self.assertIsNone(eventflow_client._region)
 
@@ -83,7 +83,6 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
       self.assertEqual(eventflow_client._client, self.mock_client)
       self.assertIsNone(eventflow_client._core_client)
       self.assertEqual(eventflow_client._crd_client, self.mock_client)
-      self.assertEqual(eventflow_client._op_client, self.mock_client)
       self.assertEqual(eventflow_client._api_version, api_version)
       self.assertEqual(eventflow_client._region, region)
 
@@ -93,7 +92,7 @@ class EventflowOperationsTest(base.EventsBase):
   def SetUp(self):
     self.eventflow_client = eventflow_operations.EventflowOperations(
         self.mock_client, self.api_version, self.region, self.mock_core_client,
-        self.mock_crd_client, self.mock_client)
+        self.mock_crd_client)
     self.StartObjectPatch(random, 'random', return_value=0)
     self.StartObjectPatch(util, 'WaitForCondition')
     gsa_key = apis.GetMessagesModule('iam', 'v1').ServiceAccountKey(

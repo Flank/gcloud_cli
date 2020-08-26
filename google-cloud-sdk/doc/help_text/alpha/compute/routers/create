@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute routers create - create a Google Compute Engine router
+    gcloud alpha compute routers create - create a Compute Engine router
 
 SYNOPSIS
     gcloud alpha compute routers create NAME --network=NETWORK
@@ -92,7 +92,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers create
         $ gcloud beta compute routers create

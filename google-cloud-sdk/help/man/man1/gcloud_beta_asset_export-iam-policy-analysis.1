@@ -11,7 +11,7 @@ gcloud beta asset export\-iam\-policy\-analysis \- export IAM policy analysis th
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta asset export\-iam\-policy\-analysis\fR \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR) [\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR] [\fB\-\-identity\fR=\fIIDENTITY\fR] [\fB\-\-expand\-groups\fR\ \fB\-\-expand\-resources\fR\ \fB\-\-expand\-roles\fR\ \fB\-\-output\-group\-edges\fR\ \fB\-\-output\-resource\-edges\fR] [\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]\ \fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta asset export\-iam\-policy\-analysis\fR \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR] [\fB\-\-identity\fR=\fIIDENTITY\fR] [\fB\-\-analyze\-service\-account\-impersonation\fR\ \fB\-\-expand\-groups\fR\ \fB\-\-expand\-resources\fR\ \fB\-\-expand\-roles\fR\ \fB\-\-output\-group\-edges\fR\ \fB\-\-output\-resource\-edges\fR] [\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]\ \fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -50,6 +50,10 @@ The folder ID to perform the analysis.
 \fB\-\-organization\fR=\fIORGANIZATION_ID\fR
 The organization ID to perform the analysis.
 
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+The project ID or number to perform the analysis.
+
 
 .RE
 .RE
@@ -85,6 +89,11 @@ The identity appearing in the form of members in the IAM policy binding.
 The analysis options.
 
 .RS 2m
+.TP 2m
+\fB\-\-analyze\-service\-account\-impersonation\fR
+If true, the response will include access analysis from identities to resources
+via service account impersonation. Default is false.
+
 .TP 2m
 \fB\-\-expand\-groups\fR
 If true, the identities section of the result will expand any Google groups
@@ -171,6 +180,16 @@ $ gcloud beta asset export\-iam\-policy\-analysis \e
     \-\-organization=YOUR_ORG_ID \e
     \-\-full\-resource\-name=YOUR_PROJECT_FULL_RESOURCE_NAME \e
     \-\-identity='user:u1@foo.com' \e
+    \-\-output\-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
+.RE
+
+To find out which users have been granted the iam.serviceAccounts.actAs
+permission on any applicable resources, run:
+
+.RS 2m
+$ gcloud beta asset export\-iam\-policy\-analysis \e
+    \-\-organization=YOUR_ORG_ID \e
+    \-\-permissions='iam.serviceAccounts.actAs' \e
     \-\-output\-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
 .RE
 

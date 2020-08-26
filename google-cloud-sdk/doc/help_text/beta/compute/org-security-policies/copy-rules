@@ -1,7 +1,7 @@
 NAME
     gcloud beta compute org-security-policies copy-rules - replace the rules of
-        a Google Compute Engine organization security policy with rules from
-        another policy
+        a Compute Engine organization security policy with rules from another
+        policy
 
 SYNOPSIS
     gcloud beta compute org-security-policies copy-rules SECURITY_POLICY

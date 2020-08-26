@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud alpha identity groups create EMAIL --labels=LABELS
         --organization=ORGANIZATION [--description=DESCRIPTION]
         [--display-name=DISPLAY_NAME] [--dynamic-user-query=DYNAMIC_USER_QUERY]
-        [--with-initial-owner=WITH_INITIAL_OWNER] [GCLOUD_WIDE_FLAG ...]
+        [--posix-group=POSIX_GROUP] [--with-initial-owner=WITH_INITIAL_OWNER]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new group.
@@ -38,6 +39,15 @@ OPTIONAL FLAGS
         Example of a query:
         --dynamic-user-query="user.organizations.exists(org,org.title=='SWE')"
 
+     --posix-group=POSIX_GROUP
+        Group id (gid) and name of the POSIX group that you want to associate
+        with the specified Cloud Identity group. You can specify multiple POSIX
+        groups with multiple instances of this flag.
+
+        For example, use '--posix-group=gid=1005,name=eng' to add a single
+        group, or '--posix-group=gid=1005,name=eng
+        --posix-group=gid=1006,name=docs' to add multiple groups.
+
      --with-initial-owner=WITH_INITIAL_OWNER
         If specified the user making the request will be added as the initial
         owner of the group being created. WITH_INITIAL_OWNER must be one of:
@@ -69,7 +79,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta identity groups create
 

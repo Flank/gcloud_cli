@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha admin-service-cluster instances - manage Admin Service Cluster
+        instances
+
+SYNOPSIS
+    gcloud alpha admin-service-cluster instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing Google Cloud Admin Service Cluster Instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create Admin Service Cluster instances.
+
+     delete
+        (ALPHA) Delete Admin Service Cluster instances.
+
+     describe
+        (ALPHA) Describe Admin Service Cluster instances.
+
+     list
+        (ALPHA) List Admin Service Cluster instances.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

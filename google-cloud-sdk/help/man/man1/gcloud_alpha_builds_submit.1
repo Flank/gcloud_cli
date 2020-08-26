@@ -11,7 +11,7 @@ gcloud alpha builds submit \- submit a build using Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-pack\fR=[\fIbuilder\fR=\fIBUILDER\fR],[\fIenv\fR=\fIENV\fR],[\fIimage\fR=\fIIMAGE\fR]\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-worker\-pool\fR=\fIWORKER_POOL\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-pack\fR=[\fIbuilder\fR=\fIBUILDER\fR],[\fIenv\fR=\fIENV\fR],[\fIimage\fR=\fIIMAGE\fR]\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -97,6 +97,12 @@ Machine type used to run the build. \fIMACHINE_TYPE\fR must be one of:
 \fBn1\-highcpu\-32\fR, \fBn1\-highcpu\-8\fR.
 
 .TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
+
+.TP 2m
 \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 Parameters to be substituted in the build specification.
 
@@ -128,6 +134,12 @@ and five seconds. If you don't specify a unit, seconds is assumed. For example,
 for this command invocation.
 
 .TP 2m
+\fB\-\-worker\-pool\fR=\fIWORKER_POOL\fR
+Specify a worker pool for the build to run in. Format:
+projects/{project}/locations/{region}/workerPools/{workerPool}. This field is
+restricted to custom workers beta users.
+
+.TP 2m
 
 At most one of these may be specified:
 
@@ -144,7 +156,7 @@ or pkg.dev namespaces. By default gcr.io/buildpacks/builder will be used. To
 specify your own builder image use the optional "builder" key/value argument. To
 pass environment variables to the builder use the optional "env" key/value
 argument where value is a list of key values using escaping
-(https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if neccessary.
+(https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if necessary.
 
 .TP 2m
 \fR\-\-tag\fB=\fITAG\fR, \fR\-t\fB \fITAG\fR
@@ -208,7 +220,7 @@ components install cloud\-build\-local\fR.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud builds submit

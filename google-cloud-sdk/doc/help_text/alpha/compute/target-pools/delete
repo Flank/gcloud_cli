@@ -6,7 +6,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute target-pools delete deletes one or more Google
+    (ALPHA) gcloud alpha compute target-pools delete deletes one or more
     Compute Engine target pools.
 
 POSITIONAL ARGUMENTS
@@ -46,7 +46,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute target-pools delete
         $ gcloud beta compute target-pools delete

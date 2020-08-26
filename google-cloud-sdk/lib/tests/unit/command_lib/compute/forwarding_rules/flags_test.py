@@ -44,7 +44,7 @@ class FlagsTest(test_case.TestCase):
   def testIPProtocolsGA(self):
     expected_choices = sorted(
         v1_messages.ForwardingRule.IPProtocolValueValuesEnum.names())
-    flags.AddIPProtocols(self.parser)
+    flags.AddIPProtocols(self.parser, support_all_protocol=False)
     self.assertEqual(expected_choices, self.choices)
 
 

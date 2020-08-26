@@ -1,13 +1,12 @@
 NAME
-    gcloud beta compute regions describe - describe a Google Compute Engine
-        region
+    gcloud beta compute regions describe - describe a Compute Engine region
 
 SYNOPSIS
     gcloud beta compute regions describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute regions describe displays all data associated
-    with a Google Compute Engine region.
+    with a Compute Engine region.
 
 POSITIONAL ARGUMENTS
      NAME

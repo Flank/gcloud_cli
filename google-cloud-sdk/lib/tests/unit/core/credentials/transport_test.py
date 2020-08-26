@@ -77,9 +77,6 @@ class RequestWrapper(creds_transport.CredentialWrappingMixin,
   def DecodeResponse(self, response, response_encoding):
     return response
 
-  def AttachCredentials(self, http_client, orig_request):
-    pass
-
   def AuthorizeClient(self, http_client, credentials):
     return http_client
 

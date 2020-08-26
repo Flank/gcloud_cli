@@ -98,6 +98,14 @@ AGENT_OS_TYPE = agent_policy.OpsAgentPolicy.Assignment.OsType(
     agent_policy.OpsAgentPolicy.Assignment.OsType.OsShortName.CENTOS, '7')
 AGENT_ASSIGNMENT = agent_policy.OpsAgentPolicy.Assignment(
     GROUP_LABELS, ZONES, INSTANCES, [AGENT_OS_TYPE])
+OPS_AGENT_POLICY = agent_policy.OpsAgentPolicy(
+    assignment=AGENT_ASSIGNMENT,
+    agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
+    create_time=CREATE_TIME,
+    description=OPS_AGENT_DESCRIPTION,
+    etag=ETAG,
+    update_time=UPDATE_TIME,
+    name=NAME)
 
 
 class OpsAgentPolicyTest(test_case.TestCase):
@@ -106,26 +114,11 @@ class OpsAgentPolicyTest(test_case.TestCase):
     self.maxDiff = None  # pylint: disable=invalid-name
 
   def testEqual(self):
-    policy1 = agent_policy.OpsAgentPolicy(AGENT_ASSIGNMENT,
-                                          OPS_AGENT_POLICY_AGENT_RULES,
-                                          OPS_AGENT_DESCRIPTION)
-    policy2 = agent_policy.OpsAgentPolicy(AGENT_ASSIGNMENT,
-                                          OPS_AGENT_POLICY_AGENT_RULES,
-                                          OPS_AGENT_DESCRIPTION)
-    self.assertEqual(policy1, policy2)
+    self.assertEqual(OPS_AGENT_POLICY, OPS_AGENT_POLICY)
 
   def testRepr(self):
-    policy = agent_policy.OpsAgentPolicy(
-        assignment=AGENT_ASSIGNMENT,
-        agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
-        create_time=CREATE_TIME,
-        description=OPS_AGENT_DESCRIPTION,
-        etag=ETAG,
-        update_time=UPDATE_TIME,
-        name=NAME,
-    )
-    self.assertMultiLineEqual(POLICY_JSON, repr(policy))
-    self.assertMultiLineEqual(POLICY_JSON, six.text_type(policy))
+    self.assertMultiLineEqual(POLICY_JSON, repr(OPS_AGENT_POLICY))
+    self.assertMultiLineEqual(POLICY_JSON, six.text_type(OPS_AGENT_POLICY))
 
 
 class CreateOpsAgentPolicyTest(test_case.TestCase):
@@ -164,52 +157,73 @@ class UpdateOpsAgentsPolicyTest(test_case.TestCase):
     self.maxDiff = None  # pylint: disable=invalid-name
 
   def testUpdateOpsAgentsPolicyWithClearMatcher(self):
-    original_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        AGENT_ASSIGNMENT, OPS_AGENT_POLICY_AGENT_RULES, OPS_AGENT_DESCRIPTION)
-    updated_assignment = agent_policy.OpsAgentPolicy.Assignment(
-        group_labels=[],
-        zones=['us-central1-c'],
-        instances=[],
-        os_types=[AGENT_OS_TYPE])
-    updated_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        updated_assignment, OPS_AGENT_POLICY_AGENT_RULES, OPS_AGENT_DESCRIPTION)
-    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
-        ops_agents_policy=original_ops_agents_policy,
+    expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=[],
+            zones=['us-central1-c'],
+            instances=[],
+            os_types=[AGENT_OS_TYPE]),
+        agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
+        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
+        etag=ETAG,
+        update_time=None,
+        name=NAME)
+
+    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
+        ops_agents_policy=OPS_AGENT_POLICY,
+        description=OPS_AGENT_DESCRIPTION,
+        etag=None,
         agent_rules=None,
         os_types=None,
         group_labels=[],
         zones=['us-central1-c'],
         instances=[])
     self.assertEqual(
-        repr(updated_ops_agents_policy), repr(actual_ops_agents_policy))
+        repr(expected_ops_agents_policy), repr(actual_ops_agents_policy))
 
   def testUpdateOpsAgentsPolicyWithNoneMatcher(self):
-    original_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        AGENT_ASSIGNMENT, OPS_AGENT_POLICY_AGENT_RULES, OPS_AGENT_DESCRIPTION)
-    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
-        ops_agents_policy=original_ops_agents_policy,
+    expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
+        assignment=AGENT_ASSIGNMENT,
+        agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
+        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
+        etag=ETAG,
+        update_time=None,
+        name=NAME)
+
+    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
+        ops_agents_policy=OPS_AGENT_POLICY,
+        description=None,
+        etag=None,
         agent_rules=None,
         os_types=None,
         group_labels=None,
         zones=None,
         instances=None)
     self.assertEqual(
-        repr(original_ops_agents_policy), repr(actual_ops_agents_policy))
+        repr(expected_ops_agents_policy), repr(actual_ops_agents_policy))
 
   def testUpdateOpsAgentsPolicyWithUpdatingAgents(self):
-    original_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        AGENT_ASSIGNMENT, OPS_AGENT_POLICY_AGENT_RULES, OPS_AGENT_DESCRIPTION)
-    updated_metrics_agent_rule = agent_policy.OpsAgentPolicy.AgentRule(
-        agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS, '6.*.*',
-        agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, False)
-    updated_agent_rules = [updated_metrics_agent_rule]
-    updated_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        AGENT_ASSIGNMENT, updated_agent_rules, OPS_AGENT_DESCRIPTION)
-    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
-        ops_agents_policy=original_ops_agents_policy,
+    metrics = agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS
+    installed = agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED
+    expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
+        assignment=AGENT_ASSIGNMENT,
+        agent_rules=[agent_policy.OpsAgentPolicy.AgentRule(
+            agent_type=metrics,
+            version='6.*.*',
+            package_state=installed,
+            enable_autoupgrade=False)],
+        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
+        etag=ETAG,
+        update_time=None,
+        name=NAME)
+
+    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
+        ops_agents_policy=OPS_AGENT_POLICY,
+        description=OPS_AGENT_DESCRIPTION,
+        etag=None,
         agent_rules=[{
             'type': 'metrics',
             'version': '6.*.*',
@@ -221,4 +235,29 @@ class UpdateOpsAgentsPolicyTest(test_case.TestCase):
         zones=None,
         instances=None)
     self.assertEqual(
-        repr(updated_ops_agents_policy), repr(actual_ops_agents_policy))
+        repr(expected_ops_agents_policy), repr(actual_ops_agents_policy))
+
+  def testUpdateOpsAgentsPolicyWithUpdatingEtag(self):
+    new_etag = '38dd4394-1550-48fd-8d70-c0e31142fadd'
+    self.assertNotEqual(new_etag, ETAG)
+
+    expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
+        assignment=AGENT_ASSIGNMENT,
+        agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
+        create_time=CREATE_TIME,
+        description=OPS_AGENT_DESCRIPTION,
+        etag=new_etag,
+        update_time=None,
+        name=NAME)
+
+    actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
+        ops_agents_policy=OPS_AGENT_POLICY,
+        description=None,
+        etag=new_etag,
+        agent_rules=None,
+        os_types=None,
+        group_labels=None,
+        zones=None,
+        instances=None)
+    self.assertEqual(
+        repr(expected_ops_agents_policy), repr(actual_ops_agents_policy))

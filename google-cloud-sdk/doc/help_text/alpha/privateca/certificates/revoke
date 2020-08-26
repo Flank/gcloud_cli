@@ -21,8 +21,9 @@ REQUIRED FLAGS
        specified name; provide the argument [--project] on the command line;
        set the property [core/project]. To set the [issuer-location] attribute:
        provide the argument [--certificate] on the command line with a fully
-       specified name. To set the [issuer] attribute: provide the argument
-       [--certificate] on the command line with a fully specified name.
+       specified name; set the property [privateca/location]. To set the
+       [issuer] attribute: provide the argument [--certificate] on the command
+       line with a fully specified name.
 
          --certificate=CERTIFICATE
             ID of the certificate or fully qualified identifier for the
@@ -84,5 +85,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

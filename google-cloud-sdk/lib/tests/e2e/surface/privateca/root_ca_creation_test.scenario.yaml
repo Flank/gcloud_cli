@@ -10,8 +10,6 @@ summary:
     - message: Creating Certificate Authority.
     - status: SUCCESS
   - stderr: |
-      Creating the initial Certificate Revocation List.
-  - stderr: |
       Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
 - execute:
   - command: privateca roots delete $$ca-name$$ --location $$location$$
@@ -370,33 +368,7 @@ actions:
         message: Creating Certificate Authority.
         status: SUCCESS
     - expect_stderr: |
-        Creating the initial Certificate Revocation List.
         Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '659'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            pemCrl: |
-              -----BEGIN X509 CRL-----
-              MIIBqTCBkgIBATANBgkqhkiG9w0BAQsFADAtMRMwEQYDVQQKEwpHb29nbGUgTExD
-              MRYwFAYDVQQDEw1TY2VuYXJpbyBUZXN0Fw0yMDA2MDEyMzI5MjVaFw0yMDA2MDgy
-              MzI5MjVaMACgLzAtMAoGA1UdFAQDAgEAMB8GA1UdIwQYMBaAFGbxNPwiuNMmWZcN
-              Txhn/RDc0L8RMA0GCSqGSIb3DQEBCwUAA4IBAQCi8sqq94UYZVsGplOS4gntRUA0
-              D2S+BxQJEYmS6M5N0S47Va+WvJduhDTSQHSP5EoS9MM+WFH1jH+Wp/jwzYSwHz1Z
-              4Vl5fdEN1CvGpnq0j2ElNp0QqMFeM0crN7FeOvIXWhe+XbT3VwLsqYsF65NNO99q
-              5HJbpHDrzkjWOi4cnYVR+ffZWwtQzqUcYNPfRAVxadFqBBcSHUMqtupU3CguQcSs
-              2W61wAfkvm6eLX5IXPPpy+o0HY6UAElhNd6l9utssL/Rjfjb2ktXKAUTl8b4RnDa
-              YgM5Q+65s9zYwbz1DI/3nJAmLnXKNXyta71ZqmcnkfJO0DzOqiGLtTLH6a4A
-              -----END X509 CRL-----
     - expect_exit:
         code: 0
 - execute_command:

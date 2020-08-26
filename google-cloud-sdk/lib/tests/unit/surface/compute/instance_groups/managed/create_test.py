@@ -321,7 +321,7 @@ class _InstanceGroupManagersCreateRegionalWithStatefulTestBase(
 
 class InstanceGroupManagersCreateZonalTestGA(
     _InstanceGroupManagersCreateZonalWithAutohealingTestBase,
-    test_base.BaseTest):
+    _InstanceGroupManagersCreateZonalWithStatefulTestBase, test_base.BaseTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -604,7 +604,6 @@ class InstanceGroupManagersCreateZonalTestGA(
 
 
 class InstanceGroupManagersCreateZonalTestBeta(
-    _InstanceGroupManagersCreateZonalWithStatefulTestBase,
     InstanceGroupManagersCreateZonalTestGA):
 
   def PreSetUp(self):
@@ -1118,7 +1117,8 @@ class InstanceGroupManagersCreateRegionalTestAlpha(
   def SetUp(self):
     self._SetUpRegional('alpha')
 
-  @parameterized.named_parameters(('Any', 'ANY'), ('Even', 'EVEN'))
+  @parameterized.named_parameters(('Any', 'ANY'), ('Even', 'EVEN'),
+                                  ('Balanced', 'BALANCED'))
   def testCreateWithDistributionTargetShape(self, target_shape):
     self.Run("""
         compute instance-groups managed create group-1
@@ -1146,7 +1146,8 @@ class InstanceGroupManagersCreateRegionalTestAlpha(
         self.region_as_list_request,
     )
 
-  @parameterized.named_parameters(('Any', 'ANY'), ('Even', 'EVEN'))
+  @parameterized.named_parameters(('Any', 'ANY'), ('Even', 'EVEN'),
+                                  ('Balanced', 'BALANCED'))
   def testCreateForZonalScopeWithDistributionTargetShape(self, target_shape):
     self.make_requests.side_effect = iter([
         [

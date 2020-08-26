@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.container.hub import api_util
 from tests.lib import test_case
 from tests.lib.surface.container.hub.memberships import base
 
@@ -124,6 +125,34 @@ class CreateTest(base.MembershipsTestBase):
         'foo=bar,baz=bar',
     ])
 
+  def testCreateMembership(self):
+    membership = self._MakeMembership(
+        name=self.membership,
+        description='test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID)
+    response = encoding.PyValueToMessage(self.messages.Operation.ResponseValue,
+                                         encoding.MessageToPyValue(membership))
+    create_membership = self._MakeMembership(
+        name=None,
+        description='test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID)
+    operation = self._MakeOperation()
+    self.mocked_client.projects_locations_memberships.Create.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsCreateRequest(
+            parent=self.parent,
+            membershipId=self.MEMBERSHIP_NAME,
+            membership=create_membership),
+        response=operation)
+    operation = self._MakeOperation(done=True, response=response)
+    self.ExpectGetOperation(operation)
+    self.ExpectGetMembership(membership)
+    api_util.CreateMembership(
+        self.Project(),
+        self.MEMBERSHIP_NAME,
+        'test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID,
+        release_track=calliope_base.ReleaseTrack.GA)
+
 
 class CreateTestBeta(CreateTest):
   """gcloud Beta track using GKE Hub API."""
@@ -226,12 +255,68 @@ class CreateTestBeta(CreateTest):
         'foo=bar,baz=bar',
     ])
 
+  def testCreateMembership(self):
+    membership = self._MakeMembership(
+        name=self.membership,
+        description='test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID)
+    response = encoding.PyValueToMessage(self.messages.Operation.ResponseValue,
+                                         encoding.MessageToPyValue(membership))
+    create_membership = self._MakeMembership(
+        name=None,
+        description='test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID)
+    operation = self._MakeOperation()
+    self.mocked_client.projects_locations_memberships.Create.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsCreateRequest(
+            parent=self.parent,
+            membershipId=self.MEMBERSHIP_NAME,
+            membership=create_membership),
+        response=operation)
+    operation = self._MakeOperation(done=True, response=response)
+    self.ExpectGetOperation(operation)
+    self.ExpectGetMembership(membership)
+    api_util.CreateMembership(
+        self.Project(),
+        self.MEMBERSHIP_NAME,
+        'test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID,
+        release_track=calliope_base.ReleaseTrack.BETA)
+
 
 class CreateTestAlpha(CreateTest):
   """gcloud Alpha track using GKE Hub API."""
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateMembership(self):
+    membership = self._MakeMembership(
+        name=self.membership,
+        description='test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID)
+    response = encoding.PyValueToMessage(self.messages.Operation.ResponseValue,
+                                         encoding.MessageToPyValue(membership))
+    create_membership = self._MakeMembership(
+        name=None,
+        description='test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID)
+    operation = self._MakeOperation()
+    self.mocked_client.projects_locations_memberships.Create.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsCreateRequest(
+            parent=self.parent,
+            membershipId=self.MEMBERSHIP_NAME,
+            membership=create_membership),
+        response=operation)
+    operation = self._MakeOperation(done=True, response=response)
+    self.ExpectGetOperation(operation)
+    self.ExpectGetMembership(membership)
+    api_util.CreateMembership(
+        self.Project(),
+        self.MEMBERSHIP_NAME,
+        'test-membership',
+        external_id=self.MEMBERSHIP_EXTERNAL_ID,
+        release_track=calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

@@ -27,6 +27,9 @@ COMMANDS
      create
         (BETA) Create Compute Engine commitments.
 
+     create-license
+        (BETA) Create Compute Engine license-based commitments.
+
      describe
         (BETA) Describe a Compute Engine commitment.
 

@@ -446,7 +446,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
+                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access allowlist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
                   }
                 },
                 "subgroup-command-a": {
@@ -554,7 +554,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
+                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access allowlist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
                   }
                 }
               },
@@ -614,7 +614,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests subgroup.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access allowlist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
               }
             }
           },
@@ -673,7 +673,7 @@
           "release": "ALPHA",
           "sections": {
             "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests second level group.",
-            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
+            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access allowlist.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
           }
         }
       },
@@ -731,7 +731,7 @@
       "release": "ALPHA",
       "sections": {
         "DESCRIPTION": "*(ALPHA)*  Alpha versions of gcloud commands.",
-        "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
+        "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access allowlist."
       }
     },
     "beta": {

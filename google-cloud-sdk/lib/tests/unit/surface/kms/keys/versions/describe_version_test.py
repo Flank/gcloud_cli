@@ -34,12 +34,20 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
   def SetUp(self):
     self.key_name = self.project_name.CryptoKey('global/my_kr/my_key/')
     self.version_name = self.key_name.Version('3')
+    self.attestation = self.messages.KeyOperationAttestation(
+        format=self.messages.KeyOperationAttestation.FormatValueValuesEnum
+        .CAVIUM_V1_COMPRESSED,
+        content=b'attestation content',
+        certChains=self.messages.CertificateChains(
+            caviumCerts=('cavium_partition_cert', 'cavium_card_cert'),
+            googleCardCerts=('google_card_cert',),
+            googlePartitionCerts=('google_partition_cert',)))
 
   def testDescribe(self):
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
             name=self.version_name.RelativeName()),
         self.messages.CryptoKeyVersion(name=self.version_name.RelativeName()))
 
@@ -57,34 +65,32 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'Invalid value for [version]: version id must be non-empty.'):
-      self.Run('kms keys versions describe {0}/cryptoKeyVersions/'
-               .format(self.key_name.RelativeName()))
+      self.Run('kms keys versions describe {0}/cryptoKeyVersions/'.format(
+          self.key_name.RelativeName()))
 
   def testDescribeHsmKeyVersionWithAttestation(self):
     attestation_file_path = self.Touch(self.temp_path)
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
             name=self.version_name.RelativeName()),
         self.messages.CryptoKeyVersion(
             name=self.version_name.RelativeName(),
-            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum.
-            GOOGLE_SYMMETRIC_ENCRYPTION,
-            protectionLevel=self.messages.CryptoKeyVersion.
-            ProtectionLevelValueValuesEnum.HSM,
-            attestation=self.messages.KeyOperationAttestation(
-                format=self.messages.KeyOperationAttestation.
-                FormatValueValuesEnum.CAVIUM_V1_COMPRESSED,
-                content=b'attestation content')))
+            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum
+            .GOOGLE_SYMMETRIC_ENCRYPTION,
+            protectionLevel=self.messages.CryptoKeyVersion
+            .ProtectionLevelValueValuesEnum.HSM,
+            attestation=self.attestation))
 
     self.Run(
         'kms keys versions describe {0} --location={1} --keyring={2} --key={3} '
-        '--attestation-file={4}'
-        .format(self.version_name.version_id, self.version_name.location_id,
-                self.version_name.key_ring_id, self.version_name.crypto_key_id,
-                attestation_file_path))
+        '--attestation-file={4}'.format(self.version_name.version_id,
+                                        self.version_name.location_id,
+                                        self.version_name.key_ring_id,
+                                        self.version_name.crypto_key_id,
+                                        attestation_file_path))
 
     self.AssertOutputContains(
         'name: {}'.format(self.key_name.RelativeName()), normalize_space=True)
@@ -93,6 +99,9 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
     # The attestation 'content' subfield should be omitted from the output,
     # since it's written to the file instead.
     self.AssertOutputNotContains('content:')
+    # The attestation 'certChains' subfield should be omitted from the output,
+    # since they are retrieved using the get-certificate-chain command.
+    self.AssertOutputNotContains('certChains:')
 
     self.AssertBinaryFileEquals(b'attestation content', attestation_file_path)
 
@@ -101,19 +110,16 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
             name=self.version_name.RelativeName()),
         self.messages.CryptoKeyVersion(
             name=self.version_name.RelativeName(),
-            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum.
-            GOOGLE_SYMMETRIC_ENCRYPTION,
-            protectionLevel=self.messages.CryptoKeyVersion.
-            ProtectionLevelValueValuesEnum.HSM,
-            attestation=self.messages.KeyOperationAttestation(
-                format=self.messages.KeyOperationAttestation.
-                FormatValueValuesEnum.CAVIUM_V1_COMPRESSED,
-                content=b'attestation content')))
+            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum
+            .GOOGLE_SYMMETRIC_ENCRYPTION,
+            protectionLevel=self.messages.CryptoKeyVersion
+            .ProtectionLevelValueValuesEnum.HSM,
+            attestation=self.attestation))
 
     self.Run(
         'kms keys versions describe {0} --location={1} --keyring={2} --key={3}'
@@ -126,6 +132,8 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
     self.AssertOutputContains('format: CAVIUM_V1_COMPRESSED')
     # The attestation 'content' subfield should be omitted from the output.
     self.AssertOutputNotContains('content:')
+    # The attestation 'certChains' subfield should be omitted from the output,
+    self.AssertOutputNotContains('certChains:')
 
     self.AssertBinaryFileEquals(b'', attestation_file_path)
 
@@ -134,25 +142,24 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
             name=self.version_name.RelativeName()),
         self.messages.CryptoKeyVersion(
             name=self.version_name.RelativeName(),
-            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum.
-            GOOGLE_SYMMETRIC_ENCRYPTION,
-            protectionLevel=self.messages.CryptoKeyVersion.
-            ProtectionLevelValueValuesEnum.SOFTWARE))
+            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum
+            .GOOGLE_SYMMETRIC_ENCRYPTION,
+            protectionLevel=self.messages.CryptoKeyVersion
+            .ProtectionLevelValueValuesEnum.SOFTWARE))
 
     with self.AssertRaisesExceptionMatches(
         exceptions.ToolException,
         'Attestations are only available for HSM key versions.'):
-      self.Run(
-          'kms keys versions describe {0} --location={1} --keyring={2} '
-          '--key={3} --attestation-file={4}'
-          .format(self.version_name.version_id, self.version_name.location_id,
-                  self.version_name.key_ring_id,
-                  self.version_name.crypto_key_id, attestation_file_path))
+      self.Run('kms keys versions describe {0} --location={1} --keyring={2} '
+               '--key={3} --attestation-file={4}'.format(
+                   self.version_name.version_id, self.version_name.location_id,
+                   self.version_name.key_ring_id,
+                   self.version_name.crypto_key_id, attestation_file_path))
 
     self.AssertBinaryFileEquals(b'', attestation_file_path)
 
@@ -161,27 +168,26 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
             name=self.version_name.RelativeName()),
         self.messages.CryptoKeyVersion(
             name=self.version_name.RelativeName(),
-            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum.
-            GOOGLE_SYMMETRIC_ENCRYPTION,
-            protectionLevel=self.messages.CryptoKeyVersion.
-            ProtectionLevelValueValuesEnum.HSM,
-            state=self.messages.CryptoKeyVersion.StateValueValuesEnum.
-            PENDING_GENERATION))
+            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum
+            .GOOGLE_SYMMETRIC_ENCRYPTION,
+            protectionLevel=self.messages.CryptoKeyVersion
+            .ProtectionLevelValueValuesEnum.HSM,
+            state=self.messages.CryptoKeyVersion.StateValueValuesEnum
+            .PENDING_GENERATION))
 
     with self.AssertRaisesExceptionMatches(
         exceptions.ToolException,
         'The attestation is unavailable until the version is generated.'):
-      self.Run(
-          'kms keys versions describe {0} --location={1} --keyring={2} '
-          '--key={3} --attestation-file={4}'
-          .format(self.version_name.version_id, self.version_name.location_id,
-                  self.version_name.key_ring_id,
-                  self.version_name.crypto_key_id, attestation_file_path))
+      self.Run('kms keys versions describe {0} --location={1} --keyring={2} '
+               '--key={3} --attestation-file={4}'.format(
+                   self.version_name.version_id, self.version_name.location_id,
+                   self.version_name.key_ring_id,
+                   self.version_name.crypto_key_id, attestation_file_path))
 
     self.AssertBinaryFileEquals(b'', attestation_file_path)
 
@@ -191,31 +197,25 @@ class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetRequest(
             name=self.version_name.RelativeName()),
         self.messages.CryptoKeyVersion(
             name=self.version_name.RelativeName(),
-            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum.
-            GOOGLE_SYMMETRIC_ENCRYPTION,
-            protectionLevel=self.messages.CryptoKeyVersion.
-            ProtectionLevelValueValuesEnum.HSM,
-            state=self.messages.CryptoKeyVersion.StateValueValuesEnum.
-            ENABLED,
-            attestation=self.messages.KeyOperationAttestation(
-                format=self.messages.KeyOperationAttestation.
-                FormatValueValuesEnum.CAVIUM_V1_COMPRESSED,
-                content=b'attestation content')))
+            algorithm=self.messages.CryptoKeyVersion.AlgorithmValueValuesEnum
+            .GOOGLE_SYMMETRIC_ENCRYPTION,
+            protectionLevel=self.messages.CryptoKeyVersion
+            .ProtectionLevelValueValuesEnum.HSM,
+            state=self.messages.CryptoKeyVersion.StateValueValuesEnum.ENABLED,
+            attestation=self.attestation))
 
-    with self.AssertRaisesExceptionMatches(
-        exceptions.BadFileException,
-        attestation_file_path):
-      self.Run(
-          'kms keys versions describe {0} --location={1} --keyring={2} '
-          '--key={3} --attestation-file={4}'
-          .format(self.version_name.version_id, self.version_name.location_id,
-                  self.version_name.key_ring_id,
-                  self.version_name.crypto_key_id, attestation_file_path))
+    with self.AssertRaisesExceptionMatches(exceptions.BadFileException,
+                                           attestation_file_path):
+      self.Run('kms keys versions describe {0} --location={1} --keyring={2} '
+               '--key={3} --attestation-file={4}'.format(
+                   self.version_name.version_id, self.version_name.location_id,
+                   self.version_name.key_ring_id,
+                   self.version_name.crypto_key_id, attestation_file_path))
 
 
 class CryptokeysVersionsDescribeTestBeta(CryptokeysVersionsDescribeTestGa):

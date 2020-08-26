@@ -5,7 +5,9 @@ SYNOPSIS
     gcloud alpha pubsub lite-topics create TOPIC --partitions=PARTITIONS
         --per-partition-bytes=PER_PARTITION_BYTES --zone=ZONE
         [--message-retention-period=MESSAGE_RETENTION_PERIOD]
-        [--scale=SCALE; default=1] [GCLOUD_WIDE_FLAG ...]
+        [--per-partition-publish-mib=PER_PARTITION_PUBLISH_MIB; default=4]
+        [--per-partition-subscribe-mib=PER_PARTITION_SUBSCRIBE_MIB; default=8]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a Pub/Sub Lite topic.
@@ -42,12 +44,13 @@ OPTIONAL FLAGS
         limit is reached. A valid example value of this flag would be
         message-retention-period="2w".
 
-     --scale=SCALE; default=1
-        Topic partition scale value. Every partition in the topic is allocated
-        throughput equivalent to scale times the standard partition throughput
-        (4 MiB/s of publishing throughput and 8 MiB/s of subscribing
-        throughput). This is also reflected in the cost of this topic; a topic
-        with scale of 2 and count of 10 is charged for 20 partitions.
+     --per-partition-publish-mib=PER_PARTITION_PUBLISH_MIB; default=4
+        Topic partition publish throughput capacity in MiB/s. Must be between 4
+        and 16.
+
+     --per-partition-subscribe-mib=PER_PARTITION_SUBSCRIBE_MIB; default=8
+        Topic partition subscribe throughput capacity in MiB/s. Must be between
+        4 and 32.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -67,7 +70,6 @@ EXAMPLES
         $ gcloud alpha pubsub lite-topics create mytopic \
             --zone=us-central1-a \
             --partitions=1 \
-            --scale=1 \
             --per-partition-bytes=30GiB \
             --message-retention-period=2w
 
@@ -75,7 +77,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta pubsub lite-topics create
 

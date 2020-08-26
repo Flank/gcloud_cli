@@ -176,6 +176,18 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
                                 re.escape('Invalid value for [model]:')):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse4', self.ios_args_set)
 
+  # Tests for --additional-ipas arg
+
+  def testAdditionalApks_MultipleFilesOk(self):
+    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':additional-ipas.two',
+                                       self.ios_args_set)
+    self.assertEqual(len(args['additional_ipas']), 2)
+
+  def testAdditionalApks_EmptyFileNotAllowed(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':additional-ipas.empty',
+                                  self.ios_args_set)
+
   # Various int-list arg validation tests
 
   def testIntList_ValidNumber(self):

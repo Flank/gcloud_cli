@@ -1171,6 +1171,39 @@ class RegionalTest(test_base.BaseTest):
          ))
     ],)
 
+  def testInternalWithAllProtocol(self):
+    messages = self.messages
+
+    self.Run("""compute backend-services create backend-service-1
+                --load-balancing-scheme internal
+                --region alaska --health-checks my-health-check-1
+                --global-health-checks
+                --network default
+                --protocol ALL""")
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1'),
+                 ],
+                 name='backend-service-1',
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                     .INTERNAL),
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/default',
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.ALL),
+                 timeoutSec=30,
+             ),
+             project='my-project',
+             region='alaska',
+         ))
+    ],)
+
   def testInternalManagedWithAllValidFlags(self):
     messages = self.messages
 

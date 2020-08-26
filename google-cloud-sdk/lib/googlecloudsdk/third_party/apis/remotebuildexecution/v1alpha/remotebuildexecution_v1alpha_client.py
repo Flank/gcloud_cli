@@ -55,10 +55,7 @@ class RemotebuildexecutionV1alpha(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new worker pool with a specified size and configuration.
-Returns a long running operation which contains a worker pool on
-completion. While the long running operation is in progress, any call to
-`GetWorkerPool` returns a worker pool in state `CREATING`.
+      r"""Creates a new worker pool with a specified size and configuration. Returns a long running operation which contains a worker pool on completion. While the long running operation is in progress, any call to `GetWorkerPool` returns a worker pool in state `CREATING`.
 
       Args:
         request: (GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateWorkerPoolRequest) input message
@@ -85,11 +82,7 @@ completion. While the long running operation is in progress, any call to
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes the specified worker pool.
-Returns a long running operation, which contains a `google.protobuf.Empty`
-response on completion.
-While the long running operation is in progress, any call to
-`GetWorkerPool` returns a worker pool in state `DELETING`.
+      r"""Deletes the specified worker pool. Returns a long running operation, which contains a `google.protobuf.Empty` response on completion. While the long running operation is in progress, any call to `GetWorkerPool` returns a worker pool in state `DELETING`.
 
       Args:
         request: (RemotebuildexecutionProjectsInstancesWorkerpoolsDeleteRequest) input message
@@ -170,10 +163,7 @@ While the long running operation is in progress, any call to
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates an existing worker pool with a specified size and/or configuration.
-Returns a long running operation, which contains a worker pool on
-completion. While the long running operation is in progress, any call to
-`GetWorkerPool` returns a worker pool in state `UPDATING`.
+      r"""Updates an existing worker pool with a specified size and/or configuration. Returns a long running operation, which contains a worker pool on completion. While the long running operation is in progress, any call to `GetWorkerPool` returns a worker pool in state `UPDATING`.
 
       Args:
         request: (RemotebuildexecutionProjectsInstancesWorkerpoolsPatchRequest) input message
@@ -210,10 +200,7 @@ completion. While the long running operation is in progress, any call to
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new instance in the specified region.
-Returns a long running operation which contains an instance on completion.
-While the long running operation is in progress, any call to `GetInstance`
-returns an instance in state `CREATING`.
+      r"""Creates a new instance in the specified region. Returns a long running operation which contains an instance on completion. While the long running operation is in progress, any call to `GetInstance` returns an instance in state `CREATING`.
 
       Args:
         request: (GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateInstanceRequest) input message
@@ -240,11 +227,7 @@ returns an instance in state `CREATING`.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes the specified instance.
-Returns a long running operation which contains a `google.protobuf.Empty`
-response on completion.
-Deleting an instance with worker pools in it will delete these worker
-pools.
+      r"""Deletes the specified instance. Returns a long running operation which contains a `google.protobuf.Empty` response on completion. Deleting an instance with worker pools in it will delete these worker pools.
 
       Args:
         request: (RemotebuildexecutionProjectsInstancesDeleteRequest) input message
@@ -324,6 +307,33 @@ pools.
         supports_download=False,
     )
 
+    def Patch(self, request, global_params=None):
+      r"""Updates the specified instance. Returns a long running operation which contains the updated instance in the response on completion.
+
+      Args:
+        request: (RemotebuildexecutionProjectsInstancesPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha/projects/{projectsId}/instances/{instancesId}',
+        http_method='PATCH',
+        method_id='remotebuildexecution.projects.instances.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['loggingEnabled', 'name1', 'updateMask'],
+        relative_path='v1alpha/{+name}',
+        request_field='googleDevtoolsRemotebuildexecutionAdminV1alphaInstance',
+        request_type_name='RemotebuildexecutionProjectsInstancesPatchRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
   class ProjectsOperationsService(base_api.BaseApiService):
     """Service class for the projects_operations resource."""
 
@@ -335,9 +345,7 @@ pools.
           }
 
     def Get(self, request, global_params=None):
-      r"""Gets the latest state of a long-running operation.  Clients can use this.
-method to poll the operation result at intervals as recommended by the API
-service.
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
 
       Args:
         request: (RemotebuildexecutionProjectsOperationsGetRequest) input message

@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -91,6 +93,23 @@ class RemoveIamPolicyBindingTestBeta(base.ServiceDirectoryUnitTestBase):
         '--role={0} '
         '--member={1}'.format(self.role_to_remove, self.user_to_remove))
     self.assertEqual(remove_binding_request, self.new_policy)
+    self.AssertErrContains('Updated IAM policy for')
+
+  def testRemoveIamPolicyBinding_InvalidRequest_Fails(self):
+    request = self.msgs.ServicedirectoryProjectsLocationsNamespacesServicesGetIamPolicyRequest(
+        resource=self.service_ref.RelativeName())
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces_services.GetIamPolicy.Expect(
+        request=request, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run(
+          'service-directory services remove-iam-policy-binding my-service '
+          '--namespace my-namespace '
+          '--location my-location '
+          '--role={0} '
+          '--member={1}'.format(self.role_to_remove, self.user_to_remove))
+    self.AssertErrNotContains('Updated IAM policy for')
 
 
 class RemoveIamPolicyBindingTestAlpha(RemoveIamPolicyBindingTestBeta):

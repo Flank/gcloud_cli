@@ -47,6 +47,7 @@ import six
 _IMAGE_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_import:{}'
 _IMAGE_EXPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_export:{}'
 _OVF_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_ovf_import:{}'
+_OS_UPGRADE_BUILDER = 'gcr.io/compute-image-tools/gce_windows_upgrade:{}'
 
 _DEFAULT_BUILDER_VERSION = 'release'
 
@@ -68,6 +69,11 @@ EXPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT = frozenset({
     ROLE_STORAGE_OBJECT_ADMIN,
 })
 
+OS_UPGRADE_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT = frozenset({
+    ROLE_COMPUTE_STORAGE_ADMIN,
+    ROLE_STORAGE_OBJECT_ADMIN,
+})
+
 IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT = frozenset({
     ROLE_COMPUTE_ADMIN,
     ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR,
@@ -75,6 +81,12 @@ IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT = frozenset({
 })
 
 EXPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT = frozenset({
+    ROLE_COMPUTE_ADMIN,
+    ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR,
+    ROLE_IAM_SERVICE_ACCOUNT_USER,
+})
+
+OS_UPGRADE_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT = frozenset({
     ROLE_COMPUTE_ADMIN,
     ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR,
     ROLE_IAM_SERVICE_ACCOUNT_USER,
@@ -578,10 +590,10 @@ def RunImageCloudBuild(args, builder, builder_args, tags, output_filter,
 
 
 def GetDaisyTimeout(args):
-  # Make Daisy time out before gcloud by shaving off 2% from the timeout time,
+  # Make Daisy time out before gcloud by shaving off 3% from the timeout time,
   # up to a max of 5m (300s).
-  two_percent = int(args.timeout * 0.02)
-  daisy_timeout = args.timeout - min(two_percent, 300)
+  timeout_offset = int(args.timeout * 0.03)
+  daisy_timeout = args.timeout - min(timeout_offset, 300)
   return daisy_timeout
 
 
@@ -716,11 +728,6 @@ def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
   _CheckIamPermissions(project_id, IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
                        IMPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
 
-  # Make OVF import time-out before gcloud by shaving off 2% from the timeout
-  # time, up to a max of 5m (300s).
-  two_percent = int(args.timeout * 0.02)
-  ovf_import_timeout = args.timeout - min(two_percent, 300)
-
   ovf_importer_args = []
   AppendArg(ovf_importer_args, 'instance-names', instance_name)
   AppendArg(ovf_importer_args, 'client-id', 'gcloud')
@@ -744,7 +751,7 @@ def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
   if tags:
     AppendArg(ovf_importer_args, 'tags', ','.join(tags))
   AppendArg(ovf_importer_args, 'zone', zone)
-  AppendArg(ovf_importer_args, 'timeout', ovf_import_timeout, '-{0}={1}s')
+  AppendArg(ovf_importer_args, 'timeout', GetDaisyTimeout(args), '-{0}={1}s')
   AppendArg(ovf_importer_args, 'project', project)
   _AppendNodeAffinityLabelArgs(ovf_importer_args, args, compute_client.messages)
   if compute_release_track:
@@ -785,11 +792,6 @@ def RunMachineImageOVFImportBuild(args, output_filter, compute_release_track):
   _CheckIamPermissions(project_id, IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
                        IMPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
 
-  # Make OVF import time-out before gcloud by shaving off 2% from the timeout
-  # time, up to a max of 5m (300s).
-  two_percent = int(args.timeout * 0.02)
-  ovf_import_timeout = args.timeout - min(two_percent, 300)
-
   machine_type = None
   if args.machine_type or args.custom_cpu or args.custom_memory:
     machine_type = instance_utils.InterpretMachineType(
@@ -822,7 +824,7 @@ def RunMachineImageOVFImportBuild(args, output_filter, compute_release_track):
   if args.tags:
     AppendArg(ovf_importer_args, 'tags', ','.join(args.tags))
   AppendArg(ovf_importer_args, 'zone', properties.VALUES.compute.zone.Get())
-  AppendArg(ovf_importer_args, 'timeout', ovf_import_timeout, '-{0}={1}s')
+  AppendArg(ovf_importer_args, 'timeout', GetDaisyTimeout(args), '-{0}={1}s')
   AppendArg(ovf_importer_args, 'project', args.project)
   if compute_release_track:
     AppendArg(ovf_importer_args, 'release-track', compute_release_track)
@@ -834,6 +836,56 @@ def RunMachineImageOVFImportBuild(args, output_filter, compute_release_track):
   return _RunCloudBuild(args, _OVF_IMPORT_BUILDER.format(args.docker_image_tag),
                         ovf_importer_args, build_tags, output_filter,
                         backoff=backoff, log_location=args.log_location)
+
+
+def RunOsUpgradeBuild(args, output_filter, instance_uri):
+  """Run a OS Upgrade on Google Cloud Builder.
+
+  Args:
+    args: an argparse namespace. All the arguments that were provided to this
+      command invocation.
+    output_filter: A list of strings indicating what lines from the log should
+      be output. Only lines that start with one of the strings in output_filter
+      will be displayed.
+    instance_uri: instance to be upgraded.
+
+  Returns:
+    A build object that either streams the output or is displayed as a
+    link to the build.
+
+  Raises:
+    FailedBuildException: If the build is completed and not 'SUCCESS'.
+  """
+  project_id = projects_util.ParseProject(
+      properties.VALUES.core.project.GetOrFail())
+
+  _CheckIamPermissions(project_id,
+                       OS_UPGRADE_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
+                       OS_UPGRADE_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
+
+  # Make OS Upgrade time-out before gcloud by shaving off 2% from the timeout
+  # time, up to a max of 5m (300s).
+  two_percent = int(args.timeout * 0.02)
+  os_upgrade_timeout = args.timeout - min(two_percent, 300)
+
+  os_upgrade_args = []
+  AppendArg(os_upgrade_args, 'instance', instance_uri)
+  AppendArg(os_upgrade_args, 'source-os', args.source_os)
+  AppendArg(os_upgrade_args, 'target-os', args.target_os)
+  AppendArg(os_upgrade_args, 'timeout', os_upgrade_timeout, '-{0}={1}s')
+  AppendArg(os_upgrade_args, 'client-id', 'gcloud')
+
+  if not args.create_machine_backup:
+    AppendArg(os_upgrade_args, 'create-machine-backup', 'false')
+  AppendBoolArg(os_upgrade_args, 'auto-rollback', args.auto_rollback)
+  AppendBoolArg(os_upgrade_args, 'use-staging-install-media',
+                args.use_staging_install_media)
+
+  build_tags = ['gce-os-upgrade']
+
+  return _RunCloudBuild(args, _OS_UPGRADE_BUILDER.format(args.docker_image_tag),
+                        os_upgrade_args, build_tags, output_filter,
+                        args.log_location)
 
 
 def _AppendNodeAffinityLabelArgs(
@@ -860,6 +912,11 @@ def AppendArg(args, name, arg, format_pattern='-{0}={1}'):
 
 def AppendBoolArg(args, name, arg=True):
   AppendArg(args, name, arg, '-{0}')
+
+
+def AppendBoolArgDefaultTrue(args, name, arg):
+  if not arg:
+    args.append('-{0}={1}'.format(name, arg))
 
 
 def MakeGcsUri(uri):

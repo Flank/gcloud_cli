@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute routers nats describe - describe a NAT in a Google
-        Compute Engine router
+    gcloud alpha compute routers nats describe - describe a NAT in a Compute
+        Engine router
 
 SYNOPSIS
     gcloud alpha compute routers nats describe NAME --router=ROUTER
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute routers nats describe is used to describe a
-    NAT in a Google Compute Engine router.
+    NAT in a Compute Engine router.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -57,7 +57,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute routers nats describe
         $ gcloud beta compute routers nats describe

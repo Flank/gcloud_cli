@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute reservations remove-iam-policy-binding - remove IAM
-        policy binding from a Google Compute Engine reservation
+        policy binding from a Compute Engine reservation
 
 SYNOPSIS
     gcloud beta compute reservations remove-iam-policy-binding
@@ -9,9 +9,9 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove an IAM policy binding from the IAM policy of a Google Compute
-    Engine reservation. One binding consists of a member, a role, and an
-    optional condition.
+    (BETA) Remove an IAM policy binding from the IAM policy of a Compute Engine
+    reservation. One binding consists of a member, a role, and an optional
+    condition.
 
 POSITIONAL ARGUMENTS
      Reservation resource - The reservation for which to remove IAM policy

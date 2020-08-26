@@ -29,7 +29,7 @@ DESCRIPTION
 
 Creating configurations
 
-    Named configurations maybe be defined by users or built into gcloud.
+    Named configurations may be defined by users or built into gcloud.
 
     User defined configurations have lowercase names, such as 'johndoe',
     'default', 'jeff-staging', or 'foo2'. These are defined by the following
@@ -448,6 +448,12 @@ AVAILABLE PROPERTIES
             Default location to use when working with Notebook resources. When
             a location value is required but not provided, the command will
             fall back to this value, if set.
+
+     privateca
+         location
+            Default location to use when working with Private CA resources.
+            When a --location flag is required but not provided, the command
+            will fall back to this value, if set.
 
      proxy
          address

@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute snapshots get-iam-policy - get the IAM policy for a
-        Google Compute Engine snapshot
+        Compute Engine snapshot
 
 SYNOPSIS
     gcloud alpha compute snapshots get-iam-policy SNAPSHOT_NAME
@@ -74,7 +74,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute snapshots get-iam-policy
         $ gcloud beta compute snapshots get-iam-policy

@@ -1,6 +1,6 @@
 NAME
-    gcloud compute resource-policies create group-placement - create a Google
-        Compute Engine group placement resource policy
+    gcloud compute resource-policies create group-placement - create a Compute
+        Engine group placement resource policy
 
 SYNOPSIS
     gcloud compute resource-policies create group-placement NAME
@@ -9,7 +9,7 @@ SYNOPSIS
         [--region=REGION] [--vm-count=VM_COUNT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create a Google Compute Engine Group Placement Resource Policy.
+    Create a Compute Engine Group Placement Resource Policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -24,11 +24,11 @@ FLAGS
         domain on the same low-latency network. COLLOCATION must be one of:
 
          collocated
-            Low network latency between VMs placed on the sameavailability
-            domain.
+            Low network latency between more VMs placed on the same
+            availability domain.
          unspecified-collocation
-            Unspecified network latency between VMs placed on the
-            sameavailability domain. This is the default behavior.
+            Unspecified network latency between VMs placed on the same
+            availability domain. This is the default behavior.
 
      --description=DESCRIPTION
         An optional, textual description for the backend.
@@ -65,8 +65,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To create a Google Compute Engine group placement policy with two
-    availability domains, run:        $ gcloud compute resource-policies create group-placement \
+    To create a Compute Engine group placement policy with two availability
+    domains, run:        $ gcloud compute resource-policies create group-placement \
             my-resource-policy --region=REGION --availability-domain-count=2
 
 NOTES

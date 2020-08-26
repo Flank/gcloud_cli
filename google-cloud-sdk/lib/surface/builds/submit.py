@@ -52,6 +52,7 @@ def _CommonArgs(parser):
       action='store_true',
       help='Specify that no source should be uploaded with this build.')
 
+  flags.AddRegionFlag(parser)
   flags.AddGcsSourceStagingDirFlag(parser)
   flags.AddGcsLogDirFlag(parser)
   flags.AddTimeoutFlag(parser)
@@ -59,6 +60,7 @@ def _CommonArgs(parser):
   flags.AddMachineTypeFlag(parser)
   flags.AddDiskSizeFlag(parser)
   flags.AddSubstitutionsFlag(parser)
+  flags.AddWorkerPoolFlag(parser)
 
   flags.AddNoCacheFlag(parser)
   flags.AddAsyncFlag(parser)
@@ -136,6 +138,7 @@ class Submit(base.CreateCommand):
     Raises:
       FailedBuildException: If the build is completed and not 'SUCCESS'.
     """
+    build_region = args.region
 
     messages = cloudbuild_util.GetMessagesModule()
 
@@ -144,10 +147,13 @@ class Submit(base.CreateCommand):
         args.tag, args.no_cache, messages, args.substitutions, args.config,
         args.IsSpecified('source'), args.no_source, args.source,
         args.gcs_source_staging_dir, args.ignore_file, args.gcs_log_dir,
-        args.machine_type, args.disk_size)
+        args.machine_type, args.disk_size, args.worker_pool)
+
+    build_region = submit_util.DetermineBuildRegion(build_config, build_region)
 
     # Start the build.
-    build, _ = submit_util.Build(messages, args.async_, build_config)
+    build, _ = submit_util.Build(
+        messages, args.async_, build_config, build_region=build_region)
     return build
 
 
@@ -194,6 +200,7 @@ class SubmitAlpha(SubmitBeta):
     Raises:
       FailedBuildException: If the build is completed and not 'SUCCESS'.
     """
+    build_region = args.region
 
     messages = cloudbuild_util.GetMessagesModule()
 
@@ -202,8 +209,13 @@ class SubmitAlpha(SubmitBeta):
         args.tag, args.no_cache, messages, args.substitutions, args.config,
         args.IsSpecified('source'), args.no_source, args.source,
         args.gcs_source_staging_dir, args.ignore_file, args.gcs_log_dir,
-        args.machine_type, args.disk_size, args.pack)
+        args.machine_type, args.disk_size, args.worker_pool, args.pack,
+        arg_cluster_name=args.cluster,
+        arg_cluster_location=args.cluster_location)
+
+    build_region = submit_util.DetermineBuildRegion(build_config, build_region)
 
     # Start the build.
-    build, _ = submit_util.Build(messages, args.async_, build_config)
+    build, _ = submit_util.Build(
+        messages, args.async_, build_config, build_region=build_region)
     return build

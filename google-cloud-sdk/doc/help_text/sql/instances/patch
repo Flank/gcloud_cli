@@ -69,9 +69,10 @@ FLAGS
         Show what changed as a result of the update.
 
      --[no-]enable-bin-log
-        Specified if binary log should be enabled. If backup configuration is
-        disabled, binary log must be disabled as well. Use --enable-bin-log to
-        enable and --no-enable-bin-log to disable.
+        Allows for data recovery from a specific point in time, down to a
+        fraction of a second. Must have automatic backups enabled to use. Make
+        sure storage can support at least 7 days of logs. Use --enable-bin-log
+        to enable and --no-enable-bin-log to disable.
 
      --[no-]enable-database-replication
         Enable database replication. Applicable only for read replica
@@ -80,9 +81,9 @@ FLAGS
         --no-enable-database-replication to disable.
 
      --enable-point-in-time-recovery
-        Specifies if point-in-time recovery (using write-ahead log archiving)
-        should be enabled. If backup configuration is disabled, point-in-time
-        recovery must be disabled as well.
+        Allows for data recovery from a specific point in time, down to a
+        fraction of a second, via write-ahead logs. Must have automatic backups
+        enabled to use. Make sure storage can support at least 7 days of logs.
 
      --follow-gae-app=FOLLOW_GAE_APP
         First Generation instances only. The App Engine app this instance

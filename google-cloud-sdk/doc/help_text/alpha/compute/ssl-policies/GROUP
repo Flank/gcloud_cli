@@ -26,13 +26,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a new Google Compute Engine SSL policy.
+        (ALPHA) Create a new Compute Engine SSL policy.
 
      delete
-        (ALPHA) Delete Google Compute Engine SSL policies.
+        (ALPHA) Delete Compute Engine SSL policies.
 
      describe
-        (ALPHA) Describe a Google Compute Engine ssl policy.
+        (ALPHA) Describe a Compute Engine ssl policy.
 
      export
         (ALPHA) Export an SSL policy.
@@ -47,13 +47,13 @@ COMMANDS
         (ALPHA) List available features that can be specified in an SSL policy.
 
      update
-        (ALPHA) Update a Google Compute Engine SSL policy.
+        (ALPHA) Update a Compute Engine SSL policy.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute ssl-policies
         $ gcloud beta compute ssl-policies

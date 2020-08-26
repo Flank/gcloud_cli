@@ -34,6 +34,9 @@ COMMANDS
      enable
         (BETA) Enable a given version.
 
+     get-certificate-chain
+        (BETA) Get a certificate chain for a given version.
+
      get-public-key
         (BETA) Get the public key for a given version.
 

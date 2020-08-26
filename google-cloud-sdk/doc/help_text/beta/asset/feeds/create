@@ -31,16 +31,15 @@ REQUIRED FLAGS
           A comma-separated list of the full names of the assets to receive
           updates. For example:
           //compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1.
-          See
+          For more information, see:
           https://cloud.google.com/apis/design/resource_names#full_resource_name
-          for more information.
 
        --asset-types=[ASSET_TYPES,...]
           A comma-separated list of types of the assets types to receive
           updates. For example:
-          compute.googleapis.com/Disk,compute.googleapis.com/Network See
+          compute.googleapis.com/Disk,compute.googleapis.com/Network For more
+          information, see:
           https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview
-          for all supported asset types.
 
      Exactly one of these must be specified:
 
@@ -70,14 +69,15 @@ OPTIONAL FLAGS
 
      --condition-expression=CONDITION_EXPRESSION
         Feed condition expression. If not specified, no condition will be
-        applied to feed.
+        applied to feed. For more information, see:
+        https://cloud.google.com/asset-inventory/docs/monitoring-asset-changes#feed_with_condition
 
      --condition-title=CONDITION_TITLE
         Title of the feed condition. For reference only.
 
      --content-type=CONTENT_TYPE
         Asset content type. If not specified, no content but the asset name and
-        type will be returned in the feed. To read more see
+        type will be returned in the feed. For more information, see
         https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview#asset_content_type.
         CONTENT_TYPE must be one of: resource, iam-policy, org-policy,
         access-policy.

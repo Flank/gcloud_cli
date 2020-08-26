@@ -11,7 +11,7 @@ gcloud builds cancel \- cancel an ongoing build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud builds cancel\fR \fIBUILDS\fR [\fIBUILDS\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud builds cancel\fR \fIBUILDS\fR [\fIBUILDS\fR\ ...] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,6 +27,19 @@ Cancel an ongoing build.
 .TP 2m
 \fIBUILDS\fR [\fIBUILDS\fR ...]
 IDs of builds to cancel
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
 
 
 .RE

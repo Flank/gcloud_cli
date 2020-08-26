@@ -11,7 +11,7 @@ gcloud alpha sql instances create \- creates a new Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-collation\fR=\fICOLLATION\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-disk\-encryption\-key\fR=\fIDISK_ENCRYPTION_KEY\fR\ :\ \fB\-\-disk\-encryption\-key\-keyring\fR=\fIDISK_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-disk\-encryption\-key\-location\fR=\fIDISK_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-disk\-encryption\-key\-project\fR=\fIDISK_ENCRYPTION_KEY_PROJECT\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-active\-directory\-domain\fR=\fIACTIVE_DIRECTORY_DOMAIN\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-collation\fR=\fICOLLATION\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-disk\-encryption\-key\fR=\fIDISK_ENCRYPTION_KEY\fR\ :\ \fB\-\-disk\-encryption\-key\-keyring\fR=\fIDISK_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-disk\-encryption\-key\-location\fR=\fIDISK_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-disk\-encryption\-key\-project\fR=\fIDISK_ENCRYPTION_KEY_PROJECT\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -43,6 +43,11 @@ default is \f5on\-demand\fR. More information on activation policies can be
 found here: https://cloud.google.com/sql/faq#activation_policy.
 \fIACTIVATION_POLICY\fR must be one of: \fBalways\fR, \fBnever\fR,
 \fBon\-demand\fR.
+
+.TP 2m
+\fB\-\-active\-directory\-domain\fR=\fIACTIVE_DIRECTORY_DOMAIN\fR
+Managed Service for Microsoft Active Directory domain this instance is joined
+to. Only available for SQL Server instances.
 
 .TP 2m
 \fB\-\-[no\-]assign\-ip\fR
@@ -120,14 +125,15 @@ https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances#databaseVer
 
 .TP 2m
 \fB\-\-enable\-bin\-log\fR
-Specified if binary log should be enabled. If backup configuration is disabled,
-binary log must be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second. Must have automatic backups enabled to use. Make sure storage can
+support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-enable\-point\-in\-time\-recovery\fR
-Specifies if point\-in\-time recovery (using write\-ahead log archiving) should
-be enabled. If backup configuration is disabled, point\-in\-time recovery must
-be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second, via write\-ahead logs. Must have automatic backups enabled to use. Make
+sure storage can support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR
@@ -438,7 +444,7 @@ $ gcloud alpha sql instances create prod\-instance \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud sql instances create

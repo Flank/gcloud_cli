@@ -72,11 +72,12 @@ PUBSUB_JS_FILE = """\
 /**
  * Background Cloud Function to be triggered by Pub/Sub.
  *
- * @param {{object}} event The Cloud Functions event.
+ * @param {{object}} data The Cloud Functions event data.
+ * @param {{object}} context The Cloud Functions event context.
  * @param {{function}} callback The callback function.
  */
-exports.{func_name} = function (event, callback) {{
-  const pubsubMessage = event.data;
+exports.{func_name} = function (data, context, callback) {{
+  const pubsubMessage = data;
   const name = pubsubMessage.data ? Buffer.from(pubsubMessage.data, 'base64').toString() : 'World';
 
   console.log(`Hello, ${{name}}!`);
@@ -92,11 +93,12 @@ STORAGE_JS_FILE = """\
 /**
  * Background Cloud Function to be triggered by GCS Storage Bucket.
  *
- * @param {{object}} event The Cloud Functions event.
+ * @param {{object}} data The Cloud Functions event data.
+ * @param {{object}} context The Cloud Functions event context.
  * @param {{function}} callback The callback function.
  */
-exports.{func_name} = function (event, callback) {{
-  const file = event.data;
+exports.{func_name} = function (data, context, callback) {{
+  const file = data;
 
   console.log(`Uploaded, ${{file}}!`);
 
@@ -192,7 +194,7 @@ class TriggerTest(DeployE2ETestBase):
     """Test Simple HTTP Cloud Function Example w/local source."""
     with self._DeployFunction('--trigger-http',
                               source=self.function_path,
-                              runtime='nodejs6') as function_name:
+                              runtime='nodejs10') as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
@@ -204,7 +206,7 @@ class TriggerTest(DeployE2ETestBase):
     with files.ChDir(self.function_path):
       with self._DeployFunction('--trigger-http',
                                 name=func_name,
-                                runtime='nodejs6') as function_name:
+                                runtime='nodejs10') as function_name:
         self.Run('functions describe {}'.format(function_name))
         self.AssertOutputContains(function_name)
         self.Run('functions call {}'.format(function_name))
@@ -216,7 +218,7 @@ class TriggerTest(DeployE2ETestBase):
         source=self.function_path,
         trigger_event='providers/cloud.pubsub/eventTypes/topic.publish',
         trigger_resource='test-topic',
-        runtime='nodejs6',
+        runtime='nodejs10',
         function_content=PUBSUB_JS_FILE) as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
@@ -231,7 +233,7 @@ class TriggerTest(DeployE2ETestBase):
         source=self.function_path,
         trigger_event='google.storage.object.finalize',
         trigger_resource='e2e-input-functions',
-        runtime='nodejs6',
+        runtime='nodejs10',
         function_content=STORAGE_JS_FILE) as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
@@ -246,7 +248,7 @@ class TriggerTest(DeployE2ETestBase):
     with self._DeployFunction('--trigger-http',
                               source=self.function_path,
                               stage_bucket=FUNCTIONS_STAGING_BUCKET,
-                              runtime='nodejs6') as function_name:
+                              runtime='nodejs10') as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
@@ -269,7 +271,7 @@ class RedeployTest(DeployE2ETestBase):
     """Test redeploy with source code update."""
     with self._DeployFunction('--trigger-http',
                               source=self.function_path,
-                              runtime='nodejs6') as function_name:
+                              runtime='nodejs10') as function_name:
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains('Hello World!')
@@ -289,7 +291,7 @@ class RedeployTest(DeployE2ETestBase):
     """Test redeploy with no source change, just metadata changes."""
     with self._DeployFunction('--trigger-http',
                               source=self.function_path,
-                              runtime='nodejs6') as function_name:
+                              runtime='nodejs10') as function_name:
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains('Hello World!')
@@ -319,7 +321,7 @@ class RedeployTest(DeployE2ETestBase):
   def testRedeployStagingBucket(self):
     """Test redeploy with staging bucket."""
     with self._DeployFunction(
-        '--trigger-http', source=self.function_path, runtime='nodejs6',
+        '--trigger-http', source=self.function_path, runtime='nodejs10',
         stage_bucket=FUNCTIONS_STAGING_BUCKET) as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
@@ -352,7 +354,7 @@ class EnvVarRedeployTest(DeployE2ETestBase):
     self.track = calliope_base.ReleaseTrack.GA
     with self._DeployFunction('--trigger-http', source=self.function_path,
                               set_env_vars='FOO=bar',
-                              runtime='nodejs6') as function_name:
+                              runtime='nodejs10') as function_name:
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains('Hello World!')
@@ -386,7 +388,7 @@ class MiscWorkflowTest(DeployE2ETestBase):
     """Test deploy and read logs."""
     with self._DeployFunction('--trigger-http',
                               source=self.function_path,
-                              runtime='nodejs6') as function_name:
+                              runtime='nodejs10') as function_name:
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains(function_name)
       log_retryer = retry.Retryer(exponential_sleep_multiplier=2)
@@ -401,15 +403,6 @@ class MiscWorkflowTest(DeployE2ETestBase):
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains(function_name)
       self.AssertErrContains('For Cloud Build Stackdriver Logs, visit:')
-
-  def testDeploy_buildInTenantProject_noStackdriverLog(self):
-    """Test deploy with build in tenant project and output log."""
-    with self._DeployFunction('--trigger-http',
-                              source=self.function_path,
-                              runtime='nodejs6') as function_name:
-      self.Run('functions call {}'.format(function_name))
-      self.AssertOutputContains(function_name)
-      self.AssertErrNotContains('For Cloud Build Stackdriver Logs, visit:')
 
 
 if __name__ == '__main__':

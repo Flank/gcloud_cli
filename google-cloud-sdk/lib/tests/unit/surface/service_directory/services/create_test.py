@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -104,6 +106,21 @@ class ServicesCreateTestBeta(base.ServiceDirectoryUnitTestBase):
       self.Run('service-directory services create '
                '--namespace my-namespace '
                '--location my-location')
+
+  def testCreate_InvalidRequest_Fails(self):
+    req = self.msgs.ServicedirectoryProjectsLocationsNamespacesServicesCreateRequest(
+        parent=self.namespace_name,
+        serviceId='my-service',
+        service=self._Service())
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces_services.Create.Expect(
+        request=req, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run('service-directory services create my-service '
+               '--namespace my-namespace '
+               '--location my-location ')
+    self.AssertErrNotContains('Created service')
 
 
 class ServicesCreateTestAlpha(ServicesCreateTestBeta):

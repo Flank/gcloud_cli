@@ -125,10 +125,10 @@ properties:
   description:
     description: |-
       Detailed description of what this `Constraint` controls as well as how and
-      where it is enforced.  Mutable.
+      where it is enforced. Mutable.
     type: string
   displayName:
-    description: The human readable name.  Mutable.
+    description: The human readable name. Mutable.
     type: string
   listConstraint:
     description: Defines this constraint as being a ListConstraint.

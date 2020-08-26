@@ -56,6 +56,10 @@ class AnthoscliBackendTest(sdk_test_base.WithOutputCapture,
                                    'auth-config-v1alpha1.yaml')
     config_v2_missing_providers = self.Resource(
         fixture_file_dir, 'auth-config-v2alpha1-missing-providers.yaml')
+    config_v2_1p = self.Resource(fixture_file_dir,
+                                 'auth-config-v2alpha1-1p.yaml')
+    config_v2_1p_ldap = self.Resource(fixture_file_dir,
+                                      'auth-config-v2alpha1-1p-ldap.yaml')
     self.v2_ex1_path = self.Touch(
         self.temp_path, 'config_v2_ex1.yaml',
         contents=yaml.dump_all(yaml.load_all_path(config_v2_path)))
@@ -71,6 +75,12 @@ class AnthoscliBackendTest(sdk_test_base.WithOutputCapture,
     self.v1_ex2_missing_providers = self.Touch(
         self.temp_path, 'config-v2alpha1-missing-providers.yaml',
         contents=yaml.dump_all(yaml.load_all_path(config_v2_missing_providers)))
+    self.v2_ex3_1p = self.Touch(
+        self.temp_path, 'config-v2alpha1-1p.yaml',
+        contents=yaml.dump_all(yaml.load_all_path(config_v2_1p)))
+    self.v2_ex4_1p_ldap = self.Touch(
+        self.temp_path, 'config-v2alpha1-1p-ldap.yaml',
+        contents=yaml.dump_all(yaml.load_all_path(config_v2_1p_ldap)))
 
   def _MockExpandVar(self, path):
     regex = r'(\$VAR\d)|(%APPDATA%)'
@@ -147,6 +157,28 @@ class AnthoscliBackendTest(sdk_test_base.WithOutputCapture,
                             self.v2_ex1_path)
     self.AssertErrContains('This will overwrite current preferred auth method')
     self.AssertErrContains('PROMPT_CHOICE')
+
+  def testGetPreferredAuthForClusterOneOption(self):
+    auth_method, _, _ = anthoscli_backend.GetPreferredAuthForCluster(
+        'testcluster', self.v2_ex3_1p, force_update=True)
+    self.assertEqual(auth_method, 'oidc1')
+    self.AssertFileContains('preferredAuthentication: oidc1',
+                            self.v2_ex3_1p)
+    self.AssertErrContains('Setting Preferred Authentication option to')
+    self.AssertErrNotContains('PROMPT_CHOICE')
+
+  def testGetPreferredAuthForClusterOneOptionLDAP(self):
+    self.StartObjectPatch(getpass, 'getpass').return_value = 'password'
+    self.WriteInput('user')
+    auth_method, username, passwd = anthoscli_backend.GetPreferredAuthForCluster(
+        'testcluster', self.v2_ex4_1p_ldap, force_update=True)
+    self.assertEqual(auth_method, 'ldap2')
+    self.assertEqual(username, 'dXNlcg==')
+    self.assertEqual(passwd, 'cGFzc3dvcmQ=')
+    self.AssertFileContains('preferredAuthentication: ldap2',
+                            self.v2_ex4_1p_ldap)
+    self.AssertErrContains('Setting Preferred Authentication option to')
+    self.AssertErrNotContains('PROMPT_CHOICE')
 
   def testGetPreferredAuthForClusterOldVersion(self):
     self.assertIsNone(anthoscli_backend.GetPreferredAuthForCluster(

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha memcache instances describe \- show metadata for a Memorystore Memcached instance
+gcloud alpha memcache instances describe \- display metadata for a Memorystore Memcached instance
 
 
 
@@ -17,10 +17,8 @@ gcloud alpha memcache instances describe \- show metadata for a Memorystore Memc
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Show metadata for a Memorystore Memcached instance.
-
-Displays all metadata associated with a Memcached instance given a valid
-instance name.
+\fB(ALPHA)\fR Displays all metadata associated with a Memcached instance given a
+valid instance name.
 
 This command can fail for the following reasons:
 .RS 2m
@@ -38,14 +36,13 @@ The active account does not have permission to access the given instance.
 .RS 2m
 .TP 2m
 
-Instance resource \- Arguments and flags that specify the Memcached instance you
-want to describe. The arguments in this group can be used to specify the
-attributes of this resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: provide
-the argument [instance] on the command line with a fully specified name; provide
-the argument [\-\-project] on the command line; set the property [core/project].
-This must be specified.
-
+Instance resource \- Arguments and flags that specify the Memcached instance to
+describe. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[instance] on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
 
 .RS 2m
 .TP 2m
@@ -83,8 +80,8 @@ this API can be found at: https://cloud.google.com/memorystore/
 
 .SH "EXAMPLES"
 
-The following command prints metadata for an instance with the name
-\f5my\-memcache\-instance\fR in \f5us\-central1\fR:
+To display the metadata for an instance named \f5my\-memcache\-instance\fR in
+region \f5us\-central1\fR, run:
 
 .RS 2m
 $ gcloud alpha memcache instances describe my\-memcache\-instance \e
@@ -98,7 +95,7 @@ $ gcloud alpha memcache instances describe my\-memcache\-instance \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta memcache instances describe

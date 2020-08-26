@@ -1,10 +1,12 @@
 NAME
-    gcloud compute instance-groups managed update - update Compute Engine
-        managed instance groups
+    gcloud compute instance-groups managed update - update a Compute Engine
+        managed instance group
 
 SYNOPSIS
     gcloud compute instance-groups managed update NAME
         [--instance-redistribution-type=TYPE]
+        [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
+        [--stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]]
         [--clear-autohealing
           | --initial-delay=INITIAL_DELAY --health-check=HEALTH_CHECK
           | --http-health-check=HTTP_HEALTH_CHECK
@@ -12,19 +14,25 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-groups managed update lets you specify or modify
-    AutoHealingPolicy for an existing managed instance group.
+    Update a Compute Engine managed instance group.
 
-    When updating the AutoHealingPolicy, you can specify the health check,
-    initial delay, or both. If the field is unspecified, its value won't be
-    modified. If --health-check is specified, the health check is used to
-    monitor the health of your application. Whenever the health check signal
-    for the instance becomes UNHEALTHY, the autohealing action (RECREATE) on an
-    instance is performed.
+    gcloud compute instance-groups managed update allows you to specify or
+    modify the stateful policy and autohealing policy for an existing managed
+    instance group.
 
-    If no health check is specified, the instance autohealing is triggered by
-    the instance status only (i.e., the autohealing action (RECREATE) on an
-    instance will be performed if instance.status is not RUNNING).
+    A stateful policy defines which resources should be preserved across the
+    group. When instances in the group are recreated, stateful resources are
+    preserved. This command allows you to update stateful resources,
+    specifically to add or remove stateful disks.
+
+    When updating the autohealing policy, you can specify the health check,
+    initial delay, or both. If either field is unspecified, its value won't be
+    modified. If --health-check is specified, the health check monitors the
+    health of your application. Whenever the health check signal for an
+    instance becomes UNHEALTHY, the autohealer recreates the instance.
+
+    If no health check exists, instance autohealing is triggered only by
+    instance status: if an instance is not RUNNING, the group recreates it.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -51,6 +59,32 @@ FLAGS
           instances to meet its target distribution.
 
     TYPE must be one of: NONE, PROACTIVE.
+
+     --remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
+        Stop considering the disks stateful by the instance group.
+
+     --stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]
+        Disks considered stateful by the instance group. Managed instance
+        groups preserve and reattach stateful disks on VM autohealing, update,
+        and recreate events.
+
+        Use this argument multiple times to update more disks.
+
+        If a stateful disk with the given device name already exists in the
+        current instance config, its properties will be replaced by the newly
+        provided ones. Otherwise, a new stateful disk definition will be added
+        to the instance config.
+
+         device-name
+            (Requied) Device name of the disk to mark stateful.
+
+         auto-delete
+            (Optional) Specifies the auto deletion policy of the stateful disk.
+            Supported values are never (never delete this disk) and
+            on-permanent-instance-deletion (delete the stateful disk when the
+            given instance is permanently deleted from the instance group; for
+            example when the group is resized down). If omitted, never is used
+            as the default.
 
      At most one of these may be specified:
 

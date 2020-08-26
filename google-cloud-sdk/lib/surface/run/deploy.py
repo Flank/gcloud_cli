@@ -24,9 +24,10 @@ import uuid
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions as c_exceptions
 from googlecloudsdk.command_lib.builds import flags as build_flags
 from googlecloudsdk.command_lib.builds import submit_util
-from googlecloudsdk.command_lib.run import config_changes as config_changes_mod
+from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import messages_util
@@ -149,42 +150,41 @@ class Deploy(base.Command):
     build_op_ref = None
     messages = None
     build_log_url = None
-    image = args.image
     include_build = flags.FlagIsExplicitlySet(args, 'source')
     # Build an image from source if source specified.
     if include_build:
       # Create a tag for the image creation
-      if (image is None and not args.IsSpecified('config') and
+      if (not args.IsSpecified('image') and not args.IsSpecified('config') and
           not args.IsSpecified('pack')):
-        image = 'gcr.io/{projectID}/cloud-run-source-deploy/{service}:{tag}'.format(
+        args.image = 'gcr.io/{projectID}/cloud-run-source-deploy/{service}:{tag}'.format(
             projectID=properties.VALUES.core.project.Get(required=True),
             service=service_ref.servicesId,
             tag=uuid.uuid4().hex)
 
       messages = cloudbuild_util.GetMessagesModule()
       build_config = submit_util.CreateBuildConfigAlpha(
-          image, args.no_cache, messages, args.substitutions, args.config,
+          args.image, args.no_cache, messages, args.substitutions, args.config,
           args.IsSpecified('source'), False, args.source,
           args.gcs_source_staging_dir, args.ignore_file, args.gcs_log_dir,
-          args.machine_type, args.disk_size, args.pack)
-
-      if args.IsSpecified('pack'):
-        image = args.pack[0].get('image')
+          args.machine_type, args.disk_size, args.worker_pool, args.pack)
 
       build, build_op = submit_util.Build(messages, True, build_config, True)
       build_op_ref = resources.REGISTRY.ParseRelativeName(
           build_op.name, 'cloudbuild.operations')
       build_log_url = build.logUrl
+      args.image = build.images[0]
+    elif not args.IsSpecified('image'):
+      raise c_exceptions.RequiredArgumentException(
+          '--image', 'Requires a container image to deploy (e.g. '
+          '`gcr.io/cloudrun/hello:latest`) if no build source is provided.')
     # Deploy a container with an image
     conn_context = connection_context.GetConnectionContext(
         args, flags.Product.RUN, self.ReleaseTrack())
-    config_changes = flags.GetConfigurationChanges(args)
+    changes = flags.GetConfigurationChanges(args)
+    changes.append(
+        config_changes.SetLaunchStageAnnotationChange(self.ReleaseTrack()))
 
     with serverless_operations.Connect(conn_context) as operations:
-      image_change = config_changes_mod.ImageChange(image)
-      changes = [image_change]
-      if config_changes:
-        changes.extend(config_changes)
       service = operations.GetService(service_ref)
       allow_unauth = GetAllowUnauth(args, operations, service_ref, service)
 
@@ -257,11 +257,13 @@ class AlphaDeploy(Deploy):
     flags.AddConfigFlags(parser)
     flags.AddSourceFlag(parser)
     flags.AddBuildTimeoutFlag(parser)
+    # TODO(b/165145546): Remove advanced build flags for 'gcloud run deploy'
     build_flags.AddGcsSourceStagingDirFlag(parser, True)
     build_flags.AddGcsLogDirFlag(parser, True)
     build_flags.AddMachineTypeFlag(parser, True)
     build_flags.AddDiskSizeFlag(parser, True)
     build_flags.AddSubstitutionsFlag(parser, True)
+    build_flags.AddWorkerPoolFlag(parser, True)
     build_flags.AddNoCacheFlag(parser, True)
     build_flags.AddIgnoreFileFlag(parser, True)
 

@@ -27,6 +27,9 @@ COMMANDS
      list
         List the keys for a service account.
 
+     upload
+        Upload a public key for an IAM service account.
+
 NOTES
     These variants are also available:
 

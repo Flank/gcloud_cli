@@ -36,6 +36,8 @@ The following \f5gcloud\fR commands respect the \f5.gcloudignore\fR file:
 \f5gcloud container builds submit\fR
 .IP "\(bu" 2m
 \f5gcloud beta debug source upload\fR
+.IP "\(bu" 2m
+\f5gcloud alpha run deploy\fR
 .RE
 .sp
 
@@ -143,7 +145,7 @@ This \f5.gcloudignore\fR would prevent the upload of the \f5node_modules/\fR
 directory and any files ending in \f5~\fR:
 
 .RS 2m
-node_modules/
+/node_modules/
 *~
 .RE
 

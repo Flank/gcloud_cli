@@ -116,20 +116,22 @@ max_allowed_packet=55555,skip_grant_tables=,log_output=1\fR)
 \fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR
 The database engine type and version. If left unspecified, the API defaults will
 be used. \fIDATABASE_VERSION\fR must be one of: \fBMYSQL_5_6\fR,
-\fBMYSQL_5_7\fR, \fBPOSTGRES_9_6\fR, \fBPOSTGRES_10\fR, \fBPOSTGRES_11\fR,
-\fBPOSTGRES_12\fR, \fBSQLSERVER_2017_EXPRESS\fR, \fBSQLSERVER_2017_WEB\fR,
-\fBSQLSERVER_2017_STANDARD\fR, \fBSQLSERVER_2017_ENTERPRISE\fR.
+\fBMYSQL_5_7\fR, \fBMYSQL_8_0\fR, \fBPOSTGRES_9_6\fR, \fBPOSTGRES_10\fR,
+\fBPOSTGRES_11\fR, \fBPOSTGRES_12\fR, \fBSQLSERVER_2017_EXPRESS\fR,
+\fBSQLSERVER_2017_WEB\fR, \fBSQLSERVER_2017_STANDARD\fR,
+\fBSQLSERVER_2017_ENTERPRISE\fR.
 
 .TP 2m
 \fB\-\-enable\-bin\-log\fR
-Specified if binary log should be enabled. If backup configuration is disabled,
-binary log must be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second. Must have automatic backups enabled to use. Make sure storage can
+support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-enable\-point\-in\-time\-recovery\fR
-Specifies if point\-in\-time recovery (using write\-ahead log archiving) should
-be enabled. If backup configuration is disabled, point\-in\-time recovery must
-be disabled as well.
+Allows for data recovery from a specific point in time, down to a fraction of a
+second, via write\-ahead logs. Must have automatic backups enabled to use. Make
+sure storage can support at least 7 days of logs.
 
 .TP 2m
 \fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR

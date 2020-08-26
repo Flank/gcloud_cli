@@ -1,7 +1,7 @@
 NAME
     gcloud alpha compute resource-policies create vm-maintenance
-        concurrency-limit - create a Google Compute Engine VM Maintenance
-        Resource Policy
+        concurrency-limit - create a Compute Engine VM Maintenance Resource
+        Policy
 
 SYNOPSIS
     gcloud alpha compute resource-policies create vm-maintenance
@@ -10,9 +10,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a Google Compute Engine VM Maintenance Resource Policy that,
-    when attached to an instance, recognizes that instance as a part of a group
-    of instances where only up the configured amount of instances in that group
+    (ALPHA) Create a Compute Engine VM Maintenance Resource Policy that, when
+    attached to an instance, recognizes that instance as a part of a group of
+    instances where only up the configured amount of instances in that group
     can undergo simultaneous maintenance.
 
 POSITIONAL ARGUMENTS
@@ -67,5 +67,5 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access allowlist.
 

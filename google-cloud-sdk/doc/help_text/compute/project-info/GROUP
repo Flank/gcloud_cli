@@ -36,7 +36,7 @@ COMMANDS
         Add or update project-wide metadata.
 
      describe
-        Describe the Google Compute Engine project resource.
+        Describe the Compute Engine project resource.
 
      remove-metadata
         Remove project-wide metadata entries.
@@ -45,7 +45,7 @@ COMMANDS
         Set usage reporting bucket for a project.
 
      update
-        Update a Google Compute Engine project resource.
+        Update a Compute Engine project resource.
 
 NOTES
     These variants are also available:

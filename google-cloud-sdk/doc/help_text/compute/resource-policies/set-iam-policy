@@ -1,6 +1,6 @@
 NAME
     gcloud compute resource-policies set-iam-policy - set the IAM policy for a
-        Google Compute Engine resource policy
+        Compute Engine resource policy
 
 SYNOPSIS
     gcloud compute resource-policies set-iam-policy

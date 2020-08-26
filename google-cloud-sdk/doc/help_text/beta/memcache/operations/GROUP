@@ -23,7 +23,7 @@ COMMANDS
         (BETA) Delete a Memorystore Memcached operation.
 
      describe
-        (BETA) Show metadata for a Memorystore Memcached operation.
+        (BETA) Display metadata for a Memorystore Memcached operation.
 
      list
         (BETA) List Memorystore Memcached operations.

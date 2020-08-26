@@ -1,16 +1,14 @@
 NAME
-    gcloud beta memcache instances describe - show metadata for a Memorystore
-        Memcached instance
+    gcloud beta memcache instances describe - display metadata for a
+        Memorystore Memcached instance
 
 SYNOPSIS
     gcloud beta memcache instances describe (INSTANCE : --region=REGION)
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Show metadata for a Memorystore Memcached instance.
-
-    Displays all metadata associated with a Memcached instance given a valid
-    instance name.
+    (BETA) Displays all metadata associated with a Memcached instance given a
+    valid instance name.
 
     This command can fail for the following reasons:
       o The instance specified does not exist.
@@ -19,12 +17,12 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      Instance resource - Arguments and flags that specify the Memcached
-     instance you want to describe. The arguments in this group can be used to
-     specify the attributes of this resource. (NOTE) Some attributes are not
-     given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the argument [instance] on the command line
-     with a fully specified name; provide the argument [--project] on the
-     command line; set the property [core/project]. This must be specified.
+     instance to describe. The arguments in this group can be used to specify
+     the attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [instance] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
 
        INSTANCE
           ID of the instance or fully qualified identifier for the instance.
@@ -47,8 +45,8 @@ API REFERENCE
     API can be found at: https://cloud.google.com/memorystore/
 
 EXAMPLES
-    The following command prints metadata for an instance with the name
-    my-memcache-instance in us-central1:
+    To display the metadata for an instance named my-memcache-instance in
+    region us-central1, run:
 
         $ gcloud beta memcache instances describe my-memcache-instance \
             --region=us-central1

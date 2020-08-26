@@ -36,7 +36,7 @@ COMMANDS
         (BETA) Add or update project-wide metadata.
 
      describe
-        (BETA) Describe the Google Compute Engine project resource.
+        (BETA) Describe the Compute Engine project resource.
 
      remove-metadata
         (BETA) Remove project-wide metadata entries.
@@ -45,7 +45,7 @@ COMMANDS
         (BETA) Set usage reporting bucket for a project.
 
      update
-        (BETA) Update a Google Compute Engine project resource.
+        (BETA) Update a Compute Engine project resource.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -63,7 +63,7 @@ class UsersListBetaTest(_BaseUsersListTest, base.SqlMockTestBeta):
                 instance='my_instance',
                 name='postgres',
                 type=self.messages.User.TypeValueValuesEnum
-                .NATIVE),
+                .BUILT_IN),
             msgs.User(
                 project=self.Project(),
                 instance='my_instance',
@@ -81,7 +81,7 @@ class UsersListBetaTest(_BaseUsersListTest, base.SqlMockTestBeta):
     self.AssertOutputContains(
         """\
 NAME             HOST  TYPE
-postgres               NATIVE
+postgres               BUILT_IN
 test@google.com        CLOUD_IAM_USER
 test-sa@iam            CLOUD_IAM_SERVICE_ACCOUNT
 """,
@@ -101,7 +101,7 @@ class UsersListAlphaTest(_BaseUsersListTest, base.SqlMockTestAlpha):
                 instance='my_instance',
                 name='postgres',
                 type=self.messages.User.TypeValueValuesEnum
-                .NATIVE),
+                .BUILT_IN),
             msgs.User(
                 project=self.Project(),
                 instance='my_instance',
@@ -119,7 +119,7 @@ class UsersListAlphaTest(_BaseUsersListTest, base.SqlMockTestAlpha):
     self.AssertOutputContains(
         """\
 NAME             HOST  TYPE
-postgres               NATIVE
+postgres               BUILT_IN
 test@google.com        CLOUD_IAM_USER
 test-sa@iam            CLOUD_IAM_SERVICE_ACCOUNT
 """,

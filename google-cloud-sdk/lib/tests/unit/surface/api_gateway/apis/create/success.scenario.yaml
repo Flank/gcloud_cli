@@ -5,16 +5,12 @@ summary:
 - execute:
   - command: |
       api-gateway apis create fake-api-name
-  - stderr: |
-      Waiting for async operation fake-operation to complete...
   - progress_tracker:
     - message: Waiting for API [fake-api-name] to be created
     - status: SUCCESS
 - execute:
   - command: |
       api-gateway apis create fake-api-name --async --display-name="Display Name"
-  - stderr: |
-      Waiting for async operation fake-operation to complete...
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -23,8 +19,6 @@ summary:
 - execute:
   - command: |
       api-gateway apis create fake-api-name --async
-  - stderr: |
-      Waiting for async operation fake-operation to complete...
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -33,8 +27,14 @@ summary:
 - execute:
   - command: |
       api-gateway apis create fake-api-name --async --labels="label1=stuff"
-  - stderr: |
-      Waiting for async operation fake-operation to complete...
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/global/operations/fake-operation
+
+- execute:
+  - command: |
+      api-gateway apis create fake-api-name --async --managed-service="fake-api-name.apigateway.fake-project.cloud.goog"
   - stderr: |+
       Asynchronous operation is in progress. Use the following command to wait for its completion:
 
@@ -47,50 +47,11 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '404'
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              producerProjectId: fake-project
-              serviceName: fake-api-name.apigateway.fake-project.cloud.goog
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-    - expect_stderr: |
-        Waiting for async operation fake-operation to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/fake-operation?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-            done: true
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
             json:
-              apiController:
-                managedService: fake-api-name.apigateway.fake-project.cloud.goog
               name: projects/fake-project/locations/global/apis/fake-api-name
         return_response:
           headers:
@@ -137,51 +98,12 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '404'
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              producerProjectId: fake-project
-              serviceName: fake-api-name.apigateway.fake-project.cloud.goog
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-    - expect_stderr: |
-        Waiting for async operation fake-operation to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/fake-operation?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-            done: true
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
             json:
               displayName: Display Name
-              apiController:
-                managedService: fake-api-name.apigateway.fake-project.cloud.goog
               name: projects/fake-project/locations/global/apis/fake-api-name
         return_response:
           headers:
@@ -201,50 +123,11 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '404'
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              producerProjectId: fake-project
-              serviceName: fake-api-name.apigateway.fake-project.cloud.goog
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-    - expect_stderr: |
-        Waiting for async operation fake-operation to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/fake-operation?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-            done: true
-    - api_call:
-        expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
             json:
-              apiController:
-                managedService: fake-api-name.apigateway.fake-project.cloud.goog
               name: projects/fake-project/locations/global/apis/fake-api-name
         return_response:
           headers:
@@ -264,41 +147,30 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services/fake-api-name.apigateway.fake-project.cloud.goog?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '404'
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/services?alt=json
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
             json:
-              producerProjectId: fake-project
-              serviceName: fake-api-name.apigateway.fake-project.cloud.goog
+              labels:
+                label1: stuff
+              name: projects/fake-project/locations/global/apis/fake-api-name
         return_response:
           headers:
             status: '200'
           body:
-            name: fake-operation
-    - expect_stderr: |
-        Waiting for async operation fake-operation to complete...
-    - api_call:
-        expect_request:
-          uri: https://servicemanagement.googleapis.com/v1/operations/fake-operation?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: fake-operation
-            done: true
+            name: projects/fake-project/locations/global/operations/fake-operation
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/global/operations/fake-operation
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway apis create fake-api-name --async --managed-service="fake-api-name.apigateway.fake-project.cloud.goog"
+    events:
     - api_call:
         expect_request:
           uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
@@ -306,10 +178,7 @@ actions:
           headers: {}
           body:
             json:
-              apiController:
-                managedService: fake-api-name.apigateway.fake-project.cloud.goog
-              labels:
-                label1: stuff
+              managedService: fake-api-name.apigateway.fake-project.cloud.goog
               name: projects/fake-project/locations/global/apis/fake-api-name
         return_response:
           headers:

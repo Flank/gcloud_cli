@@ -27,6 +27,14 @@ summary:
     - input: n
   - stderr: |
       Aborted by user.
+- set_property: privateca/location us-central1
+- execute:
+  - command: privateca roots delete ca
+  - prompt:
+    - message: You are about to delete Certificate Authority [projects/fake-project/locations/us-central1/certificateAuthorities/ca]
+    - input: y
+  - stderr: |
+      Deleted Root CA [projects/fake-project/locations/us-central1/certificateAuthorities/ca].
 actions:
 - execute_command:
     command: privateca roots delete ca --location europe-west1
@@ -123,5 +131,39 @@ actions:
         user_input: n
     - expect_stderr: |
         Aborted by user.
+    - expect_exit:
+        code: 0
+- set_property:
+    privateca/location: us-central1
+- execute_command:
+    command: privateca roots delete ca
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Certificate Authority [projects/fake-project/locations/us-central1/certificateAuthorities/ca]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/certificateAuthorities/ca?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/certificateAuthorities/ca
+            type: SELF_SIGNED
+    - api_call:
+        expect_request:
+          uri:
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/fake-project/locations/us-central1/certificateAuthorities/ca\?alt=json&requestId=[^&]+$
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+    - expect_stderr: |
+        Deleted Root CA [projects/fake-project/locations/us-central1/certificateAuthorities/ca].
     - expect_exit:
         code: 0

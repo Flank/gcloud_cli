@@ -4,9 +4,11 @@ NAME
 
 SYNOPSIS
     gcloud beta asset analyze-iam-policy
-        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID)
-        [--full-resource-name=FULL_RESOURCE_NAME] [--identity=IDENTITY]
-        [--execution-timeout=EXECUTION_TIMEOUT --expand-groups
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [--full-resource-name=FULL_RESOURCE_NAME]
+        [--identity=IDENTITY]
+        [--analyze-service-account-impersonation
+          --execution-timeout=EXECUTION_TIMEOUT --expand-groups
           --expand-resources --expand-roles
           --output-group-edges --output-resource-edges --show-response]
         [--permissions=[PERMISSIONS,...] --roles=[ROLES,...]]
@@ -24,6 +26,9 @@ REQUIRED FLAGS
        --organization=ORGANIZATION_ID
           The organization ID to perform the analysis.
 
+       --project=PROJECT_ID
+          The project ID or number to perform the analysis.
+
 OPTIONAL FLAGS
      Specifies a resource for analysis. Leaving it empty means ANY.
 
@@ -37,6 +42,13 @@ OPTIONAL FLAGS
           binding.
 
      The analysis options.
+
+       --analyze-service-account-impersonation
+          If true, the response will include access analysis from identities to
+          resources via service account impersonation. This is a very expensive
+          operation, because many derived queries will be executed. We highly
+          recommend you use ExportIamPolicyAnalysis rpc instead. Default is
+          false.
 
        --execution-timeout=EXECUTION_TIMEOUT
           The amount of time the executable has to complete. See JSON
@@ -106,6 +118,12 @@ EXAMPLES
         $ gcloud beta asset analyze-iam-policy --organization=YOUR_ORG_ID \
             --full-resource-name=YOUR_PROJECT_FULL_RESOURCE_NAME \
             --identity='user:u1@foo.com'
+
+    To find out which users have been granted the iam.serviceAccounts.actAs
+    permission on any applicable resources, run:
+
+        $ gcloud beta asset analyze-iam-policy --organization=YOUR_ORG_ID \
+            --permissions='iam.serviceAccounts.actAs'
 
 NOTES
     This command is currently in BETA and may change without notice. This

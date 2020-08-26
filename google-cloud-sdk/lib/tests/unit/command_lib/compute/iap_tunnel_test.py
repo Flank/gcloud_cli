@@ -30,15 +30,18 @@ import time
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import iap_tunnel
+from googlecloudsdk.core.credentials import store as c_store
 from surface.compute import ssh as ssh_surface
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope import util
 from tests.lib.surface.compute import test_base as compute_test_base
 from tests.lib.surface.compute import utils as compute_tests_utils
-
 import mock
+from oauth2client import client
 import six
+
+from google.oauth2 import credentials as google_auth_creds
 
 
 class StdinSocketRecvWindowsTest(test_case.Base):
@@ -356,6 +359,20 @@ class SSHTunnelArgsTest(compute_test_base.BaseTest, parameterized.TestCase):
             ['--tunnel-through-iap',
              '--no-iap-tunnel-insecure-disable-websocket-cert-check']),
         expected_tunnel_args)
+
+
+class GetAccessTokenCallbackTest(compute_test_base.BaseTest):
+
+  def testOauth2client(self):
+    google_auth_cred = google_auth_creds.Credentials('google_auth_token')
+    oauth2client_cred = client.Credentials()
+    oauth2client_cred.access_token = 'oauth2client_token'
+    self.c_store_refresh = self.StartObjectPatch(
+        c_store, 'Refresh', autospec=True, return_value=None)
+    self.AssertEqual('google_auth_token',
+                     iap_tunnel._GetAccessTokenCallback(google_auth_cred))
+    self.AssertEqual('oauth2client_token',
+                     iap_tunnel._GetAccessTokenCallback(oauth2client_cred))
 
 
 if __name__ == '__main__':

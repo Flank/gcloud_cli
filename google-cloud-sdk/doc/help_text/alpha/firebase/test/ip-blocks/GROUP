@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha firebase test ip-blocks - explore IP blocks used by Firebase
+        Test Lab devices
+
+SYNOPSIS
+    gcloud alpha firebase test ip-blocks COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Get a list of IP address blocks in CIDR notation used by Firebase
+    Test Lab devices.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        (ALPHA) List all IP address blocks used by Firebase Test Lab devices.
+
+EXAMPLES
+    To see the list of the IP blocks used, their form factors, and the date
+    they were added to Firebase Test Lab, run:
+
+        $ gcloud alpha firebase test ip-blocks list
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta firebase test ip-blocks
+

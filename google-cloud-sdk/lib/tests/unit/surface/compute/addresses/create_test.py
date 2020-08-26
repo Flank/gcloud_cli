@@ -770,11 +770,11 @@ class CreateWithSubnetAlphaTest(CreateWithSubnetBetaTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
-class CreateWithSharedLoadBalancerVipBetaTest(test_base.BaseTest):
+class CreateWithSharedLoadBalancerVipTest(test_base.BaseTest):
 
   def PreSetUp(self):
-    self.api_version = 'beta'
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SelectApi(self.api_version)
@@ -810,6 +810,14 @@ class CreateWithSharedLoadBalancerVipBetaTest(test_base.BaseTest):
           ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
+
+
+class CreateWithSharedLoadBalancerVipBetaTest(
+    CreateWithSharedLoadBalancerVipTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class CreateWithSharedLoadBalancerVipAlphaTest(

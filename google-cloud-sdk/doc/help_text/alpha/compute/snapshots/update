@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute snapshots update - update a Google Compute Engine
-        snapshot
+    gcloud alpha compute snapshots update - update a Compute Engine snapshot
 
 SYNOPSIS
     gcloud alpha compute snapshots update SNAPSHOT_NAME
@@ -8,8 +7,8 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute snapshots update updates labels for a Google
-    Compute snapshot.
+    (ALPHA) gcloud alpha compute snapshots update updates labels for a Compute
+    Engine snapshot.
 
 POSITIONAL ARGUMENTS
      SNAPSHOT_NAME
@@ -74,7 +73,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute snapshots update
         $ gcloud beta compute snapshots update

@@ -33,9 +33,6 @@ GROUPS
      images
         (BETA) List and manipulate Google Container Registry images.
 
-     memberships
-        (BETA) (DEPRECATED) Manage Google Kubernetes Hub memberships.
-
      node-pools
         (BETA) Create and delete operations for Google Kubernetes Engine node
         pools.

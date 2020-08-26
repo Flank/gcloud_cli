@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instance\-groups managed instance\-configs update \- update per instance config of a managed instance group
+gcloud alpha compute instance\-groups managed instance\-configs update \- update per\-instance config of a managed instance group
 
 
 
@@ -18,8 +18,8 @@ gcloud alpha compute instance\-groups managed instance\-configs update \- update
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed instance\-configs
-update\fR updates the per instance config of an instance controlled by a Compute
-Engine managed instance group. The command lets you change the list of
+update\fR updates the per\-instance config of an instance controlled by a
+Compute Engine managed instance group. The command lets you change the list of
 instance\-specific stateful resources, that is, the list of resources that are
 preserved during instance restarts and recreations.
 
@@ -34,7 +34,7 @@ the necessary action (for example, REFRESH), unless overridden by providing the
 .RS 2m
 .TP 2m
 \fINAME\fR
-Name of the managed instance group to update per instance config for.
+Name of the managed instance group to update per\-instance config for.
 
 
 .RE
@@ -178,7 +178,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-Region of the managed instance group to update per instance config for. If not
+Region of the managed instance group to update per\-instance config for. If not
 specified, you may be prompted to select a region.
 
 A list of regions can be fetched by running:
@@ -192,7 +192,7 @@ invocation.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-Zone of the managed instance group to update per instance config for. If not
+Zone of the managed instance group to update per\-instance config for. If not
 specified, you may be prompted to select a zone.
 
 A list of zones can be fetched by running:
@@ -236,7 +236,7 @@ my\-project/zones/us\-central1\-a/disks/my\-disk\-3 \e
     \-\-stateful\-metadata='my\-key=my\-value'
 .RE
 
-If \f5\fImy\-disk\-3\fR\fR did not exist previously in the per instance config,
+If \f5\fImy\-disk\-3\fR\fR did not exist previously in the per\-instance config,
 and if it does not exist in the group's instance template, then the command adds
 \f5\fImy\-disk\-3\fR\fR to \f5\fImy\-instance\fR\fR. The command also removes
 stateful configuration for \f5\fImy\-disk\-1\fR\fR and \f5\fImy\-disk\-2\fR\fR;
@@ -250,9 +250,10 @@ detached.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. These variants are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed instance\-configs update
 $ gcloud beta compute instance\-groups managed instance\-configs update
 .RE
 

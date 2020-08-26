@@ -1,0 +1,45 @@
+NAME
+    gcloud beta scc assets run-discovery - scan an organization for
+        new/modified/deleted assets
+
+SYNOPSIS
+    gcloud beta scc assets run-discovery [ORGANIZATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Scan an organization for new/modified/deleted assets. Note that this
+    API can only be called with limited frequency for an organization. If it is
+    called too frequently the caller will receive a TOO_MANY_REQUESTS error.
+
+POSITIONAL ARGUMENTS
+     Organization resource - The organization for which scan should be run.
+     This represents a Cloud resource.
+
+       [ORGANIZATION]
+          ID of the organization or fully qualified identifier for the
+          organization.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the securitycenter/v1 API. The full documentation for
+    this API can be found at:
+    https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
+
+EXAMPLES
+    Run new scan for organization (123456):
+
+        $ gcloud beta scc assets run-discovery 123456
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud scc assets run-discovery
+        $ gcloud alpha scc assets run-discovery
+

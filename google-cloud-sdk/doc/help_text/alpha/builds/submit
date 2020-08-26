@@ -6,7 +6,8 @@ SYNOPSIS
         [--disk-size=DISK_SIZE] [--gcs-log-dir=GCS_LOG_DIR]
         [--gcs-source-staging-dir=GCS_SOURCE_STAGING_DIR]
         [--ignore-file=IGNORE_FILE] [--machine-type=MACHINE_TYPE]
-        [--substitutions=[KEY=VALUE,...]] [--timeout=TIMEOUT]
+        [--region=REGION] [--substitutions=[KEY=VALUE,...]] [--timeout=TIMEOUT]
+        [--worker-pool=WORKER_POOL]
         [--config=CONFIG; default="cloudbuild.yaml"
           | --pack=[builder=BUILDER],[env=ENV],[image=IMAGE]
           | --tag=TAG, -t TAG] [GCLOUD_WIDE_FLAG ...]
@@ -73,6 +74,11 @@ FLAGS
         Machine type used to run the build. MACHINE_TYPE must be one of:
         n1-highcpu-32, n1-highcpu-8.
 
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
+
      --substitutions=[KEY=VALUE,...]
         Parameters to be substituted in the build specification.
 
@@ -100,6 +106,11 @@ FLAGS
         assumed. For example, "10" is 10 seconds. Overrides the default
         builds/timeout property value for this command invocation.
 
+     --worker-pool=WORKER_POOL
+        Specify a worker pool for the build to run in. Format:
+        projects/{project}/locations/{region}/workerPools/{workerPool}. This
+        field is restricted to custom workers beta users.
+
      At most one of these may be specified:
 
        --config=CONFIG; default="cloudbuild.yaml"
@@ -114,7 +125,7 @@ FLAGS
           environment variables to the builder use the optional "env" key/value
           argument where value is a list of key values using escaping
           (https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if
-          neccessary.
+          necessary.
 
        --tag=TAG, -t TAG
           The tag to use with a "docker build" image creation. Cloud Build will
@@ -159,7 +170,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud builds submit
         $ gcloud beta builds submit

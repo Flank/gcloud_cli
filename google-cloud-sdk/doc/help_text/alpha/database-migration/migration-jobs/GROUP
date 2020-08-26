@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha database-migration migration-jobs - manage Cloud Database
+        Migration Service migration jobs
+
+SYNOPSIS
+    gcloud alpha database-migration migration-jobs COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing Cloud Database Migration Service migration
+    jobs.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete a migration job.
+
+     describe
+        (ALPHA) Show details about a migration job.
+
+     list
+        (ALPHA) List migration jobs.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist.
+

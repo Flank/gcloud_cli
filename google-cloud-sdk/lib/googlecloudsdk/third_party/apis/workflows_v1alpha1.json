@@ -300,13 +300,7 @@
         },
         "state": {
           "description": "Output only. State of the workflow deployment.",
-          "enumDescriptions": [
-            "Invalid state.",
-            "The workflow has been deployed successfully and is serving.",
-            "The workflow failed to deploy successfully and is not serving.",
-            "The workflow is being deployed.",
-            "The workflow is being deleted."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Invalid state.",
@@ -325,16 +319,19 @@
         },
         "versionId": {
           "description": "Output only. The version identifier of the workflow. When the workflow gets created, version_id is set to 1. Each deployment attempt increases the version by 1.",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         },
         "createTime": {
           "description": "Output only. The timestamp of when the workflow was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The last update timestamp of the workflow.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },

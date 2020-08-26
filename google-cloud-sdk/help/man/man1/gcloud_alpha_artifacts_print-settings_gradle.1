@@ -11,7 +11,7 @@ gcloud alpha artifacts print\-settings gradle \- print a snippet to add a reposi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha artifacts print\-settings gradle\fR [\fB\-\-repository\fR=\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha artifacts print\-settings gradle\fR [\fB\-\-json\-key\fR=\fIJSON_KEY\fR] [\fB\-\-repository\fR=\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,6 +25,11 @@ file.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-json\-key\fR=\fIJSON_KEY\fR
+Path to service account JSON key. If not specified, current active service
+account credentials or a placeholder for gcloud credentials is used.
+
 .TP 2m
 
 Repository resource \- The Artifact Registry repository. If not specified, the
@@ -77,6 +82,13 @@ $ gcloud alpha artifacts print\-settings gradle \e
     \-\-repository="my\-repository"
 .RE
 
+To print a snippet using service account key:
+
+.RS 2m
+$ gcloud alpha artifacts print\-settings gradle \e
+    \-\-json\-key=path/to/key.json
+.RE
+
 
 
 .SH "NOTES"
@@ -84,7 +96,7 @@ $ gcloud alpha artifacts print\-settings gradle \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+allowlist. This variant is also available:
 
 .RS 2m
 $ gcloud beta artifacts print\-settings gradle

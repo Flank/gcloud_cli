@@ -35,6 +35,7 @@ def _GetResourceName(prefix):
   return next(e2e_utils.GetResourceNameGenerator(prefix, delimiter='_')).upper()
 
 
+@test_case.Filters.skipAlways('Timing out', 'b/152382402')
 class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
                                    cli_test_base.CliTestBase):
   # A mapping of which billing project to use for this instance of e2e test

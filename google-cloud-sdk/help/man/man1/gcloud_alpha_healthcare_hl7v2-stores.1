@@ -11,7 +11,7 @@ gcloud alpha healthcare hl7v2\-stores \- manage Cloud Healthcare API HL7v2 store
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha healthcare hl7v2\-stores\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha healthcare hl7v2\-stores\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,6 +31,23 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 Run \fB$ gcloud help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBexport\fR
+\fB(ALPHA)\fR Manage Cloud Healthcare API HL7v2 store exports.
+
+.TP 2m
+\fBimport\fR
+\fB(ALPHA)\fR Manage Cloud Healthcare API HL7v2 store imports.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -83,7 +100,7 @@ store.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud healthcare hl7v2\-stores

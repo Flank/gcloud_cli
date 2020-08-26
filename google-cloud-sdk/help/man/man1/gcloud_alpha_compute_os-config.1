@@ -11,7 +11,7 @@ gcloud alpha compute os\-config \- manage OS Config tasks for Compute Engine VM 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute os\-config\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute os\-config\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,12 +53,25 @@ Run \fB$ gcloud help\fR for details.
 .RE
 .sp
 
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBos\-upgrade\fR
+\fB(ALPHA)\fR Upgrade the instances OS version.
+
+
+.RE
+.sp
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud compute os\-config

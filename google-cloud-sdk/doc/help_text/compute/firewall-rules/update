@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
         [--destination-ranges=[CIDR_RANGE,...]] [--disabled]
-        [--[no-]enable-logging] [--priority=PRIORITY]
-        [--rules=[PROTOCOL[:PORT[-PORT]],...]]
+        [--[no-]enable-logging] [--logging-metadata=LOGGING_METADATA]
+        [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
         [--target-service-accounts=[EMAIL,...]] [--target-tags=[TAG,...]]
@@ -91,6 +91,11 @@ FLAGS
             $ gcloud compute firewall-rules update MY-RULE --no-enable-logging
 
         Use --enable-logging to enable and --no-enable-logging to disable.
+
+     --logging-metadata=LOGGING_METADATA
+        Adds or removes metadata fields to or from the reported firewall logs.
+        Can only be specified if --enable-logging is true. LOGGING_METADATA
+        must be one of: exclude-all, include-all.
 
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT

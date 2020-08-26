@@ -25,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding to a Google Compute Engine reservation.
+        Add IAM policy binding to a Compute Engine reservation.
 
      create
         Create a Compute Engine reservation.
@@ -37,16 +37,16 @@ COMMANDS
         Show details about a Compute Engine reservation.
 
      get-iam-policy
-        Get the IAM policy for a Google Compute Engine reservation.
+        Get the IAM policy for a Compute Engine reservation.
 
      list
-        List Google Compute Engine reservations.
+        List Compute Engine reservations.
 
      remove-iam-policy-binding
-        Remove IAM policy binding from a Google Compute Engine reservation.
+        Remove IAM policy binding from a Compute Engine reservation.
 
      set-iam-policy
-        Set the IAM policy for a Google Compute Engine reservation.
+        Set the IAM policy for a Compute Engine reservation.
 
      update
         Update a Compute Engine reservation.

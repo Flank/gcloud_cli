@@ -1,13 +1,13 @@
 NAME
-    gcloud compute resource-policies describe - describe a Google Compute
-        Engine resource policy
+    gcloud compute resource-policies describe - describe a Compute Engine
+        resource policy
 
 SYNOPSIS
     gcloud compute resource-policies describe NAME [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Describe a Google Compute Engine resource policy.
+    Describe a Compute Engine resource policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -43,7 +43,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command shows the details of a Google Compute Engine resource
+    The following command shows the details of a Compute Engine resource
     policy.
 
         $ gcloud compute resource-policies describe my-resource-policy \

@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.service_directory import base
 
 
@@ -98,6 +100,20 @@ class NamespacesCreateTestBeta(base.ServiceDirectoryUnitTestBase):
   def testCreate_WithoutNamespaceId_Fails(self):
     with self.AssertRaisesArgumentErrorMatches('NAMESPACE must be specified.'):
       self.Run('service-directory namespaces create ' '--location my-location')
+
+  def testCreate_InvalidRequest_Fails(self):
+    req = self.msgs.ServicedirectoryProjectsLocationsNamespacesCreateRequest(
+        parent=self.location_name,
+        namespaceId='my-namespace',
+        namespace=self._Namespace())
+    exception = http_error.MakeHttpError(code=400)
+    self.client.projects_locations_namespaces.Create.Expect(
+        request=req, exception=exception, response=None)
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Invalid request API reason: Invalid request.'):
+      self.Run('service-directory namespaces create my-namespace '
+               '--location my-location ')
+    self.AssertErrNotContains('Created namespace')
 
 
 class NamespacesCreateTestAlpha(NamespacesCreateTestBeta):

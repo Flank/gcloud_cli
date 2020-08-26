@@ -70,7 +70,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
         'functions deploy {0} '
         '--source={1} '
         '--trigger-http '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--entry-point function'.format(
             self.function_name, self.function_path))
     # test-topic is created automatically and automatically cleaned-up
@@ -82,7 +82,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
         'functions deploy {0} '
         '--source={1} '
         '--trigger-topic test-topic '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--entry-point function'.format(
             self.function_name, self.function_path))
     # test-topic is created automatically and automatically cleaned-up
@@ -93,7 +93,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source={1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--trigger-bucket e2e-input-functions --entry-point function'.format(
             self.function_name, self.function_path))
     # test-topic is created automatically and automatically cleaned-up
@@ -104,7 +104,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source {1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--trigger-event providers/cloud.pubsub/eventTypes/topic.publish '
         '--trigger-resource test-topic --entry-point function'.format(
             self.function_name, self.function_path))
@@ -122,7 +122,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source {1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--stage-bucket e2e-input-functions '
         '--trigger-http --entry-point function '
         '--ignore-file .ignore_file_test'.format(
@@ -146,7 +146,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
       self.Run(
           'functions deploy {0} '
           '--source {1} '
-          '--runtime=nodejs6 '
+          '--runtime=nodejs10 '
           '--stage-bucket e2e-input-functions '
           '--trigger-http --entry-point function '
           '--ignore-file .ignore_file_test'.format(
@@ -163,7 +163,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
       self.Run(
           'functions deploy {0} '
           '--source {1} '
-          '--runtime=nodejs6 '
+          '--runtime=nodejs10 '
           '--stage-bucket e2e-input-functions '
           '--trigger-http --entry-point function '
           '--ignore-file .ignore_file_test'.format(
@@ -179,7 +179,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source {1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--stage-bucket e2e-input-functions '
         '--trigger-http --entry-point function'.format(
             self.function_name, self.function_path))
@@ -197,7 +197,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source {1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--stage-bucket e2e-input-functions '
         '--trigger-http --entry-point function'.format(
             self.function_name, self.function_path))
@@ -213,7 +213,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source {1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--stage-bucket e2e-input-functions '
         '--trigger-http --entry-point function'.format(
             self.function_name, self.function_path))
@@ -236,7 +236,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
       self.Run(
           'functions deploy {0} '
           '--source {1} '
-          '--runtime=nodejs6 '
+          '--runtime=nodejs10 '
           '--stage-bucket e2e-input-functions '
           '--trigger-http --entry-point function'.format(
               self.function_name, self.function_path))
@@ -248,7 +248,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run(
         'functions deploy {0} '
         '--source={1} '
-        '--runtime=nodejs6 '
+        '--runtime=nodejs10 '
         '--trigger-http '
         '--entry-point function'.format(
             self.function_name, self.function_path))

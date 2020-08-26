@@ -46,9 +46,6 @@ class DeployConnectAgentTest(sdk_test_base.WithFakeAuth,
         'googlecloudsdk.api_lib.container.hub.gkehub_api_adapter.APIAdapter')()
     self.mock_kubernetes_client = self.StartPatch(
         'googlecloudsdk.command_lib.container.hub.kube_util.KubernetesClient')()
-    self.mock_old_kubernetes_client = self.StartPatch(
-        'googlecloudsdk.command_lib.container.hub.kube_util.OldKubernetesClient'
-    )()
     self.parser = test_util.ArgumentParser()
     register.Register.Args(self.parser)
     self.registry = resources.Registry()
@@ -142,29 +139,6 @@ class DeployConnectAgentTest(sdk_test_base.WithFakeAuth,
         'some data', 'some other data',
         'project/my-project/locations/global/memberships/my-membership',
         calliope_base.ReleaseTrack.GA)
-
-  def testSuccessfulAgentDeploymentWithOldKubernetesClient(self):
-    properties.VALUES.core.project.Set('my-project')
-    self.mock_old_kubernetes_client.Apply.return_value = ('some output', None)
-    self.mock_old_kubernetes_client.Logs.return_value = ('Fake log', None)
-    self.mock_old_kubernetes_client.Delete.return_value = None
-    self.mock_old_kubernetes_client.NamespaceExists.return_value = False
-    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.return_value = None
-    self.StartObjectPatch(gkehub_api_adapter, 'InitAPIAdapter',
-                          return_value=self.mock_api_adapter)
-    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
-    self.mock_api_adapter.GenerateConnectAgentManifest.return_value = [
-        {'manifest': 'some content'},
-    ]
-    args = self.parser.parse_args([
-        'my-membership', '--kubeconfig', '/tmp/kubeconfig', '--context',
-        'default', '--service-account-key-file', '/tmp/key.json'
-    ])
-    agent_util.DeployConnectAgent(
-        self.mock_old_kubernetes_client, args,
-        'some data', 'some other data',
-        'project/my-project/locations/global/memberships/my-membership',
-        calliope_base.ReleaseTrack.BETA)
 
 
 class DeploymentPodsAvailableOperationTest(sdk_test_base.SdkBase,

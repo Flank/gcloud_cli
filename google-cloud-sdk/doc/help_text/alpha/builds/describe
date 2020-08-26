@@ -2,7 +2,7 @@ NAME
     gcloud alpha builds describe - get information about a particular build
 
 SYNOPSIS
-    gcloud alpha builds describe BUILD [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha builds describe BUILD [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Get information about a particular build.
@@ -11,6 +11,12 @@ POSITIONAL ARGUMENTS
      BUILD
         The build to describe. The ID of the build is printed at the end of the
         build submission process, or in the ID column when listing builds.
+
+FLAGS
+     --region=REGION
+        The region of the Cloud Build Service to use. Must be set to
+        us-central-1. If unset, the global service is used. The global service
+        is isolated from all regional services.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -29,7 +35,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud builds describe
         $ gcloud beta builds describe

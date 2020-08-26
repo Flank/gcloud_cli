@@ -11,7 +11,7 @@ gcloud compute firewall\-rules create \- create a Compute Engine firewall rule
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute firewall\-rules create\fR \fINAME\fR (\fB\-\-action\fR=\fIACTION\fR\ |\ \fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-disabled\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]] [\fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute firewall\-rules create\fR \fINAME\fR (\fB\-\-action\fR=\fIACTION\fR\ |\ \fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-disabled\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]] [\fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -149,6 +149,12 @@ $ gcloud compute firewall\-rules create MY\-RULE \-\-no\-enable\-logging
 
 Use \fB\-\-enable\-logging\fR to enable and \fB\-\-no\-enable\-logging\fR to
 disable.
+
+.TP 2m
+\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR
+Adds or removes metadata fields to or from the reported firewall logs. Can only
+be specified if \-\-enable\-logging is true. \fILOGGING_METADATA\fR must be one
+of: \fBexclude\-all\fR, \fBinclude\-all\fR.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR; default="default"

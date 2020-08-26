@@ -29,14 +29,12 @@ actions:
               displayName: Api One
               state: ACTIVE
               createTime: '2019-11-04T21:12:05.040425833Z'
-              apiController:
-                managedService: apiNumeroUno.apigateway.fake-project.cloud.goog
+              managedService: apiNumeroUno.apigateway.fake-project.cloud.goog
             - name: /projects/fake-project/locations/global/apis/apiNumeroDos
               displayName: Api Two
               state: ACTIVE
               createTime: '2019-11-04T21:12:05.040425833Z'
-              apiController:
-                managedService: apiNumeroDos.apigateway.fake-project.cloud.goog
+              managedService: apiNumeroDos.apigateway.fake-project.cloud.goog
     - expect_stdout: |
         API_ID  DISPLAY_NAME  MANAGED_SERVICE                                  STATE   CREATE_TIME
         apis    Api One       apiNumeroUno.apigateway.fake-project.cloud.goog  ACTIVE  2019-11-04T21:12:05

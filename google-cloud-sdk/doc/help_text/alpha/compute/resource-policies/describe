@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha compute resource-policies describe - describe a Google Compute
-        Engine resource policy
+    gcloud alpha compute resource-policies describe - describe a Compute Engine
+        resource policy
 
 SYNOPSIS
     gcloud alpha compute resource-policies describe NAME [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a Google Compute Engine resource policy.
+    (ALPHA) Describe a Compute Engine resource policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -43,7 +43,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command shows the details of a Google Compute Engine resource
+    The following command shows the details of a Compute Engine resource
     policy.
 
         $ gcloud alpha compute resource-policies describe \
@@ -53,7 +53,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute resource-policies describe
         $ gcloud beta compute resource-policies describe

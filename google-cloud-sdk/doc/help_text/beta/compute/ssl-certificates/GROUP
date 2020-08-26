@@ -31,13 +31,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create a Google Compute Engine SSL certificate.
+        (BETA) Create a Compute Engine SSL certificate.
 
      delete
-        (BETA) Delete Google Compute Engine SSL certificates.
+        (BETA) Delete Compute Engine SSL certificates.
 
      describe
-        (BETA) Describe a Google Compute Engine SSL certificate.
+        (BETA) Describe a Compute Engine SSL certificate.
 
      list
         (BETA) List Google Compute Engine SSL certificates.

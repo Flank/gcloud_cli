@@ -7,9 +7,11 @@ SYNOPSIS
         (ENVIRONMENT : --location=LOCATION)
         ([--container-repository=CONTAINER_REPOSITORY
           : --container-tag=CONTAINER_TAG]
-          | --vm-image-project=VM_IMAGE_PROJECT
-          (--vm-image-family=VM_IMAGE_FAMILY | --vm-image-name=VM_IMAGE_NAME))
-        [--async] [--description=DESCRIPTION] [--display-name=DISPLAY_NAME]
+          | [(--vm-image-family=VM_IMAGE_FAMILY
+          | --vm-image-name=VM_IMAGE_NAME)
+          : --vm-image-project=VM_IMAGE_PROJECT;
+          default="deeplearning-platform-release"]) [--async]
+        [--description=DESCRIPTION] [--display-name=DISPLAY_NAME]
         [--post-startup-script=POST_STARTUP_SCRIPT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -48,10 +50,9 @@ REQUIRED FLAGS
           The tag of the container image. If not specified, this defaults to
           the latest tag.
 
-       --vm-image-project=VM_IMAGE_PROJECT
+       --vm-image-project=VM_IMAGE_PROJECT; default="deeplearning-platform-release"
           The ID of the Google Cloud project that this VM image belongs
-          to.Format: projects/{project_id}. This flag must be specified if any
-          of the other arguments in this group are specified.
+          to.Format: projects/{project_id}.
 
        Exactly one of these must be specified:
 
@@ -116,7 +117,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access allowlist. This variant is also available:
 
         $ gcloud beta notebooks environments create
 

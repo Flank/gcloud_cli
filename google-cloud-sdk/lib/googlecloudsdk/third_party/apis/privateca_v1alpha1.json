@@ -6,7 +6,7 @@
   "canonicalName": "Certificate Authority Service",
   "version": "v1alpha1",
   "revision": "0",
-  "title": "Certificate Authority Service API",
+  "title": "Certificate Authority API",
   "description": "",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -288,15 +288,11 @@
       "properties": {
         "name": {
           "description": "Output only. The resource name for this CertificateAuthority in the format `projects\/*\/locations\/*\/certificateAuthorities\/*`.",
+          "readOnly": true,
           "type": "string"
         },
         "type": {
           "description": "Required. Immutable. The Type of this CertificateAuthority.",
-          "enumDescriptions": [
-            "Not specified.",
-            "Self-signed CA.",
-            "Subordinate CA. Could be issued by a Private CA CertificateAuthority or an unmanaged CA."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Not specified.",
@@ -339,13 +335,7 @@
         },
         "state": {
           "description": "Output only. The State for this CertificateAuthority.",
-          "enumDescriptions": [
-            "Not specified.",
-            "Certificates can be issued from this CA. CRLs will be generated for this CA.",
-            "Certificates cannot be issued from this CA. CRLs will still be generated.",
-            "Certificates cannot be issued from this CA. CRLs will not be generated.",
-            "Certificates cannot be issued from this CA. CRLs will not be generated."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not specified.",
@@ -364,10 +354,12 @@
         },
         "pemCert": {
           "description": "Output only. This CertificateAuthority's CA cert.",
+          "readOnly": true,
           "type": "string"
         },
         "caCertificateDescription": {
           "description": "Output only. A structured description of this CertificateAuthority's CA cert.",
+          "readOnly": true,
           "$ref": "CertificateDescription"
         },
         "gcsBucket": {
@@ -376,20 +368,24 @@
         },
         "accessUrls": {
           "description": "Output only. URLs for accessing content published by this CA, such as the CA certificate and CRLs.",
+          "readOnly": true,
           "$ref": "AccessUrls"
         },
         "createTime": {
           "description": "Output only. The time at which this CertificateAuthority was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The time at which this CertificateAuthority was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "deletionTime": {
           "description": "Output only. The time at which this CertificateAuthority will be deleted, if scheduled for deletion.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -747,11 +743,6 @@
       "properties": {
         "type": {
           "description": "Required. The type of public key.",
-          "enumDescriptions": [
-            "Default unspecified value.",
-            "A PEM-encoded PKCS#1\/RFC 3447 RSAPrivateKey structure.",
-            "A PEM-encoded compressed NIST P-256\/secp256r1\/prime256v1 or P-384 key."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default unspecified value.",
@@ -1003,15 +994,18 @@
       "properties": {
         "name": {
           "description": "Output only. The resource path for this CertificateRevocationList in the format `projects\/*\/locations\/*\/certificateAuthorities\/*\/ certificateRevocationLists\/*`.",
+          "readOnly": true,
           "type": "string"
         },
         "sequenceNumber": {
           "description": "Output only. The CRL sequence number that appears in pem_crl.",
+          "readOnly": true,
           "type": "string",
           "format": "int64"
         },
         "revokedCertificates": {
           "description": "Output only. The revoked serial numbers that appear in pem_crl.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "$ref": "RevokedCertificate"
@@ -1019,19 +1013,17 @@
         },
         "pemCrl": {
           "description": "Output only. The PEM-encoded X.509 CRL.",
+          "readOnly": true,
           "type": "string"
         },
         "accessUrl": {
           "description": "Output only. The location where 'pem_crl' can be accessed.",
+          "readOnly": true,
           "type": "string"
         },
         "state": {
           "description": "Output only. The State for this CertificateRevocationList.",
-          "enumDescriptions": [
-            "Not specified.",
-            "The CertificateRevocationList is up to date.",
-            "The CertificateRevocationList is no longer current."
-          ],
+          "readOnly": true,
           "type": "string",
           "enumDescriptions": [
             "Not specified.",
@@ -1046,11 +1038,13 @@
         },
         "createTime": {
           "description": "Output only. The time at which this CertificateRevocationList was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The time at which this CertificateRevocationList was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -1078,17 +1072,6 @@
         },
         "revocationReason": {
           "description": "The reason the Certificate was revoked.",
-          "enumDescriptions": [
-            "Default unspecified value. This value does indicate that a Certificate has been revoked, but that a reason has not been recorded.",
-            "Key material for this Certificate may have leaked.",
-            "The key material for a certificate authority in the issuing path may have leaked.",
-            "The subject or other attributes in this Certificate have changed.",
-            "This Certificate has been superseded.",
-            "This Certificate or entities in the issuing path have ceased to operate.",
-            "This Certificate should not be considered valid, it is expected that it may become valid in the future.",
-            "This Certificate no longer has permission to assert the listed attributes.",
-            "The authority which determines appropriate attributes for a Certificate may have been compromised."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default unspecified value. This value does indicate that a Certificate has been revoked, but that a reason has not been recorded.",
@@ -1147,6 +1130,7 @@
       "properties": {
         "name": {
           "description": "Output only. The resource path for this Certificate in the format `projects\/*\/locations\/*\/certificateAuthorities\/*\/certificates\/*`.",
+          "readOnly": true,
           "type": "string"
         },
         "pemCsr": {
@@ -1164,18 +1148,22 @@
         },
         "revocationDetails": {
           "description": "Output only. Details regarding the revocation of this Certificate. This Certificate is considered revoked if and only if this field is present.",
+          "readOnly": true,
           "$ref": "RevocationDetails"
         },
         "pemCertificate": {
           "description": "Output only. The pem-encoded, signed X.509 certificate.",
+          "readOnly": true,
           "type": "string"
         },
         "certificateDescription": {
           "description": "Output only. A structured description of the issued X.509 certificate.",
+          "readOnly": true,
           "$ref": "CertificateDescription"
         },
         "pemCertificateChain": {
           "description": "Output only. The chain that may be used to verify the X.509 certificate. Expected to be in issuer-to-root order according to RFC 5246.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "type": "string"
@@ -1183,11 +1171,13 @@
         },
         "createTime": {
           "description": "Output only. The time at which this Certificate was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The time at which this Certificate was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -1207,17 +1197,6 @@
       "properties": {
         "revocationState": {
           "description": "Indicates why a Certificate was revoked.",
-          "enumDescriptions": [
-            "Default unspecified value. This value does indicate that a Certificate has been revoked, but that a reason has not been recorded.",
-            "Key material for this Certificate may have leaked.",
-            "The key material for a certificate authority in the issuing path may have leaked.",
-            "The subject or other attributes in this Certificate have changed.",
-            "This Certificate has been superseded.",
-            "This Certificate or entities in the issuing path have ceased to operate.",
-            "This Certificate should not be considered valid, it is expected that it may become valid in the future.",
-            "This Certificate no longer has permission to assert the listed attributes.",
-            "The authority which determines appropriate attributes for a Certificate may have been compromised."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default unspecified value. This value does indicate that a Certificate has been revoked, but that a reason has not been recorded.",
@@ -1281,6 +1260,7 @@
       "properties": {
         "name": {
           "description": "Output only. The resource path for this ReusableConfig in the format `projects\/*\/locations\/*\/reusableConfigs\/*`.",
+          "readOnly": true,
           "type": "string"
         },
         "values": {
@@ -1293,11 +1273,13 @@
         },
         "createTime": {
           "description": "Output only. The time at which this ReusableConfig was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
           "description": "Output only. The time at which this ReusableConfig was updated.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
@@ -1317,6 +1299,7 @@
       "properties": {
         "pemCsr": {
           "description": "Output only. The PEM-encoded signed certificate signing request (CSR).",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -1394,17 +1377,6 @@
       "properties": {
         "reason": {
           "description": "Required. The RevocationReason for revoking this certificate.",
-          "enumDescriptions": [
-            "Default unspecified value. This value does indicate that a Certificate has been revoked, but that a reason has not been recorded.",
-            "Key material for this Certificate may have leaked.",
-            "The key material for a certificate authority in the issuing path may have leaked.",
-            "The subject or other attributes in this Certificate have changed.",
-            "This Certificate has been superseded.",
-            "This Certificate or entities in the issuing path have ceased to operate.",
-            "This Certificate should not be considered valid, it is expected that it may become valid in the future.",
-            "This Certificate no longer has permission to assert the listed attributes.",
-            "The authority which determines appropriate attributes for a Certificate may have been compromised."
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default unspecified value. This value does indicate that a Certificate has been revoked, but that a reason has not been recorded.",
@@ -1449,6 +1421,7 @@
       "properties": {
         "pemCrl": {
           "description": "Output only. The PEM-encoded signed certificate revocation list (CRL).",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -1570,12 +1543,6 @@
       "properties": {
         "logType": {
           "description": "The log type that this config enables.",
-          "enumDescriptions": [
-            "Default case. Should never be this.",
-            "Admin reads. Example: CloudIAM getIamPolicy",
-            "Data writes. Example: CloudSQL Users create",
-            "Data reads. Example: CloudSQL Users list"
-          ],
           "type": "string",
           "enumDescriptions": [
             "Default case. Should never be this.",
@@ -1634,32 +1601,39 @@
       "properties": {
         "createTime": {
           "description": "Output only. The time the operation was created.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
           "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
           "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "verb": {
           "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
           "type": "string"
         },
         "statusMessage": {
           "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true,
           "type": "string"
         },
         "requestedCancellation": {
           "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
           "type": "boolean"
         },
         "apiVersion": {
           "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -2982,6 +2956,36 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Update a ReusableConfig."
+                },
+                "delete": {
+                  "id": "privateca.projects.locations.reusableConfigs.delete",
+                  "path": "v1alpha1/{+name}",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/reusableConfigs/{reusableConfigsId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The resource name for this ReusableConfig in the format `projects\/*\/locations\/*\/reusableConfigs\/*`.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/reusableConfigs\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "description": "Optional. An ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "DeleteReusableConfig deletes a ReusableConfig."
                 },
                 "setIamPolicy": {
                   "id": "privateca.projects.locations.reusableConfigs.setIamPolicy",

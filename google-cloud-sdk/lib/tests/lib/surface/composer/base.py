@@ -160,7 +160,10 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
     return environment
 
   def MakeEnvironmentWithStateAndClusterLocation(
-      self, state, cluster_location=TEST_CLUSTER_LOCATION):
+      self,
+      state,
+      cluster_location=TEST_CLUSTER_LOCATION,
+      image_version=TEST_IMAGE_VERSION):
     return self.MakeEnvironment(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -169,7 +172,7 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
             gkeCluster=self.TEST_GKE_CLUSTER,
             nodeConfig=self.messages.NodeConfig(location=cluster_location),
             softwareConfig=self.messages.SoftwareConfig(
-                imageVersion=self.TEST_IMAGE_VERSION)),
+                imageVersion=image_version)),
         state=state)
 
   def MakeOperation(self,

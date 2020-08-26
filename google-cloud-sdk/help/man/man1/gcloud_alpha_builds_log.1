@@ -11,7 +11,7 @@ gcloud alpha builds log \- stream the logs for a build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds log\fR \fIBUILD\fR [\fB\-\-stream\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds log\fR \fIBUILD\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-stream\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,12 @@ of the build submission process, or in the ID column when listing builds.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the Cloud Build Service to use. Must be set to us\-central\-1. If
+unset, the global service is used. The global service is isolated from all
+regional services.
+
 .TP 2m
 \fB\-\-stream\fR
 If a build is ongoing, stream the logs to stdout until the build completes.
@@ -76,7 +82,7 @@ $ gcloud alpha builds log `098\-765\-432`
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud builds log

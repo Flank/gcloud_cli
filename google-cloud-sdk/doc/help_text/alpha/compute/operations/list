@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha compute operations list - list Google Compute Engine
-        operations
+    gcloud alpha compute operations list - list Compute Engine operations
 
 SYNOPSIS
     gcloud alpha compute operations list [NAME ...] [--global]
@@ -10,8 +9,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute operations list displays all Google Compute
-    Engine operations in a project.
+    (ALPHA) gcloud alpha compute operations list displays all Compute Engine
+    operations in a project.
 
     By default, all global, regional, and zonal operations are listed. The
     results can be narrowed by providing combinations of the --zones,
@@ -129,7 +128,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute operations list
         $ gcloud beta compute operations list

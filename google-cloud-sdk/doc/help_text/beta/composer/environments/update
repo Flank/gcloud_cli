@@ -7,6 +7,7 @@ SYNOPSIS
         (ENVIRONMENT : --location=LOCATION)
         (--cloud-sql-machine-type=CLOUD_SQL_MACHINE_TYPE
           | --node-count=NODE_COUNT
+          | --web-server-machine-type=WEB_SERVER_MACHINE_TYPE
           | --airflow-version=AIRFLOW_VERSION --image-version=IMAGE_VERSION
           | --update-airflow-configs=[KEY=VALUE,...] --clear-airflow-configs
           | --remove-airflow-configs=[KEY,...]
@@ -49,6 +50,11 @@ REQUIRED FLAGS
 
        --node-count=NODE_COUNT
           The new number of nodes running the environment. Must be >= 3.
+
+       --web-server-machine-type=WEB_SERVER_MACHINE_TYPE
+          machine type used by the Airflow web server. The list of available
+          machine types is available here:
+          https://cloud.google.com/composer/pricing.
 
        Group of arguments for performing in-place environment upgrades.
 

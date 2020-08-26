@@ -1,5 +1,5 @@
 title: scc asset update-marks test scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 - execute:
   - command: |

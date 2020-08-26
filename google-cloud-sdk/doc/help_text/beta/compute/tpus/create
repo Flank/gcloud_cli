@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud beta compute tpus create (TPU : --zone=ZONE) --version=VERSION
         [--accelerator-type=ACCELERATOR_TYPE; default="v2-8"] [--async]
         [--description=DESCRIPTION] [--network=NETWORK; default="default"]
-        [--preemptible] [--range=RANGE] [--reserved] [GCLOUD_WIDE_FLAG ...]
+        [--preemptible] [--range=RANGE] [--reserved] [--use-service-networking]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create a new Cloud TPU.
@@ -78,6 +79,14 @@ OPTIONAL FLAGS
         creates a v2-256 TPU instance. If there exists no reservation or not
         sufficient amount of reserved cores under the project, the request will
         fail due to lack of capacity.
+
+     --use-service-networking
+        If provided, the TPU will be configured via the Service Networking (SN)
+        API instead of using a CIDR range. The Service Networking API should be
+        enabled on the project before creating the TPU.
+
+        For more information on Service Networking see
+        https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

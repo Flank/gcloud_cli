@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta memcache regions describe \- show metadata for a Memorystore Memcached region
+gcloud beta memcache regions describe \- display metadata for a Memorystore Memcached region
 
 
 
@@ -37,12 +37,11 @@ The active account does not have permission to access the given region.
 .TP 2m
 
 Region resource \- Arguments and flags that specify the Memorystore Memcached
-region you want to describe. This represents a Cloud resource. (NOTE) Some
-attributes are not given arguments in this group but can be set in other ways.
-To set the [project] attribute: provide the argument [region] on the command
-line with a fully specified name; provide the argument [\-\-project] on the
-command line; set the property [core/project]. This must be specified.
-
+region to describe. This represents a Cloud resource. (NOTE) Some attributes are
+not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [region] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -74,7 +73,7 @@ this API can be found at: https://cloud.google.com/memorystore/
 
 .SH "EXAMPLES"
 
-The following command prints metadata for the region \f5us\-central1\fR
+To display the metadata for the region \f5us\-central1\fR, run:
 
 .RS 2m
 $ gcloud beta memcache regions describe us\-central1

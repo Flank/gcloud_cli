@@ -1,15 +1,15 @@
 NAME
-    gcloud alpha compute project-info describe - describe the Google Compute
-        Engine project resource
+    gcloud alpha compute project-info describe - describe the Compute Engine
+        project resource
 
 SYNOPSIS
     gcloud alpha compute project-info describe [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute project-info describe displays all data
-    associated with the Google Compute Engine project resource. The project
-    resource contains data such as global quotas, common instance metadata, and
-    the project's creation time.
+    associated with the Compute Engine project resource. The project resource
+    contains data such as global quotas, common instance metadata, and the
+    project's creation time.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -23,7 +23,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
+    access allowlist. These variants are also available:
 
         $ gcloud compute project-info describe
         $ gcloud beta compute project-info describe

@@ -25,7 +25,7 @@ from tests.lib import completer_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.disk_types import test_resources
 
 
 class DiskTypesDescribeTest(test_base.BaseTest,

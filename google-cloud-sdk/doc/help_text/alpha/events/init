@@ -2,8 +2,9 @@ NAME
     gcloud alpha events init - initialize a cluster for eventing
 
 SYNOPSIS
-    gcloud alpha events init [--platform=PLATFORM]
-        [--service-account=SERVICE_ACCOUNT]
+    gcloud alpha events init [--broker-service-account=BROKER_SERVICE_ACCOUNT]
+        [--platform=PLATFORM] [--service-account=SERVICE_ACCOUNT]
+        [--sources-service-account=SOURCES_SERVICE_ACCOUNT]
         [--region=REGION
           | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
           | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
@@ -15,6 +16,11 @@ DESCRIPTION
     command is only available with Cloud Run for Anthos.
 
 FLAGS
+     --broker-service-account=BROKER_SERVICE_ACCOUNT
+        Email address of an existing events broker IAM service account. If no
+        service account is provided, a default service account
+        (cloud-run-events-broker) will be created.
+
      --platform=PLATFORM
         Target platform for running commands. Alternatively, set the property
         [run/platform]. If not specified, the user will be prompted to choose a
@@ -37,6 +43,11 @@ FLAGS
         Email address of an existing IAM service account which represents the
         identity of the internal events operator. If no service account is
         provided, a default service account (cloud-run-events) will be created.
+
+     --sources-service-account=SOURCES_SERVICE_ACCOUNT
+        Email address of an existing events sources IAM service account. If no
+        service account is provided, a default service account
+        (cloud-run-events-sources) will be created.
 
      Arguments to locate resources, depending on the platform used. At most one
      of these may be specified:
@@ -99,5 +110,5 @@ NOTES
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
     specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    invitation-only early access allowlist.
 

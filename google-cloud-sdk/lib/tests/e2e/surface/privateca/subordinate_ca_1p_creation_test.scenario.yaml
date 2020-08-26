@@ -3,7 +3,14 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: privateca subordinates create $$ca-name$$ --issuer $$root-ca-name$$ --issuer-location
+  - command: privateca roots create $$root-ca-id$$ --kms-key-version $$kms-key$$/cryptoKeyVersions/1
+      --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config
+      root-unconstrained --bucket $$bucket$$
+  - progress_tracker: []
+  - stderr: |
+      Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
+- execute:
+  - command: privateca subordinates create $$ca-id$$ --issuer $$root-ca-id$$ --issuer-location
       $$location$$ --subject "CN=Scenario Test,O=Google LLC" --kms-key-version $$kms-key$$/cryptoKeyVersions/1
       --reusable-config subordinate-mtls-pathlen-0 --bucket $$bucket$$
   - progress_tracker:
@@ -16,17 +23,27 @@ summary:
     - message: Activating CA.
     - status: SUCCESS
   - stderr: |
-      Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
+      Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
 - execute:
-  - command: privateca subordinates delete $$ca-name$$ --location $$location$$
+  - command: privateca subordinates delete $$ca-id$$ --location $$location$$
   - prompt:
-    - message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$]
+    - message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$]
     - input: y
   - progress_tracker:
     - message: Deleting Subordinate CA
     - status: SUCCESS
   - stderr: |
-      Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
+      Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
+- execute:
+  - command: privateca roots delete $$root-ca-id$$ --location $$location$$
+  - prompt:
+    - message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$]
+    - input: y
+  - progress_tracker:
+    - message: Deleting Root CA
+    - status: SUCCESS
+  - stderr: |
+      Deleted Root CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
 actions:
 - define_reference:
     reference: project
@@ -40,15 +57,30 @@ actions:
 - define_reference:
     reference: bucket
     value: do-not-delete-privateca-gcloud-tests
-- define_reference:
-    reference: root-ca-name
-    value: gcloud_test_root2
 - generate_resource_id:
-    reference: ca-name
+    reference: root-ca-id
+    prefix: gcloud-e2e
+    delimiter: '-'
+- generate_resource_id:
+    reference: ca-id
     prefix: e2e
     delimiter: '-'
 - execute_command:
-    command: privateca subordinates create $$ca-name$$ --issuer $$root-ca-name$$ --issuer-location
+    command: privateca roots create $$root-ca-id$$ --kms-key-version $$kms-key$$/cryptoKeyVersions/1
+      --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config
+      root-unconstrained --bucket $$bucket$$
+    validation_only: true
+    validate_remote_api_calls: false
+    events:
+    - expect_progress_tracker:
+      - message: Creating Certificate Authority.
+      - status: SUCCESS
+    - expect_stderr: |
+        Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates create $$ca-id$$ --issuer $$root-ca-id$$ --issuer-location
       $$location$$ --subject "CN=Scenario Test,O=Google LLC" --kms-key-version $$kms-key$$/cryptoKeyVersions/1
       --reusable-config subordinate-mtls-pathlen-0 --bucket $$bucket$$
     validation_only: true
@@ -337,7 +369,7 @@ actions:
         poll_operation: true
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities\?alt=json&certificateAuthorityId=$$ca-name$$&requestId=[^&]+
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities\?alt=json&certificateAuthorityId=$$ca-id$$&requestId=[^&]+
           method: POST
           headers: {}
           body:
@@ -368,7 +400,7 @@ actions:
             metadata:
               '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
               createTime: '2020-06-01T23:29:24.115774362Z'
-              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$
+              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
               verb: create
               requestedCancellation: false
               apiVersion: v1alpha1
@@ -378,7 +410,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:getCsr?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:getCsr?alt=json
           method: GET
           body: null
         return_response:
@@ -409,11 +441,11 @@ actions:
         poll_operation: true
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates\?alt=json&certificateId=subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}&requestId=[^&]+$
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates\?alt=json&certificateId=subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}&requestId=[^&]+$
           method: POST
           body:
             text:
-              matches: .*projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-name$$/certificates/subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}.*
+              matches: .*projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}.*
             json:
               lifetime: 315569261s
         return_response:
@@ -483,7 +515,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:activate?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:activate?alt=json
           method: POST
           body:
             json:
@@ -518,10 +550,10 @@ actions:
         message: Activating CA.
         status: SUCCESS
     - expect_stderr: |
-        Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
+        Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$:publishCrl?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:publishCrl?alt=json
           method: POST
           headers: {}
           body: null
@@ -547,15 +579,15 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: privateca subordinates delete $$ca-name$$ --location $$location$$
-    cleanup_for: ca-name
+    command: privateca subordinates delete $$ca-id$$ --location $$location$$
+    cleanup_for: ca-id
     events:
     - expect_prompt_continue:
-        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$]
+        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$]
         user_input: y
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -566,7 +598,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$
+            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
             type: SUBORDINATE
             config:
               subjectConfig:
@@ -657,7 +689,7 @@ actions:
         poll_operation: true
         expect_request:
           uri:
-            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$\?alt=json&requestId=[^&]+$
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$\?alt=json&requestId=[^&]+$
           method: DELETE
           headers: {}
           body: null
@@ -672,7 +704,7 @@ actions:
             metadata:
               '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
               createTime: '2020-06-01T23:29:27.242772472Z'
-              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$
+              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
               verb: delete
               requestedCancellation: false
               apiVersion: v1alpha1
@@ -681,6 +713,22 @@ actions:
         message: Deleting Subordinate CA
         status: SUCCESS
     - expect_stderr: |
-        Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-name$$].
+        Deleted Subordinate CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots delete $$root-ca-id$$ --location $$location$$
+    validation_only: true
+    validate_remote_api_calls: false
+    cleanup_for: root-ca-id
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$]
+        user_input: y
+    - expect_progress_tracker:
+        message: Deleting Root CA
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted Root CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$].
     - expect_exit:
         code: 0

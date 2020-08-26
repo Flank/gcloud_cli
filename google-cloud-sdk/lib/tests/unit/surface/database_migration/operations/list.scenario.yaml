@@ -1,0 +1,80 @@
+title: database-migration operations list scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: database-migration operations list --region=us-central1
+  - stdout: |
+      ID                                                       TARGET                               ACTION  DONE  ERROR_CODE
+      operation-1595354026581-5aaf74e0b9c40-38b777d4-22bc3cb2  us-central1/migrationJobs/test-job   verify  True  45
+      operation-1595351364231-5aaf6af5b6166-4dcff7b6-891ab681  us-central1/migrationJobs/test-job2  update  True
+actions:
+- execute_command:
+    command: database-migration operations list --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datamigration.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/fake-project/locations/us-central1/operations/operation-1595354026581-5aaf74e0b9c40-38b777d4-22bc3cb2",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                    "createTime": "2020-07-21T17:53:46.672080944Z",
+                    "endTime": "2020-07-21T17:53:58.876026255Z",
+                    "target": "projects/fake-project/locations/us-central1/migrationJobs/test-job",
+                    "verb": "verify",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha2"
+                  },
+                  "done": true,
+                  "error": {
+                    "code": 45,
+                    "message": "The requested operation is not allowed for on-premises instances."
+                  }
+                },
+                {
+                  "name": "projects/fake-project/locations/us-central1/operations/operation-1595351364231-5aaf6af5b6166-4dcff7b6-891ab681",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.OperationMetadata",
+                    "createTime": "2020-07-21T17:09:24.318666476Z",
+                    "endTime": "2020-07-21T17:09:24.358331658Z",
+                    "target": "projects/fake-project/locations/us-central1/migrationJobs/test-job2",
+                    "verb": "update",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha2"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.clouddms.v1alpha2.MigrationJob",
+                    "name": "projects/fake-project/locations/us-central1/migrationJobs/test-job2",
+                    "createTime": "2020-07-21T17:05:19.211441641Z",
+                    "updateTime": "2020-07-21T17:09:24.321285172Z",
+                    "displayName": "test-job2",
+                    "state": "DRAFT",
+                    "type": "ONE_TIME",
+                    "source": "projects/fake-project/locations/us-central1/connectionProfiles/test-source",
+                    "destination": "projects/fake-project/locations/us-central1/connectionProfiles/test-dest",
+                    "sourceDatabase": {
+                      "provider": "CLOUDSQL",
+                      "engine": "MYSQL"
+                    },
+                    "vpcPeeringConnectivity": {}
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        ID                                                       TARGET                               ACTION  DONE  ERROR_CODE
+        operation-1595354026581-5aaf74e0b9c40-38b777d4-22bc3cb2  us-central1/migrationJobs/test-job   verify  True  45
+        operation-1595351364231-5aaf6af5b6166-4dcff7b6-891ab681  us-central1/migrationJobs/test-job2  update  True
+    - expect_exit:
+        code: 0

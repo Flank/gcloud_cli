@@ -11,7 +11,7 @@ gcloud alpha spanner databases create \- create a Cloud Spanner database
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha spanner databases create\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-ddl\fR=\fIDDL\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha spanner databases create\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-ddl\fR=\fIDDL\fR] [\fB\-\-ddl\-file\fR=\fIDDL_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -63,6 +63,14 @@ the newly created database. If there is an error in any statement, the database
 is not created. Full DDL specification is at
 https://cloud.google.com/spanner/docs/data\-definition\-language
 
+.TP 2m
+\fB\-\-ddl\-file\fR=\fIDDL_FILE\fR
+Path of a file that contains semi\-colon separated DDL (data definition
+language) statements to run inside the newly created database. If there is an
+error in any statement, the database is not created. Full DDL specification is
+at https://cloud.google.com/spanner/docs/data\-definition\-language. If
+\-\-ddl_file is set, \-\-ddl is ignored.
+
 
 .RE
 .sp
@@ -102,7 +110,7 @@ $ gcloud alpha spanner databases create testdb \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. These variants are also available:
+allowlist. These variants are also available:
 
 .RS 2m
 $ gcloud spanner databases create

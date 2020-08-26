@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute instance-groups managed instance-configs delete -
-        delete per instance configs from managed instance group
+        delete per-instance configs from a managed instance group
 
 SYNOPSIS
     gcloud beta compute instance-groups managed instance-configs delete NAME
@@ -11,7 +11,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instance-groups managed instance-configs delete
-    deletes one or more per instance configs from a Google Compute Engine
+    deletes one or more per-instance configs from a Google Compute Engine
     managed instance group.
 
     Changes are applied immediately to the corresponding instances, by
@@ -95,14 +95,15 @@ EXAMPLES
         $ gcloud beta compute instance-groups managed instance-configs \
             delete my-group --region=europe-west4 --instances=my-instance
 
-    This will remove all metadata and detach all disks that were defined in
-    per-instance config (unless also defined in the instance template, in which
-    case it remains attached).
+    This removes all metadata and detaches all disks that were defined in the
+    per-instance config (except for disks that are also defined in the instance
+    template, which remain attached).
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed instance-configs delete
         $ gcloud alpha compute instance-groups managed instance-configs \
             delete
 

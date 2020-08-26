@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -175,6 +176,14 @@ class UpdateTest(test_base.BaseTest):
         filter=self.messages.PacketMirroringFilter(
             cidrRanges=['11.22.0.0/16'], IPProtocols=['tcp', 'udp']))
 
+  def testUpdate_UpdateDirection(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run("""
+          compute packet-mirrorings update my-pm --region us-central1
+          --filter-direction ingress
+          """)
+    self.CheckRequests()
+
   def _SetNextGetResult(self, **kwargs):
     pm = self._MakeBasicPacketMirroring()
     pm.update(kwargs)
@@ -260,6 +269,31 @@ class UpdateTestAlpha(UpdateTestBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.messages = core_apis.GetMessagesModule('compute', self.api_version)
     self.compute = self.compute_alpha
+
+  def testUpdate_UpdateDirection(self):
+    self._SetNextGetResult(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
+            tags=['t1'],
+            instances=[],
+            subnetworks=[],
+        ),
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+    )
+
+    self.Run("""\
+          compute packet-mirrorings update my-pm --region us-central1
+          --filter-direction ingress
+          """)
+
+    self._CheckGetAndPatchRequests(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
+            tags=['t1'],
+            instances=[],
+            subnetworks=[],
+        ),
+        filter=self.messages.PacketMirroringFilter(
+            direction=self.messages.PacketMirroringFilter
+            .DirectionValueValuesEnum.INGRESS))
 
 
 if __name__ == '__main__':

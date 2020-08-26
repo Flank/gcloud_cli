@@ -1,6 +1,6 @@
 NAME
-    gcloud compute ssl-certificates describe - describe a Google Compute Engine
-        SSL certificate
+    gcloud compute ssl-certificates describe - describe a Compute Engine SSL
+        certificate
 
 SYNOPSIS
     gcloud compute ssl-certificates describe NAME [--global | --region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute ssl-certificates describe displays all data (except private
-    keys) associated with Google Compute Engine SSL certificate in a project.
+    keys) associated with Compute Engine SSL certificate in a project.
 
 POSITIONAL ARGUMENTS
      NAME

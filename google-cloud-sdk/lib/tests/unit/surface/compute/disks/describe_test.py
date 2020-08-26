@@ -29,7 +29,7 @@ from tests.lib import completer_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute.disks import test_resources
 
 
 class DisksDescribeTestGA(

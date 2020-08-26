@@ -1,0 +1,44 @@
+title: iam workload-identity-pools update test
+release_tracks: [ALPHA, BETA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam workload-identity-pools update my-workload-identity-pool --location global
+      --display-name='My workload pool' --description='My workload pool description' --disabled
+  - stderr: |
+      Update WorkloadIdentityPool my-workload-identity-pool.
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1beta
+      BETA: v1beta
+- execute_command:
+    label: update a WorkloadIdentityPool
+    command: iam workload-identity-pools update my-workload-identity-pool --location global
+      --display-name='My workload pool' --description='My workload pool description' --disabled
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/$$api-version$$/projects/fake-project/locations/global/workloadIdentityPools/my-workload-identity-pool?alt=json&updateMask=description%2Cdisabled%2CdisplayName
+          method: PATCH
+          body: |
+            {
+              "displayName": "My workload pool",
+              "description": "My workload pool description",
+              "disabled": true
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/operations/operation-id"
+            }
+    - expect_stderr: |
+        Updated workload_identity_pool [my-workload-identity-pool].
+    - expect_stdout: |
+        name: projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/operations/operation-id
+    - expect_exit:
+        code: 0

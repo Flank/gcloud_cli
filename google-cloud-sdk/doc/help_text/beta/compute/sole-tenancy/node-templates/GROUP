@@ -30,7 +30,7 @@ COMMANDS
         (BETA) Create a Compute Engine node template.
 
      delete
-        (BETA) Delete a Google Compute Engine node template.
+        (BETA) Delete a Compute Engine node template.
 
      describe
         (BETA) Describe a Compute Engine node template.

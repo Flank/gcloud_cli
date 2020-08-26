@@ -9,17 +9,23 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Update the metadata and/or configuration parameters of a Memcached
-    instance.
+    (BETA) Update a Memcached instance with one or more of the following
+    actions:
+      o Scale up or down the number of nodes in the instance.
+      o Stage an update to instance configuration parameters.
+      o Update the instance metadata (display name, labels).
+
+    Updating parameters cannot be combined with any other update actions in the
+    same call. All other update actions can be combined in the same call.
 
 POSITIONAL ARGUMENTS
      Instance resource - Arguments and flags that specify the Memcached
-     instance you want to update. The arguments in this group can be used to
-     specify the attributes of this resource. (NOTE) Some attributes are not
-     given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the argument [instance] on the command line
-     with a fully specified name; provide the argument [--project] on the
-     command line; set the property [core/project]. This must be specified.
+     instance to update. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [instance] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
 
        INSTANCE
           ID of the instance or fully qualified identifier for the instance.
@@ -93,10 +99,11 @@ REQUIRED FLAGS
           An arbitrary and optional user provided name for the instance.
 
        --labels=KEY=VALUE
-          A list of label KEY=VALUE pairs to add.
+          List of label KEY=VALUE pairs to add.
 
        --node-count=NODE_COUNT
-          Number of memcache nodes in this instance.
+          Number of memcache nodes in this instance. Valid values range from 1
+          to 20.
 
 OPTIONAL FLAGS
      --async
@@ -116,21 +123,27 @@ API REFERENCE
     API can be found at: https://cloud.google.com/memorystore/
 
 EXAMPLES
-    The following command updates a Memcached instance with the name
-    'my-memcache-instance' in region 'us-central1' to have the display name
-    "Cache for Foo Service", and the two labels, 'env' and 'service'.
+    To scale a Memcached instance named 'my-memcache-instance' in region
+    'us-central1' to have 3 nodes, run:
 
         $ gcloud beta memcache instances update my-memcache-instance \
-            --display-name="Cache for Foo Service" \
-            --labels=env=test,service=foo
+            --node-count=3 --region=us-central1
 
-    The following command updates a Memcached instance with the name
-    'my-memcache-instance' in region 'us-central1' to have parameters
-    'protocol' and 'track-sizes'.
+    To stage an update to the parameters 'protocol' and 'track-sizes' for a
+    Memcached instance named 'my-memcache-instance' in region 'us-central1',
+    run:
 
         $ gcloud beta memcache instances update my-memcache-instance \
-            --parameters=protocol=ascii,track-sizes=true \
+            --parameters="protocol=ascii,track-sizes=true" \
             --region=us-central1
+
+    To update a Memcached instance named 'my-memcache-instance' in region
+    'us-central1' to have the display name "Foo Cache Service" and the labels
+    'env' and 'service', run:
+
+        $ gcloud beta memcache instances update my-memcache-instance \
+            --display-name="Foo Cache Service" \
+            --labels="env=test,service=foo"
 
 NOTES
     This command is currently in BETA and may change without notice. This

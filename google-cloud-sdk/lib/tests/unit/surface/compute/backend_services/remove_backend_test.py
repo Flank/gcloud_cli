@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -498,13 +497,6 @@ class RemoveBackendTest(test_base.BaseTest):
               project='my-project'))],
     )
 
-
-class RemoveBackendBetaTest(RemoveBackendTest):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testWithExistingBackendSingleRegionNeg(self):
     messages = self.messages
     self.make_requests.side_effect = [
@@ -547,14 +539,6 @@ class RemoveBackendBetaTest(RemoveBackendTest):
                   timeoutSec=120),
               project='my-project'))],
     )
-
-
-class RemoveBackendAlphaTest(RemoveBackendBetaTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
 
 if __name__ == '__main__':
   test_case.main()

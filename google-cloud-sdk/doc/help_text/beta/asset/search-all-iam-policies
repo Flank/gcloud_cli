@@ -33,27 +33,27 @@ FLAGS
 
         Examples:
 
-        * policy : "amy@gmail.com" to find IAM policy bindings that specify
-          user amy@gmail.com.
-        * policy : "roles/compute.admin" to find IAM policy bindings that
-          specify the Compute Admin role.
-        * policy.role.permissions : "storage.buckets.update" to find Cloud
-          IAM policy bindings that specify a role containing the
+        * policy:amy@gmail.com to find IAM policy bindings that specify user
+          amy@gmail.com.
+        * policy:roles/compute.admin to find IAM policy bindings that specify
+          the Compute Admin role.
+        * policy.role.permissions:storage.buckets.update to find Cloud IAM
+          policy bindings that specify a role containing the
           storage.buckets.update permission. Note that if callers don't have
           iam.roles.get access to a role's included permissions, policy
           bindings that specify this role will be dropped from the search
           results.
-        * resource : "organizations/123456" to find IAM policy bindings that
-          are set on organizations/123456.
-        * "Important" to find IAM policy bindings that contain Important as a
+        * resource:organizations/123456 to find IAM policy bindings that are
+          set on organizations/123456.
+        * Important to find IAM policy bindings that contain Important as a
           word in any of the searchable fields (except for the included
           permissions).
-        * "*por*" to find IAM policy bindings which contain por as a
-          substring in any of the searchable fields (except for the included
+        * *por* to find IAM policy bindings that contain por as a substring
+          in any of the searchable fields (except for the included
           permissions).
-        * (resource : ("instance1" OR "instance2") AND policy : "amy") to
-          find IAM policy bindings that are set on resources instance1 or
-          instance2 and also specify user amy.
+        * resource:(instance1 OR instance2) policy:amy to find IAM policy
+          bindings that are set on resources instance1 or instance2 and also
+          specify user amy.
 
      --scope=SCOPE
         A scope can be a project, a folder, or an organization. The search is
@@ -113,8 +113,8 @@ EXAMPLES
     run:
 
         $ gcloud beta asset search-all-iam-policies \
-            search-all-iam-policies --scope='organizations/123456' \
-            --query='policy : "amy@mycompany.com"'
+            --scope='organizations/123456' \
+            --query='policy:amy@mycompany.com'
 
 NOTES
     This command is currently in BETA and may change without notice. This

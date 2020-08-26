@@ -21,27 +21,49 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from surface.container.clusters import create
 
+# Select which flags are auto flags
 auto_flags = [
-    'args', 'addons', 'masterauth', 'networkpolicy', 'nodeidentity',
-    'releasechannel', 'privatecluster', 'ipalias'
+    'args',
+    'ipalias_additional',
+    'masterauth',
+    'nodeidentity',
+    'privatecluster',
+    'releasechannel',
 ]
+
+# Change default flag values in create-auto
+flag_overrides = {
+    'num_nodes': 1,
+    'enable_private_nodes': True,
+    'enable_ip_alias': True,
+    'enable_master_authorized_networks': False,
+    'privatecluster': {
+        'enable_private_nodes': None,
+        'private_cluster': None,
+    },
+}
+
+auto_flag_defaults = dict(list(create.base_flag_defaults.items()) + \
+                          list(flag_overrides.items()))
 
 
 @base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(create.CreateBeta):
   autogke = True
+  default_flag_values = auto_flag_defaults
 
   @staticmethod
   def Args(parser):
-    create.AddFlags(create.BETA, parser, auto_flags)
+    create.AddFlags(create.BETA, parser, auto_flag_defaults, auto_flags)
 
 
 @base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(create.CreateAlpha):
   autogke = True
+  default_flag_values = auto_flag_defaults
 
   @staticmethod
   def Args(parser):
-    create.AddFlags(create.ALPHA, parser, auto_flags)
+    create.AddFlags(create.ALPHA, parser, auto_flag_defaults, auto_flags)

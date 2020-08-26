@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute target-vpn-gateways describe - describe a Google
-        Compute Engine Cloud VPN Classic Target VPN Gateway
+    gcloud beta compute target-vpn-gateways describe - describe a Compute
+        Engine Cloud VPN Classic Target VPN Gateway
 
 SYNOPSIS
     gcloud beta compute target-vpn-gateways describe NAME [--region=REGION]
@@ -8,8 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute target-vpn-gateways describe displays all data
-    associated with a Google Compute Engine Cloud VPN Target VPN Gateway in a
-    project.
+    associated with a Compute Engine Cloud VPN Target VPN Gateway in a project.
 
 POSITIONAL ARGUMENTS
      NAME

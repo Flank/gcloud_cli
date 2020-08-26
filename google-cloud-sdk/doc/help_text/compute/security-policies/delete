@@ -6,9 +6,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute security-policies delete deletes Google Compute Engine
-    security policies. Security policies can only be deleted when no other
-    resources (e.g., backend services) refer to them.
+    gcloud compute security-policies delete deletes Compute Engine security
+    policies. Security policies can only be deleted when no other resources
+    (e.g., backend services) refer to them.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

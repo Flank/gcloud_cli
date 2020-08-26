@@ -20,9 +20,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import collections
+import os
 
-from apitools.base.py.testing import mock
+from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
@@ -42,7 +44,8 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
   def SetUp(self):
     self.project = 'fake-project'
     properties.VALUES.core.project.Set(self.project)
-    self.client = mock.Client(client_class=apis.GetClientClass('storage', 'v1'))
+    self.client = api_mock.Client(
+        client_class=apis.GetClientClass('storage', 'v1'))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
 
@@ -102,7 +105,7 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
       },
   ])
   def test_invalid_url(self, url_str):
-    self.assertRaises(storage_url.InvalidUrlError,
+    self.assertRaises(errors.InvalidUrlError,
                       storage_url.storage_url_from_string, url_str)
 
   @parameterized.named_parameters([
@@ -130,3 +133,55 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
   def test_url_string_property(self, cloudurl_args, expected):
     cloudurl = storage_url.CloudUrl(*cloudurl_args)
     self.assertEqual(cloudurl.url_string, expected)
+
+
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
+class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
+
+  @parameterized.named_parameters([
+      {
+          'testcase_name': '_file_path',
+          'url_str': '/random/path.txt',
+          'expected_url_obj': ExpectedStorageUrl(
+              scheme='file', bucket=None, obj='/random/path.txt', gen=None)
+      },
+      {
+          'testcase_name': '_with_file_scheme',
+          'url_str': 'file:///random/a.txt',
+          'expected_url_obj': ExpectedStorageUrl(
+              scheme='file', bucket=None, obj='/random/a.txt', gen=None)
+      }
+  ])
+  def test_file_url_from_string(self, url_str, expected_url_obj):
+    file_url_object = storage_url.storage_url_from_string(url_str)
+    self.assertEqual(file_url_object.scheme, expected_url_obj.scheme)
+    self.assertEqual(file_url_object.bucket_name, expected_url_obj.bucket,)
+    self.assertEqual(file_url_object.object_name, expected_url_obj.obj)
+    self.assertEqual(file_url_object.generation, expected_url_obj.gen)
+    self.assertEqual(
+        file_url_object.url_string,
+        '%s://%s' % (file_url_object.scheme, file_url_object.object_name))
+
+  def test_file_url_exists(self):
+    # self.root_path is a temp dir which gets deleted during TearDown.
+    localpath = self.Touch(os.path.join(self.root_path, 'fake'), 'file.txt')
+    file_url_object = storage_url.storage_url_from_string(localpath)
+    self.assertTrue(file_url_object.exists())
+
+  def test_file_url_exists_with_invalid_path(self):
+    file_url_object = storage_url.storage_url_from_string('invalid/path.txt')
+    self.assertFalse(file_url_object.exists())
+
+  def test_file_url_isdir(self):
+    # self.root_path is a temp dir which gets deleted during TearDown.
+    localpath = self.Touch(os.path.join(self.root_path, 'fake'), 'file.txt')
+    file_url_object = storage_url.storage_url_from_string(
+        os.path.dirname(localpath))
+    self.assertTrue(file_url_object.isdir())
+
+  def test_file_url_isdir_with_invalid_path(self):
+    file_url_object = storage_url.storage_url_from_string('invalid/dirpath')
+    self.assertFalse(file_url_object.isdir())
+
+
+

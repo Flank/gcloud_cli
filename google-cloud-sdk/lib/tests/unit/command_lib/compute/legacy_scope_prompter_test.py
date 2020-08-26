@@ -31,6 +31,7 @@ from googlecloudsdk.core.credentials import gce as c_gce
 from tests.lib import test_case
 from tests.lib.calliope import util
 from tests.lib.surface.compute import test_base
+
 from six.moves import zip
 
 
@@ -81,6 +82,7 @@ class EquivalenceTest(test_base.BaseTest):
     self.client = self.compute_client.apitools_client
     self.messages = self.compute_client.messages
 
+    self.StartObjectPatch(properties, 'VALUES', properties._Sections())
     self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
     self.StartObjectPatch(console_io, 'IsInteractive', return_value=True)
 
@@ -193,8 +195,8 @@ class EquivalenceTest(test_base.BaseTest):
     resource_refs = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.ZONE)
     self.AssertErrContains(
-        'Did you mean zone [{0}] for operation: [viking, norse, inuit]'
-        .format(zone))
+        'Did you mean zone [{0}] for operation: [viking, norse, inuit]'.format(
+            zone))
     self.ClearErr()
     for operation_name, resource_ref in zip(operation_names, resource_refs):
       self.assertEqual(
@@ -215,6 +217,7 @@ class EquivalenceTest(test_base.BaseTest):
     self.AssertErrContains(
         'Did you mean zone [{0}] for zone operations: [viking, norse, inuit]?'
         .format(zone))
+
 
 if __name__ == '__main__':
   test_case.main()

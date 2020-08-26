@@ -303,6 +303,62 @@ class PerimetersUpdateTestAlpha(PerimetersUpdateTestBeta):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def testUpdate_SetDirectionalPolicies(self):
+    self.SetUpForAPI(self.api_version)
+
+    ingress_policies = self._MakeIngressPolicies()
+    egress_policies = self._MakeEgressPolicies()
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title=None,
+        description=None,
+        type_='PERIMETER_TYPE_REGULAR',
+        ingress_policies=ingress_policies,
+        egress_policies=egress_policies)
+
+    perimeter_in_update_request = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            ingressPolicies=ingress_policies, egressPolicies=egress_policies))
+
+    self._ExpectPatch(perimeter_in_update_request, expected_perimeter,
+                      'status.egressPolicies,status.ingressPolicies', '123')
+
+    ingress_policies_spec_path = self.Touch(
+        self.temp_path, 'ingress.yaml', contents=self.INGRESS_POLICIES_SPECS)
+
+    egress_policies_spec_path = self.Touch(
+        self.temp_path, 'egress.yaml', contents=self.EGRESS_POLICIES_SPECS)
+
+    result = self.Run(
+        'access-context-manager perimeters update MY_PERIMETER '
+        '   --policy 123 '
+        '   --set-ingress-policies {} --set-egress-policies {}'.format(
+            ingress_policies_spec_path, egress_policies_spec_path))
+    self.assertEqual(result, expected_perimeter)
+
+  def testUpdate_clearDirectionalPolicies(self):
+    self.SetUpForAPI(self.api_version)
+
+    expected_perimeter = self._MakePerimeter(
+        'MY_PERIMETER',
+        title=None,
+        description=None,
+        type_='PERIMETER_TYPE_REGULAR',
+        ingress_policies=[],
+        egress_policies=[])
+
+    perimeter_in_update_request = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            ingressPolicies=[], egressPolicies=[]))
+    self._ExpectPatch(perimeter_in_update_request, expected_perimeter,
+                      'status.egressPolicies,status.ingressPolicies', '123')
+
+    result = self.Run(
+        'access-context-manager perimeters update MY_PERIMETER '
+        '   --policy 123 --clear-ingress-policies --clear-egress-policies')
+
+    self.assertEqual(result, expected_perimeter)
+
 
 if __name__ == '__main__':
   test_case.main()

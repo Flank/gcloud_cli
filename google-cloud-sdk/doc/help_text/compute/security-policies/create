@@ -1,6 +1,6 @@
 NAME
-    gcloud compute security-policies create - create a Google Compute Engine
-        security policy
+    gcloud compute security-policies create - create a Compute Engine security
+        policy
 
 SYNOPSIS
     gcloud compute security-policies create NAME [--file-format=FILE_FORMAT]

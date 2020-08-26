@@ -378,6 +378,10 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     cluster.config.autoscalingConfig = self.messages.AutoscalingConfig(
         policyUri=autoscaling_policy_uri)
 
+  def AddMetastoreConfig(self, cluster, dataproc_metastore_service):
+    cluster.config.metastoreConfig = self.messages.MetastoreConfig(
+        dataprocMetastoreService=dataproc_metastore_service)
+
   def ExpectGetCluster(self, cluster=None, region=None, exception=None):
     if not region:
       region = self.REGION

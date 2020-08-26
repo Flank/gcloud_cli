@@ -356,6 +356,15 @@ class ApisUnitTest(base.DataflowMockingTestBase,
           'gs://foo/template-file', 'gcr://foo-image', f.read(), 'JAVA', True)
       self.assertEqual(json.loads(result), expected_result)
 
+  def testBuildAndStoreFlexTemplateImageMissingRequiredEnv(self):
+    with self.AssertRaisesExceptionRegexp(
+        ValueError,
+        ('FLEX_TEMPLATE_JAVA_MAIN_CLASS environment variable '
+         'should be provided for all JAVA jobs.')):
+      apis.Templates.BuildAndStoreFlexTemplateImage(
+          'gcr://foo-image', 'JAVA11', ['test.jar'],
+          {}, 'JAVA')
+
 
 if __name__ == '__main__':
   test_case.main()

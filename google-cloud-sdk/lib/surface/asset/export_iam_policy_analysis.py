@@ -42,10 +42,18 @@ def AddFolderArgs(parser):
       help='The folder ID to perform the analysis.')
 
 
+def AddProjectArgs(parser):
+  parser.add_argument(
+      '--project',
+      metavar='PROJECT_ID',
+      help='The project ID or number to perform the analysis.')
+
+
 def AddParentArgs(parser):
   parent_group = parser.add_mutually_exclusive_group(required=True)
   AddOrganizationArgs(parent_group, required=False)
   AddFolderArgs(parent_group)
+  AddProjectArgs(parent_group)
 
 
 def AddResourceSelectorGroup(parser):
@@ -110,6 +118,7 @@ def AddOptionsGroup(parser):
   AddExpandResourcesArgs(options_group)
   AddOutputResourceEdgesArgs(options_group)
   AddOutputGroupEdgesArgs(options_group)
+  AddAnalyzeServiceAccountImpersonationArgs(options_group)
 
 
 def AddExpandGroupsArgs(parser):
@@ -174,6 +183,22 @@ def AddOutputPartialResultBeforeTimeoutArgs(parser):
   parser.set_defaults(output_partial_result_before_timeout=False)
 
 
+def AddAnalyzeServiceAccountImpersonationArgs(parser):
+  """Adds analyze service account impersonation arg into options.
+
+  Args:
+    parser: the option group.
+  """
+
+  parser.add_argument(
+      '--analyze-service-account-impersonation',
+      action='store_true',
+      help=(
+          'If true, the response will include access analysis from identities '
+          'to resources via service account impersonation. Default is false.'))
+  parser.set_defaults(analyze_service_account_impersonation=False)
+
+
 def AddDestinationArgs(parser):
   destination_group = parser.add_group(
       mutex=True,
@@ -220,6 +245,12 @@ class ExportIamPolicyAnalysisBeta(base.Command):
           project, run:
 
             $ {command} --organization=YOUR_ORG_ID --full-resource-name=YOUR_PROJECT_FULL_RESOURCE_NAME --identity='user:u1@foo.com' --output-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
+
+          To find out which users have been granted the
+          iam.serviceAccounts.actAs permission on any applicable resources, run:
+
+            $ {command} --organization=YOUR_ORG_ID --permissions='iam.serviceAccounts.actAs' --output-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
+
       """
   }
 
@@ -234,7 +265,7 @@ class ExportIamPolicyAnalysisBeta(base.Command):
 
   def Run(self, args):
     parent = asset_utils.GetParentNameForAnalyzeIamPolicy(
-        args.organization, args.folder)
+        args.organization, args.project, args.folder)
     client = client_util.IamPolicyAnalysisExportClient(parent)
     operation = client.Export(args)
 
