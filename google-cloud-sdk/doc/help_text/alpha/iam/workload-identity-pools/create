@@ -12,7 +12,7 @@ DESCRIPTION
     (ALPHA) Create a new WorkloadIdentityPool.
 
 POSITIONAL ARGUMENTS
-     Workload identity pool resource - The WorkloadIdentityPool to create. The
+     WorkloadIdentityPool resource - The WorkloadIdentityPool to create. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: provide the
@@ -21,9 +21,9 @@ POSITIONAL ARGUMENTS
      [--project] on the command line. This must be specified.
 
        WORKLOAD_IDENTITY_POOL
-          ID of the workload_identity_pool or fully qualified identifier for
-          the workload_identity_pool. This positional must be specified if any
-          of the other arguments in this group are specified.
+          ID of the WorkloadIdentityPool or fully qualified identifier for the
+          WorkloadIdentityPool. This positional must be specified if any of the
+          other arguments in this group are specified.
 
        --location=LOCATION
           The location name.

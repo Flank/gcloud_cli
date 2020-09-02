@@ -151,7 +151,7 @@ class StreamOutputJsonTest(test_case.TestCase):
 
   def testJsonObjects(self):
     objs = [{'one': 'two', 'three': 4}, {'five': {'six': 'seven'}}]
-    text = '\n'.join(json.dumps(obj) for obj in objs)
+    text = ''.join(json.dumps(obj) + '\n' for obj in objs)
 
     with cross_platform_temp_file.NamedTempFile(text) as multi_line_file:
       cmd = ['cat', multi_line_file.name]

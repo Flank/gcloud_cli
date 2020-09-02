@@ -42,6 +42,99 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.authorize = self.StartPatch(
         "googlecloudsdk.command_lib.cloud_shell.util.AuthorizeEnvironment",
         return_value=None)
+    self.authorize_v1 = self.StartPatch(
+        "googlecloudsdk.command_lib.cloud_shell.util.AuthorizeV1Environment",
+        return_value=None)
+
+  def testBetaNoArguments(self):
+    self.mockBetaConnection(user="my-user", host="my-host", port=123)
+    self.Run("beta cloud-shell ssh")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
+        extra_flags=None,
+        tty=True,
+        options={"StrictHostKeyChecking": "no"})
+    self.authorize_v1.assert_not_called()
+
+  def testBetaNoProject(self):
+    self.mockBetaConnection(user="my-user", host="my-host", port=123)
+    prop = properties.FromString("project")
+    properties.PersistProperty(prop, None, scope=properties.Scope.USER)
+    self.Run("beta cloud-shell ssh")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["bash -l"],
+        extra_flags=None,
+        tty=True,
+        options={"StrictHostKeyChecking": "no"})
+    self.authorize_v1.assert_not_called()
+
+  def testBetaCommand(self):
+    self.mockBetaConnection(user="my-user", host="my-host", port=123)
+    self.Run("beta cloud-shell ssh --command=ls")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "ls"],
+        extra_flags=None,
+        tty=False,
+        options={"StrictHostKeyChecking": "no"})
+    self.authorize_v1.assert_not_called()
+
+  def testBetaDryRun(self):
+    self.ssh_build.return_value = ["path to command", "arg'1"]
+
+    self.mockBetaConnection(user="my-user", host="my-host", port=123)
+    self.Run("beta cloud-shell ssh --dry-run")
+    self.ssh_run.assert_not_called()
+    self.assertEqual(
+        len(self.ssh_build.return_value), self.pipes_quote.call_count)
+    self.pipes_quote.assert_has_calls(
+        [mock.call(arg) for arg in self.ssh_build.return_value])
+    self.authorize_v1.assert_not_called()
+
+  def testBetaSshFlag(self):
+    self.mockBetaConnection(user="my-user", host="my-host", port=123)
+    self.Run("beta cloud-shell ssh --ssh-flag=-someFlag --ssh-flag=anotherFlag")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
+        extra_flags=["-someFlag", "anotherFlag"],
+        tty=True,
+        options={"StrictHostKeyChecking": "no"})
+    self.authorize_v1.assert_not_called()
+
+  def testBetaAuthorizeSessionFlag(self):
+    self.mockBetaConnection(user="my-user", host="my-host", port=123)
+    self.Run("beta cloud-shell ssh --authorize-session")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
+        extra_flags=None,
+        tty=True,
+        options={"StrictHostKeyChecking": "no"})
+    self.authorize_v1.assert_called()
+
+  def mockBetaConnection(self, user="some-user", host="some-host", port=6000):
+    self.StartPatch(
+        "googlecloudsdk.command_lib.cloud_shell.util.PrepareV1Environment",
+        return_value=util.ConnectionInfo(
+            ssh_env=None, user=user, host=host, port=port, key=None))
 
   def testNoArguments(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -55,7 +148,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=None,
         tty=True,
         options={"StrictHostKeyChecking": "no"})
-    self.authorize.assert_called()
+    self.authorize.assert_not_called()
 
   def testNoProject(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -71,7 +164,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=None,
         tty=True,
         options={"StrictHostKeyChecking": "no"})
-    self.authorize.assert_called()
+    self.authorize.assert_not_called()
 
   def testCommand(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -85,7 +178,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=None,
         tty=False,
         options={"StrictHostKeyChecking": "no"})
-    self.authorize.assert_called()
+    self.authorize.assert_not_called()
 
   def testDryRun(self):
     self.ssh_build.return_value = ["path to command", "arg'1"]
@@ -97,7 +190,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         len(self.ssh_build.return_value), self.pipes_quote.call_count)
     self.pipes_quote.assert_has_calls(
         [mock.call(arg) for arg in self.ssh_build.return_value])
-    self.authorize.assert_called()
+    self.authorize.assert_not_called()
 
   def testSshFlag(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -110,6 +203,20 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         identity_file=None,
         remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
         extra_flags=["-someFlag", "anotherFlag"],
+        tty=True,
+        options={"StrictHostKeyChecking": "no"})
+    self.authorize.assert_not_called()
+
+  def testAuthorizeSessionFlag(self):
+    self.mockConnection(user="my-user", host="my-host", port=123)
+    self.Run("alpha cloud-shell ssh --authorize-session")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
+        extra_flags=None,
         tty=True,
         options={"StrictHostKeyChecking": "no"})
     self.authorize.assert_called()

@@ -24,7 +24,6 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
-from tests.lib.surface.compute.e2e_test_base import test_case
 
 
 class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
@@ -98,7 +97,6 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
     self.AssertNewOutputContains('n1-standard-4')
     self.AssertNewOutputNotContains('n1-standard-1')
 
-  @test_case.Filters.skip('Invalid error match', 'b/157057030')
   def testUpdateInstancesMostDisruptiveAllowedAction(self):
     template1_name = self.CreateInstanceTemplate()
     template2_name = self.CreateInstanceTemplate(machine_type='n1-standard-4')
@@ -107,9 +105,11 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
     instance_uri = self.GetInstanceUris(igm_name)[0]
     old_instance_id = self._GetInstanceId(instance_uri)
     self._SetInstanceTemplate(igm_name, template2_name)
+    # TODO(b/166116455): Peding IgmInstanceReconcilerEnableFieldsComparison
+    # rollout. Check for the expected action message explicitly.
     with self.AssertRaisesExceptionRegexp(
         exceptions.ToolException,
-        r"""Effective update action .* is REPLACE, which is """
+        r"""Effective update action .* is (RESTART|REPLACE), which is """
         r"""greater than the most disruptive allowed action REFRESH .*"""):
       self.Run("""\
           compute instance-groups managed update-instances {group_name} \

@@ -33,13 +33,13 @@ COMMANDS
         (BETA) Delete VPN tunnels.
 
      describe
-        (BETA) Describe a Google Compute Engine VPN tunnel.
+        (BETA) Describe a Compute Engine VPN tunnel.
 
      list
         (BETA) List Google Compute Engine VPN tunnels.
 
      update
-        (BETA) Update a Google Compute Engine VPN tunnel.
+        (BETA) Update a Compute Engine VPN tunnel.
 
 NOTES
     This command is currently in BETA and may change without notice. These

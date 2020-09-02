@@ -7,7 +7,7 @@ SYNOPSIS
         [--cpu=CPU] [--image=IMAGE] [--local-port=LOCAL_PORT] [--memory=MEMORY]
         [--minikube-vm-driver=MINIKUBE_VM_DRIVER; default="docker"]
         [--namespace=NAMESPACE] [--service-name=SERVICE_NAME] [--source=SOURCE]
-        [--stop-cluster]
+        [--no-stop-cluster]
         [--appengine | --builder=BUILDER
           | --dockerfile=DOCKERFILE; default="Dockerfile"]
         [--application-default-credential | --service-account=SERVICE_ACCOUNT]
@@ -60,7 +60,8 @@ FLAGS
 
      --stop-cluster
         If running on minikube or kind, stop the minkube profile or kind
-        cluster at the end of the session.
+        cluster at the end of the session. Enabled by default, use
+        --no-stop-cluster to disable.
 
      At most one of these may be specified:
 

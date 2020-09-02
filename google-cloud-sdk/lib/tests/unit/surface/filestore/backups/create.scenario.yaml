@@ -1,5 +1,5 @@
 title: Create Filestore Backup
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -15,6 +15,12 @@ summary:
   - stderr: |
       Created backup.
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta1
+      ALPHA: v1p1alpha1
+
 - execute_command:
     command: |
       filestore backups create bc --instance inst --instance-zone us-central1-c --file-share
@@ -22,7 +28,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-east1/backups?alt=json&backupId=bc
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-east1/backups?alt=json&backupId=bc
           method: POST
           headers: {}
           body:
@@ -41,7 +47,7 @@ actions:
                 "target": "projects/jasonshao-consumer4/locations/us-central1/backups/my-backup3",
                 "verb": "create",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
@@ -50,7 +56,7 @@ actions:
         Create request issued
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc?alt=json
           method: GET
           headers: {}
           body: null
@@ -67,11 +73,11 @@ actions:
                 "target": "projects/jasonshao-consumer4/locations/us-central1/backups/my-backup3",
                 "verb": "create",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "@type": "type.googleapis.com/google.cloud.filestore.$$api-version$$.Backup",
                 "name": "projects/jasonshao-consumer4/locations/us-central1/backups/my-backup3",
                 "state": "READY",
                 "createTime": "2019-02-22T03:21:54.668572406Z",
@@ -96,7 +102,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1/backups?alt=json&backupId=bc
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/backups?alt=json&backupId=bc
           method: POST
           headers: {}
           body:
@@ -115,7 +121,7 @@ actions:
                 "target": "projects/fake-project/locations/us-central1/backups/bc",
                 "verb": "create",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
@@ -124,7 +130,7 @@ actions:
         Create request issued
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605?alt=json
           method: GET
           headers: {}
           body: null
@@ -141,11 +147,11 @@ actions:
               "target": "projects/fake-project/locations/us-central1/backups/bc",
               "verb": "create",
               "cancelRequested": false,
-              "apiVersion": "v1p1alpha1"
+              "apiVersion": "$$api-version$$"
             },
             "done": true,
             "response": {
-              "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+              "@type": "type.googleapis.com/google.cloud.filestore.$$api-version$$.Backup",
               "name": "projects/fake-project/locations/us-central1/backups/bc",
               "description": "my new backup",
               "state": "READY",

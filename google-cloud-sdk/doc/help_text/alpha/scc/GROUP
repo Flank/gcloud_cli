@@ -30,6 +30,9 @@ GROUPS
      operations
         (ALPHA) Manage Cloud SCC operations.
 
+     settings
+        (ALPHA) Manage Cloud SCC settings.
+
      sources
         (ALPHA) Manage Cloud SCC finding sources.
 

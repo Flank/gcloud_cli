@@ -1,6 +1,6 @@
 NAME
     gcloud alpha iam workload-identity-pools providers create-oidc - create a
-        new OIDC-type WorkloadIdentityPoolProvider
+        new OIDC WorkloadIdentityPoolProvider
 
 SYNOPSIS
     gcloud alpha iam workload-identity-pools providers create-oidc
@@ -12,7 +12,7 @@ SYNOPSIS
         [--disabled] [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a new OIDC-type WorkloadIdentityPoolProvider.
+    (ALPHA) Create a new OIDC WorkloadIdentityPoolProvider.
 
 POSITIONAL ARGUMENTS
      WorkloadIdentityPoolProvider resource - The WorkloadIdentityPoolProvider

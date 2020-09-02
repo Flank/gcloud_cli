@@ -97,15 +97,18 @@ OPS_AGENT_POLICY_AGENT_RULES = [LOGGING_AGENT_RULE, METRICS_AGENT_RULE]
 AGENT_OS_TYPE = agent_policy.OpsAgentPolicy.Assignment.OsType(
     agent_policy.OpsAgentPolicy.Assignment.OsType.OsShortName.CENTOS, '7')
 AGENT_ASSIGNMENT = agent_policy.OpsAgentPolicy.Assignment(
-    GROUP_LABELS, ZONES, INSTANCES, [AGENT_OS_TYPE])
+    group_labels=GROUP_LABELS,
+    zones=ZONES,
+    instances=INSTANCES,
+    os_types=[AGENT_OS_TYPE])
 OPS_AGENT_POLICY = agent_policy.OpsAgentPolicy(
     assignment=AGENT_ASSIGNMENT,
     agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
-    create_time=CREATE_TIME,
     description=OPS_AGENT_DESCRIPTION,
     etag=ETAG,
+    name=NAME,
     update_time=UPDATE_TIME,
-    name=NAME)
+    create_time=CREATE_TIME)
 
 
 class OpsAgentPolicyTest(test_case.TestCase):
@@ -128,7 +131,13 @@ class CreateOpsAgentPolicyTest(test_case.TestCase):
 
   def testCreateOpsAgentPolicy(self):
     expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        AGENT_ASSIGNMENT, OPS_AGENT_POLICY_AGENT_RULES, OPS_AGENT_DESCRIPTION)
+        assignment=AGENT_ASSIGNMENT,
+        agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
+        description=OPS_AGENT_DESCRIPTION,
+        etag=None,
+        name=None,
+        update_time=None,
+        create_time=None)
     # Make sure this doesn't raise an exception.
     actual_ops_agents_policy = agent_policy.CreateOpsAgentPolicy(
         OPS_AGENT_DESCRIPTION, AGENT_RULES, GROUP_LABELS,
@@ -164,11 +173,11 @@ class UpdateOpsAgentsPolicyTest(test_case.TestCase):
             instances=[],
             os_types=[AGENT_OS_TYPE]),
         agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
-        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
         etag=ETAG,
+        name=NAME,
         update_time=None,
-        name=NAME)
+        create_time=CREATE_TIME)
 
     actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
         ops_agents_policy=OPS_AGENT_POLICY,
@@ -186,11 +195,11 @@ class UpdateOpsAgentsPolicyTest(test_case.TestCase):
     expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
         assignment=AGENT_ASSIGNMENT,
         agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
-        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
         etag=ETAG,
+        name=NAME,
         update_time=None,
-        name=NAME)
+        create_time=CREATE_TIME)
 
     actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
         ops_agents_policy=OPS_AGENT_POLICY,
@@ -214,11 +223,11 @@ class UpdateOpsAgentsPolicyTest(test_case.TestCase):
             version='6.*.*',
             package_state=installed,
             enable_autoupgrade=False)],
-        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
         etag=ETAG,
+        name=NAME,
         update_time=None,
-        name=NAME)
+        create_time=CREATE_TIME)
 
     actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
         ops_agents_policy=OPS_AGENT_POLICY,
@@ -244,11 +253,11 @@ class UpdateOpsAgentsPolicyTest(test_case.TestCase):
     expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
         assignment=AGENT_ASSIGNMENT,
         agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
-        create_time=CREATE_TIME,
         description=OPS_AGENT_DESCRIPTION,
         etag=new_etag,
+        name=NAME,
         update_time=None,
-        name=NAME)
+        create_time=CREATE_TIME)
 
     actual_ops_agents_policy = agent_policy.UpdateOpsAgentsPolicy(
         ops_agents_policy=OPS_AGENT_POLICY,

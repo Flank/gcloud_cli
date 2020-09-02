@@ -25,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (BETA) Describe a Google Compute Engine zone.
+        (BETA) Describe a Compute Engine zone.
 
      list
         (BETA) List Google Compute Engine zones.

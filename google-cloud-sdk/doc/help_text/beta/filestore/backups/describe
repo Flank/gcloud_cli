@@ -1,0 +1,50 @@
+NAME
+    gcloud beta filestore backups describe - describe a Cloud Filestore backup
+
+SYNOPSIS
+    gcloud beta filestore backups describe BACKUP --region=REGION
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Displays all data associated with a Cloud Filestore backup given a
+    valid backup name.
+
+    This command can fail for the following reasons:
+      o The backup specified does not exist.
+      o The active account does not have permission to access the given
+        backup.
+
+POSITIONAL ARGUMENTS
+     BACKUP
+        Arguments and flags that specify the Filestore backup you want to
+        create.
+
+REQUIRED FLAGS
+     --region=REGION
+        Region (e.g. us-central1) for the backup.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the file/v1beta1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/filestore/
+
+EXAMPLES
+    To display all data associated with a backup of the name 'my-backup' in the
+    region us-central1:
+
+        $ gcloud beta filestore backups describe my-backup \
+            --region=us-central1
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha filestore backups describe
+

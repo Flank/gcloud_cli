@@ -371,6 +371,17 @@ actions:
           with [ops-agents-].'
 - execute_command:
     command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type='' --os-types=short-name=centos,version=7
+    events:
+    - expect_stderr:
+        matches: .* argument --agent-rules\:\ Invalid value \[\] from field \[type\],
+          expected one of \[logging, metrics\]..*
+    - expect_exit:
+        code: 1
+        message: 'argument --agent-rules: Invalid value [] from field [type],
+          expected one of [logging, metrics].'
+- execute_command:
+    command: |
       compute instances ops-agents policies create ops-agents-test-policy --agent-rules=not-a-list-of-maps --os-types=short-name=centos,version=7
     events:
     - expect_stderr:
@@ -446,6 +457,15 @@ actions:
         message: 'argument --group-labels: Bad syntax for dict arg: [not-a-list-of-maps].
           Please see `gcloud topic flags-file` or `gcloud topic escaping` for information
           on providing list or dictionary flag values with special characters.'
+- execute_command:
+    command: |
+      compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,enable-autoupgrade=true --os-types=''
+    events:
+    - expect_stderr:
+        matches: .*argument --os-types\:\ not enough args.*
+    - expect_exit:
+        code: 1
+        message: 'argument --os-types: not enough args'
 - execute_command:
     command: |
       compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging;type=metrics --os-types=not-a-list-of-maps

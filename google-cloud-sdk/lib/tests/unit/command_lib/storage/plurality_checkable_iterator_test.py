@@ -108,5 +108,19 @@ class PluralityCheckableIteratorTest(test_case.TestCase):
     next(test_iter)
     self.assertTrue(test_iter.is_empty())
 
+  def test_peeking_returns_first_iterator_item(self):
+    test_iter = plurality_checkable_iterator.PluralityCheckableIterator(
+        iter([0]))
+    self.assertEqual(test_iter.peek(), 0)
+    # Call again to confirm the first item in the iterator isn't consumed.
+    self.assertEqual(test_iter.peek(), 0)
+
+  def test_peeking_returns_none_for_empty_iterator(self):
+    test_iter = plurality_checkable_iterator.PluralityCheckableIterator(
+        iter([]))
+
+    self.assertIsNone(test_iter.peek())
+
+
 if __name__ == '__main__':
   test_case.main()

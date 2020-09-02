@@ -55,7 +55,10 @@ OPS_AGENT_POLICY_AGENT_RULES = [LOGGING_AGENT_RULE, METRICS_AGENT_RULE]
 AGENT_RULE_OS_TYPE = agent_policy.OpsAgentPolicy.Assignment.OsType(
     agent_policy.OpsAgentPolicy.Assignment.OsType.OsShortName.CENTOS, '7')
 AGENT_RULE_ASSIGNMENT = agent_policy.OpsAgentPolicy.Assignment(
-    GROUP_LABELS, ZONES, INSTANCES, [AGENT_RULE_OS_TYPE])
+    group_labels=GROUP_LABELS,
+    zones=ZONES,
+    instances=INSTANCES,
+    os_types=[AGENT_RULE_OS_TYPE])
 CREATE_TIME = '2020-06-17T22:42:38.676Z'
 UPDATE_TIME = '2020-06-18T23:42:38.676Z'
 ETAG = 'c0c751ec-839d-4de5-b5bb-1a934011020a'
@@ -141,8 +144,13 @@ class GuestPolicyToOpsAgentPolicyTest(test_case.TestCase):
     self.messages = osconfig_api_utils.GetClientMessages(
         None, api_version_override='v1beta')
     self.expected_ops_agents_policy = agent_policy.OpsAgentPolicy(
-        AGENT_RULE_ASSIGNMENT, OPS_AGENT_POLICY_AGENT_RULES,
-        OPS_AGENT_DESCRIPTION, ETAG, POLICY_NAME, UPDATE_TIME, CREATE_TIME)
+        assignment=AGENT_RULE_ASSIGNMENT,
+        agent_rules=OPS_AGENT_POLICY_AGENT_RULES,
+        description=OPS_AGENT_DESCRIPTION,
+        etag=ETAG,
+        name=POLICY_NAME,
+        update_time=UPDATE_TIME,
+        create_time=CREATE_TIME)
     self.guest_policy = self._LoadMessage(
         GUEST_POLICY_YAML, self.messages.GuestPolicy)
 

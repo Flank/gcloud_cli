@@ -1485,7 +1485,7 @@ class InstalledCliTreesTest(calliope_test_base.CalliopeTestBase):
         ('gcloud_completions', 'data/cli/gcloud_completions.py', False),
         ('gcloud_completions', 'data/cli/gcloud_completions.pyc', False),
         ('gsutil', 'data/cli/gsutil.json', True),
-        ('kubectl', 'data/cli/kubectl.json', False),
+        ('kubectl', 'data/cli/kubectl.json', True),
     ]
 
     def _Chop(path):

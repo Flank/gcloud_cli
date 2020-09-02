@@ -132,7 +132,7 @@ region us\-central1 to change the description to 'A new description.'
 
 .RS 2m
 $ gcloud alpha filestore backups update my\-backup \e
-     \-\-region=us\-central1 \-\-description="A new description."
+    \-\-region=us\-central1 \-\-description="A new description."
 .RE
 
 
@@ -142,5 +142,9 @@ $ gcloud alpha filestore backups update my\-backup \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-allowlist.
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta filestore backups update
+.RE
 

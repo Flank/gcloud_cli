@@ -134,16 +134,11 @@ class TargetHttpsProxiesListTest(test_base.BaseTest,
         cli=self.cli,
     )
 
-    request_params = {'includeAllScopes': True}
-    if hasattr(self.messages.ComputeTargetHttpsProxiesAggregatedListRequest,
-               'returnPartialSuccess'):
-      request_params['returnPartialSuccess'] = True
-
     self.list_json.assert_called_with(
         requests=[
             (self._compute_api.targetHttpsProxies, 'AggregatedList',
              self.messages.ComputeTargetHttpsProxiesAggregatedListRequest(
-                 project='my-project', **request_params)),
+                 project='my-project', includeAllScopes=True)),
         ],
         http=self.mock_http(),
         batch_url=self.batch_url,

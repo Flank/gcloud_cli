@@ -11,7 +11,7 @@ gcloud alpha run services update \- update Cloud Run environment variables and o
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run services update\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run services update\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-ingress\fR=\fIINGRESS\fR;\ default="all"] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -77,6 +77,30 @@ Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
 .TP 2m
 \fB\-\-image\fR=\fIIMAGE\fR
 Name of the container image to deploy (e.g. \f5gcr.io/cloudrun/hello:latest\fR).
+
+.TP 2m
+\fB\-\-ingress\fR=\fIINGRESS\fR; default="all"
+Set the ingress traffic sources allowed to call the service. For Cloud Run
+(fully managed) the \f5\-\-[no\-]allow\-unauthenticated\fR flag separately
+controls the identities allowed to call the service. \fIINGRESS\fR must be one
+of:
+
+.RS 2m
+.TP 2m
+\fBall\fR
+Inbound requests from all sources are allowed.
+.TP 2m
+\fBinternal\fR
+For Cloud Run (fully managed), only inbound requests from VPC networks in the
+same project are allowed. For Cloud Run for Anthos, only inbound requests from
+the same cluster are allowed.
+.TP 2m
+\fBinternal\-and\-cloud\-load\-balancing\fR
+Only supported for Cloud Run (fully managed). Only inbound requests from VPC
+networks in the same project or from Google Cloud Load Balancing are allowed.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR
@@ -306,9 +330,12 @@ or Cloud Run for Anthos deployed on VMware. Specify \f5\-\-platform=gke\fR or
 .RS 2m
 .TP 2m
 \fB\-\-connectivity\fR=\fICONNECTIVITY\fR
-Defaults to 'external'. If 'external', the service can be invoked through the
-internet, in addition to through the cluster network. \fICONNECTIVITY\fR must be
-one of:
+(DEPRECATED) Defaults to 'external'. If 'external', the service can be invoked
+through the internet, in addition to through the cluster network.
+
+The \-\-connectivity flag is deprecated and will be removed in an upcoming
+release. Please use the \-\-ingress flag instead. \fICONNECTIVITY\fR must be one
+of:
 
 .RS 2m
 .TP 2m

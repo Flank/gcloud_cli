@@ -3,11 +3,12 @@ NAME
 
 SYNOPSIS
     gcloud beta eventarc triggers create (TRIGGER : --location=LOCATION)
+        --destination-run-service=DESTINATION_RUN_SERVICE
         --matching-criteria=[ATTRIBUTE=VALUE,...]
-        (--destination-run-service=DESTINATION_RUN_SERVICE
-          : --destination-run-location=DESTINATION_RUN_LOCATION)
         --service-account=SERVICE_ACCOUNT [--async]
-        [--destination-run-path=DESTINATION_RUN_PATH] [GCLOUD_WIDE_FLAG ...]
+        [--destination-run-path=DESTINATION_RUN_PATH]
+        [--destination-run-region=DESTINATION_RUN_REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create an Eventarc trigger.
@@ -30,6 +31,12 @@ POSITIONAL ARGUMENTS
           [eventarc/location] property.
 
 REQUIRED FLAGS
+     --destination-run-service=DESTINATION_RUN_SERVICE
+        The name of the Cloud Run fully-managed service that receives the
+        events for the trigger. The service must be in the same region as the
+        trigger unless the trigger's location is global. The service must be in
+        the same project as the trigger.
+
      --matching-criteria=[ATTRIBUTE=VALUE,...]
         The criteria by which events are filtered for the trigger, specified as
         a comma-separated list of CloudEvents attribute names and values. This
@@ -37,26 +44,6 @@ REQUIRED FLAGS
         that match with this criteria will be sent to the destination. The
         criteria must include the type attribute, as well as any other
         attributes that are expected for the chosen type.
-
-     Destination Cloud Run service resource - The Cloud Run fully-managed
-     service that receives the events for the trigger. The service must be in
-     the same location as the trigger unless the trigger's location is global,
-     in which case the service must be in a different location. The arguments
-     in this group can be used to specify the attributes of this resource.
-     (NOTE) Some attributes are not given arguments in this group but can be
-     set in other ways. To set the [project] attribute: provide the argument
-     [--destination-run-service] on the command line with a fully specified
-     name; provide the argument [--project] on the command line; set the
-     property [core/project]. This must be specified.
-
-       --destination-run-service=DESTINATION_RUN_SERVICE
-          ID of the destination Cloud Run service or fully qualified identifier
-          for the destination Cloud Run service. This flag must be specified if
-          any of the other arguments in this group are specified.
-
-       --destination-run-location=DESTINATION_RUN_LOCATION
-          The location of the destination Cloud Run service. If not specified,
-          the trigger's location will be used.
 
 OPTIONAL FLAGS
      Service account resource - The IAM service account associated with the
@@ -81,6 +68,11 @@ OPTIONAL FLAGS
         The relative path on the destination Cloud Run service to which the
         events for the trigger should be sent. Examples: "/route", "route",
         "route/subroute".
+
+     --destination-run-region=DESTINATION_RUN_REGION
+        The region in which the destination Cloud Run service can be found. If
+        not specified, it is assumed that the service is in the same region as
+        the trigger.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

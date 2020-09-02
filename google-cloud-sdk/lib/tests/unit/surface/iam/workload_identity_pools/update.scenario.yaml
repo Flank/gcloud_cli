@@ -37,7 +37,7 @@ actions:
               "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/operations/operation-id"
             }
     - expect_stderr: |
-        Updated workload_identity_pool [my-workload-identity-pool].
+        Updated WorkloadIdentityPool [my-workload-identity-pool].
     - expect_stdout: |
         name: projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/operations/operation-id
     - expect_exit:

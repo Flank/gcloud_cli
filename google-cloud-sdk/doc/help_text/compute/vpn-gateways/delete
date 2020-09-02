@@ -1,15 +1,15 @@
 NAME
-    gcloud compute vpn-gateways delete - delete Google Compute Engine Highly
-        Available VPN Gateways
+    gcloud compute vpn-gateways delete - delete Compute Engine Highly Available
+        VPN Gateways
 
 SYNOPSIS
     gcloud compute vpn-gateways delete NAME [NAME ...] [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute vpn-gateways delete is used to delete one or more Google
-    Compute Engine Highly Available VPN Gateways. VPN Gateways can only be
-    deleted when no VPN tunnels refer to them.
+    gcloud compute vpn-gateways delete is used to delete one or more Compute
+    Engine Highly Available VPN Gateways. VPN Gateways can only be deleted when
+    no VPN tunnels refer to them.
 
     Highly Available VPN Gateway provides a means to create a VPN solution with
     a higher availability SLA compared to Classic Target VPN Gateway. Highly

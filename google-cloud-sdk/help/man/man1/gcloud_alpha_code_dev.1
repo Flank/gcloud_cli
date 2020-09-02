@@ -11,7 +11,7 @@ gcloud alpha code dev \- run a Cloud Run service in a local development environm
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha code dev\fR [\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-local\-port\fR=\fILOCAL_PORT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-minikube\-vm\-driver\fR=\fIMINIKUBE_VM_DRIVER\fR;\ default="docker"] [\fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stop\-cluster\fR] [\fB\-\-appengine\fR\ |\ \fB\-\-builder\fR=\fIBUILDER\fR\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-application\-default\-credential\fR\ |\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR] [\fB\-\-kind\-cluster\fR=\fIKIND_CLUSTER\fR\ |\ \fB\-\-kube\-context\fR=\fIKUBE_CONTEXT\fR\ |\ \fB\-\-minikube\-profile\fR=\fIMINIKUBE_PROFILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha code dev\fR [\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-local\-port\fR=\fILOCAL_PORT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-minikube\-vm\-driver\fR=\fIMINIKUBE_VM_DRIVER\fR;\ default="docker"] [\fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-no\-stop\-cluster\fR] [\fB\-\-appengine\fR\ |\ \fB\-\-builder\fR=\fIBUILDER\fR\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-application\-default\-credential\fR\ |\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR] [\fB\-\-kind\-cluster\fR=\fIKIND_CLUSTER\fR\ |\ \fB\-\-kube\-context\fR=\fIKUBE_CONTEXT\fR\ |\ \fB\-\-minikube\-profile\fR=\fIMINIKUBE_PROFILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,7 +74,8 @@ directory is used.
 .TP 2m
 \fB\-\-stop\-cluster\fR
 If running on minikube or kind, stop the minkube profile or kind cluster at the
-end of the session.
+end of the session. Enabled by default, use \fB\-\-no\-stop\-cluster\fR to
+disable.
 
 .TP 2m
 

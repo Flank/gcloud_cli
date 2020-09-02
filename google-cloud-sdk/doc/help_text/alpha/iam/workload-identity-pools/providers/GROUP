@@ -3,7 +3,7 @@ NAME
         WorkloadIdentityPoolProviders
 
 SYNOPSIS
-    gcloud alpha iam workload-identity-pools providers COMMAND
+    gcloud alpha iam workload-identity-pools providers GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -17,6 +17,13 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        (ALPHA) Manage IAM WorkloadIdentityPoolProvider long running
+        operations.
+
 COMMANDS
     COMMAND is one of the following:
 
@@ -24,7 +31,7 @@ COMMANDS
         (ALPHA) Create a new AWS WorkloadIdentityPoolProvider.
 
      create-oidc
-        (ALPHA) Create a new OIDC-type WorkloadIdentityPoolProvider.
+        (ALPHA) Create a new OIDC WorkloadIdentityPoolProvider.
 
      delete
         (ALPHA) Delete a WorkloadIdentityPoolProvider.
@@ -39,7 +46,7 @@ COMMANDS
         (ALPHA) Undelete a WorkloadIdentityPoolProvider.
 
      update-aws
-        (ALPHA) Update a new AWS-type WorkloadIdentityPoolProvider.
+        (ALPHA) Update an AWS WorkloadIdentityPoolProvider.
 
      update-oidc
         (ALPHA) Update an OIDC WorkloadIdentityPoolProvider.

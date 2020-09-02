@@ -685,6 +685,10 @@ class WithFakeComputeAuth(SdkBase):
   actually make a real API request.
   """
 
+  def PreSetUp(self):
+    """Set use_google_auth to True to test google auth."""
+    self.use_google_auth = False
+
   def FakeAuthAccount(self):
     """Override this method to change the account that is used for credentials.
 
@@ -709,8 +713,8 @@ class WithFakeComputeAuth(SdkBase):
     """
     return 'fake-project'
 
-  def _FakeAuthCredential(self, use_google_auth):
-    if use_google_auth:
+  def _FakeAuthCredential(self):
+    if self.use_google_auth:
       cred = gce_google_auth.Credentials()
       cred.token = self.FakeAuthAccessToken()
       return cred
@@ -731,8 +735,8 @@ class WithFakeComputeAuth(SdkBase):
                     scopes=None,
                     prevent_refresh=False,
                     allow_account_impersonation=True,
-                    use_google_auth=False):
-        return self._FakeAuthCredential(use_google_auth)
+                    use_google_auth=self.use_google_auth):
+        return self._FakeAuthCredential()
 
       # pylint:enable=unused-argument
 

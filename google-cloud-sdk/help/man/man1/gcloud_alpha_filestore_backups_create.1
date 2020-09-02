@@ -22,7 +22,7 @@ gcloud alpha filestore backups create \- create a Cloud Filestore backup
 This command can fail for the following reasons:
 .RS 2m
 .IP "\(bu" 2m
-An instance with the same name already exists.
+A backup with the same name already exists.
 .IP "\(bu" 2m
 The active account does not have permission to create backups.
 .RE
@@ -116,5 +116,9 @@ $ gcloud alpha filestore backups create my\-backup \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-allowlist.
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta filestore backups create
+.RE
 

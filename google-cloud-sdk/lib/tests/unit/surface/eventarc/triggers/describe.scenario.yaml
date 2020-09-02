@@ -10,7 +10,8 @@ summary:
       destination:
         cloudRunService:
           path: fake/destination/path
-          service: projects/fake-project/locations/us-central1/services/fake-service
+          region: us-central1
+          service: fake-service
       matchingCriteria:
       - attribute: type
         value: google.cloud.audit.log.v1.written
@@ -39,7 +40,8 @@ actions:
             destination:
               cloudRunService:
                 path: fake/destination/path
-                service: projects/fake-project/locations/us-central1/services/fake-service
+                region: us-central1
+                service: fake-service
             matchingCriteria:
             - attribute: type
               value: google.cloud.audit.log.v1.written
@@ -53,7 +55,8 @@ actions:
         destination:
           cloudRunService:
             path: fake/destination/path
-            service: projects/fake-project/locations/us-central1/services/fake-service
+            region: us-central1
+            service: fake-service
         matchingCriteria:
         - attribute: type
           value: google.cloud.audit.log.v1.written

@@ -155,6 +155,9 @@ GROUPS
      builds
         (BETA) Create and manage builds for Google Cloud Build.
 
+     cloud-shell
+        (BETA) Manage Google Cloud Shell.
+
      composer
         (BETA) Create and manage Cloud Composer Environments.
 

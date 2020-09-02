@@ -36,7 +36,7 @@ REQUIRED FLAGS
             GZIP-compressed TFRecord files.
 
      --input-paths=INPUT_PATH,[INPUT_PATH,...]
-        Google Cloud Storage paths to the instances to run prediction on.
+        Cloud Storage paths to the instances to run prediction on.
 
         Wildcards (*) accepted at the end of a path. More than one path can be
         specified if multiple file patterns are needed. For example,
@@ -52,11 +52,11 @@ REQUIRED FLAGS
         directories aren't a first-class Cloud Storage concept) of my-bucket.
 
      --output-path=OUTPUT_PATH
-        Google Cloud Storage path to which to save the output. Example:
+        Cloud Storage path to which to save the output. Example:
         gs://my-bucket/output.
 
      --region=REGION
-        The Google Compute Engine region to run the job in.
+        The Compute Engine region to run the job in.
 
      Exactly one of these must be specified:
 
@@ -64,7 +64,7 @@ REQUIRED FLAGS
           Name of the model to use for prediction.
 
        --model-dir=MODEL_DIR
-          Google Cloud Storage location where the model files are located.
+          Cloud Storage location where the model files are located.
 
 OPTIONAL FLAGS
      --batch-size=BATCH_SIZE
@@ -88,12 +88,12 @@ OPTIONAL FLAGS
         AI Platform runtime version for this job. Must be specified unless
         --master-image-uri is specified instead. It is defined in documentation
         along with the list of supported versions:
-        https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
+        https://cloud.google.com/ai-platform/prediction/docs/runtime-version-list
 
      --signature-name=SIGNATURE_NAME
         The name of the signature defined in the SavedModel to use for this
         job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
-        https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+        https://www.tensorflow.org/api_docs/python/tf/compat/v1/saved_model/signature_constants,
         which is "serving_default". Only applies to TensorFlow models.
 
      --version=VERSION

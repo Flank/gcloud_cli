@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute vpn-gateways create - create a new Google Compute
-        Engine Highly Available VPN gateway
+    gcloud beta compute vpn-gateways create - create a new Compute Engine
+        Highly Available VPN gateway
 
 SYNOPSIS
     gcloud beta compute vpn-gateways create NAME --network=NETWORK

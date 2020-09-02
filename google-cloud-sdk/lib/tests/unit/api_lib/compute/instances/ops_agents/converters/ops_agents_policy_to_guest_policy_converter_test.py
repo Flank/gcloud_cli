@@ -316,10 +316,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='-6.0.0-1.el7')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=OPS_AGENT_RULE_POLICY_AGENT_RULES,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -362,11 +369,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED),
         enable_autoupgrade=False)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION,
-        ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=[LOGGING_AGENT_RULE, metrics_agent_latest],
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -410,10 +423,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, True)
     agents_latest = [logging_agent_latest, metrics_agent_latest]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types), agents_latest,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=agents_latest,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -457,10 +477,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, True)
     agents = [logging_agent_current_major, metrics_agent_latest]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types), agents,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=agents,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self.assertEqual(
@@ -500,10 +527,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='=6.0.0-1')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
-            _GUEST_POLICY_TEMPLATES['sles'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['sles'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['sles'].os_types),
+        agent_rules=OPS_AGENT_RULE_POLICY_AGENT_RULES,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -546,11 +580,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED),
         enable_autoupgrade=False)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
-            _GUEST_POLICY_TEMPLATES['sles'].os_types),
-        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION,
-        ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['sles'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['sles'].os_types),
+        agent_rules=[LOGGING_AGENT_RULE, metrics_agent_latest],
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -594,10 +634,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, True)
     agent_rules_latest = [logging_agent_latest, metrics_agent_latest]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
-            _GUEST_POLICY_TEMPLATES['sles'].os_types), agent_rules_latest,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['sles'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['sles'].os_types),
+        agent_rules=agent_rules_latest,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -640,10 +687,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
     ]
     expected_guest_policy.assignment.osTypes[0].osVersion = '7.8'
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['rhel'].instances,
-            _GUEST_POLICY_TEMPLATES['rhel'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['rhel'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['rhel'].os_types),
+        agent_rules=OPS_AGENT_RULE_POLICY_AGENT_RULES,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -680,10 +734,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='=6.0.0-1*')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
-            _GUEST_POLICY_TEMPLATES['debian'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['debian'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['debian'].os_types),
+        agent_rules=OPS_AGENT_RULE_POLICY_AGENT_RULES,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -726,11 +787,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
             agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED),
         enable_autoupgrade=False)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
-            _GUEST_POLICY_TEMPLATES['debian'].os_types),
-        [LOGGING_AGENT_RULE, metrics_agent_latest], OPS_AGENT_RULE_DESCRIPTION,
-        ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['debian'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['debian'].os_types),
+        agent_rules=[LOGGING_AGENT_RULE, metrics_agent_latest],
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -780,10 +847,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         enable_autoupgrade=True)
     agent_rules_latest = [logging_agent_latest, metrics_agent_latest]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
-            _GUEST_POLICY_TEMPLATES['debian'].os_types), agent_rules_latest,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['debian'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['debian'].os_types),
+        agent_rules=agent_rules_latest,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -827,10 +901,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, True)
     agent_rules = [logging_agent_current_major, metrics_agent_current_major]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
-            _GUEST_POLICY_TEMPLATES['debian'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['debian'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['debian'].os_types),
+        agent_rules=agent_rules,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self.assertEqual(
@@ -877,10 +958,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='-6.*')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=agent_rules,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -924,10 +1012,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='=6.*')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['debian'].instances,
-            _GUEST_POLICY_TEMPLATES['debian'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['debian'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['debian'].os_types),
+        agent_rules=agent_rules,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -971,10 +1066,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='<7.*')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['sles'].instances,
-            _GUEST_POLICY_TEMPLATES['sles'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['sles'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['sles'].os_types),
+        agent_rules=agent_rules,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -1018,10 +1120,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, False)
     agent_rules = [logging_agent, metrics_agent]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=agent_rules,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -1055,10 +1164,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         agent_policy.OpsAgentPolicy.AgentRule.PackageState.REMOVED, False)
     agent_rules = [logging_agent, metrics_agent]
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types), agent_rules,
-        OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=agent_rules,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy)
     self._AssertProtoMessageEqual(expected_guest_policy, actual_guest_policy)
@@ -1095,10 +1211,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='-6.0.0-1.el7')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=OPS_AGENT_RULE_POLICY_AGENT_RULES,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy, expected_guest_policy.recipes)
     for recipe in expected_guest_policy.recipes:
@@ -1138,10 +1261,17 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
                 package_suffix='-6.0.0-1.el7')),
         self.messages.GuestPolicy)
     ops_agents_policy = agent_policy.OpsAgentPolicy(
-        agent_policy.OpsAgentPolicy.Assignment(
-            GROUP_LABELS, ZONES, _GUEST_POLICY_TEMPLATES['centos'].instances,
-            _GUEST_POLICY_TEMPLATES['centos'].os_types),
-        OPS_AGENT_RULE_POLICY_AGENT_RULES, OPS_AGENT_RULE_DESCRIPTION, ETAG)
+        assignment=agent_policy.OpsAgentPolicy.Assignment(
+            group_labels=GROUP_LABELS,
+            zones=ZONES,
+            instances=_GUEST_POLICY_TEMPLATES['centos'].instances,
+            os_types=_GUEST_POLICY_TEMPLATES['centos'].os_types),
+        agent_rules=OPS_AGENT_RULE_POLICY_AGENT_RULES,
+        description=OPS_AGENT_RULE_DESCRIPTION,
+        etag=ETAG,
+        name=None,
+        update_time=None,
+        create_time=None)
 
     actual_guest_policy = converter.ConvertOpsAgentPolicyToGuestPolicy(
         self.messages, ops_agents_policy, [expected_guest_policy.recipes[0]])

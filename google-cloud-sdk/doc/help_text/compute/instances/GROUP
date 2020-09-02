@@ -86,6 +86,10 @@ COMMANDS
      get-iam-policy
         Get the IAM policy for a Google Compute Engine instance.
 
+     get-screenshot
+        Capture a screenshot (JPEG image) of the virtual machine instance's
+        display.
+
      get-serial-port-output
         Read output from a virtual machine instance's serial port.
 

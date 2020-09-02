@@ -508,6 +508,13 @@ class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
     self.assertNotIn('X-Goog-User-Project', self.request_mock.call_args[0][3])
     self.assertNotIn(b'X-Goog-User-Project', self.request_mock.call_args[0][3])
 
+
+class HttpTestGCECredsGoogleAuth(HttpTestBase,
+                                 sdk_test_base.WithFakeComputeAuth):
+
+  def PreSetUp(self):
+    self.use_google_auth = True
+
   def testComputeServiceAccountGoogleAuth(self):
     # Don't do it for service accounts.
     properties.VALUES.billing.quota_project.Set('bar')

@@ -18,7 +18,8 @@ gcloud app logs read \- reads log entries for the current App Engine app
 .SH "DESCRIPTION"
 
 Display the latest log entries from stdout, stderr and crash log for the current
-Google App Engine app in a human readable format.
+Google App Engine app in a human readable format. This command requires that the
+caller have the logging.logEntries.list permission.
 
 
 

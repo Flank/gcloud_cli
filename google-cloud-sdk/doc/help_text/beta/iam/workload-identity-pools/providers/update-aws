@@ -1,6 +1,6 @@
 NAME
-    gcloud beta iam workload-identity-pools providers update-aws - update a new
-        AWS-type WorkloadIdentityPoolProvider
+    gcloud beta iam workload-identity-pools providers update-aws - update an
+        AWS WorkloadIdentityPoolProvider
 
 SYNOPSIS
     gcloud beta iam workload-identity-pools providers update-aws
@@ -9,10 +9,10 @@ SYNOPSIS
         [--account-id=ACCOUNT_ID] [--attribute-condition=ATTRIBUTE_CONDITION]
         [--attribute-mapping=[ATTRIBUTE_MAPPING,...]]
         [--description=DESCRIPTION] [--disabled] [--display-name=DISPLAY_NAME]
-        [--sts-uri=[STS_URI,...]] [GCLOUD_WIDE_FLAG ...]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Update a new AWS-type WorkloadIdentityPoolProvider.
+    (BETA) Update an AWS WorkloadIdentityPoolProvider.
 
 POSITIONAL ARGUMENTS
      WorkloadIdentityPoolProvider resource - The WorkloadIdentityPoolProvider
@@ -152,12 +152,6 @@ FLAGS
 
      --display-name=DISPLAY_NAME
         A display name for the provider. Cannot exceed 32 characters.
-
-     --sts-uri=[STS_URI,...]
-        A list of AWS STS URIs that can be used when exchanging credentials. If
-        not provided, any valid AWS STS URI is allowed. URIs must use the form
-        https://sts.amazonaws.com or https://sts.{region}.amazonaws.com, where
-        {region} is a valid AWS region. You can specify a maximum of 25 URIs.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

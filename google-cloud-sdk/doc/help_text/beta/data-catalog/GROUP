@@ -30,6 +30,9 @@ GROUPS
      tags
         (BETA) Manage tags in Cloud Data Catalog.
 
+     taxonomies
+        (BETA) Manage taxonomies in Cloud Data Catalog.
+
 COMMANDS
     COMMAND is one of the following:
 

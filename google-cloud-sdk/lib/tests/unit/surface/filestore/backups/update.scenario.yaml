@@ -1,5 +1,5 @@
 title: Create Filestore Backup
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -87,13 +87,19 @@ summary:
       state: READY
       storageBytes: '15260160'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta1
+      ALPHA: v1p1alpha1
+
 - execute_command:
     command: |
       filestore backups update backup --region us-west1 --description "New description"
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -118,7 +124,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=description
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=description
           method: PATCH
           headers: {}
           body:
@@ -147,13 +153,13 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
           method: GET
           headers: {}
           body: null
@@ -170,11 +176,11 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "@type": "type.googleapis.com/google.cloud.filestore.$$api-version$$.Backup",
                 "name": "projects/fake-project/locations/us-west1/backups/backup",
                 "description": "New description",
                 "state": "READY",
@@ -195,7 +201,7 @@ actions:
         Updated backup.
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -240,7 +246,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -261,7 +267,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:
@@ -290,13 +296,13 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
           method: GET
           headers: {}
           body: null
@@ -313,11 +319,11 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "@type": "type.googleapis.com/google.cloud.filestore.$$api-version$$.Backup",
                 "name": "projects/fake-project/locations/us-west1/backups/backup",
                 "description": "Description",
                 "state": "READY",
@@ -338,7 +344,7 @@ actions:
         Updated backup.
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -383,7 +389,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -408,7 +414,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:
@@ -436,13 +442,13 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
           method: GET
           headers: {}
           body: null
@@ -459,11 +465,11 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "@type": "type.googleapis.com/google.cloud.filestore.$$api-version$$.Backup",
                 "name": "projects/fake-project/locations/us-west1/backups/backup",
                 "description": "Description",
                 "state": "READY",
@@ -484,7 +490,7 @@ actions:
         Updated backup.
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -527,7 +533,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null
@@ -552,7 +558,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:
@@ -579,13 +585,13 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
           method: GET
           headers: {}
           body: null
@@ -602,11 +608,11 @@ actions:
                 "target": "projects/fake-project/locations/us-west1/backups/backup",
                 "verb": "update",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "@type": "type.googleapis.com/google.cloud.filestore.$$api-version$$.Backup",
                 "name": "projects/fake-project/locations/us-west1/backups/backup",
                 "description": "Description",
                 "state": "READY",
@@ -626,7 +632,7 @@ actions:
         Updated backup.
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-west1/backups/backup?alt=json
           method: GET
           headers: {}
           body: null

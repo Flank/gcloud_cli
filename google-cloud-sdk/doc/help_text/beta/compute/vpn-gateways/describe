@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute vpn-gateways describe - describe a Google Compute
-        Engine Highly Available VPN Gateway
+    gcloud beta compute vpn-gateways describe - describe a Compute Engine
+        Highly Available VPN Gateway
 
 SYNOPSIS
     gcloud beta compute vpn-gateways describe NAME [--region=REGION]
@@ -8,8 +8,8 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute vpn-gateways describe is used to display all
-    data associated with a Google Compute Engine Highly Available VPN Gateway
-    in a project.
+    data associated with a Compute Engine Highly Available VPN Gateway in a
+    project.
 
     Highly Available VPN Gateway provides a means to create a VPN solution with
     a higher availability SLA compared to Classic Target VPN Gateway. Highly

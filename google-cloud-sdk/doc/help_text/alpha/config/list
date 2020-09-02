@@ -125,7 +125,7 @@ AVAILABLE PROPERTIES
          verbosity
             Default logging verbosity for gcloud commands. This is the
             equivalent of using the global --verbosity flag. Supported
-            verbosity levels: debug, info, warning, error, and none.
+            verbosity levels: debug, info, warning, error, critical, and none.
 
      accessibility
          screen_reader

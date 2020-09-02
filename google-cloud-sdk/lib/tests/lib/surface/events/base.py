@@ -43,6 +43,10 @@ EVENTS_API_VERSION = 'v1beta1'
 # API version used for working with CRDs.
 _CRD_API_VERSION = 'v1beta1'
 
+# API name and version for CloudRun operator
+_OPERATOR_API_NAME = 'anthosevents'
+_OPERATOR_API_VERSION = 'v1alpha1'
+
 
 class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for Events unit tests."""
@@ -166,6 +170,8 @@ class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.crd_messages = apis.GetMessagesModule(self.api_name, _CRD_API_VERSION)
     self.core_messages = apis.GetMessagesModule(self.core_api_name,
                                                 self.core_api_version)
+    self.operator_messages = apis.GetMessagesModule(self.api_name,
+                                                    _OPERATOR_API_VERSION)
 
     # Create mock clients.
     client_class = apis.GetClientClass(self.api_name, self.api_version)
@@ -198,7 +204,15 @@ class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         self.mock_core_client.Mock()
         self.addCleanup(self.mock_core_client.Unmock)
 
-    # Create Eventflow/Anthosevents operations mock
+    # Setup mock operator client
+    client_class = apis.GetClientClass(_OPERATOR_API_NAME,
+                                       _OPERATOR_API_VERSION)
+    real_client = apis.GetClientInstance(
+        _OPERATOR_API_NAME, _OPERATOR_API_VERSION, no_http=True)
+    self.mock_operator_client = apitools_mock.Client(client_class, real_client)
+    self.mock_operator_client.Mock()
+    self.addCleanup(self.mock_operator_client.Unmock)
+
     self.operations = mock.Mock()
     if self.api_name == 'anthosevents':
       self.operations.IsCluster.return_value = True

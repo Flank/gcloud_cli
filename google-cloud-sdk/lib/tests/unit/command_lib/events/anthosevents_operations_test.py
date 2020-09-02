@@ -23,6 +23,7 @@ import random
 
 from apitools.base.protorpclite import protojson
 from apitools.base.py import exceptions as api_exceptions
+from googlecloudsdk.api_lib.events import cloud_run
 from googlecloudsdk.api_lib.events import configmap
 from googlecloudsdk.api_lib.events import custom_resource_definition
 from googlecloudsdk.api_lib.events import iam_util
@@ -70,6 +71,7 @@ class AnthoseventsConnectTest(cli_test_base.CliTestBase):
       self.assertEqual(anthosevents_client._client, self.mock_client)
       self.assertEqual(anthosevents_client._core_client, self.mock_client)
       self.assertEqual(anthosevents_client._crd_client, self.mock_client)
+      self.assertEqual(anthosevents_client._operator_client, self.mock_client)
       self.assertEqual(anthosevents_client._api_version, api_version)
       self.assertIsNone(anthosevents_client._region)
 
@@ -87,7 +89,7 @@ class EventflowOperationsTest(base.EventsBase):
   def SetUp(self):
     self.anthosevents_client = anthosevents_operations.AnthosEventsOperations(
         self.mock_client, self.api_version, self.region, self.mock_core_client,
-        self.mock_crd_client)
+        self.mock_crd_client, self.mock_operator_client)
     self.StartObjectPatch(random, 'random', return_value=0)
     self.StartObjectPatch(util, 'WaitForCondition')
     gsa_key = apis.GetMessagesModule('iam', 'v1').ServiceAccountKey(
@@ -937,6 +939,42 @@ class EventflowOperationsTest(base.EventsBase):
     arg_utils.ParseStaticFieldsIntoMessage(configmap_obj.Message(), kwargs)
     return configmap_obj
 
+  def testGetCloudRun(self):
+    # Expected initial object based on https://gke-internal.git.corp.google.com/knative/cloudrun-operator/+/refs/heads/master/config/999-cloud-run-cr.yaml pylint: disable=line-too-long
+    cloudrun_obj = self._MakeCloudRun(
+        **{
+            'metadata.name':
+                'cloud-run',
+            'metadata.labels.additionalProperties': [{
+                'key': 'addonmanager.kubernetes.io/mode',
+                'value': 'EnsureExists'
+            }, {
+                'key': 'operator.knative.dev/release',
+                'value': 'devel'
+            }],
+        })
+
+    expected_get_request = self.operator_messages.AnthoseventsNamespacesCloudrunsGetRequest(
+        name=anthosevents_operations._CLOUD_RUN_RELATIVE_NAME)
+    self.mock_operator_client.namespaces_cloudruns.Get.Expect(
+        expected_get_request, cloudrun_obj.Message())
+
+    self.anthosevents_client.GetCloudRun()
+
+  def testUpdateCloudRunWithEventingEnabled(self):
+    cloud_run_message = self.operator_messages.CloudRun()
+    arg_utils.SetFieldInMessage(cloud_run_message, 'spec.eventing.enabled',
+                                True)
+    expected_update_request = self.operator_messages.AnthoseventsNamespacesCloudrunsPatchRequest(
+        name=anthosevents_operations._CLOUD_RUN_RELATIVE_NAME,
+        cloudRun=cloud_run_message)
+
+    self.mock_operator_client.namespaces_cloudruns.Patch.Expect(
+        expected_update_request, cloud_run_message)
+    self.mock_operator_client.additional_http_headers = {}
+
+    self.anthosevents_client.UpdateCloudRunWithEventingEnabled()
+
   def _MakeTrigger(self, **kwargs):
     """Creates a new trigger.Trigger.
 
@@ -974,3 +1012,12 @@ class EventflowOperationsTest(base.EventsBase):
                                    api_category)
     arg_utils.ParseStaticFieldsIntoMessage(source_obj.Message(), kwargs)
     return source_obj
+
+  def _MakeCloudRun(self,
+                    kind='CloudPubSubSource',
+                    api_category='sources.eventing.knative.dev',
+                    **kwargs):
+    cloud_run_obj = cloud_run.CloudRun.New(self.mock_operator_client,
+                                           'cloud-run-system')
+    arg_utils.ParseStaticFieldsIntoMessage(cloud_run_obj.Message(), kwargs)
+    return cloud_run_obj

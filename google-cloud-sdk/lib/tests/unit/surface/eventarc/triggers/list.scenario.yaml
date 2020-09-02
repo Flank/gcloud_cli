@@ -46,6 +46,7 @@ actions:
             - destination:
                 cloudRunService:
                   service: fake-service1
+                  region: us-central1
               matchingCriteria:
               - attribute: type
                 value: google.cloud.audit.log.v1.written
@@ -58,6 +59,7 @@ actions:
                 cloudRunService:
                   service: fake-service2
                   path: /fake/path
+                  region: us-central1
               matchingCriteria:
               - attribute: type
                 value: google.cloud.pubsub.topic.v1.messagePublished
@@ -103,6 +105,7 @@ actions:
             - destination:
                 cloudRunService:
                   service: fake-service1
+                  region: us-central1
               matchingCriteria:
               - attribute: type
                 value: google.cloud.audit.log.v1.written
@@ -115,6 +118,7 @@ actions:
                 cloudRunService:
                   service: fake-service2
                   path: /fake/path
+                  region: us-central1
               matchingCriteria:
               - attribute: type
                 value: google.cloud.pubsub.topic.v1.messagePublished

@@ -19,8 +19,8 @@ gcloud beta ai\-platform jobs submit training \- submit an AI Platform training 
 
 \fB(BETA)\fR Submit an AI Platform training job.
 
-This creates temporary files and executes Python code staged by a user on Google
-Cloud Storage. Model code can either be specified with a path, e.g.:
+This creates temporary files and executes Python code staged by a user on Cloud
+Storage. Model code can either be specified with a path, e.g.:
 
 .RS 2m
 $ gcloud beta ai\-platform jobs submit training my_job \e
@@ -54,7 +54,7 @@ after this command exits and must be cancelled with \f5gcloud ai\-platform jobs
 cancel JOB_ID\fR).
 
 For more information, see:
-https://cloud.google.com/ml/docs/concepts/training\-overview
+https://cloud.google.com/ai\-platform/training/docs/overview
 
 
 
@@ -130,8 +130,8 @@ line arguments, the command line arguments override the configuration file.
 .RS 2m
 .TP 2m
 \fB\-\-job\-dir\fR=\fIJOB_DIR\fR
-Google Cloud Storage path in which to store training outputs and other data
-needed for training.
+Cloud Storage path in which to store training outputs and other data needed for
+training.
 
 This path will be passed to your TensorFlow program as the \f5\-\-job\-dir\fR
 command\-line arg. The benefit of specifying this field is that AI Platform will
@@ -172,8 +172,8 @@ greater than 0.
 .sp
 .TP 2m
 \fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR
-Docker image to run on each master worker. This image must be in Google
-Container Registry. Only one of \f5\-\-master\-image\-uri\fR and
+Docker image to run on each master worker. This image must be in Container
+Registry. Only one of \f5\-\-master\-image\-uri\fR and
 \f5\-\-runtime\-version\fR must be specified.
 
 .TP 2m
@@ -234,16 +234,28 @@ greater than 0.
 .sp
 .TP 2m
 \fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR
-Docker image to run on each parameter server. This image must be in Google
-Container Registry. If not specified, the value of \f5\-\-master\-image\-uri\fR
-is used.
+Docker image to run on each parameter server. This image must be in Container
+Registry. If not specified, the value of \f5\-\-master\-image\-uri\fR is used.
 
 .TP 2m
 \fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
-Version of Python used during training. If not set, the default version is 2.7.
-Python 3.5 is available when \f5\-\-runtime\-version\fR is set to 1.4 and above.
-Python 2.7 works with all supported runtime versions.
+Version of Python used during training. Choices are 3.7, 3.5, and 2.7. However,
+this value must be compatible with the chosen runtime version for the job.
 
+Must be used with a compatible runtime version:
+
+.RS 2m
+.IP "\(em" 2m
+3.7 is compatible with runtime versions 1.15 and later.
+.IP "\(em" 2m
+3.5 is compatible with runtime versions 1.4 through 1.14.
+.IP "\(em" 2m
+2.7 is compatible with runtime versions 1.15 and earlier.
+.RE
+.RE
+.sp
+
+.RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
 Region of the machine learning training job to submit. If not specified, you may
@@ -276,7 +288,7 @@ Alternatively, the region can be stored in the environment variable
 AI Platform runtime version for this job. Must be specified unless
 \-\-master\-image\-uri is specified instead. It is defined in documentation
 along with the list of supported versions:
-https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
+https://cloud.google.com/ai\-platform/prediction/docs/runtime\-version\-list
 
 .TP 2m
 \fB\-\-scale\-tier\fR=\fISCALE_TIER\fR
@@ -372,7 +384,7 @@ greater than 0.
 .sp
 .TP 2m
 \fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR
-Docker image to run on each worker node. This image must be in Google Container
+Docker image to run on each worker node. This image must be in Container
 Registry. If not specified, the value of \f5\-\-master\-image\-uri\fR is used.
 
 .TP 2m

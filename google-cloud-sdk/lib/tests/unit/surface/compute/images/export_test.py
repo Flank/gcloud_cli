@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.iam import iam_util
+from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
@@ -80,6 +81,8 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
             image_project, self.image_name))
     daisy_utils.AppendArg(export_vars, 'destination_uri', self.destination_uri)
     daisy_utils.AppendArg(export_vars, 'format', image_format)
+    daisy_utils.AppendArg(export_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
 
     return self.cloudbuild_v1_messages.BuildStep(
         args=export_vars, name=self.builder)

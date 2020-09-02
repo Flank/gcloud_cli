@@ -32,7 +32,7 @@ COMMANDS
         Delete VPN tunnels.
 
      describe
-        Describe a Google Compute Engine VPN tunnel.
+        Describe a Compute Engine VPN tunnel.
 
      list
         List Google Compute Engine VPN tunnels.

@@ -1,7 +1,3 @@
-filters:
-  skipAlways:
-    reason: timing out
-    bug: b/156889942
 title: Create custom event trigger
 release_tracks: [ALPHA]
 summary:

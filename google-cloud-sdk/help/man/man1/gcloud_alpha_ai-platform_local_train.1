@@ -39,6 +39,13 @@ $ gcloud alpha ai\-platform local train \-\-module\-name trainer.task \e
 Unlike submitting a training job, the \-\-package\-path parameter can be
 omitted, and will use your current working directory.
 
+AI Platform Training sets a TF_CONFIG environment variable on each VM in your
+training job. You can use TF_CONFIG to access the cluster description and the
+task description for each VM.
+
+Learn more about TF_CONFIG:
+https://cloud.google.com/ai\-platform/training/docs/distributed\-training\-details.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -83,8 +90,8 @@ specified. Default: 0
 
 .TP 2m
 \fB\-\-job\-dir\fR=\fIJOB_DIR\fR
-Google Cloud Storage path or local_directory in which to store training outputs
-and other data needed for training.
+Cloud Storage path or local_directory in which to store training outputs and
+other data needed for training.
 
 This path will be passed to your TensorFlow program as the \f5\-\-job\-dir\fR
 command\-line arg. The benefit of specifying this field is that AI Platform will

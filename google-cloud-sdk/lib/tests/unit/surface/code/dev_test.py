@@ -16,16 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import os
-import os.path
 import subprocess
 
 from googlecloudsdk.command_lib.code import kubernetes
 from googlecloudsdk.command_lib.code import run_subprocess
-from googlecloudsdk.command_lib.code import skaffold_events
-from googlecloudsdk.core import config
+from googlecloudsdk.command_lib.code import skaffold
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import platforms
 from surface import code
@@ -43,8 +39,8 @@ class DevTest(test_case.TestCase):
   ]
 
   def SetUp(self):
-    self.StartObjectPatch(skaffold_events, 'PrintUrlThreadContext')
-    self.StartObjectPatch(dev, 'Skaffold')
+    self.StartObjectPatch(skaffold, 'PrintUrlThreadContext')
+    self.StartObjectPatch(skaffold, 'Skaffold')
     properties.VALUES.core.project.Set('myproject')
     self.addCleanup(properties.VALUES.core.project.Set, None)
 
@@ -139,63 +135,3 @@ class DevTest(test_case.TestCase):
         returncode=1, cmd='')
     with self.assertRaises(dev.RuntimeMissingDependencyError):
       cmd.Run(args)
-
-
-class SkaffoldTest(test_case.TestCase):
-
-  SDK_PATH = os.path.join('sdk', 'path')
-  SKAFFOLD_PATH = os.path.join(SDK_PATH, 'bin', 'skaffold')
-
-  def SetUp(self):
-    self.StartObjectPatch(config, 'Paths').return_value.sdk_root = self.SDK_PATH
-    self.StartObjectPatch(update_manager.UpdateManager,
-                          'EnsureInstalledAndRestart').return_value = True
-
-  def testKeyboardInterrupted(self):
-    with mock.patch.object(subprocess, 'Popen'):
-      with dev.Skaffold('./skaffold.yaml') as proc:
-        raise KeyboardInterrupt()
-
-      proc.terminate.assert_called()
-
-  def testCommand(self):
-    with mock.patch.object(subprocess, 'Popen') as popen:
-      with dev.Skaffold('./skaffold.yaml'):
-        pass
-
-      popen.assert_called_with(
-          [mock.ANY, 'dev', '-f', './skaffold.yaml', '--port-forward'],
-          env=mock.ANY)
-
-  def testCommandWithContext(self):
-    with mock.patch.object(subprocess, 'Popen') as popen:
-      with dev.Skaffold('./skaffold.yaml', context_name='fake-context'):
-        pass
-
-    _, args, _ = popen.mock_calls[0]
-    self.assertIn('--kube-context=fake-context', args[0])
-
-  def testCommandWithNamespace(self):
-    with mock.patch.object(subprocess, 'Popen') as popen:
-      with dev.Skaffold('./skaffold.yaml', namespace='fake-namespace'):
-        pass
-
-    _, args, _ = popen.mock_calls[0]
-    self.assertIn('--namespace=fake-namespace', args[0])
-
-  def testEnvVars(self):
-    with mock.patch.object(subprocess, 'Popen') as popen:
-      with dev.Skaffold('./skaffold.yaml', env_vars={'A': 'B', 'C': 'D'}):
-        pass
-
-    _, _, kwargs = popen.mock_calls[0]
-    self.assertEqual(kwargs['env']['A'], 'B')
-    self.assertEqual(kwargs['env']['C'], 'D')
-
-  def testDebug(self):
-    with mock.patch.object(subprocess, 'Popen') as popen:
-      with dev.Skaffold('./skaffold.yaml', debug=True):
-        pass
-
-    _, args, _ = popen.mock_calls[0]
-    self.assertIn('-vdebug', args[0])

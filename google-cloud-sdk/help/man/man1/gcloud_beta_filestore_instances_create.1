@@ -11,7 +11,7 @@ gcloud beta filestore instances create \- create a Cloud Filestore instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta filestore instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fInfs\-export\-options\fR=\fINFS\-EXPORT\-OPTIONS\fR] \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-tier\fR=\fITIER\fR;\ default="BASIC_HDD"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta filestore instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fInfs\-export\-options\fR=\fINFS\-EXPORT\-OPTIONS\fR],[\fIsource\-backup\fR=\fISOURCE\-BACKUP\fR],[\fIsource\-backup\-region\fR=\fISOURCE\-BACKUP\-REGION\fR] \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-tier\fR=\fITIER\fR;\ default="BASIC_HDD"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,7 +53,7 @@ The zone of the instance.
 
 .RS 2m
 .TP 2m
-\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fInfs\-export\-options\fR=\fINFS\-EXPORT\-OPTIONS\fR]
+\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fInfs\-export\-options\fR=\fINFS\-EXPORT\-OPTIONS\fR],[\fIsource\-backup\fR=\fISOURCE\-BACKUP\fR],[\fIsource\-backup\-region\fR=\fISOURCE\-BACKUP\-REGION\fR]
 File share configuration for an instance. Specifying both \f5name\fR and
 \f5capacity\fR is required.
 
@@ -118,6 +118,13 @@ An integer that represents the group ID of anonymous groups. Anon_gid may only
 be set when squash_mode is set to ROOT_SQUASH. If NO_ROOT_SQUASH is specified,
 an error will be returned. The default value is 65534.
 
+.TP 2m
+\fBsource\-backup\fR
+The name of the backup to restore from.
+
+.TP 2m
+\fBsource\-backup\-region\fR
+The region of the source backup.
 .RE
 .sp
 .TP 2m

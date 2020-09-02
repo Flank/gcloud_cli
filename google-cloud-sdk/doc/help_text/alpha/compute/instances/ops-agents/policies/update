@@ -4,10 +4,10 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instances ops-agents policies update POLICY_ID
-        [--agent-rules=[type=TYPE,version=VERSION,package-state=PACKAGE-STATE,
-          enable-autoupgrade=ENABLE-AUTOUPGRADE;...]]
+        [--agent-rules=type=TYPE,version=VERSION,package-state=PACKAGE-STATE,
+          enable-autoupgrade=ENABLE-AUTOUPGRADE;[...]]
         [--description=DESCRIPTION] [--etag=ETAG]
-        [--os-types=[short-name=SHORT-NAME,version=VERSION;...]]
+        [--os-types=short-name=SHORT-NAME,version=VERSION;[...]]
         [--clear-group-labels
           | --group-labels=[LABEL_NAME=LABEL_VALUE,
           LABEL_NAME=LABEL_VALUE,...;...]]
@@ -54,8 +54,8 @@ POSITIONAL ARGUMENTS
         from other generic policies and lower the chance of naming conflicts.
 
 FLAGS
-     --agent-rules=[type=TYPE,version=VERSION,package-state=PACKAGE-STATE,enable-autoupgrade=ENABLE-AUTOUPGRADE;...]
-        A list of agent rules to be enforced by the policy.
+     --agent-rules=type=TYPE,version=VERSION,package-state=PACKAGE-STATE,enable-autoupgrade=ENABLE-AUTOUPGRADE;[...]
+        A non-empty list of agent rules to be enforced by the policy.
 
         This flag must be quoted. Items in the list are separated by ";". Each
         item in the list is a <key, value> map that represents a logging or
@@ -199,8 +199,9 @@ FLAGS
         update command to ensure that their change will be applied to the same
         version of the policy.
 
-     --os-types=[short-name=SHORT-NAME,version=VERSION;...]
-        A list of OS types to filter instances that the policy applies to.
+     --os-types=short-name=SHORT-NAME,version=VERSION;[...]
+        A non-empty list of OS types to filter instances that the policy
+        applies to.
 
         For Alpha, exactly one OS type needs to be specified. The support for
         multiple OS types will be added later for more flexibility. Each OS

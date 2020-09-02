@@ -1,12 +1,12 @@
 NAME
-    gcloud beta compute zones describe - describe a Google Compute Engine zone
+    gcloud beta compute zones describe - describe a Compute Engine zone
 
 SYNOPSIS
     gcloud beta compute zones describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute zones describe displays all data associated with
-    a Google Compute Engine zone.
+    a Compute Engine zone.
 
 POSITIONAL ARGUMENTS
      NAME

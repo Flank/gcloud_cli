@@ -1,0 +1,108 @@
+
+.TH "GCLOUD_BETA_DATA\-CATALOG_TAXONOMIES_POLICY\-TAGS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta data\-catalog taxonomies policy\-tags set\-iam\-policy \- set the IAM policy for a Cloud Data Catalog Policy Tag
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta data\-catalog taxonomies policy\-tags set\-iam\-policy\fR (\fIPOLICY_TAG\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-taxonomy\fR=\fITAXONOMY\fR) \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Set the IAM policy for the given Cloud Data Catalog Policy Tag as
+defined in a JSON or YAML file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy tag resource \- Policy tag for which to set the IAM policy. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [policy_tag] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIPOLICY_TAG\fR
+ID of the policy tag or fully qualified identifier for the policy tag. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the policy tag.
+
+.TP 2m
+\fB\-\-taxonomy\fR=\fITAXONOMY\fR
+Taxonomy of the policy tag.
+
+.RE
+.sp
+.TP 2m
+\fIPOLICY_FILE\fR
+Path to a local JSON or YAML formatted file containing a valid policy.
+
+The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
+or YAML file conforming to the structure of a Policy
+(https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+The following command will read am IAM policy defined in a JSON file
+\'policy.json' and set it for the Policy Tag 'POLICY_TAG' with location
+\'LOCATION' in the taxonomy 'TAXONOMY':
+
+.RS 2m
+$ gcloud beta data\-catalog taxonomies policy\-tags set\-iam\-policy \e
+    POLICY_TAG \-\-location=LOCATION \-\-taxonomy=TAXONOMY policy.json
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog taxonomies policy\-tags set\-iam\-policy
+.RE
+

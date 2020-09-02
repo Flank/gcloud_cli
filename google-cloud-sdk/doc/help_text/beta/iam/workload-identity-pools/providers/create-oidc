@@ -1,6 +1,6 @@
 NAME
     gcloud beta iam workload-identity-pools providers create-oidc - create a
-        new OIDC-type WorkloadIdentityPoolProvider
+        new OIDC WorkloadIdentityPoolProvider
 
 SYNOPSIS
     gcloud beta iam workload-identity-pools providers create-oidc
@@ -12,7 +12,7 @@ SYNOPSIS
         [--disabled] [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create a new OIDC-type WorkloadIdentityPoolProvider.
+    (BETA) Create a new OIDC WorkloadIdentityPoolProvider.
 
 POSITIONAL ARGUMENTS
      WorkloadIdentityPoolProvider resource - The WorkloadIdentityPoolProvider

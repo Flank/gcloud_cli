@@ -1,6 +1,6 @@
 NAME
     gcloud alpha filestore instances restore - restore a Cloud Filestore
-        instance to a snapshot
+        instance to a snapshot or backup
 
 SYNOPSIS
     gcloud alpha filestore instances restore (INSTANCE : --zone=ZONE)
@@ -13,7 +13,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) Restore an existing Cloud Filestore instance to an existing
-    snapshot.
+    snapshot or backup.
 
 POSITIONAL ARGUMENTS
      Instance resource - Arguments and flags that specify the Filestore
@@ -79,9 +79,10 @@ API REFERENCE
     API can be found at: https://cloud.google.com/filestore/
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access allowlist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta filestore instances restore
 

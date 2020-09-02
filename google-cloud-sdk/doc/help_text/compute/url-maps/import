@@ -6,7 +6,7 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Imports a URL map's configuration to a file.
+    Imports a URL map's configuration from a file.
 
 POSITIONAL ARGUMENTS
      URL_MAP

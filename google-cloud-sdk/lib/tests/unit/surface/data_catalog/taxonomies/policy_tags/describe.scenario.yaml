@@ -1,0 +1,49 @@
+title: Data Catalog describe taxonomy scenario test.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog taxonomies policy-tags describe 1601166323019705232 --taxonomy=674858940116916528754321
+      --location=us
+  - stdout: |
+      childPolicyTags:
+      - projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232
+      description: a policy tag for test
+      displayName: Some Name
+      name: projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta1
+      ALPHA: v1beta1
+- execute_command:
+    command: data-catalog taxonomies policy-tags describe 1601166323019705232 --taxonomy=674858940116916528754321
+      --location=us
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          status: 200
+          headers: {}
+          body: |
+            {
+              "name": "projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232",
+              "displayName": "Some Name",
+              "description": "a policy tag for test",
+              "childPolicyTags": [
+                "projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232"
+              ]
+            }
+    - expect_stdout: |
+        childPolicyTags:
+        - projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232
+        description: a policy tag for test
+        displayName: Some Name
+        name: projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232
+    - expect_exit:
+        code: 0

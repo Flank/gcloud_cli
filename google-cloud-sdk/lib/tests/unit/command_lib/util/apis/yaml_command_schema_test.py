@@ -352,8 +352,16 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     o = yaml_command_schema.Input(yaml_command_schema.CommandType.GENERIC,
                                   {'confirmation_prompt': 'asdf'})
     self.assertEqual(o.confirmation_prompt, 'asdf')
+    self.assertTrue(o.default_continue)
     o = yaml_command_schema.Input(yaml_command_schema.CommandType.DELETE, {})
     self.assertTrue(o.confirmation_prompt.startswith('You are about to delete'))
+    self.assertTrue(o.default_continue)
+    o = yaml_command_schema.Input(yaml_command_schema.CommandType.GENERIC, {
+        'confirmation_prompt': 'asdf',
+        'default_continue': False
+    })
+    self.assertEqual(o.confirmation_prompt, 'asdf')
+    self.assertFalse(o.default_continue)
 
   def testOutput(self):
     o = yaml_command_schema.Output({'format': 'asdf'})

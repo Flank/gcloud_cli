@@ -22,6 +22,7 @@ from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -113,6 +114,20 @@ class ContainersUtilsTest(sdk_test_base.WithTempCWD, test_case.TestCase):
                 'env': [{
                     'name': 'C',
                     'value': 'C'
+                }]
+            }]
+        }
+    })
+
+  def testUpdateEnvEmptyValue(self):
+    manifest = yaml.load('spec:\n  containers:\n   - env:\n     - name: test\n')
+    containers_utils._UpdateEnv(manifest, ['A', 'B'], None, [])
+    self.assertEqual(manifest, {
+        'spec': {
+            'containers': [{
+                'env': [{
+                    'name': 'test',
+                    'value': None
                 }]
             }]
         }

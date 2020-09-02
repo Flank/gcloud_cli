@@ -221,15 +221,7 @@ actions:
           uri: https://cloudkms.googleapis.com/v1/$$kms-key$$:setIamPolicy?alt=json
           method: POST
           body:
-            json:
-              policy:
-                bindings:
-                - members:
-                  - serviceAccount:service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
-                  - user:x509signerparserservice@prod.google.com
-                  role: roles/cloudkms.signerVerifier
-                version: 3
-              updateMask: bindings,etag,version
+            json: {}
         return_response:
           headers:
             cache-control: private
@@ -281,21 +273,7 @@ actions:
           uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/iam?alt=json
           method: PUT
           body:
-            json:
-              resourceId: projects/_/buckets/$$bucket$$
-              kind: storage#policy
-              version: 3
-              bindings:
-              - role: roles/storage.legacyBucketOwner
-                members:
-                - projectEditor:$$project$$
-                - projectOwner:$$project$$
-              - role: roles/storage.legacyBucketReader
-                members:
-                - projectViewer:$$project$$
-              - role: roles/storage.objectAdmin
-                members:
-                - serviceAccount:service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
+            json: {}
         return_response:
           headers:
             cache-control: no-cache, no-store, max-age=0, must-revalidate

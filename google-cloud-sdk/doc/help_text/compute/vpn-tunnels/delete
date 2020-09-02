@@ -6,8 +6,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute vpn-tunnels delete deletes one or more Google Compute Engine
-    VPN tunnels.
+    gcloud compute vpn-tunnels delete deletes one or more Compute Engine VPN
+    tunnels.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

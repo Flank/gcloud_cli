@@ -256,6 +256,7 @@ class CloudFilestoreInstancesUpdateAlphaTest(CloudFilestoreInstancesUpdateBase):
         expected_vol_name='instance_name',
         expected_capacity=10024,
         expected_source_snapshot=None,
+        expected_source_backup=None,
         expected_nfs_export_options=None)
     instance = util.CreateFileShareInstance(
         messages=self.messages,
@@ -279,6 +280,7 @@ class CloudFilestoreInstancesUpdateAlphaTest(CloudFilestoreInstancesUpdateBase):
         expected_vol_name=None,
         expected_capacity=None,
         expected_source_snapshot=None,
+        expected_source_backup=None,
         expected_nfs_export_options=None)
     updated_instance = util.CreateFileShareInstance(
         messages=self.messages,

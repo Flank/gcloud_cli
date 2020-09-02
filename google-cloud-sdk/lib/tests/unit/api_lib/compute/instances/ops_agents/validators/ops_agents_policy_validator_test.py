@@ -35,11 +35,18 @@ GOOD_METRICS_AGENT_RULE = agent_policy.OpsAgentPolicy.AgentRule(
 GOOD_OS_TYPE = agent_policy.OpsAgentPolicy.Assignment.OsType(
     agent_policy.OpsAgentPolicy.Assignment.OsType.OsShortName.CENTOS, '8')
 GOOD_ASSIGNMENT = agent_policy.OpsAgentPolicy.Assignment(
-    instances=[], group_labels=[], os_types=[GOOD_OS_TYPE], zones=[])
+    group_labels=[],
+    zones=[],
+    instances=[],
+    os_types=[GOOD_OS_TYPE])
 GOOD_POLICY = agent_policy.OpsAgentPolicy(
-    agent_rules=[GOOD_LOGGING_AGENT_RULE, GOOD_METRICS_AGENT_RULE],
     assignment=GOOD_ASSIGNMENT,
-    description=GOOD_DESCRIPTION)
+    agent_rules=[GOOD_LOGGING_AGENT_RULE, GOOD_METRICS_AGENT_RULE],
+    description=GOOD_DESCRIPTION,
+    etag=None,
+    name=None,
+    update_time=None,
+    create_time=None)
 
 BAD_LOGGING_AGENT_RULE_INVALID_VERSION = agent_policy.OpsAgentPolicy.AgentRule(
     agent_policy.OpsAgentPolicy.AgentRule.Type.LOGGING, '1',

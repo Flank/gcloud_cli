@@ -1,6 +1,5 @@
 NAME
-    gcloud compute vpn-tunnels describe - describe a Google Compute Engine VPN
-        tunnel
+    gcloud compute vpn-tunnels describe - describe a Compute Engine VPN tunnel
 
 SYNOPSIS
     gcloud compute vpn-tunnels describe NAME [--region=REGION]
@@ -8,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute vpn-tunnels describe displays all data associated with a
-    Google Compute Engine VPN tunnel in a project.
+    Compute Engine VPN tunnel in a project.
 
 POSITIONAL ARGUMENTS
      NAME

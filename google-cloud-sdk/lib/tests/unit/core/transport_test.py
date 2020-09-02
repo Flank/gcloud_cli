@@ -390,6 +390,13 @@ total round trip time (request+response): 2.000 secs
     self.AssertErrNotContains('response content')
     self.ClearErr()
 
+    run(
+        'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/'
+        'something@developer.iam.gserviceaccount.com:generateAccessToken?alt='
+        'json', {})
+    self.AssertErrNotContains('response content')
+    self.ClearErr()
+
   def testReportDuration(self):
     url = 'http://foo.com'
     request_headers = {b'header1': b'value1', b'header2': b'value2'}

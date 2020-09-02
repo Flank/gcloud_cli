@@ -1,0 +1,122 @@
+
+.TH "GCLOUD_BETA_FILESTORE_BACKUPS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta filestore backups create \- create a Cloud Filestore backup
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta filestore backups create\fR \fIBACKUP\fR \fB\-\-file\-share\fR=\fIFILE_SHARE\fR \fB\-\-instance\fR=\fIINSTANCE\fR \fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR \fB\-\-region\fR=\fIREGION\fR [\fB\-\-async\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a Cloud Filestore backup of an instance file share.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+A backup with the same name already exists.
+.IP "\(bu" 2m
+The active account does not have permission to create backups.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBACKUP\fR
+Arguments and flags that specify the Filestore backup you want to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\-share\fR=\fIFILE_SHARE\fR
+File share name on the Filestore instance to backup.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Share name of the Filestore instance you want to backup.
+
+.TP 2m
+\fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR
+Zone of the Filestore instance.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region (e.g. us\-central1) for the backup.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+List of label KEY=VALUE pairs to add.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBfile/v1beta1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/filestore/
+
+
+
+.SH "EXAMPLES"
+
+To create a backup with the name 'my\-backup' in a particular region like
+\'us\-central1' from an instance called 'my\-instance' in 'us\-central1\-c' and
+the source file share called 'my\-fs', run:
+
+.RS 2m
+$ gcloud beta filestore backups create my\-backup \e
+    \-\-instance=my\-instance \-\-file\-share=my\-fs
+    \-\-instance\-zone=us\-central1\-c \-\-region=us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha filestore backups create
+.RE
+

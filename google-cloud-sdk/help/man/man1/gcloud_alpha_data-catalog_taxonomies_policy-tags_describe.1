@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_ALPHA_DATA\-CATALOG_TAXONOMIES_POLICY\-TAGS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha data\-catalog taxonomies policy\-tags describe \- describe a Policy Tag Manager Policy tag
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha data\-catalog taxonomies policy\-tags describe\fR (\fIPOLICY_TAG\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-taxonomy\fR=\fITAXONOMY\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe a Policy Tag Manager Policy tag.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy tag resource \- Policy tag to describe. The arguments in this group can
+be used to specify the attributes of this resource. (NOTE) Some attributes are
+not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [policy_tag] on the command line with
+a fully specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIPOLICY_TAG\fR
+ID of the policy tag or fully qualified identifier for the policy tag. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the policy tag.
+
+.TP 2m
+\fB\-\-taxonomy\fR=\fITAXONOMY\fR
+Taxonomy of the policy tag.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+To describe the Policy Tag 'POLICY_TAG' in the taxonomy 'TAXONOMY', run:
+
+.RS 2m
+$ gcloud alpha data\-catalog taxonomies policy\-tags describe \e
+    POLICY_TAG \-\-taxonomy='TAXONOMY' \-\-location='LOCATION'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta data\-catalog taxonomies policy\-tags describe
+.RE
+

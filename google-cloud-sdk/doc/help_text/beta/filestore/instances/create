@@ -3,8 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud beta filestore instances create (INSTANCE : --zone=ZONE)
-        --file-share=[capacity=CAPACITY],
-          [name=NAME],[nfs-export-options=NFS-EXPORT-OPTIONS]
+        --file-share=[capacity=CAPACITY],[name=NAME],
+          [nfs-export-options=NFS-EXPORT-OPTIONS],[source-backup=SOURCE-BACKUP],
+          [source-backup-region=SOURCE-BACKUP-REGION]
         --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE] [--async]
         [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
         [--location=LOCATION] [--tier=TIER; default="BASIC_HDD"]
@@ -31,7 +32,7 @@ POSITIONAL ARGUMENTS
           The zone of the instance.
 
 REQUIRED FLAGS
-     --file-share=[capacity=CAPACITY],[name=NAME],[nfs-export-options=NFS-EXPORT-OPTIONS]
+     --file-share=[capacity=CAPACITY],[name=NAME],[nfs-export-options=NFS-EXPORT-OPTIONS],[source-backup=SOURCE-BACKUP],[source-backup-region=SOURCE-BACKUP-REGION]
         File share configuration for an instance. Specifying both name and
         capacity is required.
 
@@ -86,6 +87,11 @@ REQUIRED FLAGS
             NO_ROOT_SQUASH is specified, an error will be returned. The default
             value is 65534.
 
+         source-backup
+            The name of the backup to restore from.
+
+         source-backup-region
+            The region of the source backup.
      --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE]
         Network configuration for a Cloud Filestore instance. Specifying
         reserved-ip-range is optional.

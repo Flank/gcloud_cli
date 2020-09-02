@@ -21,7 +21,7 @@ summary:
       $$service-name$$
 - execute:
   - command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
-      FOO=bar --connectivity internal
+      FOO=bar $$ingress-traffic-allowed-flag$$ internal
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
@@ -34,6 +34,12 @@ actions:
 - define_reference:
     reference: api-version
     value: v1
+- define_reference:
+    reference: ingress-traffic-allowed-flag
+    track_values:
+      GA: --connectivity
+      BETA: --connectivity
+      ALPHA: --ingress
 - set_property:
     # container/use_client_certificate: true
     # auth/disable_ssl_validation: true
@@ -591,7 +597,7 @@ actions:
 
 - execute_command:
     command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
-      FOO=bar --connectivity internal --service-account default
+      FOO=bar $$ingress-traffic-allowed-flag$$ internal --service-account default
     events:
     - api_call:
         expect_request:

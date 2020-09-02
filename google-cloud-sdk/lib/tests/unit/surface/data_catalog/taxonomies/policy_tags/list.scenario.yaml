@@ -1,0 +1,72 @@
+title: Data Catalog list taxonomy scenario test.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog taxonomies policy-tags list --taxonomy=674858940116916528754321
+      --location=us
+  - stdout: |
+      ---
+      childPolicyTags:
+      - projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232
+      description: a policy tag for test
+      displayName: Some Name
+      name: projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232
+      ---
+      description: another policy tag for test
+      displayName: Some Other Name
+      name: projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232
+      parentPolicyTag: projects/fake-project/locations/us/taxonomies/6748589401169165287/policyTags/1601166323019705232
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta1
+      ALPHA: v1beta1
+- execute_command:
+    command: data-catalog taxonomies policy-tags list --taxonomy=674858940116916528754321
+      --location=us
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "policyTags": [
+                {
+                  "name": "projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232",
+                  "displayName": "Some Name",
+                  "description": "a policy tag for test",
+                  "childPolicyTags": [
+                    "projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232"
+                  ]
+                },
+                {
+                  "name": "projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232",
+                  "displayName": "Some Other Name",
+                  "description": "another policy tag for test",
+                  "parentPolicyTag": "projects/fake-project/locations/us/taxonomies/6748589401169165287/policyTags/1601166323019705232"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        ---
+        childPolicyTags:
+        - projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232
+        description: a policy tag for test
+        displayName: Some Name
+        name: projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/1601166323019705232
+        ---
+        description: another policy tag for test
+        displayName: Some Other Name
+        name: projects/fake-project/locations/us/taxonomies/674858940116916528754321/policyTags/242426323019705232
+        parentPolicyTag: projects/fake-project/locations/us/taxonomies/6748589401169165287/policyTags/1601166323019705232
+    - expect_exit:
+        code: 0

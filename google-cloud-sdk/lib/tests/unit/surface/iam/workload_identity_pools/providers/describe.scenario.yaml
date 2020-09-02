@@ -39,8 +39,7 @@ actions:
               },
               "attributeCondition": "true",
               "aws": {
-                "accountId": "1234567890",
-                "stsUri": "https://sts.amazonaws.com"
+                "accountId": "1234567890"
               }
             }
     - expect_stdout: |
@@ -49,8 +48,6 @@ actions:
           google.subject: assertion.arn
         aws:
           accountId: '1234567890'
-          stsUri:
-          - https://sts.amazonaws.com
         description: My workload pool description
         disabled: true
         displayName: My workload pool

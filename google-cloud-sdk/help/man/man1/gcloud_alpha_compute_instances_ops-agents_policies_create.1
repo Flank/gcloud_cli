@@ -11,7 +11,7 @@ gcloud alpha compute instances ops\-agents policies create \- create a Google Cl
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances ops\-agents policies create\fR \fIPOLICY_ID\fR \fB\-\-agent\-rules\fR=[\fItype\fR=\fITYPE\fR,\fIversion\fR=\fIVERSION\fR,\fIpackage\-state\fR=\fIPACKAGE\-STATE\fR,\fIenable\-autoupgrade\fR=\fIENABLE\-AUTOUPGRADE\fR;...] \fB\-\-os\-types\fR=[\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-group\-labels\fR=[\fILABEL_NAME\fR=\fILABEL_VALUE\fR,\fILABEL_NAME\fR=\fILABEL_VALUE\fR,...;...]] [\fB\-\-instances\fR=[\fIzones\fR/\fIZONE_NAME\fR/\fIinstances\fR/\fIINSTANCE_NAME\fR,...]] [\fB\-\-zones\fR=[\fIZONE_NAME\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances ops\-agents policies create\fR \fIPOLICY_ID\fR \fB\-\-agent\-rules\fR=\fItype\fR=\fITYPE\fR,\fIversion\fR=\fIVERSION\fR,\fIpackage\-state\fR=\fIPACKAGE\-STATE\fR,\fIenable\-autoupgrade\fR=\fIENABLE\-AUTOUPGRADE\fR;[...] \fB\-\-os\-types\fR=\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;[...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-group\-labels\fR=[\fILABEL_NAME\fR=\fILABEL_VALUE\fR,\fILABEL_NAME\fR=\fILABEL_VALUE\fR,...;...]] [\fB\-\-instances\fR=[\fIzones\fR/\fIZONE_NAME\fR/\fIinstances\fR/\fIINSTANCE_NAME\fR,...]] [\fB\-\-zones\fR=[\fIZONE_NAME\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,8 +49,8 @@ policies from other generic policies and lower the chance of naming conflicts.
 
 .RS 2m
 .TP 2m
-\fB\-\-agent\-rules\fR=[\fItype\fR=\fITYPE\fR,\fIversion\fR=\fIVERSION\fR,\fIpackage\-state\fR=\fIPACKAGE\-STATE\fR,\fIenable\-autoupgrade\fR=\fIENABLE\-AUTOUPGRADE\fR;...]
-A list of agent rules to be enforced by the policy.
+\fB\-\-agent\-rules\fR=\fItype\fR=\fITYPE\fR,\fIversion\fR=\fIVERSION\fR,\fIpackage\-state\fR=\fIPACKAGE\-STATE\fR,\fIenable\-autoupgrade\fR=\fIENABLE\-AUTOUPGRADE\fR;[...]
+A non\-empty list of agent rules to be enforced by the policy.
 
 This flag must be quoted. Items in the list are separated by ";". Each item in
 the list is a <key, value> map that represents a logging or metrics agent. The
@@ -193,8 +193,8 @@ agent version is set to a specific patch version in the format of
 .RE
 .sp
 .TP 2m
-\fB\-\-os\-types\fR=[\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;...]
-A list of OS types to filter instances that the policy applies to.
+\fB\-\-os\-types\fR=\fIshort\-name\fR=\fISHORT\-NAME\fR,\fIversion\fR=\fIVERSION\fR;[...]
+A non\-empty list of OS types to filter instances that the policy applies to.
 
 For Alpha, exactly one OS type needs to be specified. The support for multiple
 OS types will be added later for more flexibility. Each OS type contains the

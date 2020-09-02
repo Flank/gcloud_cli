@@ -33,6 +33,9 @@ COMMANDS
      get-iam-policy
         (ALPHA) Get IAM policy for an instance.
 
+     is-upgradeable
+        (ALPHA) Request for check if instance is upgradable.
+
      list
         (ALPHA) Request for listing instances.
 
@@ -56,6 +59,9 @@ COMMANDS
 
      update
         (ALPHA) Request for updating instances.
+
+     upgrade
+        (ALPHA) Request for upgrading instances.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

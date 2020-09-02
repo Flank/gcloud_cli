@@ -10,7 +10,7 @@ DESCRIPTION
     (ALPHA) Create a Cloud Filestore backup of an instance file share.
 
     This command can fail for the following reasons:
-      o An instance with the same name already exists.
+      o A backup with the same name already exists.
       o The active account does not have permission to create backups.
 
 POSITIONAL ARGUMENTS
@@ -64,5 +64,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access allowlist.
+    access allowlist. This variant is also available:
+
+        $ gcloud beta filestore backups create
 

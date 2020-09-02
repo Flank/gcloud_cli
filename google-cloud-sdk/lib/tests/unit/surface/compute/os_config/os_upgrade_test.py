@@ -22,6 +22,7 @@ from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iam import iam_util
+from googlecloudsdk.core import config
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.compute import daisy_test_base
@@ -58,6 +59,7 @@ class OsUpgradeTestBeta(daisy_test_base.DaisyBaseTest):
     ]
     if additional_arg:
       args.append(additional_arg)
+    args.append('-client-version={0}'.format(config.CLOUD_SDK_VERSION))
     return self.GetOsUpgradeStepForArgs(args)
 
   def GetOsUpgradeStepForArgs(self, args):

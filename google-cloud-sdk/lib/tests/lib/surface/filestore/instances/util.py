@@ -170,23 +170,35 @@ def MakeFileShareConfigMsg(messages, config):
         name=config.get('name', None),
         sourceSnapshot=config.get('source-snapshot', None),
         nfsExportOptions=config.get('nfs-export-options', None))
+  if config.get('source-backup', None):
+    return messages.FileShareConfig(
+        capacityGb=config.get('capacity', None),
+        name=config.get('name', None),
+        sourceBackup=config.get('source-backup', None),
+        nfsExportOptions=config.get('nfs-export-options', None))
   return messages.FileShareConfig(
       capacityGb=config.get('capacity', None),
       name=config.get('name', None),
       nfsExportOptions=config.get('nfs-export-options', None))
 
 
-def MakeFileShareConfig(messages, name, capacity, source_snapshot,
-                        nfs_export_options):
+def MakeFileShareConfig(messages,
+                        name,
+                        capacity,
+                        nfs_export_options,
+                        source_snapshot='',
+                        source_backup=''):
   """Creates a Fileshare configuration.
 
   Args:
       messages: The messages module.
       name: String, the FileShare name.
       capacity: Int, The Fileshare size in GB units.
-      source_snapshot: String, A snapshot path reflecting a backup of the source
-        instance.
       nfs_export_options: list, containing NfsExportOptions dictionaries.
+      source_snapshot: String, A snapshot path reflecting a snapshot of the
+        source instance.
+      source_backup: String, A backup path reflecting a backup of the source
+        instance.
 
   Returns:
       File share config message populate with values.
@@ -195,8 +207,11 @@ def MakeFileShareConfig(messages, name, capacity, source_snapshot,
   message_args = dict(
       capacityGb=capacity,
       name=name,
-      sourceSnapshot=source_snapshot,
       nfsExportOptions=nfs_export_options)
+  if source_snapshot:
+    message_args.update(sourceSnapshot=source_snapshot)
+  if source_backup:
+    message_args.update(sourceBackup=source_backup)
 
   return [messages.FileShareConfig(**message_args)]
 
@@ -220,7 +235,7 @@ def MakeNFSExportOptionsMsg(messages, nfs_export_options):
 
 def CreateFileShareConfig(messages, flags_file, expected_vol_name,
                           expected_capacity, expected_source_snapshot,
-                          expected_nfs_export_options):
+                          expected_source_backup, expected_nfs_export_options):
   """Creates a Filestore instance skeleton .
 
   Args:
@@ -229,6 +244,7 @@ def CreateFileShareConfig(messages, flags_file, expected_vol_name,
     expected_vol_name: string, test result expected volume name.
     expected_capacity: int, test result expected capacity.
     expected_source_snapshot: string, test result expected source snapshot.
+    expected_source_backup: string, test result expected source backup.
     expected_nfs_export_options: list, test result expected NfsExportOptions.
 
   Returns:
@@ -252,13 +268,15 @@ def CreateFileShareConfig(messages, flags_file, expected_vol_name,
       expected_vol_name=expected_vol_name,
       expected_capacity=expected_capacity,
       expected_source_snapshot=expected_source_snapshot,
+      expected_source_backup=expected_source_backup,
       nfs_export_configs=nfs_export_configs)
 
   return file_share_data
 
 
 def FillFileShare(file_share_data, expected_vol_name, expected_capacity,
-                  expected_source_snapshot, nfs_export_configs):
+                  expected_source_snapshot, expected_source_backup,
+                  nfs_export_configs):
   """Fill an expected file share result with config from the file_share_data.
 
   or manually from expected_* expected test result values.
@@ -268,6 +286,7 @@ def FillFileShare(file_share_data, expected_vol_name, expected_capacity,
     expected_vol_name: string, test result expected volume name.
     expected_capacity: int, test result expected capacity.
     expected_source_snapshot: string, test result expected source snapshot.
+    expected_source_backup: string, test result expected source backup.
     nfs_export_configs: list, test result  NfsExportOptions.
   """
   if file_share_data.get('name', None) is None:
@@ -277,6 +296,7 @@ def FillFileShare(file_share_data, expected_vol_name, expected_capacity,
   else:
     file_share_data['capacity'] = int(file_share_data['capacity'])
   file_share_data['source-snapshot'] = expected_source_snapshot
+  file_share_data['source-backup'] = expected_source_backup
   if file_share_data.get('nfs-export-options', None) is None:
     file_share_data['nfs-export-options'] = nfs_export_configs
 
@@ -357,3 +377,37 @@ def InstanceAddFileShareConfig(messages, instance, file_share_config):
   else:
     AddInstanceFileShare(instance,
                          [MakeFileShareConfigMsg(messages, file_share_config)])
+
+
+def SetupExpectedInstance(self,
+                          expected_network,
+                          expected_range,
+                          expected_vol_name,
+                          expected_capacity,
+                          expected_source_snapshot='',
+                          expected_source_backup=''):
+  """Populates a Filestore instance with the fields set to expected values."""
+
+  config = self.messages.Instance(
+      tier=self.basic_hdd,
+      description='test_description',
+      networks=MakeNetworkConfig(
+          messages=self.messages,
+          network=expected_network,
+          range_=expected_range))
+  AddInstanceFileShare(
+      instance=config,
+      file_shares=MakeFileShareConfig(
+          messages=self.messages,
+          name=expected_vol_name,
+          capacity=expected_capacity,
+          nfs_export_options=[],
+          source_snapshot=expected_source_snapshot,
+          source_backup=expected_source_backup))
+  ExpectCreateInstance(
+      messages=self.messages,
+      mock_client=self.mock_client,
+      parent=self.parent,
+      name=self.name,
+      op_name=self.op_name,
+      config=config)

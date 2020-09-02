@@ -124,7 +124,9 @@ class TargetHttpProxiesListTest(test_base.BaseTest,
         cli=self.cli,
     )
 
-    aggregated_list_request = self._getListRequestMessage('my-project')
+    aggregated_list_request = (
+        self.messages.ComputeTargetHttpProxiesAggregatedListRequest(
+            project='my-project', includeAllScopes=True))
 
     self.list_json.assert_called_with(
         requests=[

@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute vpn-gateways update - update a Google Compute Engine
-        Highly Available VPN gateway
+    gcloud beta compute vpn-gateways update - update a Compute Engine Highly
+        Available VPN gateway
 
 SYNOPSIS
     gcloud beta compute vpn-gateways update NAME [--region=REGION]
@@ -8,8 +8,8 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute vpn-gateways update updates labels for a Google
-    Compute Engine Highly Available VPN gateway.
+    (BETA) gcloud beta compute vpn-gateways update updates labels for a Compute
+    Engine Highly Available VPN gateway.
 
     For example:
 

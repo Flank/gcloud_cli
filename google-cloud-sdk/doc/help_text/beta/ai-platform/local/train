@@ -31,6 +31,13 @@ DESCRIPTION
     Unlike submitting a training job, the --package-path parameter can be
     omitted, and will use your current working directory.
 
+    AI Platform Training sets a TF_CONFIG environment variable on each VM in
+    your training job. You can use TF_CONFIG to access the cluster description
+    and the task description for each VM.
+
+    Learn more about TF_CONFIG:
+    https://cloud.google.com/ai-platform/training/docs/distributed-training-details.
+
 POSITIONAL ARGUMENTS
      [-- USER_ARGS ...]
         Additional user arguments to be forwarded to user code. Any relative
@@ -53,7 +60,7 @@ OPTIONAL FLAGS
         specified. Default: 0
 
      --job-dir=JOB_DIR
-        Google Cloud Storage path or local_directory in which to store training
+        Cloud Storage path or local_directory in which to store training
         outputs and other data needed for training.
 
         This path will be passed to your TensorFlow program as the --job-dir

@@ -36,6 +36,9 @@ GROUPS
      tags
         (ALPHA) Manage tags in Cloud Data Catalog.
 
+     taxonomies
+        (ALPHA) Manage taxonomies in Cloud Data Catalog.
+
 COMMANDS
     COMMAND is one of the following:
 

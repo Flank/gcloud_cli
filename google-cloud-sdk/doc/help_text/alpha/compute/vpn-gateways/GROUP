@@ -27,24 +27,22 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a new Google Compute Engine Highly Available VPN
-        gateway.
+        (ALPHA) Create a new Compute Engine Highly Available VPN gateway.
 
      delete
-        (ALPHA) Delete Google Compute Engine Highly Available VPN Gateways.
+        (ALPHA) Delete Compute Engine Highly Available VPN Gateways.
 
      describe
-        (ALPHA) Describe a Google Compute Engine Highly Available VPN Gateway.
+        (ALPHA) Describe a Compute Engine Highly Available VPN Gateway.
 
      get-status
-        (ALPHA) Get status of a Google Compute Engine Highly Available VPN
-        Gateway.
+        (ALPHA) Get status of a Compute Engine Highly Available VPN Gateway.
 
      list
         (ALPHA) List Google Compute Engine Highly Available VPN Gateways.
 
      update
-        (ALPHA) Update a Google Compute Engine Highly Available VPN gateway.
+        (ALPHA) Update a Compute Engine Highly Available VPN gateway.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

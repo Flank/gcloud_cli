@@ -24,10 +24,14 @@ platform/bq/third_party/absl/command_name.py
 platform/bq/third_party/absl/flags/LICENSE
 platform/bq/third_party/absl/flags/__init__.py
 platform/bq/third_party/absl/flags/_argument_parser.py
+platform/bq/third_party/absl/flags/_argument_parser.pyi
 platform/bq/third_party/absl/flags/_defines.py
+platform/bq/third_party/absl/flags/_defines.pyi
 platform/bq/third_party/absl/flags/_exceptions.py
 platform/bq/third_party/absl/flags/_flag.py
+platform/bq/third_party/absl/flags/_flag.pyi
 platform/bq/third_party/absl/flags/_flagvalues.py
+platform/bq/third_party/absl/flags/_flagvalues.pyi
 platform/bq/third_party/absl/flags/_helpers.py
 platform/bq/third_party/absl/flags/_validators.py
 platform/bq/third_party/absl/flags/argparse_flags.py
@@ -100,6 +104,9 @@ platform/bq/third_party/httplib2/python3/cacerts.txt
 platform/bq/third_party/httplib2/python3/certs.py
 platform/bq/third_party/httplib2/python3/iri2uri.py
 platform/bq/third_party/httplib2/python3/socks.py
+platform/bq/third_party/inflection/LICENSE
+platform/bq/third_party/inflection/__init__.py
+platform/bq/third_party/inflection/inflection.py
 platform/bq/third_party/oauth2client_4_0/LICENSE
 platform/bq/third_party/oauth2client_4_0/__init__.py
 platform/bq/third_party/oauth2client_4_0/_helpers.py

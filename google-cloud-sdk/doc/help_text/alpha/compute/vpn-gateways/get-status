@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute vpn-gateways get-status - get status of a Google
-        Compute Engine Highly Available VPN Gateway
+    gcloud alpha compute vpn-gateways get-status - get status of a Compute
+        Engine Highly Available VPN Gateway
 
 SYNOPSIS
     gcloud alpha compute vpn-gateways get-status NAME [--region=REGION]

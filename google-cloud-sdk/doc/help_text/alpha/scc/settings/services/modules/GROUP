@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha scc settings services modules - manage Cloud SCC modules
+        settings
+
+SYNOPSIS
+    gcloud alpha scc settings services modules COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud SCC modules settings.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Display effective module settings of Security Command
+        Center(SCC).
+
+     describe-explicit
+        (ALPHA) Display module settings of Security Command Center(SCC).
+
+     disable
+        (ALPHA) Disable a module in Security Command Center(SCC).
+
+     enable
+        (ALPHA) Enable a module in Security Command Center(SCC).
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist.
+

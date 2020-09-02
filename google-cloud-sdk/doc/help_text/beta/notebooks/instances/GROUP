@@ -33,6 +33,9 @@ COMMANDS
      get-iam-policy
         (BETA) Get IAM policy for an instance.
 
+     is-upgradeable
+        (BETA) Request for check if instance is upgradable.
+
      list
         (BETA) Request for listing instances.
 
@@ -56,6 +59,9 @@ COMMANDS
 
      update
         (BETA) Request for updating instances.
+
+     upgrade
+        (BETA) Request for upgrading instances.
 
 NOTES
     This command is currently in BETA and may change without notice. This

@@ -121,6 +121,7 @@ class MlPlatformModelsIntegrationTestGA(MlPlatformModelsIntegrationTest,
     self.AssertOutputNotContains(model)
 
 
+@test_case.Filters.skip('Mysterious quota issues', 'b/166278421')
 @parameterized.parameters('ml-engine', 'ai-platform')
 class MlPlatformModelsIntegrationTestBeta(MlPlatformModelsIntegrationTest,
                                           parameterized.TestCase):
@@ -140,7 +141,6 @@ class MlPlatformModelsIntegrationTestBeta(MlPlatformModelsIntegrationTest,
       # Create a version within the model
       savedmodel_dir = self.Resource('tests', 'e2e', 'surface', 'ai_platform',
                                      'testdata', 'savedmodel')
-      # TODO(b/151400378) rely on default for --machine-type.
       create_version_args = (
           '--origin {model_dir} --staging-bucket {staging_bucket} '
           '--description "My Description" --machine-type n1-standard-2 '

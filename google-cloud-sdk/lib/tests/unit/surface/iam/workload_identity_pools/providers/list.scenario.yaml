@@ -42,8 +42,7 @@ actions:
                   },
                   "attributeCondition": "true",
                   "aws": {
-                    "accountId": "1234567890",
-                    "stsUri": "https://sts.amazonaws.com"
+                    "accountId": "1234567890"
                   }
                 },
                 {
@@ -73,8 +72,6 @@ actions:
           google.subject: assertion.arn
         aws:
           accountId: '1234567890'
-          stsUri:
-          - https://sts.amazonaws.com
         description: My workload pool provider description
         disabled: true
         displayName: My workload pool provider
@@ -114,8 +111,7 @@ actions:
                   },
                   "attributeCondition": "true",
                   "aws": {
-                    "accountId": "1234567890",
-                    "stsUri": "https://sts.amazonaws.com"
+                    "accountId": "1234567890"
                   }
                 }
               ]
@@ -127,8 +123,6 @@ actions:
           google.subject: assertion.arn
         aws:
           accountId: '1234567890'
-          stsUri:
-          - https://sts.amazonaws.com
         description: My final workload pool provider description
         displayName: My final workload pool provider
         name: projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/providers/my-final-provider

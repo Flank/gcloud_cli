@@ -96,10 +96,13 @@ REQUIRED FLAGS
          source-snapshot-region
             The region of the source snapshot. If unspecified, it is assumed
             that the Filestore snapshot is local and instance-zone will be
-            used. source-backup::: The name of the backup to restore from.
+            used.
 
-                *source-backup-region*::: The region of the source backup.
+         source-backup
+            The name of the backup to restore from.
 
+         source-backup-region
+            The region of the source backup.
      --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE]
         Network configuration for a Cloud Filestore instance. Specifying
         reserved-ip-range is optional.

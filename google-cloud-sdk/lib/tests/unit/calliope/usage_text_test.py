@@ -1011,18 +1011,17 @@ Available command groups for gcloud compute:
   def testGcloudComputeInstancesUsage(self):
     # Expect to see uncategorized usage text since no categories are defined.
     with self.assertRaises(SystemExit):
-      self.cli.Execute('compute instances'.split())
-    expected = r"""ERROR: \(gcloud\.compute\.instances\) Command name argument expected\.
+      self.cli.Execute('compute networks'.split())
+    expected = r"""ERROR: \(gcloud\.compute\.networks\) Command name argument expected\.
 
-Available groups for gcloud compute instances:
+Available groups for gcloud compute networks:
 
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
-Available commands for gcloud compute instances:
+Available commands for gcloud compute networks:
 
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
 For detailed information on this command and its flags, run:
-  gcloud compute instances --help\n\Z"""
-
+  gcloud compute networks --help\n\Z"""
     self.assertIsNotNone(re.match(expected, self.GetErr()))
 
   def testGcloudConfigUsage(self):

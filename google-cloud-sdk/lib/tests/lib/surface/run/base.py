@@ -59,7 +59,7 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         collection='run.namespaces.services')
 
   def _NamespaceRef(self, region=DEFAULT_REGION, project='fake-project'):
-    # TODO(b/150322097): Remove this when the api has been split.
+    # TODO(b/148817410): Remove this when the api has been split.
     # This try/except block is needed because the v1alpha1 and v1 run apis
     # have different collection names for the namespaces.
     try:

@@ -1,0 +1,31 @@
+NAME
+    gcloud beta iam workload-identity-pools operations - manage IAM
+        WorkloadIdentityPool long running operations
+
+SYNOPSIS
+    gcloud beta iam workload-identity-pools operations COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Commands for managing IAM WorkloadIdentityPool long running
+    operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (BETA) Describe a WorkloadIdentityPool operation.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

@@ -9,7 +9,7 @@ SYNOPSIS
         --account-id=ACCOUNT_ID [--attribute-condition=ATTRIBUTE_CONDITION]
         [--attribute-mapping=[ATTRIBUTE_MAPPING,...]]
         [--description=DESCRIPTION] [--disabled] [--display-name=DISPLAY_NAME]
-        [--sts-uri=[STS_URI,...]] [GCLOUD_WIDE_FLAG ...]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new AWS WorkloadIdentityPoolProvider.
@@ -153,12 +153,6 @@ OPTIONAL FLAGS
 
      --display-name=DISPLAY_NAME
         A display name for the provider. Cannot exceed 32 characters.
-
-     --sts-uri=[STS_URI,...]
-        A list of AWS STS URIs that can be used when exchanging credentials. If
-        not provided, any valid AWS STS URI is allowed. URIs must use the form
-        https://sts.amazonaws.com or https://sts.{region}.amazonaws.com, where
-        {region} is a valid AWS region. You can specify a maximum of 25 URIs.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

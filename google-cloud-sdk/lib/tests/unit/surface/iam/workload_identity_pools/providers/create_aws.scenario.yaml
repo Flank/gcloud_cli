@@ -8,7 +8,7 @@ summary:
       --workload-identity-pool my-workload-identity-pool --location global
       --display-name='My aws provider' --description='My aws provider description' --disabled
       --attribute-mapping="google.subject=assertion.arn" --attribute-condition="true"
-      --account-id="1234567890" --sts-uri="https://sts.amazonaws.com"
+      --account-id="1234567890"
   - stderr: |
       Create WorkloadIdentityPoolProvider my-provider
 actions:
@@ -23,7 +23,7 @@ actions:
       --workload-identity-pool='my-workload-identity-pool' --location='global'
       --display-name='My aws provider' --description='My aws provider description' --disabled
       --attribute-mapping="google.subject=assertion.arn" --attribute-condition="true"
-      --account-id="1234567890" --sts-uri="https://sts.amazonaws.com"
+      --account-id="1234567890"
     events:
     - api_call:
         expect_request:
@@ -38,7 +38,6 @@ actions:
               "attributeCondition": "true",
               "aws": {
                 "accountId": "1234567890",
-                "stsUri": "https://sts.amazonaws.com"
               }
             }
         return_response:

@@ -110,6 +110,48 @@ class RegionalTest(test_base.AlphaUpdateTestBase):
               project='my-project'))],
     )
 
+  def testRegionWithSubsetting(self):
+    messages = self.messages
+    orig_backend_service = messages.BackendService(
+        backends=[],
+        description='my backend service',
+        healthChecks=[(self.compute_uri + '/projects/my-project/region/global'
+                       '/httpHealthChecks/my-health-check')],
+        name='backend-service-3',
+        portName='http',
+        protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+        selfLink=(self.compute_uri + '/projects/my-project'
+                  '/region/alaska/backendServices/backend-service-1'),
+        timeoutSec=30)
+    self.make_requests.side_effect = iter([
+        [orig_backend_service],
+        [],
+    ])
+
+    updated_backend_service = copy.deepcopy(orig_backend_service)
+    updated_backend_service.subsetting = messages.Subsetting(
+        policy=messages.Subsetting.PolicyValueValuesEnum
+        .CONSISTENT_HASH_SUBSETTING)
+
+    self.RunUpdate(
+        'backend-service-3 --region alaska '
+        '--subsetting-policy CONSISTENT_HASH_SUBSETTING',
+        use_global=False)
+
+    self.CheckRequests(
+        [(self.compute.regionBackendServices, 'Get',
+          messages.ComputeRegionBackendServicesGetRequest(
+              backendService='backend-service-3',
+              region='alaska',
+              project='my-project'))],
+        [(self.compute.regionBackendServices, 'Patch',
+          messages.ComputeRegionBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=updated_backend_service,
+              region='alaska',
+              project='my-project'))],
+    )
+
   def testRegionWithHealthChecksUpdatedToRegionHealthChecks(self):
     messages = self.messages
     orig_backend_service = messages.BackendService(
@@ -137,6 +179,45 @@ class RegionalTest(test_base.AlphaUpdateTestBase):
     self.RunUpdate('backend-service-3 --region alaska '
                    '--health-checks new-health-check '
                    '--health-checks-region alaska', use_global=False)
+
+    self.CheckRequests(
+        [(self.compute.regionBackendServices, 'Get',
+          messages.ComputeRegionBackendServicesGetRequest(
+              backendService='backend-service-3',
+              region='alaska',
+              project='my-project'))],
+        [(self.compute.regionBackendServices, 'Patch',
+          messages.ComputeRegionBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=updated_backend_service,
+              region='alaska',
+              project='my-project'))],
+    )
+
+  def testRegionWithAllProtocol(self):
+    messages = self.messages
+    orig_backend_service = messages.BackendService(
+        backends=[],
+        description='my backend service',
+        healthChecks=[(self.compute_uri + '/projects/my-project/region/global'
+                       '/httpHealthChecks/my-health-check')],
+        name='backend-service-3',
+        portName='http',
+        protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+        selfLink=(self.compute_uri + '/projects/my-project'
+                  '/region/alaska/backendServices/backend-service-1'),
+        timeoutSec=30)
+    self.make_requests.side_effect = iter([
+        [orig_backend_service],
+        [],
+    ])
+
+    updated_backend_service = copy.deepcopy(orig_backend_service)
+    updated_backend_service.protocol = messages.BackendService.ProtocolValueValuesEnum.ALL
+
+    self.RunUpdate('backend-service-3 --region alaska '
+                   '--protocol all',
+                   use_global=False)
 
     self.CheckRequests(
         [(self.compute.regionBackendServices, 'Get',

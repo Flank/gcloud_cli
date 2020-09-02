@@ -29,7 +29,7 @@ DESCRIPTION
     (ALPHA) Submit an AI Platform training job.
 
     This creates temporary files and executes Python code staged by a user on
-    Google Cloud Storage. Model code can either be specified with a path, e.g.:
+    Cloud Storage. Model code can either be specified with a path, e.g.:
 
         $ gcloud alpha ai-platform jobs submit training my_job \
                 --module-name trainer.task \
@@ -58,7 +58,7 @@ DESCRIPTION
     JOB_ID).
 
     For more information, see:
-    https://cloud.google.com/ml/docs/concepts/training-overview
+    https://cloud.google.com/ai-platform/training/docs/overview
 
 POSITIONAL ARGUMENTS
      JOB
@@ -113,8 +113,8 @@ FLAGS
     configuration file.
 
      --job-dir=JOB_DIR
-        Google Cloud Storage path in which to store training outputs and other
-        data needed for training.
+        Cloud Storage path in which to store training outputs and other data
+        needed for training.
 
         This path will be passed to your TensorFlow program as the --job-dir
         command-line arg. The benefit of specifying this field is that AI
@@ -147,7 +147,7 @@ FLAGS
             job. Must be greater than 0.
 
      --master-image-uri=MASTER_IMAGE_URI
-        Docker image to run on each master worker. This image must be in Google
+        Docker image to run on each master worker. This image must be in
         Container Registry. Only one of --master-image-uri and
         --runtime-version must be specified.
 
@@ -199,13 +199,19 @@ FLAGS
 
      --parameter-server-image-uri=PARAMETER_SERVER_IMAGE_URI
         Docker image to run on each parameter server. This image must be in
-        Google Container Registry. If not specified, the value of
-        --master-image-uri is used.
+        Container Registry. If not specified, the value of --master-image-uri
+        is used.
 
      --python-version=PYTHON_VERSION
-        Version of Python used during training. If not set, the default version
-        is 2.7. Python 3.5 is available when --runtime-version is set to 1.4
-        and above. Python 2.7 works with all supported runtime versions.
+        Version of Python used during training. Choices are 3.7, 3.5, and 2.7.
+        However, this value must be compatible with the chosen runtime version
+        for the job.
+
+        Must be used with a compatible runtime version:
+
+        * 3.7 is compatible with runtime versions 1.15 and later.
+        * 3.5 is compatible with runtime versions 1.4 through 1.14.
+        * 2.7 is compatible with runtime versions 1.15 and earlier.
 
      --region=REGION
         Region of the machine learning training job to submit. If not
@@ -231,7 +237,7 @@ FLAGS
         AI Platform runtime version for this job. Must be specified unless
         --master-image-uri is specified instead. It is defined in documentation
         along with the list of supported versions:
-        https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
+        https://cloud.google.com/ai-platform/prediction/docs/runtime-version-list
 
      --scale-tier=SCALE_TIER
         Specify the machine types, the number of replicas for workers, and
@@ -302,7 +308,7 @@ FLAGS
             job. Must be greater than 0.
 
      --worker-image-uri=WORKER_IMAGE_URI
-        Docker image to run on each worker node. This image must be in Google
+        Docker image to run on each worker node. This image must be in
         Container Registry. If not specified, the value of --master-image-uri
         is used.
 

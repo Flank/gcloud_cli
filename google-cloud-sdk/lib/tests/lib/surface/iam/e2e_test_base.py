@@ -116,3 +116,38 @@ class CustomRolesBaseTest(e2e_base.WithServiceAuth,
   def AssertOutputContainsPermissions(self):
     for permission in self.permissions.split(','):
       self.AssertOutputContains(permission)
+
+
+class WorkloadIdentityPoolBaseTest(e2e_base.WithServiceAuth,
+                                   sdk_test_base.WithOutputCapture):
+  """Base class for IAM workload identity pools integration tests."""
+
+  def PreSetUp(self):
+    self.location = 'global'
+    self.workload_identity_pool_id = next(
+        e2e_utils.GetResourceNameGenerator(prefix='iam'))
+    self.workload_identity_pool_name = 'projects/{0}/locations/{1}/workloadIdentityPools/{2}'.format(
+        '462803083913', self.location, self.workload_identity_pool_id)
+    self.aws_provider_id = next(
+        e2e_utils.GetResourceNameGenerator(prefix='iam'))
+    self.aws_provider_name = '{0}/providers/{1}'.format(
+        self.workload_identity_pool_name, self.aws_provider_id)
+    self.oidc_provider_id = next(
+        e2e_utils.GetResourceNameGenerator(prefix='iam'))
+    self.oidc_provider_name = '{0}/providers/{1}'.format(
+        self.workload_identity_pool_name, self.oidc_provider_id)
+
+  def SetUp(self):
+    pass
+
+  def TearDown(self):
+    self.RunFormat(
+        'iam workload-identity-pools delete {pool} --location {location} -q')
+
+  def RunFormat(self, cmd, *args):
+    return self.Run(
+        cmd.format(
+            *args,
+            pool=self.workload_identity_pool_id,
+            location=self.location,
+            project=self.Project()))

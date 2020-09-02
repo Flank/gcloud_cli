@@ -23,7 +23,7 @@ summary:
       $$service-name$$
 - execute:
   - command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
-      FOO=bar --connectivity internal --min-instances 0 --max-instances 2
+      FOO=bar --ingress internal --min-instances 0 --max-instances 2
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
@@ -602,7 +602,7 @@ actions:
         code: 0
 - execute_command:
     command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
-      FOO=bar --connectivity internal --min-instances 0 --max-instances 2
+      FOO=bar --ingress internal --min-instances 0 --max-instances 2
     events:
     - api_call:
         expect_request:

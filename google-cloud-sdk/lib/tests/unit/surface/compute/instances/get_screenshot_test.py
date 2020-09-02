@@ -39,11 +39,11 @@ _BASE_64_JPEG = ('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQE'
                  'pjrP/9k=')
 
 
-class InstancesGetScreenshotBetaTest(test_base.BaseTest):
+class InstancesGetScreenshoTest(test_base.BaseTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def SetUp(self):
     self.SelectApi(self.api_version)
@@ -74,6 +74,13 @@ class InstancesGetScreenshotBetaTest(test_base.BaseTest):
                              zone='test-zone',
                              project='my-project'))])
     self.AssertOutputBytesEquals(base64.b64decode(_BASE_64_JPEG))
+
+
+class InstancesGetScreenshotBetaTest(InstancesGetScreenshoTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
 if __name__ == '__main__':
   test_case.main()

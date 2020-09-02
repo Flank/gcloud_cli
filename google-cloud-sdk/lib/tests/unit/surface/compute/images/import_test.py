@@ -26,6 +26,7 @@ from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.iam import iam_util
+from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resources import InvalidResourceException
@@ -72,6 +73,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.image_name)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -86,6 +89,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.image_name)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -138,6 +143,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     if sysprep_windows:
       daisy_utils.AppendBoolArg(import_vars, 'sysprep_windows')
 
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -276,6 +283,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.destination_image)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -400,6 +409,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'timeout', '{}s'.format(timeout))
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.image_name)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -765,6 +776,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.image_name)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -810,6 +823,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.image_name)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -895,6 +910,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.image_name)
     daisy_utils.AppendBoolArg(import_vars, 'no_guest_environment')
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
@@ -1120,6 +1137,8 @@ class ImageImportTestBeta(ImageImportTest):
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
     daisy_utils.AppendArg(import_vars, 'image_name', self.destination_image)
+    daisy_utils.AppendArg(import_vars, 'client_version',
+                          config.CLOUD_SDK_VERSION)
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 

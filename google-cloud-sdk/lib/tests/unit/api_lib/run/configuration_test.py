@@ -37,8 +37,6 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
   def SetUp(self):
     self.conf = configuration.Configuration.New(
         self.mock_serverless_client, 'us-central1.{}'.format(self.Project()))
-    # TODO(b/112662240): Remove once this field is public
-    self.is_source_branch = hasattr(self.conf.Message().spec, 'build')
 
   def testNeverLimitsInMap(self):
     resource_cls = self.serverless_messages.ResourceRequirements

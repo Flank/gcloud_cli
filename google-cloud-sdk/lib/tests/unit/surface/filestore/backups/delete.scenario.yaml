@@ -1,5 +1,5 @@
 title: Delete Filestore Backup
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -18,6 +18,12 @@ summary:
   - stderr: |
       Deleted backup.
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta1
+      ALPHA: v1p1alpha1
+
 - execute_command:
     command: |
       filestore backups delete my-backup2 --region us-central1
@@ -28,7 +34,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1/backups/my-backup2?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/backups/my-backup2?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -44,7 +50,7 @@ actions:
                 "target": "projects/jasonshao-consumer4/locations/us-central1/backups/my-backup2",
                 "verb": "delete",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
@@ -53,7 +59,7 @@ actions:
         Delete request issued
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550806351119-582733dac8352-48c0a754-d4b53ccd?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550806351119-582733dac8352-48c0a754-d4b53ccd?alt=json
           method: GET
           headers: {}
           body: null
@@ -70,7 +76,7 @@ actions:
                 "target": "projects/jasonshao-consumer4/locations/us-central1/backups/my-backup2",
                 "verb": "delete",
                 "cancelRequested": false,
-                "apiVersion": "v1p1alpha1"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {

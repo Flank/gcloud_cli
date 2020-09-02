@@ -1,5 +1,5 @@
 title: Describe Filestore backup
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -13,13 +13,19 @@ summary:
       sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst1
       state: READY
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta1
+      ALPHA: v1p1alpha1
+
 - execute_command:
     command: |
       filestore backups describe ba --region us-central1
     events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1/backups/ba?alt=json
+          uri: https://file.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/backups/ba?alt=json
           method: GET
           headers: {}
           body: null

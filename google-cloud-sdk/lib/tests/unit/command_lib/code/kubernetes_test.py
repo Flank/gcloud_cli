@@ -191,6 +191,74 @@ class StartMinikubeTest(SdkPathTestCase):
 
     self.assertEqual(mock_run.call_args, self.MINIKUBE_TEARDOWN_CALL)
 
+  def testNotEnoughCpuError(self):
+    stream_output = [
+        {
+            "type": "io.k8s.sigs.minikube.error",
+            "data": {
+                "message": "Ensure your  system has enough CPUs. The minimum "
+                           "allowed is 2 CPUs.\n",
+                "exitcode": "64"
+            }
+        },
+    ]
+    expected_error_message = ("Not enough CPUs. Cloud Run Emulator requires "
+                              "2 CPUs.")
+    with mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
+         self.assertRaisesRegex(kubernetes.MinikubeStartError, expected_error_message), \
+         kubernetes.Minikube("cluster-name"):
+      pass
+
+  def testDockerUnreachable(self):
+    stream_output = [
+        {
+            "type": "io.k8s.sigs.minikube.error",
+            "data": {
+                "exitcode": "69",
+                "message": "blah blah blah",
+            }
+        },
+    ]
+    expected_error_message = "Cannot reach docker daemon."
+    with mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
+         self.assertRaisesRegex(kubernetes.MinikubeStartError, expected_error_message), \
+         kubernetes.Minikube("cluster-name"):
+      pass
+
+  def testOtherError(self):
+    stream_output = [
+        {
+            "type": "io.k8s.sigs.minikube.error",
+            "data": {
+                "message": "Blah blah blah.\n",
+                "exitcode": "64"
+            }
+        },
+    ]
+    expected_error_message = "Unable to start Cloud Run Emulator."
+    with mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
+         self.assertRaisesRegex(kubernetes.MinikubeStartError, expected_error_message), \
+         kubernetes.Minikube("cluster-name"):
+      pass
+
+  def testNonExitErrors(self):
+    stream_output = [
+        {
+            "type": "io.k8s.sigs.minikube.error",
+            "data": {
+                "message": "Blah blah blah.\n",
+            }
+        },
+    ]
+    with mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
+         kubernetes.Minikube("cluster-name"):
+      # No exception means success.
+      pass
+
 
 class MinikubeClusterTest(SdkPathTestCase):
 

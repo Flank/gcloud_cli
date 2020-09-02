@@ -21,7 +21,7 @@ import base64
 import os
 from apitools.base.py import extra_types
 from apitools.base.py.testing import mock
-from googlecloudsdk.api_lib.util import apis as apis
+from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.cloud_shell import util
 from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import cli_test_base
@@ -143,6 +143,23 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
     args.boosted = True
     util.PrepareEnvironment(args)
 
+  def testKeyNotRunningNeedsAuthorizedSession(self):
+    # Given an environment that has a key but isn't running
+    self.expectGetEnvironment(
+        response=self.makeEnvironment(
+            has_key=True,
+            running=False,
+        ))
+    # Expect that we start the environment, but don't create a key
+    self.expectStartEnvironment(
+        response=self.messages.Operation(name='some-op'),
+        access_token='access_token')
+    self.expectGetOperation(name='some-op')
+    self.expectGetEnvironment()
+
+    args = self.makeArgs(authorize_session=True)
+    util.PrepareEnvironment(args)
+
   def testNoKeyRunning(self):
     # Given an environment without a key that is running
     self.expectGetEnvironment(
@@ -226,14 +243,14 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
                     key=base64.b64decode(KEY_CONTENT)))),
         response=self.messages.PublicKey())
 
-  def expectStartEnvironment(self, response=None):
+  def expectStartEnvironment(self, response=None, access_token=None):
     if response is None:
       response = self.makeOperation(done=True)
     self.client.UsersEnvironmentsService.Start.Expect(
         self.messages.CloudshellUsersEnvironmentsStartRequest(
             name='users/me/environments/default',
             startEnvironmentRequest=self.messages.StartEnvironmentRequest(
-                accessToken='access_token')),
+                accessToken=access_token)),
         response=response)
 
   def expectGetOperation(self, name, response=None):
@@ -243,7 +260,7 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
         self.operations_messages.CloudshellOperationsGetRequest(name=name),
         response=response)
 
-  def makeArgs(self):
+  def makeArgs(self, authorize_session=False):
 
     class Struct(object):
 
@@ -251,7 +268,10 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
         self.__dict__.update(entries)
 
     return Struct(
-        ssh_key_file=None, force_key_file_overwrite=False, boosted=False)
+        ssh_key_file=None,
+        force_key_file_overwrite=False,
+        boosted=False,
+        authorize_session=authorize_session)
 
   def makeOperation(self, name='some-op', done=True):
     return self.operations_messages.Operation(

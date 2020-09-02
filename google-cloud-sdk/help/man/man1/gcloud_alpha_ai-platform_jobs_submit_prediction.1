@@ -59,7 +59,7 @@ GZIP\-compressed TFRecord files.
 
 .TP 2m
 \fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...]
-Google Cloud Storage paths to the instances to run prediction on.
+Cloud Storage paths to the instances to run prediction on.
 
 Wildcards (\f5*\fR) accepted at the \fBend\fR of a path. More than one path can
 be specified if multiple file patterns are needed. For example,
@@ -80,12 +80,11 @@ aren't a first\-class Cloud Storage concept) of \f5my\-bucket\fR.
 
 .TP 2m
 \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR
-Google Cloud Storage path to which to save the output. Example:
-gs://my\-bucket/output.
+Cloud Storage path to which to save the output. Example: gs://my\-bucket/output.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Google Compute Engine region to run the job in.
+The Compute Engine region to run the job in.
 
 .TP 2m
 
@@ -98,7 +97,7 @@ Name of the model to use for prediction.
 
 .TP 2m
 \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR
-Google Cloud Storage location where the model files are located.
+Cloud Storage location where the model files are located.
 
 
 .RE
@@ -132,13 +131,13 @@ if not specified.
 AI Platform runtime version for this job. Must be specified unless
 \-\-master\-image\-uri is specified instead. It is defined in documentation
 along with the list of supported versions:
-https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
+https://cloud.google.com/ai\-platform/prediction/docs/runtime\-version\-list
 
 .TP 2m
 \fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
 The name of the signature defined in the SavedModel to use for this job.
 Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
-https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+https://www.tensorflow.org/api_docs/python/tf/compat/v1/saved_model/signature_constants,
 which is "serving_default". Only applies to TensorFlow models.
 
 .TP 2m

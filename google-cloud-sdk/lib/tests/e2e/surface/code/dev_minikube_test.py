@@ -24,7 +24,7 @@ import os
 import signal
 import time
 
-from googlecloudsdk.command_lib.code import skaffold_events
+from googlecloudsdk.command_lib.code import skaffold
 from googlecloudsdk.core.util import retry
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
@@ -42,9 +42,9 @@ class SkaffoldContext(object):
 
   def GetLocalPort(self, service_name):
     """Get the local port of a port-forwarded kubernetes service."""
-    with contextlib.closing(
-        skaffold_events.OpenEventsStream(self._events_port)) as response:
-      return next(skaffold_events.GetServiceLocalPort(response, service_name))
+    with contextlib.closing(skaffold.OpenEventsStream(
+        self._events_port)) as response:
+      return next(skaffold.GetServiceLocalPort(response, service_name))
 
 
 class TerminateWithSigInt(object):

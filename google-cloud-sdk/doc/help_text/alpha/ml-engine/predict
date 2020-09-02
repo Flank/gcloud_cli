@@ -76,7 +76,7 @@ OPTIONAL FLAGS
      --signature-name=SIGNATURE_NAME
         The name of the signature defined in the SavedModel to use for this
         job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
-        https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+        https://www.tensorflow.org/api_docs/python/tf/compat/v1/saved_model/signature_constants,
         which is "serving_default". Only applies to TensorFlow models.
 
      --version=VERSION

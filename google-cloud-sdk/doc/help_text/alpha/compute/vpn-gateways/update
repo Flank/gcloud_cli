@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute vpn-gateways update - update a Google Compute Engine
-        Highly Available VPN gateway
+    gcloud alpha compute vpn-gateways update - update a Compute Engine Highly
+        Available VPN gateway
 
 SYNOPSIS
     gcloud alpha compute vpn-gateways update NAME [--region=REGION]
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute vpn-gateways update updates labels for a
-    Google Compute Engine Highly Available VPN gateway.
+    Compute Engine Highly Available VPN gateway.
 
     For example:
 

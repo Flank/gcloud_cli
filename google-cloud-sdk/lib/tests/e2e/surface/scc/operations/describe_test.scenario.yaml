@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: Can't find the operation in question
+    bug: b/166586122
 title: scc operations describe scenario test
 release_tracks: [ALPHA, BETA, GA]
 summary:

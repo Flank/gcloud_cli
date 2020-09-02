@@ -19,13 +19,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import datetime
+import itertools
 
-from botocore import exceptions
 from botocore import stub
+from googlecloudsdk.api_lib.storage import errors
 from googlecloudsdk.api_lib.storage import s3_api
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import storage_url
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.storage import test_base
 
@@ -88,12 +91,6 @@ class ListBucketsTest(test_base.StorageTestBase):
           for name in self.names
       ]
       self.assertCountEqual(observed_urls, expected_urls)
-
-  def test_list_buckets_error(self):
-    self.stubber.add_client_error('list_buckets')
-    with self.stubber:
-      with self.assertRaises(exceptions.ClientError):
-        next(self.s3_api.ListBuckets())
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support python2')
@@ -158,11 +155,51 @@ class ListObjectsTest(test_base.StorageTestBase):
                 object_name=obj.name))
       self.assertCountEqual(observed_cloud_urls, expected_cloud_urls)
 
-  def test_list_objects_error(self):
-    self.stubber.add_client_error('list_objects_v2')
+
+MockCall = collections.namedtuple(
+    'MockCall',
+    ['function_name', 'api_method', 'args']
+)
+
+MockError = collections.namedtuple(
+    'MockError',
+    ['http_status_code', 'error_class']
+)
+
+
+@test_case.Filters.DoNotRunOnPy2('Storage does not support python2')
+class ErrorTranslationTest(test_base.StorageTestBase, parameterized.TestCase):
+
+  mock_calls = [
+      MockCall(
+          function_name='ListBuckets',
+          api_method='list_buckets',
+          args=()),
+      MockCall(
+          function_name='ListObjects',
+          api_method='list_objects_v2',
+          args=(BUCKET_NAME,)),
+  ]
+
+  mock_errors = [
+      MockError(
+          http_status_code=404,
+          error_class=errors.S3ApiError),
+  ]
+
+  def SetUp(self):
+    self.s3_api = s3_api.S3Api()
+    self.stubber = stub.Stubber(self.s3_api.client)
+
+  @parameterized.parameters(itertools.product(mock_calls, mock_errors))
+  def test_error_translation(self, mock_call, mock_error):
+    self.stubber.add_client_error(
+        mock_call.api_method, http_status_code=mock_error.http_status_code)
+
     with self.stubber:
-      with self.assertRaises(exceptions.ClientError):
-        next(self.s3_api.ListObjects(BUCKET_NAME))
+      with self.assertRaises(mock_error.error_class):
+        cloud_api_function = getattr(self.s3_api, mock_call.function_name)
+        next(cloud_api_function(*mock_call.args))
 
 
 if __name__ == '__main__':

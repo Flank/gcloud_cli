@@ -19,7 +19,7 @@ DESCRIPTION
     (BETA) Creates a new version of an AI Platform model.
 
     For more details on managing AI Platform models and versions see
-    https://cloud.google.com/ml-engine/docs/how-tos/managing-models-jobs
+    https://cloud.google.com/ai-platform/prediction/docs/managing-models-jobs
 
 POSITIONAL ARGUMENTS
      VERSION
@@ -51,8 +51,8 @@ OPTIONAL FLAGS
 
      --config=CONFIG
         Path to a YAML configuration file containing configuration parameters
-        for the version
-        (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)
+        for the Version
+        (https://cloud.google.com/ai-platform/prediction/docs/reference/rest/v1/projects.models.versions)
         to create.
 
         The file is in YAML format. Note that not all attributes of a version
@@ -60,7 +60,8 @@ OPTIONAL FLAGS
 
             description: A free-form description of the version.
             deploymentUri: gs://path/to/source
-            runtimeVersion: '1.0'
+            runtimeVersion: '2.1'
+            #  Set only one of either manualScaling or autoScaling.
             manualScaling:
               nodes: 10  # The number of nodes to allocate for this model.
             autoScaling:
@@ -118,21 +119,26 @@ OPTIONAL FLAGS
         --explanation-method=sampled-shapley is specified.
 
      --origin=ORIGIN
-        Location of model/ "directory" (as output by
-        https://www.tensorflow.org/versions/r0.12/api_docs/python/state_ops.html#Saver).
+        Location of model/ "directory" (see
+        https://cloud.google.com/ai-platform/prediction/docs/deploying-models#upload-model).
 
         This overrides deploymentUri in the --config file. If this flag is not
         passed, deploymentUri must be specified in the file from --config.
 
-        Can be a Google Cloud Storage (gs://) path or local file path (no
-        prefix). In the latter case the files will be uploaded to Google Cloud
-        Storage and a --staging-bucket argument is required.
+        Can be a Cloud Storage (gs://) path or local file path (no prefix). In
+        the latter case the files will be uploaded to Cloud Storage and a
+        --staging-bucket argument is required.
 
      --python-version=PYTHON_VERSION
-        Version of Python used when creating the version. If not set, the
-        default version is 2.7. Python 3.5 is available when --runtime-version
-        is set to 1.4 and above. Python 2.7 works with all supported runtime
-        versions.
+        Version of Python used when creating the version. Choices are 3.7, 3.5,
+        and 2.7. However, this value must be compatible with the chosen runtime
+        version for the job.
+
+        Must be used with a compatible runtime version:
+
+        * 3.7 is compatible with runtime versions 1.15 and later.
+        * 3.5 is compatible with runtime versions 1.4 through 1.14.
+        * 2.7 is compatible with runtime versions 1.15 and earlier.
 
      --region=REGION
         Google Cloud region of the regional endpoint to use for this command.
@@ -149,7 +155,7 @@ OPTIONAL FLAGS
         AI Platform runtime version for this job. Must be specified unless
         --master-image-uri is specified instead. It is defined in documentation
         along with the list of supported versions:
-        https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
+        https://cloud.google.com/ai-platform/prediction/docs/runtime-version-list
 
      --service-account=SERVICE_ACCOUNT
         Specifies the service account for resource access control.
@@ -165,7 +171,7 @@ OPTIONAL FLAGS
      user-provided prediction code; these options configure that code.
 
        --package-uris=[PACKAGE_URI,...]
-          Comma-separated list of Google Cloud Storage URIs ('gs://...') for
+          Comma-separated list of Cloud Storage URIs ('gs://...') for
           user-supplied Python packages to use.
 
        --prediction-class=PREDICTION_CLASS

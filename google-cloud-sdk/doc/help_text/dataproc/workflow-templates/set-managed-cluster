@@ -31,8 +31,8 @@ SYNOPSIS
         [--worker-machine-type=WORKER_MACHINE_TYPE]
         [--worker-min-cpu-platform=PLATFORM] [--zone=ZONE]
         [--image=IMAGE | --image-version=VERSION]
-        [--kerberos-config-file=KERBEROS_CONFIG_FILE
-          | --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI (--kerberos-kms-key=KERBEROS_KMS_KEY : --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT)]
+        [--kerberos-config-file=KERBEROS_CONFIG_FILE | --enable-kerberos
+          --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI [--kerberos-kms-key=KERBEROS_KMS_KEY : --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT]]
         [--metadata=KEY=VALUE,[KEY=VALUE,...] --scopes=SCOPE,[SCOPE,...]
           --service-account=SERVICE_ACCOUNT
           --tags=TAG,[TAG,...] --network=NETWORK | --subnet=SUBNET
@@ -377,17 +377,19 @@ FLAGS
                 # the uppercased domain name of the cluster will be used.
                 realm: REALM.NAME
 
+       --enable-kerberos
+          Enable Kerberos on the cluster.
+
        --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI
           Google Cloud Storage URI of a KMS encrypted file containing the root
-          principal password. Must be a URL beginning with 'gs://'. This flag
-          must be specified if any of the other arguments in this group are
-          specified.
+          principal password. Must be a Cloud Storage URL beginning with
+          'gs://'.
 
        Key resource - The Cloud KMS (Key Management Service) cryptokey that
        will be used to protect the password. The 'Compute Engine Service Agent'
        service account must hold permission 'Cloud KMS CryptoKey
        Encrypter/Decrypter'. The arguments in this group can be used to specify
-       the attributes of this resource. This must be specified.
+       the attributes of this resource.
 
          --kerberos-kms-key=KERBEROS_KMS_KEY
             ID of the key or fully qualified identifier for the key. This flag

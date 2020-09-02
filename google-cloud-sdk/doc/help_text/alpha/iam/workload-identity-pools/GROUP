@@ -19,6 +19,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     operations
+        (ALPHA) Manage IAM WorkloadIdentityPool long running operations.
+
      providers
         (ALPHA) Manage IAM WorkloadIdentityPoolProviders.
 
@@ -41,7 +44,7 @@ COMMANDS
         (ALPHA) Undelete a WorkloadIdentityPool.
 
      update
-        (ALPHA) Update a new WorkloadIdentityPool.
+        (ALPHA) Update a WorkloadIdentityPool.
 
 NOTES
     This command is an internal implementation detail and may change or

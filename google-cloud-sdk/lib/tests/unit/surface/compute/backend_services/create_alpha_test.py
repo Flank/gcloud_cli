@@ -1204,6 +1204,38 @@ class RegionalTest(test_base.BaseTest):
          ))
     ],)
 
+  def testSubsettingPolicy(self):
+    messages = self.messages
+
+    self.Run("""compute backend-services create backend-service-1
+                --region alaska --health-checks my-health-check-1
+                --global-health-checks
+                --subsetting-policy CONSISTENT_HASH_SUBSETTING""")
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1'),
+                 ],
+                 name='backend-service-1',
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                     .EXTERNAL),
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 subsetting=messages.Subsetting(
+                     policy=messages.Subsetting.PolicyValueValuesEnum
+                     .CONSISTENT_HASH_SUBSETTING),
+                 timeoutSec=30,
+             ),
+             project='my-project',
+             region='alaska',
+         ))
+    ],)
+
   def testInternalManagedWithAllValidFlags(self):
     messages = self.messages
 

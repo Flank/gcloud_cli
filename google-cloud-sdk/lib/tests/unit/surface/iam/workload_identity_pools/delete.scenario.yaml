@@ -18,7 +18,7 @@ actions:
     command: iam workload-identity-pools delete my-workload-identity-pool --location global
     events:
     - expect_prompt_continue:
-        message: You are about to delete workload_identity_pool [my-workload-identity-pool]
+        message: You are about to delete WorkloadIdentityPool [my-workload-identity-pool]
         user_input: y
     - api_call:
         expect_request:
@@ -33,6 +33,6 @@ actions:
               "name": "projects/fake-project/locations/global/workoadIdentityPools/my-workload-identity-pool/operations/operation-id"
             }
     - expect_stderr: |
-        Deleted workload_identity_pool [my-workload-identity-pool].
+        Deleted WorkloadIdentityPool [my-workload-identity-pool].
     - expect_exit:
         code: 0

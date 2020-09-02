@@ -16,70 +16,38 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import os
+import subprocess
+import time
 
 from googlecloudsdk.command_lib.code import json_stream
 from tests.lib import test_case
-import mock
-
-
-class FakeFile(object):
-
-  @staticmethod
-  def fileno():
-    return 20
+import six
 
 
 class ReadJsonStreamTest(test_case.TestCase):
 
-  def testStreamJson(self):
-    read_outputs = [b'{"a": "b",', b'"c" : 3}\n{', b'"d": 4}', b'']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      expected_objects = [{'a': 'b', 'c': 3}, {'d': 4}]
-      self.assertSequenceEqual(
-          list(json_stream.ReadJsonStream(FakeFile())), expected_objects)
-
-  def testIgnoreNonJson(self):
-    read_outputs = [b'\a\n{"a": "b",', b'"c" : 3}', b'']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      expected_objects = [{'a': 'b', 'c': 3},]
-      self.assertSequenceEqual(
-          list(json_stream.ReadJsonStream(FakeFile(), ignore_non_json=True)),
-          expected_objects)
+  def testParsesJsonEventLines(self):
+    input_stream = six.BytesIO(b'{"a":1}\n{"b":2}\n')
+    expected = [{"a": 1}, {"b": 2}]
+    self.assertSequenceEqual(
+        list(json_stream.ReadJsonStream(input_stream)), expected)
 
   def testRaiseOnNonJson(self):
-    read_outputs = [b'\a\n{"a": "b",', b'"c" : 3}', b'']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      with self.assertRaises(ValueError):
-        list(json_stream.ReadJsonStream(FakeFile(), ignore_non_json=False))
+    with self.assertRaises(ValueError):
+      list(json_stream.ReadJsonStream(six.BytesIO(b"nonjson\n")))
 
-  def testIgnoreBlankLines(self):
-    read_outputs = [b'{"a": "b",', b'"c" : 3}\n\n{', b'"d": 4}', b'\n', b'']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      expected_objects = ({'a': 'b', 'c': 3}, {'d': 4})
-      self.assertSequenceEqual(
-          list(json_stream.ReadJsonStream(FakeFile())), expected_objects)
-
-  def testIgnoreNonObjects(self):
-    read_outputs = [b'{"a": "b",', b'"c" : 3}\n{', b'"d": 4}', b'\n52', b'']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      expected_objects = [{'a': 'b', 'c': 3}, {'d': 4}]
-      self.assertSequenceEqual(
-          list(json_stream.ReadJsonStream(FakeFile())), expected_objects)
-
-  def testEmitMultipleLinesPerChunk(self):
-    read_outputs = [b'{"a": 1}\n{"a":2}\n', b'']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      expected_objects = [{'a': 1}, {'a': 2}]
-      self.assertSequenceEqual(
-          list(json_stream.ReadJsonStream(FakeFile())), expected_objects)
-
-  def testSplitCodepoint(self):
-    # Split a unicode codepoint across two read outputs and make sure they
-    # get put back together properly.
-    read_outputs = [b'{"a": "\xF0\x9F', b'\x98\x80', b'"}', '']
-    with mock.patch.object(os, 'read', side_effect=read_outputs):
-      expected_objects = [{'a': b'\xF0\x9F\x98\x80'.decode('utf-8')},]
-      self.assertSequenceEqual(
-          list(json_stream.ReadJsonStream(FakeFile())), expected_objects)
-
+  def testReturnsLinesAsTheyAreAvailable(self):
+    proc = subprocess.Popen(
+        ["bash", "-c", """echo '{"ev":1}'; sleep 0.1; echo '{"ev":2}' """],
+        stdout=subprocess.PIPE)
+    try:
+      received_event_times = []
+      for unused_event in json_stream.ReadJsonStream(proc.stdout):
+        received_event_times.append(time.time())
+      self.assertGreater(
+          received_event_times[1] - received_event_times[0],
+          0.08,  # 0.1 expected, but the first echo might arrive a little late.
+          msg="events must be received at least 0.1 sec apart")
+    finally:
+      proc.stdout.close()
+      proc.wait()

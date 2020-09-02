@@ -25,6 +25,7 @@ from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import name_generator
+from googlecloudsdk.command_lib.util.args import labels_util
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.run import base
@@ -80,6 +81,18 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.assertDictEqual({service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
                          dict(self.resource.labels))
     self.assertDictEqual({}, dict(self.template.labels))
+
+  def testLabelsUpdateWithClusterLocalEndpointVisibility(self):
+    self.resource.labels[service.ENDPOINT_VISIBILITY] = service.CLUSTER_LOCAL
+    labels_change = config_changes.LabelChanges(
+        labels_util.Diff(additions={'test': 'abc'}))
+    self.resource = labels_change.Adjust(self.resource)
+    self.assertDictEqual(
+        {
+            service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL,
+            'test': 'abc'
+        }, dict(self.resource.labels))
+    self.assertDictEqual({'test': 'abc'}, dict(self.template.labels))
 
   def testEnvLiteralUpdate(self):
     self.template.env_vars.literals.update({'k1': 'v1', 'k2': 'v2'})
@@ -544,6 +557,10 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource = config_changes.ClearVpcConnectorChange().Adjust(
         self.resource)
     self.assertDictEqual({}, dict(self.resource.template.annotations))
+
+  def testSetAnnotationChange(self):
+    config_changes.SetAnnotationChange('k', 'v').Adjust(self.resource)
+    self.assertEqual('v', self.resource.annotations['k'])
 
   def testSetTemplateAnnotationChange(self):
     config_changes.SetTemplateAnnotationChange(

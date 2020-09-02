@@ -21,22 +21,21 @@ from __future__ import unicode_literals
 
 import os
 
-from googlecloudsdk.api_lib.storage import api_factory
 from googlecloudsdk.api_lib.storage import cloud_api
-from googlecloudsdk.api_lib.storage import gcs_api
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import resource_reference
+from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import wildcard_iterator
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.app import cloud_storage_util
-import mock
+from tests.lib.surface.storage import mock_cloud_api
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
-class CloudWildCardIteratorTest(cloud_storage_util.WithGCSCalls):
+class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls):
 
   def SetUp(self):
     self.project = 'fake-project'
@@ -46,12 +45,12 @@ class CloudWildCardIteratorTest(cloud_storage_util.WithGCSCalls):
 
     self.bucket1 = self.messages.Bucket(name='bucket1')
     self.bucket2 = self.messages.Bucket(name='bucket2')
-    self.buckets_response = self.messages.Buckets(items=[self.bucket1,
-                                                         self.bucket2])
+    self.buckets = [self.bucket1, self.bucket2]
+    self.buckets_response = [
+        resource_reference.BucketResource.from_gcs_metadata_object(
+            cloud_api.DEFAULT_PROVIDER.value, bucket)
+        for bucket in self.buckets]
 
-    self.object_with_generation = self.messages.Object(
-        name='a.txt', generation=1)
-    self.object1 = self.messages.Object(name='dir1/sub1/a.txt')
     self.objects = [
         self.messages.Object(name='dir1/sub1/a.txt'),
         self.messages.Object(name='dir1/sub1/aab.txt'),
@@ -64,121 +63,48 @@ class CloudWildCardIteratorTest(cloud_storage_util.WithGCSCalls):
         self.messages.Object(name='dir3/deeper/sub1/a.txt'),
         self.messages.Object(name='dir3/deeper/sub2/b.txt')
     ]
-    self.bucket1_resp = self.messages.Objects(
-        items=self.objects,
-        prefixes=[
-            'dir1', 'dir2', 'dir3'
-        ]
-    )
 
-  @mock.patch.object(api_factory, 'get_api')
-  def test_gcs_root_listing(self, mock_get_api):
+  @mock_cloud_api.patch
+  def test_gcs_root_listing(self, client):
     """Test retrieving provider URL with no specified resource."""
-    mock_get_api.return_value = gcs_api.GcsApi()
-    self.apitools_client.buckets.List.Expect(
-        self.messages.StorageBucketsListRequest(
-            project=self.project,
-            projection=(self.messages.StorageBucketsListRequest.
-                        ProjectionValueValuesEnum.noAcl)
-        ),
-        response=self.buckets_response
-    )
+    client.ListBuckets.side_effect = [self.buckets_response]
 
-    bucket_iterator = wildcard_iterator.get_wildcard_iterator('gs://')
-    actual = sorted([bucket.metadata_object.name for bucket in bucket_iterator])
-    self.assertEqual(sorted({'bucket1', 'bucket2'}), actual)
+    resource_iterator = wildcard_iterator.get_wildcard_iterator('gs://')
+    actual = [resource.metadata_object.name for resource in resource_iterator]
+    expected = [b.name for b in self.buckets]
+    self.assertEqual(actual, expected)
 
-  @mock.patch.object(api_factory, 'get_api')
-  def test_gcs_bucket_url_with_wildcard(self, mock_get_api):
+  @mock_cloud_api.patch
+  def test_gcs_bucket_url_with_wildcard(self, client):
     """Test bucket with no bucket-level expansion."""
-    # Quick fix for flaky tests.
-    # TODO(b/163796935) Replace with mock_cloud_api once cl/326521545 is out.
-    mock_get_api.return_value = gcs_api.GcsApi()
-    self.apitools_client.buckets.List.Expect(
-        self.messages.StorageBucketsListRequest(
-            project=self.project,
-            projection=(self.messages.StorageBucketsListRequest.
-                        ProjectionValueValuesEnum.noAcl)
-        ),
-        response=self.buckets_response
-    )
-    bucket_iterator = wildcard_iterator.get_wildcard_iterator('gs://bucket*')
+    client.ListBuckets.side_effect = [self.buckets_response]
+
+    resource_iterator = wildcard_iterator.get_wildcard_iterator('gs://bucket*')
     actual = []
-    for bucket in bucket_iterator:
-      self.assertIsInstance(bucket, resource_reference.BucketResource)
-      actual.append(bucket.metadata_object.name)
-    self.assertCountEqual(actual, ['bucket1', 'bucket2'])
+    expected = [b.name for b in self.buckets]
+    for resource in resource_iterator:
+      self.assertIsInstance(resource, resource_reference.BucketResource)
+      actual.append(resource.metadata_object.name)
+    self.assertEqual(actual, expected)
 
-  @mock.patch.object(api_factory, 'get_api')
-  def test_gcs_bucket_url_without_wildcard(self, mock_get_api):
+  @mock_cloud_api.patch
+  def test_gcs_bucket_url_without_wildcard(self, client):
     """Test bucket with no bucket-level expansion."""
-    mock_get_api.return_value = gcs_api.GcsApi()
-    self.apitools_client.buckets.Get.Expect(
-        self.messages.StorageBucketsGetRequest(
-            bucket='bucket1',
-            projection=(self.messages.StorageBucketsGetRequest.
-                        ProjectionValueValuesEnum.noAcl)
-        ),
-        response=self.bucket1
-    )
-    bucket_iterator = wildcard_iterator.get_wildcard_iterator('gs://bucket1')
-    bucket_list = list(bucket_iterator)
-    self.assertEqual(len(bucket_list), 1)
-    self.assertIsInstance(bucket_list[0], resource_reference.BucketResource)
-    self.assertEqual(bucket_list[0].metadata_object, self.bucket1)
+    client.GetBucket.side_effect = [self.buckets_response[0]]
+    resource_list = list(
+        wildcard_iterator.get_wildcard_iterator('gs://bucket1'))
+    actual = [resource.metadata_object.name for resource in resource_list]
+    expected = [self.bucket1.name]
+    self.assertEqual(actual, expected)
+    self.assertIsInstance(resource_list[0], resource_reference.BucketResource)
 
-  @mock.patch.object(api_factory, 'get_api')
-  def test_gcs_object_url_without_wildcard(self, mock_get_api):
-    """Test object with no object-level expansion."""
-    mock_get_api.return_value = gcs_api.GcsApi()
-    self.apitools_client.objects.Get.Expect(
-        self.messages.StorageObjectsGetRequest(
-            bucket='bucket1',
-            object='sub1/a.txt',
-            projection=(self.messages.StorageObjectsGetRequest.
-                        ProjectionValueValuesEnum.noAcl)
-        ),
-        response=self.object1
-    )
-    object_iterator = wildcard_iterator.get_wildcard_iterator(
-        'gs://bucket1/sub1/a.txt')
-    object_list = list(object_iterator)
-    self.assertEqual(len(object_list), 1)
-    self.assertIsInstance(object_list[0], resource_reference.ObjectResource)
-    self.assertEqual(object_list[0].metadata_object, self.object1)
-
-  @mock.patch.object(api_factory, 'get_api')
-  def test_gcs_object_url_with_generation_without_wildcard(self, mock_get_api):
-    """Test object with a generation parameter and no object-level expansion."""
-    mock_get_api.return_value = gcs_api.GcsApi()
-    self.apitools_client.objects.Get.Expect(
-        self.messages.StorageObjectsGetRequest(
-            bucket='bucket1',
-            object='a.txt',
-            generation=1,
-            projection=(self.messages.StorageObjectsGetRequest.
-                        ProjectionValueValuesEnum.noAcl)
-        ),
-        response=self.object_with_generation
-    )
-    object_iterator = wildcard_iterator.get_wildcard_iterator(
-        'gs://bucket1/a.txt#1')
-    object_list = list(object_iterator)
-    self.assertEqual(len(object_list), 1)
-    self.assertIsInstance(object_list[0], resource_reference.ObjectResource)
-    self.assertEqual(object_list[0].metadata_object,
-                     self.object_with_generation)
+    client.GetBucket.assert_called_once_with(self.bucket1.name)
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
-class GcsWildCardWithoutApitoolsMockTest(parameterized.TestCase,
-                                         sdk_test_base.SdkBase):
-  """Test class to test ListObjects without using apitools.mock.
-
-  apitools_client.objects.List.Expect does work for testing global_params or
-  for cases where we make multiple API calls. Hence, instead of relying on
-  apitools.mock, we will mock api client directly in each test case.
-  """
+class WildcardWithoutApitoolsMockTest(parameterized.TestCase,
+                                      sdk_test_base.SdkBase):
+  """Test class to test ListObjects when multiple API calls may be used."""
 
   def SetUp(self):
     self.messages = apis.GetMessagesModule('storage', 'v1')
@@ -199,42 +125,71 @@ class GcsWildCardWithoutApitoolsMockTest(parameterized.TestCase,
         'f.txt'
     ]
 
-  def _list_objects_side_effect(self, request, *unused_args, **unused_kwargs):
+  def _list_objects_side_effect(self, *unused_args, **kwargs):
     """Mock the ListObjects API method.
 
     Args:
-      request (apitools.messages.StorageObjectsListRequest): request object
-        that holds the prefix and delimiter information.
-    Returns:
+      **kwargs (dict): Contains arguments dict for ListObjects.
+
+    Yields:
       apitools.messages.Objects instance consisting of list of
         apitools.messages.Object instances and list of prefix strings
-        filtered based on the request.prefix and request.delimiter.
+        filtered based on the request prefix and request delimiter.
     """
     objects = []
     prefixes = set([])
 
-    request_prefix = request.prefix or ''
+    request_prefix = kwargs['prefix'] or ''
+    request_delimiter = kwargs['delimiter']
     filtered_object_suffixes = [
         object_name[len(request_prefix):] for object_name in self.object_names
         if object_name.startswith(request_prefix)
     ]
 
     for object_suffix in filtered_object_suffixes:
-      if request.delimiter:
-        name, _, suffix = object_suffix.partition(request.delimiter)
+      if request_delimiter:
+        name, _, suffix = object_suffix.partition(request_delimiter)
         if not suffix:  # Leaf object.
           objects.append(
               self.messages.Object(name=request_prefix + object_suffix))
         else:
-          prefixes.add('%s%s%s' % (request_prefix, name, request.delimiter))
+          prefixes.add('%s%s%s' % (request_prefix, name, request_delimiter))
       else:
         objects.append(
             self.messages.Object(name=request_prefix + object_suffix))
 
     prefixes = sorted(list(prefixes))
-    return self.messages.Objects(items=objects, prefixes=prefixes)
+    objects = self.messages.Objects(items=objects, prefixes=prefixes)
+
+    for o in objects.items:
+      yield resource_reference.ObjectResource.from_gcs_metadata_object(
+          provider=cloud_api.DEFAULT_PROVIDER.value,
+          metadata_object=o
+      )
+
+    for prefix_string in objects.prefixes:
+      yield resource_reference.PrefixResource(
+          storage_url=storage_url.CloudUrl(
+              scheme=cloud_api.DEFAULT_PROVIDER.value,
+              bucket_name=kwargs['bucket_name'],
+              object_name=prefix_string
+          ),
+          prefix=prefix_string
+      )
 
   @parameterized.named_parameters([
+      {
+          'testcase_name': '_list_an_object',
+          'wildcard_url': 'gs://bucket1/dir1/sub1/a.txt',
+          'expected_prefixes': [],
+          'expected_objects': ['dir1/sub1/a.txt']
+      },
+      {
+          'testcase_name': '_list_a_prefix',
+          'wildcard_url': 'gs://bucket1/dir1',
+          'expected_prefixes': ['dir1/'],
+          'expected_objects': []
+      },
       {
           'testcase_name': '_list_a_bucket',
           'wildcard_url': 'gs://bucket1/*',
@@ -316,23 +271,22 @@ class GcsWildCardWithoutApitoolsMockTest(parameterized.TestCase,
           'expected_prefixes': [],
           'expected_objects': []
       },
+      {
+          'testcase_name': '_two_single_wildcards_one_delimiter_apart',
+          'wildcard_url': 'gs://bucket1/*/*',
+          'expected_prefixes': ['dir1/sub1/', 'dir1/sub2/', 'dir2/sub1/',
+                                'dir2/sub2/', 'dir3/deeper/'],
+          'expected_objects': []
+      },
   ])
-  @mock.patch.object(api_factory, 'get_api')
-  @mock.patch.object(apis, 'GetClientInstance')
-  def test_gcs_list_with_wildcard(self, mock_get_client_instance, mock_get_api,
-                                  wildcard_url, expected_prefixes,
-                                  expected_objects):
-    mock_api_client = mock.MagicMock(spec=['objects'])
-    mock_api_client.objects.List.side_effect = self._list_objects_side_effect
-    mock_get_client_instance.return_value = mock_api_client
-
-    mock_get_api.return_value = gcs_api.GcsApi()
+  @mock_cloud_api.patch
+  def test_list_objects(self, mock_client, wildcard_url, expected_prefixes,
+                        expected_objects):
+    mock_client.ListObjects.side_effect = self._list_objects_side_effect
 
     resource_iterator = wildcard_iterator.get_wildcard_iterator(wildcard_url)
-    mock_get_api.assert_called_once_with(cloud_api.ProviderPrefix.GCS)
-    mock_get_client_instance.assert_called_once_with('storage', 'v1')
-
     prefixes, object_names = _get_prefixes_and_object_names(resource_iterator)
+
     self.assertEqual(prefixes, expected_prefixes)
     self.assertEqual(object_names, expected_objects)
 
@@ -341,20 +295,20 @@ class GcsWildCardWithoutApitoolsMockTest(parameterized.TestCase,
 class FileWildcardIteratorTest(parameterized.TestCase, sdk_test_base.SdkBase):
 
   def SetUp(self):
-    self._Touch('dir1/sub1/a.txt')
-    self._Touch('dir1/sub1/aab.txt')
-    self._Touch('dir1/sub2/aaaa.txt')
-    self._Touch('dir1/sub2/c.txt')
-    self._Touch('dir1/f.txt')
-    self._Touch('dir2/sub1/aaaaaa.txt')
-    self._Touch('dir2/sub1/d.txt')
-    self._Touch('dir2/sub2/aaaaaaaa.txt')
-    self._Touch('dir2/sub2/e.txt')
-    self._Touch('dir3/deeper/sub1/a.txt')
-    self._Touch('dir3/deeper/sub2/b.txt')
-    self._Touch('dir3/deeper/sub3/a.txt')
+    self._touch('dir1/sub1/a.txt')
+    self._touch('dir1/sub1/aab.txt')
+    self._touch('dir1/sub2/aaaa.txt')
+    self._touch('dir1/sub2/c.txt')
+    self._touch('dir1/f.txt')
+    self._touch('dir2/sub1/aaaaaa.txt')
+    self._touch('dir2/sub1/d.txt')
+    self._touch('dir2/sub2/aaaaaaaa.txt')
+    self._touch('dir2/sub2/e.txt')
+    self._touch('dir3/deeper/sub1/a.txt')
+    self._touch('dir3/deeper/sub2/b.txt')
+    self._touch('dir3/deeper/sub3/a.txt')
 
-  def _Touch(self, path):
+  def _touch(self, path):
     dir_path, filename = path.rsplit('/', 1)
     self.Touch(os.path.join(self.root_path, dir_path), filename, makedirs=True)
 

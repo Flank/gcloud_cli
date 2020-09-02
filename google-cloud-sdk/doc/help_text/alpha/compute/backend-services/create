@@ -20,6 +20,7 @@ SYNOPSIS
         [--port-name=PORT_NAME] [--protocol=PROTOCOL]
         [--session-affinity=SESSION_AFFINITY]
         [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
+        [--subsetting-policy=SUBSETTING_POLICY; default="NONE"]
         [--timeout=TIMEOUT; default="30s"]
         [--cache-key-query-string-blacklist=[QUERY_STRING,...]
           | --cache-key-query-string-whitelist=QUERY_STRING,[...]]
@@ -280,6 +281,12 @@ FLAGS
         datetimes for information on duration formats.
 
         This flag only affects signed URL requests.
+
+     --subsetting-policy=SUBSETTING_POLICY; default="NONE"
+        Enum that specifies the algorithm used. Default value is NONE which
+        implies no subsetting is enabled. For Layer 4 Internal Load Balancing,
+        only the algorithm CONSISTENT_HASH_SUBSETTING can be specified.
+        SUBSETTING_POLICY must be one of: NONE, CONSISTENT_HASH_SUBSETTING.
 
      --timeout=TIMEOUT; default="30s"
         Applicable to all load balancers except internal TCP/UDP load

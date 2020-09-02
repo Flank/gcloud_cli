@@ -18,6 +18,7 @@ SYNOPSIS
         [--protocol=PROTOCOL] [--security-policy=SECURITY_POLICY]
         [--session-affinity=SESSION_AFFINITY]
         [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
+        [--subsetting-policy=SUBSETTING_POLICY; default="NONE"]
         [--timeout=TIMEOUT]
         [--cache-key-query-string-blacklist=[QUERY_STRING,...]
           | --cache-key-query-string-whitelist=QUERY_STRING,[...]]
@@ -166,7 +167,7 @@ FLAGS
         Protocol for incoming requests.
 
         If the load-balancing-scheme is INTERNAL (internal TCP/UDP load
-        balancers), the protocol must be one of: TCP, UDP.
+        balancers), the protocol must be one of: TCP, UDP, ALL.
 
         If the load-balancing-scheme is INTERNAL_SELF_MANAGED (Traffic
         Director), the protocol must be one of: HTTP, HTTPS, HTTP2, GRPC.
@@ -250,6 +251,12 @@ FLAGS
         datetimes for information on duration formats.
 
         This flag only affects signed URL requests.
+
+     --subsetting-policy=SUBSETTING_POLICY; default="NONE"
+        Enum that specifies the algorithm used. Default value is NONE which
+        implies no subsetting is enabled. For Layer 4 Internal Load Balancing,
+        only the algorithm CONSISTENT_HASH_SUBSETTING can be specified.
+        SUBSETTING_POLICY must be one of: NONE, CONSISTENT_HASH_SUBSETTING.
 
      --timeout=TIMEOUT
         Applicable to all load balancers except internal TCP/UDP load

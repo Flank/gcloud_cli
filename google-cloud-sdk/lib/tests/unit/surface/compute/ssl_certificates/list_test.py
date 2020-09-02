@@ -191,7 +191,9 @@ class SslCertificatesListTest(test_base.BaseTest,
         cli=self.cli,
     )
 
-    aggregated_list_request = self._getListRequestMessage('my-project')
+    aggregated_list_request = (
+        self.messages.ComputeSslCertificatesAggregatedListRequest(
+            project='my-project', includeAllScopes=True))
 
     self.list_json.assert_called_with(
         requests=[(self.compute.sslCertificates, 'AggregatedList',

@@ -3,7 +3,7 @@ NAME
         stores
 
 SYNOPSIS
-    gcloud beta healthcare hl7v2-stores COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud beta healthcare hl7v2-stores GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Manage Cloud Healthcare API HL7v2 stores.
@@ -15,6 +15,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     import
+        (BETA) Manage Cloud Healthcare API HL7v2 store imports.
 
 COMMANDS
     COMMAND is one of the following:

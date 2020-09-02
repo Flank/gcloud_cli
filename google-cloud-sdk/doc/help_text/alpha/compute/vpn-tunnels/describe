@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute vpn-tunnels describe - describe a Google Compute
-        Engine VPN tunnel
+    gcloud alpha compute vpn-tunnels describe - describe a Compute Engine VPN
+        tunnel
 
 SYNOPSIS
     gcloud alpha compute vpn-tunnels describe NAME [--region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute vpn-tunnels describe displays all data
-    associated with a Google Compute Engine VPN tunnel in a project.
+    associated with a Compute Engine VPN tunnel in a project.
 
 POSITIONAL ARGUMENTS
      NAME

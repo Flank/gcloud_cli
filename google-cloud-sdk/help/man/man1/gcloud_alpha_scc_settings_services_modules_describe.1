@@ -1,0 +1,97 @@
+
+.TH "GCLOUD_ALPHA_SCC_SETTINGS_SERVICES_MODULES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha scc settings services modules describe \- display effective module settings of Security Command Center(SCC)
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha scc settings services modules describe\fR \fB\-\-module\fR=\fIMODULE_NAME\fR \fB\-\-service\fR=\fISERVICE_NAME\fR [\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe effective module settings of Security Command
+Center(SCC).
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-module\fR=\fIMODULE_NAME\fR
+Module name in Security Command Center
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE_NAME\fR
+Service name in Security Command Center. \fISERVICE_NAME\fR must be one of:
+\fBcontainer\-threat\-detection\fR, \fBevent\-threat\-detection\fR,
+\fBsecurity\-health\-analytics\fR, \fBweb\-security\-scanner\fR.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Folder ID
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Organization ID
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+Project ID
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe the 'OPEN_FIREWALL' module setting in service
+\'SECURITY_HEALTH_ANALYTICS' of project "12345", run:
+
+.RS 2m
+$ gcloud alpha scc settings services modules describe \e
+    \-\-project=12345 \-\-service=SECURITY_HEALTH_ANALYTICS \e
+    \-\-module=OPEN_FIREWALL
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist.
+

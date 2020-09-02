@@ -19,7 +19,7 @@ summary:
         --matching-criteria methodName=storage.buckets.create
         --service-account fake-service-account
         --destination-run-service fake-destination-service2
-        --destination-run-location europe-west1
+        --destination-run-region europe-west1
         --destination-run-path fake/destination/path --async
 
 actions:
@@ -38,7 +38,8 @@ actions:
             json:
               destination:
                 cloudRunService:
-                  service: projects/fake-project/locations/us-central1/services/fake-destination-service1
+                  service: fake-destination-service1
+                  region: null
               matchingCriteria:
               - attribute: type
                 value: google.cloud.pubsub.topic.v1.messagePublished
@@ -64,7 +65,8 @@ actions:
             response:
               destination:
                 cloudRunService:
-                  service: projects/fake-project/locations/us-central1/services/fake-destination-service1
+                  service: fake-destination-service1
+                  region: us-central1
               matchingCriteria:
               - attribute: type
                 value: google.cloud.pubsub.topic.v1.messagePublished
@@ -84,7 +86,8 @@ actions:
           body:
             destination:
               cloudRunService:
-                service: projects/fake-project/locations/us-central1/services/fake-destination-service1
+                service: fake-destination-service1
+                region: us-central1
             matchingCriteria:
             - attribute: type
               value: google.cloud.pubsub.topic.v1.messagePublished
@@ -100,7 +103,7 @@ actions:
         --matching-criteria methodName=storage.buckets.create
         --service-account fake-service-account
         --destination-run-service fake-destination-service2
-        --destination-run-location europe-west1
+        --destination-run-region europe-west1
         --destination-run-path fake/destination/path --async
     events:
     - api_call:
@@ -113,7 +116,8 @@ actions:
               destination:
                 cloudRunService:
                   path: fake/destination/path
-                  service: projects/fake-project/locations/europe-west1/services/fake-destination-service2
+                  region: europe-west1
+                  service: fake-destination-service2
               matchingCriteria:
               - attribute: type
                 value: google.cloud.audit.log.v1.written

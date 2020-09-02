@@ -6,8 +6,7 @@ SYNOPSIS
         [--source=SOURCE] [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Imports a backend service's configuration to a file. This configuration can
-    be imported at a later time.
+    Imports a backend service's configuration from a file.
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME

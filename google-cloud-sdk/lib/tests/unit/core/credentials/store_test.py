@@ -23,6 +23,7 @@ import datetime
 import hashlib
 import json
 import dateutil
+import google_auth_httplib2
 
 from googlecloudsdk.api_lib.iamcredentials import util as iamcredentials_util
 from googlecloudsdk.core import config
@@ -62,6 +63,19 @@ from google.oauth2 import service_account as google_auth_service_account
 def _MakeFakeCredentialsRefreshExpiry():
   """Returns an expiry for fake credentials refresh result."""
   return datetime.datetime.utcnow() + datetime.timedelta(seconds=3599)
+
+
+def _MakeFakeEmptyIdTokenRefreshResponseGoogleAuth():
+  """Returns a fake empty ID token refresh response for google-auth."""
+  return mock.Mock(status=200, data='{}')
+
+
+def _MakeFakeIdTokenRefreshFailureGoogleAuth():
+  """Returns a fake ID token refresh failure for google-auth."""
+  response_data = (
+      '{"error": "invalid_scope", "error_description": '
+      '"foo.apps.googleusercontent.com is not a valid audience string."}')
+  return mock.Mock(status=400, data=response_data)
 
 
 # The argument list needs to match that of the refresh of oauth2client
@@ -925,6 +939,74 @@ gs_oauth2_refresh_token = fake-token
     expected_creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
     expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
     expected_creds_dict['_id_token'] = 'REFRESHED-ID-TOKEN'
+    self.AssertCredentialsEqual(creds, expected_creds_dict)
+
+  def testRefreshServiceAccountId_GoogleAuth_IdTokenRefreshFailure(self):
+    """Verifies that ID token refresh failures will not throw the refresh."""
+    self.StartObjectPatch(
+        google_auth_httplib2.Request,
+        '__call__',
+        return_value=_MakeFakeIdTokenRefreshFailureGoogleAuth())
+
+    creds = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_creds_dict = {
+        'token':
+            'access_token',
+        'id_tokenb64':
+            'id-token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+    }
+    self.assertIsInstance(creds, google_auth_service_account.Credentials)
+    self.AssertCredentialsEqual(creds, expected_creds_dict)
+
+    store.Refresh(creds)
+    expected_creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
+    self.AssertCredentialsEqual(creds, expected_creds_dict)
+
+  def testRefreshServiceAccountId_GoogleAuth_EmptyIdToken(self):
+    """Verifies that an empty ID token will not throw the refresh.
+
+    google-auth will throw a RefreshError if the refresh response does not
+    contain a valid ID token even though the status code is 200
+    (http://shortn/_JaUf79ElnU). The credentials store is expected to catch
+    such an error and proceed the refresh without a new ID token.
+    """
+    self.StartObjectPatch(
+        google_auth_httplib2.Request,
+        '__call__',
+        return_value=_MakeFakeEmptyIdTokenRefreshResponseGoogleAuth())
+
+    creds = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_creds_dict = {
+        'token':
+            'access_token',
+        'id_tokenb64':
+            'id-token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+    }
+    self.assertIsInstance(creds, google_auth_service_account.Credentials)
+    self.AssertCredentialsEqual(creds, expected_creds_dict)
+
+    store.Refresh(creds)
+    expected_creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
     self.AssertCredentialsEqual(creds, expected_creds_dict)
 
   def testRefreshGceIdToken(self):

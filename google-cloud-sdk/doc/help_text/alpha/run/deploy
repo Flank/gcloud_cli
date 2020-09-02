@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha run deploy [[SERVICE] --namespace=NAMESPACE]
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
+        [--ingress=INGRESS; default="all"] [--max-instances=MAX_INSTANCES]
         [--memory=MEMORY] [--min-instances=MIN_INSTANCES] [--platform=PLATFORM]
         [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--source=SOURCE]
         [--tag=TAG] [--timeout=TIMEOUT] [--no-traffic]
@@ -12,7 +13,6 @@ SYNOPSIS
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
-        [--image=IMAGE | --pack=[builder=BUILDER],[env=ENV],[image=IMAGE]]
         [--connectivity=CONNECTIVITY --[no-]use-http2 --clear-config-maps
           | --set-config-maps=[KEY=VALUE,...] | --remove-config-maps=[KEY,...]
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
@@ -67,6 +67,27 @@ FLAGS
 
      --cpu=CPU
         Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+     --image=IMAGE
+        Name of the container image to deploy (e.g.
+        gcr.io/cloudrun/hello:latest).
+
+     --ingress=INGRESS; default="all"
+        Set the ingress traffic sources allowed to call the service. For Cloud
+        Run (fully managed) the --[no-]allow-unauthenticated flag separately
+        controls the identities allowed to call the service. INGRESS must be
+        one of:
+
+         all
+            Inbound requests from all sources are allowed.
+         internal
+            For Cloud Run (fully managed), only inbound requests from VPC
+            networks in the same project are allowed. For Cloud Run for Anthos,
+            only inbound requests from the same cluster are allowed.
+         internal-and-cloud-load-balancing
+            Only supported for Cloud Run (fully managed). Only inbound requests
+            from VPC networks in the same project or from Google Cloud Load
+            Balancing are allowed.
 
      --max-instances=MAX_INSTANCES
         The maximum number of container instances of the Service to run. Use
@@ -189,31 +210,18 @@ FLAGS
           List of label KEY=VALUE pairs to update. If a label exists its value
           is modified, otherwise a new label is created.
 
-     At most one of these may be specified:
-
-       --image=IMAGE
-          Name of the container image to deploy (e.g.
-          gcr.io/cloudrun/hello:latest).
-
-       --pack=[builder=BUILDER],[env=ENV],[image=IMAGE]
-          Uses CNCF buildpack (https://buildpacks.io/) to create image. The
-          "image" key/value must be provided. The image name must be in the
-          gcr.io/, *.gcr.io, or pkg.dev namespaces. By default
-          gcr.io/buildpacks/builder will be used. To specify your own builder
-          image use the optional "builder" key/value argument. To pass
-          environment variables to the builder use the optional "env" key/value
-          argument where value is a list of key values using escaping
-          (https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if
-          neccessary.
-
      Only applicable if connecting to Cloud Run for Anthos deployed on Google
      Cloud or Cloud Run for Anthos deployed on VMware. Specify --platform=gke
      or --platform=kubernetes to use:
 
        --connectivity=CONNECTIVITY
-          Defaults to 'external'. If 'external', the service can be invoked
-          through the internet, in addition to through the cluster network.
-          CONNECTIVITY must be one of:
+          (DEPRECATED) Defaults to 'external'. If 'external', the service can
+          be invoked through the internet, in addition to through the cluster
+          network.
+
+          The --connectivity flag is deprecated and will be removed in an
+          upcoming release. Please use the --ingress flag instead. CONNECTIVITY
+          must be one of:
 
            external
               Visible from outside the cluster.

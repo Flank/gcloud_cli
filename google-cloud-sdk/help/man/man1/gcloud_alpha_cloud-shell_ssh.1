@@ -11,7 +11,7 @@ gcloud alpha cloud\-shell ssh \- allows you to establish an interactive SSH sess
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha cloud\-shell ssh\fR [\fB\-\-boosted\fR] [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha cloud\-shell ssh\fR [\fB\-\-authorize\-session\fR] [\fB\-\-boosted\fR] [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,6 +26,13 @@ be started before establishing the SSH session.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-authorize\-session\fR
+If provided, sends OAuth credentials to the current Cloud Shell session on
+behalf of the user. When this completes, the session will be authorized to run
+various Google Cloud command line tools without requiring the user to manually
+authenticate.
+
 .TP 2m
 \fB\-\-boosted\fR
 If provided, starts Cloud Shell in boost mode. If there is alread a running
@@ -96,5 +103,9 @@ $ gcloud alpha cloud\-shell ssh \-\-command=ls
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-allowlist.
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta cloud\-shell ssh
+.RE
 

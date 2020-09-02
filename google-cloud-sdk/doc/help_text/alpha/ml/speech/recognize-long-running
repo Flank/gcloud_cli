@@ -61,7 +61,7 @@ OPTIONAL FLAGS
         The type of encoding of the file. Required if the file format is not
         WAV or FLAC. ENCODING must be one of: amr, amr-wb,
         encoding-unspecified, flac, linear16, mp3, mulaw, ogg-opus,
-        speex-with-header-byte.
+        speex-with-header-byte, webm-opus.
 
      --filter-profanity
         If True, the server will attempt to filter out profanities, replacing

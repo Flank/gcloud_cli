@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute vpn-tunnels update - update a Google Compute Engine
-        VPN tunnel
+    gcloud alpha compute vpn-tunnels update - update a Compute Engine VPN
+        tunnel
 
 SYNOPSIS
     gcloud alpha compute vpn-tunnels update NAME [--region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute vpn-tunnels update updates labels for a Google
+    (ALPHA) gcloud alpha compute vpn-tunnels update updates labels for a
     Compute Engine VPN tunnel. For example:
 
         $ gcloud alpha compute vpn-tunnels update example-tunnel \

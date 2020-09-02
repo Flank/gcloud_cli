@@ -1066,42 +1066,40 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
                             max_age='1h',
                             expiration_time='2017-08-25T00:00:00-07:00'))
 
-  def testCreateKerberosFlagsMissingKmsKey(self):
-    password_uri = 'gs://my-bucket/password.encrypted'
-    error_msg = ('argument (--kerberos-kms-key : '
-                 '--kerberos-kms-key-keyring '
-                 '--kerberos-kms-key-location '
-                 '--kerberos-kms-key-project): '
-                 'Must be specified.')
-    with self.AssertRaisesArgumentErrorMatches(error_msg):
-      self.RunDataproc(
-          ('clusters create {name} '
-           '--zone={zone} '
-           '--kerberos-root-principal-password-uri={password_uri}').format(
-               name=self.CLUSTER_NAME,
-               zone=self.ZONE,
-               password_uri=password_uri))
+  def testCreateKerberosDirectEnable(self):
+    expected_request_cluster = self.MakeCluster()
+    self.AddKerberosConfig(expected_request_cluster, enableKerberos=True)
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddKerberosConfig(expected_response_cluster, enableKerberos=True)
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        ('clusters create {name} '
+         '--zone={zone} '
+         '--enable-kerberos').format(name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
 
-  def testCreateKerberosFlagsMissingRootPrincipalPasswordUri(self):
-    kms_project = 'my-project'
-    kms_location = 'global'
-    kms_keyring = 'my-keyring'
-    kms_key = 'my-key'
-    error_msg = ('argument --kerberos-root-principal-password-uri: '
-                 'Must be specified.')
-    with self.AssertRaisesArgumentErrorMatches(error_msg):
-      self.RunDataproc(('clusters create {name} '
-                        '--zone={zone} '
-                        '--kerberos-kms-key={kms_key} '
-                        '--kerberos-kms-key-project={kms_project} '
-                        '--kerberos-kms-key-location={kms_location} '
-                        '--kerberos-kms-key-keyring={kms_keyring}').format(
-                            name=self.CLUSTER_NAME,
-                            zone=self.ZONE,
-                            kms_key=kms_key,
-                            kms_project=kms_project,
-                            kms_location=kms_location,
-                            kms_keyring=kms_keyring))
+  def testCreateKerberosFlagsDirectEnableIgnoresMissingKmsKey(self):
+    password_uri = 'gs://my-bucket/password.encrypted'
+    expected_request_cluster = self.MakeCluster()
+    self.AddKerberosConfig(
+        expected_request_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=password_uri)
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        ('clusters create {name} '
+         '--zone={zone} '
+         '--enable-kerberos '
+         '--kerberos-root-principal-password-uri={password_uri} ').format(
+             name=self.CLUSTER_NAME, zone=self.ZONE, password_uri=password_uri))
+    self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateKerberosFlagsKmsKeyOneFlag(self):
     password_uri = 'gs://my-bucket/password.encrypted'

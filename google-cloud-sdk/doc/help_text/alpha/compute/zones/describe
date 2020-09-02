@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha compute zones describe - describe a Google Compute Engine zone
+    gcloud alpha compute zones describe - describe a Compute Engine zone
 
 SYNOPSIS
     gcloud alpha compute zones describe NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute zones describe displays all data associated
-    with a Google Compute Engine zone.
+    with a Compute Engine zone.
 
 POSITIONAL ARGUMENTS
      NAME

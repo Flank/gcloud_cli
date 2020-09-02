@@ -25,7 +25,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Describe a Google Compute Engine zone.
+        (ALPHA) Describe a Compute Engine zone.
 
      list
         (ALPHA) List Google Compute Engine zones.
