@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha assured operations describe - describe Assured Workloads
+        operations
+
+SYNOPSIS
+    gcloud alpha assured operations describe RESOURCE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Obtain details about a given Assured Workloads operation.
+
+POSITIONAL ARGUMENTS
+     RESOURCE
+        The Assured Workloads operation resource to describe, for example,
+        organizations/{ORG_ID}/locations/{LOCATION}/operations/{OPERATION_ID}.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To describe an Assured Workloads operation in the us-central1 region,
+    belonging to an organization with ID 123, with workload ID 456, run:
+
+        $ gcloud alpha assured operations describe \
+            organizations/123/locations/us-central1/operations/456
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta assured operations describe
+

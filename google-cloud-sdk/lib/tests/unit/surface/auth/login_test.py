@@ -37,7 +37,6 @@ from tests.lib.core.credentials import credentials_test_base
 
 import mock
 import six
-from google.auth import crypt as google_auth_crypt
 from google.auth import jwt
 
 
@@ -531,11 +530,6 @@ class TestWriteToADC(cli_test_base.CliTestBase, test_case.WithInput,
                                       'application_default_credentials.json')
     self.StartObjectPatch(
         config, 'ADCFilePath', return_value=self.adc_file_path)
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-
-    # Mocks the signer of google-auth credentials.
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
 
     self.mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
     self.mock_metadata.return_value.connected = False

@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instances create-with-container - creates Google
-        Compute engine virtual machine instances running container images
+    gcloud alpha compute instances create-with-container - creates Compute
+        Engine virtual machine instances running container images
 
 SYNOPSIS
     gcloud alpha compute instances create-with-container INSTANCE_NAMES
@@ -49,7 +49,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute instances create-with-container creates Google
+    (ALPHA) gcloud alpha compute instances create-with-container creates
     Compute Engine virtual machines that runs a Docker image. For example:
 
         $ gcloud alpha compute instances create-with-container instance-1 \

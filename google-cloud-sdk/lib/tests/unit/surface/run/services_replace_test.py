@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.projects import util as projects_util
 from googlecloudsdk.command_lib.run import exceptions
@@ -36,7 +37,13 @@ class ReplaceTestAlpha(base.ServerlessSurfaceBase, parameterized.TestCase):
 
   def SetUp(self):
     self.operations.messages_module = self.serverless_messages
-    self.service = mock.NonCallableMock()
+    self.service = service.Service.New(self.mock_serverless_client,
+                                       self.Project())
+    self.service.name = 'my-service'
+    self.service.domain = 'https://foo-bar.baz'
+    self.service.status.latestReadyRevisionName = 'rev.1'
+    self.service.status_traffic.SetPercent('rev.1', 100)
+    self.service.spec_traffic.SetPercent('rev.1', 100)
     self.operations.GetService.return_value = self.service
     self.operations.ReleaseService.return_value = None
     self.StartObjectPatch(messages_util, 'GetStartDeployMessage')
@@ -48,6 +55,32 @@ class ReplaceTestAlpha(base.ServerlessSurfaceBase, parameterized.TestCase):
   def _MakeFile(self, yaml_data):
     return self.Touch(
         self.temp_path, 'test.yaml', contents=yaml_data, makedirs=True)
+
+  def testWithFormat(self):
+    yaml_data = """
+    apiVersion: serving.knative.dev/v1alpha1
+    kind: Service
+    metadata:
+      name: my-service
+    spec:
+      template:
+        spec:
+          containers:
+          - image: gcr.io/my-image
+    """
+    filename = self._MakeFile(yaml_data)
+    serv = self.Run('run services replace {} --format=yaml'.format(filename))
+    self.operations.ReleaseService.assert_called_once_with(
+        self._ServiceRef('my-service', project='fake-project'),
+        mock.ANY,
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        for_replace=True)
+    self.assertIsNotNone(serv)
+    self.AssertOutputContains('apiVersion: serving.knative.dev/v1')
+    self.AssertOutputContains('kind: Service')
+    self.AssertOutputContains('url: https://foo-bar.baz')
 
   def testNoNamespaceSpecifiedManaged(self):
     yaml_data = """

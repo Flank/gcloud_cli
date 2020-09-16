@@ -1,0 +1,31 @@
+NAME
+    gcloud beta eventarc attributes types - explore event types in Eventarc
+
+SYNOPSIS
+    gcloud beta eventarc attributes types COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Explore event types in Eventarc.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (BETA) Describe an event type.
+
+     list
+        (BETA) List event types in Eventarc.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

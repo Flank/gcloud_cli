@@ -27,8 +27,8 @@ OPTIONAL FLAGS
         or 3 years respectively.
 
      --roles=[ROLES,...]
-        Roles for the membership within the Group. If not specified, MEMBER
-        will be used as a default value.
+        A comma-separated list of roles for the membership within the Group. If
+        not specified, MEMBER will be used as a default value.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

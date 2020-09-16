@@ -6,7 +6,7 @@ SYNOPSIS
         [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Request for starting notbook instance.
+    (ALPHA) Request for starting notebook instances.
 
 POSITIONAL ARGUMENTS
      Instance resource - User-defined unique name of this instance. The
@@ -45,9 +45,8 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To start an instance, run:
 
-        $ gcloud alpha notebooks instances start \
-          /projects/example-project/locations/us-central1-b/instances/\
-        example-instance
+        $ gcloud alpha notebooks instances start example-instance \
+          --location=us-central1-a
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -1,5 +1,9 @@
+filters:
+  skip:
+    reason: various backend errors
+    bug: b/167184603
 title: Create and delete a Cloud Pub/Sub trigger in GKE
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: run/platform gke

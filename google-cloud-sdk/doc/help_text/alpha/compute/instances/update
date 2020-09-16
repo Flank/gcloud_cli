@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instances update - update a Google Compute Engine
-        virtual machine
+    gcloud alpha compute instances update - update a Compute Engine virtual
+        machine
 
 SYNOPSIS
     gcloud alpha compute instances update INSTANCE_NAME
@@ -12,7 +12,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances update updates labels and requested
-    CPU Platform for a Google Compute Engine virtual machine.
+    CPU Platform for a Compute Engine virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

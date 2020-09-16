@@ -59,7 +59,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To list all triggers in location 'us-central1', run:
+    To list all triggers in location us-central1, run:
 
         $ gcloud beta eventarc triggers list --location=us-central1
 

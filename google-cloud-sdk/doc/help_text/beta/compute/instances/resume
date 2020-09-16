@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances resume is used to resume a previously
-    suspended Google Compute Engine virtual machine.
+    suspended Compute Engine virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

@@ -37,18 +37,18 @@ class CreateFirestoreDatabaseTest(api_test_util.ApiTestBase):
     self.ExpectGetApplicationRequest(self.Project(), exception=err)
 
     with self.assertRaises(create_util.AppEngineAppDoesNotExist):
-      self.Run('alpha datastore databases create --region=foo')
+      self.Run('datastore databases create --region=foo')
 
   def testCreate_withAppMissingRegionFlag(self):
     self.ExpectGetApplicationRequest(self.Project(), location_id=self.REGION)
     with self.assertRaises(create_util.RegionNotSpecified):
-      self.Run('alpha datastore databases create')
+      self.Run('datastore databases create')
 
   def testCreate_withAppWithRegionFlag_mismatch(self):
     self.ExpectGetApplicationRequest(self.Project(), location_id=self.REGION)
 
     with self.assertRaises(create_util.AppEngineAppRegionDoesNotMatch):
-      self.Run('alpha datastore databases create --region=foo')
+      self.Run('datastore databases create --region=foo')
 
   def testCreate_withAppWithgRegionFlag_match_success(self):
     self.ExpectGetApplicationRequest(self.Project(), location_id=self.REGION)
@@ -60,7 +60,7 @@ class CreateFirestoreDatabaseTest(api_test_util.ApiTestBase):
         database_type=api_client.messages.Application
         .DatabaseTypeValueValuesEnum.CLOUD_DATASTORE_COMPATIBILITY)
 
-    self.Run('alpha datastore databases create --region={region}'.format(
+    self.Run('datastore databases create --region={region}'.format(
         region=self.REGION))
 
   def createAndDbTypeAlreadyMatches_noActions(self):
@@ -72,7 +72,7 @@ class CreateFirestoreDatabaseTest(api_test_util.ApiTestBase):
         database_type=api_client.messages.Application
         .DatabaseTypeValueValuesEnum.CLOUD_DATASTORE_COMPATIBILITY)
 
-    self.Run('alpha datastore databases create --region={region}'.format(
+    self.Run('datastore databases create --region={region}'.format(
         region=self.REGION))
 
 

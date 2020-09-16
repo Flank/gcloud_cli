@@ -18,14 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.storage import api_factory
-from googlecloudsdk.api_lib.storage import gcs_api
-from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.command_lib.storage import name_expansion
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.app import cloud_storage_util
+from tests.lib.surface.storage import mock_cloud_api
+from tests.lib.surface.storage import test_resources
+
 import mock
 
 
@@ -36,42 +36,19 @@ class NameExpansionTest(cloud_storage_util.WithGCSCalls):
     self.project = 'fake-project'
     properties.VALUES.core.project.Set(self.project)
 
-    self.messages = apis.GetMessagesModule('storage', 'v1')
+    self.buckets_response = [test_resources.get_bucket_resource('gs', name) for
+                             name in ['a1', 'a2', 'b1', 'c1']]
 
-    self.buckets_response = self.messages.Buckets(items=[
-        self.messages.Bucket(name='a1'),
-        self.messages.Bucket(name='a2'),
-        self.messages.Bucket(name='b1'),
-        self.messages.Bucket(name='c1'),
-    ])
-
-  @mock.patch.object(api_factory, 'get_api')
-  def test_multiple_buckets_with_wildcards(self, mock_get_api):
-    # Quick fix for flaky tests.
-    # TODO(b/163796935) Replace with mock_cloud_api once cl/326521545 is out.
-    mock_get_api.return_value = gcs_api.GcsApi()
+  @mock_cloud_api.patch
+  def test_multiple_buckets_with_wildcards(self, mock_api_client):
+    mock_api_client.ListBuckets.return_value = self.buckets_response
 
     names = ['gs://a*', 'gs://b*']
-    for _ in names:
-      # The logic tested below makes a list buckets request for each name in
-      # names, so queue all the necessary list buckets responses to avoid an
-      # apitools.base.py.testing.mock.UnexpectedRequestException.
-      self.apitools_client.buckets.List.Expect(
-          self.messages.StorageBucketsListRequest(
-              project=self.project,
-              projection=(self.messages.StorageBucketsListRequest.
-                          ProjectionValueValuesEnum.noAcl)
-          ),
-          response=self.buckets_response
-      )
-
     bucket_iterator = name_expansion.NameExpansionIterator(names)
+    self.assertEqual(list(bucket_iterator), self.buckets_response[:3])
 
-    observed = []
-    for bucket in bucket_iterator:
-      self.assertIsInstance(bucket, resource_reference.BucketResource)
-      observed.append(bucket.metadata_object.name)
-    self.assertCountEqual(observed, ['a1', 'a2', 'b1'])
+    named_expansion_call = mock.call(cloud_api.FieldsScope.SHORT)
+    mock_api_client.ListBuckets.assert_has_calls([named_expansion_call]*2)
 
 
 if __name__ == '__main__':

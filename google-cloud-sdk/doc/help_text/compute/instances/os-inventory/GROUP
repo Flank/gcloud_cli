@@ -23,7 +23,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        Describe a Google Compute Engine virtual instance's OS inventory data.
+        Describe a Compute Engine virtual instance's OS inventory data.
 
      list-instances
         List instances with specific OS inventory data values.

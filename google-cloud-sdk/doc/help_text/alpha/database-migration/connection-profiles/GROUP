@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha database-migration connection-profiles - manage Cloud Database
+    gcloud alpha database-migration connection-profiles - manage Database
         Migration Service connection profiles
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Commands for managing Cloud Database Migration Service connection
+    (ALPHA) Commands for managing Database Migration Service connection
     profiles.
 
 GCLOUD WIDE FLAGS

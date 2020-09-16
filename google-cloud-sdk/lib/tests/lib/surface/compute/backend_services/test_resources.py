@@ -390,3 +390,41 @@ BACKEND_SERVICES_WITH_CUSTOM_CACHE_KEY_WHITELIST_BETA = (
 BACKEND_SERVICES_WITH_CUSTOM_CACHE_KEY_BLACKLIST_BETA = (
     MakeBackendServicesWithCustomCacheKey(
         beta_messages, 'beta', blacklist=['contentid', 'language']))
+
+
+def MakeBackendServicesWithDefaultCdnPolicy(msgs, api):
+  """Creates backend service with default cdnPolicy."""
+  prefix = _COMPUTE_PATH + '/' + api
+  return (msgs.BackendService(
+      backends=[],
+      description='my backend service',
+      healthChecks=[
+          ('https://compute.googleapis.com/compute/{0}/projects/'
+           'my-project/global/httpHealthChecks/my-health-check'.format(api))
+      ],
+      name='backend-service-1',
+      portName='http',
+      protocol=msgs.BackendService.ProtocolValueValuesEnum.HTTP,
+      selfLink=(prefix + '/projects/my-project'
+                '/global/backendServices/backend-service-1'),
+      timeoutSec=30,
+      customResponseHeaders=['Header: Value', 'Header2: {cdn_cache_id}'],
+      cdnPolicy=msgs.BackendServiceCdnPolicy(
+          cacheMode=msgs.BackendServiceCdnPolicy.CacheModeValueValuesEnum
+          .CACHE_ALL_STATIC,
+          clientTtl=4000,
+          defaultTtl=5000,
+          maxTtl=6000,
+          negativeCaching=True,
+          negativeCachingPolicy=[
+              msgs.BackendServiceCdnPolicyNegativeCachingPolicy(
+                  code=404, ttl=3000),
+              msgs.BackendServiceCdnPolicyNegativeCachingPolicy(
+                  code=301, ttl=3500),
+          ])))
+
+
+BACKEND_SERVICES_WITH_DEFAULT_CDN_POLICY_ALPHA = (
+    MakeBackendServicesWithDefaultCdnPolicy(alpha_messages, 'alpha'))
+BACKEND_SERVICES_WITH_DEFAULT_CDN_POLICY_BETA = (
+    MakeBackendServicesWithDefaultCdnPolicy(beta_messages, 'beta'))

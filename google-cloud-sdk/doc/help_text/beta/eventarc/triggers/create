@@ -33,9 +33,8 @@ POSITIONAL ARGUMENTS
 REQUIRED FLAGS
      --destination-run-service=DESTINATION_RUN_SERVICE
         The name of the Cloud Run fully-managed service that receives the
-        events for the trigger. The service must be in the same region as the
-        trigger unless the trigger's location is global. The service must be in
-        the same project as the trigger.
+        events for the trigger. The service must be in the same project as the
+        trigger.
 
      --matching-criteria=[ATTRIBUTE=VALUE,...]
         The criteria by which events are filtered for the trigger, specified as
@@ -66,8 +65,8 @@ OPTIONAL FLAGS
 
      --destination-run-path=DESTINATION_RUN_PATH
         The relative path on the destination Cloud Run service to which the
-        events for the trigger should be sent. Examples: "/route", "route",
-        "route/subroute".
+        events for the trigger should be sent. Examples: /route, route,
+        route/subroute.
 
      --destination-run-region=DESTINATION_RUN_REGION
         The region in which the destination Cloud Run service can be found. If
@@ -83,9 +82,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To create a new trigger 'my-trigger' for events of type
-    'google.cloud.pubsub.topic.v1.messagePublished' with destination Cloud Run
-    service 'my-service', run:
+    To create a new trigger my-trigger for events of type
+    google.cloud.pubsub.topic.v1.messagePublished with destination Cloud Run
+    service my-service, run:
 
         $ gcloud beta eventarc triggers create my-trigger \
              --matching-criteria="type=google.cloud.pubsub.topic.v1.messagePu\

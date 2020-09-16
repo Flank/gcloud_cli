@@ -1,5 +1,5 @@
 title: Cloud API Gateway Apis Delete Failure Scenarios
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

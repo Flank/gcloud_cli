@@ -21,27 +21,59 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.functions import env_vars
 from googlecloudsdk.api_lib.functions import util as api_util
+from googlecloudsdk.calliope import base
+from tests.lib import parameterized
 from tests.lib import test_case
 
 
-class EnvVarsTest(test_case.TestCase):
+class EnvVarsTest(parameterized.TestCase):
   """Test environment variable api utility functions.
   """
 
-  def testGetFunctionEnvVarsAsDictNone(self):
+  _BUILD_ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
+      track=base.ReleaseTrack.ALPHA
+  ).CloudFunction.BuildEnvironmentVariablesValue
+  _ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
+  ).CloudFunction.EnvironmentVariablesValue
+
+  def testGetEnvVarsAsDict_BuildEnvVar_None(self):
     messages = api_util.GetApiMessagesModule()
     function = messages.CloudFunction()
-    actual = env_vars.GetFunctionEnvVarsAsDict(function)
+    actual = env_vars.GetEnvVarsAsDict(function.buildEnvironmentVariables)
     self.assertEqual({}, actual)
 
-  def testGetFunctionEnvVarsAsDict(self):
+  def testGetEnvVarsAsDict_EnvVar_None(self):
+    messages = api_util.GetApiMessagesModule()
+    function = messages.CloudFunction()
+    actual = env_vars.GetEnvVarsAsDict(function.environmentVariables)
+    self.assertEqual({}, actual)
+
+  def testGetEnvVarsAsDict_BuildEnvVar(self):
     expected = {
         'FOO': 'BAR',
         'BAZ': 'BOO',
     }
 
     messages = api_util.GetApiMessagesModule()
-    env_vars_class = messages.CloudFunction.EnvironmentVariablesValue
+    env_vars_class = self._BUILD_ENV_VARS_TYPE_CLASS
+    function = messages.CloudFunction()
+    function.buildEnvironmentVariables = (
+        env_vars_class(additionalProperties=[
+            env_vars_class.AdditionalProperty(key='BAZ', value='BOO'),
+            env_vars_class.AdditionalProperty(key='FOO', value='BAR'),
+        ]))
+
+    actual = env_vars.GetEnvVarsAsDict(function.buildEnvironmentVariables)
+    self.assertEqual(expected, actual)
+
+  def testGetEnvVarsAsDict_EnvVar(self):
+    expected = {
+        'FOO': 'BAR',
+        'BAZ': 'BOO',
+    }
+
+    messages = api_util.GetApiMessagesModule()
+    env_vars_class = self._ENV_VARS_TYPE_CLASS
     function = messages.CloudFunction()
     function.environmentVariables = (
         env_vars_class(additionalProperties=[
@@ -50,28 +82,29 @@ class EnvVarsTest(test_case.TestCase):
         ])
     )
 
-    actual = env_vars.GetFunctionEnvVarsAsDict(function)
+    actual = env_vars.GetEnvVarsAsDict(function.environmentVariables)
     self.assertEqual(expected, actual)
 
-  def testDictToEnvVarsPropertyNone(self):
-    actual = env_vars.DictToEnvVarsProperty(None)
-    self.assertEqual(None, actual)
+  @parameterized.parameters((_BUILD_ENV_VARS_TYPE_CLASS),
+                            (_ENV_VARS_TYPE_CLASS))
+  def testDictToEnvVarsPropertyNone(self, env_vars_type_class):
+    actual = env_vars.DictToEnvVarsProperty(env_vars_type_class, None)
+    self.assertIsNone(actual)
 
-  def testDictToEnvVarsProperty(self):
-    messages = api_util.GetApiMessagesModule()
-    env_vars_class = messages.CloudFunction.EnvironmentVariablesValue
+  @parameterized.parameters((_BUILD_ENV_VARS_TYPE_CLASS),
+                            (_ENV_VARS_TYPE_CLASS))
+  def testDictToEnvVarsProperty(self, env_vars_type_class):
     expected = (
-        env_vars_class(additionalProperties=[
-            env_vars_class.AdditionalProperty(key='BAZ', value='BOO'),
-            env_vars_class.AdditionalProperty(key='FOO', value='BAR'),
-        ])
-    )
+        env_vars_type_class(additionalProperties=[
+            env_vars_type_class.AdditionalProperty(key='BAZ', value='BOO'),
+            env_vars_type_class.AdditionalProperty(key='FOO', value='BAR'),
+        ]))
 
     env_vars_dict = {
         'FOO': 'BAR',
         'BAZ': 'BOO',
     }
-    actual = env_vars.DictToEnvVarsProperty(env_vars_dict)
+    actual = env_vars.DictToEnvVarsProperty(env_vars_type_class, env_vars_dict)
     self.assertEqual(expected, actual)
 
 if __name__ == '__main__':

@@ -1,13 +1,13 @@
 NAME
     gcloud alpha database-migration migration-jobs describe - show details
-        about a migration job
+        about a Database Migration Service migration job
 
 SYNOPSIS
     gcloud alpha database-migration migration-jobs describe
         (MIGRATION_JOB : --region=REGION) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Show details about a migration job.
+    (ALPHA) Show details about a Database Migration Service migration job.
 
 POSITIONAL ARGUMENTS
      Migration job resource - The migration job you want to get the details of.

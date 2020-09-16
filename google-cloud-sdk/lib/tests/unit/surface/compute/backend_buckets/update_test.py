@@ -72,6 +72,32 @@ class BackendBucketUpdateGaTest(test_base.BaseTest):
                                            'backend-bucket-2-enable-cdn-true')),
                              project='my-project'))])
 
+  def CheckRequestMadeWithCdnPolicyFlexibleCache(self,
+                                                 expected_cdn_policy,
+                                                 custom_response_headers,
+                                                 enable_cdn=True):
+    """Verifies the request was made with the expected CDN policy with Flexible Cache properties."""
+    messages = self.messages
+    self.CheckRequests(
+        [(self.compute.backendBuckets, 'Get',
+          messages.ComputeBackendBucketsGetRequest(
+              backendBucket='backend-bucket-4-cdn-policy-flexible-cache',
+              project='my-project'))],
+        [(self.compute.backendBuckets, 'Patch',
+          messages.ComputeBackendBucketsPatchRequest(
+              backendBucket='backend-bucket-4-cdn-policy-flexible-cache',
+              backendBucketResource=messages.BackendBucket(
+                  bucketName='gcs-bucket-4',
+                  cdnPolicy=expected_cdn_policy,
+                  customResponseHeaders=custom_response_headers,
+                  description='my other backend bucket',
+                  enableCdn=enable_cdn,
+                  name='backend-bucket-4-cdn-policy-flexible-cache',
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendBuckets/' +
+                            'backend-bucket-4-cdn-policy-flexible-cache')),
+              project='my-project'))])
+
   def testWithNoFlags(self):
     with self.AssertRaisesToolExceptionRegexp(
         'At least one property must be modified.'):
@@ -352,6 +378,175 @@ class BackendBucketUpdateBetaTest(BackendBucketUpdateGaTest):
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.BETA)
     self._backend_buckets = test_resources.BACKEND_BUCKETS_BETA
+    self._fcc_backend_bucket = test_resources.BACKEND_BUCKETS_FCC_BETA
+
+  def testUpdateAllProperties(self):
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+          backend-bucket-4-cdn-policy-flexible-cache --cache-mode CACHE_ALL_STATIC
+          --negative-caching --client-ttl 4000 --default-ttl 5000 --max-ttl 6000
+          --negative-caching-policy='404=1000,301=1200'
+          --custom-response-header 'Test-Header: value'
+          --custom-response-header 'Test-Header2: {cdn_cache_id}'
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.CACHE_ALL_STATIC,
+            clientTtl=4000,
+            defaultTtl=5000,
+            maxTtl=6000,
+            negativeCaching=True,
+            negativeCachingPolicy=[
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=404, ttl=1000),
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=301, ttl=1200),
+            ]),
+        ['Test-Header: value', 'Test-Header2: {cdn_cache_id}'],
+    )
+
+  def testUpdateCacheModeToUseOriginHeaders(self):
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+    backend-bucket-4-cdn-policy-flexible-cache --cache-mode USE_ORIGIN_HEADERS
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.USE_ORIGIN_HEADERS,
+            clientTtl=None,
+            defaultTtl=None,
+            maxTtl=None,
+            negativeCaching=True,
+            negativeCachingPolicy=[
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=404, ttl=3000),
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=301, ttl=3500),
+            ]),
+        ['Header: Value', 'Header2: {cdn_cache_id}'],
+    )
+
+  def testUpdateCacheModeToUseOriginHeadersWithTtls(self):
+    """Verify invalid ttl values are passed if user specified them explicitly."""
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+    backend-bucket-4-cdn-policy-flexible-cache --cache-mode USE_ORIGIN_HEADERS
+          --client-ttl 4000 --default-ttl 5000 --max-ttl 6000
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.USE_ORIGIN_HEADERS,
+            clientTtl=4000,
+            defaultTtl=5000,
+            maxTtl=6000,
+            negativeCaching=True,
+            negativeCachingPolicy=[
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=404, ttl=3000),
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=301, ttl=3500),
+            ]),
+        ['Header: Value', 'Header2: {cdn_cache_id}'],
+    )
+
+  def testUpdateCacheModeToForceCacheAll(self):
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+    backend-bucket-4-cdn-policy-flexible-cache --cache-mode FORCE_CACHE_ALL
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.FORCE_CACHE_ALL,
+            clientTtl=4000,
+            defaultTtl=5000,
+            maxTtl=None,
+            negativeCaching=True,
+            negativeCachingPolicy=[
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=404, ttl=3000),
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=301, ttl=3500),
+            ]),
+        ['Header: Value', 'Header2: {cdn_cache_id}'],
+    )
+
+  def testUpdateCacheModeToForceCacheAllDisableCdn(self):
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+    backend-bucket-4-cdn-policy-flexible-cache --cache-mode FORCE_CACHE_ALL
+    --no-enable-cdn
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.FORCE_CACHE_ALL,
+            clientTtl=4000,
+            defaultTtl=5000,
+            maxTtl=None,
+            negativeCaching=True,
+            negativeCachingPolicy=[
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=404, ttl=3000),
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=301, ttl=3500),
+            ]), ['Header: Value', 'Header2: {cdn_cache_id}'], False)
+
+  def testClearProperties(self):
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+    backend-bucket-4-cdn-policy-flexible-cache --no-negative-caching
+    --no-custom-response-headers --no-client-ttl --no-max-ttl --no-default-ttl --no-negative-caching-policies
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.CACHE_ALL_STATIC,
+            negativeCaching=False,
+            negativeCachingPolicy=[]),
+        [],
+    )
+
+  def testDisableNegativeCaching(self):
+    self.make_requests.side_effect = iter([
+        [self._fcc_backend_bucket],
+        [],
+    ])
+    self.RunUpdate("""
+    backend-bucket-4-cdn-policy-flexible-cache --no-negative-caching
+    """)
+    self.CheckRequestMadeWithCdnPolicyFlexibleCache(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.CACHE_ALL_STATIC,
+            clientTtl=4000,
+            defaultTtl=5000,
+            maxTtl=6000,
+            negativeCaching=False,
+            negativeCachingPolicy=[]),
+        ['Header: Value', 'Header2: {cdn_cache_id}'],
+    )
 
 
 class BackendBucketUpdateAlphaTest(BackendBucketUpdateBetaTest):
@@ -359,6 +554,7 @@ class BackendBucketUpdateAlphaTest(BackendBucketUpdateBetaTest):
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.ALPHA)
     self._backend_buckets = test_resources.BACKEND_BUCKETS_ALPHA
+    self._fcc_backend_bucket = test_resources.BACKEND_BUCKETS_FCC_ALPHA
 
 
 if __name__ == '__main__':

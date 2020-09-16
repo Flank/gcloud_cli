@@ -1,5 +1,5 @@
 title: Cloud API Gateway API Config Describe Failure with incomplete args
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -14,25 +14,30 @@ summary:
   - command: |
       api-gateway api-configs describe --api apiName
   - stderr: |
-      ERROR: (gcloud.alpha.api-gateway.api-configs.describe) argument --api: API_CONFIG must be specified.
-      Usage: gcloud alpha api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
+      ERROR: (gcloud.$$gcloud-track$$.api-gateway.api-configs.describe) argument --api: API_CONFIG must be specified.
+      Usage: gcloud $$gcloud-track$$ api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
         optional flags may be  --api | --help
 
       For detailed information on this command and its flags, run:
-        gcloud alpha api-gateway api-configs describe --help
+        gcloud $$gcloud-track$$ api-gateway api-configs describe --help
   - error: '1: argument --api: API_CONFIG must be specified.'
 - execute:
   - command: |
       api-gateway api-configs describe
   - stderr: |
-      ERROR: (gcloud.alpha.api-gateway.api-configs.describe) argument API_CONFIG: Must be specified.
-      Usage: gcloud alpha api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
+      ERROR: (gcloud.$$gcloud-track$$.api-gateway.api-configs.describe) argument API_CONFIG: Must be specified.
+      Usage: gcloud $$gcloud-track$$ api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
         optional flags may be  --api | --help
 
       For detailed information on this command and its flags, run:
-        gcloud alpha api-gateway api-configs describe --help
+        gcloud $$gcloud-track$$ api-gateway api-configs describe --help
   - error: '1: argument API_CONFIG: Must be specified.'
 actions:
+- define_reference:
+    reference: gcloud-track
+    track_values:
+      ALPHA: alpha
+      BETA: beta
 - execute_command:
     command: |
       api-gateway api-configs describe rev1
@@ -49,12 +54,12 @@ actions:
       api-gateway api-configs describe --api apiName
     events:
     - expect_stderr: |
-        ERROR: (gcloud.alpha.api-gateway.api-configs.describe) argument --api: API_CONFIG must be specified.
-        Usage: gcloud alpha api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
+        ERROR: (gcloud.$$gcloud-track$$.api-gateway.api-configs.describe) argument --api: API_CONFIG must be specified.
+        Usage: gcloud $$gcloud-track$$ api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
           optional flags may be  --api | --help
 
         For detailed information on this command and its flags, run:
-          gcloud alpha api-gateway api-configs describe --help
+          gcloud $$gcloud-track$$ api-gateway api-configs describe --help
     - expect_exit:
         code: 1
         message: 'argument --api: API_CONFIG must be specified.'
@@ -63,12 +68,12 @@ actions:
       api-gateway api-configs describe
     events:
     - expect_stderr: |
-        ERROR: (gcloud.alpha.api-gateway.api-configs.describe) argument API_CONFIG: Must be specified.
-        Usage: gcloud alpha api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
+        ERROR: (gcloud.$$gcloud-track$$.api-gateway.api-configs.describe) argument API_CONFIG: Must be specified.
+        Usage: gcloud $$gcloud-track$$ api-gateway api-configs describe (API_CONFIG : --api=API) [optional flags]
           optional flags may be  --api | --help
 
         For detailed information on this command and its flags, run:
-          gcloud alpha api-gateway api-configs describe --help
+          gcloud $$gcloud-track$$ api-gateway api-configs describe --help
     - expect_exit:
         code: 1
         message: 'argument API_CONFIG: Must be specified.'

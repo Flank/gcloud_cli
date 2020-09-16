@@ -26,11 +26,13 @@ gcloud alpha apigee apis undeploy \- undeploy an Apigee API proxy from an enviro
 .RS 2m
 .TP 2m
 
-Revision resource \- The API proxy revision to be undeployed, and the
-environment from which it should be removed. The revision defaults to
-\f5auto\fR, which will undeploy whichever revision is currently deployed, unless
-there is more than one such revision. The arguments in this group can be used to
-specify the attributes of this resource.
+Revision resource \- API proxy revision to be undeployed and environment from
+which it should be removed. Revisions can either be a positive revision number,
+or the special value \f5\fIauto\fR\fR, which will undeploy whatever revision is
+currently deployed. If revision is unspecified, the default is \f5\fIauto\fR\fR.
+The arguments in this group can be used to specify the attributes of this
+resource.
+
 
 .RS 2m
 .TP 2m
@@ -39,15 +41,18 @@ ID of the revision or fully qualified identifier for the revision.
 
 .TP 2m
 \fB\-\-api\fR=\fIAPI\fR
-The API proxy to be undeployed.
+API proxy to be undeployed. Must currently be deployed. To get a list of
+available deployed proxies, run \f5gcloud alpha apigee deployments list
+\-\-environment=ENV\fR.
 
 .TP 2m
 \fB\-\-environment\fR=\fIENVIRONMENT\fR
-The environment from which to undeploy the API proxy.
+Environment from which to undeploy the API proxy. To get a list of available
+environments, run \f5gcloud alpha apigee environments list\fR.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
-The organization of the proxy and environment.
+Apigee organization of the proxy and environment.
 
 
 .RE
@@ -75,11 +80,11 @@ $ gcloud alpha apigee apis undeploy \-\-environment=test \-\-api=my\-api
 .RE
 
 To undeploy revision 3 of an \f5my\-api\fR from the \f5test\fR environment of
-Apigee organization \f5\fItest\-org\fR\fR, run:
+the organization named \f5\fItest\-org\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha apigee apis undeploy \-\-organization=test\-org \e
-    \-\-environment=test \-\-api=my\-api 3
+$ gcloud alpha apigee apis undeploy 3 \-\-organization=test\-org \e
+    \-\-environment=test \-\-api=my\-api
 .RE
 
 

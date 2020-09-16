@@ -176,6 +176,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         flags='--update-addons KubernetesDashboard=DISABLED')
 
   def testUpdateAddonsCloudRun(self):
+    internal = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
+    external = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
@@ -186,6 +188,21 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
             desiredAddonsConfig=self.msgs.AddonsConfig(
                 cloudRunConfig=self.msgs.CloudRunConfig(disabled=True))),
         flags='--update-addons CloudRun=DISABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=internal))),
+        flags='--update-addons CloudRun=ENABLED '
+        '--cloud-run-config load-balancer-type='
+        'INTERNAL')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=external))),
+        flags='--update-addons CloudRun=ENABLED --cloud-run-config load-balancer-type=EXTERNAL'
+    )
 
   def testUpdateAddonsConfigConnector(self):
     # test disabling ConfigConnector
@@ -1974,6 +1991,184 @@ resourceLimits:
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
 
+  def testEnableAutoprovisioningWithMinCpuPlatformFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+minCpuPlatform: 'Skylake'
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            minCpuPlatform='Skylake',
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithMinCpuPlatform(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            minCpuPlatform='Skylake',
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-min-cpu-platform Skylake ')
+
+  def testUpdateAutoprovisioningBootDiskKmsKeyFromFile(self):
+    m = self.messages
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+bootDiskKmsKey: projects/123/locations/us-1/keyRings/abc
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=m.AutoprovisioningNodePoolDefaults(
+            oauthScopes=[],
+            bootDiskKmsKey='projects/123/locations/us-1/keyRings/abc'),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=2, minimum=1),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testUpdateAutoprovisioningDiskSizeFromFile(self):
+    m = self.messages
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+diskSizeGb: 100
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=m.AutoprovisioningNodePoolDefaults(
+            oauthScopes=[], diskSizeGb=100),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=2, minimum=1),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testUpdateAutoprovisioningDiskTypeFromFile(self):
+    m = self.messages
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+diskType: pd-ssd
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=m.AutoprovisioningNodePoolDefaults(
+            oauthScopes=[], diskType='pd-ssd'),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=2, minimum=1),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testUpdateAutoprovisioningShieldedInstanceConfigFromFile(self):
+    m = self.messages
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+shieldedInstanceConfig:
+    enableSecureBoot: true
+    enableIntegrityMonitoring: false
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=m.AutoprovisioningNodePoolDefaults(
+            oauthScopes=[],
+            shieldedInstanceConfig=m.ShieldedInstanceConfig(
+                enableSecureBoot=True, enableIntegrityMonitoring=False)),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=2, minimum=1),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testUpdateAutoprovisioningOnlyOneShieldedInstanceSettingsFromFileError(
+      self):
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+shieldedInstanceConfig:
+  enableSecureBoot: true
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    name = 'tobeupdated'
+    error_msg = ('Must specify both \'enableSecureBoot\' and '
+                 '\'enableIntegrityMonitoring\' in \'shieldedInstanceConfig\'')
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaisesRegex(c_util.Error, error_msg):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          ' --enable-autoprovisioning '
+          '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
   def testDisableWorkloadIdentity(self):
     update = self.msgs.ClusterUpdate(
         desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
@@ -2120,6 +2315,35 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
                 .GcePersistentDiskCsiDriverConfig(enabled=False))),
         flags='--update-addons GcePersistentDiskCsiDriver=DISABLED')
 
+  def testUpdateAddonsCloudRun(self):
+    internal = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
+    external = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False))),
+        flags='--update-addons CloudRun=ENABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=True))),
+        flags='--update-addons CloudRun=DISABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=internal))),
+        flags='--update-addons CloudRun=ENABLED '
+        '--cloud-run-config load-balancer-type='
+        'INTERNAL')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=external))),
+        flags='--update-addons CloudRun=ENABLED --cloud-run-config load-balancer-type=EXTERNAL'
+    )
+
   def testUpdateLocations(self):
     self._TestUpdate(
         update=self.msgs.ClusterUpdate(
@@ -2261,50 +2485,6 @@ resourceLimits:
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
 
-  def testEnableAutoprovisioningWithMinCpuPlatformFromFile(self):
-    autoprovisioning_config_file = self.Touch(
-        self.temp_path,
-        'autoprovisioning-config',
-        contents="""
-minCpuPlatform: 'Skylake'
-resourceLimits:
-  - resourceType: 'cpu'
-    minimum: 8
-    maximum: 100
-  - resourceType: 'memory'
-    maximum: 20
-        """)
-    self._TestUpdateAutoprovisioning(
-        enabled=True,
-        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
-            minCpuPlatform='Skylake',
-            oauthScopes=[],
-        ),
-        resource_limits=[
-            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
-            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
-        ],
-        autoprovisioning_locations=[],
-        flags='--enable-autoprovisioning '
-        '--autoprovisioning-config-file {}'.format(
-            autoprovisioning_config_file))
-
-  def testEnableAutoprovisioningWithMinCpuPlatform(self):
-    self._TestUpdateAutoprovisioning(
-        enabled=True,
-        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
-            minCpuPlatform='Skylake',
-            oauthScopes=[],
-        ),
-        resource_limits=[
-            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
-            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
-        ],
-        autoprovisioning_locations=[],
-        flags='--enable-autoprovisioning --max-memory 128 '
-        '--max-cpu 100 --min-cpu 8 '
-        '--autoprovisioning-min-cpu-platform Skylake ')
-
   def testUpdateAutoscalingProfile(self):
     autoscaling = self.msgs.ClusterAutoscaling(
         autoscalingProfile=(
@@ -2366,6 +2546,32 @@ resourceLimits:
       self.Run(
           self.clusters_command_base.format(self.ZONE) + ' update ' + name +
           flags)
+
+  def testUpdateAutoprovisioningOnlyOneShieldedInstanceSettingsFromFileError(
+      self):
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+shieldedInstanceConfig:
+  enableSecureBoot: true
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    name = 'tobeupdated'
+    error_msg = ('Must specify both \'enableSecureBoot\' and '
+                 '\'enableIntegrityMonitoring\' in \'shieldedInstanceConfig\'')
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaisesRegex(c_util.Error, error_msg):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          ' --enable-autoprovisioning '
+          '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
 
   def testUpdateMonitoring(self):
     self._TestUpdate(
@@ -2443,6 +2649,18 @@ resourceLimits:
         update=update,
         flags='--identity-provider=https://gkehub.googleapis.com/projects/test/locations/global/memberships/new-test '
     )
+
+  def testEnableGkeOidc(self):
+    update = self.msgs.ClusterUpdate(
+        desiredGkeOidcConfig=self.msgs.GkeOidcConfig(
+            enabled=True))
+    self._TestUpdate(update=update, flags='--enable-gke-oidc ')
+
+  def testDisableGkeOidc(self):
+    update = self.msgs.ClusterUpdate(
+        desiredGkeOidcConfig=self.msgs.GkeOidcConfig(
+            enabled=False))
+    self._TestUpdate(update=update, flags='--no-enable-gke-oidc ')
 
   def testEnableDatabaseEncryption(self):
     update = self.msgs.ClusterUpdate(

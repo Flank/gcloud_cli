@@ -1865,6 +1865,17 @@ class YAMLFileContentsTest(sdk_test_base.SdkBase, test_case.WithInput,
                  "'objectItem': {'prop1': 'bar', 'prop2': 'baz'}}")
     self.YamlFileTest(json_data, ext='json')
 
+  def testReadListFile(self):
+    yaml_data = """
+    - A
+    - B
+    - C
+    - D
+    """
+    self.YamlFileTest(yaml_data)
+    json_data = '{A, B, C, D}'
+    self.YamlFileTest(json_data)
+
   def testReadFileWithValidation(self):
     data = """
     version: 1

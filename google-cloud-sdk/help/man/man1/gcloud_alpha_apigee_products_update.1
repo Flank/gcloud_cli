@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha apigee products update \- modifies an existing Apigee API product
+gcloud alpha apigee products update \- update an existing Apigee API product
 
 
 
@@ -17,7 +17,16 @@ gcloud alpha apigee products update \- modifies an existing Apigee API product
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Modifies an existing Apigee API product.
+\fB(ALPHA)\fR Update an existing Apigee API product.
+
+\f5gcloud alpha apigee products update\fR applies a set of modifications to an
+existing API product.
+
+To create a new API product, run:
+
+.RS 2m
+$ gcloud alpha apigee products create
+.RE
 
 
 
@@ -26,9 +35,14 @@ gcloud alpha apigee products update \- modifies an existing Apigee API product
 .RS 2m
 .TP 2m
 
-API product resource \- The API product to be updated. The arguments in this
-group can be used to specify the attributes of this resource. This must be
-specified.
+API product resource \- API product to be updated. To get a list of available
+API products, run:
+
+$ gcloud alpha apigee products list
+
+The arguments in this group can be used to specify the attributes of this
+resource. This must be specified.
+
 
 .RS 2m
 .TP 2m
@@ -52,8 +66,8 @@ Platform project's associated organization will be used.
 .RS 2m
 .TP 2m
 \fB\-\-display\-name\fR=\fISET_DISPLAYNAME\fR
-The name to be displayed in the UI or developer portal to developers registering
-for API access.
+Name to be displayed in the UI or developer portal to developers registering for
+API access.
 
 .TP 2m
 
@@ -74,7 +88,18 @@ accessible through the API product.
 .RE
 .sp
 The API proxy names must already be deployed to the bound environments, or
-creation of the API product will fail.
+creation of the API product will fail. To get a list of deployed API proxies,
+run:
+
+.RS 2m
+$ gcloud alpha apigee deployments list
+.RE
+
+To deploy an API proxy, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deploy.
+.RE
 
 
 .RS 2m
@@ -104,19 +129,29 @@ Make all environments accessible through this API product.
 Environments to which the API product is bound. Requests to environments that
 are not listed are rejected, preventing developers from accessing those
 resources even if they can access the same API proxies in another environment.
-For example, this can prevent applications with access to production APIs from
-accessing the alpha or beta versions of those APIs.
+For example, this can be used to prevent applications with access to production
+APIs from accessing the alpha or beta versions of those APIs.
+
+.RE
+.RE
+.sp
+To get a list of available environments, run:
+
+.RS 2m
+$ gcloud alpha apigee environments list
+.RE
+
 
 .RS 2m
 .TP 2m
 \fB\-\-add\-environment\fR=[\fIENVIRONMENT\fR,...]
 Adds a new environment to the set of environments.
 
+.RS 2m
 .TP 2m
 \fB\-\-remove\-environment\fR=[\fIENVIRONMENT\fR,...]
 Removes an existing environment from the set of environments.
 
-.RE
 .RE
 .sp
 .TP 2m
@@ -139,9 +174,9 @@ are mapped from the \f5proxy.pathsuffix\fR variable.
 .RE
 .sp
 The proxy path suffix is defined as the URI fragment following the ProxyEndpoint
-base path. For example, if \f5/forecastrss\fR is given as an element of this
-list, and the base path defined for the API proxy is \f5/weather\fR, then only
-requests to \f5/weather/forecastrss\fR are permitted by the API product.
+base path. For example, if \f5\fI/forecastrss\fR\fR is given as an element of
+this list, and the base path defined for the API proxy is \f5/weather\fR, then
+only requests to \f5/weather/forecastrss\fR are permitted by the API product.
 
 Proxy paths can use asterisks as wildcards; \f5/**\fR indicates that all
 sub\-URIs are included, whereas a single asterisk indicates that only URIs one
@@ -154,6 +189,9 @@ For example, if the base path of the API proxy is \f5/v1/weatherapikey\fR, then
 the API product supports requests to \f5/v1/weatherapikey\fR and to any
 sub\-URIs, such as \f5/v1/weatherapikey/forecastrss\fR,
 \f5/v1/weatherapikey/region/CA\fR, and so on.
+
+The API proxy resources must already be deployed to the bound environments, or
+creation of the API product will fail.
 
 
 .RS 2m
@@ -225,8 +263,8 @@ Remove the API product's description.
 
 .TP 2m
 \fB\-\-description\fR=\fISET_DESCRIPTION\fR
-An overview of the API product. Include key information about the API product
-that is not captured by other fields.
+Overview of the API product. Include key information about the API product that
+is not captured by other fields.
 
 .RE
 .sp
@@ -276,19 +314,19 @@ following:
 .RS 2m
 .TP 2m
 \fB\-\-quota\fR=\fIQUOTA\fR
-The number of request messages permitted per app by this API product for the
+Number of request messages permitted per app by this API product for the
 specified \f5\-\-quota\-interval\fR and \f5\-\-quota\-unit\fR.
 
-For example, \f5\-\-quota=50 \-\-quota\-interval=12 \-\-quota\-unit=hour\fR
-means 50 requests are allowed every 12 hours.
+For example, \f5\-\-quota=50\fR, \f5\-\-quota\-interval=12\fR, and
+\f5\-\-quota\-unit=hour\fR means 50 requests are allowed every 12 hours.
 
 .TP 2m
 \fB\-\-quota\-interval\fR=\fIQUOTA_INTERVAL\fR
-The time interval over which the number of request messages is calculated.
+Time interval over which the number of request messages is calculated.
 
 .TP 2m
 \fB\-\-quota\-unit\fR=\fIQUOTA_UNIT\fR
-The time unit for \f5\-\-quota\-interval\fR. \fIQUOTA_UNIT\fR must be one of:
+Time unit for \f5\-\-quota\-interval\fR. \fIQUOTA_UNIT\fR must be one of:
 \fBminute\fR, \fBhour\fR, \fBday\fR, \fBmonth\fR.
 
 .RE
@@ -383,7 +421,7 @@ doesn't, and remove the attribute \f5\fIbaz\fR\fR if it exists, run:
 
 .RS 2m
 $ gcloud alpha apigee products update my\-prod \e
-  \-\-add\-attribute=foo=bar  \-\-remove\-attribute=baz
+  \-\-add\-attribute="foo=bar"  \-\-remove\-attribute=baz
 .RE
 
 To update the list of API proxies included in the API product, run:
@@ -401,11 +439,13 @@ $ gcloud alpha apigee products update my\-prod \e
   \-\-add\-environment=test \-\-all\-apis \-\-all\-resources
 .RE
 
-To update the list of API resources included in the API product, run:
+To update the list of API resources included in the API product, and output the
+updated API product as a JSON object, run:
 
 .RS 2m
 $ gcloud alpha apigee products update my\-prod \e
-  \-\-add\-resource=NEW_ONE,NEW_TWO \-\-remove\-resource=OLD_ONE,OLD_TWO
+  \-\-add\-resource="NEW_ONE#NEW_TWO" \e
+  \-\-remove\-resource="OLD_ONE#OLD_TWO" \-\-format=json
 .RE
 
 

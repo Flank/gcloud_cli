@@ -1,0 +1,72 @@
+
+.TH "GCLOUD_BETA_FIRESTORE_DATABASES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta firestore databases create \- create a Google Cloud Firestore Native database
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta firestore databases create\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a Google Cloud Firestore Native database.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region to create the Google Cloud Firestore Native database within. Use
+\f5gcloud app regions list\fR to list available regions.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create Google Cloud Firestore Native database
+
+.RS 2m
+$ gcloud beta firestore databases create
+.RE
+
+To create an app in the us\-central region, run:
+
+.RS 2m
+$ gcloud beta firestore databases create \-\-region=us\-central
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud firestore databases create
+$ gcloud alpha firestore databases create
+.RE
+

@@ -17,7 +17,7 @@ gcloud beta notebooks instances update \- request for updating instances
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for updating notbook instance.
+\fB(BETA)\fR Request for updating notebook instances.
 
 
 
@@ -114,25 +114,23 @@ Run \fB$ gcloud help\fR for details.
 To update machine type for an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances update \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance \-\-machine\-type=n1\-standard\-8
+$ gcloud beta notebooks instances update example\-instance \e
+  \-\-machine\-type=n1\-standard\-8 \-\-location=us\-central1\-a
 .RE
 
 To update labels for an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances update \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance \-\-labels=k1=v1,k2=v2
+$ gcloud beta notebooks instances update example\-instance \e
+  \-\-labels=k1=v1,k2=v2 \-\-location=us\-central1\-a
 .RE
 
 To update labels and accelerator cores, run:
 
 .RS 2m
-$ gcloud beta notebooks instances update \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance \-\-labels=k1=v1,k2=v2 \-\-accelerator\-core\-count=2
+$ gcloud beta notebooks instances update example\-instance \e
+  \-\-labels=k1=v1,k2=v2 \-\-accelerator\-core\-count=2 \e
+  \-\-location=us\-central1\-a
 .RE
 
 

@@ -96,6 +96,7 @@ class StartMinikubeTest(SdkPathTestCase):
          kubernetes.Minikube("cluster-name"):
       self.assertIn("cluster-name", mock_stream.call_args[0][0])
       self.assertIn("start", mock_stream.call_args[0][0])
+      self.assertEqual(mock_stream.call_args[1]["timeout_sec"], 240)
 
     self.assertEqual(mock_run.call_args, self.MINIKUBE_TEARDOWN_CALL)
 
@@ -113,14 +114,8 @@ class StartMinikubeTest(SdkPathTestCase):
          mock.patch.object(run_subprocess, "StreamOutputJson") as mock_stream, \
          mock.patch.object(run_subprocess, "Run") as mock_run, \
          kubernetes.Minikube("cluster-name", vm_driver="docker"):
-      mock_stream.assert_called_once_with(
-          Matcher(lambda cmd: "--vm-driver=docker" in cmd),
-          timeout_sec=150,
-          show_stderr=False)
-      mock_stream.assert_called_once_with(
-          Matcher(lambda cmd: "--container-runtime=docker" in cmd),
-          timeout_sec=150,
-          show_stderr=False)
+      self.assertIn("--vm-driver=docker", mock_stream.call_args[0][0])
+      self.assertIn("--container-runtime=docker", mock_stream.call_args[0][0])
 
     self.assertEqual(mock_run.call_args, self.MINIKUBE_TEARDOWN_CALL)
 

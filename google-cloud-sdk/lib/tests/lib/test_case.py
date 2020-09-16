@@ -295,6 +295,11 @@ class TestCase(unittest.TestCase, object):
           message='unclosed <ssl.SSLSocket',
           # This only exists in Python 3.
           category=ResourceWarning)  # pylint:disable=undefined-variable
+      # Disable socket errors caused by requests.Session keep-alive
+      warnings.filterwarnings(
+          action='ignore',
+          message='unclosed <socket.socket',
+          category=ResourceWarning)  # pylint:disable=undefined-variable
     # Make sure certain things are restored between tests
     self._originals = {
         'working directory': os.getcwd(),

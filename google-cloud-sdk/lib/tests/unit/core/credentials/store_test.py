@@ -44,17 +44,14 @@ from tests.lib.core.credentials import devshell_test_base
 import httplib2
 import mock
 from oauth2client import client
-from oauth2client import crypt
 from oauth2client import service_account
 from oauth2client.contrib import gce as oauth2client_gce
 from oauth2client.contrib import reauth_errors
 import six
 from six.moves import http_client as httplib
 from google.auth import compute_engine as google_auth_gce
-from google.auth import crypt as google_auth_crypt
 from google.auth import exceptions as google_auth_exceptions
 from google.auth import impersonated_credentials as google_auth_impersonated_creds
-from google.auth import jwt
 from google.oauth2 import _client
 from google.oauth2 import credentials as google_auth_creds
 from google.oauth2 import service_account as google_auth_service_account
@@ -161,7 +158,6 @@ class StoreTests(sdk_test_base.WithLogCapture,
         'token_uri',
         'user_agent',
         scopes=config.CLOUDSDK_SCOPES)
-    self.crypt_mock = self.StartObjectPatch(crypt, 'make_signed_jwt')
     self.refresh_mock = self.StartObjectPatch(
         client.OAuth2Credentials, 'refresh', autospec=True)
     self.refresh_mock_google_auth = self.StartObjectPatch(
@@ -169,11 +165,6 @@ class StoreTests(sdk_test_base.WithLogCapture,
     self.request_mock = self.StartObjectPatch(httplib2.Http, 'request',
                                               autospec=True)
     self.accounts_mock = self.StartObjectPatch(c_gce.Metadata(), 'Accounts')
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
-    self.StartObjectPatch(jwt, 'encode', return_value=b'fake_assertion')
     self.StartObjectPatch(
         _client,
         'jwt_grant',
@@ -842,7 +833,7 @@ gs_oauth2_refresh_token = fake-token
         r'Failed to load credential file: \[non-existing-file\]'):
       store.Load(use_google_auth=True)
 
-  def testServiceAccountImpersonationNotConfiguredError(self):
+  def testLoadServiceAccountImpersonationNotConfiguredError(self):
     store.Store(self.fake_cred)
     properties.VALUES.auth.impersonate_service_account.Set('asdf@google.com')
     with mock.patch(
@@ -853,6 +844,18 @@ gs_oauth2_refresh_token = fake-token
           r'gcloud is configured to impersonate service account '
           r'\[asdf@google.com\] but impersonation support is not available.'):
         store.Load()
+
+  def testRefreshServiceAccountImpersonationNotConfiguredError(self):
+    self.StartObjectPatch(iamcredentials_util, 'GenerateAccessToken')
+    credentials = iamcredentials_util.ImpersonationCredentials(
+        'service-account-id', 'access-token', '2016-01-08T00:00:00Z',
+        config.CLOUDSDK_SCOPES)
+    store.IMPERSONATION_TOKEN_PROVIDER = None
+    with self.assertRaisesRegex(
+        store.AccountImpersonationError,
+        'gcloud is configured to impersonate a service account '
+        'but impersonation support is not available.'):
+      store.Refresh(credentials, is_impersonated_credential=True)
 
   def testServiceAccountImpersonationGoogleAuthNotConfiguredError(self):
     fake_cred = self.MakeServiceAccountCredentialsGoogleAuth()
@@ -866,6 +869,20 @@ gs_oauth2_refresh_token = fake-token
           r'gcloud is configured to impersonate service account '
           r'\[asdf@google.com\] but impersonation support is not available.'):
         store.Load(use_google_auth=True)
+
+  def testRefreshServiceAccountImpersonationBadCredError(self):
+    self.StartObjectPatch(iamcredentials_util, 'GenerateAccessToken')
+
+    bad_credential = self.MakeUserAccountCredentialsGoogleAuth()
+
+    try:
+      store.IMPERSONATION_TOKEN_PROVIDER = (
+          iamcredentials_util.ImpersonationAccessTokenProvider())
+      with self.assertRaisesRegex(store.AccountImpersonationError,
+                                  'Invalid impersonation account for refresh'):
+        store.Refresh(bad_credential, is_impersonated_credential=True)
+    finally:  # Clean-Up
+      store.IMPERSONATION_TOKEN_PROVIDER = None
 
   def testNoAccountError(self):
     store.Store(self.fake_cred)
@@ -1308,12 +1325,6 @@ class LegacyGeneratorTests(cli_test_base.CliTestBase,
         config, '_GetGlobalConfigDir', return_value=self.temp_path)
     self.paths = config.Paths()
 
-    # Mocks the signer of service account credentials.
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-    self.rsa_mock = self.StartObjectPatch(google_auth_crypt.RSASigner,
-                                          'from_service_account_info')
-
     self.oauth2client_user_creds = self.MakeUserCredentials()
     self.oauth2client_sv_creds = self.MakeServiceAccountCredentials()
     self.oauth2client_gce_creds = oauth2client_gce.AppAssertionCredentials()
@@ -1470,11 +1481,6 @@ class RevokeTest(cli_test_base.CliTestBase,
     self.google_auth_revoke_mock = self.StartObjectPatch(
         c_google_auth.UserCredWithReauth, 'revoke')
 
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-
   def _AssertLegacyCredsNotPresent(self, account):
     self.AssertDirectoryNotExists(config.Paths().LegacyCredentialsDir(account))
 
@@ -1504,6 +1510,8 @@ class RevokeTest(cli_test_base.CliTestBase,
       store.Revoke()
 
   def testRevoke_Oauth2client(self):
+    self.StartObjectPatch(
+        store, 'GoogleAuthDisabledGlobally', return_value=True)
     store.Store(self.oauth2client_creds, self.fake_account)
     self.AssertCredsExistInLocal(self.fake_account)
     result = store.Revoke(account=self.fake_account)
@@ -1512,6 +1520,8 @@ class RevokeTest(cli_test_base.CliTestBase,
     self.oauth2client_revoke_mock.assert_called()
 
   def testRevoke_Oauth2client_KnownError(self):
+    self.StartObjectPatch(
+        store, 'GoogleAuthDisabledGlobally', return_value=True)
     self.oauth2client_revoke_mock.side_effect = client.TokenRevokeError(
         'invalid_token')
     store.Store(self.oauth2client_creds, self.fake_account)
@@ -1522,6 +1532,8 @@ class RevokeTest(cli_test_base.CliTestBase,
     self.oauth2client_revoke_mock.assert_called()
 
   def testRevoke_Oauth2client_UnknownError(self):
+    self.StartObjectPatch(
+        store, 'GoogleAuthDisabledGlobally', return_value=True)
     self.oauth2client_revoke_mock.side_effect = client.TokenRevokeError(
         'random_error')
     store.Store(self.oauth2client_creds, self.fake_account)
@@ -1532,7 +1544,7 @@ class RevokeTest(cli_test_base.CliTestBase,
   def testRevoke_GoogleAuth(self):
     store.Store(self.oauth2client_creds, self.fake_account)
     self.AssertCredsExistInLocal(self.fake_account)
-    result = store.Revoke(account=self.fake_account, use_google_auth=True)
+    result = store.Revoke(account=self.fake_account)
     self.AssertCredsNotExistInLocal(self.fake_account)
     self.assertTrue(result)
     self.google_auth_revoke_mock.assert_called()
@@ -1542,7 +1554,7 @@ class RevokeTest(cli_test_base.CliTestBase,
         'invalid_token')
     store.Store(self.oauth2client_creds, self.fake_account)
     self.AssertCredsExistInLocal(self.fake_account)
-    result = store.Revoke(account=self.fake_account, use_google_auth=True)
+    result = store.Revoke(account=self.fake_account)
     self.AssertCredsNotExistInLocal(self.fake_account)
     self.assertFalse(result)
     self.google_auth_revoke_mock.assert_called()
@@ -1553,7 +1565,7 @@ class RevokeTest(cli_test_base.CliTestBase,
     store.Store(self.oauth2client_creds, self.fake_account)
     self.AssertCredsExistInLocal(self.fake_account)
     with self.assertRaisesRegex(c_google_auth.TokenRevokeError, 'random_error'):
-      store.Revoke(account=self.fake_account, use_google_auth=True)
+      store.Revoke(account=self.fake_account)
 
   def testRevoke_GCE(self):
     self.StartObjectPatch(
@@ -1576,7 +1588,7 @@ class RevokeTest(cli_test_base.CliTestBase,
         return_value=c_devshell.DevShellCredentialsGoogleAuth(None))
     with self.assertRaisesRegex(store.RevokeError,
                                 'Cannot revoke .* Cloud Shell .*'):
-      store.Revoke(account=self.fake_account, use_google_auth=True)
+      store.Revoke(account=self.fake_account)
 
   def testRevoke_NonExistingAccount(self):
     with self.assertRaisesRegex(store.NoCredentialsForAccountException,
@@ -1598,7 +1610,7 @@ class RevokeTest(cli_test_base.CliTestBase,
     sv = self.MakeServiceAccountCredentialsGoogleAuth()
     store.Store(sv, sv.service_account_email)
     self.AssertCredsExistInLocal(sv.service_account_email)
-    result = store.Revoke(sv.service_account_email, use_google_auth=True)
+    result = store.Revoke(sv.service_account_email)
     self.AssertCredsNotExistInLocal(sv.service_account_email)
     revoke_credentials_mock.assert_not_called()
     self.assertFalse(result)
@@ -1606,7 +1618,7 @@ class RevokeTest(cli_test_base.CliTestBase,
   def testRevoke_MissingLegacyCredentials(self):
     store.Store(self.oauth2client_creds, self.fake_account)
     files.RmTree(config.Paths().LegacyCredentialsDir(self.fake_account))
-    store.Revoke(account=self.fake_account, use_google_auth=True)
+    store.Revoke(account=self.fake_account)
     self.AssertCredsNotExistInLocal(self.fake_account)
 
 

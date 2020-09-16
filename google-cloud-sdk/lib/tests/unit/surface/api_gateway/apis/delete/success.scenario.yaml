@@ -1,5 +1,5 @@
 title: Cloud API Gateway Apis Delete Success Scenarios
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -38,7 +38,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-name?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-name?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -50,7 +50,7 @@ actions:
             done: false
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/fake-op?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/operations/fake-op?alt=json
           method: GET
           headers: {}
           body: null
@@ -75,7 +75,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-name?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-name?alt=json
           method: DELETE
           headers: {}
           body: null

@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import contextlib
+import io
 import json
 import os
 import re
@@ -50,8 +51,72 @@ from tests.lib.scenario import updates
 
 import httplib2
 import mock
+import requests
 import six
 from six.moves import http_client as httplib
+
+
+def make_requests_response(status_code, headers, body):
+  http_resp = requests.Response()
+  http_resp.status_code = status_code
+  http_resp.raw = io.BytesIO(six.ensure_binary(body))
+  http_resp.headers = headers
+  return http_resp
+
+
+class TransportTest(test_case.TestCase, parameterized.TestCase):
+
+  @parameterized.parameters(
+      (session.Httplib2Transport(None).RequestFromArgs(
+          'url', method='POST', body='test', headers={'header': 'val'}),),
+      (session.RequestsTransport(None).RequestFromArgs(
+          'POST', 'url', data='test', headers={'header': 'val'}),)
+  )
+  def testRequestFromArgs(self, request):
+    self.assertEqual(request.uri, 'url')
+    self.assertEqual(request.method, 'POST')
+    self.assertEqual(request.headers, {'header': 'val'})
+    self.assertEqual(request.body, 'test')
+
+  @parameterized.parameters(
+      (session.Httplib2Transport(None),
+       (httplib2.Response({'status': httplib.OK, 'header': 'val'}),
+        'test'.encode('utf-8'))),
+      (session.RequestsTransport(None),
+       make_requests_response(
+           httplib.OK, {'header': 'val'}, 'test'.encode('utf-8')))
+  )
+  def testResponseFromTransportResponse(self, transport, transport_response):
+    response = transport.ResponseFromTransportResponse(transport_response)
+    self.assertEqual(response.status, httplib.OK)
+    self.assertEqual(response.headers, {'header': 'val'})
+    self.assertEqual(response.body, 'test')
+
+  def testToHttplib2TransportResponse(self):
+    response = events.Response(
+        httplib.OK, {'header': 'val'}, 'test')
+    transport = session.Httplib2Transport(None)
+    transport_response = transport.ResponseToTransportResponse(response)
+
+    expected_response = (
+        httplib2.Response({'status': httplib.OK, 'header': 'val'}),
+        'test'.encode('utf-8'))
+    self.assertEqual(transport_response, expected_response)
+
+  def testToRequestsTransportResponse(self):
+    response = events.Response(
+        httplib.OK, {'header': 'val'}, 'test')
+    transport = session.RequestsTransport(None)
+    transport_response = transport.ResponseToTransportResponse(response)
+
+    expected_response = make_requests_response(
+        httplib.OK, {'header': 'val'}, 'test'.encode('utf-8'))
+    self.assertEqual(transport_response.status_code,
+                     expected_response.status_code)
+    self.assertEqual(transport_response.headers,
+                     expected_response.headers)
+    self.assertEqual(transport_response.content,
+                     expected_response.content)
 
 
 class _SessionTestsBase(sdk_test_base.WithOutputCapture,
@@ -247,16 +312,22 @@ class SessionTests(_SessionTestsBase):
       answer = console_io.PromptResponse(message='foo')
       self.assertEqual('bar', answer)
 
-  def testMakeRealRequest(self):
+  @parameterized.parameters(
+      (session.Httplib2Transport(None),
+       (httplib2.Response({'status': httplib.OK}), 'test'.encode('utf-8'))),
+      (session.RequestsTransport(None),
+       make_requests_response(httplib.OK, {}, 'test'.encode('utf-8')))
+  )
+  def testMakeRealRequest(self, transport, response):
     client_mock = mock.Mock()
     args = ['arg1']
     kwargs = {'kwarg1': 'value'}
     ce = self.CommandExecution({'expect_exit': {'code': 0}})
-    with self.Execute(ce) as s:
-      s._orig_request_method = mock.Mock(return_value=(
-          httplib2.Response({'status': httplib.OK}), 'test'.encode('utf-8')))
-      response = s._MakeRealRequest(client_mock, args, kwargs)
-      s._orig_request_method.assert_called_with(client_mock, args, kwargs)
+    with self.Execute(ce):
+      transport._orig_request_method = mock.Mock(return_value=response)
+      response = transport.MakeRealRequest(client_mock, args, kwargs)
+      transport._orig_request_method.assert_called_with(
+          client_mock, args, kwargs)
       self.assertEqual(response.status, httplib.OK)
       self.assertEqual(response.body, 'test')
 
@@ -342,7 +413,7 @@ class SessionTests(_SessionTestsBase):
     self.assertEqual(1, len(context.exception.failures))
 
   def testIgnoreApiCalls(self):
-    request_mock = self.StartPatch('httplib2.Http.request', auto_spec=True)
+    request_mock = self.StartPatch('httplib2.Http.request', autospec=True)
     response = {'status': 'RUNNING', 'progress': '0'}
     request_mock.return_value = (httplib2.Response({'status': httplib.OK}),
                                  self.ToJson(response).encode('utf-8'))
@@ -359,8 +430,8 @@ class SessionTests(_SessionTestsBase):
       self.assertEqual('0', self.FromJson(body)['progress'])
 
   def testRepeatableAPICall(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     running = {
         'api_call': {
             'repeatable': True,
@@ -420,8 +491,8 @@ class SessionTests(_SessionTestsBase):
       self.assertEqual('100', self.FromJson(body)['progress'])
 
   def testOptionalAPICallRemote(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     first_event = {'expect_stderr': 'err'}
     optional_call = {
         'api_call': {
@@ -618,8 +689,8 @@ class SessionTests(_SessionTestsBase):
       self.assertEqual(op_body, self.FromJson(body))
 
   def testAPICallOperation(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     op_body = {
         'name': 'operation-12345',
         'kind': 'foo#operation',
@@ -690,8 +761,8 @@ class SessionTests(_SessionTestsBase):
       self.assertEqual(op_body, self.FromJson(body))
 
   def testAPICallOperationWithWait(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     op_body = {
         'name': 'operation-12345',
         'kind': 'foo#operation',
@@ -810,8 +881,8 @@ class SessionTests(_SessionTestsBase):
       ({'status': 404, 'headers': {}, 'body': 'error'},),
   )
   def testAPICallResponsePayloadUpdates(self, response):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     request_mock.return_value = events.Response(httplib.OK, {}, 'success')
     data = {
         'api_call': {
@@ -921,8 +992,8 @@ class SessionTests(_SessionTestsBase):
     self.assertEqual(1, len(context.exception.failures))
 
   def testBatchApiCallRemote(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     request_mock.return_value = events.Response(
         httplib.OK,
         {'Content-type': 'multipart/mixed; boundary=BATCH_BOUNDARY'},
@@ -1170,8 +1241,8 @@ class SessionUpdateTests(_SessionTestsBase):
 
   def testRepeatableAPICall(self):
     """Check that repeatable calls are automatically marked as such."""
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     running = {
         'api_call': {
             'expect_request': {
@@ -1236,8 +1307,8 @@ class SessionUpdateTests(_SessionTestsBase):
     self.assertIsNone(done['api_call'].get('repeatable'))
 
   def testAPICallGenerateOperationPolling(self):
-    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest',
-                                         auto_spec=True)
+    request_mock = self.StartObjectPatch(session.Transport, 'MakeRealRequest',
+                                         autospec=True)
     op_body = {
         'name': 'operation-12345',
         'kind': 'foo#operation',

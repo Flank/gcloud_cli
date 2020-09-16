@@ -27,7 +27,7 @@ summary:
   - stdout: |
       done: false
       metadata:
-        '@type': type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata
+        '@type': type.googleapis.com/google.cloud.networkmanagement.s.OperationMetadata
         apiVersion: v1
         cancelRequested: false
         createTime: '2020-01-28T20:33:01.243468876Z'
@@ -35,13 +35,18 @@ summary:
         verb: rerun
       name: $$operation$$
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
 - execute_command:
     command: network-management connectivity-tests rerun mytest
     events:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/projects/fake-project/locations/global/connectivityTests/mytest:rerun?alt=json
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/projects/fake-project/locations/global/connectivityTests/mytest:rerun?alt=json
           method: POST
           headers: {}
           body: null
@@ -52,12 +57,12 @@ actions:
             {
               "name": "projects/fake-project/locations/global/operations/operation-1580243581223-59d39215141a7-72dd9c81-bfae7703",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.OperationMetadata",
                 "createTime": "2020-01-28T20:33:01.243468876Z",
                 "target": "projects/fake-project/locations/global/connectivityTests/mytest",
                 "verb": "rerun",
                 "cancelRequested": false,
-                "apiVersion": "v1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
@@ -68,7 +73,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/projects/fake-project/locations/global/connectivityTests/mytest?alt=json
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/projects/fake-project/locations/global/connectivityTests/mytest?alt=json
           method: GET
           headers: {}
           body: null
@@ -102,7 +107,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/projects/fake-project/locations/global/connectivityTests/mytest:rerun?alt=json
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/projects/fake-project/locations/global/connectivityTests/mytest:rerun?alt=json
           method: POST
           headers: {}
           body: null
@@ -113,12 +118,12 @@ actions:
             {
               "name": "projects/fake-project/locations/global/operations/operation-1580243581223-59d39215141a7-72dd9c81-bfae7703",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.OperationMetadata",
                 "createTime": "2020-01-28T20:33:01.243468876Z",
                 "target": "projects/fake-project/locations/global/connectivityTests/mytest",
                 "verb": "rerun",
                 "cancelRequested": false,
-                "apiVersion": "v1"
+                "apiVersion": "$$api-version$$"
               },
               "done": false
             }
@@ -128,8 +133,8 @@ actions:
     - expect_stdout: |
         done: false
         metadata:
-          '@type': type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata
-          apiVersion: v1
+          '@type': type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.OperationMetadata
+          apiVersion: $$api-version$$
           cancelRequested: false
           createTime: '2020-01-28T20:33:01.243468876Z'
           target: projects/fake-project/locations/global/connectivityTests/mytest

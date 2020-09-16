@@ -941,24 +941,46 @@ def EnableUserProjectQuota():
       properties.VALUES.billing.CURRENT_PROJECT)
 
 
-def AllowGoogleAuth():
-  """Allows the command group to use google auth for authentication.
+def OptInRequests():
+  """Opts the command group into to using google auth for authentication.
 
   Call this function in the Filter method of the command group
-  to enable google-auth.
+  to enable requests.
   """
-  properties.VALUES.auth.google_auth_allowed.Set(True)
+  properties.VALUES.transport.opt_in_requests.Set(True)
+
+
+def UseRequests():
+  """Returns True if using google-auth to authenticate the http request.
+
+  transport/disable_requests_override is a global switch to turn off requests in
+  case support is buggy. transport/opt_in_requests is an internal property
+  to opt-in surfaces.
+  """
+
+  return (UseGoogleAuth() and
+          properties.VALUES.transport.opt_in_requests.GetBool() and
+          not properties.VALUES.transport.disable_requests_override.GetBool())
+
+
+def OptOutGoogleAuth():
+  """Opt-out the command group to use google auth for authentication.
+
+  Call this function in the Filter method of the command group
+  to opt-out google-auth.
+  """
+  properties.VALUES.auth.opt_out_google_auth.Set(True)
 
 
 def UseGoogleAuth():
   """Returns True if using google-auth to authenticate the http request.
 
   auth/disable_load_google_auth is a global switch to turn off google-auth in
-  case google-auth is buggy. auth/google_auth_allowed is an internal property
-  to opt-in surface.
+  case google-auth is crashing. auth/opt_out_google_auth is an internal property
+  to opt-out a surface.
   """
-  return (properties.VALUES.auth.google_auth_allowed.GetBool() and
-          not properties.VALUES.auth.disable_load_google_auth.GetBool())
+  return not (properties.VALUES.auth.opt_out_google_auth.GetBool() or
+              properties.VALUES.auth.disable_load_google_auth.GetBool())
 
 
 def LogCommand(prog, args):

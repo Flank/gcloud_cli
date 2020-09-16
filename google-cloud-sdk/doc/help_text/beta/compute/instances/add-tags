@@ -1,13 +1,13 @@
 NAME
-    gcloud beta compute instances add-tags - add tags to Google Compute Engine
-        virtual machine instances
+    gcloud beta compute instances add-tags - add tags to Compute Engine virtual
+        machine instances
 
 SYNOPSIS
     gcloud beta compute instances add-tags INSTANCE_NAME --tags=TAG,[TAG,...]
         [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute instances add-tags is used to add tags to Google
+    (BETA) gcloud beta compute instances add-tags is used to add tags to
     Compute Engine virtual machine instances.
 
     Tags can be used to identify the instances when adding network firewall

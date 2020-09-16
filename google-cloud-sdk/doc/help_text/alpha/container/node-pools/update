@@ -53,7 +53,7 @@ REQUIRED FLAGS
           List of supported kubelet configs in 'kubeletConfig'.
 
             KEY                VALUE
-            cpuManagerPolicy   either 'static' or 'default'
+            cpuManagerPolicy   either 'static' or 'none'
             cpuCFSQuota        true or false (enabled by default)
             cpuCFSQuotaPeriod  interval (e.g., '100ms')
 

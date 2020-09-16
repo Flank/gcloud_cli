@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances describe displays all data associated
-    with a Google Compute Engine virtual machine instance.
+    with a Compute Engine virtual machine instance.
 
     It's possible to limit the the scope of the description by using the
     '--format' flag. For details, see Filtering and formatting fun with gcloud

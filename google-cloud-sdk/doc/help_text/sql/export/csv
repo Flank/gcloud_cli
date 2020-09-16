@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud sql export csv INSTANCE URI --query=QUERY [--async]
         [--database=DATABASE,[DATABASE,...], -d DATABASE,[DATABASE,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--offload] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as
@@ -35,6 +35,11 @@ OPTIONAL FLAGS
         Database(s) from which the export is made. Information on requirements
         can be found here:
         https://cloud.google.com/sql/docs/mysql/admin-api/v1beta4/instances/export#exportContext.databases
+
+     --offload
+        Offload an export to a temporary instance. Doing so reduces strain on
+        source instances and allows other operations to be performed while the
+        export is in progress.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

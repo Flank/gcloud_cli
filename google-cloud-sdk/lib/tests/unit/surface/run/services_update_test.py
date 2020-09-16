@@ -39,12 +39,22 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.operations.ReleaseService.return_value = None
     self.service = service.Service.New(self.mock_serverless_client,
                                        self.Project())
+    self.service.name = 's1'
     self.service.status.latestReadyRevisionName = 'rev.1'
     self.service.domain = 'info.cern.ch'
     self.service.spec_traffic.SetPercent(traffic.LATEST_REVISION_KEY, 100)
     self.operations.GetService.return_value = self.service
     self.env_mock = self.StartObjectPatch(
         config_changes, 'EnvVarLiteralChanges')
+
+  def testUpdateWithFormat(self):
+    serv = self.Run('run services update --timeout 5 s1 --format=yaml')
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
+    self.assertIsNotNone(serv)
+    self.AssertOutputContains('apiVersion: serving.knative.dev/v1')
+    self.AssertOutputContains('kind: Service')
+    self.AssertOutputContains('url: info.cern.ch')
 
   def testUpdateEnvVars(self):
     """Tests update of env vars."""

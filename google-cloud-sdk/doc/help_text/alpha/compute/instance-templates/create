@@ -19,7 +19,8 @@ SYNOPSIS
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--min-node-cpu=MIN_NODE_CPU]
         [--network=NETWORK] [--network-interface=[PROPERTY=VALUE,...]]
-        [--network-tier=NETWORK_TIER] [--preemptible]
+        [--network-tier=NETWORK_TIER]
+        [--post-key-revocation-action-type=POLICY] [--preemptible]
         [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--private-network-ip=PRIVATE_NETWORK_IP] [--region=REGION]
         [--no-restart-on-failure] [--shielded-integrity-monitoring]
@@ -457,6 +458,14 @@ FLAGS
         Specifies the network tier that will be used to configure the instance.
         NETWORK_TIER must be one of: PREMIUM, STANDARD. The default value is
         PREMIUM.
+
+     --post-key-revocation-action-type=POLICY
+        The instance will be shut down when the KMS key of one of its disk is
+        revoked, if set to SHUTDOWN.
+
+        Default setting is NOOP.
+
+        POLICY must be one of: noop, shutdown.
 
      --preemptible
         If provided, instances will be preemptible and time-limited. Instances

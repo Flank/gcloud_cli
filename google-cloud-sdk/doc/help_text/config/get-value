@@ -459,6 +459,21 @@ AVAILABLE PROPERTIES
             When an instance is required but not provided by a flag, the
             command will fall back to this value, if set.
 
+     ssh
+         putty_force_connect
+            Whether or not gcloud should automatically accept new or changed
+            host keys when executing plink/pscp commands on Windows. Defaults
+            to True, but can be set to False to present these interactive
+            prompts to the user for host key checking.
+
+         verify_internal_ip
+            Whether or not gcloud should perform an initial SSH connection to
+            verify an instance ID is correct when connecting via its internal
+            IP. Without this check, gcloud will simply connect to the internal
+            IP of the desired instance, which may be wrong if the desired
+            instance is in a different subnet but happens to share the same
+            internal IP as an instance in the current subnet. Defaults to True.
+
      survey
          disable_prompts
             If True, gcloud will not prompt you to take periodic usage

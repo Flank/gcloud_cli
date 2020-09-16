@@ -3,8 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud beta compute backend-buckets create BACKEND_BUCKET_NAME
-        --gcs-bucket-name=GCS_BUCKET_NAME [--description=DESCRIPTION]
-        [--[no-]enable-cdn]
+        --gcs-bucket-name=GCS_BUCKET_NAME [--cache-mode=CACHE_MODE]
+        [--client-ttl=CLIENT_TTL]
+        [--custom-response-header=CUSTOM_RESPONSE_HEADER]
+        [--default-ttl=DEFAULT_TTL] [--description=DESCRIPTION]
+        [--[no-]enable-cdn] [--max-ttl=MAX_TTL]
         [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -23,6 +26,84 @@ REQUIRED FLAGS
         bucket must be in the same project.
 
 OPTIONAL FLAGS
+     --cache-mode=CACHE_MODE
+        Specifies the cache setting for all responses from this backend.
+        CACHE_MODE must be one of:
+
+         CACHE_ALL_STATIC
+            Automatically cache static content, including common image formats,
+            media (video and audio), web assets (JavaScript and CSS). Requests
+            and responses that are marked as uncacheable, as well as dynamic
+            content (including HTML), aren't cached.
+         FORCE_CACHE_ALL
+            Cache all content, ignoring any "private", "no-store" or "no-cache"
+            directives in Cache-Control response headers. Warning: this may
+            result in Cloud CDN caching private, per-user (user identifiable)
+            content. You should only enable this on backends that are not
+            serving private or dynamic content, such as storage buckets.
+         USE_ORIGIN_HEADERS
+            Require the origin to set valid caching headers to cache content.
+            Responses without these headers aren't cached at Google's edge, and
+            require a full trip to the origin on every request, potentially
+            impacting performance and increasing load on the origin server.
+
+     --client-ttl=CLIENT_TTL
+        Specifies a separate client (for example, browser client) TTL, separate
+        from the TTL for Cloud CDN's edge caches.
+
+        This allows you to set a shorter TTL for browsers/clients, and to have
+        those clients revalidate content against Cloud CDN on a more regular
+        basis, without requiring revalidation at the origin.
+
+        The value of clientTtl cannot be set to a value greater than that of
+        maxTtl, but can be equal.
+
+        Any cacheable response has its max-age/s-maxage directives and/or
+        Expires header adjusted down to the client TTL value if necessary.
+
+        The maximum allowed value is 86400s (1 day).
+
+        Omit this field to use the value of defaultTtl as the clientTtl.
+
+        When creating a new backend with CACHE_ALL_STATIC and the field is
+        unset, or when switching to that mode and the field is unset, a default
+        value of 3600 is used.
+
+        When the cache mode is set to "USE_ORIGIN_HEADERS", you must omit this
+        field.
+
+     --custom-response-header=CUSTOM_RESPONSE_HEADER
+        Custom headers that the external HTTP(S) load balancer adds to proxied
+        responses. For the list of headers, see Creating custom headers
+        (https://cloud.google.com/load-balancing/docs/custom-headers).
+
+        Variables are not case-sensitive.
+
+     --default-ttl=DEFAULT_TTL
+        Specifies the default TTL for cached content served by this origin for
+        responses that do not have an existing valid TTL (max-age or
+        s-max-age).
+
+        The default value is 3600s for cache modes that allow a default TTL to
+        be defined.
+
+        The value of defaultTtl cannot be set to a value greater than that of
+        maxTtl, but can be equal.
+
+        When the cacheMode is set to FORCE_CACHE_ALL, the defaultTtl overwrites
+        the TTL set in all responses.
+
+        A TTL of "0" means Always revalidate.
+
+        The maximum allowed value is 31,622,400s (1 year). Infrequently
+        accessed objects may be evicted from the cache before the defined TTL.
+
+        When creating a new backend with CACHE_ALL_STATIC or FORCE_CACHE_ALL
+        and the field is unset, or when updating an existing backend to use
+        these modes and the field is unset, a default value of 3600 is used.
+        When the cache mode is set to "USE_ORIGIN_HEADERS", you must omit this
+        field.
+
      --description=DESCRIPTION
         An optional, textual description for the backend bucket.
 
@@ -30,6 +111,28 @@ OPTIONAL FLAGS
         Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP
         responses from a backend bucket at the edge of the network, close to
         users. Use --enable-cdn to enable and --no-enable-cdn to disable.
+
+     --max-ttl=MAX_TTL
+        Specifies the maximum allowed TTL for cached content served by this
+        origin.
+
+        The default value is 86400 for cache modes that support a max TTL.
+
+        Cache directives that attempt to set a max-age or s-maxage higher than
+        this, or an Expires header more than maxTtl seconds in the future, are
+        capped at the value of maxTtl, as if it were the value of an s-maxage
+        Cache-Control directive.
+
+        A TTL of "0" means Always revalidate.
+
+        The maximum allowed value is 31,622,400s (1 year). Infrequently
+        accessed objects may be evicted from the cache before the defined TTL.
+
+        When creating a new backend with CACHE_ALL_STATIC and the field is
+        unset, or when updating an existing backend to use these modes and the
+        field is unset, a default value of 86400 is used. When the cache mode
+        is set to "USE_ORIGIN_HEADERS" or "FORCE_CACHE_ALL", you must omit this
+        field.
 
      --signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE
         The amount of time up to which the response to a signed URL request

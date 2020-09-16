@@ -12,7 +12,8 @@ DESCRIPTION
     revisions.
 
 POSITIONAL ARGUMENTS
-     API proxy resource - API proxy to be described. The arguments in this
+     API proxy resource - API proxy to be described. To get a list of available
+     API proxies, run gcloud alpha apigee apis list. The arguments in this
      group can be used to specify the attributes of this resource. This must be
      specified.
 

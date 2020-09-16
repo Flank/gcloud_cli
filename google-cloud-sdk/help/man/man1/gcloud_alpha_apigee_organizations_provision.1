@@ -1,0 +1,147 @@
+
+.TH "GCLOUD_ALPHA_APIGEE_ORGANIZATIONS_PROVISION" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha apigee organizations provision \- provision an Apigee SaaS organization
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha apigee organizations provision\fR \fB\-\-authorized\-network\fR=\fIAUTHORIZED_NETWORK\fR [\fB\-\-analytics\-region\fR=\fIANALYTICS_REGION\fR] [\fB\-\-async\fR] [\fB\-\-runtime\-location\fR=\fIRUNTIME_LOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Provision an Apigee SaaS organization.
+
+\f5gcloud alpha apigee organizations provision\fR creates an Apigee organization
+and populates it with the necessary child resources to be immediately useable.
+
+This is a long running operation and could take anywhere from 10 minutes to 1
+hour to complete.
+
+At the moment, only trial organizations are supported.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-authorized\-network\fR=\fIAUTHORIZED_NETWORK\fR
+Name of the network to which the provisioned organization should be attached.
+This must be a VPC network peered through Service Networking. To get a list of
+existing networks, run:
+
+.RS 2m
+$ gcloud compute networks list
+.RE
+
+To check whether a network is peered through Service Networking, run:
+
+.RS 2m
+$ gcloud services vpc\-peerings list \-\-network=NETWORK_NAME \e
+  \-\-service=servicenetworking.googleapis.com
+.RE
+
+To create a new network suitable for Apigee provisioning, choose a name for the
+network and address range, and run:
+
+.RS 2m
+$ gcloud compute networks create NETWORK_NAME \e
+  \-\-bgp\-routing\-mode=global \e
+  \-\-description='network for an Apigee trial'
+$ gcloud compute addresses create ADDRESS_RANGE_NAME \-\-global \e
+  \-\-prefix\-length=16 \e
+  \-\-description="peering range for an Apigee trial" \e
+  \-\-network=NETWORK_NAME \-\-purpose=vpc_peering
+$ gcloud services vpc\-peerings connect \e
+  \-\-service=servicenetworking.googleapis.com \e
+  \-\-network=NETWORK_NAME \-\-ranges=ADDRESS_RANGE_NAME
+.RE
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-analytics\-region\fR=\fIANALYTICS_REGION\fR
+Primary Cloud Platform region for analytics data storage. For valid values, see:
+https://docs.apigee.com/hybrid/latest/precog\-provision.
+
+If unspecified, the default is \f5\fIus\-west1\fR\fR
+
+.TP 2m
+\fB\-\-async\fR
+If set, returns immediately and outputs a description of the long running
+operation that was launched. Else, \f5gcloud alpha apigee organizations
+provision\fR will block until the organization has been provisioned.
+
+To monitor the operation once it's been launched, run \f5gcloud alpha apigee
+operations describe OPERATION_NAME\fR.
+
+.TP 2m
+\fB\-\-runtime\-location\fR=\fIRUNTIME_LOCATION\fR
+Cloud Platform location for the runtime instance. For trial organizations, this
+is a compute zone. To get a list of valid zones, run \f5gcloud compute zones
+list\fR. If unspecified, the default is \f5\fIus\-west1\-a\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To provision an organization for the active Cloud Platform project, attached to
+a network named \f5\fIdefault\fR\fR run:
+
+.RS 2m
+$ gcloud alpha apigee organizations provision \e
+  \-\-authorized\-network=default
+.RE
+
+To provision an organization asynchronously and print only the name of the
+launched operation, run:
+
+.RS 2m
+$ gcloud alpha apigee organizations provision \e
+  \-\-authorized\-network=default \-\-async \-\-format="value(name)"
+.RE
+
+To provision an organization for the project named \f5\fImy\-proj\fR\fR, with
+analytics and runtimes located in \f5\fIus\-central1\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha apigee organizations provision \e
+  \-\-authorized\-network=default \-\-project=my\-proj \e
+  \-\-analytics\-region=us\-central1 \-\-runtime\-location=us\-central1\-a
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist.
+

@@ -23,8 +23,7 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Describe a Google Compute Engine virtual instance's OS
-        inventory data.
+        (ALPHA) Describe a Compute Engine virtual instance's OS inventory data.
 
      list-instances
         (ALPHA) List instances with specific OS inventory data values.

@@ -1,5 +1,5 @@
 title: Cloud API Gateway API Create with Success
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -47,7 +47,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
@@ -61,7 +61,7 @@ actions:
             done: false
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/123456?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/operations/123456?alt=json
           method: GET
           headers: {}
           body: null
@@ -72,14 +72,14 @@ actions:
             name: projects/fake-project/locations/global/operations/123456
             done: true
             response:
-              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig
+              '@type': type.googleapis.com/google.cloud.apigateway.v1beta.ApiConfig
               name: projects/fake-project/locations/global/apis/fake-api-name
     - expect_progress_tracker:
         message: Waiting for API [fake-api-name] to be created
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/fake-api-name?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/fake-api-name?alt=json
           method: GET
           headers: {}
           body: null
@@ -98,7 +98,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
@@ -123,7 +123,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
@@ -147,7 +147,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:
@@ -173,7 +173,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis?alt=json&apiId=fake-api-name
           method: POST
           headers: {}
           body:

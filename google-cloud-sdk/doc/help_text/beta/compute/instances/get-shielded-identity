@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute instances get-shielded-identity - get the Shielded
-        identity for a Google Compute Engine instance
+        identity for a Compute Engine instance
 
 SYNOPSIS
     gcloud beta compute instances get-shielded-identity INSTANCE_NAME
@@ -8,8 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances get-shielded-identity displays the
-    Shielded identity associated with a Google Compute Engine instance in a
-    project.
+    Shielded identity associated with a Compute Engine instance in a project.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

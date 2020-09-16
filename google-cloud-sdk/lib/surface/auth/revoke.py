@@ -56,14 +56,6 @@ class Revoke(base.Command):
                         help='Accounts whose credentials are to be revoked.')
     parser.add_argument('--all', action='store_true',
                         help='Revoke credentials for all accounts.')
-    parser.add_argument(
-        '--use-oauth2client',
-        action='store_true',
-        default=False,
-        hidden=True,
-        help='The gcloud command-line tool is using google-auth-library-python '
-             'as its new auth library. Use this flag to switch back to the '
-             'oauth2client.')
     parser.display_info.AddFormat('list[title="Revoked credentials:"]')
 
   def Run(self, args):
@@ -91,14 +83,14 @@ class Revoke(base.Command):
     for account in accounts:
       if active_account == account:
         properties.PersistProperty(properties.VALUES.core.account, None)
-      if not c_store.Revoke(account, use_google_auth=not args.use_oauth2client):
+      if not c_store.Revoke(account):
         if account.endswith('.gserviceaccount.com'):
           log.warning(
               '[{}] appears to be a service account. Service account tokens '
               'cannot be revoked, but they will expire automatically. To '
               'prevent use of the service account token earlier than the '
-              'expiration, revoke the parent service account or service '
-              'account key.'.format(account))
+              'expiration, delete or disable the parent service account.'
+              .format(account))
         else:
           log.warning(
               '[{}] already inactive (previously revoked?)'.format(account))

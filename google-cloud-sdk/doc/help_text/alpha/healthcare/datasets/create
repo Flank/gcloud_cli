@@ -34,8 +34,8 @@ FLAGS
 
      --storage-class=STORAGE_CLASS
         Default blob storage class to store DICOM instances in this dataset.
-        STORAGE_CLASS must be one of: blob-storage-class-unspecified, coldline,
-        nearline, standard.
+        STORAGE_CLASS must be one of: archive, blob-storage-class-unspecified,
+        coldline, nearline, standard.
 
      --time-zone=TIME_ZONE
         Default timezone used by this dataset.

@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances reset is used to perform a hard
-    reset on a Google Compute Engine virtual machine.
+    reset on a Compute Engine virtual machine.
 
     This will not perform a clean shutdown of the guest OS on the instance.
 

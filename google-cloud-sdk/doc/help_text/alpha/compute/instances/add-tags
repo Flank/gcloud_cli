@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute instances add-tags - add tags to Google Compute Engine
+    gcloud alpha compute instances add-tags - add tags to Compute Engine
         virtual machine instances
 
 SYNOPSIS
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances add-tags is used to add tags to
-    Google Compute Engine virtual machine instances.
+    Compute Engine virtual machine instances.
 
     Tags can be used to identify the instances when adding network firewall
     rules. Tags can also be used to get firewall rules that already exist to be

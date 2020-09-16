@@ -337,6 +337,30 @@ class InstanceGroupManagerInstanceConfigsUpdateGAZonalTest(
           --stateful-disk device-name=bar
         """)
 
+  def testUpdatePatchModeWithoutSource(self):
+    update_preserved_state_disks = [
+        self._preserved_state_disk_1,
+        config_utils.MakePreservedStateDiskMapEntry(
+            self.messages, 'baz',
+            (self.project_uri + '/zones/us-central2-a/disks/baz'), 'READ_WRITE')
+    ]
+    self._ExpectListPerInstanceConfigs()
+    self._ExpectUpdatePerInstanceConfigs(
+        preserved_state_disks=update_preserved_state_disks,
+        preserved_state_metadata=self.preserved_state_metadata)
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
+    self._ExpectGetInstanceGroupManager()
+
+    self.Run("""
+        compute instance-groups managed instance-configs update group-1
+          --zone us-central2-a
+          --instance foo
+          --stateful-disk device-name=baz,mode=rw
+        """)
+
   def testUpdateRemoveAllDiskAndMetadataOverrides(self):
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(

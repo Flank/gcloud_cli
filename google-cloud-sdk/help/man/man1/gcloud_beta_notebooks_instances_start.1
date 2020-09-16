@@ -17,7 +17,7 @@ gcloud beta notebooks instances start \- request for starting instances
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for starting notbook instance.
+\fB(BETA)\fR Request for starting notebook instances.
 
 
 
@@ -80,9 +80,8 @@ Run \fB$ gcloud help\fR for details.
 To start an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances start \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud beta notebooks instances start example\-instance \e
+  \-\-location=us\-central1\-a
 .RE
 
 

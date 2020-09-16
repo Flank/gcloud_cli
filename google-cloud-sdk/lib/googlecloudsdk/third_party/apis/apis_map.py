@@ -124,6 +124,16 @@ MAP = {
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
+    'aiplatform': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.aiplatform.v1alpha1',
+                client_classpath='aiplatform_v1alpha1_client.AiplatformV1alpha1',
+                messages_modulepath='aiplatform_v1alpha1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
     'anthosevents': {
         'v1':
             APIDef(
@@ -228,6 +238,24 @@ MAP = {
                 class_path='googlecloudsdk.third_party.apis.artifactregistry.v1beta1',
                 client_classpath='artifactregistry_v1beta1_client.ArtifactregistryV1beta1',
                 messages_modulepath='artifactregistry_v1beta1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+        'v1beta2':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.artifactregistry.v1beta2',
+                client_classpath='artifactregistry_v1beta2_client.ArtifactregistryV1beta2',
+                messages_modulepath='artifactregistry_v1beta2_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
+    'assuredworkloads': {
+        'v1beta1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.assuredworkloads.v1beta1',
+                client_classpath='assuredworkloads_v1beta1_client.AssuredworkloadsV1beta1',
+                messages_modulepath='assuredworkloads_v1beta1_messages',
                 default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
@@ -535,16 +563,6 @@ MAP = {
                 client_classpath='cloudresourcemanager_v2beta1_client.CloudresourcemanagerV2beta1',
                 messages_modulepath='cloudresourcemanager_v2beta1_messages',
                 default_version=False,
-                enable_mtls=False,
-                mtls_endpoint_override=''),
-    },
-    'cloudresourcesearch': {
-        'v1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.cloudresourcesearch.v1',
-                client_classpath='cloudresourcesearch_v1_client.CloudresourcesearchV1',
-                messages_modulepath='cloudresourcesearch_v1_messages',
-                default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
@@ -922,6 +940,14 @@ MAP = {
                 class_path='googlecloudsdk.third_party.apis.domains.v1alpha2',
                 client_classpath='domains_v1alpha2_client.DomainsV1alpha2',
                 messages_modulepath='domains_v1alpha2_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+        'v1beta1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.domains.v1beta1',
+                client_classpath='domains_v1beta1_client.DomainsV1beta1',
+                messages_modulepath='domains_v1beta1_messages',
                 default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),

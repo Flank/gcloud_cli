@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha database-migration - manage Cloud Database Migration Service
+    gcloud alpha database-migration - manage Database Migration Service
         resources
 
 SYNOPSIS
     gcloud alpha database-migration GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Commands for managing Cloud Database Migration Service resources.
+    (ALPHA) Commands for managing Database Migration Service resources.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,13 +20,13 @@ GROUPS
     GROUP is one of the following:
 
      connection-profiles
-        (ALPHA) Manage Cloud Database Migration Service connection profiles.
+        (ALPHA) Manage Database Migration Service connection profiles.
 
      migration-jobs
-        (ALPHA) Manage Cloud Database Migration Service migration jobs.
+        (ALPHA) Manage Database Migration Service migration jobs.
 
      operations
-        (ALPHA) Manage Cloud Database Migration Service operations.
+        (ALPHA) Manage Database Migration Service operations.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

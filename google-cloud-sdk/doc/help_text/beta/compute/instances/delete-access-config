@@ -10,9 +10,9 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances delete-access-config is used to delete
-    access configurations from network interfaces of Google Compute Engine
-    virtual machines. Access configurations allow you to assign a public,
-    external IP to a virtual machine.
+    access configurations from network interfaces of Compute Engine virtual
+    machines. Access configurations let you assign a public, external IP to a
+    virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

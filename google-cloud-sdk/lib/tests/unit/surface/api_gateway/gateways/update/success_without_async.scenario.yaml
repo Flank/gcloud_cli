@@ -1,5 +1,5 @@
 title: Cloud API Gateway Gateway Update Without Async Test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -14,7 +14,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
           method: GET
           headers: {}
           body: null
@@ -28,7 +28,7 @@ actions:
             labels: null
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name?alt=json&updateMask=apiConfig%2CdisplayName
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/us-central1/gateways/test-name?alt=json&updateMask=apiConfig%2CdisplayName
           method: PATCH
           headers: {}
           body:
@@ -45,7 +45,7 @@ actions:
             error: null
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/operations/123456789?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/us-central1/operations/123456789?alt=json
           method: GET
           headers: {}
           body: null
@@ -56,14 +56,14 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1/operations/123456789
             response:
-              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.Gateway
+              '@type': type.googleapis.com/google.cloud.apigateway.v1beta.Gateway
               name: projects/fake-project/locations/us-central1/gateways/test-name
             error: null
     - expect_progress_tracker:
         message: Waiting for API Gateway [test-name] to be updated
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
           method: GET
           headers: {}
           body: null

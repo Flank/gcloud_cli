@@ -23,10 +23,6 @@ from tests.lib import test_case
 
 class TestUserAccount(e2e_base.WithExpiredUserAuth):
 
-  # TODO(b/147255499): remove this test after everything is on google-auth.
-  def testOauth2client(self):
-    self.Run('compute instances list --account={}'.format(self.Account()))
-
   def testGoogleAuth(self):
     # dns surface is on google-auth
     self.Run('dns managed-zones list --account={}'.format(self.Account()))

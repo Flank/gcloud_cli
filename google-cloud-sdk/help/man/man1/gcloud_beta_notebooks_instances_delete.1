@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta notebooks instances delete \- request for deleting instance
+gcloud beta notebooks instances delete \- request for deleting instances
 
 
 
@@ -17,7 +17,7 @@ gcloud beta notebooks instances delete \- request for deleting instance
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for deleting notebook instance.
+\fB(BETA)\fR Request for deleting notebook instances.
 
 
 
@@ -80,9 +80,8 @@ Run \fB$ gcloud help\fR for details.
 To delete an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances delete \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud beta notebooks instances delete example\-instance \e
+  \-\-location=us\-central1\-b
 .RE
 
 

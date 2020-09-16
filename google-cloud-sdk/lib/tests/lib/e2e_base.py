@@ -26,6 +26,7 @@ from __future__ import unicode_literals
 
 import base64
 import cgi
+import datetime
 import json
 import os
 import sys
@@ -37,6 +38,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.credentials import gce as c_gce
 from googlecloudsdk.core.credentials import http as cred_http
+from googlecloudsdk.core.credentials import requests as c_requests
 from googlecloudsdk.core.credentials import store as c_store
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import retry
@@ -46,6 +48,7 @@ from tests.lib import test_case
 import httplib2
 import mock
 from oauth2client.contrib import gce as oauth2client_gce
+import requests
 import six
 
 
@@ -55,10 +58,7 @@ def main():
 
 class WithCoreModules(cli_test_base.CliTestBase):
   """A base class for gcloud tests that need the core module directories."""
-
-  # TODO(b/147255499): Remove after all surfaces are on google-auth.
-  def SetUp(self):
-    properties.VALUES.auth.google_auth_allowed.Set(True)
+  pass
 
 
 IGNORE = object()
@@ -82,7 +82,11 @@ class WithMockHttp(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.http_mock = self.StartObjectPatch(cred_http, 'Http', autospec=True)
-    self.http_mock.return_value.request.side_effect = self._request
+    self.http_mock.return_value.request.side_effect = self._httplib2Request
+
+    self.requests_mock = self.StartObjectPatch(c_requests, 'GetSession',
+                                               autospec=True)
+    self.requests_mock.return_value.request.side_effect = self._requestsRequest
 
     self.strict = True
     self._responses = {}
@@ -109,8 +113,24 @@ class WithMockHttp(cli_test_base.CliTestBase):
       if len(msg_lines) > 1:
         self.fail('\n'.join(msg_lines))
 
-  def _request(self, uri, method='GET', body=None, headers=None, *args,
-               **kwargs):
+  def _httplib2Request(self, uri, method='GET', body=None, headers=None,
+                       **kwargs):
+    status, response_headers, response_body = self._request(uri, method, body,
+                                                            headers)
+    headers = {'status': status}
+    headers.update(response_headers or {})
+    return (httplib2.Response(headers), response_body)
+
+  def _requestsRequest(self, method, uri, data=None, headers=None, **kwargs):
+    status, response_headers, response_body = self._request(uri, method, data,
+                                                            headers)
+    response = requests.Response()
+    response.status_code = status
+    response.headers = response_headers
+    response._content = response_body  # pylint: disable=protected-access
+    return response
+
+  def _request(self, uri, method, body, headers):
     if self._next_exception:
       e = self._next_exception
       self._next_exception = None
@@ -156,9 +176,7 @@ class WithMockHttp(cli_test_base.CliTestBase):
           expected_body, body,
           msg='Expected body does not match for URL: ' + base_uri)
 
-    headers = {'status': status}
-    headers.update(response_headers or {})
-    return (httplib2.Response(headers), response_body)
+    return status, response_headers, response_body
 
   def SetNextException(self, e):
     self._next_exception = e
@@ -308,8 +326,7 @@ class WithServiceAuth(WithServiceAccountFile):
     return _TEST_CONFIG['auth_data']['user_account']['billing_id']
 
 
-class WithExpiredUserAuth(WithCoreModules):
-  """A base class for tests that require credentials to be refreshed."""
+class WithExpiredUserAuthMixin(object):
 
   def Project(self):
     return _TEST_CONFIG['property_overrides']['project']
@@ -317,16 +334,36 @@ class WithExpiredUserAuth(WithCoreModules):
   def Account(self):
     return _TEST_CONFIG['auth_data']['user_account']['account']
 
+  def _ActivateRefreshToken(self):
+    self.Run('auth activate-refresh-token {account} {token}'.format(
+        account=self.Account(),
+        token=_TEST_CONFIG['auth_data']['user_account']['refresh_token']))
+
+
+class WithExpiredUserAuthEnforcedRetry(WithExpiredUserAuthMixin,
+                                       WithCoreModules):
+  """A base class to test credentials refresh after the first request failed."""
+
+  def SetUp(self):
+    self.StartPatch('googlecloudsdk.core.credentials.store.Refresh')
+    self._ActivateRefreshToken()
+    creds = c_store.Load(use_google_auth=True)
+    # Make sure an invalid token is sent to services.
+    creds.token = 'invalid_access_token'
+    creds.expiry = creds.expiry + datetime.timedelta(hours=1)
+    c_store.Store(creds)
+
+
+class WithExpiredUserAuth(WithExpiredUserAuthMixin, WithCoreModules):
+  """A base class to test when the cached user credentials are invalid."""
+
   def SetUp(self):
     with mock.patch('googlecloudsdk.core.credentials.store.Refresh') as ref:
       ref.return_value = None
-      self.Run(
-          'auth activate-refresh-token {account} {token}'.format(
-              account=self.Account(),
-              token=_TEST_CONFIG['auth_data']['user_account']['refresh_token']))
-      creds = c_store.Load()
-      creds.access_token = 'invalid_access_token'
-      c_store.Store(creds)
+      self._ActivateRefreshToken()
+      creds = c_store.Load(use_google_auth=True)
+    creds.token = 'invalid_access_token'
+    c_store.Store(creds)
 
 
 class RefreshTokenAuth(object):

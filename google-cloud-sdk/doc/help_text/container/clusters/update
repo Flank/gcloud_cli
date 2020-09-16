@@ -31,7 +31,8 @@ SYNOPSIS
           --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
           | [--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
-          | --autoprovisioning-locations=ZONE,[ZONE,...] --max-cpu=MAX_CPU
+          | --autoprovisioning-locations=ZONE,[ZONE,...]
+          --autoprovisioning-min-cpu-platform=PLATFORM --max-cpu=MAX_CPU
           --max-memory=MAX_MEMORY --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
           --autoprovisioning-max-surge-upgrade=AUTOPROVISIONING_MAX_SURGE_UPGRADE --autoprovisioning-max-unavailable-upgrade=AUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE --autoprovisioning-scopes=[SCOPE,
           ...]
@@ -44,6 +45,7 @@ SYNOPSIS
           --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
+        [--cloud-run-config=[load-balancer-type=EXTERNAL,...]]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
         [--node-pool=NODE_POOL] [--max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -448,8 +450,9 @@ REQUIRED FLAGS
               cluster's node autoprovisioning configuration. Currently it
               contains a list of resource limits, identity defaults for
               autoprovisioning, node upgrade settings, node management
-              settings, minimum cpu platform, and node locations for
-              autoprovisioning.
+              settings, minimum cpu platform, node locations for
+              autoprovisioning, disk type and size configuration, shielded
+              instance settings, and customer-managed encryption keys settings.
 
               Resource limits are specified in the field 'resourceLimits'. Each
               resource limits definition contains three fields: resourceType,
@@ -492,6 +495,22 @@ REQUIRED FLAGS
               are specified in the field 'autoprovisioningLocations'. All zones
               must be in the same region as the cluster's master(s).
 
+              Disk type and size are specified under the 'diskType' and
+              'diskSizeGb' fields, respectively. If specified, new
+              autoprovisioned nodes will be created with custom boot disks
+              configured by these settings.
+
+              Shielded instance settings are specified under the
+              'shieldedInstanceConfig' field, which has the following fields:
+              enableSecureBoot: A boolean field that indicates if secure boot
+              is enabled for autoprovisioned nodes. enableIntegrityMonitoring:
+              A boolean field that indicates if integrity monitoring is enabled
+              for autoprovisioned nodes.
+
+              Customer Managed Encryption Keys (CMEK) used by new
+              auto-provisioned node pools can be specified in the
+              'bootDiskKmsKey' field.
+
            Flags to configure autoprovisioned nodes
 
              --autoprovisioning-locations=ZONE,[ZONE,...]
@@ -499,6 +518,10 @@ REQUIRED FLAGS
                 autoprovisioning. All zones must be in the same region as the
                 cluster's master(s). Multiple locations can be specified,
                 separated by commas.
+
+             --autoprovisioning-min-cpu-platform=PLATFORM
+                If specified, new autoprovisioned nodes will be scheduled on
+                host with specified CPU architecture or a newer one.
 
              --max-cpu=MAX_CPU
                 Maximum number of cores in the cluster.
@@ -637,6 +660,16 @@ OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --cloud-run-config=[load-balancer-type=EXTERNAL,...]
+        Configurations for Cloud Run addon, requires --addons=CloudRun for
+        create and --update-addons=CloudRun=ENABLED for update.
+
+         load-balancer-type
+            Optional Type of load-balancer-type EXTERNAL or INTERNAL Example:
+
+                $ gcloud container clusters update example-cluster \
+                    --cloud-run-config=load-balancer-type=INTERNAL
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
         The list of CIDR blocks (up to 100 for private cluster, 50 for public

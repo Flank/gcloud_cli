@@ -129,7 +129,6 @@ class RegisterTest(base.MembershipsTestBase):
     # Based on the API version, use api_adapter if GenerateConnectAgentManifest
     # is a nested message, else use default the api_client.
     # note: the response type is different for both the interfaces.
-    # TODO(b/148312097): Re-visit following condition when we update alpha_api.
     if self.api_version in ['v1beta1']:
       return self.StartObjectPatch(
           gkehub_api_adapter.APIAdapter,
@@ -627,7 +626,6 @@ class RegisterTest(base.MembershipsTestBase):
     # This was a successful registration; make sure we created the Membership
     # resources.
     self.assertSuccessfulExecution()
-    # TODO(b/148312097): If needed, update this check when we enable alpha_api.
     if self.api_version != 'v1beta1':
       mock_generate_manifest.assert_called_once_with(
           'projects/fake-project/locations/global/memberships/my-cluster',
@@ -653,7 +651,6 @@ class RegisterTest(base.MembershipsTestBase):
     # This was a successful registration; make sure we created the Membership
     # resources.
     self.assertSuccessfulExecution()
-    # TODO(b/148312097): If needed, update this check when we enable alpha_api.
     if self.api_version != 'v1beta1':
       mock_generate_manifest.assert_called_once_with(
           'projects/fake-project/locations/global/memberships/my-cluster',

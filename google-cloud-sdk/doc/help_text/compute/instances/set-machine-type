@@ -1,6 +1,6 @@
 NAME
-    gcloud compute instances set-machine-type - set machine type for Google
-        Compute Engine virtual machines
+    gcloud compute instances set-machine-type - set machine type for Compute
+        Engine virtual machines
 
 SYNOPSIS
     gcloud compute instances set-machine-type INSTANCE_NAME
@@ -10,9 +10,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances set-machine-type allows you to change the machine
-    type of a virtual machine in the TERMINATED state (that is, a virtual
-    machine instance that has been stopped).
+    gcloud compute instances set-machine-type lets you change the machine type
+    of a virtual machine in the TERMINATED state (that is, a virtual machine
+    instance that has been stopped).
 
     For example, if example-instance is a g1-small virtual machine currently in
     the TERMINATED state, running:

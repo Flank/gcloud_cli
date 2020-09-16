@@ -261,7 +261,7 @@ class EnvironmentsUnitTest(ComposerUnitTestBase):
                               exception=None):
     if response is None and exception is None:
       response = self.messages.Empty()
-    if (self.track == calliope_base.ReleaseTrack.BETA and config is not None and
+    if (self.track != calliope_base.ReleaseTrack.GA and config is not None and
         config.webServerNetworkAccessControl is None):
       config.webServerNetworkAccessControl = (
           self.messages.WebServerNetworkAccessControl(allowedIpRanges=[

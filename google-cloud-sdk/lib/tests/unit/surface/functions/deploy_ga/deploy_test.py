@@ -28,6 +28,7 @@ import zipfile
 from apitools.base.py import http_wrapper
 from googlecloudsdk.api_lib.functions import env_vars as env_vars_api_util
 from googlecloudsdk.api_lib.functions import exceptions
+from googlecloudsdk.api_lib.functions import util as api_util
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import base as calliope_base
@@ -1554,6 +1555,9 @@ class EnvVarsTests(DeployTestBase):
     --env-vars-file
   """
 
+  _ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
+  ).CloudFunction.EnvironmentVariablesValue
+
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
@@ -1582,7 +1586,8 @@ class EnvVarsTests(DeployTestBase):
     source_archive_url = 'gs://bucket'
     location = self.GetLocationResource()
 
-    env_vars_message = env_vars_api_util.DictToEnvVarsProperty(env_vars)
+    env_vars_message = env_vars_api_util.DictToEnvVarsProperty(
+        self._ENV_VARS_TYPE_CLASS, env_vars)
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
@@ -1641,7 +1646,8 @@ class EnvVarsTests(DeployTestBase):
     function_name = self.GetFunctionResource(self.GetRegion(), 'my-test')
     source_archive_url = 'gs://bucket'
     trigger = self.GetPubSubTrigger(self.Project(), 'topic')
-    original_env_vars = env_vars_api_util.DictToEnvVarsProperty(old_env_vars)
+    original_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._ENV_VARS_TYPE_CLASS, old_env_vars)
     original_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
@@ -1651,7 +1657,8 @@ class EnvVarsTests(DeployTestBase):
         runtime='nodejs6'
     )
 
-    updated_env_vars = env_vars_api_util.DictToEnvVarsProperty(new_env_vars)
+    updated_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._ENV_VARS_TYPE_CLASS, new_env_vars)
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
@@ -1677,10 +1684,11 @@ class EnvVarsTests(DeployTestBase):
     source_archive_url = 'gs://bucket'
     location = self.GetLocationResource()
 
-    env_vars = env_vars_api_util.DictToEnvVarsProperty({
-        'BAZ': 'boo',
-        'BAR': 'baa',
-    })
+    env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._ENV_VARS_TYPE_CLASS, {
+            'BAZ': 'boo',
+            'BAR': 'baa',
+        })
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
@@ -1713,10 +1721,11 @@ class EnvVarsTests(DeployTestBase):
     source_archive_url = 'gs://bucket'
     trigger = self.GetPubSubTrigger(self.Project(), 'topic')
 
-    original_env_vars = env_vars_api_util.DictToEnvVarsProperty({
-        'FOO': 'bar',
-        'BAZ': 'bee',
-    })
+    original_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._ENV_VARS_TYPE_CLASS, {
+            'FOO': 'bar',
+            'BAZ': 'bee',
+        })
     original_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
@@ -1726,10 +1735,11 @@ class EnvVarsTests(DeployTestBase):
         runtime='nodejs6'
     )
 
-    updated_env_vars = env_vars_api_util.DictToEnvVarsProperty({
-        'BAZ': 'boo',
-        'BAR': 'baa',
-    })
+    updated_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._ENV_VARS_TYPE_CLASS, {
+            'BAZ': 'boo',
+            'BAR': 'baa',
+        })
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,

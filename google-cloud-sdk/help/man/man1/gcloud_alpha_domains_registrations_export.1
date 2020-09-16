@@ -18,8 +18,16 @@ gcloud alpha domains registrations export \- export a Cloud Domains registration
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Export the domain to direct management by Google Domains. The
-domain remains valid until expiry. For information on how to access it in Google
-Domains after exporting, see https://support.google.com/domains/answer/6339340.
+domain remains valid until expiry.
+
+After you export a registered domain, the auto\-renewal will be disabled, but
+you will continue to incur billing charges until the next yearly renewal date.
+You will also become the sole owner of the domain in Google Domains, and Cloud
+IAM is not used anymore.
+
+To manage your domain after exporting, visit Google Domains at
+https://domains.google.com/registrar, or see
+https://support.google.com/domains/answer/3251174 for more information.
 
 
 

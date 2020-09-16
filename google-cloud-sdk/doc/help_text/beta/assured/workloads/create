@@ -1,0 +1,92 @@
+NAME
+    gcloud beta assured workloads create - create a new Assured Workloads
+        environment
+
+SYNOPSIS
+    gcloud beta assured workloads create --billing-account=BILLING_ACCOUNT
+        --compliance-regime=COMPLIANCE_REGIME --display-name=DISPLAY_NAME
+        --location=LOCATION --next-rotation-time=NEXT_ROTATION_TIME
+        --organization=ORGANIZATION --rotation-period=ROTATION_PERIOD
+        [--external-identifier=EXTERNAL_IDENTIFIER] [--labels=[KEY=VALUE,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create a new Assured Workloads environment
+
+REQUIRED FLAGS
+     --billing-account=BILLING_ACCOUNT
+        The billing account of the new Assured Workloads environment, for
+        example, billingAccounts/0000AA-AAA00A-A0A0A0
+
+     --compliance-regime=COMPLIANCE_REGIME
+        The compliance regime of the new Assured Workloads environment.
+        COMPLIANCE_REGIME must be one of: CJIS, FEDRAMP_HIGH, FEDRAMP_MODERATE,
+        IL4.
+
+     --display-name=DISPLAY_NAME
+        The display name of the new Assured Workloads environment
+
+     --location=LOCATION
+        The location of the new Assured Workloads environment. For a current
+        list of supported LOCATION values, see Assured Workloads locations
+        (http://cloud/assured-workloads/docs/locations). LOCATION must be one
+        of: us-central1, us-east1, us-east4, us-west1, us-west2, us-west3,
+        us-west4.
+
+     --next-rotation-time=NEXT_ROTATION_TIME
+        The next rotation time of the new Assured Workloads environment, for
+        example, 2020-12-30T10:15:30.00Z
+
+     --organization=ORGANIZATION
+        The parent organization of the new Assured Workloads environment,
+        provided as an organization ID
+
+     --rotation-period=ROTATION_PERIOD
+        The billing account of the new Assured Workloads environment, for
+        example, 172800s
+
+OPTIONAL FLAGS
+     --external-identifier=EXTERNAL_IDENTIFIER
+        The external identifier of the new Assured Workloads environment
+
+     --labels=[KEY=VALUE,...]
+        The labels of the new Assured Workloads environment, for example,
+        LabelKey1=LabelValue1,LabelKey2=LabelValue2
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    The following example command creates a new Assured Workloads environment
+    with these properties:
+
+      o belonging to an organization with ID 123
+      o located in the us-central1 region
+      o display name Test-Workload
+      o compliance regime FEDRAMP_MODERATE (other options include:
+        FEDRAMP_HIGH, IL4 and CJIS)
+      o billing account billingAccounts/456
+      o first key rotation set for 10:15am on the December 30, 2020
+      o key rotation interval set for every 48 hours
+      o with the label: key = 'LabelKey1', value = 'LabelValue1'
+      o with the label: key = 'LabelKey2', value = 'LabelValue2'
+
+        $ gcloud beta assured workloads create --organization=123 \
+            --location=us-central1 --display-name=Test-Workload \
+            --compliance-regime=FEDRAMP_MODERATE \
+            --billing-account=billingAccounts/456 \
+            --next-rotation-time=2020-12-30T10:15:00.00Z \
+            --rotation-period=172800s \
+            --labels LabelKey1=LabelValue1,LabelKey2=LabelValue2
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha assured workloads create
+

@@ -34,7 +34,6 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.core.credentials import credentials_test_base
 from oauth2client import client
-from google.auth import crypt as google_auth_crypt
 
 API_NAME = 'artifactregistry'
 
@@ -59,9 +58,6 @@ class ARTestBase(sdk_test_base.WithLogCapture, cli_test_base.CliTestBase,
         'token_uri',
         'user_agent',
         scopes=config.CLOUDSDK_SCOPES)
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
     store.Store(self.fake_cred)
     store.Load()
 

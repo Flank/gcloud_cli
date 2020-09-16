@@ -8,8 +8,8 @@ SYNOPSIS
         [--list-flag [ITEM,...]; default="aaa,bbb,ccc"]
         [--optional-flag OPTIONAL_FLAG] [--question-flag QUESTION_FLAG]
         [--root-flag ROOT_PATH; default="/"] [--true-flag]
-        [--value-flag VALUE_FLAG; default="VALUE"] [GCLOUD-WIDE-FLAG ...]
-        [-- IMPLEMENTATION-ARGS ...]
+        [--value-flag VALUE_FLAG; default="VALUE"] [--[no-]action-required]
+        [GCLOUD-WIDE-FLAG ...] [-- IMPLEMENTATION-ARGS ...]
 
 DESCRIPTION
     Markdown command docstring description. This is a markdown test. If you
@@ -60,6 +60,10 @@ FLAGS
 
      --value-flag VALUE_FLAG; default="VALUE"
         Command value flag help.
+
+     --[no-]action-required
+        Enables/disables the fake flag. Use --action-required to enable and
+        --no-action-required to disable.
 
 GROUP FLAGS
      --optional-flag OPTIONAL_FLAG

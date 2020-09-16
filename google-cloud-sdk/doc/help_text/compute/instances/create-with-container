@@ -1,6 +1,6 @@
 NAME
-    gcloud compute instances create-with-container - creates Google Compute
-        engine virtual machine instances running container images
+    gcloud compute instances create-with-container - creates Compute Engine
+        virtual machine instances running container images
 
 SYNOPSIS
     gcloud compute instances create-with-container INSTANCE_NAMES
@@ -45,8 +45,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances create-with-container creates Google Compute
-    Engine virtual machines that runs a Docker image. For example:
+    gcloud compute instances create-with-container creates Compute Engine
+    virtual machines that runs a Docker image. For example:
 
         $ gcloud compute instances create-with-container instance-1 \
             --zone us-central1-a             \

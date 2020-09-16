@@ -26,9 +26,6 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
 
-from oauth2client import crypt
-from google.auth import crypt as google_auth_crypt
-
 
 class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
                                  credentials_test_base.CredentialsTestBase):
@@ -52,10 +49,6 @@ class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
   """
 
   def SetUp(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-    self.rsa_mock = self.StartObjectPatch(google_auth_crypt.RSASigner,
-                                          'from_service_account_info')
     store_file = os.path.join(self.temp_path, 'credentials.db')
     self.store = creds.SqliteCredentialStore(store_file)
     self.fake_account = 'fake-account'

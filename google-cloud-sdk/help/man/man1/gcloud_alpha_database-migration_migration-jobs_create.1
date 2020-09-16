@@ -1,0 +1,185 @@
+
+.TH "GCLOUD_ALPHA_DATABASE\-MIGRATION_MIGRATION\-JOBS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha database\-migration migration\-jobs create \- create a Database Migration Service migration job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha database\-migration migration\-jobs create\fR (\fIMIGRATION_JOB\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-destination\fR=\fIDESTINATION\fR \fB\-\-source\fR=\fISOURCE\fR \fB\-\-type\fR=\fITYPE\fR [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-dump\-path\fR=\fIDUMP_PATH\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-peer\-vpc\fR=\fIPEER_VPC\fR\ |\ [\fB\-\-vm\-ip\fR=\fIVM_IP\fR\ \fB\-\-vm\-port\fR=\fIVM_PORT\fR\ \fB\-\-vpc\fR=\fIVPC\fR\ :\ \fB\-\-vm\fR=\fIVM\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Database Migration Service migration job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Migration job resource \- The migration job to create. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [migration_job] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIMIGRATION_JOB\fR
+ID of the migration_job or fully qualified identifier for the migration_job.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Cloud region for the migration_job.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Connection profile resource \- Resource ID of the destination connection
+profile. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-destination] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. To set the [region] attribute: provide the
+argument [\-\-destination] on the command line with a fully specified name;
+provide the argument [\-\-region] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+ID of the connection_profile or fully qualified identifier for the
+connection_profile.
+
+.RE
+.sp
+.TP 2m
+
+Connection profile resource \- Resource ID of the source connection profile.
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [\-\-source] on the command line with a fully specified
+name; provide the argument [\-\-project] on the command line; set the property
+[core/project]. To set the [region] attribute: provide the argument [\-\-source]
+on the command line with a fully specified name; provide the argument
+[\-\-region] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+ID of the connection_profile or fully qualified identifier for the
+connection_profile.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR
+Type of the migration job (ONE_TIME or CONTINUOUS). \fITYPE\fR must be one of:
+\fBONE_TIME\fR, \fBCONTINUOUS\fR.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Friendly name for the migration job.
+
+.TP 2m
+\fB\-\-dump\-path\fR=\fIDUMP_PATH\fR
+Path to the dump file in Google Cloud Storage, in the format:
+\f5gs://[BUCKET_NAME]/[OBJECT_NAME]\fR.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-peer\-vpc\fR=\fIPEER_VPC\fR
+Name of the VPC network to peer with the Cloud SQL private network.
+
+.TP 2m
+\fB\-\-vm\-ip\fR=\fIVM_IP\fR
+Bastion Virtual Machine IP. This flag must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-vm\-port\fR=\fIVM_PORT\fR
+Forwarding port for the SSH tunnel. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-vpc\fR=\fIVPC\fR
+Name of the VPC network where the VM is hosted. This flag must be specified if
+any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-vm\fR=\fIVM\fR
+Name of VM that will host the SSH tunnel bastion.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a migration job with vpc peering connectivity:
+
+.RS 2m
+$ gcloud alpha database\-migration migration\-jobs create \e
+  MIGRATION_JOB \-\-region=us\-central1 \-\-display\-name=my\-job  \e
+  \-\-source=cp1 \-\-destination=cp2 \-\-peer\-vpc=network1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist.
+

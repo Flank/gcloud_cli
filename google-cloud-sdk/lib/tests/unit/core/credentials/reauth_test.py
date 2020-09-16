@@ -103,7 +103,7 @@ class ReauthUsingSecurityKeyTest(cli_test_base.CliTestBase):
     self.StartObjectPatch(
         reauth,
         'SecurityKeyChallenge',
-        auto_spec=True,
+        autospec=True,
         return_value=self.mock_security_key)
     self.mock_security_key.GetName.return_value = 'SECURITY_KEY'
     self.mock_security_key.Execute.return_value = {

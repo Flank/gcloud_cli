@@ -17,7 +17,7 @@ gcloud beta notebooks instances describe \- request for describing instances
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for describing notbook instance.
+\fB(BETA)\fR Request for describing notebook instances.
 
 
 
@@ -69,9 +69,8 @@ Run \fB$ gcloud help\fR for details.
 To describe an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances describe \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud beta notebooks instances describe example\-instance \e
+  \-\-location=us\-central1\-b
 .RE
 
 

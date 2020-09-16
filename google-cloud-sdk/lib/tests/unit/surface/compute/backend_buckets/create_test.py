@@ -62,6 +62,22 @@ class BackendBucketCreateGaTest(test_base.BaseTest):
                                  name='my-backend-bucket'),
                              project='my-project'))])
 
+  def CheckRequestMadeWithCdnPolicyAndCustomHeaders(self,
+                                                    expected_cdn_policy,
+                                                    custom_response_headers,
+                                                    enable_cdn=False):
+    """Verifies the request was made with the expected CDN policy."""
+    messages = self.messages
+    self.CheckRequests([(self.compute.backendBuckets, 'Insert',
+                         messages.ComputeBackendBucketsInsertRequest(
+                             backendBucket=messages.BackendBucket(
+                                 bucketName='gcs-bucket-1',
+                                 cdnPolicy=expected_cdn_policy,
+                                 customResponseHeaders=custom_response_headers,
+                                 enableCdn=enable_cdn,
+                                 name='my-backend-bucket'),
+                             project='my-project'))])
+
   def testSimpleCase(self):
     messages = self.messages
     self.make_requests.side_effect = [[
@@ -193,6 +209,50 @@ class BackendBucketCreateBetaTest(BackendBucketCreateGaTest):
 
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.BETA)
+
+  def testCdnFlexibleCacheControlWithUseOriginHeaders(self):
+    self.RunCreate("""
+        my-backend-bucket --gcs-bucket-name gcs-bucket-1
+        --cache-mode CACHE_ALL_STATIC --client-ttl 4000
+        --default-ttl 5000 --max-ttl 6000 --negative-caching
+        --negative-caching-policy='404=3000,301=3500'
+        --custom-response-header 'Test-Header:'
+        --custom-response-header 'Test-Header2: {cdn_cache_id}'
+      """)
+    self.CheckRequestMadeWithCdnPolicyAndCustomHeaders(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.CACHE_ALL_STATIC,
+            clientTtl=4000,
+            defaultTtl=5000,
+            maxTtl=6000,
+            negativeCaching=True,
+            negativeCachingPolicy=[
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=404, ttl=3000),
+                self.messages.BackendBucketCdnPolicyNegativeCachingPolicy(
+                    code=301, ttl=3500),
+            ]), ['Test-Header:', 'Test-Header2: {cdn_cache_id}'],
+        enable_cdn=True)
+
+  def testCdnFlexibleCacheControlWithCacheAllStatic(self):
+    self.RunCreate('my-backend-bucket --gcs-bucket-name gcs-bucket-1 '
+                   '--cache-mode use-origin-headers --no-negative-caching')
+    self.CheckRequestMadeWithCdnPolicyAndCustomHeaders(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.USE_ORIGIN_HEADERS,
+            negativeCaching=False), [],
+        enable_cdn=True)
+
+  def testCdnFlexibleCacheControlWithCacheAllStaticCdnDisabled(self):
+    self.RunCreate('my-backend-bucket --gcs-bucket-name gcs-bucket-1 '
+                   '--cache-mode use-origin-headers --no-enable-cdn')
+    self.CheckRequestMadeWithCdnPolicyAndCustomHeaders(
+        self.messages.BackendBucketCdnPolicy(
+            cacheMode=self.messages.BackendBucketCdnPolicy
+            .CacheModeValueValuesEnum.USE_ORIGIN_HEADERS), [],
+        enable_cdn=False)
 
 
 class BackendBucketCreateAlphaTest(BackendBucketCreateBetaTest):

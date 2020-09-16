@@ -26,8 +26,9 @@ gcloud alpha apigee apis list \- list Apigee API proxies
 .RS 2m
 .TP 2m
 
-Organization resource \- The organization whose API proxies should be listed.
-This represents a Cloud resource.
+Organization resource \- Apigee organization whose API proxies should be listed.
+If unspecified, the Cloud Platform project's associated organization will be
+used. This represents a Cloud resource.
 
 .RS 2m
 .TP 2m
@@ -98,11 +99,17 @@ To list all API proxies for the active Cloud Platform project, run:
 $ gcloud alpha apigee apis list
 .RE
 
-To list all API proxies in an Apigee organization called \f5\fImy\-org\fR\fR,
-run:
+To list all API proxies in an organization called \f5\fImy\-org\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha apigee apis list \-\-organization=my\-org
+.RE
+
+To list all API proxies in an organization called \f5\fImy\-org\fR\fR, formatted
+as a JSON array, run:
+
+.RS 2m
+$ gcloud alpha apigee apis list \-\-organization=my\-org \-\-format=json
 .RE
 
 

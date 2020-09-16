@@ -861,6 +861,29 @@ this value, if set.
 .RE
 .sp
 .TP 2m
+\fIssh\fR
+
+.RS 2m
+.TP 2m
+\fBputty_force_connect\fR
+Whether or not \f5gcloud\fR should automatically accept new or changed host keys
+when executing plink/pscp commands on Windows. Defaults to True, but can be set
+to False to present these interactive prompts to the user for host key checking.
+
+
+.TP 2m
+\fBverify_internal_ip\fR
+Whether or not \f5gcloud\fR should perform an initial SSH connection to verify
+an instance ID is correct when connecting via its internal IP. Without this
+check, \f5gcloud\fR will simply connect to the internal IP of the desired
+instance, which may be wrong if the desired instance is in a different subnet
+but happens to share the same internal IP as an instance in the current subnet.
+Defaults to True.
+
+
+.RE
+.sp
+.TP 2m
 \fIsurvey\fR
 
 .RS 2m

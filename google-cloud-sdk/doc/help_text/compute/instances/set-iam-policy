@@ -1,13 +1,13 @@
 NAME
-    gcloud compute instances set-iam-policy - set IAM policy for a Google
-        Compute Engine instance
+    gcloud compute instances set-iam-policy - set IAM policy for a Compute
+        Engine instance
 
 SYNOPSIS
     gcloud compute instances set-iam-policy (INSTANCE : --zone=ZONE)
         POLICY_FILE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Set IAM policy for a Google Compute Engine instance.
+    Set IAM policy for a Compute Engine instance.
 
 POSITIONAL ARGUMENTS
      Instance resource - The instance to set the IAM policy of. The arguments

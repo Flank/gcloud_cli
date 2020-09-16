@@ -17,7 +17,7 @@ gcloud alpha notebooks instances register \- request for registering instances
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Request for registering notbook instance.
+\fB(ALPHA)\fR Request for registering notebook instances.
 
 
 
@@ -80,9 +80,8 @@ Run \fB$ gcloud help\fR for details.
 To register an old type instance, run:
 
 .RS 2m
-$ gcloud alpha notebooks instances register \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud alpha notebooks instances register example\-instance \e
+  \-\-location=us\-central1\-b
 .RE
 
 

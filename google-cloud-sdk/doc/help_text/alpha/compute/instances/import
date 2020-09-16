@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instances import - create Google Compute Engine
-        virtual machine instances from virtual appliance in OVA/OVF format
+    gcloud alpha compute instances import - create Compute Engine virtual
+        machine instances from virtual appliance in OVA/OVF format
 
 SYNOPSIS
     gcloud alpha compute instances import INSTANCE_NAME --source-uri=SOURCE_URI
@@ -18,13 +18,13 @@ SYNOPSIS
           | --node-group=NODE_GROUP] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute instances import creates Google Compute Engine
+    (ALPHA) gcloud alpha compute instances import creates Compute Engine
     virtual machine instances from virtual appliance in OVA/OVF format.
 
     Importing OVF involves:
       o Unpacking OVF package (if in OVA format) to Cloud Storage.
-      o Import disks from OVF to Google Compute Engine.
-      o Translate the boot disk to make it bootable in Google Compute Engine.
+      o Import disks from OVF to Compute Engine.
+      o Translate the boot disk to make it bootable in Compute Engine.
       o Create a VM instance using OVF metadata and imported disks and boot
         it.
 

@@ -11,7 +11,7 @@ gcloud alpha functions deploy \- create or update a Google Cloud Function
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-allow\-unauthenticated\fR] [\fB\-\-egress\-settings\fR=\fIEGRESS_SETTINGS\fR] [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-build\-worker\-pool\fR=\fIBUILD_WORKER_POOL\fR\ |\ \fB\-\-clear\-build\-worker\-pool\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-clear\-max\-instances\fR\ |\ \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-clear\-vpc\-connector\fR\ |\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-allow\-unauthenticated\fR] [\fB\-\-egress\-settings\fR=\fIEGRESS_SETTINGS\fR] [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-build\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-clear\-build\-env\-vars\fR\ |\ \fB\-\-set\-build\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-build\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-build\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-build\-worker\-pool\fR=\fIBUILD_WORKER_POOL\fR\ |\ \fB\-\-clear\-build\-worker\-pool\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-clear\-max\-instances\fR\ |\ \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-clear\-vpc\-connector\fR\ |\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -258,6 +258,44 @@ numbers.
 Label keys starting with \f5deployment\fR are reserved for use by deployment
 tools and cannot be specified manually.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-build\-env\-vars\-file\fR=\fIFILE_PATH\fR
+Path to a local YAML file with definitions for all Build environment variables.
+All existing Build environment variables will be removed before the new Build
+environment variables are added.
+
+.TP 2m
+\fB\-\-clear\-build\-env\-vars\fR
+Remove all Build environment variables.
+
+.TP 2m
+\fB\-\-set\-build\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as Build environment variables. All existing
+Build environment variables will be removed first.
+
+.TP 2m
+
+Only \-\-update\-build\-env\-vars and \-\-remove\-build\-env\-vars can be used
+together. If both are specified, \-\-remove\-build\-env\-vars will be applied
+first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-build\-env\-vars\fR=[\fIKEY\fR,...]
+List of Build environment variables to be removed.
+
+.TP 2m
+\fB\-\-update\-build\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as Build environment variables.
+
+.RE
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:

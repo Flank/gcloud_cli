@@ -38,7 +38,6 @@ from oauth2client import crypt
 from six.moves import http_client as httplib
 import sqlite3
 from google.auth import crypt as google_auth_crypt
-from google.auth import jwt
 from google.oauth2 import service_account as google_auth_service_account
 
 
@@ -112,17 +111,6 @@ class StoreOperationsTests(sdk_test_base.SdkBase,
         httplib2.Http,
         'request',
         return_value=_MakeFakeOauth2clientCredsRefreshResponse())
-
-    # Mocks the signer of oauth2client credentials.
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-    self.StartObjectPatch(
-        crypt, 'make_signed_jwt', return_value=b'fake_assertion')
-
-    # Mocks the signer of google-auth credentials.
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
-    self.StartObjectPatch(jwt, 'encode', return_value=b'fake_assertion')
 
   def TestStoreOperations(self, creds_stored, expected_loaded_type,
                           expected_loaded_type_google_auth,
@@ -590,10 +578,6 @@ class StoreCreationConcurrencyTests(sdk_test_base.SdkBase):
 class Sqlite3Tests(sdk_test_base.WithLogCapture,
                    credentials_test_base.CredentialsTestBase):
 
-  def SetUp(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-
   def testNoWarnMessage(self):
     creds.GetCredentialStore()
     self.AssertErrEquals('')
@@ -686,9 +670,6 @@ class ADCTestsOauth2client(cli_test_base.CliTestBase,
                                       'application_default_credentials.json')
     self.StartObjectPatch(
         config, 'ADCFilePath', return_value=self.adc_file_path)
-    # Mocks the signer of service account credentials.
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
 
     self.user_creds = creds.FromJson(self.USER_CREDENTIALS_JSON)
     self.service_creds = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)

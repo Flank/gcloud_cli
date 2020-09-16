@@ -74,8 +74,7 @@ EXAMPLES
 
         $ gcloud beta recommender recommendations list \
             --project=project-name --location=global \
-            --recommender=google.iam.policy.google.compute.instance.MachineT\
-        ypeRecommender
+            --recommender=google.compute.instance.MachineTypeRecommender
 
 NOTES
     This command is currently in BETA and may change without notice. These

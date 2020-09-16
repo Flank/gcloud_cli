@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute instances set-min-cpu-platform - set minimum CPU
-        platform for Google Compute Engine virtual machines
+        platform for Compute Engine virtual machines
 
 SYNOPSIS
     gcloud alpha compute instances set-min-cpu-platform INSTANCE_NAME

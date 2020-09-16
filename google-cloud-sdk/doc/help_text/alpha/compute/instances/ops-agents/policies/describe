@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute instances ops-agents policies describe - describe a
-        Google Cloud Operations Suite Agents (Ops Agents) policy
+        Google Cloud's operations suite agents (Ops Agents) policy
 
 SYNOPSIS
     gcloud alpha compute instances ops-agents policies describe POLICY_ID
@@ -8,10 +8,9 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances ops-agents policies describe
-    describes a policy that facilitates agent management across Google Cloud
-    Compute instances based on user specified instance filters. This policy
-    installs, specifies versioning, enables autoupgrade, and removes Ops
-    Agents.
+    describes a policy that facilitates agent management across Compute Engine
+    instances based on user specified instance filters. This policy installs,
+    specifies versioning, enables autoupgrade, and removes Ops Agents.
 
     The command returns the content of one policy. If no policies are found, it
     returns a NOT_FOUND error.
@@ -35,7 +34,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To describe an Ops agents policy named ops-agents-test-policy in the
+    To describe an Ops Agents policy named ops-agents-test-policy in the
     current project, run:
 
         $ gcloud alpha compute instances ops-agents policies describe \

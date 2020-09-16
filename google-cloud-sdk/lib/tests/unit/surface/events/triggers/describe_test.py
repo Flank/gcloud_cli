@@ -23,13 +23,14 @@ from googlecloudsdk.api_lib.events import source
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from tests.lib.surface.events import base
 
 
-class TriggersDescribeTestAlpha(base.EventsBase):
+class TriggersDescribeAnthosTestBeta(base.EventsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _MakeSourceCrd(self):
     """Creates a source CRD and assigns it as output to ListSourceCRD."""
@@ -73,38 +74,9 @@ class TriggersDescribeTestAlpha(base.EventsBase):
     self.operations.GetTrigger.return_value = self.trigger
 
   def testDescribeManaged(self):
-    """Trigger and source spec are both described with the default output."""
-    self._MakeSourceCrd()
-    self._MakeSource()
-    self._MakeTrigger(self.source)
-    self.Run('events triggers describe my-trigger --region=us-central1')
-
-    self.operations.GetTrigger.assert_called_once_with(
-        self._TriggerRef('my-trigger', 'fake-project'))
-    self.operations.GetSource.assert_called_once_with(
-        self._SourceRef('my-source', 'cloudpubsubsources', 'default'),
-        self.source_crd)
-    self.AssertOutputContains('name: my-trigger')
-    self.AssertOutputContains(
-        """filter:
-             attributes:
-               type: com.google.event.type""",
-        normalize_space=True)
-    self.AssertOutputContains(
-        """subscriber:
-            ref:
-              apiVersion: serving.knative.dev/v1alpha1
-              kind: Service
-              name: my-service""",
-        normalize_space=True)
-    self.AssertOutputContains(
-        """sink:
-            ref:
-              apiVersion: eventing.knative.dev/v1alpha1
-              kind: Broker
-              name: my-broker""",
-        normalize_space=True)
-    self.AssertOutputContains('topic: my-topic')
+    """This command is for Anthos only."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('events triggers delete my-trigger --platform=managed')
 
   def testDescribeGke(self):
     """Trigger and source spec are both described with the default output."""
@@ -160,12 +132,53 @@ class TriggersDescribeTestAlpha(base.EventsBase):
     self.AssertErrContains('No matching event source')
 
 
-class TriggersDescribeTestAlphaAnthos(TriggersDescribeTestAlpha):
+class TriggersDescribeAnthosTestAlpha(TriggersDescribeAnthosTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_name = 'anthosevents'
-    self.api_version = 'v1beta1'
 
   def testDescribeManaged(self):
     pass
+
+
+class TriggersDescribeManagedTestAlpha(TriggersDescribeAnthosTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'run'
+    self.api_version = 'v1alpha1'
+
+  def testDescribeManaged(self):
+    """Trigger and source spec are both described with the default output."""
+    self._MakeSourceCrd()
+    self._MakeSource()
+    self._MakeTrigger(self.source)
+    self.Run('events triggers describe my-trigger --platform=managed '
+             '--region=us-central1')
+
+    self.operations.GetTrigger.assert_called_once_with(
+        self._TriggerRef('my-trigger', 'fake-project'))
+    self.operations.GetSource.assert_called_once_with(
+        self._SourceRef('my-source', 'cloudpubsubsources', 'default'),
+        self.source_crd)
+    self.AssertOutputContains('name: my-trigger')
+    self.AssertOutputContains(
+        """filter:
+             attributes:
+               type: com.google.event.type""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """subscriber:
+            ref:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              name: my-service""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """sink:
+            ref:
+              apiVersion: eventing.knative.dev/v1alpha1
+              kind: Broker
+              name: my-broker""",
+        normalize_space=True)
+    self.AssertOutputContains('topic: my-topic')

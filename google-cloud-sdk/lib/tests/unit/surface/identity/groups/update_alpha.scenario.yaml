@@ -45,12 +45,6 @@ summary:
       the specified argument:eng-discuss@foo.com'
 actions:
 
-- define_reference:
-    reference: api-version
-    track_values:
-      ALPHA: v1alpha1
-      BETA: v1beta1
-
 - execute_command:
     label: Add a single posix group with no existing groups.
     command: |
@@ -59,7 +53,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -72,7 +66,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -89,15 +83,12 @@ actions:
               "displayName": "eng discuss group",
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
-              "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              }
+              "updateTime": "2019-10-02T17:42:04.747863Z"
             }
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
           method: PATCH
           headers: {}
           body:
@@ -114,8 +105,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.
@@ -130,7 +120,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -143,7 +133,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -161,9 +151,6 @@ actions:
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
               "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              },
               "posixGroups": [
                 {"gid": 1007, "name": "test"}
               ]
@@ -171,7 +158,7 @@ actions:
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
           method: PATCH
           headers: {}
           body:
@@ -190,8 +177,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.
@@ -207,7 +193,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -220,7 +206,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -237,15 +223,12 @@ actions:
               "displayName": "eng discuss group",
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
-              "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              }
+              "updateTime": "2019-10-02T17:42:04.747863Z"
             }
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
           method: PATCH
           headers: {}
           body:
@@ -264,8 +247,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.
@@ -279,7 +261,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -292,7 +274,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -310,9 +292,6 @@ actions:
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
               "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              },
               "posixGroups": [
                 {"gid": 1005, "name": "eng"},
                 {"gid": 1006, "name": "docs"},
@@ -322,7 +301,7 @@ actions:
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
           method: PATCH
           headers: {}
           body:
@@ -339,8 +318,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.
@@ -354,7 +332,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -367,7 +345,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -385,9 +363,6 @@ actions:
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
               "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              },
               "posixGroups": [
                 {"gid": 1005, "name": "eng"},
                 {"gid": 1006, "name": "docs"},
@@ -397,7 +372,7 @@ actions:
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
           method: PATCH
           headers: {}
           body:
@@ -414,8 +389,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.
@@ -429,7 +403,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -442,7 +416,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -460,9 +434,6 @@ actions:
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
               "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              },
               "posixGroups": [
                 {"gid": 1005, "name": "eng"},
                 {"gid": 1006, "name": "docs"},
@@ -472,7 +443,7 @@ actions:
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=posix_groups
           method: PATCH
           headers: {}
           body:
@@ -486,8 +457,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.
@@ -502,7 +472,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -515,7 +485,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
           method: GET
           headers: {}
           body: null
@@ -532,15 +502,12 @@ actions:
               "displayName": "eng discuss group",
               "description": "This is a group for engineering discussion.",
               "createTime": "2019-10-02T17:42:04.747863Z",
-              "updateTime": "2019-10-02T17:42:04.747863Z",
-              "labels": {
-                "system/groups/discussion_forum": ""
-              }
+              "updateTime": "2019-10-02T17:42:04.747863Z"
             }
 
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=display_name%2Cposix_groups
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=display_name%2Cposix_groups
           method: PATCH
           headers: {}
           body:
@@ -558,8 +525,7 @@ actions:
               "displayName": "New Engineer Discuss",
               "description": "Group for engineering discussions",
               "createTime": "2019-10-10T18:48:13.555558Z",
-              "updateTime": "2019-10-10T18:48:13.555558Z",
-              "labels": "system/groups/external"
+              "updateTime": "2019-10-10T18:48:13.555558Z"
             }
     - expect_stderr: |
         Updated.

@@ -30,6 +30,7 @@ from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.api_lib.run import secret
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import eventflow_operations
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import stages
@@ -88,6 +89,11 @@ class EventflowConnectTest(cli_test_base.CliTestBase):
 
 
 class EventflowOperationsTest(base.EventsBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'run'
+    self.api_version = 'v1alpha1'
 
   def SetUp(self):
     self.eventflow_client = eventflow_operations.EventflowOperations(

@@ -1,14 +1,13 @@
 NAME
-    gcloud alpha database-migration migration-jobs - manage Cloud Database
-        Migration Service migration jobs
+    gcloud alpha database-migration migration-jobs - manage Database Migration
+        Service migration jobs
 
 SYNOPSIS
     gcloud alpha database-migration migration-jobs COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Commands for managing Cloud Database Migration Service migration
-    jobs.
+    (ALPHA) Commands for managing Database Migration Service migration jobs.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -21,14 +20,42 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     create
+        (ALPHA) Create a Database Migration Service migration job.
+
      delete
-        (ALPHA) Delete a migration job.
+        (ALPHA) Delete a Database Migration Service migration job.
 
      describe
-        (ALPHA) Show details about a migration job.
+        (ALPHA) Show details about a Database Migration Service migration job.
+
+     generate-ssh-script
+        (ALPHA) Generate a SSH script for a Database Migration Service
+        migration job.
 
      list
-        (ALPHA) List migration jobs.
+        (ALPHA) List Database Migration Service migration jobs.
+
+     promote
+        (ALPHA) Promote a Database Migration Service migration job.
+
+     restart
+        (ALPHA) Restart a Database Migration Service migration job.
+
+     resume
+        (ALPHA) Resume a Database Migration Service migration job.
+
+     start
+        (ALPHA) Start a Database Migration Service migration job.
+
+     stop
+        (ALPHA) Stop a Database Migration Service migration job.
+
+     update
+        (ALPHA) Update a Database Migration Service migration job.
+
+     verify
+        (ALPHA) Verify a Database Migration Service migration job.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

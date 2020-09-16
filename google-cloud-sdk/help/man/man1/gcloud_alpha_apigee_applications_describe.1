@@ -30,8 +30,9 @@ information.
 .RS 2m
 .TP 2m
 
-Application resource \- The application to be described. The arguments in this
-group can be used to specify the attributes of this resource. This must be
+Application resource \- Application to be described. To get a list of available
+applications, run \f5gcloud alpha apigee applications list\fR. The arguments in
+this group can be used to specify the attributes of this resource. This must be
 specified.
 
 .RS 2m
@@ -73,11 +74,12 @@ $ gcloud alpha apigee applications describe \e
 .RE
 
 To describe that application in the Apigee organization \f5\fImy\-org\fR\fR,
-run:
+formatted as a JSON object, run:
 
 .RS 2m
 $ gcloud alpha apigee applications describe \e
-  46d6151e\-0000\-4dfa\-b9c7\-c03b8b58bb2f \-\-organization=my\-org
+  46d6151e\-0000\-4dfa\-b9c7\-c03b8b58bb2f \-\-organization=my\-org \e
+  \-\-format=json
 .RE
 
 

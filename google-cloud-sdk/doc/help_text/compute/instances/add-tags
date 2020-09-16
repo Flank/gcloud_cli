@@ -1,14 +1,14 @@
 NAME
-    gcloud compute instances add-tags - add tags to Google Compute Engine
-        virtual machine instances
+    gcloud compute instances add-tags - add tags to Compute Engine virtual
+        machine instances
 
 SYNOPSIS
     gcloud compute instances add-tags INSTANCE_NAME --tags=TAG,[TAG,...]
         [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances add-tags is used to add tags to Google Compute
-    Engine virtual machine instances.
+    gcloud compute instances add-tags is used to add tags to Compute Engine
+    virtual machine instances.
 
     Tags can be used to identify the instances when adding network firewall
     rules. Tags can also be used to get firewall rules that already exist to be

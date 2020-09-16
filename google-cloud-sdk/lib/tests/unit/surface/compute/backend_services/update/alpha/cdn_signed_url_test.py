@@ -32,34 +32,6 @@ class WithCdnSignedUrlApiUpdateTest(test_base.AlphaUpdateTestBase):
         [],
     ])
 
-  def CheckRequestMadeWithCdnPolicy(self, expected_message):
-    """Verifies the request was made with the expected CDN policy."""
-    messages = self.messages
-    self.CheckRequests(
-        [(self.compute.backendServices, 'Get',
-          messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Patch',
-          messages.ComputeBackendServicesPatchRequest(
-              backendService='backend-service-1',
-              backendServiceResource=messages.BackendService(
-                  backends=[],
-                  cdnPolicy=expected_message,
-                  description='my backend service',
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpHealthChecks/my-health-check')
-                  ],
-                  name='backend-service-1',
-                  portName='http',
-                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
-                  selfLink=(self.compute_uri + '/projects/'
-                            'my-project/global/backendServices/'
-                            'backend-service-1'),
-                  timeoutSec=30),
-              project='my-project'))],
-    )
-
   def testSetValidCacheMaxAge(self):
     """Tests updating backend service with a valid cache max age."""
     self.RunUpdate("""

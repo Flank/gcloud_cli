@@ -11,8 +11,9 @@ DESCRIPTION
     (ALPHA) List Apigee developers by email address.
 
 FLAGS
-     Organization resource - The Apigee organization whose developers should be
-     listed. This represents a Cloud resource.
+     Organization resource - Apigee organization whose developers should be
+     listed. If unspecified, the Cloud Platform project's associated
+     organization will be used. This represents a Cloud resource.
 
        --organization=ORGANIZATION
           ID of the organization or fully qualified identifier for the
@@ -60,9 +61,11 @@ EXAMPLES
 
         $ gcloud alpha apigee developers list
 
-    To list all developers in an Apigee organization called my-org, run:
+    To list all developers in an Apigee organization called my-org, formatted
+    as JSON objects, run:
 
-        $ gcloud alpha apigee developers list --organization=my-org
+        $ gcloud alpha apigee developers list --organization=my-org \
+          --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

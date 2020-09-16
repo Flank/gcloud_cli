@@ -8,7 +8,7 @@ gcloud markdown markdown-command - markdown command docstring index
 
 ## SYNOPSIS
 
-`gcloud markdown markdown-command` [[_USER_@]_INSTANCE_:]_SRC_ [[[_USER_@]_INSTANCE_:]_SRC_ ...] [[_USER_@]_INSTANCE_:]_DEST_ [_USER_@]_INSTANCE_ [*--dict-flag* [_ITEM_,...]; default="aaa=1,bbb=22,ccc=aha"] [*--false-flag*] [*--list-flag* [_ITEM_,...]; default="aaa,bbb,ccc"] [*--optional-flag* _OPTIONAL_FLAG_] [*--question-flag* _QUESTION_FLAG_] [*--root-flag* _ROOT_PATH_; default="/"] [*--true-flag*] [*--value-flag* _VALUE_FLAG_; default="VALUE"] [_GCLOUD-WIDE-FLAG ..._] [-- _IMPLEMENTATION-ARGS_ ...]
+`gcloud markdown markdown-command` [[_USER_@]_INSTANCE_:]_SRC_ [[[_USER_@]_INSTANCE_:]_SRC_ ...] [[_USER_@]_INSTANCE_:]_DEST_ [_USER_@]_INSTANCE_ [*--dict-flag* [_ITEM_,...]; default="aaa=1,bbb=22,ccc=aha"] [*--false-flag*] [*--list-flag* [_ITEM_,...]; default="aaa,bbb,ccc"] [*--optional-flag* _OPTIONAL_FLAG_] [*--question-flag* _QUESTION_FLAG_] [*--root-flag* _ROOT_PATH_; default="/"] [*--true-flag*] [*--value-flag* _VALUE_FLAG_; default="VALUE"] [*--[no-]action-required*] [_GCLOUD-WIDE-FLAG ..._] [-- _IMPLEMENTATION-ARGS_ ...]
 
 ## DESCRIPTION
 
@@ -75,6 +75,11 @@ Command true flag help.
 *--value-flag* _VALUE_FLAG_; default="VALUE"::
 
 Command value flag help.
+
+*--[no-]action-required*::
+
+Enables/disables the fake flag. Use --action-required to enable and
+--no-action-required to disable.
 
 
 ## GROUP FLAGS

@@ -1,6 +1,6 @@
 NAME
-    gcloud compute instances create - create Google Compute Engine virtual
-        machine instances
+    gcloud compute instances create - create Compute Engine virtual machine
+        instances
 
 SYNOPSIS
     gcloud compute instances create INSTANCE_NAMES [INSTANCE_NAMES ...]
@@ -48,8 +48,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances create facilitates the creation of Google Compute
-    Engine virtual machines.
+    gcloud compute instances create facilitates the creation of Compute Engine
+    virtual machines.
 
     When an instance is in RUNNING state and the system begins to boot, the
     instance creation is considered finished, and the command returns with a

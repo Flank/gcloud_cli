@@ -8,10 +8,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute instances move facilitates moving a Google
-    Compute Engine virtual machine from one zone to another. Moving a virtual
-    machine may incur downtime if the guest OS must be shutdown in order to
-    quiesce disk volumes prior to snapshotting.
+    (ALPHA) gcloud alpha compute instances move facilitates moving a Compute
+    Engine virtual machine from one zone to another. Moving a virtual machine
+    may incur downtime if the guest OS must be shutdown in order to quiesce
+    disk volumes prior to snapshotting.
 
     For example, running:
 

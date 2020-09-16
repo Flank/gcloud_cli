@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute instances set-scopes - set scopes and service account
-        for a Google Compute Engine instance
+        for a Compute Engine instance
 
 SYNOPSIS
     gcloud beta compute instances set-scopes INSTANCE_NAME [--zone=ZONE]
@@ -9,7 +9,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Set scopes and service account for a Google Compute Engine instance.
+    (BETA) Set scopes and service account for a Compute Engine instance.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

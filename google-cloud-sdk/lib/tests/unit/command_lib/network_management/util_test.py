@@ -98,3 +98,66 @@ class ValidateNetworkURIsTest(ValidationTestBase):
     self.shouldRejectNetworkURI("projects/project/networks/default")
     self.shouldRejectNetworkURI("projects/project/network/default")
     self.shouldRejectNetworkURI("default")
+
+
+class ValidateGKEMasterClustersURIsTest(ValidationTestBase):
+
+  def validateGKEMasterCluster(self, flag_name, flag_value):
+    args = self.createArgs(flag_name, flag_value)
+    return util.ValidateGKEMasterClustersURIs(self.ref, args, self.request)
+
+  def shouldAcceptGKEMasterClustersURI(self, cluster_uri):
+    result = self.validateGKEMasterCluster("source_gke_master_cluster",
+                                           cluster_uri)
+    self.assertEqual(result, self.request)
+
+    result = self.validateGKEMasterCluster("destination_gke_master_cluster",
+                                           cluster_uri)
+    self.assertEqual(result, self.request)
+
+  def shouldRejectGKEMasterClustersURI(self, cluster_uri):
+    with self.assertRaises(util.InvalidInputError):
+      self.validateGKEMasterCluster("source_gke_master_cluster", cluster_uri)
+    with self.assertRaises(util.InvalidInputError):
+      self.validateGKEMasterCluster("destination_gke_master_cluster",
+                                    cluster_uri)
+
+  def testValidateGKEMasterCluster(self):
+    self.shouldAcceptGKEMasterClustersURI(
+        "projects/google.com:project/locations/us-central1/clusters/cluster-1")
+    self.shouldAcceptGKEMasterClustersURI(
+        "projects/project/locations/us-central1-a/clusters/cluster-1")
+    self.shouldAcceptGKEMasterClustersURI(
+        "projects/project/zones/us-central1-a/clusters/cluster-1")
+    self.shouldRejectGKEMasterClustersURI("projects/project/clusters/cluster-1")
+    self.shouldRejectGKEMasterClustersURI("cluster-1")
+
+
+class ValidateCloudSQLInstancesURIsTest(ValidationTestBase):
+
+  def validateCloudSQLInstance(self, flag_name, flag_value):
+    args = self.createArgs(flag_name, flag_value)
+    return util.ValidateCloudSQLInstancesURIs(self.ref, args, self.request)
+
+  def shouldAcceptCloudSQLInstancesURI(self, cluster_uri):
+    result = self.validateCloudSQLInstance("source_cloud_sql_instance",
+                                           cluster_uri)
+    self.assertEqual(result, self.request)
+
+    result = self.validateCloudSQLInstance("destination_cloud_sql_instance",
+                                           cluster_uri)
+    self.assertEqual(result, self.request)
+
+  def shouldRejectCloudSQLInstancesURI(self, cluster_uri):
+    with self.assertRaises(util.InvalidInputError):
+      self.validateCloudSQLInstance("source_cloud_sql_instance", cluster_uri)
+    with self.assertRaises(util.InvalidInputError):
+      self.validateCloudSQLInstance("destination_cloud_sql_instance",
+                                    cluster_uri)
+
+  def testValidateCloudSQLInstance(self):
+    self.shouldAcceptCloudSQLInstancesURI(
+        "projects/my-project/instances/my-instance")
+    self.shouldRejectCloudSQLInstancesURI(
+        "projects/my-project/locations/loc/instances/my-instance")
+    self.shouldRejectCloudSQLInstancesURI("my-instance")

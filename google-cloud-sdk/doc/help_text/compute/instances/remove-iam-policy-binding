@@ -1,6 +1,6 @@
 NAME
     gcloud compute instances remove-iam-policy-binding - remove IAM policy
-        binding from a Google Compute Engine instance
+        binding from a Compute Engine instance
 
 SYNOPSIS
     gcloud compute instances remove-iam-policy-binding (INSTANCE : --zone=ZONE)
@@ -9,7 +9,7 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Remove an IAM policy binding from the IAM policy of a Google Compute Engine
+    Remove an IAM policy binding from the IAM policy of a Compute Engine
     instance. One binding consists of a member, a role, and an optional
     condition.
 

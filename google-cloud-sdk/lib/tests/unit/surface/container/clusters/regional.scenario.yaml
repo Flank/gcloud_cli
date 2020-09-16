@@ -51,8 +51,6 @@ actions:
       --network=gke-clusters-regional-test-do-not-delete --timeout=1080 --no-enable-basic-auth
       --no-issue-client-certificate --verbosity="none"
     events:
-    - expect_stderr: |
-        This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
     - api_call:
         poll_operation: true
         expect_request:

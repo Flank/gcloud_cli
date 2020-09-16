@@ -11,7 +11,7 @@ gcloud beta compute backend\-services update \- update a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-no\-health\-checks\fR] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-cache\-mode\fR=\fICACHE_MODE\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-[no\-]enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-no\-health\-checks\fR] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-client\-ttl\fR=\fICLIENT_TTL\fR\ |\ \fB\-\-no\-client\-ttl\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-custom\-response\-header\fR=\fICUSTOM_RESPONSE_HEADER\fR\ |\ \fB\-\-no\-custom\-response\-headers\fR] [\fB\-\-default\-ttl\fR=\fIDEFAULT_TTL\fR\ |\ \fB\-\-no\-default\-ttl\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fB\-\-max\-ttl\fR=\fIMAX_TTL\fR\ |\ \fB\-\-no\-max\-ttl\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -62,6 +62,35 @@ parameters will be included according to
 will be excluded. Use "\-\-cache\-key\-query\-string\-blacklist=" (sets the
 blacklist to the empty list) to include the entire query string. Can only be
 applied for global resources.
+
+.TP 2m
+\fB\-\-cache\-mode\fR=\fICACHE_MODE\fR
+Specifies the cache setting for all responses from this backend.
+\fICACHE_MODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBCACHE_ALL_STATIC\fR
+Automatically cache static content, including common image formats, media (video
+and audio), web assets (JavaScript and CSS). Requests and responses that are
+marked as uncacheable, as well as dynamic content (including HTML), aren't
+cached.
+.TP 2m
+\fBFORCE_CACHE_ALL\fR
+Cache all content, ignoring any "private", "no\-store" or "no\-cache" directives
+in Cache\-Control response headers. Warning: this may result in Cloud CDN
+caching private, per\-user (user identifiable) content. You should only enable
+this on backends that are not serving private or dynamic content, such as
+storage buckets.
+.TP 2m
+\fBUSE_ORIGIN_HEADERS\fR
+Require the origin to set valid caching headers to cache content. Responses
+without these headers aren't cached at Google's edge, and require a full trip to
+the origin on every request, potentially impacting performance and increasing
+load on the origin server.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-connection\-drain\-on\-failover\fR
@@ -324,6 +353,42 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-client\-ttl\fR=\fICLIENT_TTL\fR
+Specifies a separate client (for example, browser client) TTL, separate from the
+TTL for Cloud CDN's edge caches.
+
+This allows you to set a shorter TTL for browsers/clients, and to have those
+clients revalidate content against Cloud CDN on a more regular basis, without
+requiring revalidation at the origin.
+
+The value of clientTtl cannot be set to a value greater than that of maxTtl, but
+can be equal.
+
+Any cacheable response has its max\-age/s\-maxage directives and/or Expires
+header adjusted down to the client TTL value if necessary.
+
+The maximum allowed value is 86400s (1 day).
+
+Omit this field to use the value of defaultTtl as the clientTtl.
+
+When creating a new backend with CACHE_ALL_STATIC and the field is unset, or
+when switching to that mode and the field is unset, a default value of 3600 is
+used.
+
+When the cache mode is set to "USE_ORIGIN_HEADERS", you must omit this field.
+
+.TP 2m
+\fB\-\-no\-client\-ttl\fR
+Clears client TTL value.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR
 Specifies a HTTP Header to be added by your load balancer. This flag can be
 repeated to specify multiple headers. For example:
@@ -337,6 +402,60 @@ $ gcloud beta compute backend\-services update NAME             \e
 .TP 2m
 \fB\-\-no\-custom\-request\-headers\fR
 Remove all custom request headers for the backend service.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-custom\-response\-header\fR=\fICUSTOM_RESPONSE_HEADER\fR
+Custom headers that the external HTTP(S) load balancer adds to proxied
+responses. For the list of headers, see Creating custom headers
+(https://cloud.google.com/load\-balancing/docs/custom\-headers).
+
+Variables are not case\-sensitive.
+
+.TP 2m
+\fB\-\-no\-custom\-response\-headers\fR
+Remove all custom response headers for the backend service.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-default\-ttl\fR=\fIDEFAULT_TTL\fR
+Specifies the default TTL for cached content served by this origin for responses
+that do not have an existing valid TTL (max\-age or s\-max\-age).
+
+The default value is 3600s for cache modes that allow a default TTL to be
+defined.
+
+The value of defaultTtl cannot be set to a value greater than that of maxTtl,
+but can be equal.
+
+When the cacheMode is set to FORCE_CACHE_ALL, the defaultTtl overwrites the TTL
+set in all responses.
+
+A TTL of "0" means Always revalidate.
+
+The maximum allowed value is 31,622,400s (1 year). Infrequently accessed objects
+may be evicted from the cache before the defined TTL.
+
+When creating a new backend with CACHE_ALL_STATIC or FORCE_CACHE_ALL and the
+field is unset, or when updating an existing backend to use these modes and the
+field is unset, a default value of 3600 is used. When the cache mode is set to
+"USE_ORIGIN_HEADERS", you must omit this field.
+
+.TP 2m
+\fB\-\-no\-default\-ttl\fR
+Clears default TTL value.
 
 .RE
 .sp
@@ -391,6 +510,38 @@ $ gcloud config unset compute/region
 
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-ttl\fR=\fIMAX_TTL\fR
+Specifies the maximum allowed TTL for cached content served by this origin.
+
+The default value is 86400 for cache modes that support a max TTL.
+
+Cache directives that attempt to set a max\-age or s\-maxage higher than this,
+or an Expires header more than maxTtl seconds in the future, are capped at the
+value of maxTtl, as if it were the value of an s\-maxage Cache\-Control
+directive.
+
+A TTL of "0" means Always revalidate.
+
+The maximum allowed value is 31,622,400s (1 year). Infrequently accessed objects
+may be evicted from the cache before the defined TTL.
+
+When creating a new backend with CACHE_ALL_STATIC and the field is unset, or
+when updating an existing backend to use these modes and the field is unset, a
+default value of 86400 is used. When the cache mode is set to
+"USE_ORIGIN_HEADERS" or "FORCE_CACHE_ALL", you must omit this field.
+
+.TP 2m
+\fB\-\-no\-max\-ttl\fR
+Clears max TTL value.
 
 
 .RE

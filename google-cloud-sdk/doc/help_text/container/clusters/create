@@ -6,6 +6,7 @@ SYNOPSIS
         [--accelerator=[type=TYPE,[count=COUNT],...]]
         [--additional-zones=ZONE,[ZONE,...]] [--addons=[ADDON,...]] [--async]
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY]
+        [--cloud-run-config=[load-balancer-type=EXTERNAL,...]]
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
@@ -42,7 +43,8 @@ SYNOPSIS
         [[--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
           | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY
-          : --autoprovisioning-locations=ZONE,[ZONE,...] --min-cpu=MIN_CPU
+          : --autoprovisioning-locations=ZONE,[ZONE,...]
+          --autoprovisioning-min-cpu-platform=PLATFORM --min-cpu=MIN_CPU
           --min-memory=MIN_MEMORY
           --autoprovisioning-max-surge-upgrade=AUTOPROVISIONING_MAX_SURGE_UPGRADE --autoprovisioning-max-unavailable-upgrade=AUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE --autoprovisioning-scopes=[SCOPE,
           ...]
@@ -135,6 +137,16 @@ FLAGS
         For more information about protecting resources with Cloud KMS Keys
         please see:
         https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+
+     --cloud-run-config=[load-balancer-type=EXTERNAL,...]
+        Configurations for Cloud Run addon, requires --addons=CloudRun for
+        create and --update-addons=CloudRun=ENABLED for update.
+
+         load-balancer-type
+            Optional Type of load-balancer-type EXTERNAL or INTERNAL Example:
+
+                $ gcloud container clusters create example-cluster \
+                    --cloud-run-config=load-balancer-type=INTERNAL
 
      --cluster-ipv4-cidr=CLUSTER_IPV4_CIDR
         The IP address range for the pods in this cluster in CIDR notation
@@ -238,8 +250,9 @@ FLAGS
             $ gcloud container clusters create example-cluster \
                 --enable-autorepair
 
-        Node autorepair is enabled by default for clusters using COS or
-        COS_CONTAINERD as a base image, use --no-enable-autorepair to disable.
+        Node autorepair is enabled by default for clusters using COS,
+        COS_CONTAINERD, UBUNTU or UBUNTU_CONTAINERD as a base image, use
+        --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
@@ -698,7 +711,9 @@ FLAGS
             cluster's node autoprovisioning configuration. Currently it
             contains a list of resource limits, identity defaults for
             autoprovisioning, node upgrade settings, node management settings,
-            minimum cpu platform, and node locations for autoprovisioning.
+            minimum cpu platform, node locations for autoprovisioning, disk
+            type and size configuration, shielded instance settings, and
+            customer-managed encryption keys settings.
 
             Resource limits are specified in the field 'resourceLimits'. Each
             resource limits definition contains three fields: resourceType,
@@ -741,6 +756,22 @@ FLAGS
             specified in the field 'autoprovisioningLocations'. All zones must
             be in the same region as the cluster's master(s).
 
+            Disk type and size are specified under the 'diskType' and
+            'diskSizeGb' fields, respectively. If specified, new
+            autoprovisioned nodes will be created with custom boot disks
+            configured by these settings.
+
+            Shielded instance settings are specified under the
+            'shieldedInstanceConfig' field, which has the following fields:
+            enableSecureBoot: A boolean field that indicates if secure boot is
+            enabled for autoprovisioned nodes. enableIntegrityMonitoring: A
+            boolean field that indicates if integrity monitoring is enabled for
+            autoprovisioned nodes.
+
+            Customer Managed Encryption Keys (CMEK) used by new
+            auto-provisioned node pools can be specified in the
+            'bootDiskKmsKey' field.
+
          Flags to configure autoprovisioned nodes
 
            --max-cpu=MAX_CPU
@@ -762,6 +793,10 @@ FLAGS
               autoprovisioning. All zones must be in the same region as the
               cluster's master(s). Multiple locations can be specified,
               separated by commas.
+
+           --autoprovisioning-min-cpu-platform=PLATFORM
+              If specified, new autoprovisioned nodes will be scheduled on host
+              with specified CPU architecture or a newer one.
 
            --min-cpu=MIN_CPU
               Minimum number of cores in the cluster.

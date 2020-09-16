@@ -11,7 +11,7 @@ gcloud alpha logging buckets create \- creates a bucket
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging buckets create\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging buckets create\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-analytics\fR=\fIENABLE_ANALYTICS\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -50,6 +50,11 @@ cannot be changed.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 A textual description for the bucket.
+
+.TP 2m
+\fB\-\-enable\-analytics\fR=\fIENABLE_ANALYTICS\fR
+Whether to opt the bucket into advanced log analytics. This field may only be
+set at bucket creation and cannot be changed later.
 
 .TP 2m
 \fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR

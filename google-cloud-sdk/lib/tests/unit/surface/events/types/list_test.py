@@ -20,13 +20,14 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.events import custom_resource_definition
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from tests.lib.surface.events import base
 
 
-class TypesListTestAlpha(base.EventsBase):
+class TypesListAnthosTestBeta(base.EventsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _MakeEventTypes(self, num_sources, num_event_types_per_source):
     """Creates source CRDs with event types and assigns them to ListSourceCRDs."""
@@ -52,22 +53,9 @@ class TypesListTestAlpha(base.EventsBase):
         self.source_crds)
 
   def testListManaged(self):
-    """Event types are listable."""
-    self._MakeEventTypes(num_sources=2, num_event_types_per_source=3)
-    out = self.Run('events types list --platform=managed --region=us-central1')
-
-    self.operations.ListSourceCustomResourceDefinitions.assert_called_once()
-    self.assertEqual(out, self.event_types)
-    self.AssertOutputEquals(
-        """TYPE SOURCE DESCRIPTION
-           google.source.0.et.0 SourceKind0 desc00
-           google.source.0.et.1 SourceKind0 desc01
-           google.source.0.et.2 SourceKind0 desc02
-           google.source.1.et.0 SourceKind1 desc10
-           google.source.1.et.1 SourceKind1 desc11
-           google.source.1.et.2 SourceKind1 desc12
-        """,
-        normalize_space=True)
+    """This command is for Anthos only."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('events types list --platform=managed')
 
   def testListGke(self):
     """Event types are listable."""
@@ -104,9 +92,36 @@ class TypesListTestAlpha(base.EventsBase):
         normalize_space=True)
 
 
-class TypesListTestAlphaAnthos(TypesListTestAlpha):
+class TypesListAnthosTestAlpha(TypesListAnthosTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_name = 'anthosevents'
-    self.api_version = 'v1beta1'
+
+  def testListManaged(self):
+    pass
+
+
+class TypesListManagedTestAlpha(TypesListAnthosTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'run'
+    self.api_version = 'v1alpha1'
+
+  def testListManaged(self):
+    """Event types are listable."""
+    self._MakeEventTypes(num_sources=2, num_event_types_per_source=3)
+    out = self.Run('events types list --platform=managed --region=us-central1')
+
+    self.operations.ListSourceCustomResourceDefinitions.assert_called_once()
+    self.assertEqual(out, self.event_types)
+    self.AssertOutputEquals(
+        """TYPE SOURCE DESCRIPTION
+           google.source.0.et.0 SourceKind0 desc00
+           google.source.0.et.1 SourceKind0 desc01
+           google.source.0.et.2 SourceKind0 desc02
+           google.source.1.et.0 SourceKind1 desc10
+           google.source.1.et.1 SourceKind1 desc11
+           google.source.1.et.2 SourceKind1 desc12
+        """,
+        normalize_space=True)

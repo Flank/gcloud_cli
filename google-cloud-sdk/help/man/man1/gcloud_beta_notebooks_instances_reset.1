@@ -17,7 +17,7 @@ gcloud beta notebooks instances reset \- request for resetting instances
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for reseting notbook instance.
+\fB(BETA)\fR Request for reseting notebook instances.
 
 
 
@@ -80,9 +80,8 @@ Run \fB$ gcloud help\fR for details.
 To reset an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances reset \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud beta notebooks instances reset example\-instance \e
+  \-\-location=us\-central1\-a
 .RE
 
 

@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha assured workloads - commands for reading and manipulating
+        Assured Workloads resources
+
+SYNOPSIS
+    gcloud alpha assured workloads COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create, read, update, list and delete Assured Workloads resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new Assured Workloads environment.
+
+     delete
+        (ALPHA) Delete Assured Workloads environment.
+
+     describe
+        (ALPHA) Describe Assured Workloads environment.
+
+     list
+        (ALPHA) List all Assured Workloads environments that belong to a given
+        parent organization.
+
+     update
+        (ALPHA) Update Assured Workloads environments.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta assured workloads
+

@@ -680,7 +680,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
   def testSourceFileErrorOnInvalidGCSPath(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        r'Invalid value for [source-uri]: must be a path to an object or a directory in Google Cloud Storage'
+        r'Invalid value for [source-uri]: must be a path to an object or a directory in Cloud Storage'
     ):
       self._RunFlags("""
                {0} --source-uri {1} --os {2}

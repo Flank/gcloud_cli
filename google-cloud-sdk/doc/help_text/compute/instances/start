@@ -6,8 +6,8 @@ SYNOPSIS
         [--async] [--csek-key-file=FILE] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances start is used to start a stopped Google Compute
-    Engine virtual machine. Only a stopped virtual machine can be started.
+    gcloud compute instances start is used to start a stopped Compute Engine
+    virtual machine. Only a stopped virtual machine can be started.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

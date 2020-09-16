@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances resume is used to resume a
-    previously suspended Google Compute Engine virtual machine.
+    previously suspended Compute Engine virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

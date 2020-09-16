@@ -18,30 +18,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.credentials import google_auth_credentials
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib import test_case
+from tests.lib.core.credentials import credentials_test_base
 
 import httplib2
-from oauth2client import client
 
 
 def _SetUp(self):
   properties.VALUES.core.account.Set('fakeuser')
-  self.fake_cred = client.OAuth2Credentials(
-      'access-token',
-      'client_id',
-      'client_secret',
-      'fake-token',
-      None,
-      'token_uri',
-      'user_agent',
-      scopes=config.CLOUDSDK_SCOPES)
-  store.Store(self.fake_cred)
+  fake_creds = self.MakeUserAccountCredentialsGoogleAuth()
+  fake_creds.token = 'access-token'
+  store.Store(fake_creds)
 
-  self.refresh_mock = self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
+  self.refresh_mock = self.StartObjectPatch(
+      google_auth_credentials.UserCredWithReauth, 'refresh')
   self.request_mock = self.StartObjectPatch(
       httplib2.Http, 'request', autospec=True)
   self.request_mock.return_value = (httplib2.Response({'status': 200}),
@@ -49,7 +43,8 @@ def _SetUp(self):
 
 
 # Use asset surface as an example, asset API supports project override
-class BillingProjectAPISupportsProjectOverride(cli_test_base.CliTestBase):
+class BillingProjectAPISupportsProjectOverride(
+    cli_test_base.CliTestBase, credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     _SetUp(self)
@@ -59,7 +54,7 @@ class BillingProjectAPISupportsProjectOverride(cli_test_base.CliTestBase):
     self.Run('asset export --project fake-project '
              '--output-path=gs://my-bucket/my-object '
              '--billing-project billing_project_in_flag')
-    project_override_header = self.request_mock.call_args[0][4][
+    project_override_header = self.request_mock.call_args[1]['headers'][
         b'X-Goog-User-Project']
     self.assertEqual(project_override_header, b'billing_project_in_flag')
 
@@ -76,14 +71,14 @@ class BillingProjectAPISupportsProjectOverride(cli_test_base.CliTestBase):
       properties.PersistProperty(properties.VALUES.billing.quota_project, None,
                                  properties.Scope.USER)
 
-    project_override_header = self.request_mock.call_args[0][4][
+    project_override_header = self.request_mock.call_args[1]['headers'][
         b'X-Goog-User-Project']
     self.assertEqual(project_override_header, b'billing_project_in_flag')
 
 
 # Use iot surface as an example, iot API does not support project override
 class BillingProjectAPIDoesNotSupportsProjectOverride(
-    cli_test_base.CliTestBase):
+    cli_test_base.CliTestBase, credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     _SetUp(self)
@@ -92,7 +87,7 @@ class BillingProjectAPIDoesNotSupportsProjectOverride(
 
     self.Run('iot registries list --region=us-central1 --project fake-project '
              '--billing-project billing_project_in_flag')
-    project_override_header = self.request_mock.call_args[0][4][
+    project_override_header = self.request_mock.call_args[1]['headers'][
         b'X-Goog-User-Project']
     self.assertEqual(project_override_header, b'billing_project_in_flag')
 
@@ -108,7 +103,7 @@ class BillingProjectAPIDoesNotSupportsProjectOverride(
       properties.PersistProperty(properties.VALUES.billing.quota_project, None,
                                  properties.Scope.USER)
 
-    project_override_header = self.request_mock.call_args[0][4][
+    project_override_header = self.request_mock.call_args[1]['headers'][
         b'X-Goog-User-Project']
     self.assertEqual(project_override_header, b'billing_project_in_flag')
 

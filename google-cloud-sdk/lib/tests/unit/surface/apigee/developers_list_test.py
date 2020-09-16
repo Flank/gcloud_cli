@@ -65,7 +65,8 @@ class DevelopersListTest(base.ApigeeSurfaceTest):
         body=json.dumps(second_response))
     self.RunApigee("developers list --organization=test-org --format=json")
     self.AssertJsonOutputMatches(
-        emails, "Must correctly splice a multi-part API response.")
+        developer_structures,
+        "Must correctly splice a multi-part API response.")
 
   def testEmptyResponse(self):
     self.AddHTTPResponse(
@@ -112,5 +113,5 @@ class DevelopersListTest(base.ApigeeSurfaceTest):
         body=json.dumps(self._canned_response))
     self.RunApigee("developers list --format=json --project=test-proj")
     self.AssertJsonOutputMatches(
-        ["bigboy@example.com", "littleman@example.com"],
+        self._canned_response["developer"],
         "Must return expected developers in proper order.")

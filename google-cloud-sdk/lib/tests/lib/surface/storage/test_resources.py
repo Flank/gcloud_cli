@@ -24,17 +24,19 @@ from googlecloudsdk.command_lib.storage import storage_url
 
 
 def get_bucket_resource(scheme, name):
+  url = storage_url.CloudUrl(scheme=scheme, bucket_name=name)
+  # TODO(b/167691513) Delete when refactors stop using Apitools for resources
+  # are complete.
   messages = apis.GetMessagesModule('storage', 'v1')
   metadata = messages.Bucket(name=name)
-  return resource_reference.BucketResource.from_gcs_metadata_object(
-      scheme, metadata)
+  return resource_reference.BucketResource(url, name, metadata=metadata)
 
 
-def get_object_resource(scheme, bucket, name):
+def get_object_resource(scheme, bucket, name, generation=None):
   messages = apis.GetMessagesModule('storage', 'v1')
   metadata = messages.Object(bucket=bucket, name=name)
-  return resource_reference.ObjectResource.from_gcs_metadata_object(
-      scheme, metadata)
+  url = storage_url.CloudUrl(scheme, bucket, name, generation)
+  return resource_reference.ObjectResource(url, metadata)
 
 
 def get_prefix_resource(scheme, bucket, prefix):
@@ -52,7 +54,44 @@ def get_file_directory_resource(path):
   return resource_reference.FileDirectoryResource(url)
 
 
-def get_unknown_resource(url_str):
-  url = storage_url.storage_url_from_string(url_str)
+def get_unknown_resource(url_string):
+  url = storage_url.storage_url_from_string(url_string)
   return resource_reference.UnknownResource(url)
 
+
+def from_url_string(url_string):
+  """Convert test resource URL to resource object. Do not use in production.
+
+  Do not use in production because terminating with a delimiter is not always
+  an accurate indicator of if a URL is a prefix. For example, a query for
+  "gs://bucket/dir" may have just forgotten the trailing "/".
+
+  Furthermore, different operating systems may have different ways to signal
+  filesystem paths point to directories.
+
+  Args:
+    url_string (str): Path to resource. Ex: "gs://bucket/hi" or "/bin/cat.png".
+
+  Returns:
+    resource.Resource subclass appropriate for URL.
+  """
+  parsed_url = storage_url.storage_url_from_string(url_string)
+
+  if isinstance(parsed_url, storage_url.FileUrl):
+    # See docstring.
+    if url_string.endswith(parsed_url.delimiter):
+      return get_file_directory_resource(url_string)
+    return get_file_object_resource(url_string)
+  # CloudUrl because it's not a FileUrl.
+  if parsed_url.is_bucket():
+    return get_bucket_resource(parsed_url.scheme, parsed_url.bucket_name)
+  if parsed_url.is_object() and not url_string.endswith(
+      storage_url.CloudUrl.CLOUD_URL_DELIM):
+    return get_object_resource(parsed_url.scheme, parsed_url.bucket_name,
+                               parsed_url.object_name)
+  # See docstring.
+  if parsed_url.is_object() and url_string.endswith(
+      storage_url.CloudUrl.CLOUD_URL_DELIM):
+    return get_prefix_resource(parsed_url.scheme, parsed_url.bucket_name,
+                               parsed_url.object_name)
+  return get_unknown_resource(url_string)

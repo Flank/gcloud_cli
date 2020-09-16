@@ -77,7 +77,7 @@ class ProductsListTest(base.ApigeeSurfaceTest):
         body=json.dumps(second_response))
     self.RunApigee("products list --organization=test-org --format=json")
     self.AssertJsonOutputMatches(
-        names, "Must correctly splice a multi-part API response.")
+        product_structures, "Must correctly splice a multi-part API response.")
 
   def testProjectFallback(self):
     self.AddHTTPResponse(
@@ -96,5 +96,5 @@ class ProductsListTest(base.ApigeeSurfaceTest):
         body=json.dumps(self._canned_response))
     self.RunApigee("products list --format=json --project=test-proj")
     self.AssertJsonOutputMatches(
-        ["gcloud-test3", "gcloud-test2", "gcloud-test1"],
+        self._canned_response["apiProduct"],
         "Must return expected products in proper order.")

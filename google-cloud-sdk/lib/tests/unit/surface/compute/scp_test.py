@@ -276,6 +276,23 @@ class ScpTest(ScpBaseTest):
         mock_matchers.TypeMatcher(ssh.SCPCommand),
         self.env, force_connect=True)
 
+  def testDisableForceConnect(self):
+    properties.VALUES.ssh.putty_force_connect.Set(False)
+    self.make_requests.side_effect = iter([
+        [self.instance],
+        [self.project_resource],
+    ])
+
+    self.Run("""\
+        compute scp
+          instance-1:~/remote-file
+          ~/local-dir --zone zone-1
+        """)
+
+    self.scp_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        self.env, force_connect=False)
+
   def testWithAlternateUser(self):
     project_resource = self.messages.Project(
         name='my-project',

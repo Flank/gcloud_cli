@@ -208,14 +208,6 @@ class CreateTestBase(object):
              '--config {} --origin gs://path/to/file '
              '--runtime-version 0.12'.format(module_name, yaml_path))
 
-  def testCreateMissingDeploymentUri(self, module_name):
-    with self.AssertRaisesExceptionMatches(
-        versions_util.InvalidArgumentCombinationError,
-        'Either `--origin` must be provided or `deploymentUri` must be '
-        'provided in the file given by `--config`.'):
-      self.Run(
-          '{} versions create versionId --model modelId'.format(module_name))
-
   def testCreate_LocalPathNoStagingBucket(self, module_name):
     """Tests an error from an invalid combination of flags."""
     with self.assertRaisesRegex(exceptions.Error,
@@ -335,6 +327,15 @@ class CreateGaTest(CreateTestBase, base.MlGaPlatformTestBase):
     super(CreateGaTest, self).SetUp()
     self.track = calliope_base.ReleaseTrack.GA
 
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateMissingDeploymentUri(self, module_name):
+    with self.AssertRaisesExceptionMatches(
+        versions_util.InvalidArgumentCombinationError,
+        'Either `--origin` must be provided or `deploymentUri` must be '
+        'provided in the file given by `--config`.'):
+      self.Run(
+          '{} versions create versionId --model modelId'.format(module_name))
+
 
 class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
 
@@ -435,81 +436,6 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
              '--origin gs://path/to/file '
              '--explanation-method xrai '
              '--num-integral-steps 42'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-
-class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
-
-  def SetUp(self):
-    super(CreateAlphaTest, self).SetUp()
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testPythonVersionFlag(self, module_name):
-    self._ExpectCreate(python_version='2.7')
-    self._ExpectOperationPolling()
-    self.Run(
-        '{} versions create versionId --model modelId '
-        '--origin gs://path/to/file --python-version 2.7'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testPythonVersionFromConfig(self, module_name):
-    yaml_contents = """\
-        description: dummy description
-        deploymentUri: gs://foo/bar
-        runtimeVersion: '1.0'
-        pythonVersion: '3.4'
-    """
-    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
-    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
-                       description='dummy description',
-                       python_version='3.4')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--config {}'.format(module_name, yaml_path))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateExplainabilityIntegratedGradients(self, module_name):
-    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
-    ig_config = self.msgs.GoogleCloudMlV1IntegratedGradientsAttribution()
-    ig_config.numIntegralSteps = 42
-    explain_config.integratedGradientsAttribution = ig_config
-    self._ExpectCreate(explain_config=explain_config)
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--explanation-method integrated-gradients '
-             '--num-integral-steps 42'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateExplainabilityXrai(self, module_name):
-    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
-    xrai_config = self.msgs.GoogleCloudMlV1XraiAttribution()
-    xrai_config.numIntegralSteps = 42
-    explain_config.xraiAttribution = xrai_config
-    self._ExpectCreate(explain_config=explain_config)
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--explanation-method xrai '
-             '--num-integral-steps 42'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateExplainabilitySamplingShap(self, module_name):
-    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
-    shap_config = self.msgs.GoogleCloudMlV1SampledShapleyAttribution()
-    shap_config.numPaths = 42
-    explain_config.sampledShapleyAttribution = shap_config
-    self._ExpectCreate(explain_config=explain_config)
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file '
-             '--explanation-method sampled-shapley '
-             '--num-paths 42'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
   @parameterized.parameters('ml-engine', 'ai-platform')
@@ -730,11 +656,8 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
         .format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
-  # Note: Since we inherit from the GA Base class, we need to override the
-  # original test to check for the new error message. This would be better
-  # named testCreateMissingDeploymentUriAndImage.
   @parameterized.parameters('ml-engine', 'ai-platform')
-  def testCreateMissingDeploymentUri(self, module_name):
+  def testCreateMissingDeploymentUriAndImage(self, module_name):
     with self.AssertRaisesExceptionMatches(
         versions_util.InvalidArgumentCombinationError,
         'Either `--origin`, `--image`, or equivalent parameters in a config '
@@ -752,6 +675,81 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
       self.Run(
           '{} versions create versionId --model modelId '
           '--command /bin/bash --args=--a,--b'.format(module_name))
+
+
+class CreateAlphaTest(CreateBetaTest, base.MlAlphaPlatformTestBase):
+
+  def SetUp(self):
+    super(CreateAlphaTest, self).SetUp()
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testPythonVersionFlag(self, module_name):
+    self._ExpectCreate(python_version='2.7')
+    self._ExpectOperationPolling()
+    self.Run(
+        '{} versions create versionId --model modelId '
+        '--origin gs://path/to/file --python-version 2.7'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testPythonVersionFromConfig(self, module_name):
+    yaml_contents = """\
+        description: dummy description
+        deploymentUri: gs://foo/bar
+        runtimeVersion: '1.0'
+        pythonVersion: '3.4'
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
+                       description='dummy description',
+                       python_version='3.4')
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--config {}'.format(module_name, yaml_path))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilityIntegratedGradients(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    ig_config = self.msgs.GoogleCloudMlV1IntegratedGradientsAttribution()
+    ig_config.numIntegralSteps = 42
+    explain_config.integratedGradientsAttribution = ig_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method integrated-gradients '
+             '--num-integral-steps 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilityXrai(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    xrai_config = self.msgs.GoogleCloudMlV1XraiAttribution()
+    xrai_config.numIntegralSteps = 42
+    explain_config.xraiAttribution = xrai_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method xrai '
+             '--num-integral-steps 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilitySamplingShap(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    shap_config = self.msgs.GoogleCloudMlV1SampledShapleyAttribution()
+    shap_config.numPaths = 42
+    explain_config.sampledShapleyAttribution = shap_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method sampled-shapley '
+             '--num-paths 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
 
 
 if __name__ == '__main__':

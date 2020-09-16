@@ -6,12 +6,12 @@ SYNOPSIS
         [--async] [--discard-local-ssd] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute instances suspend is used to suspend a Google
-    Compute Engine virtual machine. Suspending a VM is the equivalent of sleep
-    or standby mode: the guest receives an ACPI S3 suspend signal, after which
-    all VM state is saved to temporary storage. An instance can only be
-    suspended while it is in the RUNNING state. A suspended instance will be
-    put in SUSPENDED state.
+    (BETA) gcloud beta compute instances suspend is used to suspend a Compute
+    Engine virtual machine. Suspending a VM is the equivalent of sleep or
+    standby mode: the guest receives an ACPI S3 suspend signal, after which all
+    VM state is saved to temporary storage. An instance can only be suspended
+    while it is in the RUNNING state. A suspended instance will be put in
+    SUSPENDED state.
 
     Note: A suspended instance can be resumed by running the gcloud beta
     compute instances resume command.

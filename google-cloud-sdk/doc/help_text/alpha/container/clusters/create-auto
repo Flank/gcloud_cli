@@ -5,6 +5,7 @@ SYNOPSIS
     gcloud alpha container clusters create-auto NAME [--async]
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
+        [--cluster-version=CLUSTER_VERSION]
         [--create-subnetwork=[KEY=VALUE,...]] [--network=NETWORK]
         [--release-channel=CHANNEL] [--services-ipv4-cidr=CIDR]
         [--services-secondary-range-name=NAME] [--subnetwork=SUBNETWORK]
@@ -45,6 +46,15 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'. Cannot be used
         with --create-subnetwork.
+
+     --cluster-version=CLUSTER_VERSION
+        The Kubernetes version to use for the master and nodes. Defaults to
+        server-specified.
+
+        The default Kubernetes version is available using the following
+        command.
+
+            $ gcloud container get-server-config
 
      --create-subnetwork=[KEY=VALUE,...]
         Create a new subnetwork for the cluster. The name and range of the

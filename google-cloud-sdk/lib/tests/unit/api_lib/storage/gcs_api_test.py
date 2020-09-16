@@ -55,9 +55,7 @@ class CreateBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.gcs_client = gcs_api.GcsApi()
 
   def test_create_bucket(self):
-    self.bucket_reference = (
-        resource_reference.BucketResource.from_gcs_metadata_object(
-            cloud_api.ProviderPrefix.GCS.value, self.bucket))
+    expected_reference = gcs_api._BucketResourceFromMetadata(self.bucket)
     self.apitools_client.buckets.Insert.Expect(
         self.messages.StorageBucketsInsertRequest(
             bucket=self.bucket, project=TEST_PROJECT,
@@ -65,10 +63,7 @@ class CreateBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         response=self.bucket)
 
     bucket_reference = self.gcs_client.CreateBucket(self.bucket)
-    self.assertEqual(bucket_reference.metadata_object,
-                     self.bucket_reference.metadata_object)
-    self.assertEqual(bucket_reference.storage_url,
-                     self.bucket_reference.storage_url)
+    self.assertEqual(bucket_reference, expected_reference)
 
   def test_create_bucket_api_error(self):
     self.apitools_client.buckets.Insert.Expect(
@@ -212,13 +207,12 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.gcs_client = gcs_api.GcsApi()
 
   def test_list_buckets(self):
-    buckets = self.messages.Buckets(items=[self.messages.Bucket(name=name)
-                                           for name in self._BUCKET_NAMES])
+    buckets = [self.messages.Bucket(name=name)
+               for name in self._BUCKET_NAMES]
     self.apitools_client.buckets.List.Expect(
         self.messages.StorageBucketsListRequest(
             project=TEST_PROJECT, projection=self.default_projection),
-        response=buckets
-    )
+        response=self.messages.Buckets(items=buckets))
 
     names = [b.metadata_object.name for b in self.gcs_client.ListBuckets()]
     self.assertCountEqual(names, self._BUCKET_NAMES)
@@ -545,6 +539,18 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
         request, exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
+      self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT)
+
+  def test_get_object_metadata_not_found_error(self):
+    request = self.messages.StorageObjectsGetRequest(
+        bucket=TEST_BUCKET,
+        object=TEST_OBJECT,
+        projection=self.default_projection)
+    self.apitools_client.objects.Get.Expect(
+        request,
+        exception=apitools_exceptions.HttpNotFoundError(None, None, None))
+
+    with self.assertRaises(cloud_errors.NotFoundError):
       self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT)
 
   def test_get_object_metadata_generation(self):

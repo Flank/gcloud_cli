@@ -1,5 +1,5 @@
 title: Cloud API Gateway API Config Update
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -38,7 +38,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
           method: GET
           headers: {}
           body: null
@@ -58,7 +58,7 @@ actions:
             updateTime: '2020-03-02T22:50:01.113341054Z'
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=displayName
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=displayName
           method: PATCH
           headers: {}
           body:
@@ -81,7 +81,7 @@ actions:
             done: false
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/123456?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/operations/123456?alt=json
           method: GET
           headers: {}
           body: null
@@ -91,8 +91,8 @@ actions:
           body:
             done: true
             metadata:
-              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata
-              apiVersion: v1alpha1
+              '@type': type.googleapis.com/google.cloud.apigateway.v1beta.OperationMetadata
+              apiVersion: v1beta
               createTime: '2020-03-02T22:50:00.804508837Z'
               endTime: '2020-03-02T22:50:01.073670687Z'
               requestedCancellation: false
@@ -100,7 +100,7 @@ actions:
               verb: update
             name: projects/fake-project/locations/global/operations/123456
             response:
-              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig
+              '@type': type.googleapis.com/google.cloud.apigateway.v1beta.ApiConfig
               createTime: '2020-03-02T22:50:00.572479989Z'
               displayName: rev1
               gatewayConfig:
@@ -116,7 +116,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
           method: GET
           headers: {}
           body: null
@@ -141,7 +141,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
           method: GET
           headers: {}
           body: null
@@ -164,7 +164,7 @@ actions:
               another-lable: has one too
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=labels
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:
@@ -199,7 +199,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
           method: GET
           headers: {}
           body: null
@@ -222,7 +222,7 @@ actions:
               another-lable: has one too
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=labels
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:
@@ -260,7 +260,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json
           method: GET
           headers: {}
           body: null
@@ -284,7 +284,7 @@ actions:
               label1: some value
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=labels
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/test-api/configs/rev1?alt=json&updateMask=labels
           method: PATCH
           headers: {}
           body:

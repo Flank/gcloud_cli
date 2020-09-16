@@ -96,13 +96,6 @@ class GCEIntegrationTestGCPServices(cli_test_base.CliTestBase):
       self.Run('dns managed-zones list --project {} --account={}'.format(
           auth.Project(), auth.Account()))
 
-  # TODO(b/147255499): remove this test after everything is on google-auth.
-  @sdk_test_base.Filters.RunOnlyOnGCE
-  def testOauth2client(self):
-    with e2e_base.GceServiceAccount() as auth:
-      self.Run('compute instances list --project {} --account={}'.format(
-          auth.Project(), auth.Account()))
-
 
 if __name__ == '__main__':
   test_case.main()

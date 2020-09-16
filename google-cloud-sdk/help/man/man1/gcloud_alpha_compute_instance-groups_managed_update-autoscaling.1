@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed update\-autoscaling \- update auto
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-cpu\-utilization\-predictive\-method\fR=\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-clear\-scale\-in\-control\fR\ |\ \fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-cpu\-utilization\-predictive\-method\fR=\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-clear\-scale\-in\-control\fR\ |\ \fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-disable\-schedule\fR=\fIDISABLE_SCHEDULE\fR\ |\ \fB\-\-enable\-schedule\fR=\fIENABLE_SCHEDULE\fR\ |\ \fB\-\-remove\-schedule\fR=\fIREMOVE_SCHEDULE\fR\ |\ \fB\-\-set\-schedule\fR=\fISET_SCHEDULE\fR\ |\ \fB\-\-update\-schedule\fR=\fIUPDATE_SCHEDULE\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-schedule\-cron\fR=\fISCHEDULE_CRON\fR\ \fB\-\-schedule\-description\fR=\fISCHEDULE_DESCRIPTION\fR\ \fB\-\-schedule\-duration\-sec\fR=\fISCHEDULE_DURATION_SEC\fR\ \fB\-\-schedule\-min\-required\-replicas\fR=\fISCHEDULE_MIN_REQUIRED_REPLICAS\fR\ \fB\-\-schedule\-time\-zone\fR=\fISCHEDULE_TIME_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -76,6 +76,14 @@ the predicted peak.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR
+Maximum number of replicas Autoscaler will set.
+
+.TP 2m
+\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR
+Minimum number of replicas Autoscaler will set.
 
 .TP 2m
 \fB\-\-mode\fR=\fIMODE\fR
@@ -154,6 +162,50 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-disable\-schedule\fR=\fIDISABLE_SCHEDULE\fR
+A unique name of the scaling schedule to be disabled.
+
+When the scaling schedule is disabled its configuration persists but the scaling
+schedule itself never becomes active. If you disable a scaling schedule that is
+currently active the deleted scaling schedule will stop being effective
+immediately after it moves into DISABLED state. If this results in removing
+instances from MIG, the autoscaler will respect the 10\-minute stabilization
+period and if configured also scale\-in controls. This ensures you don't
+accidentally lose capacity immediately after the scaling schedule ends.
+
+.TP 2m
+\fB\-\-enable\-schedule\fR=\fIENABLE_SCHEDULE\fR
+A unique name of the scaling schedule to be enabled.
+
+.TP 2m
+\fB\-\-remove\-schedule\fR=\fIREMOVE_SCHEDULE\fR
+A unique name of the scaling schedule to be removed.
+
+Be careful with this action as scaling schedule deletion cannot be undone.
+
+You can delete any schedule regardless of its status. If you delete a scaling
+schedule that is currently active, the deleted scaling schedule will stop being
+effective immediately after it is deleted. If this results in removing instances
+from MIG, the autoscaler will respect the 10\-minute stabilization period and if
+configured also scale\-in controls. This ensures you don't accidentally lose
+capacity immediately after the scaling schedule ends.
+
+.TP 2m
+\fB\-\-set\-schedule\fR=\fISET_SCHEDULE\fR
+A unique name of the scaling schedule to be configured.
+
+.TP 2m
+\fB\-\-update\-schedule\fR=\fIUPDATE_SCHEDULE\fR
+A unique name of the scaling schedule to be updated.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-region\fR=\fIREGION\fR
 Region of the managed instance group to operate on. If not specified, you may be
 prompted to select a region.
@@ -181,8 +233,58 @@ $ gcloud compute zones list
 Overrides the default \fBcompute/zone\fR property value for this command
 invocation.
 
-
 .RE
+.sp
+.TP 2m
+\fB\-\-schedule\-cron\fR=\fISCHEDULE_CRON\fR
+Start time of the scaling schedule in cron format.
+
+This is when an autoscaler will start creating new VMs if MIG size is lower than
+the minimum number of instances. Set the start time to allow enough time for new
+VMs to boot and initialize. For example if your workload takes 10 minutes from
+VM creation to start serving then set start time 10 minutes earlier than the
+time you need VMs to be ready.
+
+.TP 2m
+\fB\-\-schedule\-description\fR=\fISCHEDULE_DESCRIPTION\fR
+A verbose description of the scaling schedule.
+
+.TP 2m
+\fB\-\-schedule\-duration\-sec\fR=\fISCHEDULE_DURATION_SEC\fR
+How long should the scaling schedule be active, measured in seconds.
+
+Minimum duration is 5 minutes. Scaling schedule is active from its start time
+and for configured duration. During this time autoscaler will scale MIG to have
+at least as many VMs as defined by the minimum number of instances. After
+specified duration if there is no need to maintain capacity, the autoscaler will
+start removing instances after a 10 minutes stabilization period and (if
+configured) following scale\-in controls.
+
+.TP 2m
+\fB\-\-schedule\-min\-required\-replicas\fR=\fISCHEDULE_MIN_REQUIRED_REPLICAS\fR
+How many VMs autoscaler should ensure for the duration of this scaling schedule.
+
+Autoscaler will provide at least this number of instances when the scaling
+schedule is active. MIG can have more VMs if there are other scaling schedules
+active with higher instance count or if autoscaling policy (for example on CPU)
+requires more instances to meet its target.
+
+This configuration does not change autoscaling minimum and maximum instance
+limits which are always in effect. Autoscaler will not create more than the
+maximum number of instances configured for MIG.
+
+.TP 2m
+\fB\-\-schedule\-time\-zone\fR=\fISCHEDULE_TIME_ZONE\fR
+Location of the scaling schedule's start time.
+
+It should be provided provided as a location from the IANA tz database (for
+example Europe/Paris). It will consider daylight saving time (DST) adjustments.
+If no time zone is provided UTC is used as a default.
+
+See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for the list of
+valid timezones.
+
+
 .RE
 .sp
 

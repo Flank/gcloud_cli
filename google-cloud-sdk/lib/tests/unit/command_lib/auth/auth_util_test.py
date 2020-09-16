@@ -31,8 +31,6 @@ from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib.core.credentials import credentials_test_base
 
-from google.auth import crypt as google_auth_crypt
-
 
 class TestAuthUtils(cli_test_base.CliTestBase,
                     credentials_test_base.CredentialsTestBase):
@@ -44,12 +42,7 @@ class TestAuthUtils(cli_test_base.CliTestBase,
                                              'PromptIfADCEnvVarIsSet')
     self.StartObjectPatch(
         config, 'ADCFilePath', return_value=self.adc_file_path)
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     self.StartObjectPatch(creds, 'GetQuotaProject', return_value='my project')
-
-    # Mocks the signer of google-auth credentials.
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
 
   def testWriteGcloudCredentialsToADC_UserCreds(self):
     auth_util.WriteGcloudCredentialsToADC(
@@ -245,7 +238,6 @@ class TestDumpAdcWithQuotaProject(cli_test_base.CliTestBase,
       auth_util.AddQuotaProjectToADC(self.fake_project)
 
   def testDumpADCRequiredQuotaProject_NotUserAccount(self):
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     creds.ADC(self.MakeServiceAccountCredentials()).DumpADCToFile()
     with self.AssertRaisesExceptionMatches(
         c_exc.BadFileException,

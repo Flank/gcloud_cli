@@ -1,5 +1,5 @@
 title: Cloud API Gateway API Config Delete without async
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -25,7 +25,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/apiName/configs/test-name?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/apiName/configs/test-name?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -38,7 +38,7 @@ actions:
             error: null
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/operations/123456789?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/us-central1/operations/123456789?alt=json
           method: GET
           headers: {}
           body: null

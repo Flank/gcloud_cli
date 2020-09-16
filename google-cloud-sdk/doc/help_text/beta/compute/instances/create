@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute instances create - create Google Compute Engine virtual
+    gcloud beta compute instances create - create Compute Engine virtual
         machine instances
 
 SYNOPSIS
@@ -50,7 +50,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances create facilitates the creation of
-    Google Compute Engine virtual machines.
+    Compute Engine virtual machines.
 
     When an instance is in RUNNING state and the system begins to boot, the
     instance creation is considered finished, and the command returns with a

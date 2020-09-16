@@ -1,0 +1,62 @@
+NAME
+    gcloud beta assured workloads update - update Assured Workloads
+        environments
+
+SYNOPSIS
+    gcloud beta assured workloads update RESOURCE
+        (--display-name=DISPLAY_NAME --labels=[KEY=VALUE,...]) [--etag=ETAG]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update a given Assured Workloads environment.
+
+POSITIONAL ARGUMENTS
+     RESOURCE
+        The Assured Workloads environment resource to update, in the form:
+        organizations/{ORG_ID}/locations/{LOCATION}/workloads/{WORKLOAD_ID}.
+
+REQUIRED FLAGS
+     Settings that can be updated on the Assured Workloads environment. At
+     least one of these must be specified:
+
+       --display-name=DISPLAY_NAME
+          The new display name of the Assured Workloads environment.
+
+       --labels=[KEY=VALUE,...]
+          The new labels of the Assured Workloads environment, for example,
+          LabelKey1=LabelValue1,LabelKey2=LabelValue2
+
+OPTIONAL FLAGS
+     --etag=ETAG
+        The etag acquired by reading the Assured Workloads environment before
+        updating.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update a given Assured Workloads environment in the us-central1 region,
+    belonging to an organization with ID 123, with workload ID 456 and an etag
+    of 789 with a new display name of 'Test-Workload-2' and a new set of labels
+    (including any required existing labels) of (key = 'ExistingLabelKey1',
+    value = 'ExistingLabelValue1') and (key = 'NewLabelKey2', value =
+    'NewLabelValue2'), run:
+
+        $ gcloud beta assured workloads update \
+            organizations/123/locations/us-central1/workloads/456 \
+            --display-name=Test-Workload-2 \
+            --labels \
+            ExistingLabelKey1=ExistingLabelValue1,\
+        NewLabelKey2=NewLabelValue2 --etag=789
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha assured workloads update
+

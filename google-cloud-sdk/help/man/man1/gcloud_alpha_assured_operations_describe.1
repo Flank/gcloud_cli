@@ -1,0 +1,69 @@
+
+.TH "GCLOUD_ALPHA_ASSURED_OPERATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha assured operations describe \- describe Assured Workloads operations
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha assured operations describe\fR \fIRESOURCE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Obtain details about a given Assured Workloads operation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIRESOURCE\fR
+The Assured Workloads operation resource to describe, for example,
+organizations/{ORG_ID}/locations/{LOCATION}/operations/{OPERATION_ID}.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an Assured Workloads operation in the us\-central1 region, belonging
+to an organization with ID 123, with workload ID 456, run:
+
+.RS 2m
+$ gcloud alpha assured operations describe \e
+    organizations/123/locations/us\-central1/operations/456
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta assured operations describe
+.RE
+

@@ -8,6 +8,7 @@ SYNOPSIS
         [--allow-route-overlap] [--async]
         [--autoscaling-profile=AUTOSCALING_PROFILE]
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY]
+        [--cloud-run-config=[load-balancer-type=EXTERNAL,...]]
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
@@ -18,7 +19,7 @@ SYNOPSIS
         [--disk-type=DISK_TYPE] [--enable-autorepair] [--no-enable-autoupgrade]
         [--enable-binauthz] [--enable-cloud-logging]
         [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
-        [--enable-dataplane-v2] [--enable-gvnic]
+        [--enable-dataplane-v2] [--enable-gke-oidc] [--enable-gvnic]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-logging-monitoring-system-only]
@@ -38,7 +39,9 @@ SYNOPSIS
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--node-labels=[NODE_LABEL,...]] [--node-taints=[NODE_TAINT,...]]
-        [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
+        [--node-version=NODE_VERSION]
+        [--notification-config=[pubsub=ENABLED|DISABLED,
+          pubsub-topic=TOPIC,...]] [--num-nodes=NUM_NODES; default=3]
         [--preemptible] [--release-channel=CHANNEL]
         [--security-group=SECURITY_GROUP] [--services-ipv4-cidr=CIDR]
         [--services-secondary-range-name=NAME]
@@ -51,7 +54,8 @@ SYNOPSIS
         [[--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
           | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY
-          : --autoprovisioning-locations=ZONE,[ZONE,...] --min-cpu=MIN_CPU
+          : --autoprovisioning-locations=ZONE,[ZONE,...]
+          --autoprovisioning-min-cpu-platform=PLATFORM --min-cpu=MIN_CPU
           --min-memory=MIN_MEMORY
           --autoprovisioning-max-surge-upgrade=AUTOPROVISIONING_MAX_SURGE_UPGRADE --autoprovisioning-max-unavailable-upgrade=AUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE --autoprovisioning-scopes=[SCOPE,
           ...]
@@ -142,6 +146,16 @@ FLAGS
         For more information about protecting resources with Cloud KMS Keys
         please see:
         https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+
+     --cloud-run-config=[load-balancer-type=EXTERNAL,...]
+        Configurations for Cloud Run addon, requires --addons=CloudRun for
+        create and --update-addons=CloudRun=ENABLED for update.
+
+         load-balancer-type
+            Optional Type of load-balancer-type EXTERNAL or INTERNAL Example:
+
+                $ gcloud beta container clusters create example-cluster \
+                    --cloud-run-config=load-balancer-type=INTERNAL
 
      --cluster-ipv4-cidr=CLUSTER_IPV4_CIDR
         The IP address range for the pods in this cluster in CIDR notation
@@ -246,8 +260,9 @@ FLAGS
             $ gcloud beta container clusters create example-cluster \
                 --enable-autorepair
 
-        Node autorepair is enabled by default for clusters using COS or
-        COS_CONTAINERD as a base image, use --no-enable-autorepair to disable.
+        Node autorepair is enabled by default for clusters using COS,
+        COS_CONTAINERD, UBUNTU or UBUNTU_CONTAINERD as a base image, use
+        --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
@@ -301,6 +316,16 @@ FLAGS
      --enable-dataplane-v2
         Enables the new eBPF dataplane for GKE clusters that is required for
         network security, scalability and visibility features.
+
+     --enable-gke-oidc
+        Enable GKE OIDC authentication on the cluster.
+
+        When enabled, users would be able to authenticate to Kubernetes cluster
+        after properly setting OIDC config.
+
+        GKE OIDC is by default disabled when creating a new cluster. To disable
+        GKE OIDC in an existing cluster, explicitly set flag
+        --no-enable-gke-oidc.
 
      --enable-gvnic
         Enable the use of GVNIC for this cluster. Requires re-creation of nodes
@@ -590,6 +615,22 @@ FLAGS
 
             $ gcloud container get-server-config
 
+     --notification-config=[pubsub=ENABLED|DISABLED,pubsub-topic=TOPIC,...]
+        The notification configuration of the cluster. GKE supports publishing
+        cluster upgrade notifications to any Pub/Sub topic you created in the
+        same project. Create a subscription for the topic specified to receive
+        notification messages. See https://cloud.google.com/pubsub/docs/admin
+        on how to manage Pub/Sub topics and subscriptions.
+
+        Example:
+
+            $ gcloud beta container clusters create example-cluster \
+              --notification-config=pubsub=ENABLED,pubsub-topic=projects/\
+            {project}/topics/{topic-name}
+
+        The project of the Pub/Sub topic must be the same one as the cluster.
+        It can be either the project ID or the project number.
+
      --num-nodes=NUM_NODES; default=3
         The number of nodes to be created in each of the cluster's zones.
 
@@ -693,7 +734,7 @@ FLAGS
         List of supported kubelet configs in 'kubeletConfig'.
 
           KEY                VALUE
-          cpuManagerPolicy   either 'static' or 'default'
+          cpuManagerPolicy   either 'static' or 'none'
           cpuCFSQuota        true or false (enabled by default)
           cpuCFSQuotaPeriod  interval (e.g., '100ms')
 
@@ -835,7 +876,9 @@ FLAGS
             cluster's node autoprovisioning configuration. Currently it
             contains a list of resource limits, identity defaults for
             autoprovisioning, node upgrade settings, node management settings,
-            minimum cpu platform, and node locations for autoprovisioning.
+            minimum cpu platform, node locations for autoprovisioning, disk
+            type and size configuration, shielded instance settings, and
+            customer-managed encryption keys settings.
 
             Resource limits are specified in the field 'resourceLimits'. Each
             resource limits definition contains three fields: resourceType,
@@ -878,6 +921,22 @@ FLAGS
             specified in the field 'autoprovisioningLocations'. All zones must
             be in the same region as the cluster's master(s).
 
+            Disk type and size are specified under the 'diskType' and
+            'diskSizeGb' fields, respectively. If specified, new
+            autoprovisioned nodes will be created with custom boot disks
+            configured by these settings.
+
+            Shielded instance settings are specified under the
+            'shieldedInstanceConfig' field, which has the following fields:
+            enableSecureBoot: A boolean field that indicates if secure boot is
+            enabled for autoprovisioned nodes. enableIntegrityMonitoring: A
+            boolean field that indicates if integrity monitoring is enabled for
+            autoprovisioned nodes.
+
+            Customer Managed Encryption Keys (CMEK) used by new
+            auto-provisioned node pools can be specified in the
+            'bootDiskKmsKey' field.
+
          Flags to configure autoprovisioned nodes
 
            --max-cpu=MAX_CPU
@@ -899,6 +958,10 @@ FLAGS
               autoprovisioning. All zones must be in the same region as the
               cluster's master(s). Multiple locations can be specified,
               separated by commas.
+
+           --autoprovisioning-min-cpu-platform=PLATFORM
+              If specified, new autoprovisioned nodes will be scheduled on host
+              with specified CPU architecture or a newer one.
 
            --min-cpu=MIN_CPU
               Minimum number of cores in the cluster.

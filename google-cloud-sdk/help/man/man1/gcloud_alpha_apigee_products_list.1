@@ -26,8 +26,8 @@ gcloud alpha apigee products list \- list Apigee API products
 .RS 2m
 .TP 2m
 
-Organization resource \- The Apigee organization whose products should be
-listed. This represents a Cloud resource.
+Organization resource \- Apigee organization whose products should be listed.
+This represents a Cloud resource.
 
 .RS 2m
 .TP 2m
@@ -98,11 +98,12 @@ To list all API products for the active Cloud Platform project, run:
 $ gcloud alpha apigee products list
 .RE
 
-To list all API products in an Apigee organization called \f5\fImy\-org\fR\fR,
-run:
+To get a JSON array of all the API products in an organization named
+\f5\fImy\-org\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha apigee products list \-\-organization=my\-org
+$ gcloud alpha apigee products list \-\-organization=my\-org \e
+  \-\-format=json
 .RE
 
 

@@ -63,9 +63,9 @@ class P4saUtilsTest(sdk_test_base.WithFakeAuth):
     mock_fn.assert_has_calls(
         [mock.call(self._PROJECT_ID, 'privateca.googleapis.com')])
 
-  @mock.patch.object(kms_iam, 'AddPolicyBindingToCryptoKey', autospec=True)
+  @mock.patch.object(kms_iam, 'AddPolicyBindingsToCryptoKey', autospec=True)
   @mock.patch.object(
-      storage_api.StorageClient, 'AddIamPolicyBinding', autospec=True)
+      storage_api.StorageClient, 'AddIamPolicyBindings', autospec=True)
   def testAddResourceRoleBindingsCallsIamFunctions(self, mock_storage_fn,
                                                    mock_kms_fn):
     p4sa_email = 'service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com'
@@ -74,14 +74,16 @@ class P4saUtilsTest(sdk_test_base.WithFakeAuth):
     p4sa.AddResourceRoleBindings(p4sa_email, self.key_ref, self.bucket_ref)
 
     mock_kms_fn.assert_has_calls([
-        mock.call(self.key_ref, iam_principal, 'roles/cloudkms.signerVerifier')
+        mock.call(self.key_ref,
+                  [(iam_principal, 'roles/cloudkms.signerVerifier'),
+                   (iam_principal, 'roles/viewer')]),
     ])
     mock_storage_fn.assert_has_calls([
         mock.call(
             mock.ANY,  # self
             self.bucket_ref,
-            iam_principal,
-            'roles/storage.objectAdmin')
+            [(iam_principal, 'roles/storage.objectAdmin'),
+             (iam_principal, 'roles/storage.legacyBucketReader')])
     ])
 
 

@@ -26,11 +26,23 @@ from googlecloudsdk.core.credentials import google_auth_credentials as c_google_
 from tests.lib import test_case
 
 from oauth2client import client
+from oauth2client import crypt
 import six
+
+from google.auth import crypt as google_auth_crypt
+from google.auth import jwt
 
 
 class CredentialsTestBase(test_case.Base):
   """A base class for tests of credentials."""
+
+  def SetUp(self):
+    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
+    self.StartObjectPatch(google_auth_crypt.RSASigner,
+                          'from_service_account_info')
+    self.StartObjectPatch(crypt, 'make_signed_jwt')
+    self.StartObjectPatch(jwt, 'encode', return_value=b'fake_assertion')
 
   # JSON representation for user credentials.
   USER_CREDENTIALS_JSON = textwrap.dedent("""\

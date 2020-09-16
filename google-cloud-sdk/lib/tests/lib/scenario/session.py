@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import abc
 import contextlib
 import enum
 import json
@@ -33,12 +34,16 @@ from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import config
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
+from googlecloudsdk.core.util import http_encoding
 from tests.lib.scenario import assertions
 from tests.lib.scenario import events as events_lib
 from tests.lib.scenario import reference_resolver
 
 import httplib2
 import mock
+import requests
+import six
+from six.moves import http_client as httplib
 
 _UX_TYPES = [ux.name for ux in console_io.UXElementType]
 _UX_RE = re.compile(r'^{{\"ux\": \"({})\"'.format('|'.join(_UX_TYPES)))
@@ -84,6 +89,77 @@ class StreamMocker(object):
     self.stdin_writer = stdin_writer
 
 
+class Transport(six.with_metaclass(abc.ABCMeta, object)):
+  """Transport for scenario test sessions."""
+
+  def __init__(self, orig_request_method):
+    self._orig_request_method = orig_request_method
+
+  @abc.abstractmethod
+  def RequestFromArgs(self, *args, **kwargs):
+    """Returns a Request object from the args used in a request call."""
+
+  @abc.abstractmethod
+  def ResponseFromTransportResponse(self, response):
+    """Returns a Response object from the transport's raw response."""
+
+  @abc.abstractmethod
+  def ResponseToTransportResponse(self):
+    """Converts a Response object to the response returned by the transport."""
+
+  def MakeRealRequest(self, self_, *args, **kwargs):
+    """Convenience for mocking during testing."""
+    transport_response = self._orig_request_method(self_, *args, **kwargs)
+    return self.ResponseFromTransportResponse(transport_response)
+
+
+class Httplib2Transport(Transport):
+  """httplib2 transport for scenario test sessions."""
+
+  def RequestFromArgs(self, uri, method='GET', body=None, headers=None,
+                      redirections=5, connection_type=None, **kwargs):
+    """Returns a Request object from the args used in a request call."""
+    del redirections, connection_type, kwargs  # Unused
+    return events_lib.Request(uri, method, headers, body)
+
+  def ResponseFromTransportResponse(self, response):
+    """Returns a Response object from the transport's raw response."""
+    info, content = response
+    headers = info.copy()
+    status = int(headers.pop('status', httplib.OK))
+    return events_lib.Response(status, headers, content.decode('utf-8'))
+
+  def ResponseToTransportResponse(self, response):
+    """Converts a Response object to the response returned by the transport."""
+    headers = response.headers.copy()
+    headers['status'] = response.status
+    return (httplib2.Response(headers), http_encoding.Encode(response.body))
+
+
+class RequestsTransport(Transport):
+  """requests transport for scenario test sessions."""
+
+  def RequestFromArgs(self, method, uri, headers=None, data=None, **kwargs):
+    """Returns a Request object from the args used in a request call."""
+    del kwargs  # Unused
+    # params is not used by apitools
+    return events_lib.Request(uri, method, headers or {}, data)
+
+  def ResponseFromTransportResponse(self, response):
+    """Returns a Response object from the transport's raw response."""
+    return events_lib.Response(response.status_code, response.headers,
+                               response.content.decode('utf-8'))
+
+  def ResponseToTransportResponse(self, response):
+    """Converts a Response object to the response returned by the transport."""
+    resp = requests.Response()
+    resp.status_code = response.status
+    resp.headers = response.headers
+    # pylint: disable=protected-access
+    resp._content = http_encoding.Encode(response.body)
+    return resp
+
+
 class Session(object):
   """Runs a scenario session and checks assertions."""
 
@@ -114,12 +190,18 @@ class Session(object):
     self._user_input_already_given = False
     self._exit_was_handled = False
 
-    self._orig_request_method = httplib2.Http.request
-    self._request_patch = mock.patch.object(
+    self._httplib2_patch = mock.patch.object(
         httplib2.Http,
         'request',
         autospec=True,
-        side_effect=self._HandleRequest)
+        side_effect=self._RequestHandler(
+            Httplib2Transport(httplib2.Http.request)))
+    self._requests_patch = mock.patch.object(
+        requests.Session,
+        'request',
+        autospec=True,
+        side_effect=self._RequestHandler(
+            RequestsTransport(requests.Session.request)))
     # pylint:disable=protected-access
     self._orig_batch_request_method = batch.BatchHttpRequest._Execute
     self._batch_request_patch = mock.patch.object(
@@ -249,30 +331,31 @@ class Session(object):
     self._InsertEvent(current_event)
     return current_event
 
-  def _HandleRequest(self, self_, *args, **kwargs):
-    """Mock http request function."""
-    request = events_lib.Request.FromRequestArgs(*args, **kwargs)
-    if self._processing_batch_request:
-      # When in batch mode, effectively unmock the http request method because
-      # we are intercepting elsewhere.
-      return self._MakeRealRequest(self_, *args, **kwargs).ToTransportResponse()
+  def _RequestHandler(self, transport):
+    """Returns a mock http request function."""
+    def _HandleRequest(self_, *args, **kwargs):
+      """Mock http request function."""
+      request = transport.RequestFromArgs(*args, **kwargs)
+      if self._processing_batch_request:
+        # When in batch mode, effectively unmock the http request method because
+        # we are intercepting elsewhere.
+        response = transport.MakeRealRequest(self_, *args, **kwargs)
+        return transport.ResponseToTransportResponse(response)
 
-    self._ProcessStdout()
-    self._ProcessStderr()
+      self._ProcessStdout()
+      self._ProcessStderr()
 
-    # These modes have a bunch in common, but it is clearer to split them than
-    # have a bunch of if/else switches.
-    if self._execution_mode == ExecutionMode.LOCAL:
-      return self._HandleRequestLocal(request).ToTransportResponse()
+      # These modes have a bunch in common, but it is clearer to split them than
+      # have a bunch of if/else switches.
+      if self._execution_mode == ExecutionMode.LOCAL:
+        response = self._HandleRequestLocal(request)
+        return transport.ResponseToTransportResponse(response)
 
-    # For remote mode, make the actual call and then process the result.
-    response = self._MakeRealRequest(self_, *args, **kwargs)
-    return self._HandleRequestRemote(request, response).ToTransportResponse()
-
-  def _MakeRealRequest(self, self_, *args, **kwargs):
-    """Convenience for mocking during testing."""
-    transport_response = self._orig_request_method(self_, *args, **kwargs)
-    return events_lib.Response.FromTransportResponse(transport_response)
+      # For remote mode, make the actual call and then process the result.
+      response = transport.MakeRealRequest(self_, *args, **kwargs)
+      processed_response = self._HandleRequestRemote(request, response)
+      return transport.ResponseToTransportResponse(processed_response)
+    return _HandleRequest
 
   def _HandleBatchRequest(self, self_, *args, **kwargs):
     """Mock apitools batch request.
@@ -311,14 +394,14 @@ class Session(object):
 
           # Construct and save the batch response for this request based on the
           # canned data we have saved.
-          response = http_wrapper.Response(headers, body,
-                                           self_._BatchHttpRequest__batch_url)
+          apitools_response = http_wrapper.Response(
+              headers, body, self_._BatchHttpRequest__batch_url)
           # Save the responses into to the tuple stored in the batch request
           # object. This code is the same as in BatchHttpRequest object
           # so the end result is a properly mocked out batch request.
           self_._BatchHttpRequest__request_response_handlers[key] = (
               self_._BatchHttpRequest__request_response_handlers[key]._replace(
-                  response=response))
+                  response=apitools_response))
       else:
         # In remote mode, we actually want to make the real call. Call the
         # underlying request method to execute the batch.
@@ -597,7 +680,8 @@ class Session(object):
     self._stderr_patch.start()
     self._stdin_patch.start()
     if not self._ignore_api_calls:
-      self._request_patch.start()
+      self._httplib2_patch.start()
+      self._requests_patch.start()
       self._batch_request_patch.start()
     self._file_writer_patch.start()
     self._binary_file_writer_patch.start()
@@ -612,7 +696,8 @@ class Session(object):
     self._stderr_patch.stop()
     self._stdin_patch.stop()
     if not self._ignore_api_calls:
-      self._request_patch.stop()
+      self._httplib2_patch.stop()
+      self._requests_patch.stop()
       self._batch_request_patch.stop()
     self._file_writer_patch.stop()
     self._binary_file_writer_patch.stop()

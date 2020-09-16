@@ -48,11 +48,10 @@ COMMANDS
     COMMAND is one of the following:
 
      add-access-config
-        (ALPHA) Create a Google Compute Engine virtual machine access
-        configuration.
+        (ALPHA) Create a Compute Engine virtual machine access configuration.
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding to a Google Compute Engine instance.
+        (ALPHA) Add IAM policy binding to a Compute Engine instance.
 
      add-labels
         (ALPHA) Add labels to Google Compute Engine virtual machine instances.
@@ -61,23 +60,23 @@ COMMANDS
         (ALPHA) Add or update instance metadata.
 
      add-resource-policies
-        (ALPHA) Add resource policies to Google Compute Engine VM instances.
+        (ALPHA) Add resource policies to Compute Engine VM instances.
 
      add-tags
-        (ALPHA) Add tags to Google Compute Engine virtual machine instances.
+        (ALPHA) Add tags to Compute Engine virtual machine instances.
 
      attach-disk
         (ALPHA) Attach a disk to an instance.
 
      create
-        (ALPHA) Create Google Compute Engine virtual machine instances.
+        (ALPHA) Create Compute Engine virtual machine instances.
 
      create-with-container
-        (ALPHA) Creates Google Compute engine virtual machine instances running
+        (ALPHA) Creates Compute Engine virtual machine instances running
         container images.
 
      delete
-        (ALPHA) Delete Google Compute Engine virtual machine instances.
+        (ALPHA) Delete Compute Engine virtual machine instances.
 
      delete-access-config
         (ALPHA) Delete an access configuration from a virtual machine network
@@ -97,17 +96,17 @@ COMMANDS
         (ALPHA) Get the Guest Attributes for a compute instance.
 
      get-iam-policy
-        (ALPHA) Get the IAM policy for a Google Compute Engine instance.
+        (ALPHA) Get the IAM policy for a Compute Engine instance.
 
      get-serial-port-output
         (ALPHA) Read output from a virtual machine instance's serial port.
 
      get-shielded-identity
-        (ALPHA) Get the Shielded identity for a Google Compute Engine instance.
+        (ALPHA) Get the Shielded identity for a Compute Engine instance.
 
      import
-        (ALPHA) Create Google Compute Engine virtual machine instances from
-        virtual appliance in OVA/OVF format.
+        (ALPHA) Create Compute Engine virtual machine instances from virtual
+        appliance in OVA/OVF format.
 
      list
         (ALPHA) List Google Compute Engine instances.
@@ -117,8 +116,7 @@ COMMANDS
         zones.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding from a Google Compute Engine
-        instance.
+        (ALPHA) Remove IAM policy binding from a Compute Engine instance.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine virtual machine
@@ -128,11 +126,10 @@ COMMANDS
         (ALPHA) Remove instance metadata.
 
      remove-resource-policies
-        (ALPHA) Remove resource policies to Google Compute Engine VM instances.
+        (ALPHA) Remove resource policies to Compute Engine VM instances.
 
      remove-tags
-        (ALPHA) Remove tags from Google Compute Engine virtual machine
-        instances.
+        (ALPHA) Remove tags from Compute Engine virtual machine instances.
 
      reset
         (ALPHA) Reset a virtual machine instance.
@@ -144,25 +141,23 @@ COMMANDS
         (ALPHA) Set auto-delete behavior for disks.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for a Google Compute Engine instance.
+        (ALPHA) Set IAM policy for a Compute Engine instance.
 
      set-machine-type
-        (ALPHA) Set machine type for Google Compute Engine virtual machines.
+        (ALPHA) Set machine type for Compute Engine virtual machines.
 
      set-min-cpu-platform
-        (ALPHA) (DEPRECATED) Set minimum CPU platform for Google Compute Engine
+        (ALPHA) (DEPRECATED) Set minimum CPU platform for Compute Engine
         virtual machines.
 
      set-name
-        (ALPHA) Set the name of a Google Compute Engine virtual machine.
+        (ALPHA) Set the name of a Compute Engine virtual machine.
 
      set-scheduling
-        (ALPHA) Set scheduling options for Google Compute Engine virtual
-        machines.
+        (ALPHA) Set scheduling options for Compute Engine virtual machines.
 
      set-scopes
-        (ALPHA) Set scopes and service account for a Google Compute Engine
-        instance.
+        (ALPHA) Set scopes and service account for a Compute Engine instance.
 
      simulate-maintenance-event
         (ALPHA) Simulate maintenance of virtual machine instances.
@@ -181,14 +176,13 @@ COMMANDS
         serial port and display it as it becomes available.
 
      update
-        (ALPHA) Update a Google Compute Engine virtual machine.
+        (ALPHA) Update a Compute Engine virtual machine.
 
      update-access-config
-        (ALPHA) Update a Google Compute Engine virtual machine access
-        configuration.
+        (ALPHA) Update a Compute Engine virtual machine access configuration.
 
      update-container
-        (ALPHA) Updates Google Compute engine virtual machine instances running
+        (ALPHA) Updates Compute Engine virtual machine instances running
         container images.
 
      update-from-file

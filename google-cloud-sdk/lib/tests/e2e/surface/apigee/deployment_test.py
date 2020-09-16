@@ -133,7 +133,7 @@ class DeploymentTest(base.ApigeeServiceAccountTest):
             self.RunApigee("products list --organization=%s --format=json" %
                            organization)
             prod_list = self.GetJsonOutput()
-            self.assertIn(product_name, prod_list)
+            self.assertIn({"name": product_name}, prod_list)
 
           finally:
             try:
@@ -144,7 +144,7 @@ class DeploymentTest(base.ApigeeServiceAccountTest):
               self.RunApigee("products list --organization=%s --format=json" %
                              organization)
               prod_list = self.GetJsonOutput()
-              self.assertNotIn(product_name, prod_list)
+              self.assertNotIn({"name": product_name}, prod_list)
             except errors.EntityNotFoundError:
               # If the product doesn't exist, there's nothing to be done.
               pass

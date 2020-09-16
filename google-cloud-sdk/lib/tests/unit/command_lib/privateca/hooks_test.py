@@ -29,6 +29,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
 import mock
+import six
 
 
 def GetCertificateAuthorityRef(relative_name):
@@ -68,8 +69,7 @@ class HookTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   @mock.patch.object(request_utils, 'GenerateRequestId')
   def testAddRequestIdHook(self, mock_request_utils):
     mock_request_utils.return_value = 'hooks_id'
-    request = self.messages.PrivatecaProjectsLocationsCertificateAuthoritiesDeleteRequest(
-    )
+    request = self.messages.ScheduleDeleteCertificateAuthorityRequest()
     hooks.AddRequestIdHook(None, None, request)
     self.assertEqual(request.requestId, 'hooks_id')
 
@@ -133,7 +133,7 @@ class ConvertCertificateLifetimeToIso8601Test(cli_test_base.CliTestBase):
     hooks.ConvertCertificateLifetimeToIso8601(cert_without_lifetimes, None)
 
   def testConvertAmountLessThanDays(self):
-    two_hours = str(2*60*60) + 's'
+    two_hours = six.text_type(2 * 60 * 60) + 's'
     modified = hooks.ConvertCertificateLifetimeToIso8601(
         self._GenerateCertificate(two_hours), None)
     self.assertEqual(modified.lifetime, 'PT2H')
@@ -141,7 +141,7 @@ class ConvertCertificateLifetimeToIso8601Test(cli_test_base.CliTestBase):
         modified.certificateDescription.subjectDescription.lifetime, 'PT2H')
 
   def testConvertAmountInDays(self):
-    thirty_days = str(30*24*60*60) + 's'
+    thirty_days = six.text_type(30 * 24 * 60 * 60) + 's'
     modified = hooks.ConvertCertificateLifetimeToIso8601(
         self._GenerateCertificate(thirty_days), None)
     self.assertEqual(modified.lifetime, 'P30D')
@@ -149,10 +149,10 @@ class ConvertCertificateLifetimeToIso8601Test(cli_test_base.CliTestBase):
         modified.certificateDescription.subjectDescription.lifetime, 'P30D')
 
   def testConvertAmountInTwoUnits(self):
-    thirty_days_and_two_hours = str(30*24*60*60 + 2*60*60) + 's'
+    thirty_days_and_two_hours = six.text_type(30 * 24 * 60 * 60 +
+                                              2 * 60 * 60) + 's'
     modified = hooks.ConvertCertificateLifetimeToIso8601(
         self._GenerateCertificate(thirty_days_and_two_hours), None)
     self.assertEqual(modified.lifetime, 'P30DT2H')
     self.assertEqual(
         modified.certificateDescription.subjectDescription.lifetime, 'P30DT2H')
-

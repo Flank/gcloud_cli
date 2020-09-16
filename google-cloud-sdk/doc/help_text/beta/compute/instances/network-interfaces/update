@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute instances network-interfaces update - update a Google
-        Compute Engine virtual machine network interface
+    gcloud beta compute instances network-interfaces update - update a Compute
+        Engine virtual machine network interface
 
 SYNOPSIS
     gcloud beta compute instances network-interfaces update INSTANCE_NAME
@@ -11,7 +11,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances network-interfaces update updates
-    network interfaces of a Google Compute Engine virtual machine. For example:
+    network interfaces of a Compute Engine virtual machine. For example:
 
         $ gcloud beta compute instances network-interfaces update \
             example-instance --zone us-central1-a --aliases r1:172.16.0.1/32

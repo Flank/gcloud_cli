@@ -135,14 +135,15 @@ class UtilTest(base.EventsBase):
     self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
     self._MakeSource(self.source_crds[0])
     self._MakeTrigger(self.source, self.event_types[0])
+
     expected = resources.REGISTRY.Parse(
         'source-for-my-trigger',
         params={'namespacesId': 'source-namespace'},
-        collection='run.namespaces.cloudpubsubsources',
+        collection='anthosevents.namespaces.cloudpubsubsources',
         api_version=self.api_version)
     self.assertEqual((expected, self.source_crds[0]),
                      util.GetSourceRefAndCrdForTrigger(self.trigger,
-                                                       self.source_crds, False))
+                                                       self.source_crds, True))
 
   def testValidateTriggerSucceeds(self):
     self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)

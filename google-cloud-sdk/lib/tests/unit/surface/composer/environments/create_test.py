@@ -666,6 +666,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
 
   def testAirflowVersion_SuccessfulAsyncCreate(self):
     """Test that creating an environment with an airflow version works."""
+    print('running with', self.track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     software_config = self.messages.SoftwareConfig(
@@ -1377,40 +1378,16 @@ class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
   def testSuccessfulPrivateIpEnvironmentCreation(self):
-    # Call GA version, since Web Server ACL is only available in beta.
-    self.successfulPrivateIpEnvironmentCreationGa()
+    # Call beta version, since Web Server ACL is only available in beta.
+    self.successfulPrivateIpEnvironmentCreationBeta()
 
   def testPrivateIpEnvironmentCreationWithOptions(self):
-    # Call GA version, since Web Server ACL is only available in beta.
-    self.privateIpEnvironmentCreationWithOptionsGa()
-
-  def testPrivateIpEnvironmentCreationWithWebServerAndCloudSqlRanges(self):
-    # Feature available only in beta.
-    pass
-
-  def testPrivateIPEnvironmentFlagPrerequisitesWebServerCloudSqlRanges(self):
-    # Feature available only in beta.
-    pass
-
-  def testWebServerAccessControl(self):
-    # Feature available only in beta.
-    pass
-
-  def testWebServerAccessControlFormatValidation(self):
-    # Feature available only in beta.
-    pass
-
-  def testPrivateIPEnvironmentWebServerAccessControlRequirement(self):
-    # Feature available only in beta.
-    pass
+    # Call beta version, since Web Server ACL is only available in beta.
+    self.privateIpEnvironmentCreationWithOptionsBeta()
 
   def testIpAliasEnvironmentFlagPrerequisiteForPrivateIp(self):
-    # Call GA version, since Web Server ACL is only available in beta.
-    self.ipAliasEnvironmentFlagPrerequisiteForPrivateIpGa()
-
-  def testWebServerAccessControlExclusiveFlags(self):
-    # Feature available only in beta.
-    pass
+    # Call beta version, since Web Server ACL is only available in beta.
+    self.ipAliasEnvironmentFlagPrerequisiteForPrivateIpBeta()
 
   def testSuccessfulCreationWithSyntacticallyCorrectKmsKey(self):
     """Tests that creation succeedes with a properly formatted KMS key."""

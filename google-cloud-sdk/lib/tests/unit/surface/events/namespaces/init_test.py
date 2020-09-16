@@ -21,24 +21,24 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from tests.lib import cli_test_base
 from tests.lib.surface.events import base
 
 
-class InitTestAlphaAnthos(base.EventsBase):
+class InitTestBeta(base.EventsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_name = 'anthosevents'
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.operations.CreateOrReplaceSourcesSecret.return_value = (None)
 
   def testNamespaceInitFailNonGke(self):
-    """This command is for anthos only."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events namespaces init --copy-default-secret')
+    """This command is for Anthos only."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run(
+          'events namespaces init --platform=managed --copy-default-secret')
 
   def testRequireDefaultFlag(self):
     """Test command requires copy-default-secret flag."""
@@ -48,8 +48,18 @@ class InitTestAlphaAnthos(base.EventsBase):
 
   def testNamespaceInitSuccess(self):
     """Tests successful namespaces init."""
-    self.Run(
-        'events namespaces init --platform=gke '
-        '--cluster=cluster-1 --cluster-location=us-central1-a --copy-default-secret'
-    )
+    self.Run('events namespaces init --platform=gke --cluster=cluster-1 '
+             '--cluster-location=us-central1-a --copy-default-secret')
     self.AssertErrContains('Initialized namespace')
+
+
+class InitTestAlpha(InitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testNamespaceInitFailNonGke(self):
+    """This command is for anthos only."""
+    with self.assertRaises(exceptions.UnsupportedArgumentError):
+      self.Run('events namespaces init --platform=managed '
+               '--copy-default-secret')

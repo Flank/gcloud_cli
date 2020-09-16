@@ -29,7 +29,7 @@ from tests.lib.surface.sql import base
 class _BaseInstancesExportSqlTest(object):
   # pylint:disable=g-tzinfo-datetime
 
-  def _ExpectExport(self, databases=None, tables=None):
+  def _ExpectExport(self, databases=None, tables=None, offload=False):
     # Generate SQL export context.
     export_context = self.messages.ExportContext(
         csvExportOptions=None,
@@ -41,6 +41,7 @@ class _BaseInstancesExportSqlTest(object):
             tables=tables or [],
         ),
         uri='gs://speckletest/testinstance.gz',
+        offload=offload,
     )
 
     # Mock out endpoints for export.
@@ -149,6 +150,11 @@ class _BaseInstancesExportSqlTest(object):
     self._ExpectExport(tables=['table1', 'table2'], databases=['db1', 'db2'])
     self.Run('sql export sql testinstance --database=db1,db2 '
              '--table=table1,table2 gs://speckletest/testinstance.gz')
+
+  def testExportWithOffload(self):
+    self._ExpectExport(offload=True)
+    self.Run('sql export sql testinstance gs://speckletest/testinstance.gz '
+             '--offload')
 
 
 class InstancesExportSqlGATest(_BaseInstancesExportSqlTest, base.SqlMockTestGA):

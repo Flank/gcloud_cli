@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute instances remove-resource-policies - remove resource
-        policies to Google Compute Engine VM instances
+        policies to Compute Engine VM instances
 
 SYNOPSIS
     gcloud alpha compute instances remove-resource-policies INSTANCE_NAME
@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances remove-resource-policies removes
-    resource policies from Google Compute Engine virtual instances.
+    resource policies from Compute Engine virtual instances.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

@@ -1,0 +1,69 @@
+
+.TH "GCLOUD_BETA_ASSURED_WORKLOADS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta assured workloads describe \- describe Assured Workloads environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta assured workloads describe\fR \fIRESOURCE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Obtain details about a given Assured Workloads environment.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIRESOURCE\fR
+The Assured Workloads resource to describe, for example,
+organizations/{ORG_ID}/locations/{LOCATION}/workloads/{WORKLOAD_ID}.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an Assured Workloads environment in the us\-central1 region,
+belonging to an organization with ID 123, with workload ID 456 and an etag of
+789, run:
+
+
+.RS 2m
+$ gcloud beta assured workloads describe \e
+    organizations/123/locations/us\-central1/workloads/456
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha assured workloads describe
+.RE
+

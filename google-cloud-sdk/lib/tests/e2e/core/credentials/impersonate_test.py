@@ -23,13 +23,6 @@ from tests.lib import e2e_base
 
 class TestServiceAccountImpersonation(cli_test_base.CliTestBase):
 
-  # TODO(b/147255499): remove this test after everything is on google-auth.
-  def testOauth2client(self):
-    with e2e_base.ImpersonationAccountAuth():
-      self.Run('compute instances list')
-    self.AssertErrContains(
-        'This command is using service account impersonation')
-
   def testGoogleAuth(self):
     with e2e_base.ImpersonationAccountAuth():
       # dns surface is on google-auth

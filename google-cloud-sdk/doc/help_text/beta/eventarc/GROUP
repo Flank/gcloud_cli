@@ -18,6 +18,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     attributes
+        (BETA) Explore CloudEvents attributes in Eventarc.
+
      triggers
         (BETA) Manage Eventarc triggers.
 

@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instances remove-tags - remove tags from Google
-        Compute Engine virtual machine instances
+    gcloud alpha compute instances remove-tags - remove tags from Compute
+        Engine virtual machine instances
 
 SYNOPSIS
     gcloud alpha compute instances remove-tags INSTANCE_NAME
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances remove-tags is used to remove tags
-    from Google Compute Engine virtual machine instances.
+    from Compute Engine virtual machine instances.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

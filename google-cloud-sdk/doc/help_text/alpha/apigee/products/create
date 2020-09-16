@@ -16,15 +16,18 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Create an Apigee API product.
 
-    An API product is a collection of API resources combined with quota
-    settings and metadata, used to deliver customized and productized API
-    bundles to the developer community. Call this after the API resources to be
-    collected have already been deployed to a public-facing environment.
+    gcloud alpha apigee products create publishes a collection of API proxy
+    resources as an API product.
+
+    API products combine their underlying API proxies with quota settings and
+    metadata, to deliver customized and productized API bundles to the
+    developer community.
 
     API products enable the repackaging of APIs on-the-fly, without having to
     do any additional coding or configuration. Apigee recommends starting with
     a simple API product including only required elements, and then
-    provisioning credentials to apps to enable them to start testing your APIs.
+    provisioning credentials to apps to enable them to start testing those
+    APIs.
 
     At minimum, a new API product requires an internal name, access policy, and
     declaration of what environments and API proxies to include in the product.
@@ -32,7 +35,7 @@ DESCRIPTION
     values, and non-interactive calls will fail.
 
 POSITIONAL ARGUMENTS
-     API product resource - The API product to be created. Characters in a
+     API product resource - API product to be created. Characters in a
      product's internal name are restricted to: A-Za-z0-9._-$ %. The arguments
      in this group can be used to specify the attributes of this resource.
 
@@ -52,11 +55,11 @@ FLAGS
         can be specified.
 
      --description=DESCRIPTION
-        An overview of the API product. Include key information about the API
+        Overview of the API product. Include key information about the API
         product that is not captured by other fields.
 
      --display-name=DISPLAY_NAME
-        The name to be displayed in the UI or developer portal to developers
+        Name to be displayed in the UI or developer portal to developers
         registering for API access.
 
      --manual-approval
@@ -78,9 +81,15 @@ FLAGS
           Environments to which the API product is bound. Requests to
           environments that are not listed are rejected, preventing developers
           from accessing those resources through API Proxies deployed in
-          another environment. For example, this can prevent resources
-          associated with API proxies in prod from being accessed by API
-          proxies deployed in test.
+          another environment.
+
+          For example, this can prevent resources associated with API proxies
+          in a prod environment from also granting access to matching API
+          proxies deployed in a test environment.
+
+          To get a list of available environments, run:
+
+              $ gcloud alpha apigee environments list
 
      Arguments specifying which API proxies and resources to expose. At most
      one of these may be specified:
@@ -97,11 +106,18 @@ FLAGS
             bound. Only those API proxies will be accessible through the new
             API product.
 
-            If not specified, all deployed API proxies will be included in the
+            If not provided, all deployed API proxies will be included in the
             product, so long as they match the other parameters.
 
             The API proxy names must already be deployed to the bound
-            environments, or creation of the API product will fail.
+            environments, or creation of the API product will fail. To get a
+            list of deployed API proxies, run:
+
+                $ gcloud alpha apigee deployments list
+
+            To deploy an API proxy, run:
+
+                $ gcloud alpha apigee apis deploy
 
          --resources=RESOURCE#[RESOURCE#...]
             API resources to be bundled in the API product, separated by #
@@ -129,8 +145,11 @@ FLAGS
             /v1/weatherapikey/forecastrss, /v1/weatherapikey/region/CA, and so
             on.
 
-            If not specified, all deployed API resources will be included in
-            the product, so long as they match the other parameters.
+            If not provided, all deployed API resources will be included in the
+            product, so long as they match the other parameters.
+
+            The API proxy resources must already be deployed to the bound
+            environments, or creation of the API product will fail.
 
      At most one of these may be specified:
 
@@ -149,19 +168,31 @@ FLAGS
      following:
 
        --quota=QUOTA
-          The number of request messages permitted per app by this API product
-          for the specified --quota-interval and --quota-unit.
+          Number of request messages permitted per app by this API product for
+          the specified --quota-interval and --quota-unit.
 
-          For example, --quota=50 --quota-interval=12 --quota-unit=hour means
-          50 requests are allowed every 12 hours.
+          For example, to create an API product that allows 50 requests every
+          twelve hours to every deployed API proxy, run:
+
+              $ gcloud alpha apigee products create PRODUCT --all-environments \
+                --all-proxies --public-access --quota=50 --quota-interval=12 \
+                --quota-unit=hour
+
+          If specified, --quota-interval and --quota-unit must be specified
+          too.
 
        --quota-interval=QUOTA_INTERVAL
-          The time interval over which the number of request messages is
+          Time interval over which the number of request messages is
           calculated.
 
+          If specified, --quota and --quota-unit must be specified too.
+
        --quota-unit=QUOTA_UNIT
-          The time unit for --quota-interval. QUOTA_UNIT must be one of:
-          minute, hour, day, month.
+          Time unit for --quota-interval.
+
+          If specified, --quota and --quota-interval must be specified too.
+
+          QUOTA_UNIT must be one of: minute, hour, day, month.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -183,6 +214,24 @@ EXAMPLES
         $ gcloud alpha apigee products create kitchen-sink \
           --environments=prod --all-proxies --public-access
 
+    To require manual approval of developers before they can access the new API
+    product, run:
+
+        $ gcloud alpha apigee products create kitchen-sink \
+          --environments=prod --all-proxies --public-access \
+          --manual-approval
+
+    To hide the new API product while still making it accessible to developers,
+    run:
+
+        $ gcloud alpha apigee products create kitchen-sink \
+          --environments=prod --all-proxies --private-access
+
+    To restrict the new API product to internal users only, run:
+
+        $ gcloud alpha apigee products create kitchen-sink \
+          --environments=prod --all-proxies --internal-access
+
     To expose all API proxies that are deployed to a URI fragment beginning
     with /v1 or /v0, run:
 
@@ -203,29 +252,11 @@ EXAMPLES
           --resources="/v0/**#/v1/**" --public-access
 
     To impose a quota of 50 calls per half-hour on a new all-inclusive API
-    product, run:
+    product, and output the new API product as a JSON object, run:
 
         $ gcloud alpha apigee products create kitchen-sink \
           --environments=prod --all-proxies --public-access --quota=50 \
-          --quota-interval=30 --quota-unit=minute
-
-    To require manual approval of developers before they can access the new API
-    product, run:
-
-        $ gcloud alpha apigee products create kitchen-sink \
-          --environments=prod --all-proxies --public-access \
-          --manual-approval
-
-    To hide the new API product while still making it accessible to developers,
-    run:
-
-        $ gcloud alpha apigee products create kitchen-sink \
-          --environments=prod --all-proxies --private-access
-
-    To restrict the new API product to internal users only, run:
-
-        $ gcloud alpha apigee products create kitchen-sink \
-          --environments=prod --all-proxies --internal-access
+          --quota-interval=30 --quota-unit=minute --format=json
 
     To specify a human-friendly display name and description for the product,
     run:

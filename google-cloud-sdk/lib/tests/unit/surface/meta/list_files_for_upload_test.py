@@ -212,14 +212,6 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
   def testSameResultsAsGit(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
-  # The version of Git used in our .deb and .rpm packaging tests don't conform
-  # to https://git-scm.com/docs/gitignore.
-  #
-  # In particular, with a file called '\t\t' and a line '\t\t ' in .gitignore,
-  # they *do* upload the file. They should not, because trailing *spaces* should
-  # be stripped, but other trailing whitespaces should not.
-  @test_case.Filters.DoNotRunInDebPackage('DEB git doesn\'t follow spec.')
-  @test_case.Filters.DoNotRunInRpmPackage('RPM git doesn\'t follow spec.')
   @parameterized.named_parameters(
       T('TrailingSpaces',
         _CombineFormats(

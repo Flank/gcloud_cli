@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute instances set-scopes - set scopes and service account
-        for a Google Compute Engine instance
+        for a Compute Engine instance
 
 SYNOPSIS
     gcloud alpha compute instances set-scopes INSTANCE_NAME [--zone=ZONE]
@@ -9,8 +9,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Set scopes and service account for a Google Compute Engine
-    instance.
+    (ALPHA) Set scopes and service account for a Compute Engine instance.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

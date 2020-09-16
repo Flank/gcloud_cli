@@ -14,8 +14,6 @@
 # limitations under the License.
 """Tests for the instance-groups managed set-autoscaling subcommand."""
 
-# TODO(b/140557440) Break up file to prevent linter deadline.
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -1431,6 +1429,97 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
     self.CheckRequests(self.managed_instance_group_get_request,
                        self.autoscalers_list_request,
                        [(self.compute.autoscalers, 'Update', request)])
+
+  def testInsertAutoscaler_ScheduledScaling_MissingRequired(self):
+    self.make_requests.side_effect = iter([
+        [self.INSTANCE_GROUP_MANAGERS[0]],  # Get IGM.
+        test_resources.MakeAutoscalers('alpha'),
+        []  # Insert autoscaler.
+    ])
+    with self.assertRaises(managed_instance_groups_utils.InvalidArgumentError):
+      self.Run('compute instance-groups managed set-autoscaling group-1 '
+               '--max-num-replicas 10 --zone zone-1 '
+               '--set-schedule test-sbs-1 '
+               '--schedule-cron "30 6 * * Mon-Fri" '
+               '--schedule-time-zone "America/New_York" '
+               '--schedule-min-required-replicas 10 '
+               '--schedule-description "description"')
+
+  def testInsertAutoscaler_ScheduledScaling(self):
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 '
+             '--set-schedule test-sbs-1 '
+             '--schedule-cron "30 6 * * Mon-Fri" '
+             '--schedule-duration-sec 3600 '
+             '--schedule-time-zone "America/New_York" '
+             '--schedule-min-required-replicas 10 '
+             '--schedule-description "description"')
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    schedule='30 6 * * Mon-Fri',
+                    durationSec=3600,
+                    timeZone='America/New_York',
+                    minRequiredReplicas=10,
+                    description='description'))])
+    request = self.messages.ComputeAutoscalersInsertRequest(
+        autoscaler=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[],
+                maxNumReplicas=10,
+                scalingSchedules=schedules),
+            name='group-1-aaaa',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Insert', request)],
+    )
+
+  def testInsertAutoscaler_ScheduledScaling_MissingOptional(self):
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 '
+             '--set-schedule test-sbs-1 '
+             '--schedule-cron "30 6 * * Mon-Fri" '
+             '--schedule-duration-sec 3600 '
+             '--schedule-time-zone "America/New_York" '
+             '--schedule-min-required-replicas 10 ')
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    schedule='30 6 * * Mon-Fri',
+                    durationSec=3600,
+                    timeZone='America/New_York',
+                    minRequiredReplicas=10))])
+    request = self.messages.ComputeAutoscalersInsertRequest(
+        autoscaler=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[],
+                maxNumReplicas=10,
+                scalingSchedules=schedules),
+            name='group-1-aaaa',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Insert', request)],
+    )
 
 
 if __name__ == '__main__':

@@ -13,9 +13,10 @@ DESCRIPTION
     information.
 
 POSITIONAL ARGUMENTS
-     Application resource - The application to be described. The arguments in
-     this group can be used to specify the attributes of this resource. This
-     must be specified.
+     Application resource - Application to be described. To get a list of
+     available applications, run gcloud alpha apigee applications list. The
+     arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
 
        APPLICATION
           ID of the application or fully qualified identifier for the
@@ -41,10 +42,12 @@ EXAMPLES
         $ gcloud alpha apigee applications describe \
           46d6151e-0000-4dfa-b9c7-c03b8b58bb2f
 
-    To describe that application in the Apigee organization my-org, run:
+    To describe that application in the Apigee organization my-org, formatted
+    as a JSON object, run:
 
         $ gcloud alpha apigee applications describe \
-          46d6151e-0000-4dfa-b9c7-c03b8b58bb2f --organization=my-org
+          46d6151e-0000-4dfa-b9c7-c03b8b58bb2f --organization=my-org \
+          --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

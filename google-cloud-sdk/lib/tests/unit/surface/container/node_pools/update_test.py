@@ -70,14 +70,6 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self.assertEqual(result.management.autoRepair, True)
     self.assertEqual(result.management.autoUpgrade, None)
 
-    self.AssertErrContains("""This will enable the autorepair feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
-information on node autorepairs.
-{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
-Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}/clusters/my-cluster/nodePools/my-pool].
-""".format(self.API_VERSION, location))
-
   def testRegionalEnableAutoRepair(self):
     self._TestEnableAutoRepair(self.REGION)
 
@@ -106,13 +98,6 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}
     self.assertEqual(result.name, pool.name)
     self.assertEqual(result.management.autoRepair, False)
     self.assertEqual(result.management.autoUpgrade, True)
-    self.AssertErrContains("""This will disable the autorepair feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
-information on node autorepairs.
-{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
-Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
-""".format(self.API_VERSION))
 
   def testEnableAutoUpgrade(self):
     pool_kwargs = {

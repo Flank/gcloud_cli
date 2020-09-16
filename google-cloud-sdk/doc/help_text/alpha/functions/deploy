@@ -9,6 +9,10 @@ SYNOPSIS
         [--runtime=RUNTIME] [--service-account=SERVICE_ACCOUNT]
         [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
         [--update-labels=[KEY=VALUE,...]]
+        [--build-env-vars-file=FILE_PATH | --clear-build-env-vars
+          | --set-build-env-vars=[KEY=VALUE,...]
+          | --remove-build-env-vars=[KEY,...]
+          --update-build-env-vars=[KEY=VALUE,...]]
         [--build-worker-pool=BUILD_WORKER_POOL | --clear-build-worker-pool]
         [--clear-env-vars | --env-vars-file=FILE_PATH
           | --set-env-vars=[KEY=VALUE,...]
@@ -197,6 +201,30 @@ FLAGS
 
         Label keys starting with deployment are reserved for use by deployment
         tools and cannot be specified manually.
+
+     At most one of these may be specified:
+
+       --build-env-vars-file=FILE_PATH
+          Path to a local YAML file with definitions for all Build environment
+          variables. All existing Build environment variables will be removed
+          before the new Build environment variables are added.
+
+       --clear-build-env-vars
+          Remove all Build environment variables.
+
+       --set-build-env-vars=[KEY=VALUE,...]
+          List of key-value pairs to set as Build environment variables. All
+          existing Build environment variables will be removed first.
+
+       Only --update-build-env-vars and --remove-build-env-vars can be used
+       together. If both are specified, --remove-build-env-vars will be applied
+       first.
+
+         --remove-build-env-vars=[KEY,...]
+            List of Build environment variables to be removed.
+
+         --update-build-env-vars=[KEY=VALUE,...]
+            List of key-value pairs to set as Build environment variables.
 
      At most one of these may be specified:
 

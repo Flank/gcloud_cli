@@ -25,8 +25,8 @@ from tests.lib import test_case
 
 
 # TODO(b/147255499): remove this test after google-auth rollout is done.
-class TestUseOauth2client(e2e_base.WithServiceAuth):
-  """Tests to make sure surfaces are not on google-auth."""
+class TestUseGoogleAuth(e2e_base.WithServiceAuth):
+  """Tests to make sure surfaces are on google-auth."""
 
   def MockLoadIfEnabledBuilder(self, expected_use_google_auth):
     orig_load_if_enabled = c_store.LoadIfEnabled
@@ -41,11 +41,22 @@ class TestUseOauth2client(e2e_base.WithServiceAuth):
     return MockLoadIfEnabled
 
   def SetUp(self):
-    # restore the default value to avoid interference between tests.
-    properties.VALUES.auth.google_auth_allowed.Set(False)
+    properties.VALUES.auth.opt_out_google_auth.Set(False)
     self.StartObjectPatch(
         c_store,
-        'LoadIfEnabled').side_effect = self.MockLoadIfEnabledBuilder(False)
+        'LoadIfEnabled').side_effect = self.MockLoadIfEnabledBuilder(True)
+
+  def testDns(self):
+    self.Run('dns managed-zones list')
+
+  def testKms(self):
+    self.Run('kms locations list')
+
+  def testPubsub(self):
+    self.Run('pubsub topics list')
+
+  def testDataflow(self):
+    self.Run('dataflow jobs list')
 
   def testCompute(self):
     self.Run('compute instances list')
@@ -64,41 +75,6 @@ class TestUseOauth2client(e2e_base.WithServiceAuth):
 
   def testServices(self):
     self.Run('services list')
-
-
-# TODO(b/147255499): remove this test after google-auth rollout is done.
-class TestUseGoogleAuth(e2e_base.WithServiceAuth):
-  """Tests to make sure surfaces are on google-auth."""
-
-  def MockLoadIfEnabledBuilder(self, expected_use_google_auth):
-    orig_load_if_enabled = c_store.LoadIfEnabled
-
-    def MockLoadIfEnabled(allow_account_impersonation=True,
-                          use_google_auth=False):
-      self.assertIs(use_google_auth, expected_use_google_auth)
-      return orig_load_if_enabled(
-          allow_account_impersonation=allow_account_impersonation,
-          use_google_auth=use_google_auth)
-
-    return MockLoadIfEnabled
-
-  def SetUp(self):
-    properties.VALUES.auth.google_auth_allowed.Set(False)
-    self.StartObjectPatch(
-        c_store,
-        'LoadIfEnabled').side_effect = self.MockLoadIfEnabledBuilder(True)
-
-  def testDns(self):
-    self.Run('dns managed-zones list')
-
-  def testKms(self):
-    self.Run('kms locations list')
-
-  def testPubsub(self):
-    self.Run('pubsub topics list')
-
-  def testDataflow(self):
-    self.Run('dataflow jobs list')
 
 
 if __name__ == '__main__':

@@ -108,9 +108,8 @@ To remove an IAM policy binding for the role of 'roles/editor' for the user
 
 .RS 2m
 $ gcloud alpha notebooks instances remove\-iam\-policy\-binding \e
-    /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/editor'
+    example\-instance \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor' \-\-location=us\-central1\-a
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

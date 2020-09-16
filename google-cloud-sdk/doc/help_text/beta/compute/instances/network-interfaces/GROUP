@@ -28,12 +28,11 @@ COMMANDS
     COMMAND is one of the following:
 
      get-effective-firewalls
-        (BETA) Get the effective firewalls on a Google Compute Engine virtual
-        machine network interface.
+        (BETA) Get the effective firewalls on a Compute Engine virtual machine
+        network interface.
 
      update
-        (BETA) Update a Google Compute Engine virtual machine network
-        interface.
+        (BETA) Update a Compute Engine virtual machine network interface.
 
 NOTES
     This command is currently in BETA and may change without notice. These

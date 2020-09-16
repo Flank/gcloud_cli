@@ -1,6 +1,5 @@
 NAME
-    gcloud compute instances update - update a Google Compute Engine virtual
-        machine
+    gcloud compute instances update - update a Compute Engine virtual machine
 
 SYNOPSIS
     gcloud compute instances update INSTANCE_NAME [--[no-]deletion-protection]
@@ -12,7 +11,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute instances update updates labels and requested CPU Platform
-    for a Google Compute Engine virtual machine.
+    for a Compute Engine virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

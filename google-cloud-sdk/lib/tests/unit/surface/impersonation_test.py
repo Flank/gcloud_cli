@@ -19,53 +19,43 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py.testing import mock
+import datetime
 
 from googlecloudsdk.api_lib.iamcredentials import util
-from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.credentials import google_auth_credentials
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib import test_case
+from tests.lib.core.credentials import credentials_test_base
 
 import httplib2
 from oauth2client import client
 
+from google.auth import impersonated_credentials
 
-class ImpersonationTest(cli_test_base.CliTestBase):
+
+class ImpersonationTest(cli_test_base.CliTestBase,
+                        credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     properties.VALUES.core.account.Set('fakeuser')
-    self.fake_cred = client.OAuth2Credentials(
-        'access-token', 'client_id', 'client_secret',
-        'fake-token', None, 'token_uri', 'user_agent',
-        scopes=config.CLOUDSDK_SCOPES)
-    store.Store(self.fake_cred)
-    self.refresh_mock = self.StartObjectPatch(client.OAuth2Credentials,
-                                              'refresh')
-
-    self.mock_client = mock.Client(apis.GetClientClass('iamcredentials', 'v1'))
-    self.mock_client.Mock()
-    self.addCleanup(self.mock_client.Unmock)
-    self.messages = self.mock_client.MESSAGES_MODULE
-    self.gen_request_msg = (
-        self.messages
-        .IamcredentialsProjectsServiceAccountsGenerateAccessTokenRequest)
+    fake_creds = self.MakeUserAccountCredentialsGoogleAuth()
+    fake_creds.token = 'access-token'
+    store.Store(fake_creds)
+    self.refresh_mock = self.StartObjectPatch(
+        google_auth_credentials.UserCredWithReauth, 'refresh')
+    self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
 
     self.request_mock = self.StartObjectPatch(
         httplib2.Http, 'request', autospec=True)
+    self.StartObjectPatch(
+        impersonated_credentials,
+        '_make_iam_token_request',
+        return_value=('impersonation-token',
+                      datetime.datetime(9999, 2, 3, 14, 15, 16)))
 
   def testImpersonation(self):
-    self.mock_client.projects_serviceAccounts.GenerateAccessToken.Expect(
-        self.gen_request_msg(
-            name='projects/-/serviceAccounts/asdf@google.com',
-            generateAccessTokenRequest=self.messages.GenerateAccessTokenRequest(
-                scope=config.CLOUDSDK_SCOPES)),
-        self.messages.GenerateAccessTokenResponse(
-            accessToken='impersonation-token',
-            expireTime='2016-01-08T00:00:00Z')
-    )
 
     self.request_mock.return_value = (httplib2.Response({'status': 200}),
                                       b'{"projects": []}')
@@ -73,9 +63,8 @@ class ImpersonationTest(cli_test_base.CliTestBase):
     try:
       store.IMPERSONATION_TOKEN_PROVIDER = (
           util.ImpersonationAccessTokenProvider())
-      self.Run(
-          'alpha --impersonate-service-account asdf@google.com projects list')
-      access_token = self.request_mock.call_args[0][4][b'Authorization']
+      self.Run('--impersonate-service-account asdf@google.com projects list')
+      access_token = self.request_mock.call_args[1]['headers'][b'authorization']
       # Make sure the request was made with the service account token.
       self.assertEqual(access_token, b'Bearer impersonation-token')
     finally:

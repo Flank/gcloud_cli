@@ -29,7 +29,6 @@ from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
 
 from oauth2client import client
-from oauth2client import crypt
 from oauth2client import service_account
 from google.auth import crypt as google_auth_crypt
 from google.oauth2 import service_account as google_auth_service_account
@@ -61,7 +60,6 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
                               creds.ToJsonGoogleAuth(credentials))
 
   def testToJson_ServiceAccount(self):
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     json_data = self.SERVICE_ACCOUNT_CREDENTIALS_JSON
     with files.TemporaryDirectory() as tmp_dir:
       cred_file = self.Touch(tmp_dir, contents=json_data)
@@ -91,8 +89,6 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
     self.assertMultiLineEqual(json_data, creds.ToJsonGoogleAuth(credentials))
 
   def testToJson_P12ServiceAccount(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
     json_data = self.P12_SERVICE_ACCOUNT_CREDENTIALS_JSON
     json_key = json.loads(json_data)
 
@@ -137,7 +133,6 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
     self.AssertCredentialsEqual(expected_credentials, expected_credentials_dict)
 
   def testFromJson_ServiceAccount(self):
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     credentials = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)
 
     self.AssertCredentialsEqual(
@@ -181,8 +176,6 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
     self.assertEqual(creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT, creds_type)
 
   def testFromJson_P12ServiceAccount(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
 
     credentials = creds.FromJson(self.P12_SERVICE_ACCOUNT_CREDENTIALS_JSON)
 

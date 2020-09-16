@@ -33,6 +33,9 @@ GROUPS
      environments
         (ALPHA) Manage Apigee environments.
 
+     operations
+        (ALPHA) Manage Apigee long running operations.
+
      organizations
         (ALPHA) Manage Apigee organizations.
 

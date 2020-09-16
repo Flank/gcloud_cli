@@ -1,5 +1,5 @@
 title: Cloud API Gateway operations list test scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -27,7 +27,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/operations?alt=json
           method: GET
           headers: {}
           body: null
@@ -40,17 +40,17 @@ actions:
                 {
                   "name": "projects/fake-project/locations/global/operations/fake-operation",
                   "metadata": {
-                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.OperationMetadata",
                     "createTime": "2019-11-12T17:11:58.294467322Z",
                     "endTime": "2019-11-12T17:11:58.339702050Z",
                     "target": "projects/fake-project/locations/global/apis/fake-api",
                     "verb": "create",
                     "requestedCancellation": false,
-                    "apiVersion": "v1alpha1"
+                    "apiVersion": "v1beta"
                   },
                   "done": true,
                   "response": {
-                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.Api",
                     "name": "projects/fake-project/locations/global/apis/fake-api",
                     "createTime": "2019-11-12T17:11:58.287899825Z",
                     "updateTime": "2019-11-12T17:11:58.297158524Z",
@@ -73,7 +73,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/project/locations/global/operations?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/project/locations/global/operations?alt=json
           method: GET
           headers: {}
           body: null
@@ -86,17 +86,17 @@ actions:
                 {
                   "name": "projects/fake-project/locations/global/operations/fake-operation",
                   "metadata": {
-                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.OperationMetadata",
                     "createTime": "2019-11-12T17:11:58.294467322Z",
                     "endTime": "2019-11-12T17:11:58.339702050Z",
                     "target": "projects/fake-project/locations/global/apis/fake-api",
                     "verb": "create",
                     "requestedCancellation": false,
-                    "apiVersion": "v1alpha1"
+                    "apiVersion": "v1beta"
                   },
                   "done": true,
                   "response": {
-                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.Api",
                     "name": "projects/fake-project/locations/global/apis/fake-api",
                     "createTime": "2019-11-12T17:11:58.287899825Z",
                     "updateTime": "2019-11-12T17:11:58.297158524Z",
@@ -118,7 +118,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/-/operations?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/-/operations?alt=json
           method: GET
           headers: {}
           body: null
@@ -131,17 +131,17 @@ actions:
                   {
                     "name": "projects/fake-project/locations/us-central1/operations/fake-operation",
                     "metadata": {
-                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.OperationMetadata",
                       "createTime": "2019-11-12T17:11:58.294467322Z",
                       "endTime": "2019-11-12T17:11:58.339702050Z",
                       "target": "projects/fake-project/locations/us-central1/apis/fake-api",
                       "verb": "create",
                       "requestedCancellation": false,
-                      "apiVersion": "v1alpha1"
+                      "apiVersion": "v1beta"
                     },
                     "done": true,
                     "response": {
-                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.Api",
                       "name": "projects/fake-project/locations/us-central1/apis/fake-api",
                       "createTime": "2019-11-12T17:11:58.287899825Z",
                       "updateTime": "2019-11-12T17:11:58.297158524Z",
@@ -154,17 +154,17 @@ actions:
                   {
                     "name": "projects/fake-project/locations/global/operations/fake-operation",
                     "metadata": {
-                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.OperationMetadata",
                       "createTime": "2019-11-12T17:11:58.294467322Z",
                       "endTime": "2019-11-12T17:11:58.339702050Z",
                       "target": "projects/fake-project/locations/global/apis/fake-api",
                       "verb": "create",
                       "requestedCancellation": false,
-                      "apiVersion": "v1alpha1"
+                      "apiVersion": "v1beta"
                     },
                     "done": true,
                     "response": {
-                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1beta.Api",
                       "name": "projects/fake-project/locations/global/apis/fake-api",
                       "createTime": "2019-11-12T17:11:58.287899825Z",
                       "updateTime": "2019-11-12T17:11:58.297158524Z",

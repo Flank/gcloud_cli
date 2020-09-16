@@ -101,7 +101,7 @@ class InstancesUnitTestBase(UnitTestBase):
                              name=None,
                              redis_version='REDIS_3_2',
                              connect_mode='DIRECT_PEERING',
-                             tls_mode=None):
+                             transit_encryption_mode=None):
     network_ref = resources.REGISTRY.Create(
         'compute.networks', project=self.Project(), network='my-network')
     redis_configs = {
@@ -145,9 +145,10 @@ class InstancesUnitTestBase(UnitTestBase):
     else:
       redis_instance.connectMode = self.messages.Instance.ConnectModeValueValuesEnum(
           'PRIVATE_SERVICE_ACCESS')
-    if tls_mode == 'BASIC_TLS':
-      redis_instance.tlsMode = self.messages.Instance.TlsModeValueValuesEnum(
-          'BASIC_TLS')
+
+    if transit_encryption_mode == 'SERVER_AUTHENTICATION':
+      redis_instance.transitEncryptionMode = self.messages.Instance.TransitEncryptionModeValueValuesEnum(
+          'SERVER_AUTHENTICATION')
     return redis_instance
 
 

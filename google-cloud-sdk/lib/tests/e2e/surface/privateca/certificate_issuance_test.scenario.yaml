@@ -1,5 +1,10 @@
+filters:
+  skipAlways:
+    reason: E2E tests will fail during beta command migration
+    bug: b/168122371
+    locally: true
 title: Issue a certificate from an existing root, describe it, and revoke it.
-release_tracks: [ALPHA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -106,17 +111,16 @@ actions:
 - execute_command:
     command: privateca certificates create $$cert-id$$ --issuer $$ca-id$$ --issuer-location
       $$location$$ --csr test_csr.pem --validity P1D
-    validation_only: true
     events:
     - api_call:
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates\?alt=json&certificateId=$$cert-id$$&requestId=[^&]+$
+            matches: https://privateca\.googleapis\.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates\?alt=json&certificateId=$$cert-id$$&requestId=[^&]+$
           method: POST
           headers: {}
           body:
             json:
-              lifetime: 2592000s
+              lifetime: 86400s
               name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
               pemCsr: |
                 -----BEGIN CERTIFICATE REQUEST-----
@@ -144,22 +148,15 @@ actions:
             content-length: '546'
             content-type: application/json; charset=UTF-8
           body:
-            name: projects/$$project$$/locations/$$location$$/operations/operation-1584057829302-5a0b134382020-66f9c627-5639cd77
-            metadata:
-              '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
-              createTime: '2020-03-12T16:13:46.441888581Z'
-              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
-              verb: create
-              requestedCancellation: false
-              apiVersion: v1alpha1
-            done: true
-            response:
-              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
-    - expect_progress_tracker:
-        message: Creating Certificate.
-        status: SUCCESS
+            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
+        expect_response:
+          body:
+            json: {}
+          extract_references:
+          - field: name
+            reference: cert-name
     - expect_stderr: |
-        Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$].
+        Created Certificate [$$cert-name$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -168,7 +165,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$?alt=json
+          uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -285,7 +282,7 @@ actions:
             updateTime: '2020-06-22T21:23:43.006454915Z'
     - expect_stdout: |
         lifetime: P1D
-        name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
+        name: $$cert-name$$
         pemCsr: |
           -----BEGIN CERTIFICATE REQUEST-----
           MIIC/TCCAeUCAQAwgZkxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9u
@@ -318,7 +315,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$:revoke?alt=json
+          uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$:revoke?alt=json
           method: POST
           headers: {}
           body:
@@ -330,20 +327,10 @@ actions:
             content-length: '546'
             content-type: application/json; charset=UTF-8
           body:
-            name: projects/atrefai-test/locations/$$location$$/operations/operation-1584029629110-5a0aaa35b57e5-37e78e15-3bfbeaab
-            metadata:
-              '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
-              createTime: '2020-03-12T16:13:49.121821064Z'
-              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
-              verb: revoke
-              requestedCancellation: false
-              apiVersion: v1alpha1
-            done: true
-            response:
-              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
-              revocationDetails:
-                revocationState: REVOCATION_REASON_UNSPECIFIED
-                revocationTime: '2020-04-17T15:14:00.105-07:00'
+            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$/certificates/$$cert-id$$
+            revocationDetails:
+              revocationState: REVOCATION_REASON_UNSPECIFIED
+              revocationTime: '2020-04-17T15:14:00.105-07:00'
     - expect_progress_tracker:
         message: Revoking Certificate.
         status: SUCCESS
@@ -359,12 +346,12 @@ actions:
     cleanup_for: ca-id
     events:
     - expect_prompt_continue:
-        message: You are about to delete Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$]
+        message: You are about to schedule Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$] for deletion in 30 days
         user_input: y
     - expect_progress_tracker:
-        message: Deleting Root CA
+        message: Scheduling Root CA for deletion
         status: SUCCESS
-    - expect_stderr: |
-        Deleted Root CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
+    - expect_stderr:
+        matches: '.*Scheduled Root CA \[projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$\] for deletion at .*'
     - expect_exit:
         code: 0

@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha database-migration operations - manage Cloud Database
-        Migration Service operations
+    gcloud alpha database-migration operations - manage Database Migration
+        Service operations
 
 SYNOPSIS
     gcloud alpha database-migration operations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Commands for managing Cloud Database Migration Service operations.
+    (ALPHA) Commands for managing Database Migration Service operations.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,7 +20,7 @@ COMMANDS
     COMMAND is one of the following:
 
      delete
-        (ALPHA) Delete a Cloud Database Migration Service operation.
+        (ALPHA) Delete a Database Migration Service operation.
 
      describe
         (ALPHA) Show details about a operation.

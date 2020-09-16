@@ -11,7 +11,7 @@ gcloud alpha container hub \- centrally manage features and services on all your
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container hub\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container hub\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,10 +49,6 @@ Run \fB$ gcloud help\fR for details.
 \fB(ALPHA)\fR Manage Config Management feature.
 
 .TP 2m
-\fBfeatures\fR
-\fB(ALPHA)\fR Manage features on all Hub memberships(registered clusters).
-
-.TP 2m
 \fBingress\fR
 \fB(ALPHA)\fR Manage MultiClusterIngress Feature.
 
@@ -60,6 +56,10 @@ Run \fB$ gcloud help\fR for details.
 \fBmemberships\fR
 \fB(ALPHA)\fR Manage memberships of all your GKE and other Kubernetes cluster
 with HUB.
+
+.TP 2m
+\fBmulti\-cluster\-services\fR
+\fB(ALPHA)\fR Manage MultiClusterServiceDiscovery Feature.
 
 
 .RE
@@ -73,10 +73,22 @@ Manage memberships of all your GKE and other Kubernetes clusters with Hub:
 $ gcloud alpha container hub memberships \-\-help
 .RE
 
-Manage features on all memberships:
+Manage Config Management feature on all memberships:
 
 .RS 2m
-$ gcloud alpha container hub features \-\-help
+$ gcloud alpha container hub config\-management \-\-help
+.RE
+
+Manage MultiClusterIngress feature on all memberships:
+
+.RS 2m
+$ gcloud alpha container hub ingress \-\-help
+.RE
+
+Manage MultiClusterServices feature on all memberships:
+
+.RS 2m
+$ gcloud alpha container hub multi\-cluster\-services \-\-help
 .RE
 
 

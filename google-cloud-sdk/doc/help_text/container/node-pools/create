@@ -85,8 +85,9 @@ FLAGS
             $ gcloud container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autorepair
 
-        Node autorepair is enabled by default for node pools using COS or
-        COS_CONTAINERD as a base image, use --no-enable-autorepair to disable.
+        Node autorepair is enabled by default for node pools using COS,
+        COS_CONTAINERD, UBUNTU or UBUNTU_CONTAINERD as a base image, use
+        --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair

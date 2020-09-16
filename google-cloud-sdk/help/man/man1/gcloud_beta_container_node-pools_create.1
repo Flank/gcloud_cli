@@ -93,8 +93,9 @@ $ gcloud beta container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autorepair
 .RE
 
-Node autorepair is enabled by default for node pools using COS or COS_CONTAINERD
-as a base image, use \-\-no\-enable\-autorepair to disable.
+Node autorepair is enabled by default for node pools using COS, COS_CONTAINERD,
+UBUNTU or UBUNTU_CONTAINERD as a base image, use \-\-no\-enable\-autorepair to
+disable.
 
 See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
 for more info.
@@ -425,7 +426,7 @@ tab(	);
 l(17)B l(34)B
 l(17) l(34).
 KEY	VALUE
-cpuManagerPolicy	either 'static' or 'default'
+cpuManagerPolicy	either 'static' or 'none'
 cpuCFSQuota	true or false (enabled by default)
 cpuCFSQuotaPeriod	interval (e.g., '100ms')
 .TE

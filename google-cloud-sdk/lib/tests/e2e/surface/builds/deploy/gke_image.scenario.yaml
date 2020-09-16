@@ -104,8 +104,6 @@ actions:
       --disk-size=10GB
     validation_only: true
     events:
-    - expect_stderr: |
-        This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
     - expect_progress_tracker:
         message: Creating cluster $$cluster$$ in $$location$$
         status: SUCCESS

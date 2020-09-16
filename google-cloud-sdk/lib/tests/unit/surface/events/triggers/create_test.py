@@ -28,16 +28,17 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import flags
 from googlecloudsdk.command_lib.events import util
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import flags as run_flags
 from tests.lib.surface.events import base
 
 import mock
 
 
-class TriggersCreateTestAlpha(base.EventsBase):
+class TriggersCreateAnthosTestBeta(base.EventsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
 
@@ -88,29 +89,10 @@ class TriggersCreateTestAlpha(base.EventsBase):
     self.trigger.filter_attributes[trigger.EVENT_TYPE_FIELD] = event_type
 
   def testCreateManaged(self):
-    """Tests successful create with default output format."""
-    self._MakeEventType()
-    self._MakeSource(self.source_crd, namespace='fake-project')
-    self._MakeTrigger(self.source, self.event_type.type)
-    self.operations.CreateTrigger.return_value = self.trigger
-    self.Run('events triggers create my-trigger --region=us-central1 '
-             '--target-service=my-service --type=google.source.my.type')
-
-    trigger_ref = self._TriggerRef('my-trigger', 'fake-project')
-    self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
-    self.source.name = 'source-for-my-trigger'
-    self.operations.CreateTrigger.assert_called_once_with(
-        trigger_ref, self.source, self.event_type.type,
-        collections.OrderedDict(), 'my-service', 'default')
-    self.operations.CreateSource.assert_called_once_with(
-        self.source, self.event_type.crd, self.trigger,
-        self._NamespaceRef(project='fake-project'), 'default', {})
-    self.operations.PollSource.assert_called_once_with(self.source,
-                                                       self.event_type,
-                                                       mock.ANY)
-    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
-    self.AssertErrContains('Initializing trigger...')
-    self.AssertErrContains('"status": "SUCCESS"')
+    """This command is for Anthos only."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('events triggers create my-trigger --platform=managed '
+               '--target-service=my-service --type=google.source.my.type')
 
   def testCreateGke(self):
     """Tests successful create with default output format."""
@@ -288,9 +270,44 @@ class TriggersCreateTestAlpha(base.EventsBase):
                '--trigger-filters knsourcetrigger=value1,key2=value2')
 
 
-class TriggersCreateTestAlphaAnthos(TriggersCreateTestAlpha):
+class TriggersCreateAnthosTestAlpha(TriggersCreateAnthosTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_name = 'anthosevents'
-    self.api_version = 'v1beta1'
+
+  def testCreateManaged(self):
+    pass
+
+
+class TriggersCreateManagedTestAlpha(TriggersCreateAnthosTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'run'
+    self.api_version = 'v1alpha1'
+
+  def testCreateManaged(self):
+    """Tests successful create with default output format."""
+    self._MakeEventType()
+    self._MakeSource(self.source_crd, namespace='fake-project')
+    self._MakeTrigger(self.source, self.event_type.type)
+    self.operations.CreateTrigger.return_value = self.trigger
+    self.Run('events triggers create my-trigger --platform=managed '
+             '--region=us-central1 --target-service=my-service '
+             '--type=google.source.my.type')
+
+    trigger_ref = self._TriggerRef('my-trigger', 'fake-project')
+    self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
+    self.source.name = 'source-for-my-trigger'
+    self.operations.CreateTrigger.assert_called_once_with(
+        trigger_ref, self.source, self.event_type.type,
+        collections.OrderedDict(), 'my-service', 'default')
+    self.operations.CreateSource.assert_called_once_with(
+        self.source, self.event_type.crd, self.trigger,
+        self._NamespaceRef(project='fake-project'), 'default', {})
+    self.operations.PollSource.assert_called_once_with(self.source,
+                                                       self.event_type,
+                                                       mock.ANY)
+    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
+    self.AssertErrContains('Initializing trigger...')
+    self.AssertErrContains('"status": "SUCCESS"')

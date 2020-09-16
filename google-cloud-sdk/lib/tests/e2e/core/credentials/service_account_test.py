@@ -25,13 +25,8 @@ class TestServiceAccount(e2e_base.WithServiceAuth):
   """This class tests service account activated via google-auth.
 
   Activating service account via google-auth is the default behavior of the
-  base class WithServiceAuth. The two test methods cover the cases of
-  loading credentials of oauth2client and google-auth respectively.
+  base class WithServiceAuth.
   """
-
-  # TODO(b/147255499): remove this test after everything is on google-auth.
-  def testLoadOauth2client(self):
-    self.Run('compute instances list')
 
   def testLoadGoogleAuth(self):
     # dns surface is on google-auth
@@ -42,9 +37,7 @@ class TestServiceAccountOauth2client(TestServiceAccount):
   """This class tests service account activated via oauth2client.
 
   Setting disable_activate_service_account_google_auth to True will cause
-  the activation being executed against oauth2client. The two test cases of
-  loading credentails of oauth2client and google-auth are inherented from
-  TestServiceAccount.
+  the activation being executed against oauth2client.
   """
 
   def PreSetUp(self):

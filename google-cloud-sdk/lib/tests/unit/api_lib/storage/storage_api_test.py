@@ -672,6 +672,51 @@ class BucketIamPolicyTest(e2e_base.WithMockHttp):
                                                'roles/storage.objectAdmin')
     self.assertEqual(actual_policy, expected_policy)
 
+  def testAddIamPolicyBindings(self):
+    old_policy = self.storage_v1_messages.Policy(
+        kind='storage#policy',
+        resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
+        version=1,
+        etag=b'CAE3',
+        bindings=[
+            self.storage_v1_messages.Policy.BindingsValueListEntry(
+                role='roles/storage.legacyBucketOwner',
+                members=[
+                    'projectEditor:{}'.format(self._PROJECT_ID),
+                    'projectOwner:{}'.format(self._PROJECT_ID),
+                ]),
+        ])
+
+    new_policy = copy.deepcopy(old_policy)
+    new_policy.version = 3
+    new_policy.bindings.append(
+        self.storage_v1_messages.Policy.BindingsValueListEntry(
+            role='roles/storage.objectAdmin',
+            members=['user:test-user@gmail.com', 'user:test-user-2@gmail.com']))
+    new_policy.bindings.append(
+        self.storage_v1_messages.Policy.BindingsValueListEntry(
+            role='roles/storage.bucketAdmin',
+            members=['user:test-user@gmail.com']))
+
+    expected_policy = copy.deepcopy(new_policy)
+    expected_policy.etag = b'CAE4'
+    self.mocked_storage_v1.buckets.GetIamPolicy.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, optionsRequestedPolicyVersion=3),
+        response=old_policy)
+    self.mocked_storage_v1.buckets.SetIamPolicy.Expect(
+        self.storage_v1_messages.StorageBucketsSetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, policy=new_policy),
+        response=expected_policy)
+
+    client = storage_api.StorageClient()
+    actual_policy = client.AddIamPolicyBindings(
+        self.bucket_reference,
+        [('user:test-user@gmail.com', 'roles/storage.objectAdmin'),
+         ('user:test-user-2@gmail.com', 'roles/storage.objectAdmin'),
+         ('user:test-user@gmail.com', 'roles/storage.bucketAdmin')])
+    self.assertEqual(actual_policy, expected_policy)
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -19,7 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py import encoding
 from apitools.base.py.testing import mock as api_mock
 
 from googlecloudsdk.api_lib.privateca import base as privateca_base
@@ -64,13 +63,10 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
         subject=self.messages.Subject,
         subjectAltName=self.messages.SubjectAltNames())
     lifetime = times.FormatDurationForJson(times.ParseDuration(lifetime))
-    response_val = encoding.PyValueToMessage(
-        self.messages.Operation.ResponseValue, {
-            'name': '{}/certificate/{}'.format(parent_name, cert_name),
-            'pemCertificate': self.test_cert,
-            'pemCertificateChain': [self.parent_cert]
-        })
-    response = self.messages.Operation(done=True, response=response_val)
+    response = self.messages.Certificate(
+        name='{}/certificate/{}'.format(parent_name, cert_name),
+        pemCertificate=self.test_cert,
+        pemCertificateChain=[self.parent_cert])
 
     request = self.messages.PrivatecaProjectsLocationsCertificateAuthoritiesCertificatesCreateRequest(
         certificateId=cert_name,
@@ -118,7 +114,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
                 organizationalUnit='organizationUnit', locality='locality'),
             subjectAltName=self.messages.SubjectAltNames()))
 
-    self.Run('alpha privateca certificates create --issuer ca --issuer-location'
+    self.Run('beta privateca certificates create --issuer ca --issuer-location'
              ' europe --cert-output-file cert_out.pem --generate-key '
              '--key-output-file private_key.pem --no-is-ca-cert '
              '--subject "CN=google.com, OU=organizationUnit, L=locality"')
@@ -146,7 +142,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
                 emailAddresses=['email1@gmail.com', 'email2@gmail.com'],
                 ipAddresses=['1.1.1.1'])))
 
-    self.Run('alpha privateca certificates create cert --issuer ca '
+    self.Run('beta privateca certificates create cert --issuer ca '
              '--issuer-location europe --cert-output-file cert_out.pem '
              '--generate-key --key-output-file private_key.pem '
              '--email-san email1@gmail.com,email2@gmail.com --ip-san 1.1.1.1 '
@@ -171,7 +167,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
                 emailAddresses=['email1@gmail.com', 'email2@gmail.com'],
                 ipAddresses=['1.1.1.1'])))
 
-    self.Run('alpha privateca certificates create cert --issuer ca '
+    self.Run('beta privateca certificates create cert --issuer ca '
              '--issuer-location europe --cert-output-file cert_out.pem '
              '--generate-key --key-output-file private_key.pem '
              '--email-san email1@gmail.com,email2@gmail.com --ip-san 1.1.1.1 '
@@ -196,7 +192,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
             subject=self.messages.Subject(organization='google'),
             subjectAltName=self.messages.SubjectAltNames()))
 
-    self.Run(('alpha privateca certificates create cert --issuer ca '
+    self.Run(('beta privateca certificates create cert --issuer ca '
               '--issuer-location europe --cert-output-file cert_out.pem '
               '--generate-key --key-output-file private_key.pem '
               '--reusable-config {} '
@@ -228,7 +224,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
             subjectAltName=self.messages.SubjectAltNames()))
 
     self.Run(
-        'alpha privateca certificates create cert --issuer ca '
+        'beta privateca certificates create cert --issuer ca '
         '--issuer-location europe --cert-output-file cert_out.pem '
         '--generate-key --key-output-file private_key.pem '
         '--extended-key-usages client_auth,server_auth '

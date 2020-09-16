@@ -26,8 +26,9 @@ gcloud alpha apigee developers list \- list Apigee developers by email address
 .RS 2m
 .TP 2m
 
-Organization resource \- The Apigee organization whose developers should be
-listed. This represents a Cloud resource.
+Organization resource \- Apigee organization whose developers should be listed.
+If unspecified, the Cloud Platform project's associated organization will be
+used. This represents a Cloud resource.
 
 .RS 2m
 .TP 2m
@@ -99,10 +100,11 @@ $ gcloud alpha apigee developers list
 .RE
 
 To list all developers in an Apigee organization called \f5\fImy\-org\fR\fR,
-run:
+formatted as JSON objects, run:
 
 .RS 2m
-$ gcloud alpha apigee developers list \-\-organization=my\-org
+$ gcloud alpha apigee developers list \-\-organization=my\-org \e
+  \-\-format=json
 .RE
 
 

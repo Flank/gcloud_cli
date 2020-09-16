@@ -9,15 +9,18 @@ SYNOPSIS
           | --database-encryption-key=DATABASE_ENCRYPTION_KEY
           | --disable-database-encryption | --disable-default-snat
           | --disable-workload-identity | --enable-autoscaling
-          | --enable-binauthz | --enable-cost-management | --enable-gvnic
-          | --enable-intra-node-visibility | --enable-legacy-authorization
+          | --enable-binauthz | --enable-cost-management | --enable-gke-oidc
+          | --enable-gvnic | --enable-intra-node-visibility
+          | --enable-legacy-authorization
           | --enable-logging-monitoring-system-only
           | --enable-master-authorized-networks | --enable-master-global-access
           | --enable-network-policy | --enable-pod-security-policy
           | --enable-shielded-nodes | --enable-stackdriver-kubernetes
           | --enable-vertical-pod-autoscaling | --generate-password
           | --identity-provider=IDENTITY_PROVIDER
-          | --maintenance-window=START_TIME | --release-channel=CHANNEL
+          | --maintenance-window=START_TIME
+          | --notification-config=[pubsub=ENABLED|DISABLED,
+          pubsub-topic=TOPIC,...] | --release-channel=CHANNEL
           | --remove-labels=[KEY,...] | --security-profile=SECURITY_PROFILE
           | --set-password | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
@@ -36,7 +39,8 @@ SYNOPSIS
           --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
           | [--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
-          | --autoprovisioning-locations=ZONE,[ZONE,...] --max-cpu=MAX_CPU
+          | --autoprovisioning-locations=ZONE,[ZONE,...]
+          --autoprovisioning-min-cpu-platform=PLATFORM --max-cpu=MAX_CPU
           --max-memory=MAX_MEMORY --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
           --autoprovisioning-max-surge-upgrade=AUTOPROVISIONING_MAX_SURGE_UPGRADE --autoprovisioning-max-unavailable-upgrade=AUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE --autoprovisioning-scopes=[SCOPE,
           ...]
@@ -142,6 +146,16 @@ REQUIRED FLAGS
 
           Use --no-enable-cost-management to disable this feature.
 
+       --enable-gke-oidc
+          Enable GKE OIDC authentication on the cluster.
+
+          When enabled, users would be able to authenticate to Kubernetes
+          cluster after properly setting OIDC config.
+
+          GKE OIDC is by default disabled when creating a new cluster. To
+          disable GKE OIDC in an existing cluster, explicitly set flag
+          --no-enable-gke-oidc.
+
        --enable-gvnic
           Enable the use of GVNIC for this cluster. Requires re-creation of
           nodes using either a node-pool upgrade or node-pool creation.
@@ -242,6 +256,23 @@ REQUIRED FLAGS
 
           To remove an existing maintenance window from the cluster, use
           '--clear-maintenance-window'.
+
+       --notification-config=[pubsub=ENABLED|DISABLED,pubsub-topic=TOPIC,...]
+          The notification configuration of the cluster. GKE supports
+          publishing cluster upgrade notifications to any Pub/Sub topic you
+          created in the same project. Create a subscription for the topic
+          specified to receive notification messages. See
+          https://cloud.google.com/pubsub/docs/admin on how to manage Pub/Sub
+          topics and subscriptions.
+
+          Example:
+
+              $ gcloud alpha container clusters update example-cluster \
+                --notification-config=pubsub=ENABLED,pubsub-topic=projects/\
+              {project}/topics/{topic-name}
+
+          The project of the Pub/Sub topic must be the same one as the cluster.
+          It can be either the project ID or the project number.
 
        --release-channel=CHANNEL
           Subscribe or unsubscribe this cluster to a release channel.
@@ -531,8 +562,9 @@ REQUIRED FLAGS
               cluster's node autoprovisioning configuration. Currently it
               contains a list of resource limits, identity defaults for
               autoprovisioning, node upgrade settings, node management
-              settings, minimum cpu platform, and node locations for
-              autoprovisioning.
+              settings, minimum cpu platform, node locations for
+              autoprovisioning, disk type and size configuration, shielded
+              instance settings, and customer-managed encryption keys settings.
 
               Resource limits are specified in the field 'resourceLimits'. Each
               resource limits definition contains three fields: resourceType,
@@ -575,6 +607,22 @@ REQUIRED FLAGS
               are specified in the field 'autoprovisioningLocations'. All zones
               must be in the same region as the cluster's master(s).
 
+              Disk type and size are specified under the 'diskType' and
+              'diskSizeGb' fields, respectively. If specified, new
+              autoprovisioned nodes will be created with custom boot disks
+              configured by these settings.
+
+              Shielded instance settings are specified under the
+              'shieldedInstanceConfig' field, which has the following fields:
+              enableSecureBoot: A boolean field that indicates if secure boot
+              is enabled for autoprovisioned nodes. enableIntegrityMonitoring:
+              A boolean field that indicates if integrity monitoring is enabled
+              for autoprovisioned nodes.
+
+              Customer Managed Encryption Keys (CMEK) used by new
+              auto-provisioned node pools can be specified in the
+              'bootDiskKmsKey' field.
+
            Flags to configure autoprovisioned nodes
 
              --autoprovisioning-locations=ZONE,[ZONE,...]
@@ -582,6 +630,10 @@ REQUIRED FLAGS
                 autoprovisioning. All zones must be in the same region as the
                 cluster's master(s). Multiple locations can be specified,
                 separated by commas.
+
+             --autoprovisioning-min-cpu-platform=PLATFORM
+                If specified, new autoprovisioned nodes will be scheduled on
+                host with specified CPU architecture or a newer one.
 
              --max-cpu=MAX_CPU
                 Maximum number of cores in the cluster.

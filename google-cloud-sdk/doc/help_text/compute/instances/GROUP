@@ -36,10 +36,10 @@ COMMANDS
     COMMAND is one of the following:
 
      add-access-config
-        Create a Google Compute Engine virtual machine access configuration.
+        Create a Compute Engine virtual machine access configuration.
 
      add-iam-policy-binding
-        Add IAM policy binding to a Google Compute Engine instance.
+        Add IAM policy binding to a Compute Engine instance.
 
      add-labels
         Add labels to Google Compute Engine virtual machine instances.
@@ -48,23 +48,23 @@ COMMANDS
         Add or update instance metadata.
 
      add-resource-policies
-        Add resource policies to Google Compute Engine VM instances.
+        Add resource policies to Compute Engine VM instances.
 
      add-tags
-        Add tags to Google Compute Engine virtual machine instances.
+        Add tags to Compute Engine virtual machine instances.
 
      attach-disk
         Attach a disk to an instance.
 
      create
-        Create Google Compute Engine virtual machine instances.
+        Create Compute Engine virtual machine instances.
 
      create-with-container
-        Creates Google Compute engine virtual machine instances running
-        container images.
+        Creates Compute Engine virtual machine instances running container
+        images.
 
      delete
-        Delete Google Compute Engine virtual machine instances.
+        Delete Compute Engine virtual machine instances.
 
      delete-access-config
         Delete an access configuration from a virtual machine network
@@ -84,7 +84,7 @@ COMMANDS
         Get the Guest Attributes for a compute instance.
 
      get-iam-policy
-        Get the IAM policy for a Google Compute Engine instance.
+        Get the IAM policy for a Compute Engine instance.
 
      get-screenshot
         Capture a screenshot (JPEG image) of the virtual machine instance's
@@ -94,11 +94,11 @@ COMMANDS
         Read output from a virtual machine instance's serial port.
 
      get-shielded-identity
-        Get the Shielded identity for a Google Compute Engine instance.
+        Get the Shielded identity for a Compute Engine instance.
 
      import
-        Create Google Compute Engine virtual machine instances from virtual
-        appliance in OVA/OVF format.
+        Create Compute Engine virtual machine instances from virtual appliance
+        in OVA/OVF format.
 
      list
         List Google Compute Engine instances.
@@ -107,7 +107,7 @@ COMMANDS
         Move an instance and its attached persistent disks between zones.
 
      remove-iam-policy-binding
-        Remove IAM policy binding from a Google Compute Engine instance.
+        Remove IAM policy binding from a Compute Engine instance.
 
      remove-labels
         Remove labels from Google Compute Engine virtual machine instances.
@@ -116,7 +116,7 @@ COMMANDS
         Remove instance metadata.
 
      remove-tags
-        Remove tags from Google Compute Engine virtual machine instances.
+        Remove tags from Compute Engine virtual machine instances.
 
      reset
         Reset a virtual machine instance.
@@ -125,16 +125,16 @@ COMMANDS
         Set auto-delete behavior for disks.
 
      set-iam-policy
-        Set IAM policy for a Google Compute Engine instance.
+        Set IAM policy for a Compute Engine instance.
 
      set-machine-type
-        Set machine type for Google Compute Engine virtual machines.
+        Set machine type for Compute Engine virtual machines.
 
      set-scheduling
-        Set scheduling options for Google Compute Engine virtual machines.
+        Set scheduling options for Compute Engine virtual machines.
 
      set-service-account
-        Set service account and scopes for a Google Compute Engine instance.
+        Set service account and scopes for a Compute Engine instance.
 
      simulate-maintenance-event
         Simulate maintenance of virtual machine instances.
@@ -150,14 +150,14 @@ COMMANDS
         port and display it as it becomes available.
 
      update
-        Update a Google Compute Engine virtual machine.
+        Update a Compute Engine virtual machine.
 
      update-access-config
-        Update a Google Compute Engine virtual machine access configuration.
+        Update a Compute Engine virtual machine access configuration.
 
      update-container
-        Updates Google Compute engine virtual machine instances running
-        container images.
+        Updates Compute Engine virtual machine instances running container
+        images.
 
      update-from-file
         Update a Compute Engine virtual machine instance using a configuration

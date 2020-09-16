@@ -29,8 +29,10 @@ including the developer's name, email address, apps, and other information.
 .RS 2m
 .TP 2m
 
-Developer resource \- The developer to be described. The arguments in this group
-can be used to specify the attributes of this resource. This must be specified.
+Developer resource \- Email address of the developer to be described. To get a
+list of available developers, run \f5gcloud alpha apigee developers list\fR. The
+arguments in this group can be used to specify the attributes of this resource.
+This must be specified.
 
 .RS 2m
 .TP 2m
@@ -69,11 +71,12 @@ address is \f5\fIlarry@example.com\fR\fR, run:
 $ gcloud alpha apigee developers describe larry@example.com
 .RE
 
-To describe that developer in the Apigee organization \f5\fImy\-org\fR\fR, run:
+To describe that developer in the Apigee organization \f5\fImy\-org\fR\fR,
+formatted as a JSON object, run:
 
 .RS 2m
-$ gcloud alpha apigee developers describe \-\-organization=my\-org \e
-  larry@example.com
+$ gcloud alpha apigee developers describe larry@example.com \e
+  \-\-organization=my\-org \-\-format=json
 .RE
 
 

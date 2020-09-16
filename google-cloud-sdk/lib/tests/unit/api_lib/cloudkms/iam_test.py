@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
+
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.cloudkms import base as cloudkms_base
 from googlecloudsdk.api_lib.cloudkms import iam
@@ -62,6 +64,79 @@ class KmsIamTest(sdk_test_base.WithFakeAuth):
 
     actual = iam.TestCryptoKeyIamPermissions(self.key_ref, permissions)
     self.assertEqual(actual.permissions, expected.permissions)
+
+  def testAddPolicyBindingToCryptoKey(self):
+    old_policy = self.messages.Policy(
+        version=1,
+        etag=b'CAE3',
+        bindings=[])
+
+    # IAM utils always sets the policy version to the latest available.
+    new_policy = copy.deepcopy(old_policy)
+    new_policy.version = 3
+    new_policy.bindings.append(
+        self.messages.Binding(
+            role='roles/cloudkms.signerVerifier',
+            members=['user:test-user@gmail.com']))
+    new_policy_request = self.messages.SetIamPolicyRequest(
+        policy=new_policy, updateMask='bindings,etag,version')
+
+    # ETAG should be updated after SetIamPolicy.
+    expected_policy = copy.deepcopy(new_policy)
+    expected_policy.etag = b'CAE4'
+    self.mock_client.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
+        request=self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
+            resource=self._KEY_NAME, options_requestedPolicyVersion=3),
+        response=old_policy)
+    self.mock_client.projects_locations_keyRings_cryptoKeys.SetIamPolicy.Expect(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysSetIamPolicyRequest(
+            resource=self._KEY_NAME, setIamPolicyRequest=new_policy_request),
+        response=expected_policy)
+
+    actual_policy = iam.AddPolicyBindingToCryptoKey(
+        self.key_ref, 'user:test-user@gmail.com',
+        'roles/cloudkms.signerVerifier')
+    self.assertEqual(actual_policy, expected_policy)
+
+  def testAddPolicyBindingsToCryptoKey(self):
+    old_policy = self.messages.Policy(
+        version=1,
+        etag=b'CAE3',
+        bindings=[])
+
+    new_policy = copy.deepcopy(old_policy)
+    new_policy.version = 3
+    new_policy.bindings.append(
+        self.messages.Binding(
+            role='roles/cloudkms.signerVerifier',
+            members=['user:test-user@gmail.com', 'user:test-user-2@gmail.com']))
+    new_policy.bindings.append(
+        self.messages.Binding(
+            role='roles/viewer', members=['user:test-user@gmail.com']))
+    new_policy_request = self.messages.SetIamPolicyRequest(
+        policy=new_policy, updateMask='bindings,etag,version')
+
+    expected_policy = copy.deepcopy(new_policy)
+    expected_policy.etag = b'CAE4'
+    self.mock_client.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
+        request=self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
+            resource=self._KEY_NAME, options_requestedPolicyVersion=3),
+        response=old_policy)
+    self.mock_client.projects_locations_keyRings_cryptoKeys.SetIamPolicy.Expect(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysSetIamPolicyRequest(
+            resource=self._KEY_NAME, setIamPolicyRequest=new_policy_request),
+        response=expected_policy)
+
+    actual_policy = iam.AddPolicyBindingsToCryptoKey(
+        self.key_ref,
+        [('user:test-user@gmail.com', 'roles/cloudkms.signerVerifier'),
+         ('user:test-user-2@gmail.com', 'roles/cloudkms.signerVerifier'),
+         ('user:test-user@gmail.com', 'roles/viewer')])
+    self.assertEqual(actual_policy, expected_policy)
 
 
 if __name__ == '__main__':

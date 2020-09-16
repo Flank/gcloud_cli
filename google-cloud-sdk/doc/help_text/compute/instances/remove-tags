@@ -1,14 +1,14 @@
 NAME
-    gcloud compute instances remove-tags - remove tags from Google Compute
-        Engine virtual machine instances
+    gcloud compute instances remove-tags - remove tags from Compute Engine
+        virtual machine instances
 
 SYNOPSIS
     gcloud compute instances remove-tags INSTANCE_NAME
         (--all | --tags=TAG,[TAG,...]) [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances remove-tags is used to remove tags from Google
-    Compute Engine virtual machine instances.
+    gcloud compute instances remove-tags is used to remove tags from Compute
+    Engine virtual machine instances.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

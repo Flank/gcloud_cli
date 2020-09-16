@@ -62,28 +62,46 @@ class FileDownloadTaskTest(sdk_test_base.SdkBase):
 class FileUploadTaskTest(sdk_test_base.SdkBase):
   """Tests logic of FileUploadTask."""
 
-  @mock_cloud_api.patch
-  @mock.patch.object(files, 'BinaryFileReader')
-  def test_execute_uploads_file(self, mock_client, mock_file_reader):
-    messages = core_apis.GetMessagesModule('storage', 'v1')
+  def SetUp(self):
+    self.messages = core_apis.GetMessagesModule('storage', 'v1')
 
+  @mock_cloud_api.patch
+  @mock.patch.object(files, 'BinaryFileReader', new_callable=mock.mock_open)
+  def test_execute_uploads_file(self, mock_client, mock_stream):
     source_resource = resource_reference.FileObjectResource(
         storage_url.storage_url_from_string('file://o1.txt'))
     destination_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('gs://b/o2.txt'),
-        messages.Object(name='o2', bucket='b'))
-
-    mock_stream = mock.Mock()
-    mock_file_reader.return_value = mock_stream
+        self.messages.Object(name='o2', bucket='b'))
 
     task = file_upload_task.FileUploadTask(source_resource,
                                            destination_resource)
     task.execute()
 
+    mock_stream.assert_called_once_with('o1.txt')
+    # We create a new instance of mock_stream to emulate "with ... as ..."
+    # syntax in the task. However, this means "assert_called_once" must be above
+    # because now mock_stream is called twice.
     mock_client.UploadObject.assert_called_once_with(
-        mock_stream, destination_resource.metadata_object)
-    mock_file_reader.assert_called_once_with('o1.txt')
-    mock_stream.close.assert_called_once()
+        mock_stream(), destination_resource.metadata_object)
+
+  @mock_cloud_api.patch
+  @mock.patch.object(files, 'BinaryFileReader', new_callable=mock.mock_open)
+  def test_execute_generates_destination_metadata_if_missing(
+      self, mock_client, mock_stream):
+    source_resource = resource_reference.FileObjectResource(
+        storage_url.storage_url_from_string('file://o1.txt'))
+    destination_resource = resource_reference.ObjectResource(
+        storage_url.storage_url_from_string('gs://b/o2.txt'), None)
+
+    task = file_upload_task.FileUploadTask(source_resource,
+                                           destination_resource)
+    task.execute()
+
+    mock_stream.assert_called_once_with('o1.txt')
+    mock_client.UploadObject.assert_called_once_with(
+        mock_stream(),
+        self.messages.Object(name='o2.txt', bucket='b'))
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
@@ -97,10 +115,10 @@ class IntraCloudCopyTaskTest(sdk_test_base.SdkBase):
 
   @mock_cloud_api.patch
   def test_execute_copies_file(self, mock_client):
-    source_resource = resource_reference.BucketResource(
+    source_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('gs://b/o1.txt'),
         self.source_metadata)
-    destination_resource = resource_reference.BucketResource(
+    destination_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('gs://b/o2.txt'),
         self.destination_metadata)
 
@@ -112,10 +130,10 @@ class IntraCloudCopyTaskTest(sdk_test_base.SdkBase):
         source_resource.metadata_object, destination_resource.metadata_object)
 
   def test_execute_fails_for_local_to_cloud_copy(self):
-    source_resource = resource_reference.BucketResource(
+    source_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('file://o1.txt'),
         self.source_metadata)
-    destination_resource = resource_reference.BucketResource(
+    destination_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('gs://b/o2.txt'),
         self.destination_metadata)
 
@@ -124,10 +142,10 @@ class IntraCloudCopyTaskTest(sdk_test_base.SdkBase):
                                                destination_resource)
 
   def test_execute_fails_for_inter_cloud_copy(self):
-    source_resource = resource_reference.BucketResource(
+    source_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('s3://b/o1.txt'),
         self.source_metadata)
-    destination_resource = resource_reference.BucketResource(
+    destination_resource = resource_reference.ObjectResource(
         storage_url.storage_url_from_string('gs://b/o2.txt'),
         self.destination_metadata)
 

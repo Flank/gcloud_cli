@@ -1,0 +1,103 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_RESOURCE\-POLICIES_CREATE_INSTANCE\-SCHEDULE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute resource\-policies create instance\-schedule \- create a Compute Engine instance schedule resource policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute resource\-policies create instance\-schedule\fR \fINAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-timezone\fR=\fITIMEZONE\fR] [\fB\-\-vm\-start\-schedule\fR=\fIVM_START_SCHEDULE\fR] [\fB\-\-vm\-stop\-schedule\fR=\fIVM_STOP_SCHEDULE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Compute Engine instance schedule resource policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the resource policy to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the backend.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the resource policy to operate on. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-timezone\fR=\fITIMEZONE\fR
+Timezone used in interpreting schedule. The value of this field must be a time
+zone name from the tz database http://en.wikipedia.org/wiki/Tz_database
+
+.TP 2m
+\fB\-\-vm\-start\-schedule\fR=\fIVM_START_SCHEDULE\fR
+Schedule for starting the instance, specified using standard CRON format.
+
+.TP 2m
+\fB\-\-vm\-stop\-schedule\fR=\fIVM_STOP_SCHEDULE\fR
+Schedule for stopping the instance, specified using standard CRON format.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist.
+

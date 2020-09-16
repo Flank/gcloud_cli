@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances simulate-maintenance-event simulates a
-    maintenance event on Google Compute Engine virtual machines.
+    maintenance event on Compute Engine virtual machines.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

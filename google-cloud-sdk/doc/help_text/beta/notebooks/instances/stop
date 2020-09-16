@@ -1,12 +1,12 @@
 NAME
-    gcloud beta notebooks instances stop - request for stoping instances
+    gcloud beta notebooks instances stop - request for stopping instances
 
 SYNOPSIS
     gcloud beta notebooks instances stop (INSTANCE : --location=LOCATION)
         [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Request for stoping notbook instance.
+    (BETA) Request for stopping notebook instances.
 
 POSITIONAL ARGUMENTS
      Instance resource - User-defined unique name of this instance. The
@@ -45,9 +45,8 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To stop an instance, run:
 
-        $ gcloud beta notebooks instances stop \
-          /projects/example-project/locations/us-central1-b/instances/\
-        example-instance
+        $ gcloud beta notebooks instances stop example-instance \
+          --location=us-central1-a
 
 NOTES
     This command is currently in BETA and may change without notice. This

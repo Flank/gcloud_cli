@@ -10,7 +10,7 @@ DESCRIPTION
     (ALPHA) List Apigee API products.
 
 FLAGS
-     Organization resource - The Apigee organization whose products should be
+     Organization resource - Apigee organization whose products should be
      listed. This represents a Cloud resource.
 
        --organization=ORGANIZATION
@@ -59,9 +59,11 @@ EXAMPLES
 
         $ gcloud alpha apigee products list
 
-    To list all API products in an Apigee organization called my-org, run:
+    To get a JSON array of all the API products in an organization named
+    my-org, run:
 
-        $ gcloud alpha apigee products list --organization=my-org
+        $ gcloud alpha apigee products list --organization=my-org \
+          --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

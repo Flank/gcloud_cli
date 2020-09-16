@@ -31,6 +31,8 @@ import functools
 import os
 import zipfile
 
+from googlecloudsdk.api_lib.functions import env_vars as env_vars_api_util
+from googlecloudsdk.api_lib.functions import util as api_util
 from googlecloudsdk.api_lib.functions.exceptions import FunctionsError
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.calliope import base as calliope_base
@@ -41,6 +43,7 @@ from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import archive
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.functions import base
 from tests.lib.surface.functions import util as testutil
@@ -94,7 +97,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                                   memory=None,
                                   timeout=None,
                                   retry=None,
-                                  project=None):
+                                  project=None,
+                                  runtime='nodejs6',
+                                  build_env_vars=None):
     if project is None:
       project = self.Project()
     result = self.messages.CloudFunction(
@@ -105,7 +110,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             eventType='google.pubsub.topic.publish',
             resource='projects/{0}/topics/topic'.format(project),
         ),
-        runtime='nodejs6',
+        runtime=runtime,
+        buildEnvironmentVariables=build_env_vars,
         labels=self._GetDefaultLabelsMessage(),
     )
     if memory:
@@ -203,14 +209,17 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                                 name,
                                 url,
                                 entry_point=None,
-                                timeout=None):
+                                timeout=None,
+                                runtime='nodejs6',
+                                build_env_vars=None):
     https_trigger = self.messages.HttpsTrigger()
     result = self.messages.CloudFunction(
         name=name,
         sourceArchiveUrl=url,
         httpsTrigger=https_trigger,
         entryPoint=entry_point,
-        runtime='nodejs6',
+        runtime=runtime,
+        buildEnvironmentVariables=build_env_vars,
         labels=self._GetDefaultLabelsMessage(),
     )
     if timeout:
@@ -230,7 +239,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   def _ExpectFunctionCreateWithPubsub(self,
                                       gcs_dest_url,
                                       entry_point=None,
-                                      project=None):
+                                      project=None,
+                                      runtime='nodejs6',
+                                      build_env_vars=None):
     if project is None:
       project = self.Project()
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
@@ -244,7 +255,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                 gcs_dest_url,
                 'projects/{0}/topics/topic'.format(project),
                 entry_point=entry_point,
-                project=project)),
+                project=project,
+                runtime=runtime,
+                build_env_vars=build_env_vars)),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
@@ -437,7 +450,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                                     entry_point=None,
                                     allow_unauthenticated=False,
                                     no_allow_unauthenticated=False,
-                                    fail_policy_bind=False):
+                                    fail_policy_bind=False,
+                                    runtime='nodejs6',
+                                    build_env_vars=None):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(self.Project(),
@@ -446,7 +461,11 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithHttp(
-                test_name, gcs_dest_url, entry_point=entry_point)),
+                test_name,
+                gcs_dest_url,
+                entry_point=entry_point,
+                runtime=runtime,
+                build_env_vars=build_env_vars)),
         self._GenerateActiveOperation('operations/operation'))
     if allow_unauthenticated:
       self._ExpectAddIamPolicyBinding(test_name, fail_policy_bind)
@@ -475,9 +494,18 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self._GenerateFailedOperation('operations/operation'))
     return 0
 
-  def _ExpectFunctionUpdate(self, original_function, updated_function):
-    self.mock_client.projects_locations_functions.Update.Expect(
-        original_function,
+  def _ExpectFunctionUpdate(self,
+                            original_function,
+                            updated_function,
+                            update_mask=None):
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=original_function.name), original_function)
+    self.mock_client.projects_locations_functions.Patch.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsPatchRequest(
+            name=updated_function.name,
+            cloudFunction=updated_function,
+            updateMask=update_mask),
         self._GenerateActiveOperation('operations/operation'))
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(
@@ -486,7 +514,6 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=updated_function.name), updated_function)
-    return 0
 
   def _ExpectCopyFileToGCS(self, callback):
 
@@ -1248,6 +1275,228 @@ class FunctionsAlphaTests(FunctionsBetaTests):
     self.Run('functions deploy my-test '
              '--trigger-event providers/firebase.auth/eventTypes/user.create '
              '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
+
+  _BUILD_ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
+      track=calliope_base.ReleaseTrack.ALPHA
+  ).CloudFunction.BuildEnvironmentVariablesValue
+
+  @parameterized.named_parameters(('Set build env vars for a new function', {
+      'FOO': 'bar',
+      'BAZ': 'boo'
+  }, '--set-build-env-vars FOO=bar,BAZ=boo'),
+                                  ('Update build env vars for a new function', {
+                                      'FOO': 'bar',
+                                      'BAZ': 'boo'
+                                  }, '--update-build-env-vars FOO=bar,BAZ=boo'))
+  def testBuildEnvVarsFromFlagsCreateFunction(self, build_env_vars_dict,
+                                              cli_args):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, build_env_vars_dict)
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp,
+            allow_unauthenticated=True,
+            runtime='nodejs10',
+            build_env_vars=build_env_vars))
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+
+    self.Run('functions deploy my-test --trigger-http --stage-bucket buck {} '
+             '--runtime=nodejs10  --allow-unauthenticated'.format(cli_args))
+
+  @parameterized.named_parameters(
+      ('Set build env vars for an existing function without build env vars',
+       None, {
+           'FOO': 'bar',
+           'BAZ': 'boo'
+       }, '--set-build-env-vars FOO=bar,BAZ=boo'),
+      ('Set build env vars for an existing function with build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, {
+          'FOO': 'new bar',
+          'BOO': 'baz'
+      }, '--set-build-env-vars "FOO=new bar,BOO=baz"'),
+      ('Clear build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, None, '--clear-build-env-vars'),
+      ('Update build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, {
+          'FOO': 'bar',
+          'BAZ': 'bam',
+          'BAR': 'baa'
+      }, '--update-build-env-vars BAZ=bam,BAR=baa'),
+      ('Remove build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, {
+          'FOO': 'bar'
+      }, '--remove-build-env-vars BAZ,BAR'),
+  )
+  def testEnvVarsFromFlagsUpdateFunction(self, existing_build_env_vars_dict,
+                                         updated_build_env_vars_dict, cli_args):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    existing_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, existing_build_env_vars_dict)
+    updated_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, updated_build_env_vars_dict)
+    existing_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=existing_build_env_vars)
+    updated_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=updated_build_env_vars)
+
+    self._ExpectFunctionUpdate(
+        existing_function,
+        updated_function,
+        update_mask='buildEnvironmentVariables')
+
+    self.Run('functions deploy my-test {}'.format(cli_args))
+
+  def testBuildEnvVarsFromFileCreateFunction(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    build_env_vars_dict = {'FOO': 'bar', 'BAZ': 'boo'}
+    build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, build_env_vars_dict)
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp,
+            allow_unauthenticated=True,
+            runtime='nodejs10',
+            build_env_vars=build_env_vars))
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+
+    with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+      yaml_load_path.return_value = build_env_vars_dict
+
+      self.Run('functions deploy my-test --trigger-http --stage-bucket buck '
+               '--build-env-vars-file build-env-vars.yml --runtime=nodejs10 '
+               '--allow-unauthenticated')
+
+  def testBuildEnvVarsFromFileUpdateFunction(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    existing_build_env_vars_dict = {'FOO': 'bar', 'BAZ': 'boo'}
+    existing_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, existing_build_env_vars_dict)
+    updated_build_env_vars_dict = {'BAR': 'foo', 'BOO': 'baz'}
+    updated_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, updated_build_env_vars_dict)
+    existing_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=existing_build_env_vars)
+    updated_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=updated_build_env_vars)
+
+    self._ExpectFunctionUpdate(
+        existing_function,
+        updated_function,
+        update_mask='buildEnvironmentVariables')
+
+    with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+      yaml_load_path.return_value = updated_build_env_vars_dict
+
+      self.Run(
+          'functions deploy my-test --build-env-vars-file build-env-vars.yml')
+
+  @parameterized.parameters(
+      ('--set-build-env-vars GOOGLE_ENTRYPOINT=foo',
+       'GOOGLE_ENTRYPOINT is reserved for internal use by GCF deployments and '
+       'cannot be used.'),
+      ('--update-build-env-vars GOOGLE_FUNCTION_TARGET=foo',
+       'GOOGLE_FUNCTION_TARGET is reserved for internal use by GCF deployments '
+       'and cannot be used.'),
+      ('--update-build-env-vars GOOGLE_RUNTIME=foo',
+       'GOOGLE_RUNTIME is reserved for internal use by GCF deployments and '
+       'cannot be used.'),
+      ('--remove-build-env-vars GOOGLE_RUNTIME_VERSION',
+       'GOOGLE_RUNTIME_VERSION is reserved for internal use by GCF deployments '
+       'and cannot be used.'),
+      ('--remove-build-env-vars X_GOOGLE_VAR',
+       'Environment variable keys that start with `X_GOOGLE_` are reserved for '
+       'use by deployment tools and cannot be specified manually.'))
+  def testBuildEnvVarsFromFlagsWithInvalidKeysFails(self, cli_args,
+                                                    expected_error_message):
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           expected_error_message):
+      self.Run(
+          'functions deploy my-test {} --runtime=nodejs10'.format(cli_args))
+
+  @parameterized.parameters(
+      ({
+          'GOOGLE_ENTRYPOINT': 'foo'
+      }, 'GOOGLE_ENTRYPOINT is reserved for internal use by GCF deployments '
+       'and cannot be used.'),
+      ({
+          'GOOGLE_FUNCTION_TARGET': 'foo'
+      }, 'GOOGLE_FUNCTION_TARGET is reserved for internal use by GCF '
+       'deployments and cannot be used.'),
+      ({
+          'GOOGLE_RUNTIME': 'foo'
+      }, 'GOOGLE_RUNTIME is reserved for internal use by GCF deployments and '
+       'cannot be used.'),
+      ({
+          'GOOGLE_RUNTIME_VERSION': 'foo'
+      }, 'GOOGLE_RUNTIME_VERSION is reserved for internal use by GCF '
+       'deployments and cannot be used.'),
+      ({
+          '': 'bar'
+      }, 'Environment variable keys cannot be empty.'),
+      ({
+          'X_GOOGLE_FOO': 'boo'
+      }, 'Environment variable keys that start with `X_GOOGLE_` are reserved '
+       'for use by deployment tools and cannot be specified manually.'),
+      ({
+          'FOO=BAR': 'boo'
+      }, 'Environment variable keys cannot contain `=`.'),
+  )
+  def testBuildEnvVarsFromFileWithInvalidKeysFails(self, build_env_vars,
+                                                   expected_error_message):
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           expected_error_message):
+      with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+        yaml_load_path.return_value = build_env_vars
+
+        self.Run('functions deploy my-test --build-env-vars-file '
+                 'build-env-vars.yml --runtime=nodejs10')
 
 
 if __name__ == '__main__':

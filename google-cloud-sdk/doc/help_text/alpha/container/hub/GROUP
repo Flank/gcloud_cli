@@ -3,7 +3,7 @@ NAME
         your Kubernetes clusters with Hub
 
 SYNOPSIS
-    gcloud alpha container hub GROUP [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha container hub GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) The command group to register GKE or other Kubernetes clusters
@@ -29,9 +29,6 @@ GROUPS
      config-management
         (ALPHA) Manage Config Management feature.
 
-     features
-        (ALPHA) Manage features on all Hub memberships(registered clusters).
-
      ingress
         (ALPHA) Manage MultiClusterIngress Feature.
 
@@ -39,14 +36,25 @@ GROUPS
         (ALPHA) Manage memberships of all your GKE and other Kubernetes cluster
         with HUB.
 
+     multi-cluster-services
+        (ALPHA) Manage MultiClusterServiceDiscovery Feature.
+
 EXAMPLES
     Manage memberships of all your GKE and other Kubernetes clusters with Hub:
 
         $ gcloud alpha container hub memberships --help
 
-    Manage features on all memberships:
+    Manage Config Management feature on all memberships:
 
-        $ gcloud alpha container hub features --help
+        $ gcloud alpha container hub config-management --help
+
+    Manage MultiClusterIngress feature on all memberships:
+
+        $ gcloud alpha container hub ingress --help
+
+    Manage MultiClusterServices feature on all memberships:
+
+        $ gcloud alpha container hub multi-cluster-services --help
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

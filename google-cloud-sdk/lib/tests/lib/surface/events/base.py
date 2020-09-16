@@ -40,6 +40,9 @@ ALPHA_API_VERSION = 'v1alpha1'
 EVENTS_API_NAME = 'events'
 EVENTS_API_VERSION = 'v1beta1'
 
+ANTHOS_API_NAME = 'anthosevents'
+ANTHOS_API_VERSION = 'v1beta1'
+
 # API version used for working with CRDs.
 _CRD_API_VERSION = 'v1beta1'
 
@@ -54,11 +57,11 @@ class EventsBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   # Subclasses may change the values of these fields in PreSetUp().
   # This is the main API name and version for the test class. They are used
   # everywhere except when working with core resources (Anthos only) or CRDs.
-  # For now, the only supported values are ALPHA_API_NAME/VERSION and
-  # EVENTS_API_NAME/VERSION.
-  api_name = ALPHA_API_NAME
-  api_version = ALPHA_API_VERSION
-  platform = 'managed'
+  # For now, the only supported values are ALPHA_API_NAME/VERSION,
+  # EVENTS_API_NAME/VERSION, and ANTHOS_API_NAME/VERSION.
+  api_name = ANTHOS_API_NAME
+  api_version = ANTHOS_API_VERSION
+  platform = 'gke'
   region = 'us-central1'
 
   # API name and version used by Anthos for working with core resources.

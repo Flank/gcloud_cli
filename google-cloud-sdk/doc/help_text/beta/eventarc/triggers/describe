@@ -35,7 +35,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To describe the trigger 'my-trigger', run:
+    To describe the trigger my-trigger, run:
 
         $ gcloud beta eventarc triggers describe my-trigger
 

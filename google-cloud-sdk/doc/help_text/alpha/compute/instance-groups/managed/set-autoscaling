@@ -15,14 +15,19 @@ SYNOPSIS
         [--scale-based-on-load-balancing]
         [--scale-in-control=[max-scaled-in-replicas=MAX-SCALED-IN-REPLICAS],
           [max-scaled-in-replicas-percent=MAX-SCALED-IN-REPLICAS-PERCENT],
-          [time-window=TIME-WINDOW]] [--stackdriver-metric-filter=FILTER]
+          [time-window=TIME-WINDOW]] [--set-schedule=SET_SCHEDULE]
+        [--stackdriver-metric-filter=FILTER]
         [--stackdriver-metric-single-instance-assignment=ASSIGNMENT]
         [--stackdriver-metric-utilization-target=TARGET]
         [--stackdriver-metric-utilization-target-type=TARGET_TYPE]
         [--target-cpu-utilization=TARGET_CPU_UTILIZATION]
         [--target-load-balancing-utilization=TARGET_LOAD_BALANCING_UTILIZATION]
         [--update-stackdriver-metric=METRIC] [--region=REGION | --zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--schedule-cron=SCHEDULE_CRON
+          --schedule-description=SCHEDULE_DESCRIPTION
+          --schedule-duration-sec=SCHEDULE_DURATION_SEC
+          --schedule-min-required-replicas=SCHEDULE_MIN_REQUIRED_REPLICAS
+          --schedule-time-zone=SCHEDULE_TIME_ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-groups managed set-autoscaling sets
@@ -149,6 +154,9 @@ FLAGS
             allowed deduction subtracted from the peak size observed in this
             period. Measured in seconds.
 
+     --set-schedule=SET_SCHEDULE
+        A unique name of the scaling schedule.
+
      --stackdriver-metric-filter=FILTER
         Expression for filtering samples used to autoscale, see
         https://cloud.google.com/monitoring/api/v3/filters.
@@ -214,6 +222,52 @@ FLAGS
 
           Overrides the default compute/zone property value for this command
           invocation.
+
+     --schedule-cron=SCHEDULE_CRON
+        Start time of the scaling schedule in cron format.
+
+        This is when an autoscaler will start creating new VMs if MIG size is
+        lower than the minimum number of instances. Set the start time to allow
+        enough time for new VMs to boot and initialize. For example if your
+        workload takes 10 minutes from VM creation to start serving then set
+        start time 10 minutes earlier than the time you need VMs to be ready.
+
+     --schedule-description=SCHEDULE_DESCRIPTION
+        A verbose description of the scaling schedule.
+
+     --schedule-duration-sec=SCHEDULE_DURATION_SEC
+        How long should the scaling schedule be active, measured in seconds.
+
+        Minimum duration is 5 minutes. Scaling schedule is active from its
+        start time and for configured duration. During this time autoscaler
+        will scale MIG to have at least as many VMs as defined by the minimum
+        number of instances. After specified duration if there is no need to
+        maintain capacity, the autoscaler will start removing instances after a
+        10 minutes stabilization period and (if configured) following scale-in
+        controls.
+
+     --schedule-min-required-replicas=SCHEDULE_MIN_REQUIRED_REPLICAS
+        How many VMs autoscaler should ensure for the duration of this scaling
+        schedule.
+
+        Autoscaler will provide at least this number of instances when the
+        scaling schedule is active. MIG can have more VMs if there are other
+        scaling schedules active with higher instance count or if autoscaling
+        policy (for example on CPU) requires more instances to meet its target.
+
+        This configuration does not change autoscaling minimum and maximum
+        instance limits which are always in effect. Autoscaler will not create
+        more than the maximum number of instances configured for MIG.
+
+     --schedule-time-zone=SCHEDULE_TIME_ZONE
+        Location of the scaling schedule's start time.
+
+        It should be provided provided as a location from the IANA tz database
+        (for example Europe/Paris). It will consider daylight saving time (DST)
+        adjustments. If no time zone is provided UTC is used as a default.
+
+        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for
+        the list of valid timezones.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

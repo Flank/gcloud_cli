@@ -25,7 +25,7 @@ COMMANDS
         (ALPHA) Request for creating an instance.
 
      delete
-        (ALPHA) Request for deleting instance.
+        (ALPHA) Request for deleting instances.
 
      describe
         (ALPHA) Request for describing instances.
@@ -34,7 +34,7 @@ COMMANDS
         (ALPHA) Get IAM policy for an instance.
 
      is-upgradeable
-        (ALPHA) Request for check if instance is upgradable.
+        (ALPHA) Request for checking if a notebook instance is upgradeable.
 
      list
         (ALPHA) Request for listing instances.
@@ -55,7 +55,7 @@ COMMANDS
         (ALPHA) Request for starting instances.
 
      stop
-        (ALPHA) Request for stoping instances.
+        (ALPHA) Request for stopping instances.
 
      update
         (ALPHA) Request for updating instances.

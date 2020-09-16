@@ -242,11 +242,11 @@ class CreateTestAlpha(CreateTestBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'v1alpha1'
 
-  def testCreate_TlsMode(self):
+  def testCreate_TransitEncryptionMode(self):
     instance_to_create = self.MakeAllOptionsInstance(
         redis_version='REDIS_4_0',
         connect_mode='PRIVATE_SERVICE_ACCESS',
-        tls_mode='BASIC_TLS')
+        transit_encryption_mode='SERVER_AUTHENTICATION')
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
@@ -264,7 +264,7 @@ class CreateTestAlpha(CreateTestBeta):
         ' --size 4'
         ' --tier standard'
         ' --connect-mode private_service_access'
-        ' --tls-mode basic_tls'
+        ' --transit-encryption-mode server_authentication'
         ' --zone zone1'.format(self.instance_id, self.region_id, network))
 
     self.assertEqual(actual_instance, expected_instance)

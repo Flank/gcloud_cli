@@ -21,15 +21,12 @@ from googlecloudsdk.api_lib.auth import service_account
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
 
-from google.auth import crypt as google_auth_crypt
 from google.oauth2 import service_account as google_auth_service_account
 
 
 class ServiceAccountTest(credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
-    self.StartObjectPatch(google_auth_crypt.RSASigner,
-                          'from_service_account_info')
     self.creds_dict = {
         'type': 'service_account',
         'client_email': 'bar@developer.gserviceaccount.com',

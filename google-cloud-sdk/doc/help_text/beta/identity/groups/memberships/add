@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta identity groups memberships add --group-email=GROUP_EMAIL
         --member-email=MEMBER_EMAIL --organization=ORGANIZATION
-        [--roles=[ROLES,...]] [GCLOUD_WIDE_FLAG ...]
+        [--expiration=EXPIRATION] [--roles=[ROLES,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create a new membership in an existing group.
@@ -21,9 +21,14 @@ REQUIRED FLAGS
         The organization of the group the new membership is being added to.
 
 OPTIONAL FLAGS
+     --expiration=EXPIRATION
+        Optional time of expiration for the membership. This is given as a
+        duration from now, for example '30d', '6m', '3y' for 30 days, 6 months,
+        or 3 years respectively.
+
      --roles=[ROLES,...]
-        Roles for the membership within the Group. If not specified, MEMBER
-        will be used as a default value.
+        A comma-separated list of roles for the membership within the Group. If
+        not specified, MEMBER will be used as a default value.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

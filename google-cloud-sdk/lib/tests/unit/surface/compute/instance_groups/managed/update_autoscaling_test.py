@@ -345,5 +345,229 @@ class InstanceGroupManagersSetAutoscalingZonalTestAlpha(
 
     self.CheckRequests(*self.expected_requests)
 
+  def testPatchAutoscaler_MinMax(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            minNumReplicas=1,
+            maxNumReplicas=20)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--min-num-replicas 1 '
+             '--max-num-replicas 20 '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testPatchAutoscaler_ScheduledScaling_WithMinMax(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    schedule='30 6 * * Mon-Fri',
+                    durationSec=3600,
+                    timeZone='America/New_York',
+                    minRequiredReplicas=10,
+                    description='description'))])
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scalingSchedules=schedules,
+            minNumReplicas=1,
+            maxNumReplicas=20)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--min-num-replicas 1 '
+             '--max-num-replicas 20 '
+             '--set-schedule test-sbs-1 '
+             '--schedule-cron "30 6 * * Mon-Fri" '
+             '--schedule-duration-sec 3600 '
+             '--schedule-time-zone "America/New_York" '
+             '--schedule-min-required-replicas 10 '
+             '--schedule-description "description" '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testPatchAutoscaler_ScheduledScaling(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    schedule='30 6 * * Mon-Fri',
+                    durationSec=3600,
+                    timeZone='America/New_York',
+                    minRequiredReplicas=10,
+                    description='description'))])
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scalingSchedules=schedules)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--set-schedule test-sbs-1 '
+             '--schedule-cron "30 6 * * Mon-Fri" '
+             '--schedule-duration-sec 3600 '
+             '--schedule-time-zone "America/New_York" '
+             '--schedule-min-required-replicas 10 '
+             '--schedule-description "description" '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testPatchAutoscaler_ScheduledScaling_MissingRequired(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy()
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+    with self.assertRaises(managed_instance_groups_utils.InvalidArgumentError):
+      self.Run(
+          'compute instance-groups managed update-autoscaling group-1 '
+          '--set-schedule test-sbs-1 '
+          '--schedule-duration-sec 3600 '
+          '--schedule-time-zone "America/New_York" '
+          '--schedule-min-required-replicas 10 '
+          '--schedule-description "description" '
+          '{} {}'.format(self.location_flag, self.location))
+
+  def testPatchAutoscaler_UpdateScheduledScaling(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    schedule='30 6 * * Mon-Fri',
+                    durationSec=3600,
+                    minRequiredReplicas=10))])
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scalingSchedules=schedules)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--update-schedule test-sbs-1 '
+             '--schedule-cron "30 6 * * Mon-Fri" '
+             '--schedule-duration-sec 3600 '
+             '--schedule-min-required-replicas 10 '
+             '{} {}'.format(self.location_flag, self.location))
+
+  def testPatchAutoscaler_EnableScheduledScaling(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    disabled=False))])
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scalingSchedules=schedules)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--enable-schedule test-sbs-1 '
+             '{} {}'.format(self.location_flag, self.location))
+
+  def testPatchAutoscaler_DisableScheduledScaling(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule(
+                    disabled=True))])
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scalingSchedules=schedules)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--disable-schedule test-sbs-1 '
+             '{} {}'.format(self.location_flag, self.location))
+
+  def testPatchAutoscaler_RemoveScheduledScaling(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    scaling_schedule_wrapper = (self.messages.AutoscalingPolicy.
+                                ScalingSchedulesValue.AdditionalProperty)
+    schedules = self.messages.AutoscalingPolicy.ScalingSchedulesValue(
+        additionalProperties=[
+            scaling_schedule_wrapper(
+                key='test-sbs-1',
+                value=self.messages.AutoscalingPolicyScalingSchedule())])
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scalingSchedules=schedules)
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--remove-schedule test-sbs-1 '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
 if __name__ == '__main__':
   test_case.main()

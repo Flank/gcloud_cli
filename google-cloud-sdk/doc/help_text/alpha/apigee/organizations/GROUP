@@ -18,9 +18,15 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     delete
+        (ALPHA) Delete an Apigee organization.
+
      list
         (ALPHA) List Apigee organizations and their paired Cloud Platform
         projects.
+
+     provision
+        (ALPHA) Provision an Apigee SaaS organization.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

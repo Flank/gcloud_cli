@@ -39,7 +39,7 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To delete the trigger 'my-trigger', run:
+    To delete the trigger my-trigger, run:
 
         $ gcloud beta eventarc triggers delete my-trigger
 

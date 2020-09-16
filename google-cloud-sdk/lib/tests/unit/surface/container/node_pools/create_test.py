@@ -232,22 +232,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --sandbox type=gvisor'
         ' --boot-disk-kms-key={bootDiskKmsKey}'
         ' --node-group={nodeGroup}'.format(**pool_kwargs))
-    # pylint: disable=line-too-long
-    self.AssertErrContains(
-        """WARNING: Starting in 1.12, new node pools will be created with \
-their legacy Compute Engine instance metadata APIs disabled by default. To \
-create a node pool with legacy instance metadata endpoints disabled, run \
-`node-pools create` with the flag `--metadata disable-legacy-endpoints=true`.
-This will enable the autorepair feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
-information on node autorepairs.
-{{"ux": "PROGRESS_TRACKER", "message": "Creating node pool my-custom-pool", \
-"status": "SUCCESS"}}
-Created \
-[https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-custom-pool].
-""".format(self.API_VERSION))
-    # pylint: enable=line-too-long
     self.AssertOutputMatches(
         (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {machine_type} {disk_size} {version}\\n').format(
@@ -260,7 +244,8 @@ Created \
   @parameterized.parameters(
       ('', '', True),
       ('--image-type', 'COS', True),
-      ('--image-type', 'UBUNTU', False),
+      ('--image-type', 'UBUNTU', True),
+      ('--image-type', 'WINDOWS_LTSC', False)
   )
   def testAutoRepairDefaults(self, image_flag, image_value, expect_autorepair):
     pool_kwargs = {

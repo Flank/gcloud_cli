@@ -1,5 +1,6 @@
 NAME
-    gcloud alpha database-migration migration-jobs list - list migration jobs
+    gcloud alpha database-migration migration-jobs list - list Database
+        Migration Service migration jobs
 
 SYNOPSIS
     gcloud alpha database-migration migration-jobs list --region=REGION
@@ -7,7 +8,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List migration jobs.
+    (ALPHA) List Database Migration Service migration jobs.
 
 REQUIRED FLAGS
      Region resource - The location you want to list the migration jobs for.

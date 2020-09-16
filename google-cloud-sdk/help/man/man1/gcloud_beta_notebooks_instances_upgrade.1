@@ -17,7 +17,7 @@ gcloud beta notebooks instances upgrade \- request for upgrading instances
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for upgrading notebook instance.
+\fB(BETA)\fR Request for upgrading notebook instances.
 
 
 
@@ -80,9 +80,8 @@ Run \fB$ gcloud help\fR for details.
 To upgrade an instance, run:
 
 .RS 2m
-$ gcloud beta notebooks instances upgrade \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud beta notebooks instances upgrade example\-instance \e
+  \-\-location=us\-central1\-a
 .RE
 
 

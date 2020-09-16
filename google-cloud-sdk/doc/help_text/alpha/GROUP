@@ -149,6 +149,10 @@ GROUPS
      asset
         (ALPHA) Manage the Cloud Asset Inventory.
 
+     assured
+        (ALPHA) Commands for reading and manipulating Assured Workloads data
+        controls.
+
      auth
         (ALPHA) Manage oauth2 credentials for the Google Cloud SDK.
 
@@ -190,7 +194,7 @@ GROUPS
         (ALPHA) Manage Cloud Data Catalog resources.
 
      database-migration
-        (ALPHA) Manage Cloud Database Migration Service resources.
+        (ALPHA) Manage Database Migration Service resources.
 
      dataflow
         (ALPHA) Manage Google Cloud Dataflow resources.
@@ -317,9 +321,6 @@ GROUPS
      resource-settings
         (ALPHA) Create and manage Resource Settings.
 
-     resources
-        (ALPHA) List and search resources accessible from your account.
-
      run
         (ALPHA) Manage your Cloud Run applications.
 
@@ -367,9 +368,6 @@ COMMANDS
 
      interactive
         (ALPHA) Start the gcloud interactive shell.
-
-     search-help
-        (ALPHA) (DEPRECATED) Search the help text of gcloud commands.
 
      survey
         (ALPHA) Invoke a customer satisfaction survey for Cloud SDK.

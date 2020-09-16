@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instances ops\-agents policies update \- update a Google Cloud Operations Suite Agents (Ops\ Agents) policy
+gcloud alpha compute instances ops\-agents policies update \- update a Google Cloud's operations suite agents (Ops\ Agents) policy
 
 
 
@@ -18,13 +18,13 @@ gcloud alpha compute instances ops\-agents policies update \- update a Google Cl
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instances ops\-agents policies update\fR
-updates a policy that facilitates agent management across Google Cloud Compute
+updates a policy that facilitates agent management across Compute Engine
 instances based on user specified instance filters. This policy installs,
 specifies versioning, enables autoupgrade, and removes Ops Agents.
 
 The command returns the content of the updated policy or an error indicating why
-the update fails. The updated policy takes effect asynchronously. It can take 10
-~ 15 minutes for the VMs to enforce the updated policy.
+the update fails. The updated policy takes effect asynchronously. It can take
+10\-15 minutes for the VMs to enforce the updated policy.
 
 The available flags for the \f5\fIupdate\fR\fR command are similar to the flags
 for the \f5\fIcreate\fR\fR command. All the flags for \f5\fIupdate\fR\fR are
@@ -32,13 +32,13 @@ optional. If a flag is not specified, it retains the original value. The full
 value of each flag needs to be re\-stated during \f5\fIupdate\fR\fR. Take the
 \f5\fI\-\-agents\fR\fR flag for example:
 
-If the original policy specified two agents (e.g.
-\f5\fI\-\-agents="type=logging;type=metrics"\fR\fR), yet only one agent (e.g.
-\f5\fI\-\-agents="type=logging"\fR\fR) is specified in a \fBgcloud alpha compute
-instances ops\-agents policies update\fR command, the other agent will no longer
-be managed and enforced by the policy. In order to remove the metrics agent in
-this case, set the package state explicitly to \f5\fIremoved\fR\fR (e.g.
-\f5\fI\-\-agents="type=logging;type=metrics,package\-state=removed"\fR\fR).
+If the original policy specified two agents
+(\f5\fI\-\-agents="type=logging;type=metrics"\fR\fR), and only one agent
+(\f5\fI\-\-agents="type=logging"\fR\fR) is specified in a \fBgcloud alpha
+compute instances ops\-agents policies update\fR command, then the policy stops
+managing and enforcing the unspecified agent. In order to remove the metrics
+agent in this case, set the package state explicitly to \f5\fIremoved\fR\fR
+(\f5\fI\-\-agents="type=logging;type=metrics,package\-state=removed"\fR\fR).
 
 In order to explicitly clear the \f5\fI\-\-group\-labels\fR\fR,
 \f5\fI\-\-instances\fR\fR, and \f5\fI\-\-zones\fR\fR instance filters, use the

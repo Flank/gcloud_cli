@@ -63,27 +63,27 @@ class ReachabilityCheckerTests(diagnostics_test_base.DiagnosticTestBase):
 
   def testCantConnectNoInternet(self):
     self.http_request_mock.side_effect = http_client.ResponseNotReady
-    expected_result = CheckFailResult(['https://www.google.com'])
+    expected_result = CheckFailResult(['https://www.googleapis.com'])
     actual_result, actual_fixer = self.reachability_checker.Check(
-        ['https://www.google.com'])
+        ['https://www.googleapis.com'])
     self.AssertResultEqual(expected_result, actual_result)
     self.assertEqual(CHANGE_PROXY, actual_fixer)
 
   def testCantConnectNoInternetTimeout(self):
     self.http_request_mock.side_effect = socket.timeout
-    expected_result = CheckFailResult(['https://www.google.com'],
+    expected_result = CheckFailResult(['https://www.googleapis.com'],
                                       exception=socket.timeout())
     actual_result, actual_fixer = self.reachability_checker.Check(
-        ['https://www.google.com'])
+        ['https://www.googleapis.com'])
     self.AssertResultEqual(expected_result, actual_result)
     self.assertEqual(CHANGE_PROXY, actual_fixer)
 
   def testCantConnectSSLError(self):
     self.http_request_mock.side_effect = ssl.SSLError
-    expected_result = CheckFailResult(['https://www.google.com'],
+    expected_result = CheckFailResult(['https://www.googleapis.com'],
                                       exception=ssl.SSLError())
     actual_result, actual_fixer = self.reachability_checker.Check(
-        ['https://www.google.com'])
+        ['https://www.googleapis.com'])
     self.AssertResultEqual(expected_result, actual_result)
     self.assertEqual(CHANGE_PROXY, actual_fixer)
 
@@ -111,7 +111,7 @@ class ReachabilityCheckerTests(diagnostics_test_base.DiagnosticTestBase):
     expected_result = check_base.Result(
         passed=True, message='Reachability Check passed.')
     actual_result, actual_fixer = self.reachability_checker.Check(
-        ['https://www.google.com'])
+        ['https://www.googleapis.com'])
     self.AssertResultEqual(expected_result, actual_result)
     self.assertEqual(None, actual_fixer)
 
@@ -195,7 +195,6 @@ class NetworkDiagnosticTests(diagnostics_test_base.DiagnosticTestBase):
 class DefaultUrlsTests(test_case.Base):
 
   _BASE_DEFAULT_URLS = [
-      'https://www.google.com',
       'https://accounts.google.com',
       'https://cloudresourcemanager.googleapis.com/v1beta1/projects',
       'https://www.googleapis.com/auth/cloud-platform']

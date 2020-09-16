@@ -1,6 +1,6 @@
 NAME
     gcloud alpha container hub config-management status - prints the status of
-        all clusters with Configuration Management installed
+        all clusters with Config Management installed
 
 SYNOPSIS
     gcloud alpha container hub config-management status [--filter=EXPRESSION]
@@ -54,8 +54,30 @@ EXAMPLES
         $ gcloud alpha container hub config-management status
 
         Name             Status  Last_Synced_Token   Sync_Branch  Last_Synced_Time
-        mamaged-cluster  SYNCED  2945500b7f          acme         2020-03-23
+        managed-cluster  SYNCED  2945500b7f          acme         2020-03-23
         11:12:31 -0700 PDT
+
+    View the status for the cluster named managed-cluster-a:
+
+        $ gcloud alpha container hub config-management status \
+            --filter="acm_status.name:managed-cluster-a"
+
+    Use a regular expression to list status for multiple clusters:
+
+        $ gcloud alpha container hub config-management status \
+            --filter="acm_status.name ~ managed-cluster.*"
+
+    List all clusters where current status is SYNCED:
+
+        $ gcloud alpha container hub config-management status \
+            --filter="acm_status.config_sync:SYNCED"
+
+    List all the clusters where sync_branch is v1 and current Config Sync
+    status is not SYNCED:
+
+        $ gcloud alpha container hub config-management status \
+            --filter="acm_status.sync_branch:v1 AND\
+         -acm_status.config_sync:SYNCED"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -29,16 +29,18 @@ from tests.lib.surface.sql import base
 class _BaseInstancesExportCsvTest(object):
   # pylint:disable=g-tzinfo-datetime
 
-  def _ExpectExport(self, databases=None, query=None):
+  def _ExpectExport(self, databases=None, query=None, offload=False):
     # Generate CSV export context.
     export_context = self.messages.ExportContext(
         csvExportOptions=self.messages.ExportContext.CsvExportOptionsValue(
-            selectQuery=query,),
+            selectQuery=query),
         databases=databases or [],
         fileType=self.messages.ExportContext.FileTypeValueValuesEnum.CSV,
         kind='sql#exportContext',
         sqlExportOptions=None,
-        uri='gs://speckletest/testinstance.gz')
+        uri='gs://speckletest/testinstance.gz',
+        offload=offload,
+    )
 
     # Mock out endpoints for export.
     self.mocked_client.instances.Export.Expect(
@@ -142,6 +144,11 @@ class _BaseInstancesExportCsvTest(object):
     self._ExpectExport(query='SELECT * FROM table', databases=['db1', 'db2'])
     self.Run('sql export csv testinstance --database=db1,db2 '
              '--query="SELECT * FROM table" gs://speckletest/testinstance.gz')
+
+  def testExportWithOffload(self):
+    self._ExpectExport(query='SELECT * FROM table', offload=True)
+    self.Run('sql export csv testinstance --query="SELECT * FROM table" '
+             'gs://speckletest/testinstance.gz --offload')
 
 
 class InstancesExportCsvGATest(_BaseInstancesExportCsvTest, base.SqlMockTestGA):

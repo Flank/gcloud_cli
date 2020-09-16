@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO(b/140557440) Break up file to prevent linter deadline.
-
 """Tests for the backend services add-backend subcommand."""
 
 from __future__ import absolute_import

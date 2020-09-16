@@ -25,6 +25,9 @@ COMMANDS
      github
         (ALPHA) Create a build trigger for a GitHub repository.
 
+     scheduled
+        (ALPHA) Create a build trigger that fires on a schedule.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

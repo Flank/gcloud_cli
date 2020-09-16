@@ -1,16 +1,16 @@
 NAME
-    gcloud alpha database-migration migration-jobs delete - delete a migration
-        job
+    gcloud alpha database-migration migration-jobs delete - delete a Database
+        Migration Service migration job
 
 SYNOPSIS
     gcloud alpha database-migration migration-jobs delete
         (MIGRATION_JOB : --region=REGION) [--force] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a Cloud Database Migration Service migration job.
+    (ALPHA) Delete a Database Migration Service migration job.
 
 POSITIONAL ARGUMENTS
-     Migration job resource - Migration job resource - Cloud Database Migration
+     Migration job resource - Migration job resource - Database Migration
      Service migration job to delete. The arguments in this group can be used
      to specify the attributes of this resource. (NOTE) Some attributes are not
      given arguments in this group but can be set in other ways. To set the
@@ -45,7 +45,7 @@ API REFERENCE
     for this API can be found at: https://cloud.google.com/datamigration/
 
 EXAMPLES
-    To delete a connection profile:
+    To delete a migration job:
 
         $ gcloud alpha database-migration migration-jobs delete \
           MIGRATION_JOB --region=us-central1

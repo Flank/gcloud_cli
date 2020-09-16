@@ -20,7 +20,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import io
+import textwrap
 import uuid
+
+from apitools.base.py import batch
+from apitools.base.py import http_wrapper
 
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
@@ -29,15 +33,18 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import requests as creds_requests
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import platforms
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+import httplib2
 import mock
 import requests
 import six
 from six.moves import http_client as httplib
 from google.auth import credentials
 from google.auth import exceptions as google_auth_exceptions
+from google.oauth2 import credentials as google_auth_creds
 
 
 def MakeRequestsResponse(status_code, headers, body):
@@ -77,6 +84,33 @@ class CredentialsTest(sdk_test_base.WithFakeAuth):
         'Access was blocked due to an organization policy'):
       http_client.request('GET', 'http://foo.com')
 
+  def testBatchTokenRefreshError(self):
+    refresh_mock = self.StartObjectPatch(credentials.Credentials,
+                                         'before_request')
+    refresh_mock.side_effect = google_auth_exceptions.RefreshError
+    http_client = creds_requests.GetApitoolsRequests(
+        creds_requests.GetSession())
+    batch_http_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute')
+    with self.assertRaisesRegex(
+        store.TokenRefreshError,
+        'There was a problem refreshing your current auth tokens'):
+      batch_http_request.Execute(http_client)
+
+  def testBatchTokenRefreshDeniedByCAAError(self):
+    refresh_mock = self.StartObjectPatch(credentials.Credentials,
+                                         'before_request')
+    refresh_mock.side_effect = google_auth_exceptions.RefreshError(
+        'access_denied: Account restricted')
+    http_client = creds_requests.GetApitoolsRequests(
+        creds_requests.GetSession())
+    batch_http_request = batch.BatchHttpRequest(
+        'https://www.googleapis.com/batch/compute')
+    with self.assertRaisesRegex(
+        store.TokenRefreshDeniedByCAAError,
+        'Access was blocked due to an organization policy'):
+      batch_http_request.Execute(http_client)
+
 
 class FakeService(object):
   """A service for testing."""
@@ -94,6 +128,86 @@ class FakeService(object):
 
   def ProcessHttpResponse(self, _, http_response):
     return http_response
+
+
+class BatchTokenRefreshTest(sdk_test_base.WithFakeAuth):
+
+  def PreSetUp(self):
+    self.use_google_auth = True
+
+  def __ConfigureMock(self, mock_request, expected_request, response):
+    if isinstance(response, list):
+      response = list(response)
+
+    def CheckRequest(_, request, **kwargs):
+      del request, kwargs  # unused
+
+      if isinstance(response, list):
+        return response.pop(0)
+      return response
+
+    mock_request.side_effect = CheckRequest
+
+  def testBatchTokenRefresh(self):
+    refresh_mock = self.StartObjectPatch(google_auth_creds.Credentials,
+                                         'refresh')
+    mock_service = FakeService()
+
+    desired_url = 'https://www.example.com'
+    batch_api_request = batch.BatchApiRequest(batch_url=desired_url)
+    # The request to be added. The actual request sent will be somewhat
+    # larger, as this is added to a batch.
+    desired_request = http_wrapper.Request(desired_url, 'POST', {
+        'content-type': 'multipart/mixed; boundary="None"',
+        'content-length': 80,
+    }, 'x' * 80)
+
+    mock_request = self.StartObjectPatch(http_wrapper, 'MakeRequest',
+                                         autospec=True)
+    self.__ConfigureMock(
+        mock_request,
+        http_wrapper.Request(
+            desired_url, 'POST', {
+                'content-type': 'multipart/mixed; boundary="None"',
+                'content-length': 419,
+            }, 'x' * 419), [
+                http_wrapper.Response(
+                    {
+                        'status': '200',
+                        'content-type': 'multipart/mixed; boundary="boundary"',
+                    },
+                    textwrap.dedent("""\
+            --boundary
+            content-type: text/plain
+            content-id: <id+0>
+
+            HTTP/1.1 401 UNAUTHORIZED
+            Invalid grant
+
+            --boundary--"""), None),
+                http_wrapper.Response(
+                    {
+                        'status': '200',
+                        'content-type': 'multipart/mixed; boundary="boundary"',
+                    },
+                    textwrap.dedent("""\
+            --boundary
+            content-type: text/plain
+            content-id: <id+0>
+
+            HTTP/1.1 200 OK
+            content
+            --boundary--"""), None)
+            ])
+
+    batch_api_request.Add(mock_service, 'unused', None, {
+        'desired_request': desired_request,
+    })
+
+    http_client = creds_requests.GetApitoolsRequests(
+        creds_requests.GetSession())
+    batch_api_request.Execute(http_client)
+    refresh_mock.assert_called_once()
 
 
 class HttpTestBase(sdk_test_base.SdkBase):
@@ -248,6 +362,32 @@ class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
                      self.request_mock.call_args[1]['headers'])
     self.assertNotIn(b'X-Goog-User-Project',
                      self.request_mock.call_args[1]['headers'])
+
+
+class ApitoolsRequestsTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.use_google_auth = True
+
+  @parameterized.parameters(
+      (None, b'data'),
+      ('utf-8', 'data'),
+  )
+  def testResponseEncoding(self, encoding, expected_response):
+    self.request_mock = self.StartObjectPatch(
+        requests.Session,
+        'request',
+        return_value=MakeRequestsResponse(httplib.OK, {
+            'header': 'value',
+        }, b'data'))
+    session = creds_requests.GetSession(response_encoding=encoding)
+    apitools_requests = creds_requests.GetApitoolsRequests(session)
+    response = apitools_requests.request('url')
+    self.assertEqual(response[0], httplib2.Response({
+        'status': httplib.OK,
+        'header': 'value',
+    }))
+    self.assertEqual(response[1], expected_response)
 
 
 if __name__ == '__main__':

@@ -23,7 +23,8 @@ COMMANDS
         (ALPHA) Update Configmanagement Feature Spec.
 
      delete
-        (ALPHA) Remove Configmanagement Feature Spec for the given membership.
+        (ALPHA) Remove the ConfigManagement Feature Spec for the given
+        membership.
 
      disable
         (ALPHA) Disable Config Management feature.
@@ -32,7 +33,7 @@ COMMANDS
         (ALPHA) Enable Config Management feature.
 
      status
-        (ALPHA) Prints the status of all clusters with Configuration Management
+        (ALPHA) Prints the status of all clusters with Config Management
         installed.
 
 NOTES

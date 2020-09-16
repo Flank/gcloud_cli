@@ -30,7 +30,11 @@ actions:
 - generate_resource_id:
     reference: my-test
     prefix: nm.test.
-
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
 - execute_command:
     command: network-management connectivity-tests create $$my-test$$ --protocol=UDP
       --source-instance=projects/fake-project/zones/fake-zone/instances/fake-source-instance
@@ -39,7 +43,7 @@ actions:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/global/connectivityTests?alt=json&testId=$$my-test$$
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/connectivityTests?alt=json&testId=$$my-test$$
           method: POST
           body:
             json:
@@ -56,12 +60,12 @@ actions:
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1580332376678-59d4dcdf0624d-b5f84ceb-dc895995
             metadata:
-              '@type': type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata
+              '@type': type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.OperationMetadata
               createTime: '2020-01-29T21:12:56.764616983Z'
               target: projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$
               verb: create
               cancelRequested: false
-              apiVersion: v1
+              apiVersion: $$api-version$$
             done: false
         expect_response:
           extract_references:
@@ -73,7 +77,7 @@ actions:
         Create request issued for: [$$my-test$$]
     - api_call:
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/$$operation$$?alt=json
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/$$operation$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -86,16 +90,16 @@ actions:
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1580332376678-59d4dcdf0624d-b5f84ceb-dc895995
             metadata:
-              '@type': type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata
+              '@type': type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.OperationMetadata
               createTime: '2020-01-29T21:12:56.764616983Z'
               endTime: '2020-01-29T21:12:56.801388458Z'
               target: projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$
               verb: create
               cancelRequested: false
-              apiVersion: v1
+              apiVersion: $$api-version$$
             done: true
             response:
-              '@type': type.googleapis.com/google.cloud.networkmanagement.v1.ConnectivityTest
+              '@type': type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.ConnectivityTest
               name: projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$
               createTime: '2020-01-29T21:12:56.759830452Z'
               updateTime: '2020-01-29T21:12:56.767263400Z'
@@ -105,7 +109,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$?alt=json
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -132,7 +136,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://networkmanagement.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$?alt=json
+          uri: https://networkmanagement.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -145,12 +149,12 @@ actions:
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1580332379140-59d4dce15f322-f65f2938-98a7f9d8
             metadata:
-              '@type': type.googleapis.com/google.cloud.networkmanagement.v1.OperationMetadata
+              '@type': type.googleapis.com/google.cloud.networkmanagement.$$api-version$$.OperationMetadata
               createTime: '2020-01-29T21:12:59.149638126Z'
               target: projects/cloud-sdk-integration-testing/locations/global/connectivityTests/$$my-test$$
               verb: delete
               cancelRequested: false
-              apiVersion: v1
+              apiVersion: $$api-version$$
             done: false
         poll_operation: true
     - expect_stderr: |

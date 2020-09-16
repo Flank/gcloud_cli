@@ -60,11 +60,13 @@ API REFERENCE
     https://cloud.google.com/ai-platform/notebooks/docs/
 
 EXAMPLES
-    To add an IAM policy binding for the role of 'roles/editor' for the user
-    'test-user@gmail.com' on the instance 'instance-id', run:
+    To add an IAM policy binding for the role of 'roles/notebooks.admin' for
+    the user 'test-user@gmail.com' on the instance 'instance-id', run:
 
-        $ gcloud beta notebooks instances add-iam-policy-binding TODO \
-            --member='user:test-user@gmail.com' --role='roles/editor'
+        $ gcloud beta notebooks instances add-iam-policy-binding \
+            --member='user:test-user@gmail.com' \
+            --role='roles/notebooks.admin' example-instance \
+            --location=us-central1-a
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

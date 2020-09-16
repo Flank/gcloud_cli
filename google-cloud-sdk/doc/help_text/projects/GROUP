@@ -45,6 +45,9 @@ COMMANDS
      get-ancestors
         Get the ancestors for a project.
 
+     get-ancestors-iam-policy
+        Get IAM policies for a project and its ancestors.
+
      get-iam-policy
         Get IAM policy for a project.
 

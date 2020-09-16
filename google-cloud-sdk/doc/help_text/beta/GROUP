@@ -143,6 +143,10 @@ GROUPS
      asset
         (BETA) Manage the Cloud Asset Inventory.
 
+     assured
+        (BETA) Commands for reading and manipulating Assured Workloads data
+        controls.
+
      auth
         (BETA) Manage oauth2 credentials for the Google Cloud SDK.
 
@@ -205,6 +209,9 @@ GROUPS
 
      error-reporting
         (BETA) Manage Stackdriver Error Reporting.
+
+     events
+        (BETA) Manage your Cloud Run for Anthos Events resources.
 
      filestore
         (BETA) Create and manipulate Cloud Filestore resources.

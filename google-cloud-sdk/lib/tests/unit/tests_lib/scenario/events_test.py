@@ -29,7 +29,6 @@ from tests.lib.scenario import events
 from tests.lib.scenario import reference_resolver
 from tests.lib.scenario import updates
 
-import httplib2
 from six.moves import http_client as httplib
 
 
@@ -44,14 +43,6 @@ class RequestTest(test_case.TestCase):
     self.assertEqual(request.headers, apitools_request.headers)
     self.assertEqual(request.body, apitools_request.body)
 
-  def testFromRequestArgs(self):
-    request = events.Request.FromRequestArgs(
-        'url', method='POST', body='test', headers={'header': 'val'})
-    self.assertEqual(request.uri, 'url')
-    self.assertEqual(request.method, 'POST')
-    self.assertEqual(request.headers, {'header': 'val'})
-    self.assertEqual(request.body, 'test')
-
 
 class ResponseTest(test_case.TestCase):
 
@@ -64,15 +55,6 @@ class ResponseTest(test_case.TestCase):
     self.assertEqual(response.status, apitools_response.status_code)
     self.assertEqual(response.headers, apitools_headers)
     self.assertEqual(response.body, apitools_response.content)
-
-  def testFromTransportResponse(self):
-    transport_response = (
-        httplib2.Response({'status': httplib.OK, 'header': 'val'}),
-        'test'.encode('utf-8'))
-    response = events.Response.FromTransportResponse(transport_response)
-    self.assertEqual(response.status, httplib.OK)
-    self.assertEqual(response.headers, {'header': 'val'})
-    self.assertEqual(response.body, 'test')
 
 
 class EventsTest(test_case.TestCase, parameterized.TestCase):

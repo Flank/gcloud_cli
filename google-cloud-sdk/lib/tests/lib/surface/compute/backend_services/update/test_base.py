@@ -24,7 +24,51 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute.backend_services import test_resources
 
 
-class UpdateTestBase(test_base.BaseTest):
+class CommonUpdateTestBase(test_base.BaseTest):
+  """Test base for the all api versions of backend services update subcommand."""
+
+  def CheckRequestMadeWithCdnPolicy(self, expected_cdn_policy):
+    """Verifies the request was made with the expected CDN policy."""
+    self.CheckRequestMadeWithCdnPolicyAndCustomResponseHeaders(
+        expected_cdn_policy, [], None)
+
+  def CheckRequestMadeWithCdnPolicyAndCustomResponseHeaders(
+      self, expected_cdn_policy, expected_custom_headers, enable_cdn=True):
+    """Verifies the request was made with the expected CDN policy and custom response headers."""
+    messages = self.messages
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  enableCDN=enable_cdn,
+                  cdnPolicy=expected_cdn_policy,
+                  customResponseHeaders=expected_custom_headers,
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+  def RunUpdate(self, command, use_global=True):
+    suffix = ' --global' if use_global else ''
+    self.Run('compute backend-services update ' + command + suffix)
+
+
+class UpdateTestBase(CommonUpdateTestBase):
   """Test base for the backend services update subcommand."""
 
   def SetUp(self):
@@ -42,12 +86,8 @@ class UpdateTestBase(test_base.BaseTest):
     self._https_backend_services_with_health_check = (
         test_resources.HTTPS_BACKEND_SERVICES_WITH_HEALTH_CHECK_V1)
 
-  def RunUpdate(self, command, use_global=True):
-    suffix = ' --global' if use_global else ''
-    self.Run('compute backend-services update ' + command + suffix)
 
-
-class BetaUpdateTestBase(test_base.BaseTest):
+class BetaUpdateTestBase(CommonUpdateTestBase):
   """Test base for the beta backend services update subcommand."""
 
   def SetUp(self):
@@ -60,12 +100,8 @@ class BetaUpdateTestBase(test_base.BaseTest):
     self._https_backend_services_with_health_check = (
         test_resources.HTTPS_BACKEND_SERVICES_WITH_HEALTH_CHECK_BETA)
 
-  def RunUpdate(self, command, use_global=True):
-    suffix = ' --global' if use_global else ''
-    self.Run('compute backend-services update ' + command + suffix)
 
-
-class AlphaUpdateTestBase(test_base.BaseTest):
+class AlphaUpdateTestBase(CommonUpdateTestBase):
   """Test base for the alpha backend services update subcommand."""
 
   def SetUp(self):
@@ -83,8 +119,3 @@ class AlphaUpdateTestBase(test_base.BaseTest):
         test_resources.TCP_BACKEND_SERVICES_WITH_HEALTH_CHECK_ALPHA)
     self._ssl_backend_services_with_health_check = (
         test_resources.SSL_BACKEND_SERVICES_WITH_HEALTH_CHECK_ALPHA)
-
-  def RunUpdate(self, command, use_global=True):
-    suffix = ' --global' if use_global else ''
-    self.Run('compute backend-services update ' + command + suffix)
-

@@ -1,5 +1,5 @@
 NAME
-    gcloud compute instances set-scheduling - set scheduling options for Google
+    gcloud compute instances set-scheduling - set scheduling options for
         Compute Engine virtual machines
 
 SYNOPSIS
@@ -13,7 +13,7 @@ SYNOPSIS
 
 DESCRIPTION
     $gcloud compute instances set-scheduling is used to configure scheduling
-    options for Google Compute Engine virtual machines.
+    options for Compute Engine virtual machines.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

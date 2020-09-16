@@ -1,6 +1,6 @@
 NAME
     gcloud compute instances add-iam-policy-binding - add IAM policy binding to
-        a Google Compute Engine instance
+        a Compute Engine instance
 
 SYNOPSIS
     gcloud compute instances add-iam-policy-binding (INSTANCE : --zone=ZONE)
@@ -9,9 +9,8 @@ SYNOPSIS
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Add an IAM policy binding to the IAM policy of a Google Compute Engine
-    instance. One binding consists of a member, a role, and an optional
-    condition.
+    Add an IAM policy binding to the IAM policy of a Compute Engine instance.
+    One binding consists of a member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
      Instance resource - The instance for which to add IAM policy binding to.

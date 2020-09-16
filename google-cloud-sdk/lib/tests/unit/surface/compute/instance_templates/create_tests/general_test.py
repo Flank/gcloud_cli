@@ -445,6 +445,27 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTestBeta):
         'WARNING: The --maintenance-policy flag is now deprecated. '
         'Please use `--on-host-maintenance` instead')
 
+  def testPostKeyRevocationActionType(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+          --post-key-revocation-action-type shutdown
+        """)
+
+    template = self._MakeInstanceTemplate()
+
+    template.properties.postKeyRevocationActionType = m.InstanceProperties.PostKeyRevocationActionTypeValueValuesEnum(
+        'SHUTDOWN')
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

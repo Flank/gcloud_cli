@@ -21,24 +21,20 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from tests.lib.surface.events import base
 
 
-class CreateTestAlpha(base.EventsBase):
+class CreateAnthosTestBeta(base.EventsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_name = 'anthosevents'
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.BETA
     self.core_api_name = 'anthosevents'
 
   def testEventTypesFailFailNonGKE(self):
-    """This command is only for initializing a cluster."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events brokers create default '
-               '--platform=managed --region=us-central1')
-    self.AssertErrContains(
-        'This command is only available with Cloud Run for Anthos.')
+    """This command is for Anthos only."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('events brokers create default ' '--platform=managed')
 
   def testCreate(self):
     """Tests successful init with success message."""
@@ -64,3 +60,18 @@ class CreateTestAlpha(base.EventsBase):
                '--platform=gke --cluster=cluster-1 '
                '--cluster-location=us-central1-a')
     self.AssertErrContains('Only brokers named "default" may be created.')
+
+
+class CreateAnthosTestAlpha(CreateAnthosTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.core_api_name = 'anthosevents'
+
+  def testEventTypesFailFailNonGKE(self):
+    """This command is only for initializing a cluster."""
+    with self.assertRaises(exceptions.UnsupportedArgumentError):
+      self.Run('events brokers create default '
+               '--platform=managed --region=us-central1')
+    self.AssertErrContains(
+        'This command is only available with Cloud Run for Anthos.')

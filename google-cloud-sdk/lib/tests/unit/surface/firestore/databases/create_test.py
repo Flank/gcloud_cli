@@ -37,18 +37,18 @@ class CreateFirestoreDatabaseTest(api_test_util.ApiTestBase):
     self.ExpectGetApplicationRequest(self.Project(), exception=err)
 
     with self.assertRaises(create_util.AppEngineAppDoesNotExist):
-      self.Run('alpha firestore databases create --region=foo')
+      self.Run('firestore databases create --region=foo')
 
   def testCreate_withAppMissingRegionFlag(self):
     self.ExpectGetApplicationRequest(self.Project(), location_id=self.REGION)
     with self.assertRaises(create_util.RegionNotSpecified):
-      self.Run('alpha firestore databases create')
+      self.Run('firestore databases create')
 
   def testCreate_withAppWithRegionFlag_mismatch(self):
     self.ExpectGetApplicationRequest(self.Project(), location_id=self.REGION)
 
     with self.assertRaises(create_util.AppEngineAppRegionDoesNotMatch):
-      self.Run('alpha firestore databases create --region=foo')
+      self.Run('firestore databases create --region=foo')
 
   def testCreate_withAppWithgRegionFlag_match_success(self):
     self.ExpectGetApplicationRequest(self.Project(), location_id=self.REGION)
@@ -60,7 +60,7 @@ class CreateFirestoreDatabaseTest(api_test_util.ApiTestBase):
         database_type=api_client.messages.Application
         .DatabaseTypeValueValuesEnum.CLOUD_FIRESTORE)
 
-    self.Run('alpha firestore databases create --region={region}'.format(
+    self.Run('firestore databases create --region={region}'.format(
         region=self.REGION))
 
   def createAndDbTypeAlreadyMatches_noActions(self):
@@ -72,7 +72,7 @@ class CreateFirestoreDatabaseTest(api_test_util.ApiTestBase):
         database_type=api_client.messages.Application
         .DatabaseTypeValueValuesEnum.CLOUD_FIRESTORE)
 
-    self.Run('alpha firestore databases create --region={region}'.format(
+    self.Run('firestore databases create --region={region}'.format(
         region=self.REGION))
 
 

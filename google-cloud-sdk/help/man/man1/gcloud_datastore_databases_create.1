@@ -1,0 +1,71 @@
+
+.TH "GCLOUD_DATASTORE_DATABASES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud datastore databases create \- create a Google Cloud Firestore in Datastore Mode database
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud datastore databases create\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a Google Cloud Firestore in Datastore Mode database.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region to create the Google Cloud Firestore in Datastore Mode database
+within. Use \f5gcloud app regions list\fR to list available regions.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create Google Cloud Firestore in Datastore Mode database
+
+.RS 2m
+$ gcloud datastore databases create
+.RE
+
+To create an app in the us\-central region, run:
+
+.RS 2m
+$ gcloud datastore databases create \-\-region=us\-central
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha datastore databases create
+$ gcloud beta datastore databases create
+.RE
+

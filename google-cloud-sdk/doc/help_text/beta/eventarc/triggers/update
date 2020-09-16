@@ -43,9 +43,8 @@ FLAGS
 
      --destination-run-service=DESTINATION_RUN_SERVICE
         The name of the Cloud Run fully-managed service that receives the
-        events for the trigger. The service must be in the same region as the
-        trigger unless the trigger's location is global. The service must be in
-        the same project as the trigger.
+        events for the trigger. The service must be in the same project as the
+        trigger.
 
      --matching-criteria=[ATTRIBUTE=VALUE,...]
         The criteria by which events are filtered for the trigger, specified as
@@ -63,8 +62,8 @@ FLAGS
 
        --destination-run-path=DESTINATION_RUN_PATH
           The relative path on the destination Cloud Run service to which the
-          events for the trigger should be sent. Examples: "/route", "route",
-          "route/subroute".
+          events for the trigger should be sent. Examples: /route, route,
+          route/subroute.
 
      At most one of these may be specified:
 
@@ -96,8 +95,8 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To update the trigger 'my-trigger' by setting its destination Cloud Run
-    service to 'my-service', run:
+    To update the trigger my-trigger by setting its destination Cloud Run
+    service to my-service, run:
 
         $ gcloud beta eventarc triggers update my-trigger \
              --destination-run-service=my-service

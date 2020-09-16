@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha notebooks instances is-upgradeable - request for check if
-        instance is upgradable
+    gcloud alpha notebooks instances is-upgradeable - request for checking if a
+        notebook instance is upgradeable
 
 SYNOPSIS
     gcloud alpha notebooks instances is-upgradeable
         (INSTANCE : --location=LOCATION) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Request for checking if notebook instance is upgradeable.
+    (ALPHA) Request for checking if a notebook instance is upgradeable.
 
 POSITIONAL ARGUMENTS
      Instance resource - User-defined unique name of this instance. The
@@ -41,9 +41,8 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To check if an instance can be upgraded, run:
 
-        $ gcloud alpha notebooks instances is-upgradeable \
-          /projects/example-project/locations/us-central1-b/instances/\
-        example-instance
+        $ gcloud alpha notebooks instances is-upgradeable example-instance \
+          --location=us-central1-a
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

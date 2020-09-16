@@ -35,9 +35,17 @@ EXAMPLES
 
         $ gcloud container hub memberships --help
 
-    Manage features on all memberships:
+    Manage Config Management feature on all memberships:
 
-        $ gcloud container hub features --help
+        $ gcloud container hub config-management --help
+
+    Manage MultiClusterIngress feature on all memberships:
+
+        $ gcloud container hub ingress --help
+
+    Manage MultiClusterServices feature on all memberships:
+
+        $ gcloud container hub multi-cluster-services --help
 
 NOTES
     These variants are also available:

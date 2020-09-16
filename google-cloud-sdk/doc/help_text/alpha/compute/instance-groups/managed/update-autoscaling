@@ -5,12 +5,21 @@ NAME
 SYNOPSIS
     gcloud alpha compute instance-groups managed update-autoscaling NAME
         [--cpu-utilization-predictive-method=CPU_UTILIZATION_PREDICTIVE_METHOD]
-        [--mode=MODE]
+        [--max-num-replicas=MAX_NUM_REPLICAS]
+        [--min-num-replicas=MIN_NUM_REPLICAS] [--mode=MODE]
         [--clear-scale-in-control
           | --scale-in-control=[max-scaled-in-replicas=MAX-SCALED-IN-REPLICAS],
           [max-scaled-in-replicas-percent=MAX-SCALED-IN-REPLICAS-PERCENT],
-          [time-window=TIME-WINDOW]] [--region=REGION | --zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+          [time-window=TIME-WINDOW]]
+        [--disable-schedule=DISABLE_SCHEDULE
+          | --enable-schedule=ENABLE_SCHEDULE
+          | --remove-schedule=REMOVE_SCHEDULE | --set-schedule=SET_SCHEDULE
+          | --update-schedule=UPDATE_SCHEDULE] [--region=REGION | --zone=ZONE]
+        [--schedule-cron=SCHEDULE_CRON
+          --schedule-description=SCHEDULE_DESCRIPTION
+          --schedule-duration-sec=SCHEDULE_DURATION_SEC
+          --schedule-min-required-replicas=SCHEDULE_MIN_REQUIRED_REPLICAS
+          --schedule-time-zone=SCHEDULE_TIME_ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-groups managed update-autoscaling
@@ -49,6 +58,12 @@ FLAGS
             Standard predictive autoscaling predicts the future values of the
             scaling metric and then scales a MIG to ensure that new VM
             instances are ready in time to cover the predicted peak.
+
+     --max-num-replicas=MAX_NUM_REPLICAS
+        Maximum number of replicas Autoscaler will set.
+
+     --min-num-replicas=MIN_NUM_REPLICAS
+        Minimum number of replicas Autoscaler will set.
 
      --mode=MODE
         Set the mode of an autoscaler for a managed instance group.
@@ -107,6 +122,44 @@ FLAGS
 
      At most one of these may be specified:
 
+       --disable-schedule=DISABLE_SCHEDULE
+          A unique name of the scaling schedule to be disabled.
+
+          When the scaling schedule is disabled its configuration persists but
+          the scaling schedule itself never becomes active. If you disable a
+          scaling schedule that is currently active the deleted scaling
+          schedule will stop being effective immediately after it moves into
+          DISABLED state. If this results in removing instances from MIG, the
+          autoscaler will respect the 10-minute stabilization period and if
+          configured also scale-in controls. This ensures you don't
+          accidentally lose capacity immediately after the scaling schedule
+          ends.
+
+       --enable-schedule=ENABLE_SCHEDULE
+          A unique name of the scaling schedule to be enabled.
+
+       --remove-schedule=REMOVE_SCHEDULE
+          A unique name of the scaling schedule to be removed.
+
+          Be careful with this action as scaling schedule deletion cannot be
+          undone.
+
+          You can delete any schedule regardless of its status. If you delete a
+          scaling schedule that is currently active, the deleted scaling
+          schedule will stop being effective immediately after it is deleted.
+          If this results in removing instances from MIG, the autoscaler will
+          respect the 10-minute stabilization period and if configured also
+          scale-in controls. This ensures you don't accidentally lose capacity
+          immediately after the scaling schedule ends.
+
+       --set-schedule=SET_SCHEDULE
+          A unique name of the scaling schedule to be configured.
+
+       --update-schedule=UPDATE_SCHEDULE
+          A unique name of the scaling schedule to be updated.
+
+     At most one of these may be specified:
+
        --region=REGION
           Region of the managed instance group to operate on. If not specified,
           you may be prompted to select a region.
@@ -128,6 +181,52 @@ FLAGS
 
           Overrides the default compute/zone property value for this command
           invocation.
+
+     --schedule-cron=SCHEDULE_CRON
+        Start time of the scaling schedule in cron format.
+
+        This is when an autoscaler will start creating new VMs if MIG size is
+        lower than the minimum number of instances. Set the start time to allow
+        enough time for new VMs to boot and initialize. For example if your
+        workload takes 10 minutes from VM creation to start serving then set
+        start time 10 minutes earlier than the time you need VMs to be ready.
+
+     --schedule-description=SCHEDULE_DESCRIPTION
+        A verbose description of the scaling schedule.
+
+     --schedule-duration-sec=SCHEDULE_DURATION_SEC
+        How long should the scaling schedule be active, measured in seconds.
+
+        Minimum duration is 5 minutes. Scaling schedule is active from its
+        start time and for configured duration. During this time autoscaler
+        will scale MIG to have at least as many VMs as defined by the minimum
+        number of instances. After specified duration if there is no need to
+        maintain capacity, the autoscaler will start removing instances after a
+        10 minutes stabilization period and (if configured) following scale-in
+        controls.
+
+     --schedule-min-required-replicas=SCHEDULE_MIN_REQUIRED_REPLICAS
+        How many VMs autoscaler should ensure for the duration of this scaling
+        schedule.
+
+        Autoscaler will provide at least this number of instances when the
+        scaling schedule is active. MIG can have more VMs if there are other
+        scaling schedules active with higher instance count or if autoscaling
+        policy (for example on CPU) requires more instances to meet its target.
+
+        This configuration does not change autoscaling minimum and maximum
+        instance limits which are always in effect. Autoscaler will not create
+        more than the maximum number of instances configured for MIG.
+
+     --schedule-time-zone=SCHEDULE_TIME_ZONE
+        Location of the scaling schedule's start time.
+
+        It should be provided provided as a location from the IANA tz database
+        (for example Europe/Paris). It will consider daylight saving time (DST)
+        adjustments. If no time zone is provided UTC is used as a default.
+
+        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for
+        the list of valid timezones.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -1,5 +1,5 @@
 title: Cloud API Gateway API Add Policy Binding with Success
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -18,7 +18,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/my-api:getIamPolicy?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/my-api:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -29,7 +29,7 @@ actions:
             etag: ACAB
     - api_call:
         expect_request:
-          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/my-api:setIamPolicy?alt=json
+          uri: https://apigateway.googleapis.com/v1beta/projects/fake-project/locations/global/apis/my-api:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:

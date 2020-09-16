@@ -9,7 +9,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Request for updating notbook instance.
+    (BETA) Request for updating notebook instances.
 
 POSITIONAL ARGUMENTS
      Instance resource - User-defined unique name of this instance. The
@@ -67,21 +67,19 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To update machine type for an instance, run:
 
-        $ gcloud beta notebooks instances update \
-          /projects/example-project/locations/us-central1-b/instances/\
-        example-instance --machine-type=n1-standard-8
+        $ gcloud beta notebooks instances update example-instance \
+          --machine-type=n1-standard-8 --location=us-central1-a
 
     To update labels for an instance, run:
 
-        $ gcloud beta notebooks instances update \
-          /projects/example-project/locations/us-central1-b/instances/\
-        example-instance --labels=k1=v1,k2=v2
+        $ gcloud beta notebooks instances update example-instance \
+          --labels=k1=v1,k2=v2 --location=us-central1-a
 
     To update labels and accelerator cores, run:
 
-        $ gcloud beta notebooks instances update \
-          /projects/example-project/locations/us-central1-b/instances/\
-        example-instance --labels=k1=v1,k2=v2 --accelerator-core-count=2
+        $ gcloud beta notebooks instances update example-instance \
+          --labels=k1=v1,k2=v2 --accelerator-core-count=2 \
+          --location=us-central1-a
 
 NOTES
     This command is currently in BETA and may change without notice. This

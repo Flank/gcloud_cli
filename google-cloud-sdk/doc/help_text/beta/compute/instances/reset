@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances reset is used to perform a hard reset
-    on a Google Compute Engine virtual machine.
+    on a Compute Engine virtual machine.
 
     This will not perform a clean shutdown of the guest OS on the instance.
 

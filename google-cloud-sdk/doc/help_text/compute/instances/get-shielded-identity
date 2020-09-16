@@ -1,6 +1,6 @@
 NAME
     gcloud compute instances get-shielded-identity - get the Shielded identity
-        for a Google Compute Engine instance
+        for a Compute Engine instance
 
 SYNOPSIS
     gcloud compute instances get-shielded-identity INSTANCE_NAME [--zone=ZONE]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute instances get-shielded-identity displays the Shielded
-    identity associated with a Google Compute Engine instance in a project.
+    identity associated with a Compute Engine instance in a project.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

@@ -11,7 +11,7 @@ gcloud beta sql export sql \- exports data from a Cloud SQL instance to a SQL fi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql export sql\fR \fIINSTANCE\fR \fIURI\fR [\fB\-\-async\fR] [\fB\-\-database\fR=\fIDATABASE\fR,[\fIDATABASE\fR,...],\ \fB\-d\fR\ \fIDATABASE\fR,[\fIDATABASE\fR,...]] [\fB\-\-table\fR=\fITABLE\fR,[\fITABLE\fR,...],\ \fB\-t\fR\ \fITABLE\fR,[\fITABLE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql export sql\fR \fIINSTANCE\fR \fIURI\fR [\fB\-\-async\fR] [\fB\-\-database\fR=\fIDATABASE\fR,[\fIDATABASE\fR,...],\ \fB\-d\fR\ \fIDATABASE\fR,[\fIDATABASE\fR,...]] [\fB\-\-offload\fR] [\fB\-\-table\fR=\fITABLE\fR,[\fITABLE\fR,...],\ \fB\-t\fR\ \fITABLE\fR,[\fITABLE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,6 +51,12 @@ Return immediately, without waiting for the operation in progress to complete.
 Database(s) from which the export is made. Information on requirements can be
 found here:
 https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances/export#exportContext.databases
+
+.TP 2m
+\fB\-\-offload\fR
+Offload an export to a temporary instance. Doing so reduces strain on source
+instances and allows other operations to be performed while the export is in
+progress.
 
 .TP 2m
 \fB\-\-table\fR=\fITABLE\fR,[\fITABLE\fR,...], \fB\-t\fR \fITABLE\fR,[\fITABLE\fR,...]

@@ -9,9 +9,9 @@ SYNOPSIS
 
 DESCRIPTION
     $gcloud compute instances set-disk-auto-delete is used to configure the
-    auto-delete behavior for disks attached to Google Compute Engine virtual
-    machines. When auto-delete is on, the persistent disk is deleted when the
-    instance it is attached to is deleted.
+    auto-delete behavior for disks attached to Compute Engine virtual machines.
+    When auto-delete is on, the persistent disk is deleted when the instance it
+    is attached to is deleted.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

@@ -18,11 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import io
 import socket
 import uuid
 
 from googlecloudsdk.core import config
+from googlecloudsdk.core import context_aware
 from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
@@ -58,6 +60,10 @@ def MakeRequestsResponse(status_code, headers, body):
   http_resp.raw = io.BytesIO(six.ensure_binary(body))
   http_resp.headers = headers
   return http_resp
+
+ProxySettings = collections.namedtuple(
+    'ProxySettings',
+    ['proxy_type', 'address', 'port', 'rdns', 'username', 'password'])
 
 
 class RequestsTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture,
@@ -438,6 +444,49 @@ total round trip time (request+response): 2.000 secs
     with self.assertRaises(requests.ConnectTimeout):
       http_client.request('GET', 'http://localhost/')
 
+  @parameterized.parameters(
+      (ProxySettings(None, None, None, None, None, None),
+       None, None),
+      (ProxySettings('http', '123.123.123.123', '4321', None, None, None),
+       'https://123.123.123.123:4321', None),
+      (ProxySettings('http', '123.123.123.123', '4321', False,
+                     'user', 'pass'),
+       'https://user:pass@123.123.123.123:4321', None),
+      (ProxySettings('http', '123.123.123.123', '4321', False,
+                     'user', ''),
+       'https://user:@123.123.123.123:4321', None),
+      (ProxySettings('socks4', '123.123.123.123', '4321', False,
+                     None, None),
+       'socks4://123.123.123.123:4321', None),
+      (ProxySettings('socks4', '123.123.123.123', '4321', True,
+                     None, None),
+       'socks4a://123.123.123.123:4321', None),
+      (ProxySettings('socks5', '123.123.123.123', '4321', True,
+                     None, None),
+       'socks5h://123.123.123.123:4321', None),
+      (ProxySettings(None, '123.123.123.123', '4321', None, None, None),
+       None, (properties.InvalidValueError,
+              'Please set all or none of the following properties: '
+              'proxy/type, proxy/address and proxy/port')
+       ),
+  )
+  def testGetProxyInfo(self, proxy_settings, expected_proxy,
+                       expected_exception):
+    properties.VALUES.proxy.proxy_type.Set(proxy_settings.proxy_type)
+    properties.VALUES.proxy.address.Set(proxy_settings.address)
+    properties.VALUES.proxy.port.Set(proxy_settings.port)
+    properties.VALUES.proxy.rdns.Set(proxy_settings.rdns)
+    properties.VALUES.proxy.username.Set(proxy_settings.username)
+    properties.VALUES.proxy.password.Set(proxy_settings.password)
+
+    if expected_exception:
+      exception_type, exception_regex = expected_exception
+      with self.assertRaisesRegex(exception_type, exception_regex):
+        core_requests.GetProxyInfo()
+    else:
+      proxy = core_requests.GetProxyInfo()
+      self.assertEqual(expected_proxy, proxy)
+
   def testRPCDurationReporting(self):
     request_mock = self.StartObjectPatch(requests.Session, 'request')
     request_mock.return_value = self.default_response
@@ -487,6 +536,33 @@ class ResponseTest(test_case.TestCase):
     self.assertEqual(response.status_code, httplib.OK)
     self.assertEqual(response.headers, {'hdr': '1'})
     self.assertEqual(response.body, b'body')
+
+
+class ContextAwareTest(test_case.TestCase):
+
+  def testWithContextAwareConfig(self):
+    properties.VALUES.context_aware.use_client_certificate.Set(True)
+    context_mock = mock.Mock()
+    self.StartObjectPatch(
+        core_requests, 'CreateSSLContext', return_value=context_mock)
+
+    context_aware_config = self.StartObjectPatch(context_aware, 'Config')
+    context_aware_config.return_value = mock.Mock(
+        client_cert_path='mock_path', client_cert_password='mock_pass')
+
+    http_adapter_mock = self.StartObjectPatch(
+        core_requests.HTTPAdapter, 'send')
+    http_adapter_mock.return_value = MakeRequestsResponse(
+        httplib.OK, {}, b'response content')
+    http_client = core_requests.GetSession()
+    http_client.request('GET', 'https://www.foo.com', data='Request Body')
+
+    context_mock.load_cert_chain.assert_called_once_with(
+        'mock_path',
+        **{
+            'keyfile': 'mock_path',
+            'password': 'mock_pass',
+        })
 
 
 if __name__ == '__main__':

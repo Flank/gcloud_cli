@@ -56,6 +56,9 @@ apis:
       resources:
         customer:
           path: customer/{customerId}
+  aiplatform:
+    v1alpha1:
+      discovery_doc: aiplatform_v1alpha1.json
   anthosevents:
     v1:
       discovery_doc: anthosevents_v1.json
@@ -95,6 +98,12 @@ apis:
       discovery_doc: artifactregistry_v1alpha1.json
     v1beta1:
       discovery_doc: artifactregistry_v1beta1.json
+      default: true
+    v1beta2:
+      discovery_doc: artifactregistry_v1beta2.json
+  assuredworkloads:
+    v1beta1:
+      discovery_doc: assuredworkloads_v1beta1.json
       default: true
   bigtableadmin:
     v2:
@@ -171,6 +180,7 @@ apis:
       # of a request containing (project_id + xyz) into just an Xyz object.
       unelidable_request_methods:
       - cloudbuild.projects.builds.create
+      - cloudbuild.projects.builds.cancel
     v1alpha1:
       discovery_doc: cloudbuild_v1alpha1.json
       resources:
@@ -254,9 +264,6 @@ apis:
       discovery_doc: cloudresourcemanager_v2beta1.json
     v2:
       discovery_doc: cloudresourcemanager_v2.json
-  cloudresourcesearch:
-    v1:
-      discovery_doc: cloudresourcesearch_v1.json
   cloudshell:
     v1alpha1:
       discovery_doc: cloudshell_v1alpha1.json
@@ -314,6 +321,8 @@ apis:
       unelidable_request_methods:
         - compute.disks.resize
       resources:
+        regionAcceleratorTypes:
+          path: projects/{project}/regions/{region}/acceleratorTypes/{acceleratorType}
         nextHopGateways:
           path: projects/{project}/global/gateways/{nextHopGateway}
         securityPolicyRules:
@@ -453,9 +462,11 @@ apis:
     v1alpha2:
       discovery_doc: dns_v1alpha2.json
   domains:
+    v1beta1:
+      discovery_doc: domains_v1beta1.json
+      default: true
     v1alpha2:
       discovery_doc: domains_v1alpha2.json
-      default: true
   eventarc:
     v1beta1:
       discovery_doc: eventarc_v1beta1.json
@@ -497,6 +508,11 @@ apis:
       discovery_doc: gkehub_v1alpha1.json
     v1alpha2:
       discovery_doc: gkehub_v1alpha2.json
+      # Include projects.locations.global.memberships collection explicitly for initializeHub.
+      # This is not imported automatically since gcloud skips collections that do not have a GET method.
+      resources:
+        projects.locations.global.memberships:
+          path: projects/{projectsId}/locations/global/memberships
     v1beta1:
       discovery_doc: gkehub_v1beta1.json
     v1:

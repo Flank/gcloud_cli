@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha database-migration operations delete - delete a Cloud Database
+    gcloud alpha database-migration operations delete - delete a Database
         Migration Service operation
 
 SYNOPSIS
@@ -7,10 +7,10 @@ SYNOPSIS
         (OPERATION : --region=REGION) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a Cloud Database Migration Service operation.
+    (ALPHA) Delete a Database Migration Service operation.
 
 POSITIONAL ARGUMENTS
-     Operation resource - Operation resource - Cloud Database Migration Service
+     Operation resource - Operation resource - Database Migration Service
      operation to delete. The arguments in this group can be used to specify
      the attributes of this resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]

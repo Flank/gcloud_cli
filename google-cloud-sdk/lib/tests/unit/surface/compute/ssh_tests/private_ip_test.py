@@ -32,11 +32,13 @@ import mock
 
 MESSAGES = apis.GetMessagesModule('compute', 'v1')
 
+INTERNAL_IP = '10.240.0.52'
+
 INSTANCE_WITHOUT_EXTERNAL_ADDRESS = MESSAGES.Instance(
     id=22222,
     name='instance-2',
     networkInterfaces=[
-        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
+        MESSAGES.NetworkInterface(networkIP=INTERNAL_IP),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
     selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
@@ -52,7 +54,7 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
     self.SelectApi('v1')
 
     # Common test vars
-    self.remote = ssh.Remote('10.240.0.52', user='john')
+    self.remote = ssh.Remote(INTERNAL_IP, user='john')
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -140,8 +142,8 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
 
     with self.AssertRaisesExceptionRegexp(
         core_exceptions.NetworkIssueError,
-        r'Established connection with host 10.240.0.52 but was unable to '
-        r'confirm ID of the instance.'):
+        r'Established connection with host {} but was unable to '
+        r'confirm ID of the instance.'.format(INTERNAL_IP)):
       self.Run("""compute ssh john@instance-1 --zone zone-1 --internal-ip""")
 
     self.CheckRequests(
@@ -208,6 +210,23 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
     self.ssh_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
         self.env, force_connect=True)
+
+  def testDisableInternalIpVerification(self):
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITHOUT_EXTERNAL_ADDRESS],
+        [self.project_resource],
+        [],
+    ])
+
+    self.Run('compute ssh john@instance-1 --zone zone-1 --internal-ip '
+             '--no-verify-internal-ip')
+
+    # Only expect one call since we're skipping the IP verification connection.
+    self.ssh_init.assert_called_once()
+    self.ssh_run.assert_called_once()
+    self.AssertErrContains(
+        'Skipping internal IP verification connection and connecting to [{}] '
+        'in the current subnet.'.format(INTERNAL_IP))
 
 
 if __name__ == '__main__':

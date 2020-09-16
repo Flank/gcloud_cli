@@ -1,6 +1,6 @@
 NAME
     gcloud compute instances add-resource-policies - add resource policies to
-        Google Compute Engine VM instances
+        Compute Engine VM instances
 
 SYNOPSIS
     gcloud compute instances add-resource-policies INSTANCE_NAME
@@ -9,8 +9,8 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute instances add-resource-policies adds resource policies to
-    Google Compute Engine virtual instances. These policies define time windows
-    in which live migrations take place.
+    Compute Engine virtual instances. These policies define time windows in
+    which live migrations take place.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

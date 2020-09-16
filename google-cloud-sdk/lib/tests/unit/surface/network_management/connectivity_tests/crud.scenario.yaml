@@ -1,5 +1,5 @@
 title: network-management connectivity-tests CRUD tests
-release_tracks: [GA, BETA]
+release_tracks: [GA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.

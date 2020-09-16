@@ -27,7 +27,7 @@ COMMANDS
     COMMAND is one of the following:
 
      update
-        Update a Google Compute Engine virtual machine network interface.
+        Update a Compute Engine virtual machine network interface.
 
 NOTES
     These variants are also available:

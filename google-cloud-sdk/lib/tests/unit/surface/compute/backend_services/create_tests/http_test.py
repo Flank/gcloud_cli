@@ -466,7 +466,7 @@ class HttpBackendServiceCreateTest(test_base.BackendServiceCreateTestBase):
       compute backend-services create test --global --protocol HBHBH""")
 
 
-class BetaBackendServiceCreateTest(test_base.BackendServiceCreateTestBase):
+class BetaBackendServiceCreateTest(HttpBackendServiceCreateTest):
 
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.BETA)
@@ -522,6 +522,110 @@ class BetaBackendServiceCreateTest(test_base.BackendServiceCreateTestBase):
                   timeoutSec=30),
               project='my-project'))],
     )
+
+  def testCdnFlexibleCacheControlWithCacheAllStatic(self):
+    self.Run("""
+        compute backend-services create my-backend-service
+          --http-health-checks my-health-check --global
+          --enable-cdn --cache-mode CACHE_ALL_STATIC --client-ttl 4000
+          --default-ttl 5000 --max-ttl 6000 --negative-caching
+          --negative-caching-policy='404=3000,301=3500'
+          --custom-response-header 'Test-Header:'
+          --custom-response-header 'Test-Header2: {cdn_cache_id}'
+        """)
+
+    self.CheckRequests([
+        (self.compute.backendServices, 'Insert',
+         self.messages.ComputeBackendServicesInsertRequest(
+             backendService=self.messages.BackendService(
+                 backends=[],
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/httpHealthChecks/my-health-check')
+                 ],
+                 name='my-backend-service',
+                 enableCDN=True,
+                 cdnPolicy=self.messages.BackendServiceCdnPolicy(
+                     cacheMode=self.messages.BackendServiceCdnPolicy
+                     .CacheModeValueValuesEnum.CACHE_ALL_STATIC,
+                     clientTtl=4000,
+                     defaultTtl=5000,
+                     maxTtl=6000,
+                     negativeCaching=True,
+                     negativeCachingPolicy=[
+                         self.messages
+                         .BackendServiceCdnPolicyNegativeCachingPolicy(
+                             code=404, ttl=3000),
+                         self.messages
+                         .BackendServiceCdnPolicyNegativeCachingPolicy(
+                             code=301, ttl=3500),
+                     ]),
+                 customResponseHeaders=[
+                     'Test-Header:', 'Test-Header2: {cdn_cache_id}'
+                 ],
+                 portName='http',
+                 protocol=(
+                     self.messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                 timeoutSec=30),
+             project='my-project'))
+    ])
+
+  def testCdnFlexibleCacheControlWithUseOriginHeaders(self):
+    self.Run("""
+        compute backend-services create my-backend-service
+          --http-health-checks my-health-check --global
+          --enable-cdn --cache-mode use-origin-headers --no-negative-caching
+        """)
+
+    self.CheckRequests([
+        (self.compute.backendServices, 'Insert',
+         self.messages.ComputeBackendServicesInsertRequest(
+             backendService=self.messages.BackendService(
+                 backends=[],
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/httpHealthChecks/my-health-check')
+                 ],
+                 name='my-backend-service',
+                 enableCDN=True,
+                 cdnPolicy=self.messages.BackendServiceCdnPolicy(
+                     cacheMode=self.messages.BackendServiceCdnPolicy
+                     .CacheModeValueValuesEnum.USE_ORIGIN_HEADERS,
+                     negativeCaching=False),
+                 portName='http',
+                 protocol=(
+                     self.messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                 timeoutSec=30),
+             project='my-project'))
+    ],)
+
+  def testCdnFlexibleCacheControlWithCacheAllStaticNoEnableCdn(self):
+    self.Run("""
+        compute backend-services create my-backend-service --no-enable-cdn
+          --global --cache-mode CACHE_ALL_STATIC
+        """)
+
+    self.CheckRequests([
+        (self.compute.backendServices, 'Insert',
+         self.messages.ComputeBackendServicesInsertRequest(
+             backendService=self.messages.BackendService(
+                 name='my-backend-service',
+                 enableCDN=False,
+                 cdnPolicy=self.messages.BackendServiceCdnPolicy(
+                     cacheMode=self.messages.BackendServiceCdnPolicy
+                     .CacheModeValueValuesEnum.CACHE_ALL_STATIC),
+                 portName='http',
+                 protocol=(
+                     self.messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                 timeoutSec=30),
+             project='my-project'))
+    ])
+
+
+class AlphaBackendServiceCreateTest(BetaBackendServiceCreateTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

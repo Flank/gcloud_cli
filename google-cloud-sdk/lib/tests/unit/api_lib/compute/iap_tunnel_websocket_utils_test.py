@@ -45,11 +45,13 @@ class IapTunnelWebSocketUtilsTest(
     self.assertEqual(sorted(created_url_parts[1].split('&')), expected_query)
 
   @parameterized.parameters(
-      (('my-project', 'b-zone', 'instance2', 'nic1', 23, '', None), 'abc', 123,
-       'wss://tunnel.cloudproxy.app/v4/reconnect', ['ack=123', 'sid=abc']),
+      (('my-project', 'b-zone', 'instance2', 'nic1', 23, '', None),
+       'abc', 123, 'wss://tunnel.cloudproxy.app/v4/reconnect',
+       ['ack=123', 'sid=abc', 'zone=b-zone']),
       (('my-project', 'b-zone', 'instance2', 'nic1', 23,
-        'ws://tunnel2.cloudproxy.app/v3', None), 'abcd', 1234,
-       'ws://tunnel2.cloudproxy.app/v3/reconnect', ['ack=1234', 'sid=abcd']),
+        'ws://tunnel2.cloudproxy.app/v3', None),
+       'abcd', 1234, 'ws://tunnel2.cloudproxy.app/v3/reconnect',
+       ['ack=1234', 'sid=abcd', 'zone=b-zone']),
   )
   def testCreateReconnectUrl(self, target, sid, ack_bytes, expected_base,
                              expected_query):

@@ -56,7 +56,6 @@ def MakeBackendBuckets(msgs, api):
           selfLink=(prefix + '/projects/my-project/global/'
                     'backendBuckets/backend-bucket-3-enable-cdn-false'))
   ]
-
   return buckets
 
 BACKEND_BUCKETS_ALPHA = MakeBackendBuckets(alpha_messages, 'alpha')
@@ -64,4 +63,31 @@ BACKEND_BUCKETS_BETA = MakeBackendBuckets(beta_messages, 'beta')
 BACKEND_BUCKETS = MakeBackendBuckets(messages, 'v1')
 
 
+def MakeFlexibleCacheBackendBucket(msgs, api):
+  prefix = _COMPUTE_PATH + '/' + api
+  return msgs.BackendBucket(
+      bucketName='gcs-bucket-4',
+      description='my other backend bucket',
+      name='backend-bucket-4-cdn-policy-flexible-cache',
+      enableCdn=True,
+      customResponseHeaders=['Header: Value', 'Header2: {cdn_cache_id}'],
+      cdnPolicy=msgs.BackendBucketCdnPolicy(
+          cacheMode=msgs.BackendBucketCdnPolicy.CacheModeValueValuesEnum
+          .CACHE_ALL_STATIC,
+          clientTtl=4000,
+          defaultTtl=5000,
+          maxTtl=6000,
+          negativeCaching=True,
+          negativeCachingPolicy=[
+              msgs.BackendBucketCdnPolicyNegativeCachingPolicy(
+                  code=404, ttl=3000),
+              msgs.BackendBucketCdnPolicyNegativeCachingPolicy(
+                  code=301, ttl=3500),
+          ]),
+      selfLink=(prefix + '/projects/my-project/global/'
+                'backendBuckets/backend-bucket-4-cdn-policy-flexible-cache'))
 
+
+BACKEND_BUCKETS_FCC_ALPHA = MakeFlexibleCacheBackendBucket(
+    alpha_messages, 'alpha')
+BACKEND_BUCKETS_FCC_BETA = MakeFlexibleCacheBackendBucket(beta_messages, 'beta')

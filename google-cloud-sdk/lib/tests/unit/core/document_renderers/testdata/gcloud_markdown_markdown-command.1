@@ -11,7 +11,7 @@ gcloud markdown markdown\-command \- markdown command docstring index
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud markdown markdown\-command\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-dict\-flag\fR\ [\fIITEM\fR,...];\ default="aaa=1,bbb=22,ccc=aha"] [\fB\-\-false\-flag\fR] [\fB\-\-list\-flag\fR\ [\fIITEM\fR,...];\ default="aaa,bbb,ccc"] [\fB\-\-optional\-flag\fR\ \fIOPTIONAL_FLAG\fR] [\fB\-\-question\-flag\fR\ \fIQUESTION_FLAG\fR] [\fB\-\-root\-flag\fR\ \fIROOT_PATH\fR;\ default="/"] [\fB\-\-true\-flag\fR] [\fB\-\-value\-flag\fR\ \fIVALUE_FLAG\fR;\ default="VALUE"] [\fIGCLOUD\-WIDE\-FLAG\ ...\fR] [\-\-\ \fIIMPLEMENTATION\-ARGS\fR\ ...]
+\f5gcloud markdown markdown\-command\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-dict\-flag\fR\ [\fIITEM\fR,...];\ default="aaa=1,bbb=22,ccc=aha"] [\fB\-\-false\-flag\fR] [\fB\-\-list\-flag\fR\ [\fIITEM\fR,...];\ default="aaa,bbb,ccc"] [\fB\-\-optional\-flag\fR\ \fIOPTIONAL_FLAG\fR] [\fB\-\-question\-flag\fR\ \fIQUESTION_FLAG\fR] [\fB\-\-root\-flag\fR\ \fIROOT_PATH\fR;\ default="/"] [\fB\-\-true\-flag\fR] [\fB\-\-value\-flag\fR\ \fIVALUE_FLAG\fR;\ default="VALUE"] [\fB\-\-[no\-]action\-required\fR] [\fIGCLOUD\-WIDE\-FLAG\ ...\fR] [\-\-\ \fIIMPLEMENTATION\-ARGS\fR\ ...]
 
 
 .SH "DESCRIPTION"
@@ -87,6 +87,11 @@ Command true flag help.
 .TP 2m
 \fB\-\-value\-flag\fR \fIVALUE_FLAG\fR; default="VALUE"
 Command value flag help.
+
+.TP 2m
+\fB\-\-[no\-]action\-required\fR
+Enables/disables the fake flag. Use \-\-action\-required to enable and
+\-\-no\-action\-required to disable.
 
 
 .RE

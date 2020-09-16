@@ -12,9 +12,9 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances os-inventory list-instances displays all Google
-    Compute Engine instances in a project matching an inventory filter. Run $
-    gcloud topic filters to see the supported filter syntax.
+    gcloud compute instances os-inventory list-instances displays all Compute
+    Engine instances in a project matching an inventory filter. Run $ gcloud
+    topic filters to see the supported filter syntax.
 
 FLAGS
      --inventory-filter=INVENTORY_FILTER

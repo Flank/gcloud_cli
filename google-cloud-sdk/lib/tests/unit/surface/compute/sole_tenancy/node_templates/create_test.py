@@ -29,6 +29,7 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
     self.region = 'us-central1'
+    self.api_version = 'v1'
 
   def _ExpectCreate(self, template):
     request = self.messages.ComputeNodeTemplatesInsertRequest(
@@ -183,14 +184,7 @@ class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
     self.region = 'us-central1'
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
-
-
-class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
-
-  def SetUp(self):
-    self.region = 'us-central1'
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
+    self.api_version = 'beta'
 
   @parameterized.named_parameters(
       ('SimpleDisk', 'type=local-ssd,count=1', 'local-ssd', 1, None),
@@ -235,6 +229,37 @@ class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
           '--node-requirements vCPU=64,memory=128MB '
           '--disk {0} '
           '--region {1}'.format(disk, self.region))
+
+  def testCreateWithAccelerator(self):
+    template = self._CreateBaseNodeTemplateMessage()
+    template.nodeType = 'n1-node-96-624'
+    accelerator_type = ('https://compute.googleapis.com/compute/{api}/'
+                        'projects/my-project/regions/us-central1/'
+                        'acceleratorTypes/p100'.format(api=self.api_version))
+    template.accelerators = [
+        self.messages.AcceleratorConfig(
+            acceleratorType=accelerator_type, acceleratorCount=2)
+    ]
+    request = self._ExpectCreate(template)
+
+    result = self.Run(
+        'compute sole-tenancy node-templates create my-template '
+        '--node-affinity-labels environment=prod,grouping=frontend '
+        '--accelerator=type=p100,count=2 '
+        '--node-type n1-node-96-624 '
+        '--region {}'.format(self.region))
+
+    self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
+    self.assertEqual(result, template)
+
+
+class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
+
+  def SetUp(self):
+    self.region = 'us-central1'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

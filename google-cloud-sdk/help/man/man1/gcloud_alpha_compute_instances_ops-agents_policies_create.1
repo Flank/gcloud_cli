@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instances ops\-agents policies create \- create a Google Cloud Operations Suite Agents (Ops\ Agents) policy
+gcloud alpha compute instances ops\-agents policies create \- create a Google Cloud's operations suite agents (Ops\ Agents) policy
 
 
 
@@ -18,13 +18,13 @@ gcloud alpha compute instances ops\-agents policies create \- create a Google Cl
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instances ops\-agents policies create\fR
-creates a policy that facilitates agent management across Google Cloud Compute
+creates a policy that facilitates agent management across Compute Engine
 instances based on user specified instance filters. This policy installs,
 specifies versioning, enables autoupgrade, and removes Ops Agents.
 
 The command returns the content of the created policy or an error indicating why
 the creation fails. The created policy takes effect asynchronously. It can take
-10 ~ 15 minutes for the VMs to enforce the newly created policy.
+10\-15 minutes for the VMs to enforce the newly created policy.
 
 
 
@@ -339,8 +339,8 @@ Run \fB$ gcloud help\fR for details.
 To create a policy named \f5\fIops\-agents\-test\-policy\fR\fR that targets a
 single CentOS 7 VM instance named
 \f5\fIzones/us\-central1\-a/instances/test\-instance\fR\fR for testing or
-development, and installs both Logging and Monitoring Agents on that VM
-instance, run:
+development and installs both Logging and Monitoring Agents on that VM instance,
+run:
 
 .RS 2m
 $ gcloud alpha compute instances ops\-agents policies create \e
@@ -354,8 +354,8 @@ $ gcloud alpha compute instances ops\-agents policies create \e
 To create a policy named \f5\fIops\-agents\-prod\-policy\fR\fR that targets all
 CentOS 7 VMs in zone \f5\fIus\-central1\-a\fR\fR with either
 \f5\fIenv=prod,product=myapp\fR\fR or \f5\fIenv=staging,product=myapp\fR\fR
-labels, and makes sure the logging agent and metrics agent versions are pinned
-to specific major versions for staging and production, run:
+labels and makes sure the logging agent and metrics agent versions are pinned to
+specific major versions for staging and production, run:
 
 .RS 2m
 $ gcloud alpha compute instances ops\-agents policies create \e

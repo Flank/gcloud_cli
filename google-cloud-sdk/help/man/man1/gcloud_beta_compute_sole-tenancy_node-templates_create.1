@@ -11,7 +11,7 @@ gcloud beta compute sole\-tenancy node\-templates create \- create a Compute Eng
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-cpu\-overcommit\-type\fR=\fICPU_OVERCOMMIT_TYPE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-cpu\-overcommit\-type\fR=\fICPU_OVERCOMMIT_TYPE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIcount\fR=\fICOUNT\fR],[\fIsize\fR=\fISIZE\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -88,6 +88,23 @@ $ gcloud beta compute sole\-tenancy node\-types list
 
 .RS 2m
 .TP 2m
+\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
+Attaches accelerators (e.g. GPUs) to the node template.
+
+.RS 2m
+.TP 2m
+\fBtype\fR
+The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of accelerator
+to attach to the node template. Use 'gcloud compute accelerator\-types list' to
+learn about all available accelerator types.
+
+.TP 2m
+\fBcount\fR
+Number of accelerators to attach to each node template. The default value is 1.
+
+.RE
+.sp
+.TP 2m
 \fB\-\-cpu\-overcommit\-type\fR=\fICPU_OVERCOMMIT_TYPE\fR
 CPU overcommit type for nodes created based on this template. To overcommit CPUs
 on a VM, set \-\-cpu\-overcommit\-type equal to either standard or none, and
@@ -101,6 +118,30 @@ CPUs on VMs that are scheduled on nodes that support it.
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional description of this resource.
 
+.TP 2m
+\fB\-\-disk\fR=[\fIcount\fR=\fICOUNT\fR],[\fIsize\fR=\fISIZE\fR],[\fItype\fR=\fITYPE\fR]
+Option to specify disk properties. It is mutually exclusive with
+\'\-\-node\-requirements=[localSSD=LOCALSSD]' but
+\'\-\-node\-requirements=[memory=MEMORY],[vCPU=VCPU],any' are still available.
+
+.RS 2m
+.TP 2m
+\fBtype\fR
+Specifies the desired disk type on the node. This disk type must be a local
+storage type. This should be the name of the disk type. Currently only
+\f5local\-ssd\fR is allowed.
+
+.TP 2m
+\fBsize\fR
+The size of the disk in GiB. Currently you can specify only 375 GiB or no value
+at all.
+
+.TP 2m
+\fBcount\fR
+Specifies the number of such disks.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 Labels to use for node affinity, which will be used in instance scheduling. This

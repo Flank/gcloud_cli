@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute instances set-iam-policy - set IAM policy for a Google
+    gcloud alpha compute instances set-iam-policy - set IAM policy for a
         Compute Engine instance
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         POLICY_FILE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Set IAM policy for a Google Compute Engine instance.
+    (ALPHA) Set IAM policy for a Compute Engine instance.
 
 POSITIONAL ARGUMENTS
      Instance resource - The instance to set the IAM policy of. The arguments

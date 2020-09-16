@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta notebooks instances is\-upgradeable \- request for check if instance is upgradable
+gcloud beta notebooks instances is\-upgradeable \- request for checking if a notebook instance is upgradeable
 
 
 
@@ -17,7 +17,7 @@ gcloud beta notebooks instances is\-upgradeable \- request for check if instance
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Request for checking if notebook instance is upgradeable.
+\fB(BETA)\fR Request for checking if a notebook instance is upgradeable.
 
 
 
@@ -69,9 +69,8 @@ Run \fB$ gcloud help\fR for details.
 To check if an instance can be upgraded, run:
 
 .RS 2m
-$ gcloud beta notebooks instances is\-upgradeable \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud beta notebooks instances is\-upgradeable example\-instance \e
+  \-\-location=us\-central1\-a
 .RE
 
 

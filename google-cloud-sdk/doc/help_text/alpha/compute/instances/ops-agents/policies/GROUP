@@ -23,23 +23,23 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Google Cloud Operations Suite Agents (Ops Agents)
+        (ALPHA) Create a Google Cloud's operations suite agents (Ops Agents)
         policy.
 
      delete
-        (ALPHA) Delete a Google Cloud Operations Suite Agents (Ops Agents)
+        (ALPHA) Delete a Google Cloud's operations suite agents (Ops Agents)
         policy.
 
      describe
-        (ALPHA) Describe a Google Cloud Operations Suite Agents (Ops Agents)
+        (ALPHA) Describe a Google Cloud's operations suite agents (Ops Agents)
         policy.
 
      list
-        (ALPHA) List Google Cloud Operations Suite Agents (Ops Agents)
+        (ALPHA) List Google Cloud's operations suite agents (Ops Agents)
         policies.
 
      update
-        (ALPHA) Update a Google Cloud Operations Suite Agents (Ops Agents)
+        (ALPHA) Update a Google Cloud's operations suite agents (Ops Agents)
         policy.
 
 NOTES

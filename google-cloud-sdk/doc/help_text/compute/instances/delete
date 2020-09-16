@@ -1,6 +1,6 @@
 NAME
-    gcloud compute instances delete - delete Google Compute Engine virtual
-        machine instances
+    gcloud compute instances delete - delete Compute Engine virtual machine
+        instances
 
 SYNOPSIS
     gcloud compute instances delete INSTANCE_NAMES [INSTANCE_NAMES ...]
@@ -8,8 +8,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances delete deletes one or more Google Compute Engine
-    virtual machine instances.
+    gcloud compute instances delete deletes one or more Compute Engine virtual
+    machine instances.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

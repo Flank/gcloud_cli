@@ -3,8 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging buckets create BUCKET_ID --location=LOCATION
-        [--description=DESCRIPTION] [--retention-days=RETENTION_DAYS]
-        [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--enable-analytics=ENABLE_ANALYTICS]
+        [--retention-days=RETENTION_DAYS] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a bucket.
@@ -21,6 +21,10 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         A textual description for the bucket.
+
+     --enable-analytics=ENABLE_ANALYTICS
+        Whether to opt the bucket into advanced log analytics. This field may
+        only be set at bucket creation and cannot be changed later.
 
      --retention-days=RETENTION_DAYS
         The period logs will be retained, after which logs will automatically

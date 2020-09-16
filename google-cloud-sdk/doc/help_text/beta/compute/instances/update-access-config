@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute instances update-access-config - update a Google
-        Compute Engine virtual machine access configuration
+    gcloud beta compute instances update-access-config - update a Compute
+        Engine virtual machine access configuration
 
 SYNOPSIS
     gcloud beta compute instances update-access-config INSTANCE_NAME
@@ -11,8 +11,8 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances update-access-config is used to update
-    access configurations for network interfaces of Google Compute Engine
-    virtual machines.
+    access configurations for network interfaces of Compute Engine virtual
+    machines.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME

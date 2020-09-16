@@ -25,7 +25,7 @@ COMMANDS
         (BETA) Request for creating an instance.
 
      delete
-        (BETA) Request for deleting instance.
+        (BETA) Request for deleting instances.
 
      describe
         (BETA) Request for describing instances.
@@ -34,7 +34,7 @@ COMMANDS
         (BETA) Get IAM policy for an instance.
 
      is-upgradeable
-        (BETA) Request for check if instance is upgradable.
+        (BETA) Request for checking if a notebook instance is upgradeable.
 
      list
         (BETA) Request for listing instances.
@@ -55,7 +55,7 @@ COMMANDS
         (BETA) Request for starting instances.
 
      stop
-        (BETA) Request for stoping instances.
+        (BETA) Request for stopping instances.
 
      update
         (BETA) Request for updating instances.

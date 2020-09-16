@@ -35,9 +35,17 @@ EXAMPLES
 
         $ gcloud beta container hub memberships --help
 
-    Manage features on all memberships:
+    Manage Config Management feature on all memberships:
 
-        $ gcloud beta container hub features --help
+        $ gcloud beta container hub config-management --help
+
+    Manage MultiClusterIngress feature on all memberships:
+
+        $ gcloud beta container hub ingress --help
+
+    Manage MultiClusterServices feature on all memberships:
+
+        $ gcloud beta container hub multi-cluster-services --help
 
 NOTES
     This command is currently in BETA and may change without notice. These

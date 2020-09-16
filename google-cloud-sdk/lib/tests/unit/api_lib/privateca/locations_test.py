@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.privateca import base
 from googlecloudsdk.api_lib.privateca import locations
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -33,7 +32,7 @@ class LocationsApiTest(sdk_test_base.WithFakeAuth):
   def SetUp(self):
     self.messages = base.GetMessagesModule()
     self.client = mock.Client(
-        client_class=apis.GetClientClass('privateca', 'v1alpha1'),
+        client_class=base.GetClientClass(),
         real_client=base.GetClientInstance())
     self.client.Mock()
     self.addCleanup(self.client.Unmock)

@@ -2,7 +2,7 @@
 # required for tests to pass
 # yamllint disable rule:trailing-spaces
 title: Cloud API Gateway Gateway Create with no location Test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -17,15 +17,20 @@ summary:
   - command: |
       api-gateway gateways create test-name --location us-central1
   - stderr: |
-      ERROR: (gcloud.alpha.api-gateway.gateways.create) argument (--api-config : --api): Must be specified.
-      Usage: gcloud alpha api-gateway gateways create (GATEWAY : --location=LOCATION) (--api-config=API_CONFIG : --api=API) [optional flags]
+      ERROR: (gcloud.$$gcloud-track$$.api-gateway.gateways.create) argument (--api-config : --api): Must be specified.
+      Usage: gcloud $$gcloud-track$$ api-gateway gateways create (GATEWAY : --location=LOCATION) (--api-config=API_CONFIG : --api=API) [optional flags]
         optional flags may be  --api | --async | --display-name | --help | --labels |
                                --location
 
       For detailed information on this command and its flags, run:
-        gcloud alpha api-gateway gateways create --help
+        gcloud $$gcloud-track$$ api-gateway gateways create --help
   - error: '1: argument (--api-config : --api): Must be specified.'
 actions:
+- define_reference:
+    reference: gcloud-track
+    track_values:
+      ALPHA: alpha
+      BETA: beta
 - execute_command:
     command: |
       api-gateway gateways create test-name --api-config projects/project-name/apis/api-name/configs/api-config-name
@@ -42,13 +47,13 @@ actions:
       api-gateway gateways create test-name --location us-central1
     events:
     - expect_stderr: |
-        ERROR: (gcloud.alpha.api-gateway.gateways.create) argument (--api-config : --api): Must be specified.
-        Usage: gcloud alpha api-gateway gateways create (GATEWAY : --location=LOCATION) (--api-config=API_CONFIG : --api=API) [optional flags]
+        ERROR: (gcloud.$$gcloud-track$$.api-gateway.gateways.create) argument (--api-config : --api): Must be specified.
+        Usage: gcloud $$gcloud-track$$ api-gateway gateways create (GATEWAY : --location=LOCATION) (--api-config=API_CONFIG : --api=API) [optional flags]
           optional flags may be  --api | --async | --display-name | --help | --labels |
                                  --location
 
         For detailed information on this command and its flags, run:
-          gcloud alpha api-gateway gateways create --help
+          gcloud $$gcloud-track$$ api-gateway gateways create --help
     - expect_exit:
         code: 1
         message: 'argument (--api-config : --api): Must be specified.'

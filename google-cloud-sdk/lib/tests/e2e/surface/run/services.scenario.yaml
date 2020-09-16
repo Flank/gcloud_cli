@@ -48,7 +48,7 @@ summary:
   - command: run services update --region us-central1 $$service-name$$ --memory 1024Mi
       --async
   - stderr: |
-      Deploying asynchronously.
+      Service [$$service-name$$] is deploying asynchronously.
 - execute:
   - command: run services delete $$service-name$$ --region us-central1 --quiet
   - stderr: |
@@ -1619,7 +1619,7 @@ actions:
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_stderr: |
-        Deploying asynchronously.
+        Service [$$service-name$$] is deploying asynchronously.
     - expect_exit:
         code: 0
 

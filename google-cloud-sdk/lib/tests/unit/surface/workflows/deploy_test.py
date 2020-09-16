@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib.apitools import http_error
 from tests.lib.surface.workflows import base
 
@@ -34,7 +35,7 @@ NEW_DESCRIPTION = 'test_workflow_new_description'
 NEW_SERVICE_ACCOUNT = 'test-account@my-project.iam.gserviceaccount.com'
 
 
-class WorkflowsDeployTest(base.WorkflowsUnitTestBase):
+class WorkflowsDeployTest(parameterized.TestCase, base.WorkflowsUnitTestBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
@@ -181,6 +182,63 @@ class WorkflowsDeployTest(base.WorkflowsUnitTestBase):
                           id=WORKFLOW_ID,
                           desc=NEW_DESCRIPTION))
     self.assertEqual(result, new_workflow)
+
+  LONG_WORKFLOW_NAME_MESSAGE = (
+      'Invalid value for [workflow]: ID must be between 1-64 characters long')
+  WORKFLOW_START_LETTER_MESSAGE = (
+      'Invalid value for [workflow]: ID must start with a letter')
+  WORKFLOW_END_ALPHANUMERIC_MESSAGE = (
+      'Invalid value for [workflow]: ID must end with a letter or number')
+  WORKFLOW_INVALID_CHARS_MESSAGE = (
+      'Invalid value for [workflow]: ID must only contain letters, numbers, '
+      'underscores and hyphens'
+  )
+
+  @parameterized.named_parameters(
+      ('Workflow name too long',
+       'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
+       LONG_WORKFLOW_NAME_MESSAGE),
+      ('Workflow name cannot start with a number',
+       '1testWorkflow', WORKFLOW_START_LETTER_MESSAGE),
+      ('Workflow name cannot start with underscore',
+       '_testWorkflow', WORKFLOW_START_LETTER_MESSAGE),
+      ('Workflow name cannot end with underscore',
+       'testWorkflow_', WORKFLOW_END_ALPHANUMERIC_MESSAGE),
+      ('Workflow name cannot end with dash',
+       'testWorkflow-', WORKFLOW_END_ALPHANUMERIC_MESSAGE),
+      ('Workflow name cannot contain spaces',
+       '"test Workflow"', WORKFLOW_INVALID_CHARS_MESSAGE),
+      ('Workflow name cannot contain special chars',
+       '"test~Workflow"', WORKFLOW_INVALID_CHARS_MESSAGE)
+  )
+  def testDeploy_workflowNamesInvalid(self, workflow_name, exception_message):
+    with self.AssertRaisesToolExceptionMatches(exception_message):
+      self.Run('workflows deploy {}'.format(workflow_name))
+    self.AssertOutputEquals('')
+
+  @parameterized.named_parameters(
+      ('Workflow name just fits',
+       'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl'),
+      ('Workflow name ends with number',
+       'testWorkflow1'),
+      ('Workflow name contains dashes and underscores',
+       't_e-st__Work--flow'),
+  )
+  def testDeploy_workflowNamesValid(self, workflow_name):
+    workflow = self.messages.Workflow(sourceContents=NEW_SOURCE)
+    source_path = self.Touch(
+        self.temp_path, name='workflow.yaml', contents=NEW_SOURCE)
+    full_workflow_name = self.GetWorkflowName(workflow_name)
+
+    self.ExpectGet(
+        full_workflow_name, exception=http_error.MakeHttpError(code=404))
+    self.ExpectCreate(self.GetLocationName(), workflow_name, workflow)
+    self.MockOperationWait()
+    self.ExpectGet(full_workflow_name, result=workflow)
+
+    result = self.Run('workflows deploy {id} --source={source}'.format(
+        id=workflow_name, source=source_path))
+    self.assertEqual(result, workflow)
 
 
 class WorkflowsDeployTestAlpha(WorkflowsDeployTest):

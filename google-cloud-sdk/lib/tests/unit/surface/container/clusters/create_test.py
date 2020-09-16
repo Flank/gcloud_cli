@@ -333,18 +333,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
              status=return_cluster.status,
          ),
         normalize_space=True)
-    # Note: We use ErrContains rather than ErrEquals because this command can
-    # have a warning at the top depending on if kubectl is currently available,
-    # which can vary depending on environment.
-    self.AssertErrContains("""This will disable the autorepair feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
-information on node autorepairs.
-{{"ux": "PROGRESS_TRACKER", "message": "Creating cluster my-little-cluster-kubernetes-is-magic in us-central1-f", "status": "SUCCESS"}}
-Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-little-cluster-kubernetes-is-magic].
-To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-f/my-little-cluster-kubernetes-is-magic?project=fake-project-id
-kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
-""".format(self.API_VERSION))
     c_config = c_util.ClusterConfig.Load(cluster_kwargs['name'], self.ZONE,
                                          self.PROJECT_ID)
     self._TestDefaultAuth(c_config)
@@ -804,7 +792,8 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
                  flags=flags))
 
   @parameterized.parameters(('', '', True), ('--image-type', 'COS', True),
-                            ('--image-type', 'UBUNTU', False))
+                            ('--image-type', 'UBUNTU', True),
+                            ('--image-type', 'WINDOWS_LTSC', False))
   def testAutoRepairDefaults(self, image_flag, image_value, expect_autorepair):
     cluster_kwargs = {
         'management': self._MakeDefaultNodeManagement(expect_autorepair),
@@ -1740,6 +1729,295 @@ resourceLimits:
         '--min-memory 16 --max-memory 128 '
         '--autoprovisioning-locations=us-central1-a,us-central1-b ')
 
+  def testCreateAutoprovisioningMinCpuPlatformFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    minCpuPlatform='Skylake',
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+minCpuPlatform: Skylake
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningMinCpuPlatformFromFlags(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    minCpuPlatform='Skylake',
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=10, maximum=20),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=16, maximum=128)
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
+        '--autoprovisioning-min-cpu-platform Skylake '
+        '--min-memory 16 --max-memory 128')
+
+  def testCreateAutoprovisioningBootDiskKmsKeyFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    bootDiskKmsKey='projects/123/locations/us-1/keyRings/abc',
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+bootDiskKmsKey: projects/123/locations/us-1/keyRings/abc
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningDiskSizeFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    diskSizeGb=100,
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+diskSizeGb: 100
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningDiskTypeFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    diskType='pd-ssd',
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+diskType: pd-ssd
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningShieldedInstanceConfigFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    shieldedInstanceConfig=m.ShieldedInstanceConfig(
+                        enableSecureBoot=True,
+                        enableIntegrityMonitoring=False,
+                    ),
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+shieldedInstanceConfig:
+    enableSecureBoot: true
+    enableIntegrityMonitoring: false
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningOnlyOneShieldedInstanceSettingsFromFileWithError(
+      self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+shieldedInstanceConfig:
+  enableSecureBoot: true
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+
+    with self.assertRaises(c_util.Error):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' create my-cluster '
+          ' --enable-autoprovisioning '
+          '--autoprovisioning-config-file {}'.format(
+              autoprovisioning_config_file))
+    self.AssertErrContains(
+        'Must specify both \'enableSecureBoot\' and \'enableIntegrityMonitoring\' in \'shieldedInstanceConfig\''
+    )
+
   def testCreateEnableAddonsCloudRunWithoutStackdriverKubernetes(self):
     logging = 'Cloud Logging'
     monitoring = 'Cloud Monitoring'
@@ -2008,6 +2286,66 @@ class CreateTestGAOnly(CreateTestGA):
       self.Run((self.clusters_command_base.format(self.ZONE) +
                 ' create {0} --enable-stackdriver-kubernetes '
                 '--addons=CloudRun').format(self.CLUSTER_NAME))
+
+  def testCreateEnableAddonsCloudRunWithExternalLoadBalancer(self):
+    load_balancer_type = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=load_balancer_type)),
+        'loggingService':
+            'logging.googleapis.com/kubernetes',
+        'monitoringService':
+            'monitoring.googleapis.com/kubernetes',
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0}'
+              ' --enable-stackdriver-kubernetes'
+              ' --addons=HttpLoadBalancing,KubernetesDashboard,CloudRun'
+              ' --cloud-run-config=load-balancer-type=EXTERNAL').format(
+                  self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateEnableAddonsCloudRunWithInternalLoadBalancer(self):
+    load_balancer_type = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=load_balancer_type)),
+        'loggingService':
+            'logging.googleapis.com/kubernetes',
+        'monitoringService':
+            'monitoring.googleapis.com/kubernetes',
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0}'
+              ' --enable-stackdriver-kubernetes'
+              ' --addons=HttpLoadBalancing,KubernetesDashboard,CloudRun'
+              ' --cloud-run-config=load-balancer-type=INTERNAL').format(
+                  self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
 
   def testCreateEnableAddonsConfigConnector(self):
     cluster_kwargs = {
@@ -2279,27 +2617,6 @@ resourceLimits:
         '--no-enable-autoprovisioning-autorepair '
         '--enable-autoprovisioning-autoupgrade '
         '--min-memory 16 --max-memory 128')
-
-  def testEnableAutoprovisioningWithFromFileWithError(self):
-    autoprovisioning_config_file = self.Touch(
-        self.temp_path,
-        'autoprovisioning-config',
-        contents="""
-minCpuPlatform: Skylake
-resourceLimits:
-  - resourceType: 'cpu'
-    minimum: 8
-    maximum: 100
-  - resourceType: 'memory'
-    maximum: 20
-        """)
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
-          '--enable-autoprovisioning '
-          '--autoprovisioning-config-file {}'.format(
-              autoprovisioning_config_file))
-    self.AssertErrContains('Min CPU platform not implemented in GA.')
 
   @parameterized.parameters(('rapid'), ('regular'), ('stable'))
   def testReleaseChannelRapid(self, channel):
@@ -2773,51 +3090,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         .format(self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
 
-  def testCreateAutoprovisioningMinCpuPlatformFromFile(self):
-    m = self.messages
-    cluster_kwargs = {
-        'name':
-            'rl-cluster',
-        'clusterAutoscaling':
-            m.ClusterAutoscaling(
-                enableNodeAutoprovisioning=True,
-                autoprovisioningNodePoolDefaults=m
-                .AutoprovisioningNodePoolDefaults(
-                    minCpuPlatform='Skylake',
-                    oauthScopes=[],
-                ),
-                resourceLimits=[
-                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
-                    m.ResourceLimit(
-                        resourceType='memory', minimum=10, maximum=20),
-                ]),
-    }
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(
-            targetLink=self.TARGET_LINK.format(self.API_VERSION,
-                                               self.PROJECT_NUM, self.ZONE,
-                                               cluster_kwargs['name'])))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    autoprovisioning_config = self.Touch(
-        self.temp_path,
-        'autoprovisioning-config',
-        contents="""
-minCpuPlatform: Skylake
-resourceLimits:
-  - resourceType: 'cpu'
-    minimum: 1
-    maximum: 2
-  - resourceType: 'memory'
-    minimum: 10
-    maximum: 20
-        """)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
-        '--enable-autoprovisioning '
-        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
-
   def testCreateAutoprovisioningUpgradeSettingsFromFile(self):
     m = self.messages
     cluster_kwargs = {
@@ -3033,39 +3305,6 @@ resourceLimits:
         '--enable-autoprovisioning-autoupgrade '
         '--min-memory 16 --max-memory 128')
 
-  def testCreateAutoprovisioningMinCpuPlatformFromFlags(self):
-    m = self.messages
-    cluster_kwargs = {
-        'name':
-            'rl-cluster',
-        'clusterAutoscaling':
-            m.ClusterAutoscaling(
-                enableNodeAutoprovisioning=True,
-                autoprovisioningNodePoolDefaults=m
-                .AutoprovisioningNodePoolDefaults(
-                    minCpuPlatform='Skylake',
-                    oauthScopes=[],
-                ),
-                resourceLimits=[
-                    m.ResourceLimit(resourceType='cpu', minimum=10, maximum=20),
-                    m.ResourceLimit(
-                        resourceType='memory', minimum=16, maximum=128)
-                ]),
-    }
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(
-            targetLink=self.TARGET_LINK.format(self.API_VERSION,
-                                               self.PROJECT_NUM, self.ZONE,
-                                               cluster_kwargs['name'])))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
-        '--enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
-        '--autoprovisioning-min-cpu-platform Skylake '
-        '--min-memory 16 --max-memory 128')
-
   def testCreateDisableAddonsIstio(self):
     cluster_kwargs = {
         'addonsConfig':
@@ -3151,6 +3390,64 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
       self.Run((self.clusters_command_base.format(self.ZONE) +
                 ' create {0} --enable-stackdriver-kubernetes '
                 '--addons={1}').format(self.CLUSTER_NAME, ','.join(addons)))
+
+  def testCreateEnableAddonsCloudRunWithExternalLoadBalancer(self):
+    load_balancer_type = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_EXTERNAL
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=load_balancer_type)),
+        'clusterTelemetry':
+            self.msgs.ClusterTelemetry(
+                type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.ENABLED),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0}'
+              ' --enable-stackdriver-kubernetes'
+              ' --addons=HttpLoadBalancing,KubernetesDashboard,CloudRun'
+              ' --cloud-run-config=load-balancer-type=EXTERNAL').format(
+                  self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateEnableAddonsCloudRunWithInternalLoadBalancer(self):
+    load_balancer_type = self.messages.CloudRunConfig.LoadBalancerTypeValueValuesEnum.LOAD_BALANCER_TYPE_INTERNAL
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False, loadBalancerType=load_balancer_type)),
+        'clusterTelemetry':
+            self.msgs.ClusterTelemetry(
+                type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.ENABLED),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0}'
+              ' --enable-stackdriver-kubernetes'
+              ' --addons=HttpLoadBalancing,KubernetesDashboard,CloudRun'
+              ' --cloud-run-config=load-balancer-type=INTERNAL').format(
+                  self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
 
   def testCreateEnableAddonsNodeLocalDNS(self):
     cluster_kwargs = {
@@ -3704,6 +4001,19 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
+
+  def testGkeOidcConfig(self):
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters({})
+    expected_cluster.gkeOidcConfig = self.messages.GkeOidcConfig(
+        enabled=True)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        '{base} create {name} --enable-gke-oidc'.format(
+            base=self.clusters_command_base.format(self.ZONE),
+            name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
 
   def _TestCreate(self, cluster_kwargs, flags):
     expected_cluster = self._MakeCluster(**cluster_kwargs)

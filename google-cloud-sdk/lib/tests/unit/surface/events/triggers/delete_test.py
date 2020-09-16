@@ -22,14 +22,15 @@ from googlecloudsdk.api_lib.events import custom_resource_definition
 from googlecloudsdk.api_lib.events import source
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.core.console import console_io
 from tests.lib.surface.events import base
 
 
-class TriggersDeleteTestAlpha(base.EventsBase):
+class TriggersDeleteAnthosTestBeta(base.EventsBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _MakeSourceCrd(self):
     """Creates a source CRD and assigns it as output to ListSourceCRD."""
@@ -73,19 +74,9 @@ class TriggersDeleteTestAlpha(base.EventsBase):
     self.operations.GetTrigger.return_value = self.trigger
 
   def testDeleteManaged(self):
-    """Tests the source is manually deleted for requests against managed."""
-    self._MakeSourceCrd()
-    self._MakeSource()
-    self._MakeTrigger(self.source)
-    self.WriteInput('Y\n')
-    self.Run('events triggers delete my-trigger --region=us-central1')
-
-    self.operations.DeleteSource.assert_called_once_with(
-        self._SourceRef('my-source', 'cloudpubsubsources', 'fake-project'),
-        self.source_crd)
-    self.operations.DeleteTrigger.assert_called_once_with(
-        self._TriggerRef('my-trigger', 'fake-project'))
-    self.AssertErrContains('Deleted trigger [my-trigger].')
+    """This command is for Anthos only."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('events triggers delete my-trigger --platform=managed')
 
   def testDeleteGke(self):
     """Tests successful delete with default output format."""
@@ -106,9 +97,34 @@ class TriggersDeleteTestAlpha(base.EventsBase):
     self.operations.DeleteTrigger.assert_not_called()
 
 
-class TriggersDeleteTestAlphaAnthos(TriggersDeleteTestAlpha):
+class TriggersDeleteAnthosTestAlpha(TriggersDeleteAnthosTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_name = 'anthosevents'
-    self.api_version = 'v1beta1'
+
+  def testDeleteManaged(self):
+    pass
+
+
+class TriggersDeleteManagedTestAlpha(TriggersDeleteAnthosTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_name = 'run'
+    self.api_version = 'v1alpha1'
+
+  def testDeleteManaged(self):
+    """Tests the source is manually deleted for requests against managed."""
+    self._MakeSourceCrd()
+    self._MakeSource()
+    self._MakeTrigger(self.source)
+    self.WriteInput('Y\n')
+    self.Run('events triggers delete my-trigger --platform=managed '
+             '--region=us-central1')
+
+    self.operations.DeleteSource.assert_called_once_with(
+        self._SourceRef('my-source', 'cloudpubsubsources', 'fake-project'),
+        self.source_crd)
+    self.operations.DeleteTrigger.assert_called_once_with(
+        self._TriggerRef('my-trigger', 'fake-project'))
+    self.AssertErrContains('Deleted trigger [my-trigger].')

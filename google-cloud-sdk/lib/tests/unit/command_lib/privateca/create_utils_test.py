@@ -60,7 +60,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
                 commonName='foobar',
                 subject=self.messages.Subject(organization='foo'))),
         issuingOptions=self.messages.IssuingOptions(),
-        cloudKmsKeyVersion=self._KMS_KEY_NAME,
+        keySpec=self.messages.KeyVersionSpec(
+            cloudKmsKeyVersion=self._KMS_KEY_NAME),
         gcsBucket='my-bucket',
     )
 

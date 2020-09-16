@@ -8,8 +8,8 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances start is used to start a stopped
-    Google Compute Engine virtual machine. Only a stopped virtual machine can
-    be started.
+    Compute Engine virtual machine. Only a stopped virtual machine can be
+    started.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

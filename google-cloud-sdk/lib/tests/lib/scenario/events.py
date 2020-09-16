@@ -30,7 +30,7 @@ from googlecloudsdk.core.resource import resource_transform
 from googlecloudsdk.core.util import http_encoding
 from tests.lib.scenario import assertions
 from tests.lib.scenario import updates
-import httplib2
+
 import six
 from six.moves import http_client as httplib
 from six.moves import urllib
@@ -63,17 +63,6 @@ class Request(object):
                apitools_request.headers,
                apitools_request.body)
 
-  @classmethod
-  def FromRequestArgs(cls, *args, **kwargs):
-    uri, method, headers, body = cls._FromHttplib2(*args, **kwargs)
-    return cls(uri, method, headers, body)
-
-  @classmethod
-  def _FromHttplib2(cls, uri, method='GET', body=None, headers=None,
-                    redirections=5, connection_type=None, **kwargs):
-    del redirections, connection_type, kwargs  # Unused
-    return uri, method, headers or {}, body
-
   def __init__(self, uri, method, headers, body):
     self.uri = uri
     self.method = method
@@ -96,13 +85,6 @@ class Response(object):
     status = int(headers.pop('status', httplib.OK))
     return cls(status, headers, apitools_response.content)
 
-  @classmethod
-  def FromTransportResponse(cls, response):
-    info, content = response
-    headers = info.copy()
-    status = int(headers.pop('status', httplib.OK))
-    return cls(status, headers, content.decode('utf-8'))
-
   def __init__(self, status, headers, body):
     self.status = status
     self.headers = headers
@@ -119,12 +101,6 @@ class Response(object):
     except (ValueError, TypeError):
       # Not a json object.
       return self.body
-
-  def ToTransportResponse(self):
-    """Converts a Response object to the response returned by the transport."""
-    headers = self.headers.copy()
-    headers['status'] = self.status
-    return (httplib2.Response(headers), http_encoding.Encode(self.body))
 
 
 class Event(six.with_metaclass(abc.ABCMeta, object)):

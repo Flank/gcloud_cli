@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha notebooks instances stop \- request for stoping instances
+gcloud alpha notebooks instances stop \- request for stopping instances
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha notebooks instances stop \- request for stoping instances
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Request for stoping notbook instance.
+\fB(ALPHA)\fR Request for stopping notebook instances.
 
 
 
@@ -80,9 +80,8 @@ Run \fB$ gcloud help\fR for details.
 To stop an instance, run:
 
 .RS 2m
-$ gcloud alpha notebooks instances stop \e
-  /projects/example\-project/locations/us\-central1\-b/instances/\e
-example\-instance
+$ gcloud alpha notebooks instances stop example\-instance \e
+  \-\-location=us\-central1\-a
 .RE
 
 

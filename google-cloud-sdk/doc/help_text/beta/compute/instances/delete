@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute instances delete - delete Google Compute Engine virtual
+    gcloud beta compute instances delete - delete Compute Engine virtual
         machine instances
 
 SYNOPSIS
@@ -8,8 +8,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute instances delete deletes one or more Google
-    Compute Engine virtual machine instances.
+    (BETA) gcloud beta compute instances delete deletes one or more Compute
+    Engine virtual machine instances.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]

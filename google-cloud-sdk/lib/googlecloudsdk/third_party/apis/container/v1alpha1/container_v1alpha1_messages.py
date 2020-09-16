@@ -752,6 +752,7 @@ class ClusterUpdate(_messages.Message):
     desiredDnsConfig: DNSConfig contains clusterDNS config for this cluster.
     desiredEnableGvnic: Enable or disable gvnic on this cluster. This field is
       not yet used.
+    desiredGkeOidcConfig: Security message for security related configuration
     desiredImage: The desired name of the image to use for this node. This is
       used to create clusters using a custom image.
     desiredImageProject: The project containing the desired image to use for
@@ -874,34 +875,35 @@ class ClusterUpdate(_messages.Message):
   desiredDefaultSnatStatus = _messages.MessageField('DefaultSnatStatus', 10)
   desiredDnsConfig = _messages.MessageField('DNSConfig', 11)
   desiredEnableGvnic = _messages.BooleanField(12)
-  desiredImage = _messages.StringField(13)
-  desiredImageProject = _messages.StringField(14)
-  desiredImageType = _messages.StringField(15)
-  desiredIntraNodeVisibilityConfig = _messages.MessageField('IntraNodeVisibilityConfig', 16)
-  desiredKubernetesObjectsExportConfig = _messages.MessageField('KubernetesObjectsExportConfig', 17)
-  desiredL4ilbSubsettingConfig = _messages.MessageField('ILBSubsettingConfig', 18)
-  desiredLocations = _messages.StringField(19, repeated=True)
-  desiredLoggingService = _messages.StringField(20)
-  desiredMaster = _messages.MessageField('Master', 21)
-  desiredMasterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 22)
-  desiredMasterVersion = _messages.StringField(23)
-  desiredMonitoringService = _messages.StringField(24)
-  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 25)
-  desiredNodePoolId = _messages.StringField(26)
-  desiredNodeVersion = _messages.StringField(27)
-  desiredNotificationConfig = _messages.MessageField('NotificationConfig', 28)
-  desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 29)
-  desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 30)
-  desiredPrivateIpv6Access = _messages.MessageField('PrivateIPv6Status', 31)
-  desiredPrivateIpv6GoogleAccess = _messages.EnumField('DesiredPrivateIpv6GoogleAccessValueValuesEnum', 32)
-  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 33)
-  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 34)
-  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 35)
-  desiredTpuConfig = _messages.MessageField('TpuConfig', 36)
-  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 37)
-  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 38)
-  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 39)
-  securityProfile = _messages.MessageField('SecurityProfile', 40)
+  desiredGkeOidcConfig = _messages.MessageField('GkeOidcConfig', 13)
+  desiredImage = _messages.StringField(14)
+  desiredImageProject = _messages.StringField(15)
+  desiredImageType = _messages.StringField(16)
+  desiredIntraNodeVisibilityConfig = _messages.MessageField('IntraNodeVisibilityConfig', 17)
+  desiredKubernetesObjectsExportConfig = _messages.MessageField('KubernetesObjectsExportConfig', 18)
+  desiredL4ilbSubsettingConfig = _messages.MessageField('ILBSubsettingConfig', 19)
+  desiredLocations = _messages.StringField(20, repeated=True)
+  desiredLoggingService = _messages.StringField(21)
+  desiredMaster = _messages.MessageField('Master', 22)
+  desiredMasterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 23)
+  desiredMasterVersion = _messages.StringField(24)
+  desiredMonitoringService = _messages.StringField(25)
+  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 26)
+  desiredNodePoolId = _messages.StringField(27)
+  desiredNodeVersion = _messages.StringField(28)
+  desiredNotificationConfig = _messages.MessageField('NotificationConfig', 29)
+  desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 30)
+  desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 31)
+  desiredPrivateIpv6Access = _messages.MessageField('PrivateIPv6Status', 32)
+  desiredPrivateIpv6GoogleAccess = _messages.EnumField('DesiredPrivateIpv6GoogleAccessValueValuesEnum', 33)
+  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 34)
+  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 35)
+  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 36)
+  desiredTpuConfig = _messages.MessageField('TpuConfig', 37)
+  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 38)
+  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 39)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 40)
+  securityProfile = _messages.MessageField('SecurityProfile', 41)
 
 
 class CompleteIPRotationRequest(_messages.Message):
@@ -2254,11 +2256,19 @@ class MasterAuth(_messages.Message):
     password: The password to use for HTTP basic authentication to the master
       endpoint. Because the master endpoint is open to the Internet, you
       should create a strong password. If a password is provided for cluster
-      creation, username must be non-empty.
+      creation, username must be non-empty. Warning: basic authentication is
+      deprecated, and will be removed in GKE control plane versions 1.19 and
+      newer. For a list of recommended authentication methods, see:
+      https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-
+      authentication
     username: The username to use for HTTP basic authentication to the master
       endpoint. For clusters v1.6.0 and later, basic authentication can be
       disabled by leaving username unspecified (or setting it to the empty
-      string).
+      string). Warning: basic authentication is deprecated, and will be
+      removed in GKE control plane versions 1.19 and newer. For a list of
+      recommended authentication methods, see:
+      https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-
+      authentication
   """
 
   clientCertificate = _messages.StringField(1)
@@ -4438,10 +4448,13 @@ class VerticalPodAutoscaling(_messages.Message):
   controlled by it.
 
   Fields:
+    enableExperimentalFeatures: Enables experimental features support for
+      Vertical Pod Autoscaling.
     enabled: Enables vertical pod autoscaling.
   """
 
-  enabled = _messages.BooleanField(1)
+  enableExperimentalFeatures = _messages.BooleanField(1)
+  enabled = _messages.BooleanField(2)
 
 
 class WorkloadIdentityConfig(_messages.Message):

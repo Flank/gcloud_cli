@@ -40,7 +40,7 @@ class RevokeTest(cli_test_base.CliTestBase):
 
     result = self.Run('auth revoke acct1')
     self.assertEqual(['acct1'], result)
-    self.mock_revoke.assert_called_once_with('acct1', True)
+    self.mock_revoke.assert_called_once_with('acct1')
     self.assertEqual('junk', properties.VALUES.core.account.Get())
     self.AssertOutputEquals('Revoked credentials:\n - acct1\n')
     self.AssertErrEquals("""\
@@ -51,14 +51,16 @@ acct3
 """, normalize_space=True)
 
   def testRevoke_UsingOauth2client(self):
+    self.StartObjectPatch(
+        store, 'GoogleAuthDisabledGlobally', return_value=True)
     self.mock_accounts.side_effect = [
         ['acct1', 'acct2', 'acct3'],
         ['acct2', 'acct3']
     ]
 
-    result = self.Run('auth revoke acct1 --use-oauth2client')
+    result = self.Run('auth revoke acct1')
     self.assertEqual(['acct1'], result)
-    self.mock_revoke.assert_called_once_with('acct1', False)
+    self.mock_revoke.assert_called_once_with('acct1')
     self.assertEqual('junk', properties.VALUES.core.account.Get())
     self.AssertOutputEquals('Revoked credentials:\n - acct1\n')
     self.AssertErrEquals("""\
@@ -75,7 +77,7 @@ acct3
     result = self.Run('auth revoke acct1 --all')
     self.assertEqual(accts, result)
     for acct in accts:
-      self.mock_revoke.assert_any_call(acct, True)
+      self.mock_revoke.assert_any_call(acct)
     self.assertEqual('junk', properties.VALUES.core.account.Get())
 
   def testActive(self):
@@ -85,7 +87,7 @@ acct3
 
     result = self.Run('auth revoke')
     self.assertEqual(['acct1'], result)
-    self.mock_revoke.assert_called_once_with('acct1', True)
+    self.mock_revoke.assert_called_once_with('acct1')
     self.assertEqual(None, properties.VALUES.core.account.Get())
 
   def testNone(self):

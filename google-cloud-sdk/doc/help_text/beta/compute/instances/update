@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute instances update - update a Google Compute Engine
-        virtual machine
+    gcloud beta compute instances update - update a Compute Engine virtual
+        machine
 
 SYNOPSIS
     gcloud beta compute instances update INSTANCE_NAME
@@ -12,7 +12,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances update updates labels and requested
-    CPU Platform for a Google Compute Engine virtual machine.
+    CPU Platform for a Compute Engine virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
