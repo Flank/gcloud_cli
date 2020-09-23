@@ -208,6 +208,88 @@ class SNUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
         op,
         exception=error)
 
+  def ExpectCreatePeeredDnsDomain(self,
+                                  network,
+                                  name,
+                                  dns_suffix,
+                                  operation,
+                                  error=None):
+    """Add an expectation on the mocked create peered dns domain method.
+
+    Args:
+      network: The network name in the create peered dns domain request.
+      name: The DNS zone name in the create peered dns domain request.
+      dns_suffix: The DNS domain suffix in the create peered dns domain request.
+      operation: The name of the operation that create peered dns domain should
+        return.
+      error: Optional; If specified create peered dns domain will raise this
+        exception.
+    """
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services_projects_global_networks_peeredDnsDomains.Create.Expect(
+        self.services_messages.
+        ServicenetworkingServicesProjectsGlobalNetworksPeeredDnsDomainsCreateRequest(
+            parent='services/%s/projects/%s/global/networks/%s' %
+            (self.service, self.PROJECT_NUMBER, network),
+            peeredDnsDomain=self.services_messages.PeeredDnsDomain(
+                dnsSuffix=dns_suffix,
+                name=name,
+            ),
+        ),
+        op,
+        exception=error,
+    )
+
+  def ExpectDeletePeeredDnsDomain(self, network, name, operation, error=None):
+    """Add an expectation on the mocked delete peered dns domain method.
+
+    Args:
+      network: The network name in the delete peered dns domain request.
+      name: The DNS zone name in the delete peered dns domain request.
+      operation: The name of the operation that delete peered dns domain should
+        return.
+      error: Optional; If specified delete peered dns domain will raise this
+        exception.
+    """
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services_projects_global_networks_peeredDnsDomains.Delete.Expect(
+        self.services_messages.
+        ServicenetworkingServicesProjectsGlobalNetworksPeeredDnsDomainsDeleteRequest(
+            name='services/%s/projects/%s/global/networks/%s/peeredDnsDomains/%s'
+            % (self.service, self.PROJECT_NUMBER, network, name)),
+        op,
+        exception=error,
+    )
+
+  def ExpectListPeeredDnsDomains(self, network, domains, error=None):
+    """Add an expectation on the mocked list peered dns domains method.
+
+    Args:
+      network: The network name in the delete peered dns domain request.
+      domains: The list of peered dns domains to return.
+      error: Optional; If specified list peered dns domains will raise this
+        exception.
+    """
+    if error:
+      resp = None
+    else:
+      resp = self.services_messages.ListPeeredDnsDomainsResponse(
+          peeredDnsDomains=domains)
+    self.mocked_client.services_projects_global_networks_peeredDnsDomains.List.Expect(
+        self.services_messages.
+        ServicenetworkingServicesProjectsGlobalNetworksPeeredDnsDomainsListRequest(
+            parent='services/%s/projects/%s/global/networks/%s' %
+            (self.service, self.PROJECT_NUMBER, network)),
+        resp,
+        exception=error,
+    )
+
 
 class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
                      cli_test_base.CliTestBase):

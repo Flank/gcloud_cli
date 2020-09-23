@@ -39,6 +39,7 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
   def testToJson_UserAccount(self):
     json_data = self.USER_CREDENTIALS_JSON
     credentials = creds.FromJson(json_data)
+    credentials.token_uri = None
     self.assertMultiLineEqual(json_data, creds.ToJson(credentials))
 
   def testToJson_UserAccountGoogleAuth(self):

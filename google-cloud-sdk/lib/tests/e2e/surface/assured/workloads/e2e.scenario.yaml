@@ -15,7 +15,7 @@ summary:
   - stderr: |
       Created Assured Workloads environment [$$workload$$].
 - execute:
-  - command: assured workloads list organizations/531459884741/locations/us-central1
+  - command: assured workloads list --organization=531459884741 --location=us-central1
       --page-size=5 --limit=1 --filter="name=$$workload$$"
   - stderr: |
       Using endpoint [https://us-central1-assuredworkloads.googleapis.com/]
@@ -90,10 +90,10 @@ actions:
             content-length: '441'
             content-type: application/json; charset=UTF-8
           body:
-            name: organizations/531459884741/locations/us-central1/operations/18fabd85-a94a-4240-85ea-203ceb6a8937
+            name: organizations/531459884741/locations/us-central1/operations/6606dd11-0768-45c9-afa6-6423568d37e2
             metadata:
               '@type': type.googleapis.com/google.cloud.assuredworkloads.v1beta1.CreateWorkloadOperationMetadata
-              createTime: '2020-09-03T14:11:51.323064Z'
+              createTime: '2020-09-11T10:48:15.051981Z'
               displayName: gcloud-e2e-workloads
               parent: organizations/531459884741/locations/us-central1
               complianceRegime: FEDRAMP_MODERATE
@@ -119,24 +119,24 @@ actions:
             content-length: '1029'
             content-type: application/json; charset=UTF-8
           body:
-            name: organizations/531459884741/locations/us-central1/operations/18fabd85-a94a-4240-85ea-203ceb6a8937
+            name: organizations/531459884741/locations/us-central1/operations/6606dd11-0768-45c9-afa6-6423568d37e2
             metadata:
               '@type': type.googleapis.com/google.cloud.assuredworkloads.v1beta1.CreateWorkloadOperationMetadata
-              createTime: '2020-09-03T14:11:51.323064Z'
+              createTime: '2020-09-11T10:48:15.051981Z'
               displayName: gcloud-e2e-workloads
               parent: organizations/531459884741/locations/us-central1
               complianceRegime: FEDRAMP_MODERATE
             done: true
             response:
               '@type': type.googleapis.com/google.cloud.assuredworkloads.v1beta1.Workload
-              name: organizations/531459884741/locations/us-central1/workloads/00-3ebf33c0-817f-417d-b855-6d6
+              name: organizations/531459884741/locations/us-central1/workloads/00-83562af2-e297-4530-b0e1-182
               displayName: gcloud-e2e-workloads
               resources:
-              - resourceId: '493031002111'
-              - resourceId: '240392851323'
+              - resourceId: '998275154822'
+              - resourceId: '925681295020'
               complianceRegime: FEDRAMP_MODERATE
-              createTime: '2020-09-03T14:12:03.103Z'
-              etag: '-59382269'
+              createTime: '2020-09-11T10:48:26.963Z'
+              etag: '794605754'
               labels:
                 goog-aw-external-identifier: gcloud-2e2
     - expect_progress_tracker:
@@ -150,14 +150,14 @@ actions:
           body: None
         return_response:
           body:
-            name: organizations/531459884741/locations/us-central1/workloads/00-3ebf33c0-817f-417d-b855-6d6
+            name: organizations/531459884741/locations/us-central1/workloads/00-83562af2-e297-4530-b0e1-182
             displayName: gcloud-e2e-workloads
             resources:
-            - resourceId: '240392851323'
-            - resourceId: '493031002111'
+            - resourceId: '925681295020'
+            - resourceId: '998275154822'
             complianceRegime: FEDRAMP_MODERATE
-            createTime: '2020-09-03T14:12:03.103Z'
-            etag: '-59382269'
+            createTime: '2020-09-11T10:48:26.963Z'
+            etag: '794605754'
             labels:
               goog-aw-external-identifier: gcloud-2e2
           status: 200
@@ -183,7 +183,7 @@ actions:
         code: 0
 - execute_command:
     # List workloads
-    command: assured workloads list organizations/531459884741/locations/us-central1
+    command: assured workloads list --organization=531459884741 --location=us-central1
       --page-size=5 --limit=1 --filter="name=$$workload$$"
     events:
     - expect_stderr: |
@@ -199,61 +199,61 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2686'
+            content-length: '2691'
             content-type: application/json; charset=UTF-8
           body:
             workloads:
-            - name: organizations/531459884741/locations/us-central1/workloads/00-3ebf33c0-817f-417d-b855-6d6
+            - name: organizations/531459884741/locations/us-central1/workloads/00-83562af2-e297-4530-b0e1-182
               displayName: gcloud-e2e-workloads
               resources:
-              - resourceId: '240392851323'
-              - resourceId: '493031002111'
+              - resourceId: '925681295020'
+              - resourceId: '998275154822'
               complianceRegime: FEDRAMP_MODERATE
-              createTime: '2020-09-03T14:12:03.103Z'
-              etag: '-59382269'
+              createTime: '2020-09-11T10:48:26.963Z'
+              etag: '794605754'
               labels:
                 goog-aw-external-identifier: gcloud-2e2
-            - name: organizations/531459884741/locations/us-central1/workloads/00-6e416852-6a4f-4ac3-97bc-600
+            - name: organizations/531459884741/locations/us-central1/workloads/00-bbc12287-fbe4-4025-8b2a-c56
               displayName: gcloud-e2e-workloads
               resources:
-              - resourceId: '4962050984'
-              - resourceId: '146235302208'
+              - resourceId: '18724843437'
+              - resourceId: '1062609252530'
               complianceRegime: FEDRAMP_MODERATE
-              createTime: '2020-09-03T08:12:30.073Z'
-              etag: '-1726899842'
+              createTime: '2020-09-09T04:45:50.236Z'
+              etag: '-2051268434'
               labels:
                 goog-aw-external-identifier: gcloud-2e2
-            - name: organizations/531459884741/locations/us-central1/workloads/00-e0b7b939-1d26-41b3-8061-42f
+            - name: organizations/531459884741/locations/us-central1/workloads/00-9787680e-9702-4158-a4eb-a7a
               displayName: gcloud-e2e-workloads
               resources:
-              - resourceId: '48876275424'
-              - resourceId: '484959073005'
+              - resourceId: '608038976406'
+              - resourceId: '931738339307'
               complianceRegime: FEDRAMP_MODERATE
-              createTime: '2020-09-01T19:01:46.555Z'
-              etag: '1958112834'
+              createTime: '2020-09-07T10:18:04.576Z'
+              etag: '-1707741484'
               labels:
                 goog-aw-external-identifier: gcloud-2e2
-            - name: organizations/531459884741/locations/us-central1/workloads/00-8c2bf280-0c05-49ae-aad4-46f
+            - name: organizations/531459884741/locations/us-central1/workloads/00-d981648c-5411-449c-8cd6-695
               displayName: gcloud-e2e-workloads
               resources:
-              - resourceId: '19191270817'
-              - resourceId: '425451496967'
+              - resourceId: '502526108552'
+              - resourceId: '864633141470'
               complianceRegime: FEDRAMP_MODERATE
-              createTime: '2020-09-01T19:01:45.807Z'
-              etag: '1470443945'
+              createTime: '2020-09-03T14:43:38.762Z'
+              etag: '-1005295742'
               labels:
                 goog-aw-external-identifier: gcloud-2e2
-            - name: organizations/531459884741/locations/us-central1/workloads/00-28d1f0f4-b056-4643-8eae-22d
+            - name: organizations/531459884741/locations/us-central1/workloads/00-438d6242-d761-4910-87c9-d6e
               displayName: gcloud-e2e-workloads
               resources:
-              - resourceId: '337674887595'
-              - resourceId: '750773131666'
+              - resourceId: '40604646857'
+              - resourceId: '572481554355'
               complianceRegime: FEDRAMP_MODERATE
-              createTime: '2020-09-01T19:01:03.867Z'
-              etag: '-1787746689'
+              createTime: '2020-09-03T14:41:42.580Z'
+              etag: '-1861224266'
               labels:
                 goog-aw-external-identifier: gcloud-2e2
-            nextPageToken: CjIKBgjvtLr6BQoGCMC9tZ0DCiAqHjAwLTI4ZDFmMGY0LWIwNTYtNDY0My04ZWFlLTIyZA==
+            nextPageToken: CjIKBgimgcT6BQoGCICyyJQCCiAqHjAwLTQzOGQ2MjQyLWQ3NjEtNDkxMC04N2M5LWQ2ZQ==
           status: 200
     - expect_stdout:
         matches: .*goog-aw-external-identifier:\ gcloud-2e2.*name:\ $$workload$$.*
@@ -279,14 +279,14 @@ actions:
             content-length: '440'
             content-type: application/json; charset=UTF-8
           body:
-            name: organizations/531459884741/locations/us-central1/workloads/00-3ebf33c0-817f-417d-b855-6d6
+            name: organizations/531459884741/locations/us-central1/workloads/00-83562af2-e297-4530-b0e1-182
             displayName: gcloud-e2e-workloads
             resources:
-            - resourceId: '240392851323'
-            - resourceId: '493031002111'
+            - resourceId: '925681295020'
+            - resourceId: '998275154822'
             complianceRegime: FEDRAMP_MODERATE
-            createTime: '2020-09-03T14:12:03.103Z'
-            etag: '-59382269'
+            createTime: '2020-09-11T10:48:26.963Z'
+            etag: '794605754'
             labels:
               goog-aw-external-identifier: gcloud-2e2
           status: 200
@@ -323,17 +323,17 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '471'
+            content-length: '470'
             content-type: application/json; charset=UTF-8
           body:
-            name: organizations/531459884741/locations/us-central1/workloads/00-3ebf33c0-817f-417d-b855-6d6
+            name: organizations/531459884741/locations/us-central1/workloads/00-83562af2-e297-4530-b0e1-182
             displayName: gcloud-e2e-workloads-updated
             resources:
-            - resourceId: '240392851323'
-            - resourceId: '493031002111'
+            - resourceId: '925681295020'
+            - resourceId: '998275154822'
             complianceRegime: FEDRAMP_MODERATE
-            createTime: '2020-09-03T14:12:03.103Z'
-            etag: '-882213967'
+            createTime: '2020-09-11T10:48:26.963Z'
+            etag: '546924017'
             labels:
               goog-aw-external-identifier: gcloud-2e2
               update: 'true'

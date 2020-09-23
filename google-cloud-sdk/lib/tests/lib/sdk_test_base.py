@@ -237,7 +237,7 @@ class SdkBase(test_case.Base):
     elif hasattr(self, 'dirs_size_limit_class'):
       size_limit = getattr(self, '_dirs_size_limit_class')
     else:
-      size_limit = 2<<20  # 2MB default
+      size_limit = 2<<21  # 4MB default
     self.assertLess(size, size_limit)
 
     # Remove the root directory and its contents
@@ -670,12 +670,9 @@ class WithFakeAuth(SdkBase):
     self._load_mock = self.StartObjectPatch(c_store, 'Load')
     self.FakeAuthSetCredentialsPresent(True)
     if self.use_google_auth:
-      refresh_mock = self.StartObjectPatch(credentials.Credentials, 'refresh')
+      self.StartObjectPatch(credentials.Credentials, 'refresh')
     else:
-      refresh_mock = self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
-    refresh_mock.side_effect = ValueError(
-        'TESTING ERROR: You are attempting to refresh a fake credential.  '
-        'This probably means you are about to use it, and you should not be.')
+      self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
 
 
 class WithFakeComputeAuth(SdkBase):
@@ -750,10 +747,7 @@ class WithFakeComputeAuth(SdkBase):
     properties.VALUES.core.account.Set(self.FakeAuthAccount())
     self._load_mock = self.StartObjectPatch(c_store, 'Load')
     self.FakeAuthSetCredentialsPresent(True)
-    refresh_mock = self.StartObjectPatch(gce.AppAssertionCredentials, 'refresh')
-    refresh_mock.side_effect = ValueError(
-        'TESTING ERROR: You are attempting to refresh a fake credential.  '
-        'This probably means you are about to use it, and you should not be.')
+    self.StartObjectPatch(gce.AppAssertionCredentials, 'refresh')
 
 
 class _BundledLocations(object):

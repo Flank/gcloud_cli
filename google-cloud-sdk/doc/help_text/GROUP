@@ -227,6 +227,9 @@ GROUPS
      iap
         Manage IAP policies.
 
+     identity
+        Manage Cloud Identity Groups and Memberships resources.
+
      iot
         Manage Cloud IoT resources.
 

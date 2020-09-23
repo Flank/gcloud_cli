@@ -83,7 +83,6 @@ class MlPlatformModelsIntegrationTestGA(MlPlatformModelsIntegrationTest,
                                         parameterized.TestCase):
   """e2e tests for ai-platform models command group."""
 
-  @test_case.Filters.skip('Intermittently requires another flag', 'b/162816316')
   def testMainOps(self, module_name):
     with self._CreateModel(module_name) as model:
       # Confirm the model exists
@@ -97,6 +96,7 @@ class MlPlatformModelsIntegrationTestGA(MlPlatformModelsIntegrationTest,
       create_version_args = (
           '--origin {model_dir} '
           '--staging-bucket {staging_bucket} '
+          '--runtime-version 2.1 '
           '--description "My Description"').format(
               model_dir=savedmodel_dir, staging_bucket=self._STAGING_BUCKET_URL)
       with self._CreateVersion(

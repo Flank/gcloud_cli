@@ -6,9 +6,9 @@ summary:
   - command: labelmanager keys describe env --label-parent="organizations/961309089256"
   - stdout: |
       createTime: '2019-10-10T22:06:52.891Z'
-      description: gcloud test key environment
+      description: gcloud e2e test key environment -- do not change or add children
       displayName: env
-      etag: qY2BVcr2UDmZmwzJHjMTBg==
+      etag: Cz9iNOft6JeYN1pdREUCjg==
       name: labelKeys/889673984972
       parent: organizations/961309089256
       state: ACTIVE
@@ -16,13 +16,12 @@ summary:
   - command: labelmanager keys describe labelKeys/889673984972
   - stdout: |
       createTime: '2019-10-10T22:06:52.891Z'
-      description: gcloud test key environment
+      description: gcloud e2e test key environment -- do not change or add children
       displayName: env
-      etag: qY2BVcr2UDmZmwzJHjMTBg==
+      etag: Cz9iNOft6JeYN1pdREUCjg==
       name: labelKeys/889673984972
       parent: organizations/961309089256
       state: ACTIVE
-
 actions:
 - execute_command:
     command: labelmanager keys describe env --label-parent="organizations/961309089256"
@@ -35,7 +34,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '1412'
+            content-length: '1880'
             content-type: application/json; charset=UTF-8
           body:
             keys:
@@ -45,18 +44,12 @@ actions:
               etag: reNZ6PEFJ/jFoz9OO3vi1Q==
               state: ACTIVE
               createTime: '2020-08-04T01:34:15.316Z'
-            - name: labelKeys/864523402578
-              parent: organizations/961309089256
-              displayName: do-not-delete-test-key
-              etag: P5WttmO0fB5iV+d4sFhq0g==
-              state: DELETE_REQUESTED
-              createTime: '2020-08-04T11:20:43.504Z'
-              deleteTime: '2020-08-04T11:21:28.243Z'
             - name: labelKeys/889673984972
               parent: organizations/961309089256
               displayName: env
-              description: gcloud test key environment
-              etag: qY2BVcr2UDmZmwzJHjMTBg==
+              description: gcloud e2e test key environment -- do not change or add
+                children
+              etag: Cz9iNOft6JeYN1pdREUCjg==
               state: ACTIVE
               createTime: '2019-10-10T22:06:52.891Z'
             - name: labelKeys/952766012010
@@ -80,22 +73,22 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '256'
+            content-length: '293'
             content-type: application/json; charset=UTF-8
           body:
             name: labelKeys/889673984972
             parent: organizations/961309089256
             displayName: env
-            description: gcloud test key environment
-            etag: qY2BVcr2UDmZmwzJHjMTBg==
+            description: gcloud e2e test key environment -- do not change or add children
+            etag: Cz9iNOft6JeYN1pdREUCjg==
             state: ACTIVE
             createTime: '2019-10-10T22:06:52.891Z'
           status: 200
     - expect_stdout: |
         createTime: '2019-10-10T22:06:52.891Z'
-        description: gcloud test key environment
+        description: gcloud e2e test key environment -- do not change or add children
         displayName: env
-        etag: qY2BVcr2UDmZmwzJHjMTBg==
+        etag: Cz9iNOft6JeYN1pdREUCjg==
         name: labelKeys/889673984972
         parent: organizations/961309089256
         state: ACTIVE
@@ -112,22 +105,22 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '256'
+            content-length: '293'
             content-type: application/json; charset=UTF-8
           body:
             name: labelKeys/889673984972
             parent: organizations/961309089256
             displayName: env
-            description: gcloud test key environment
-            etag: qY2BVcr2UDmZmwzJHjMTBg==
+            description: gcloud e2e test key environment -- do not change or add children
+            etag: Cz9iNOft6JeYN1pdREUCjg==
             state: ACTIVE
             createTime: '2019-10-10T22:06:52.891Z'
           status: 200
     - expect_stdout: |
         createTime: '2019-10-10T22:06:52.891Z'
-        description: gcloud test key environment
+        description: gcloud e2e test key environment -- do not change or add children
         displayName: env
-        etag: qY2BVcr2UDmZmwzJHjMTBg==
+        etag: Cz9iNOft6JeYN1pdREUCjg==
         name: labelKeys/889673984972
         parent: organizations/961309089256
         state: ACTIVE

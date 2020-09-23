@@ -126,6 +126,8 @@ INDEX_HINT = 'Indexes are being rebuilt. This may take a moment.'
 QUEUE_HINT = ('Task queues have been updated.'
               '\n\nVisit the Cloud Platform Console Task Queues '
               'page to view your queues and cron jobs.')
+START_VERSION_MESSAGE = ('Starting version [{project}/{service}/{version}] '
+                         'before promoting it.\n')
 STOP_VERSION_MESSAGE = 'Stopping version [{project}/{service}/{version}].\n'
 STOP_VERSION_HINT = (
     'Sent request to stop version [{project}/{service}/{version}]. '
@@ -204,6 +206,7 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
                             default_bucket='gs://default-bucket/',
                             hostname=None,
                             create_attempts=1, create_success=True,
+                            start_version=None,
                             stop_version=None,
                             stop_version_suppressed=False,
                             existing_services=None,
@@ -225,6 +228,8 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
       create_attempts: int, number of calls expected to be made to
           create version
       create_success: bool, True if create should succeed
+      start_version: str, version ID that deploy is expected to send a start
+          request for.
       stop_version: str, version ID that deploy is expected to send a stop
           request for.
       stop_version_suppressed: bool, if user passes --stop-previous-version and
@@ -242,6 +247,8 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
       operation_metadata: Metadata to be returned on the Operation.
       project: str, ID of project (self.Project() will be used by default)
     """
+    if existing_services is None:
+      existing_services = {}
     project = project or self.Project()
     self.ExpectGetApplicationRequest(project, code_bucket=default_bucket,
                                      hostname=hostname)
@@ -271,7 +278,23 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
           service,
           existing_services)
 
+    # pylint: disable=bad-continuation
     if set_default:
+      # set_default > 0 means we want to promote this version to be the default.
+      # That also implies starting the version if it is stopped, which requires
+      # looking up its current serving status with GetVersion. The test library
+      # will mock the GetVersion call to return the version in
+      # existing_services, so first ensure the version is present in
+      # existing_services and set the serving status to SERVING by default.
+      (existing_services.setdefault(service, {})
+                        .setdefault(version, {})
+                        .setdefault('serving_status',
+                                    self.messages.Version
+                                        .ServingStatusValueValuesEnum.SERVING))
+
+      self.ExpectGetVersionRequest(project, service, version, existing_services)
+      if start_version:
+        self.ExpectStartVersionRequest(project, service, start_version)
       self.ExpectSetDefault(project, service, version,
                             num_tries=set_default,
                             success=set_default_success)
@@ -295,6 +318,13 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
       self.ExpectCreateVersion(project, service, version,
                                handlers=handlers,
                                deployment=deployment)
+      existing_services = {
+          service: {
+              version: {
+                  'serving_status':
+                      self.messages.Version
+                      .ServingStatusValueValuesEnum.SERVING}}}
+      self.ExpectGetVersionRequest(project, service, version, existing_services)
       self.ExpectSetDefault(project, service, version)
 
   def AssertConfigDeployed(self, cron=False, dispatch=False, dos=False,
@@ -320,7 +350,8 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
   def AssertPostDeployHints(self, default_service=False, single_service=None,
                             multiple_services=False, cron=False,
                             cron_with_tasks=False, dispatch=False, dos=False,
-                            index=False, queue=False, stop_version=None):
+                            index=False, queue=False, start_version=None,
+                            stop_version=None):
     """Assert that hints are correctly displayed after deploying.
 
     Args:
@@ -336,6 +367,8 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
       dos: bool, if True the dos.yaml hint should be displayed.
       index: bool, if True the index.yaml hint should be displayed.
       queue: bool, if True, the queue.yaml hint should be displayed.
+      start_version: str|None, the name of the deployed version that was started
+          or None if no such version exists
       stop_version: str|None, the name of the previous version that was stopped
           or None if no such version exists
 
@@ -361,16 +394,21 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
     _AssertHintDisplayedOrNotDisplayed(dos, DOS_HINT)
     _AssertHintDisplayedOrNotDisplayed(index, INDEX_HINT)
     _AssertHintDisplayedOrNotDisplayed(queue, QUEUE_HINT)
+    service_id = 'default' if default_service else single_service
+    _AssertHintDisplayedOrNotDisplayed(
+        start_version,
+        START_VERSION_MESSAGE.format(
+            project=self.Project(), version=start_version,
+            service=service_id))
     # --stop-previous-version checks
     if stop_version and multiple_services:
       raise InfrastructureException(
           'Need to update test infrastructure to support this check')
-    stop_service = single_service or (default_service and 'default')
     _AssertHintDisplayedOrNotDisplayed(
         stop_version, STOP_VERSION_MESSAGE.format(
-            project=self.Project(), version=stop_version, service=stop_service))
+            project=self.Project(), version=stop_version, service=service_id))
     _AssertHintDisplayedOrNotDisplayed(stop_version, STOP_VERSION_HINT.format(
-        project=self.Project(), version=stop_version, service=stop_service))
+        project=self.Project(), version=stop_version, service=service_id))
 
   def _RuntimeBuilderExperimentEnabled(self, enabled=True):
     experiment_config = mock.MagicMock()
@@ -405,6 +443,14 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.ExpectListServicesRequest(self.Project(), None)
     self.ExpectCreateVersion(self.Project(), 'default', '1',
                              deployment=self.GetDeploymentMessage())
+    existing_services = {
+        'default': {
+            '1': {
+                'serving_status':
+                    self.messages.Version
+                    .ServingStatusValueValuesEnum.SERVING}}}
+    self.ExpectGetVersionRequest(self.Project(), 'default', '1',
+                                 existing_services)
     self.ExpectSetDefault(self.Project(), 'default', '1')
     # Explicitly calling Run so that the bucket is not appended.
     self.Run('app deploy {m} --version 1'.format(m=self.FullPath('app.yaml')))
@@ -1127,6 +1173,25 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     with self.assertRaisesRegex(app_exceptions.MultiDeployError,
                                 'appyaml flag'):
       self.Run(('app deploy --appyaml=../foo.yaml deployable1 deployable2 '))
+
+  def testDeploy_PromoteStoppedVersion(self):
+    """Test deploy with --promote where the version is stopped."""
+    existing_services = {
+        'default': {
+            '1': {
+                'serving_status':
+                    self.messages.Version.ServingStatusValueValuesEnum.STOPPED,
+                'env': 'flex'}}}
+    self.MakeApp()
+    self.ExpectServiceDeployed('default', '1',
+                               existing_services=existing_services,
+                               start_version='1',
+                               deployment=self.GetDeploymentMessage())
+
+    self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
+              '--promote --no-stop-previous-version {0}')
+             .format(self.FullPath('app.yaml')))
+    self.AssertPostDeployHints(default_service=True, start_version='1')
 
   def testStopPreviousVersion_NoPreviousVersion(self):
     """Test deploy with --stop-previous-version if no previous versions."""

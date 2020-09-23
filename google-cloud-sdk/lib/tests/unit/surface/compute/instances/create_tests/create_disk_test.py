@@ -445,5 +445,71 @@ class InstancesCreateDiskTestBeta(create_test_base.InstancesCreateTestBase):
     )
 
 
+class InstancesCreateDiskTestAlpha(create_test_base.InstancesCreateTestBase):
+  """Test creation of VM instances with create disk(s)."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testCreateDiskWithRegionalDisk(self):
+
+    m = self.messages
+
+    self.Run(
+        'compute instances create instance-1 '
+        '--create-disk size=200GB,name=disk-1,mode=ro,replica-zones=central2-b,'
+        'device-name=data-1,auto-delete=no,boot=yes,auto-delete=yes,mode=ro '
+        '--zone central2-a', self.track)
+
+    full_replica_zone_url = ('https://compute.googleapis.com/compute/alpha/'
+                             'projects/my-project/zones/central2-b')
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          deviceName='data-1',
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              diskName='disk-1',
+                              diskSizeGb=200,
+                              replicaZones=[full_replica_zone_url]),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='default',
+                          scopes=create_test_base.DEFAULT_SCOPES,
+                      ),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+
 if __name__ == '__main__':
   test_case.main()

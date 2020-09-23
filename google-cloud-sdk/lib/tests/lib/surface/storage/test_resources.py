@@ -18,25 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
 
 
 def get_bucket_resource(scheme, name):
   url = storage_url.CloudUrl(scheme=scheme, bucket_name=name)
-  # TODO(b/167691513) Delete when refactors stop using Apitools for resources
-  # are complete.
-  messages = apis.GetMessagesModule('storage', 'v1')
-  metadata = messages.Bucket(name=name)
-  return resource_reference.BucketResource(url, name, metadata=metadata)
+  return resource_reference.BucketResource(url)
 
 
 def get_object_resource(scheme, bucket, name, generation=None):
-  messages = apis.GetMessagesModule('storage', 'v1')
-  metadata = messages.Object(bucket=bucket, name=name)
   url = storage_url.CloudUrl(scheme, bucket, name, generation)
-  return resource_reference.ObjectResource(url, metadata)
+  return resource_reference.ObjectResource(url)
 
 
 def get_prefix_resource(scheme, bucket, prefix):

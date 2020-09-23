@@ -28,6 +28,17 @@ COMMANDS
      list
         (ALPHA) List Apigee applications.
 
+EXAMPLES
+    To get the names and UUIDs of all applications in the active Cloud Platform
+    project, run:
+
+        $ gcloud alpha apigee applications list
+
+    To get a JSON representation of an application in the active Cloud Platform
+    project, including its API keys, run:
+
+        $ gcloud alpha apigee applications describe APP_UUID --format=json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

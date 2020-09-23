@@ -25,6 +25,9 @@ GROUPS
      operations
         (BETA) Manage Operation for various services.
 
+     peered-dns-domains
+        (BETA) Peered DNS domains for various private service connections.
+
      vpc-peerings
         (BETA) VPC Peerings to various services.
 

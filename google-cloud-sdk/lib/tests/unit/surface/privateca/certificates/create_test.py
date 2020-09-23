@@ -24,6 +24,7 @@ from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.privateca import base as privateca_base
 from googlecloudsdk.api_lib.privateca import certificate_utils
 from googlecloudsdk.api_lib.privateca import request_utils
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.privateca import key_generation
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
@@ -34,7 +35,7 @@ import mock
 
 
 class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
-                 sdk_test_base.WithFakeAuth):
+                 sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture):
 
   def SetUp(self):
     self.mock_client = api_mock.Client(
@@ -50,30 +51,40 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
     self.parent_cert = ('----BEGIN CERTIFICATE----\ntest\n----END '
                         'CERTIFICATE----')
 
-  def _ExpectCreateOperation(self,
-                             parent_name,
-                             cert_name,
-                             request_id,
-                             public_key,
-                             lifetime='P30D',
-                             reusable_config=None,
-                             subject_config=None):
+  def _ExpectGetCa(self, ca_name, ca_tier=None):
+    ca_tier = ca_tier or self.messages.CertificateAuthority.TierValueValuesEnum.ENTERPRISE
+    self.mock_client.projects_locations_certificateAuthorities.Get.Expect(
+        request=self.messages
+        .PrivatecaProjectsLocationsCertificateAuthoritiesGetRequest(
+            name=ca_name),
+        response=self.messages.CertificateAuthority(name=ca_name, tier=ca_tier))
+
+  def _ExpectCreateCertificate(self,
+                               parent_name,
+                               cert_id,
+                               request_id,
+                               public_key,
+                               lifetime='P30D',
+                               reusable_config=None,
+                               subject_config=None,
+                               include_name=False,
+                               labels=None):
     reusable_config = reusable_config or self.messages.ReusableConfigWrapper()
     subject_config = subject_config or self.messsages.SubjectConfig(
         subject=self.messages.Subject,
         subjectAltName=self.messages.SubjectAltNames())
     lifetime = times.FormatDurationForJson(times.ParseDuration(lifetime))
     response = self.messages.Certificate(
-        name='{}/certificate/{}'.format(parent_name, cert_name),
         pemCertificate=self.test_cert,
         pemCertificateChain=[self.parent_cert])
+    if include_name:
+      response.name = '{}/certificate/{}'.format(parent_name, cert_id)
 
     request = self.messages.PrivatecaProjectsLocationsCertificateAuthoritiesCertificatesCreateRequest(
-        certificateId=cert_name,
+        certificateId=cert_id,
         requestId=request_id,
         parent=parent_name,
         certificate=self.messages.Certificate(
-            name='{}/certificates/{}'.format(parent_name, cert_name),
             lifetime=lifetime,
             config=self.messages.CertificateConfig(
                 reusableConfig=reusable_config,
@@ -81,7 +92,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
                 publicKey=self.messages.PublicKey(
                     type=self.messages.PublicKey.TypeValueValuesEnum
                     .PEM_RSA_KEY,
-                    key=public_key))))
+                    key=public_key)),
+            labels=labels))
 
     self.mock_client.projects_locations_certificateAuthorities_certificates.Create.Expect(
         request=request, response=response)
@@ -92,7 +104,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
             keyUsage=self.messages.KeyUsage(
                 baseKeyUsage=self.messages.KeyUsageOptions(),
                 extendedKeyUsage=self.messages.ExtendedKeyUsageOptions()),
-            caOptions=self.messages.CaOptions(isCa=False)))
+            caOptions=self.messages.CaOptions(isCa=is_ca)))
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
@@ -102,7 +114,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
       key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
   def testCreateKeyGen(self, key_gen_mock, cert_name_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
-    self._ExpectCreateOperation(
+    self._ExpectGetCa(parent_name)
+    self._ExpectCreateCertificate(
         parent_name,
         cert_name_mock.return_value,
         request_id=request_id_mock.return_value,
@@ -129,7 +142,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
       key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
   def testCreateKeyGenWithAltNames(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
-    self._ExpectCreateOperation(
+    self._ExpectGetCa(parent_name)
+    self._ExpectCreateCertificate(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
@@ -154,7 +168,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
       key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
   def testCreateKeyGenWithSubjectAndSan(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
-    self._ExpectCreateOperation(
+    self._ExpectGetCa(parent_name)
+    self._ExpectCreateCertificate(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
@@ -180,7 +195,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
   def testReusableConfig(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
     reusable_config_name = 'projects/project/locations/loc/reusableConfigs/config'
-    self._ExpectCreateOperation(
+    self._ExpectGetCa(parent_name)
+    self._ExpectCreateCertificate(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
@@ -204,7 +220,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
       key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
   def testReusableConfigValues(self, key_gen_mock, request_id_mock):
     parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
-    self._ExpectCreateOperation(
+    self._ExpectGetCa(parent_name)
+    self._ExpectCreateCertificate(
         parent_name,
         'cert',
         request_id=request_id_mock.return_value,
@@ -230,3 +247,108 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
         '--extended-key-usages client_auth,server_auth '
         '--key-usages digital_signature,cert_sign '
         '--subject CN=google.com,O=google --is-ca-cert --max-chain-length 3')
+
+  def testDevOpsWithoutCertOutputFileFails(self):
+    parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
+    self._ExpectGetCa(
+        parent_name,
+        self.messages.CertificateAuthority.TierValueValuesEnum.DEVOPS)
+
+    with self.AssertRaisesExceptionRegexp(exceptions.RequiredArgumentException,
+                                          '--cert-output-file'):
+      self.Run(
+          'beta privateca certificates create cert --issuer ca '
+          '--issuer-location europe '
+          '--generate-key --key-output-file private_key.pem '
+          '--subject CN=google.com,O=google')
+
+  @mock.patch.object(
+      request_utils, 'GenerateRequestId', return_value='create_id')
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testDevOpsWithCertIdLogsWarning(self, key_gen_mock, request_id_mock):
+    parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
+    self._ExpectGetCa(
+        parent_name,
+        self.messages.CertificateAuthority.TierValueValuesEnum.DEVOPS)
+    self._ExpectCreateCertificate(
+        parent_name,
+        'explicit-cert-id',
+        request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
+        reusable_config=self._MakeIsCaReusableConfig(is_ca=False),
+        subject_config=self.messages.SubjectConfig(
+            subject=self.messages.Subject(),
+            subjectAltName=self.messages.SubjectAltNames(
+                dnsNames=['example.com'])))
+
+    self.Run('beta privateca certificates create explicit-cert-id --issuer ca '
+             '--issuer-location europe --cert-output-file cert_out.pem '
+             '--generate-key --key-output-file private_key.pem '
+             '--dns-san example.com')
+    self.AssertErrContains('certificate ID was specified but will not be used')
+
+  @mock.patch.object(
+      request_utils, 'GenerateRequestId', return_value='create_id')
+  @mock.patch.object(
+      certificate_utils, 'GenerateCertId', return_value='00000000-AAA-AAA')
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testDevOpsWithLabelsLogsWarning(self, key_gen_mock, cert_name_mock,
+                                      request_id_mock):
+    parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
+    self._ExpectGetCa(
+        parent_name,
+        self.messages.CertificateAuthority.TierValueValuesEnum.DEVOPS)
+    self._ExpectCreateCertificate(
+        parent_name,
+        cert_name_mock.return_value,
+        request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
+        reusable_config=self._MakeIsCaReusableConfig(is_ca=False),
+        subject_config=self.messages.SubjectConfig(
+            subject=self.messages.Subject(),
+            subjectAltName=self.messages.SubjectAltNames(
+                dnsNames=['example.com'])),
+        labels=self.messages.Certificate.LabelsValue(
+            additionalProperties=[
+                self.messages.Certificate.LabelsValue.AdditionalProperty(
+                    key='foo', value='bar')]))
+
+    self.Run('beta privateca certificates create --issuer ca '
+             '--issuer-location europe --cert-output-file cert_out.pem '
+             '--generate-key --key-output-file private_key.pem '
+             '--dns-san example.com --labels "foo=bar"')
+    self.AssertErrContains('labels was specified but will not be used')
+
+  @mock.patch.object(
+      request_utils, 'GenerateRequestId', return_value='create_id')
+  @mock.patch.object(
+      key_generation, 'RSAKeyGen', return_value=(b'private', b'public'))
+  def testDevOpsWithCertIdAndLabelsLogsWarning(self, key_gen_mock,
+                                               request_id_mock):
+    parent_name = 'projects/fake-project/locations/europe/certificateAuthorities/ca'
+    self._ExpectGetCa(
+        parent_name,
+        self.messages.CertificateAuthority.TierValueValuesEnum.DEVOPS)
+    self._ExpectCreateCertificate(
+        parent_name,
+        'explicit-cert-id',
+        request_id=request_id_mock.return_value,
+        public_key=key_gen_mock.return_value[1],
+        reusable_config=self._MakeIsCaReusableConfig(is_ca=False),
+        subject_config=self.messages.SubjectConfig(
+            subject=self.messages.Subject(),
+            subjectAltName=self.messages.SubjectAltNames(
+                dnsNames=['example.com'])),
+        labels=self.messages.Certificate.LabelsValue(
+            additionalProperties=[
+                self.messages.Certificate.LabelsValue.AdditionalProperty(
+                    key='foo', value='bar')]))
+
+    self.Run('beta privateca certificates create explicit-cert-id --issuer ca '
+             '--issuer-location europe --cert-output-file cert_out.pem '
+             '--generate-key --key-output-file private_key.pem '
+             '--dns-san example.com --labels "foo=bar"')
+    self.AssertErrContains('certificate ID, labels were specified but will not '
+                           'be used')

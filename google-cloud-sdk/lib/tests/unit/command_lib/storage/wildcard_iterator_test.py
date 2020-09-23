@@ -23,6 +23,7 @@ import os
 
 from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.api_lib.storage import errors as api_errors
+from googlecloudsdk.api_lib.storage import gcs_api
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
@@ -50,9 +51,7 @@ class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls,
     self.bucket2 = self.messages.Bucket(name='bucket2')
     self.buckets = [self.bucket1, self.bucket2]
     self.buckets_response = [
-        resource_reference.BucketResource.from_gcs_metadata_object(
-            cloud_api.DEFAULT_PROVIDER.value, bucket)
-        for bucket in self.buckets]
+        gcs_api._BucketResourceFromMetadata(bucket) for bucket in self.buckets]
 
     self.objects = [
         self.messages.Object(name='dir1/sub1/a.txt'),
@@ -82,7 +81,7 @@ class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls,
 
     resource_iterator = wildcard_iterator.get_wildcard_iterator(
         'gs://', fields_scope=fields_scope)
-    actual = [resource.metadata_object.name for resource in resource_iterator]
+    actual = [resource.metadata.name for resource in resource_iterator]
     expected = [b.name for b in self.buckets]
     self.assertEqual(actual, expected)
 
@@ -146,7 +145,7 @@ class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls,
         all_versions=True,
         bucket_name='bucket1',
         delimiter='/',
-        fields_scope=cloud_api.FieldsScope.SHORT,
+        fields_scope=cloud_api.FieldsScope.NO_ACL,
         prefix=request_prefix,
     )
 
@@ -161,9 +160,9 @@ class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls,
 
     self.assertEqual(resources, [])
     client.GetObjectMetadata.assert_called_once_with(
-        'bucket1', 'b.txt', '2', cloud_api.FieldsScope.SHORT)
+        'bucket1', 'b.txt', '2', cloud_api.FieldsScope.NO_ACL)
     client.ListObjects.assert_called_once_with(
-        'bucket1', 'b.txt', '/', True, cloud_api.FieldsScope.SHORT)
+        'bucket1', 'b.txt', '/', True, cloud_api.FieldsScope.NO_ACL)
 
   @mock_cloud_api.patch
   def test_object_with_generation_without_wildcard(self, client):
@@ -174,7 +173,7 @@ class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls,
         wildcard_iterator.get_wildcard_iterator('gs://bucket1/a.txt#1'))
     self.assertEqual(resource_list, [resource])
     client.GetObjectMetadata.assert_called_once_with(
-        'bucket1', 'a.txt', '1', cloud_api.FieldsScope.SHORT)
+        'bucket1', 'a.txt', '1', cloud_api.FieldsScope.NO_ACL)
     self.assertFalse(client.ListObjects.called)
 
   @mock_cloud_api.patch
@@ -192,7 +191,7 @@ class CloudWildcardIteratorTest(cloud_storage_util.WithGCSCalls,
         all_versions=True,
         bucket_name='bucket1',
         delimiter='/',
-        fields_scope=cloud_api.FieldsScope.SHORT,
+        fields_scope=cloud_api.FieldsScope.NO_ACL,
         prefix='a.txt',
     )
 
@@ -447,7 +446,7 @@ class WildcardWithoutApitoolsMockTest(parameterized.TestCase,
 
     self.assertEqual(resources, [resource])
     mock_client.GetObjectMetadata.assert_called_once_with(
-        'bucket', 'a/b.txt', None, cloud_api.FieldsScope.SHORT)
+        'bucket', 'a/b.txt', None, cloud_api.FieldsScope.NO_ACL)
     self.assertFalse(mock_client.ListObjects.called)
 
 
@@ -505,10 +504,7 @@ class FileWildcardIteratorTest(parameterized.TestCase, sdk_test_base.SdkBase):
       {
           'testcase_name': '_list_with_double_asterisk',
           'wildcard_url': 'dir3/**',
-          'expected_dirs': ['dir3/deeper',
-                            'dir3/deeper/sub1',
-                            'dir3/deeper/sub2',
-                            'dir3/deeper/sub3'],
+          'expected_dirs': [],
           'expected_files': ['dir3/deeper/sub1/a.txt',
                              'dir3/deeper/sub2/b.txt',
                              'dir3/deeper/sub3/a.txt']

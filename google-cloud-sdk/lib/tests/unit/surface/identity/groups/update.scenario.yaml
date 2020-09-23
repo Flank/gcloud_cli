@@ -41,7 +41,7 @@ summary:
   - label: Update a group which does not exist.
   - command: |
       identity groups update eng-discuss@foo.com
-  - error: '1: Invalid value for [email]: There is no such a group associated with
+  - error: '1: Invalid value for [--email]: There is no such a group associated with
       the specified argument:eng-discuss@foo.com'
 - execute:
   - label: Update Group's labels. (a single label)
@@ -88,7 +88,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -132,7 +132,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -172,7 +172,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -213,7 +213,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -236,7 +236,7 @@ actions:
             }
     - expect_exit:
         code: 1
-        message: 'Invalid value for [email]: There is no such a group associated with
+        message: 'Invalid value for [--email]: There is no such a group associated with
           the specified argument:eng-discuss@foo.com'
 
 - execute_command:
@@ -247,7 +247,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -292,7 +292,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -337,7 +337,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -384,7 +384,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -407,7 +407,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null

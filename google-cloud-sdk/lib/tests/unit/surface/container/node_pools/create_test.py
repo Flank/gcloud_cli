@@ -953,6 +953,18 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
               **pool_kwargs))
     self.AssertErrContains(c_util.INVALIID_SURGE_UPGRADE_SETTINGS)
 
+  def testEnableGcfs(self):
+    pool_kwargs = {'gcfsConfig': self.messages.GcfsConfig(enabled=True)}
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) +
+        ' create {0} --cluster={1} --enable-gcfs'.format(
+            self.NODE_POOL_NAME, self.CLUSTER_NAME))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):

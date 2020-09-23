@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha compute url-maps validate - validates URL map configs from
+        your project
+
+SYNOPSIS
+    gcloud alpha compute url-maps validate --source=SOURCE
+        [--file_format=FILE_FORMAT] [--global | --region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Runs static validation for the UrlMap. In particular, the tests of
+    the provided UrlMap will be run. Calling this method does NOT create the
+    UrlMap.
+
+REQUIRED FLAGS
+     --source=SOURCE
+        Path to the file that contains the URL map config for validation. The
+        file must not contain any output-only fields. A schema describing the
+        export/import format can be found in:
+        $CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/alpha/UrlMap.yaml.
+
+OPTIONAL FLAGS
+     --file_format=FILE_FORMAT
+        The format of the file containing the URL map config. Currently
+        supports yaml which is also the default. FILE_FORMAT must be: yaml.
+
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to validate.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    A URL map can be validated by running:
+
+        $ gcloud alpha compute url-maps validate --source=<path-to-file>
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist.
+

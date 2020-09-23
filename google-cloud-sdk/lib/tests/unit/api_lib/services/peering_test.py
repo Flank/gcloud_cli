@@ -30,6 +30,8 @@ class PeeringTest(unit_test_base.SNUnitTestBase):
   OPERATION_NAME = 'operations/abc.0000000000'
   NETWORK = 'hello'
   RANGES = ['10.0.1.0/30', '10.0.3.0/30']
+  DNS_ZONE_NAME = 'googleapis-com'
+  DNS_SUFFIX = 'googleapis.com.'
 
   def testCreateConnection_Success(self):
     """Test CreateConnection returns operation when successful."""
@@ -161,3 +163,124 @@ class PeeringTest(unit_test_base.SNUnitTestBase):
         r'Error!'):
       peering.DisableVpcServiceControls(self.PROJECT_NUMBER, self.service,
                                         self.NETWORK)
+
+  def testCreatePeeredDnsDomain_Success(self):
+    """Test CreatePeeredDnsDomain returns operation when successful."""
+    want = self.services_messages.Operation(
+        name=self.OPERATION_NAME,
+        done=False,
+    )
+    self.ExpectCreatePeeredDnsDomain(
+        self.NETWORK,
+        self.DNS_ZONE_NAME,
+        self.DNS_SUFFIX,
+        self.OPERATION_NAME,
+    )
+
+    got = peering.CreatePeeredDnsDomain(
+        self.PROJECT_NUMBER,
+        self.service,
+        self.NETWORK,
+        self.DNS_ZONE_NAME,
+        self.DNS_SUFFIX,
+    )
+
+    self.assertEqual(got, want)
+
+  def testCreatePeeredDnsDomain_PermissionDenied(self):
+    """Test CreatePeeredDnsDomain raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error!')
+    self.ExpectCreatePeeredDnsDomain(
+        self.NETWORK,
+        self.DNS_ZONE_NAME,
+        self.DNS_SUFFIX,
+        self.OPERATION_NAME,
+        error=server_error,
+    )
+
+    with self.assertRaisesRegex(
+        exceptions.CreatePeeredDnsDomainPermissionDeniedException,
+        r'Error!',
+    ):
+      peering.CreatePeeredDnsDomain(
+          self.PROJECT_NUMBER,
+          self.service,
+          self.NETWORK,
+          self.DNS_ZONE_NAME,
+          self.DNS_SUFFIX,
+      )
+
+  def testDeletePeeredDnsDomain_Success(self):
+    """Test DeletePeeredDnsDomain returns operation when successful."""
+    want = self.services_messages.Operation(
+        name=self.OPERATION_NAME,
+        done=False,
+    )
+    self.ExpectDeletePeeredDnsDomain(
+        self.NETWORK,
+        self.DNS_ZONE_NAME,
+        self.OPERATION_NAME,
+    )
+
+    got = peering.DeletePeeredDnsDomain(
+        self.PROJECT_NUMBER,
+        self.service,
+        self.NETWORK,
+        self.DNS_ZONE_NAME,
+    )
+
+    self.assertEqual(got, want)
+
+  def testDeletePeeredDnsDomain_PermissionDenied(self):
+    """Test DeletePeeredDnsDomain raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error!')
+    self.ExpectDeletePeeredDnsDomain(
+        self.NETWORK,
+        self.DNS_ZONE_NAME,
+        self.OPERATION_NAME,
+        error=server_error,
+    )
+
+    with self.assertRaisesRegex(
+        exceptions.DeletePeeredDnsDomainPermissionDeniedException,
+        r'Error!',
+    ):
+      peering.DeletePeeredDnsDomain(
+          self.PROJECT_NUMBER,
+          self.service,
+          self.NETWORK,
+          self.DNS_ZONE_NAME,
+      )
+
+  def testListPeeredDnsDomains_Success(self):
+    """Test ListPeeredDnsDomains returns domains when successful."""
+    want = [
+        self.services_messages.PeeredDnsDomain(
+            name=self.DNS_ZONE_NAME,
+            dnsSuffix=self.DNS_SUFFIX,
+        ),
+    ]
+    self.ExpectListPeeredDnsDomains(self.NETWORK, want)
+
+    got = peering.ListPeeredDnsDomains(
+        self.PROJECT_NUMBER,
+        self.service,
+        self.NETWORK,
+    )
+
+    self.assertEqual(got, want)
+
+  def testListPeeredDnsDomains_PermissionDenied(self):
+    """Test ListPeeredDnsDomains raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error!')
+    self.ExpectListPeeredDnsDomains(self.NETWORK, None, error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.ListPeeredDnsDomainsPermissionDeniedException,
+        r'Error!',
+    ):
+      peering.ListPeeredDnsDomains(
+          self.PROJECT_NUMBER,
+          self.service,
+          self.NETWORK,
+      )

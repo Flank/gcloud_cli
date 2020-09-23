@@ -211,7 +211,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         'secondaryWorkerAcceleratorTypeUri' in kwargs or
         'secondaryWorkerType' in kwargs):
 
-      type_map = {
+      preemptibility_type_map = {
           'preemptible':
               self.messages.InstanceGroupConfig.PreemptibilityValueValuesEnum(
                   'PREEMPTIBLE'),
@@ -224,7 +224,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
           numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
           diskConfig=make_disk_config('secondaryWorker'),
           accelerators=make_accelerators('secondaryWorker'),
-          preemptibility=type_map.get(
+          preemptibility=preemptibility_type_map.get(
               kwargs.get('secondaryWorkerType', None), None))
 
     endpoint_config = None
@@ -241,6 +241,18 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
               key=key, value=value) for key, value in six.iteritems(labels)
       ])
 
+    private_ipv6_google_access_type_map = {
+        'inherit-subnetwork':
+            self.messages.GceClusterConfig
+            .PrivateIpv6GoogleAccessValueValuesEnum('INHERIT_FROM_SUBNETWORK'),
+        'outbound':
+            self.messages.GceClusterConfig
+            .PrivateIpv6GoogleAccessValueValuesEnum('OUTBOUND'),
+        'bidirectional':
+            self.messages.GceClusterConfig
+            .PrivateIpv6GoogleAccessValueValuesEnum('BIDIRECTIONAL')
+    }
+
     cluster = self.messages.Cluster(
         clusterName=kwargs.get('clusterName', self.CLUSTER_NAME),
         clusterUuid=kwargs.get('clusterUuid', None),
@@ -256,6 +268,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                         networkUri=kwargs.get('networkUri', None),
                         subnetworkUri=kwargs.get('subnetworkUri', None),
                         internalIpOnly=kwargs.get('internalIpOnly', False),
+                        privateIpv6GoogleAccess=private_ipv6_google_access_type_map
+                        .get(kwargs.get('privateIpv6GoogleAccess', None), None),
                         tags=kwargs.get('tags', []),
                         metadata=kwargs.get('metadata', None),
                         serviceAccount=kwargs.get('serviceAccount', None),
@@ -381,6 +395,10 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
   def AddMetastoreConfig(self, cluster, dataproc_metastore_service):
     cluster.config.metastoreConfig = self.messages.MetastoreConfig(
         dataprocMetastoreService=dataproc_metastore_service)
+
+  def AddNodeGroupAffinity(self, cluster, node_group_uri):
+    cluster.config.gceClusterConfig.nodeGroupAffinity = self.messages.NodeGroupAffinity(
+        nodeGroupUri=node_group_uri)
 
   def ExpectGetCluster(self, cluster=None, region=None, exception=None):
     if not region:

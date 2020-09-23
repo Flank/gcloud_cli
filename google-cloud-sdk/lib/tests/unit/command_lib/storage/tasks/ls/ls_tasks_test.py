@@ -146,10 +146,10 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     client.ListBuckets.assert_called_once_with(cloud_api.FieldsScope.SHORT)
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix=None),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket2.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket2.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)])
 
   @parameterized.parameters(('gs://bucket1'), ('gs://bucket1/'))
@@ -175,9 +175,9 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.GetBucket.assert_called_once_with(
-        self.bucket1.metadata_object.name, cloud_api.FieldsScope.SHORT,)
+        self.bucket1.name, cloud_api.FieldsScope.SHORT,)
     client.ListObjects.assert_called_once_with(
-        all_versions=False, bucket_name=self.bucket1.metadata_object.name,
+        all_versions=False, bucket_name=self.bucket1.name,
         delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)
 
   @parameterized.parameters(('gs://b*2'), ('gs://b**2'))
@@ -203,8 +203,8 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     client.ListBuckets.assert_called_once_with(cloud_api.FieldsScope.SHORT)
     client.ListObjects.assert_called_once_with(
-        all_versions=False, bucket_name=self.bucket2.metadata_object.name,
-        delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)
+        all_versions=False, bucket_name=self.bucket2.name, delimiter='/',
+        fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)
 
   @mock_cloud_api.patch
   def test_execute_lists_object_url_properly(self, client):
@@ -221,9 +221,7 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     self.assertFalse(client.ListObjects.called)
     client.GetObjectMetadata.assert_called_once_with(
-        self.bucket1.metadata_object.name,
-        self.object1.metadata_object.name,
-        None, cloud_api.FieldsScope.SHORT)
+        self.bucket1.name, self.object1.name, None, cloud_api.FieldsScope.SHORT)
 
   @mock_cloud_api.patch
   def test_execute_lists_object_url_with_wildcard_properly(self, client):
@@ -254,14 +252,14 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix=None),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir1.prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix)])
 
@@ -282,14 +280,14 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix=None),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix='dir1/object2'),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix='dir2/object2')])
 
@@ -328,27 +326,27 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=None),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir1.prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir1.prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir2.prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir3.prefix)])
 
@@ -367,14 +365,13 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.GetObjectMetadata.assert_called_once_with(
-        self.bucket1.metadata_object.name, 'dir2/', None,
-        cloud_api.FieldsScope.SHORT)
+        self.bucket1.name, 'dir2/', None, cloud_api.FieldsScope.SHORT)
     client.ListObjects.assert_has_calls([
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix='dir2'),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix='dir2/')])
 
   @mock_cloud_api.patch
@@ -392,14 +389,13 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.GetObjectMetadata.assert_called_once_with(
-        self.bucket1.metadata_object.name, 'dir2', None,
-        cloud_api.FieldsScope.SHORT)
+        self.bucket1.name, 'dir2', None, cloud_api.FieldsScope.SHORT)
     client.ListObjects.assert_has_calls([
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT, prefix='dir2'),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix)])
 
@@ -418,11 +414,10 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
-                  fields_scope=cloud_api.FieldsScope.SHORT,
-                  prefix='d'),
+                  bucket_name=self.bucket1.name, delimiter='/',
+                  fields_scope=cloud_api.FieldsScope.SHORT, prefix='d'),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix)])
 
@@ -442,11 +437,11 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket2.metadata_object.name,
+                  bucket_name=self.bucket2.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix='d'),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket2.metadata_object.name,
+                  bucket_name=self.bucket2.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix='dir_object/')])
 
@@ -480,15 +475,15 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     self.assertEqual(client.ListObjects.mock_calls, [
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=query_prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir1.prefix),
         mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
+                  bucket_name=self.bucket1.name, delimiter='/',
                   fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix)])
 
@@ -515,7 +510,7 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.ListObjects.assert_called_once_with(
-        all_versions=False, bucket_name=self.bucket1.metadata_object.name,
+        all_versions=False, bucket_name=self.bucket1.name,
         delimiter=None, fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)
 
   # pylint:disable=line-too-long
@@ -541,7 +536,7 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.ListObjects.assert_called_once_with(
-        all_versions=False, bucket_name=self.bucket1.metadata_object.name,
+        all_versions=False, bucket_name=self.bucket1.name,
         delimiter=None, fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)
 
   @mock_cloud_api.patch
@@ -574,11 +569,10 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       task.execute()
 
     client.GetObjectMetadata.assert_called_once_with(
-        self.bucket1.metadata_object.name, 'potato', None,
-        cloud_api.FieldsScope.SHORT)
+        self.bucket1.name, 'potato', None, cloud_api.FieldsScope.SHORT)
     client.ListObjects.assert_called_once_with(
         all_versions=False,
-        bucket_name=self.bucket1.metadata_object.name,
+        bucket_name=self.bucket1.name,
         delimiter='/',
         fields_scope=cloud_api.FieldsScope.SHORT,
         prefix='potato')
@@ -639,30 +633,24 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.GetBucket.assert_called_once_with(
-        self.bucket1.metadata_object.name, cloud_api.FieldsScope.SHORT)
+        self.bucket1.name, cloud_api.FieldsScope.SHORT)
     self.assertEqual(client.ListObjects.mock_calls, [
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=None),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir1.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir1.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir2.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir3.prefix)])
 
@@ -716,36 +704,28 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     client.ListBuckets.assert_called_once_with(cloud_api.FieldsScope.SHORT)
     self.assertEqual(client.ListObjects.mock_calls, [
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=None),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir1.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir1.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir2.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir3.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket2.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket2.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=None),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket2.metadata_object.name,
+        mock.call(all_versions=False, bucket_name=self.bucket2.name,
                   delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir_duplicate_of_object.prefix)])
 
@@ -774,19 +754,16 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     )
     self.assertEqual(output, expected_output)
     client.GetObjectMetadata.assert_called_once_with(
-        self.bucket1.metadata_object.name, 'dir2', None,
-        cloud_api.FieldsScope.SHORT)
+        self.bucket1.name, 'dir2', None, cloud_api.FieldsScope.SHORT)
     self.assertEqual(client.ListObjects.mock_calls, [
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
-                  fields_scope=cloud_api.FieldsScope.SHORT, prefix='dir2'),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
-                  fields_scope=cloud_api.FieldsScope.SHORT,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
+                  delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
+                  prefix='dir2'),
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
+                  delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.dir2.prefix),
-        mock.call(all_versions=False,
-                  bucket_name=self.bucket1.metadata_object.name, delimiter='/',
-                  fields_scope=cloud_api.FieldsScope.SHORT,
+        mock.call(all_versions=False, bucket_name=self.bucket1.name,
+                  delimiter='/', fields_scope=cloud_api.FieldsScope.SHORT,
                   prefix=self.subdir3.prefix)])
 
   # pylint:disable=line-too-long
@@ -814,7 +791,7 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.assertEqual(output, expected_output)
 
     client.ListObjects.assert_called_once_with(
-        all_versions=False, bucket_name=self.bucket1.metadata_object.name,
+        all_versions=False, bucket_name=self.bucket1.name,
         delimiter=None, fields_scope=cloud_api.FieldsScope.SHORT, prefix=None)
 
   @parameterized.parameters(

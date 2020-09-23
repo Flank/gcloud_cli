@@ -92,18 +92,8 @@ summary:
   - command: |
       identity groups memberships add --organization 433637338589
       --group-email eng-discuss@foo.com --member-email user@foo.com --roles MEMBER,OWNER --expiration 30d
-  - stdout: |
-      done: true
-      response:
-        '@type': type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership
-        memberKey:
-          id: user@foo.com
-        name: groups/11zu0gzc3tkdgn2/memberships/110293416452252446513
-        roles:
-        - expiryDetail:
-            expireTime: ''
-          name: MEMBER
-        - name: OWNER
+  - error: '1: Invalid value for [roles]: When setting "expiration", a single role
+      should be input.'
 - execute:
   - label: Add a member to a specified group with a non-MEMBER role and an expiration
       date.
@@ -118,8 +108,8 @@ summary:
   - command: |
       identity groups memberships add --organization 433637338589
       --group-email eng-discuss@foo.com --member-email user@foo.com --roles MANAGER,OWNER --expiration 30d
-  - error: '1: Invalid value for [expiration]: Expiration date can be set with a MEMBER
-      role only.'
+  - error: '1: Invalid value for [roles]: When setting "expiration", a single role
+      should be input.'
 actions:
 
 - define_reference:
@@ -136,7 +126,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -197,7 +187,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -258,7 +248,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -313,7 +303,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -381,7 +371,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -449,7 +439,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -460,59 +450,10 @@ actions:
             {
               "name": "groups/11zu0gzc3tkdgn2"
             }
-    - api_call:
-        expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              memberKey:
-                id: user@foo.com
-              roles:
-              - expiryDetail: {}
-                name: MEMBER
-              - name: OWNER
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership",
-                "name": "groups/11zu0gzc3tkdgn2/memberships/110293416452252446513",
-                "memberKey": {
-                  "id": "user@foo.com"
-                },
-                "roles": [
-                  {
-                    "name": "MEMBER",
-                    "expiryDetail": {
-                      "expireTime": ""
-                    }
-                  },
-                  {
-                    "name": "OWNER"
-                  }
-                ]
-              }
-            }
-    - expect_stdout: |
-        done: true
-        response:
-          '@type': type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership
-          memberKey:
-            id: user@foo.com
-          name: groups/11zu0gzc3tkdgn2/memberships/110293416452252446513
-          roles:
-          - expiryDetail:
-              expireTime: ''
-            name: MEMBER
-          - name: OWNER
     - expect_exit:
-        code: 0
-
+        code: 1
+        message: 'Invalid value for [roles]: When setting "expiration", a single role
+          should be input.'
 - execute_command:
     label: Add a member to a specified group with a non-MEMBER role and an expiration
       date.
@@ -522,7 +463,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -537,7 +478,6 @@ actions:
         code: 1
         message: 'Invalid value for [expiration]: Expiration date can be set with
           a MEMBER role only.'
-
 - execute_command:
     label: Add a member to a specified group with multiple roles (including non-MEMBER)
       and an expiration date.
@@ -547,7 +487,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -560,5 +500,5 @@ actions:
             }
     - expect_exit:
         code: 1
-        message: 'Invalid value for [expiration]: Expiration date can be set with
-          a MEMBER role only.'
+        message: 'Invalid value for [roles]: When setting "expiration", a single role
+          should be input.'

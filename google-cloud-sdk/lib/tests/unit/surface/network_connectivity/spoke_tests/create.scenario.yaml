@@ -1,0 +1,84 @@
+title: network-connectivity spoke-tests create tests
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      network-connectivity spokes create testspoke \
+        --region=us-central1 \
+        --hub="/projects/fake-porject/regions/us-central1/hubs/testhub" \
+        --vpn-tunnel=/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel1,/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel2
+  - stderr: |
+      Create request issue for: [testspoke]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created spoke [testhub].
+
+actions:
+- define_reference:
+    reference: name
+    value: projects/connectivity-hub-e2e-testing/locations/us-central1/operations/operation-1599378557469-5aea056c781e1-8a3ea36d-a1121328
+- execute_command:
+    command: |
+      network-connectivity spokes create testspoke --region=us-central1 --hub="/projects/fake-project/locations/global/hubs/testhub" --vpn-tunnel=/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel1,/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel2
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/spokes?alt=json&spokeId=testspoke
+          method: POST
+          body:
+            json:
+              hub: "/projects/fake-project/locations/global/hubs/testhub"
+              linked_vpn_tunnels:
+                value: [/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel1,/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel2]
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+           {
+              "name": "projects/connectivity-hub-e2e-testing/locations/us-central1/operations/operation-1599378557469-5aea056c781e1-8a3ea36d-a1121328",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.networkconnectivity.v1alpha1.OperationMetadata",
+                "createTime": "2020-09-06T08:13:07.163729555Z",
+                "target": "projects/connectivity-hub-e2e-testing/locations/us-central1/spokes/tstspoke",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+           }
+    - expect_stderr: |
+        Create request issued for: [testspoke]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$name$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/spokes/testspoke?alt=json
+          method: GET
+          body: |-
+            {
+              "name": "projects/connectivity-hub-e2e-testing/locations/us-central1/operations/operation-1599378557469-5aea056c781e1-8a3ea36d-a1121328",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.networkconnectivity.v1alpha1.OperationMetadata",
+                "createTime": "2020-09-06T08:13:07.163729555Z",
+                "endTime": "2020-09-06T08:13:07.894366421Z",
+                "target": "projects/fake-project/locations/us-central1/spokes/testspoke",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+        return_response:
+          headers:
+            status: '200'
+          body:
+    - expect_stderr: |
+        Created spoke [testspoke].
+    - expect_exit:
+        code: 0

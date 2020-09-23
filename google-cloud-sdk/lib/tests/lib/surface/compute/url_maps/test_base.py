@@ -77,6 +77,40 @@ class UrlMapsTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         response=url_map,
         exception=exception)
 
+  def ExpectGlobalValidateRequest(self,
+                                  project,
+                                  url_map,
+                                  expected_response=None,
+                                  expected_exception=None):
+    expected_request = self.messages.ComputeUrlMapsValidateRequest(
+        project=project,
+        urlMap=url_map.name,
+        urlMapsValidateRequest=self.messages.UrlMapsValidateRequest(
+            resource=url_map))
+
+    self.apitools_client.urlMaps.Validate.Expect(
+        request=expected_request,
+        response=expected_response,
+        exception=expected_exception)
+
+  def ExpectRegionValidateRequest(self,
+                                  project,
+                                  region,
+                                  url_map,
+                                  expected_response=None,
+                                  expected_exception=None):
+    expected_request = self.messages.ComputeRegionUrlMapsValidateRequest(
+        project=project,
+        region=region,
+        urlMap=url_map.name,
+        regionUrlMapsValidateRequest=self.messages.RegionUrlMapsValidateRequest(
+            resource=url_map))
+
+    self.apitools_client.regionUrlMaps.Validate.Expect(
+        request=expected_request,
+        response=expected_response,
+        exception=expected_exception)
+
   def ExpectPatchRequest(self, url_map_ref, url_map=None, exception=None):
     if url_map_ref.Collection() == 'compute.regionUrlMaps':
       service = self.apitools_client.regionUrlMaps
@@ -123,11 +157,16 @@ class UrlMapsTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     if expected != actual:
       raise MessageEqualityAssertionError(expected, actual)
 
+  def MakeService(self, api, name):
+    return 'https://compute.googleapis.com/compute/' + api + '/projects/my-project/global/backendServices/' + name
+
+  def MakeDefaultService(self, api):
+    return self.MakeService(api, 'default-service')
+
   def MakeTestUrlMap(self, messages, api):
     return messages.UrlMap(
         name='url-map-1',
-        defaultService='https://compute.googleapis.com/compute/' + api +
-        '/projects/my-project/global/backendServices/default-service',
+        defaultService=self.MakeDefaultService(api),
         selfLink='https://compute.googleapis.com/compute/' + api +
         '/projects/my-project/global/urlMaps/url-map-1')
 

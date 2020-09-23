@@ -63,17 +63,13 @@ actions:
         path: skaffold.yaml
         contents:
           matches: |
-            apiVersion: skaffold/v2beta4
+            apiVersion: skaffold/v2beta5
             build:
               artifacts:
-              - buildpack:
+              - buildpacks:
                   builder: my-builder:latest
-                  env:
-                  - GOOGLE_DEVMODE=1
                 context: .*[/\\]helloworld
                 image: gcr.io/project/blahblah
-                sync:
-                  auto: {}
             deploy:
               kubectl:
                 manifests:

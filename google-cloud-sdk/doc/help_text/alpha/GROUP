@@ -282,6 +282,9 @@ GROUPS
         (ALPHA) Manage Cloud Monitoring alerting policies, dashboards, and
         notification channels.
 
+     network-connectivity
+        (ALPHA) Manage Network Connectivity Resources.
+
      network-security
         (ALPHA) Manage Network Security resources.
 

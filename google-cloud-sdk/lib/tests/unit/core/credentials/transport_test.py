@@ -170,43 +170,6 @@ class RequestWrapperTest(sdk_test_base.SdkBase, parameterized.TestCase):
     orig_request.assert_called_once_with(
         'uri', 'method', headers={b'x-goog-iam-authorization-token': b'token'})
 
-  @parameterized.parameters(
-      (True, True, True, True),
-      (True, True, False, False),
-      (True, False, True, True),
-      (True, False, False, False),
-      (False, True, True, True),
-      (False, True, False, False),
-      (False, False, True, False),
-      (False, False, False, False),
-  )
-  def testResourceQuota(self, enable_resource_quota, force_resource_quota,
-                        quota_project_returned, header_expected):
-    http_client = HttpClient()
-    orig_request = self.StartObjectPatch(
-        http_client, 'request', return_value={
-            'status': httplib.OK,
-        })
-    fake_creds = mock.Mock()
-    self.StartObjectPatch(store, 'LoadIfEnabled', return_value=fake_creds)
-    self.StartObjectPatch(creds, 'GetQuotaProject')
-    if quota_project_returned:
-      creds.GetQuotaProject.return_value = 'quota project'
-    else:
-      creds.GetQuotaProject.return_value = None
-
-    RequestWrapper().WrapCredentials(
-        http_client,
-        enable_resource_quota=enable_resource_quota,
-        force_resource_quota=force_resource_quota)
-    http_client.request('uri', 'method')
-
-    if header_expected:
-      orig_request.assert_called_once_with(
-          'uri', 'method', headers={b'X-Goog-User-Project': b'quota project'})
-    else:
-      orig_request.assert_called_once_with('uri', 'method')
-
   def testExceptionHandling(self):
     http_client = HttpClient()
     orig_request = self.StartObjectPatch(
@@ -234,6 +197,45 @@ class RequestWrapperTest(sdk_test_base.SdkBase, parameterized.TestCase):
         'access_denied: Account restricted')
     with self.assertRaises(store.TokenRefreshDeniedByCAAError):
       http_client.request('uri', 'method')
+
+
+class MockQuotaHandler(creds_transport.QuotaHandlerMixin):
+
+  def WrapQuota(self, http_client, enable_resource_quota, force_resource_quota,
+                allow_account_impersonation, use_google_auth):
+    pass
+
+
+class QuotaHandlerMixinTest(sdk_test_base.SdkBase, parameterized.TestCase):
+
+  @parameterized.parameters(
+      # user credentials
+      (True, False, True, 'quota_project', 'project', 'quota_project'),
+      (True, False, True, 'CURRENT_PROJECT', 'project', 'project'),
+      (True, False, True, 'CURRENT_PROJECT_WITH_FALLBACK', 'project',
+       'project'),
+      (True, False, True, 'LEGACY', 'project', None),
+      (True, True, True, 'LEGACY', 'project', 'project'),
+      (False, True, True, 'LEGACY', 'project', 'project'),
+      (False, False, True, 'quota_project', 'project', None),
+      # non-user credentials
+      (True, False, False, 'quota_project', 'project', None),
+      (True, True, False, 'quota_project', 'project', None),
+      (True, True, False, 'CURRENT_PROJECT', 'project', None),
+      (True, True, False, 'CURRENT_PROJECT_WITH_FALLBACK', 'project', None),
+  )
+  def testQuotaProjects(self, enable_resource_quota, force_resource_quota,
+                        is_user_creds, quota_project_property, project_property,
+                        returned_quota_project):
+    quota_handler = MockQuotaHandler()
+    self.StartObjectPatch(
+        creds, 'IsUserAccountCredentials', return_value=is_user_creds)
+    self.StartObjectPatch(store, 'LoadIfEnabled')
+    properties.VALUES.billing.quota_project.Set(quota_project_property)
+    properties.VALUES.core.project.Set(project_property)
+    quota_project = quota_handler.QuotaProject(enable_resource_quota,
+                                               force_resource_quota, True, True)
+    self.assertEqual(returned_quota_project, quota_project)
 
 
 if __name__ == '__main__':

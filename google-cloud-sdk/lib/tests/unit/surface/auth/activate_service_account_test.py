@@ -149,9 +149,10 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase,
         })
     # Activate via oauth2client or google-auth will have loaded credentials
     # carry different URLs. Both are valid.
-    self.assertIn(creds_oauth2client.token_uri,
-                  ('https://www.googleapis.com/oauth2/v4/token',
-                   'https://oauth2.googleapis.com/token'))
+    self.assertIn(
+        creds_oauth2client.token_uri,
+        'https://oauth2.googleapis.com/token',
+    )
 
     # Loads google-auth credentials and verifies.
     creds_google_auth = store.Load(use_google_auth=True)
@@ -194,9 +195,8 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase,
         })
     # Activate via oauth2client or google-auth will have loaded credentials
     # carry different URLs. Both are valid.
-    self.assertIn(creds_oauth2client.token_uri,
-                  ('https://www.googleapis.com/oauth2/v4/token',
-                   'https://oauth2.googleapis.com/token'))
+    self.assertEqual(creds_oauth2client.token_uri,
+                     'https://oauth2.googleapis.com/token')
 
     # Loads google-auth credentials and verifies.
     creds_google_auth = store.Load(use_google_auth=True)
@@ -241,8 +241,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase,
     # Activate via oauth2client or google-auth will have loaded credentials
     # carry different URLs. Both are valid.
     self.assertIn(creds_oauth2client.token_uri,
-                  ('https://www.googleapis.com/oauth2/v4/token',
-                   'https://oauth2.googleapis.com/token'))
+                  'https://oauth2.googleapis.com/token')
 
     # Loads google-auth credentials and verifies.
     creds_google_auth = store.Load(use_google_auth=True)
@@ -455,6 +454,26 @@ gs_service_key_file = {0}
     # Removes the generated file to ensure the second execution of this test
     # agsinst google-auth generates the file correctly.
     os.remove(adc_path)
+
+  def testTokenHostProperty(self):
+    self.RemoveServiceAccount()
+
+    properties.VALUES.auth.token_host.Set('fake-token-host')
+    json_key_file = self._GetTestDataPathFor('inactive_service_account.json')
+    self.Run('auth activate-service-account {0} --key-file={1}'.format(
+        _SERVICE_ACCOUNT_EMAIL, json_key_file))
+    properties.VALUES.auth.token_host.Set(None)
+
+    oauth2client_creds = store.Load(use_google_auth=False)
+    google_auth_creds = store.Load(use_google_auth=True)
+    self.assertEqual(oauth2client_creds.token_uri, 'fake-token-host')
+    self.assertEqual(google_auth_creds._token_uri, 'fake-token-host')
+    properties.VALUES.auth.token_host.Set('another-fake-token-host')
+
+    oauth2client_creds = store.Load(use_google_auth=False)
+    google_auth_creds = store.Load(use_google_auth=True)
+    self.assertEqual(oauth2client_creds.token_uri, 'another-fake-token-host')
+    self.assertEqual(google_auth_creds._token_uri, 'another-fake-token-host')
 
 
 class BadServiceAccountTest(cli_test_base.CliTestBase):

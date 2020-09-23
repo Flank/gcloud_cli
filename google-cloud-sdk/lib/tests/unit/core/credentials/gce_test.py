@@ -52,5 +52,23 @@ class TestGCEMetaData(test_case.Base):
         http_errors_to_ignore=(404,)
     )
 
+  def testProjectWhenValid(self):
+    self.StartObjectPatch(
+        gce, '_ReadNoProxyWithCleanFailures', return_value='project')
+    project = self.metadata.Project()
+    self.assertEqual(project, 'project')
+
+  def testProjectWhenEmpty(self):
+    self.StartObjectPatch(
+        gce, '_ReadNoProxyWithCleanFailures', return_value='')
+    project = self.metadata.Project()
+    self.assertIsNone(project)
+
+  def testProjectWhenNone(self):
+    self.StartObjectPatch(
+        gce, '_ReadNoProxyWithCleanFailures', return_value=None)
+    project = self.metadata.Project()
+    self.assertIsNone(project)
+
 if __name__ == '__main__':
   test_case.main()

@@ -11,7 +11,7 @@ gcloud beta assured operations list \- list all Assured Workloads operations tha
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta assured operations list\fR \fIPARENT\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta assured operations list\fR \fB\-\-location\fR=\fILOCATION\fR \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,13 +22,19 @@ organization.
 
 
 
-.SH "POSITIONAL ARGUMENTS"
+.SH "REQUIRED FLAGS"
 
 .RS 2m
 .TP 2m
-\fIPARENT\fR
-The parent organization of the operations, in the form:
-organizations/{ORG_ID}/locations/{LOCATION}
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the Assured Workloads operations. For a current list of
+supported LOCATION values, see Assured Workloads locations
+(http://cloud/assured\-workloads/docs/locations).
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The parent organization of the Assured Workloads operations, provided as an
+organization ID.
 
 
 .RE

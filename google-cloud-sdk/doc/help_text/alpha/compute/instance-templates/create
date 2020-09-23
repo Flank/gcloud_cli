@@ -12,7 +12,8 @@ SYNOPSIS
         [--create-disk=[PROPERTY=VALUE,...]] [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],
           [boot=BOOT],[device-name=DEVICE-NAME],[mode=MODE],[name=NAME]]
-        [--labels=[KEY=VALUE,...]] [--local-nvdimm=[size=SIZE]]
+        [--[no-]enable-nested-virtualization] [--labels=[KEY=VALUE,...]]
+        [--local-nvdimm=[size=SIZE]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -303,6 +304,11 @@ FLAGS
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
             is yes.
+
+     --[no-]enable-nested-virtualization
+        If set to true, enables nested virtualization for the instance. Use
+        --enable-nested-virtualization to enable and
+        --no-enable-nested-virtualization to disable.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

@@ -2,7 +2,7 @@ NAME
     gcloud alpha metastore services - manage Dataproc Metastore services
 
 SYNOPSIS
-    gcloud alpha metastore services COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha metastore services GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Dataproc Metastore services.
@@ -14,6 +14,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     imports
+        (ALPHA) Manage metadata imports under Dataproc Metastore services.
 
 COMMANDS
     COMMAND is one of the following:

@@ -111,11 +111,6 @@ EXAMPLES
 
         $ gcloud beta app versions list
 
-    To generate all relevant config files for ~/my_app (or emit an error
-    message if the directory contents are not recognized), run:
-
-        $ gcloud beta app gen-config ~/my_app
-
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

@@ -117,6 +117,13 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     self.assertEqual({'expect_exit': {'code': 1, 'message': 'foo'}},
                      backing_data)
 
+  def testExitEventWithTraceback(self):
+    backing_data = {'expect_exit': {'code': 0, 'message': None}}
+    e = events.ExitEvent.FromData(backing_data)
+    failures = e.HandleReturnCode(1, 'foo', details='traceback details')
+    self.assertEqual(2, len(failures))
+    self.assertEqual(failures[1].details, 'traceback details')
+
   def testExitEventMissing(self):
     e = events.ExitEvent.ForMissing(('line', 'col'))
     self.assertEqual(events.EventType.EXIT, e.EventType())

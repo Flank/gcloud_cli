@@ -97,11 +97,6 @@ EXAMPLES
 
         $ gcloud app versions list
 
-    To generate all relevant config files for ~/my_app (or emit an error
-    message if the directory contents are not recognized), run:
-
-        $ gcloud app gen-config ~/my_app
-
 NOTES
     These variants are also available:
 

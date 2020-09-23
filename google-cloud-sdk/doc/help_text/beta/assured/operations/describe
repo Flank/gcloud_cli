@@ -3,15 +3,28 @@ NAME
         operations
 
 SYNOPSIS
-    gcloud beta assured operations describe RESOURCE [GCLOUD_WIDE_FLAG ...]
+    gcloud beta assured operations describe
+        (OPERATION : --location=LOCATION --organization=ORGANIZATION)
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Obtain details about a given Assured Workloads operation.
 
 POSITIONAL ARGUMENTS
-     RESOURCE
-        The Assured Workloads operation resource to describe, for example,
-        organizations/{ORG_ID}/locations/{LOCATION}/operations/{OPERATION_ID}.
+     Operation resource - The Assured Workloads operation resource to describe.
+     The arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
+
+       OPERATION
+          ID of the operation or fully qualified identifier for the operation.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --location=LOCATION
+          The location for the operation.
+
+       --organization=ORGANIZATION
+          The parent organization for the operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

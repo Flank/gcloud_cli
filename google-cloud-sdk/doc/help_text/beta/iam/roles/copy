@@ -18,11 +18,11 @@ FLAGS
         The project of the destination role.
 
      --destination=DESTINATION
-        The destination role id for the new custom role. For example: viewer.
+        The destination role ID for the new custom role. For example: viewer.
 
      --source=SOURCE
-        The source role name or id.For curated roles, for example:
-        roles/viewer.For custom roles, for example: viewer.
+        The source role ID. For predefined roles, for example: roles/viewer.
+        For custom roles, for example: myCompanyAdmin.
 
      --source-organization=SOURCE_ORGANIZATION
         The organization of the source role if it is an custom role.

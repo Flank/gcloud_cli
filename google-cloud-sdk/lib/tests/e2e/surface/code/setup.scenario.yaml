@@ -63,7 +63,7 @@ actions:
         path: skaffold.yaml
         contents:
           matches: |
-            apiVersion: skaffold/v2beta4
+            apiVersion: skaffold/v2beta5
             build:
               artifacts:
               - context: .*[/\\]temp_cwd

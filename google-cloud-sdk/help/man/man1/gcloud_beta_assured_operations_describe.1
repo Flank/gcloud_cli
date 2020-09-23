@@ -11,7 +11,7 @@ gcloud beta assured operations describe \- describe Assured Workloads operations
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta assured operations describe\fR \fIRESOURCE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta assured operations describe\fR (\fIOPERATION\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,11 +25,28 @@ gcloud beta assured operations describe \- describe Assured Workloads operations
 
 .RS 2m
 .TP 2m
-\fIRESOURCE\fR
-The Assured Workloads operation resource to describe, for example,
-organizations/{ORG_ID}/locations/{LOCATION}/operations/{OPERATION_ID}.
+
+Operation resource \- The Assured Workloads operation resource to describe. The
+arguments in this group can be used to specify the attributes of this resource.
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of the operation or fully qualified identifier for the operation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location for the operation.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The parent organization for the operation.
 
 
+.RE
 .RE
 .sp
 

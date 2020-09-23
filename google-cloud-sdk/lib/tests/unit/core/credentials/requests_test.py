@@ -215,6 +215,11 @@ class HttpTestBase(sdk_test_base.SdkBase):
   def FakeAuthUserAgent(self):
     return ''
 
+  def EncodeHeaders(self, headers):
+    return {
+        k.encode('ascii'): v.encode('ascii') for k, v in six.iteritems(headers)
+    }
+
   def UserAgent(self, cmd_path, invocation_id, python_version, interactive,
                 fromscript=False):
     template = ('{0} gcloud/{1} command/{2} invocation-id/{3} environment/{4} '
@@ -249,6 +254,7 @@ class HttpTestBase(sdk_test_base.SdkBase):
                           return_value='xterm')
     self.expected_user_agent = self.UserAgent(
         'None', uuid_mock.return_value.hex, python_version, False)
+    self.url = 'http://foo.com'
 
 
 class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
@@ -256,25 +262,18 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
   def PreSetUp(self):
     self.use_google_auth = True
 
-  def _EncodeHeaders(self, headers):
-    return {
-        k.encode('ascii'): v.encode('ascii')
-        for k, v in six.iteritems(headers)}
-
   def testIAMAuthoritySelectorHeader(self):
-    url = 'http://foo.com'
     authority_selector = 'superuser@google.com'
     properties.VALUES.auth.authority_selector.Set(authority_selector)
 
     expected_headers = {'x-goog-iam-authority-selector': authority_selector}
-    expected_headers = self._EncodeHeaders(expected_headers)
+    expected_headers = self.EncodeHeaders(expected_headers)
 
-    creds_requests.GetSession().request('GET', url)
+    creds_requests.GetSession().request('GET', self.url)
     self.assertDictContainsSubset(expected_headers,
                                   self.request_mock.call_args[1]['headers'])
 
   def testIAMAuthorizationTokenHeader(self):
-    url = 'http://foo.com'
     authorization_token = 'A very interesting authorization token'
     authorization_token_file = self.Touch(
         self.temp_path, 'auth_token_file', contents=authorization_token)
@@ -282,70 +281,19 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
         authorization_token_file)
 
     expected_headers = {'x-goog-iam-authorization-token': authorization_token}
-    expected_headers = self._EncodeHeaders(expected_headers)
-    creds_requests.GetSession().request('GET', url)
+    expected_headers = self.EncodeHeaders(expected_headers)
+    creds_requests.GetSession().request('GET', self.url)
     self.assertDictContainsSubset(expected_headers,
                                   self.request_mock.call_args[1]['headers'])
 
   def testDisabledAuth(self):
     properties.VALUES.auth.disable_credentials.Set(True)
-    url = 'http://foo.com'
     expected_headers = {'user-agent': self.expected_user_agent}
-    expected_headers = self._EncodeHeaders(expected_headers)
+    expected_headers = self.EncodeHeaders(expected_headers)
     http_client = creds_requests.GetSession()
-    http_client.request('GET', url)
+    http_client.request('GET', self.url)
     self.request_mock.assert_called_once_with(
-        'GET', url, headers=expected_headers, timeout=mock.ANY)
-
-  def testResourceProjectOverride(self):
-    properties.VALUES.billing.quota_project.Set(
-        properties.VALUES.billing.CURRENT_PROJECT)
-    properties.VALUES.core.project.Set('foo')
-    creds_requests.GetSession(
-        enable_resource_quota=True).request('GET', 'http://foo.com')
-    expected_headers = self._EncodeHeaders({'X-Goog-User-Project': 'foo'})
-    self.assertDictContainsSubset(expected_headers,
-                                  self.request_mock.call_args[1]['headers'])
-
-  def testResourceProjectOverrideLegacyProject(self):
-    properties.VALUES.billing.quota_project.Set(
-        properties.VALUES.billing.LEGACY)
-    for enable_resource_quota in [False, True]:
-      creds_requests.GetSession(
-          enable_resource_quota=enable_resource_quota
-          ).request('GET', 'http://foo.com')
-      self.assertNotIn('X-Goog-User-Project',
-                       self.request_mock.call_args[1]['headers'])
-      self.assertNotIn(b'X-Goog-User-Project',
-                       self.request_mock.call_args[1]['headers'])
-
-  def testResourceProjectOverrideUnsetDefault(self):
-    properties.VALUES.billing.quota_project.Set(None)
-    creds_requests.GetSession(
-        enable_resource_quota=False).request('GET', 'http://foo.com')
-    self.assertNotIn('X-Goog-User-Project',
-                     self.request_mock.call_args[1]['headers'])
-    self.assertNotIn(b'X-Goog-User-Project',
-                     self.request_mock.call_args[1]['headers'])
-
-  def testResourceProjectOverrideCustomProject(self):
-    properties.VALUES.billing.quota_project.Set('bar')
-    creds_requests.GetSession(
-        enable_resource_quota=True).request('GET', 'http://foo.com')
-    expected_headers = self._EncodeHeaders({'X-Goog-User-Project': 'bar'})
-    self.assertDictContainsSubset(expected_headers,
-                                  self.request_mock.call_args[1]['headers'])
-
-  def testResourceProjectOverrideForceResourceQuota(self):
-    properties.VALUES.billing.quota_project.Set(
-        properties.VALUES.billing.LEGACY)
-    properties.VALUES.core.project.Set('foo')
-    creds_requests.GetSession(
-        enable_resource_quota=True,
-        force_resource_quota=True).request('GET', 'http://foo.com')
-    expected_headers = self._EncodeHeaders({'X-Goog-User-Project': 'foo'})
-    self.assertDictContainsSubset(expected_headers,
-                                  self.request_mock.call_args[1]['headers'])
+        'GET', self.url, headers=expected_headers, timeout=mock.ANY)
 
 
 class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
@@ -356,8 +304,8 @@ class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
   def testComputeServiceAccount(self):
     # Don't do it for service accounts.
     properties.VALUES.billing.quota_project.Set('bar')
-    creds_requests.GetSession(
-        enable_resource_quota=True).request('GET', 'http://foo.com')
+    creds_requests.GetSession(enable_resource_quota=True).request(
+        'GET', self.url)
     self.assertNotIn('X-Goog-User-Project',
                      self.request_mock.call_args[1]['headers'])
     self.assertNotIn(b'X-Goog-User-Project',
@@ -388,6 +336,137 @@ class ApitoolsRequestsTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
         'header': 'value',
     }))
     self.assertEqual(response[1], expected_response)
+
+
+class HttpTestUserProjectQuota(HttpTestBase, sdk_test_base.WithFakeAuth):
+
+  def PreSetUp(self):
+    self.use_google_auth = True
+
+  def SetUp(self):
+    common_headers = {
+        'user-agent': self.expected_user_agent,
+        'authorization': 'Bearer ' + self.FakeAuthAccessToken()
+    }
+    self.common_headers = self.EncodeHeaders(common_headers)
+
+    self.permission_denied_response = MakeRequestsResponse(
+        403, {},
+        b'{"error": {"message": "Grant the caller the Owner or Editor role, '
+        b'or a custom role with the serviceusage.services.use permission"}}')
+
+  def testForceUserProjectQuota(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.LEGACY)
+    properties.VALUES.core.project.Set('foo')
+    creds_requests.GetSession(
+        enable_resource_quota=True,
+        force_resource_quota=True).request('GET', self.url)
+    self.common_headers[b'X-Goog-User-Project'] = b'foo'
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testLegacyMode(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.LEGACY)
+    creds_requests.GetSession().request('GET', self.url)
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testCurrentProjectMode_WithPermission(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT)
+    properties.VALUES.core.project.Set('foo')
+    creds_requests.GetSession().request('GET', self.url)
+    self.common_headers[b'X-Goog-User-Project'] = b'foo'
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testCurrentProjectMode_WithoutPermission(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT)
+    properties.VALUES.core.project.Set('foo')
+    self.request_mock.return_value = self.permission_denied_response
+    creds_requests.GetSession().request('GET', self.url)
+    self.common_headers[b'X-Goog-User-Project'] = b'foo'
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testCurrentProjectMode_EmptyProject(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT)
+    creds_requests.GetSession().request('GET', self.url)
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testCurrentProjectWithFallbackMode_WithPermission(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT_WITH_FALLBACK)
+    properties.VALUES.core.project.Set('foo')
+
+    creds_requests.GetSession().request('GET', self.url)
+    self.common_headers[b'X-Goog-User-Project'] = b'foo'
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testCurrentProjectWithFallbackMode_WithoutPermission(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT_WITH_FALLBACK)
+    properties.VALUES.core.project.Set('foo')
+    self.request_mock.side_effect = (self.permission_denied_response,
+                                     mock.DEFAULT)
+
+    creds_requests.GetSession().request('GET', self.url)
+    headers_with_quota = self.common_headers.copy()
+    headers_with_quota[b'X-Goog-User-Project'] = b'foo'
+
+    self.assertEqual(self.request_mock.call_count, 2)
+    calls = [
+        mock.call(
+            'GET', self.url, headers=headers_with_quota, timeout=mock.ANY),
+        mock.call(
+            'GET', self.url, headers=self.common_headers, timeout=mock.ANY),
+    ]
+    self.request_mock.assert_has_calls(calls)
+
+  def testCurrentProjectWithFallbackMode_EmptyProject(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT_WITH_FALLBACK)
+    creds_requests.GetSession().request('GET', self.url)
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testQuotaProjectManuallySet_WithPermission(self):
+    properties.VALUES.billing.quota_project.Set('bar')
+    creds_requests.GetSession().request('GET', self.url)
+    self.common_headers[b'X-Goog-User-Project'] = b'bar'
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testQuotaProjectManuallySet_WithoutPermission(self):
+    properties.VALUES.billing.quota_project.Set('bar')
+    self.request_mock.return_value = self.permission_denied_response
+    creds_requests.GetSession().request('GET', self.url)
+    self.common_headers[b'X-Goog-User-Project'] = b'bar'
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testQuotaProjectDisabled(self):
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.CURRENT_PROJECT)
+    properties.VALUES.core.project.Set('foo')
+    creds_requests.GetSession(enable_resource_quota=False).request(
+        'GET', self.url)
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
+
+  def testNoCredentialsMode(self):
+    properties.VALUES.billing.quota_project.Set('bar')
+    properties.VALUES.auth.disable_credentials.Set(True)
+    creds_requests.GetSession().request('GET', self.url)
+    del self.common_headers[b'authorization']
+    self.request_mock.assert_called_once_with(
+        'GET', self.url, headers=self.common_headers, timeout=mock.ANY)
 
 
 if __name__ == '__main__':

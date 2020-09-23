@@ -7,7 +7,8 @@ SYNOPSIS
         [--all-updates-rule-monitoring-notification-channels=[ALL_UPDATES_RULE_MONITORING_NOTIFICATION_CHANNELS,
           ...]] [--all-updates-rule-pubsub-topic=ALL_UPDATES_RULE_PUBSUB_TOPIC]
         [--credit-types-treatment=CREDIT_TYPES_TREATMENT]
-        [--display-name=DISPLAY_NAME] [--filter-labels=FILTER_LABELS]
+        [--disable-default-iam-recipients] [--display-name=DISPLAY_NAME]
+        [--filter-labels=FILTER_LABELS]
         [--filter-projects=[FILTER_PROJECTS,...]]
         [--filter-services=[FILTER_SERVICES,...]]
         [--filter-subaccounts=[FILTER_SUBACCOUNTS,...]]
@@ -53,6 +54,12 @@ FLAGS
         types are used in the calculation. CREDIT_TYPES_TREATMENT must be one
         of: credit-types-treatment-unspecified, exclude-all-credits,
         include-all-credits.
+
+     --disable-default-iam-recipients
+        When set to true, disables default notifications sent when a threshold
+        is exceeded. Default notifications are sent to those with Billing
+        Account Administrator and Billing Account User IAM roles for the target
+        account.
 
      --display-name=DISPLAY_NAME
         User data for display name in UI. Must be less than or equal to 60

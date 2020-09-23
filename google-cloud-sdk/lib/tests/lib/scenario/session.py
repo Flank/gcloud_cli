@@ -667,12 +667,12 @@ class Session(object):
 
     return self._orig_input()
 
-  def _HandleExit(self, exc):
+  def _HandleExit(self, exc, exc_tb=None):
     self._ProcessStdout()
     self._ProcessStderr()
 
     current_event = self._GetOrCreateNextEvent(events_lib.EventType.EXIT)
-    self._Handle(current_event, exc)
+    self._Handle(current_event, exc, exc_tb=exc_tb)
     self._exit_was_handled = True
 
   def __enter__(self):
@@ -713,7 +713,7 @@ class Session(object):
       # handled by a intercepted call to _Handlexit already.
       # Framework errors should not be handled here as they represent errors in
       # the test, not in the running command.
-      self._HandleExit(exc_val)
+      self._HandleExit(exc_val, exc_tb=exc_tb)
       error_handled = True
 
     # Consume the rest of events so they get into the processed events stream.

@@ -39,6 +39,9 @@ COMMANDS
      set-traffic
         (BETA) Set traffic splitting settings.
 
+     update
+        (BETA) Update service-level settings.
+
 EXAMPLES
     To list your deployed services, run:
 

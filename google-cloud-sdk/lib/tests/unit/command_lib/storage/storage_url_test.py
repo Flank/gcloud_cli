@@ -38,7 +38,7 @@ ExpectedStorageUrl = collections.namedtuple(
 )
 
 
-@test_case.Filters.DoNotRunOnPy2('Storage does not support python 2')
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
 
   def SetUp(self):
@@ -138,6 +138,12 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
 
+  def SetUp(self):
+    # self.root_path is a temp dir which gets deleted during TearDown.
+    self.local_file = self.Touch(
+        os.path.join(self.root_path, 'fake'), 'file.txt')
+    self.local_file_url = storage_url.storage_url_from_string(self.local_file)
+
   @parameterized.named_parameters([
       {
           'testcase_name': '_file_path',
@@ -163,20 +169,15 @@ class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
         '%s://%s' % (file_url_object.scheme, file_url_object.object_name))
 
   def test_file_url_exists(self):
-    # self.root_path is a temp dir which gets deleted during TearDown.
-    localpath = self.Touch(os.path.join(self.root_path, 'fake'), 'file.txt')
-    file_url_object = storage_url.storage_url_from_string(localpath)
-    self.assertTrue(file_url_object.exists())
+    self.assertTrue(self.local_file_url.exists())
 
   def test_file_url_exists_with_invalid_path(self):
     file_url_object = storage_url.storage_url_from_string('invalid/path.txt')
     self.assertFalse(file_url_object.exists())
 
   def test_file_url_isdir(self):
-    # self.root_path is a temp dir which gets deleted during TearDown.
-    localpath = self.Touch(os.path.join(self.root_path, 'fake'), 'file.txt')
     file_url_object = storage_url.storage_url_from_string(
-        os.path.dirname(localpath))
+        os.path.dirname(self.local_file))
     self.assertTrue(file_url_object.isdir())
 
   def test_file_url_isdir_with_invalid_path(self):
@@ -184,4 +185,63 @@ class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertFalse(file_url_object.isdir())
 
 
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
+class StorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
 
+  @parameterized.named_parameters([
+      {
+          'testcase_name': '_cloud_url_with_trailing_slash',
+          'url_str': 'gs://bucket/dir/',
+          'part': '**',
+          'expected_string': 'gs://bucket/dir/**'
+      },
+      {
+          'testcase_name': '_with_cloud_url_without_trailing_slash',
+          'url_str': 'gs://bucket/dir',
+          'part': '**',
+          'expected_string': 'gs://bucket/dir/**'
+      },
+      {
+          'testcase_name': '_with_leading_slash_in_part',
+          'url_str': 'gs://bucket/dir',
+          'part': '/**',
+          'expected_string': 'gs://bucket/dir/**'
+      },
+      {
+          'testcase_name': '_with_multiple_slashes_only_removes_one_slash',
+          'url_str': 'gs://bucket/dir//',
+          'part': '///**',
+          'expected_string': 'gs://bucket/dir////**'
+      },
+      {
+          'testcase_name': '_with_file_url',
+          'url_str': os.path.join('file://fakedir', 'dir'),
+          'part': '**',
+          'expected_string': os.path.join('file://fakedir', 'dir', '**')
+      }
+  ])
+  def test_join_returns_new_url_with_appended_part(self, url_str,
+                                                   part, expected_string):
+    url = storage_url.storage_url_from_string(url_str)
+    new_url = url.join(part)
+    self.assertEqual(new_url.url_string, expected_string)
+    self.assertEqual(type(url), type(new_url))
+
+  def test_equality(self):
+    url1 = storage_url.CloudUrl.from_url_string('gs://bucket/obj.txt#1234')
+    url2 = storage_url.CloudUrl('gs', 'bucket', 'obj.txt', '1234')
+    self.assertEqual(url1, url2)
+
+  def test_not_equal_with_different_type(self):
+    url1 = storage_url.CloudUrl.from_url_string('gs://bucket/obj.txt#1234')
+    url2 = storage_url.FileUrl('gs://bucket/obj.txt#1234')
+    self.assertNotEqual(url1, url2)
+
+  def test_not_equal_with_different_data(self):
+    url1 = storage_url.CloudUrl.from_url_string('gs://bucket/obj.txt#1234')
+    url2 = storage_url.CloudUrl.from_url_string('gs://bucket/obj.txt#5678')
+    self.assertNotEqual(url1, url2)
+
+  def test_hash(self):
+    url = storage_url.CloudUrl('gs', 'bucket', 'obj.txt', '1234')
+    self.assertEqual(hash(url), hash('gs://bucket/obj.txt#1234'))

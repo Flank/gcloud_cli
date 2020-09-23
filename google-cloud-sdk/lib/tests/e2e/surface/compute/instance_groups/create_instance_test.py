@@ -149,6 +149,7 @@ class ManagedInstanceGroupsCreateInstanceGAZonalTest(
           scope_flag=self.GetScopeFlag(),
           instance=existing_instance_name))
 
+  @e2e_test_base.test_case.Filters.skip('Error not as expected', 'b/168818741')
   def testCreateInstanceNonExistingDiskError(self):
     instance_template = self.CreateInstanceTemplate()
     igm_name = self.CreateInstanceGroupManagerStateful(

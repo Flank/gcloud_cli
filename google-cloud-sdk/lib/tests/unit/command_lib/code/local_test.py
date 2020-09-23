@@ -27,6 +27,7 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.command_lib.code import flags
 from googlecloudsdk.command_lib.code import local
+
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
@@ -512,3 +513,69 @@ class CloudSqlProxyGeneratorTest(test_case.TestCase):
             emptyDir: {}
     """)
     self.assertEqual(deployment, yaml.load(expected_yaml_text))
+
+
+class CreateBuilderTest(test_case.TestCase):
+
+  def SetUp(self):
+    self.parser = calliope_test_util.ArgumentParser()
+    flags.CommonFlags(self.parser)
+
+  def testAppengineBuilder(self):
+    args = self.parser.parse_args(['--appengine'])
+
+    with files.TemporaryDirectory() as temp_dir:
+      app_yaml = 'runtime: python37'
+      files.WriteFileContents(os.path.join(temp_dir, 'app.yaml'), app_yaml)
+
+      self.assertEqual(
+          local._CreateBuilder(args, temp_dir),
+          local.BuildpackBuilder(
+              builder='gcr.io/gae-runtimes/buildpacks/python37/builder:argo_current',
+              trust=True,
+              devmode=False))
+
+  def testUntrustedBuilder(self):
+    args = self.parser.parse_args(['--builder=my-builder:latest'])
+
+    self.assertEqual(
+        local._CreateBuilder(args, files.GetCWD()),
+        local.BuildpackBuilder(
+            builder='my-builder:latest', trust=False, devmode=False))
+
+  def testTrustedDevmodeBuilder(self):
+    args = self.parser.parse_args(['--builder=gcr.io/buildpack/builder:v1'])
+
+    self.assertEqual(
+        local._CreateBuilder(args, files.GetCWD()),
+        local.BuildpackBuilder(
+            builder='gcr.io/buildpack/builder:v1', trust=True, devmode=True))
+
+  def testDockerfile(self):
+    with files.TemporaryDirectory() as temp_dir:
+      dockerfile = os.path.join(temp_dir, 'Dockerfile')
+      files.WriteFileContents(dockerfile, '')
+
+      args = self.parser.parse_args(['--dockerfile=' + dockerfile])
+
+      self.assertEqual(
+          local._CreateBuilder(args, temp_dir),
+          local.DockerfileBuilder(dockerfile=dockerfile))
+
+  def testDockerfileNotInContext(self):
+    with files.TemporaryDirectory() as temp_dir, \
+         files.TemporaryDirectory() as temp_dir2, \
+         self.assertRaises(local.InvalidLocationError):
+      dockerfile = os.path.join(temp_dir, 'Dockerfile')
+      files.WriteFileContents(dockerfile, '')
+      args = self.parser.parse_args(['--dockerfile=' + dockerfile])
+
+      local._CreateBuilder(args, temp_dir2)
+
+  def testDockerfileMissing(self):
+    with files.TemporaryDirectory() as temp_dir:
+      args = self.parser.parse_args(
+          ['--dockerfile=' + os.path.join(temp_dir, 'Dockerfile')])
+
+      with self.assertRaises(local.InvalidLocationError):
+        local._CreateBuilder(args, temp_dir)

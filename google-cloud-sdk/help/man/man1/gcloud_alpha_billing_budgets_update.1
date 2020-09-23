@@ -11,7 +11,7 @@ gcloud alpha billing budgets update \- update a budget
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha billing budgets update\fR (\fIBUDGET\fR\ :\ \fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT\fR) [\fB\-\-all\-updates\-rule\-monitoring\-notification\-channels\fR=[\fIALL_UPDATES_RULE_MONITORING_NOTIFICATION_CHANNELS\fR,...]] [\fB\-\-all\-updates\-rule\-pubsub\-topic\fR=\fIALL_UPDATES_RULE_PUBSUB_TOPIC\fR] [\fB\-\-credit\-types\-treatment\fR=\fICREDIT_TYPES_TREATMENT\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-filter\-labels\fR=\fIFILTER_LABELS\fR] [\fB\-\-filter\-projects\fR=[\fIFILTER_PROJECTS\fR,...]] [\fB\-\-filter\-services\fR=[\fIFILTER_SERVICES\fR,...]] [\fB\-\-filter\-subaccounts\fR=[\fIFILTER_SUBACCOUNTS\fR,...]] [\fB\-\-budget\-amount\fR=\fIBUDGET_AMOUNT\fR\ |\ \fB\-\-last\-period\-amount\fR] [\fB\-\-threshold\-rules\-from\-file\fR=\fITHRESHOLD_RULES_FROM_FILE\fR\ |\ \fB\-\-add\-threshold\-rule\fR=\fIADD_THRESHOLD_RULE\fR\ \fB\-\-clear\-threshold\-rules\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha billing budgets update\fR (\fIBUDGET\fR\ :\ \fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT\fR) [\fB\-\-all\-updates\-rule\-monitoring\-notification\-channels\fR=[\fIALL_UPDATES_RULE_MONITORING_NOTIFICATION_CHANNELS\fR,...]] [\fB\-\-all\-updates\-rule\-pubsub\-topic\fR=\fIALL_UPDATES_RULE_PUBSUB_TOPIC\fR] [\fB\-\-credit\-types\-treatment\fR=\fICREDIT_TYPES_TREATMENT\fR] [\fB\-\-disable\-default\-iam\-recipients\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-filter\-labels\fR=\fIFILTER_LABELS\fR] [\fB\-\-filter\-projects\fR=[\fIFILTER_PROJECTS\fR,...]] [\fB\-\-filter\-services\fR=[\fIFILTER_SERVICES\fR,...]] [\fB\-\-filter\-subaccounts\fR=[\fIFILTER_SUBACCOUNTS\fR,...]] [\fB\-\-budget\-amount\fR=\fIBUDGET_AMOUNT\fR\ |\ \fB\-\-last\-period\-amount\fR] [\fB\-\-threshold\-rules\-from\-file\fR=\fITHRESHOLD_RULES_FROM_FILE\fR\ |\ \fB\-\-add\-threshold\-rule\fR=\fIADD_THRESHOLD_RULE\fR\ \fB\-\-clear\-threshold\-rules\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -69,6 +69,12 @@ against the budget. If this is not specified, then no credit types are used in
 the calculation. \fICREDIT_TYPES_TREATMENT\fR must be one of:
 \fBcredit\-types\-treatment\-unspecified\fR, \fBexclude\-all\-credits\fR,
 \fBinclude\-all\-credits\fR.
+
+.TP 2m
+\fB\-\-disable\-default\-iam\-recipients\fR
+When set to true, disables default notifications sent when a threshold is
+exceeded. Default notifications are sent to those with Billing Account
+Administrator and Billing Account User IAM roles for the target account.
 
 .TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR

@@ -3,18 +3,24 @@ NAME
         environments that belong to a given parent organization
 
 SYNOPSIS
-    gcloud alpha assured workloads list PARENT [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+    gcloud alpha assured workloads list --location=LOCATION
+        --organization=ORGANIZATION [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List all Assured Workloads environments that belong to a given
     parent organization.
 
-POSITIONAL ARGUMENTS
-     PARENT
-        The parent organization of the Assured Workloads environment, in the
-        form: organizations/{ORG_ID}/locations/{LOCATION}
+REQUIRED FLAGS
+     --location=LOCATION
+        The location of the Assured Workloads environments. For a current list
+        of supported LOCATION values, see Assured Workloads locations
+        (http://cloud/assured-workloads/docs/locations).
+
+     --organization=ORGANIZATION
+        The parent organization of the Assured Workloads environments, provided
+        as an organization ID.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

@@ -23,6 +23,7 @@ import collections
 import enum
 import json
 import os
+import traceback
 
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
@@ -234,20 +235,24 @@ class ExitEvent(Event):
     self._code_assertion = code_assertion
     self._message_assertion = message_assertion
 
-  def Handle(self, exc):
+  def Handle(self, exc, exc_tb=None):
     code = getattr(exc, 'exit_code', 1) if exc else 0
     message = six.text_type(exc) if exc else None
-    return self.HandleReturnCode(code, message)
+    details = '\n'.join(traceback.format_tb(exc_tb)) if exc_tb else None
+    return self.HandleReturnCode(code, message, details=details)
 
-  def HandleReturnCode(self, return_code, message=None):
+  def HandleReturnCode(self, return_code, message=None, details=None):
     failures = []
     failures.extend(
         self._code_assertion.Check(
             self._update_context.ForKey('code'), return_code))
     if self._message_assertion or (failures and message):
       msg_assertion = self._message_assertion or assertions.EqualsAssertion('')
-      failures.extend(
-          msg_assertion.Check(self._update_context.ForKey('message'), message))
+      failure = msg_assertion.Check(
+          self._update_context.ForKey('message'), message)
+      if details and failure:
+        failure[0].details = details
+      failures.extend(failure)
     return failures
 
   def Summary(self):

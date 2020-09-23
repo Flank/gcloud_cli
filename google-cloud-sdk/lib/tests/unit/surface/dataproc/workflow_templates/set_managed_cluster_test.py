@@ -125,6 +125,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     num_masters = 3
     num_workers = 7
     num_secondary_workers = 5
+    node_group_uri = 'foo-node-group'
     image_version = '1.7'
     network = 'foo-network'
     network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
@@ -168,6 +169,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
         tags=['tag1', 'tag2'],
         metadata=encoding.DictToAdditionalPropertyMessage(
             cluster_metadata, self.messages.GceClusterConfig.MetadataValue))
+    self.AddNodeGroupAffinity(managed_cluster, node_group_uri)
 
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectCallSetManagedCluster(
@@ -188,6 +190,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                '--num-secondary-workers {num_secondary} '
                '--service-account {service_account} '
                '--scopes {scopes} '
+               '--node-group {node_group} '
                '--properties core:com.foo=foo,hdfs:com.bar=bar '
                '--tags tag1,tag2 '
                '--metadata key1=value1,key2=value2 ').format(
@@ -204,7 +207,8 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                    actions=','.join(action_uris),
                    num_secondary=num_secondary_workers,
                    service_account=service_account,
-                   scopes=scope_list)
+                   scopes=scope_list,
+                   node_group=node_group_uri)
 
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(workflow_template, result)

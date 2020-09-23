@@ -108,12 +108,14 @@ exports.{func_name} = function (data, context, callback) {{
 
 
 # TODO(b/120152563): fix the release tracks.
-class DeployE2ETestBase(e2e_base.WithServiceAuth,
-                        cli_test_base.CliTestBase):
+class DeployE2ETestBaseBeta(e2e_base.WithServiceAuth,
+                            cli_test_base.CliTestBase):
   """End to End tests for gcloud functions deploy command."""
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
     self.function_path = self.CreateTempDir()
 
   def _WriteFunctionSource(self, function_name, file_path,
@@ -183,8 +185,17 @@ class DeployE2ETestBase(e2e_base.WithServiceAuth,
 
     return env_vars
 
+  def _ParseBuildEnvVars(self, function_resource):
+    if not function_resource or not function_resource.buildEnvironmentVariables:
+      return {}
+    build_env_vars = {}
+    for prop in function_resource.buildEnvironmentVariables.additionalProperties:
+      build_env_vars[prop.key] = prop.value
 
-class TriggerTest(DeployE2ETestBase):
+    return build_env_vars
+
+
+class TriggerTestBeta(DeployE2ETestBaseBeta):
   """Deploy Trigger Tests."""
   # General Workflow:
   # Deploy, Describe, Call, Delete
@@ -255,7 +266,7 @@ class TriggerTest(DeployE2ETestBase):
       self.AssertOutputContains('Hello World!')
 
 
-class RedeployTest(DeployE2ETestBase):
+class RedeployTestBeta(DeployE2ETestBaseBeta):
   """Redeploy Tests."""
   # General Workflow:
   # Deploy, Describe, Call, [Update Function and/or Metadata], Deploy,->
@@ -340,8 +351,11 @@ class RedeployTest(DeployE2ETestBase):
                                     sleep_ms=1000)
 
 
-class EnvVarRedeployTest(DeployE2ETestBase):
+class EnvVarRedeployTestGA(DeployE2ETestBaseBeta):
   """Environment Variable Redeploy Tests."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _RunAndCheckErr(self, function_name, output):
     self.ClearOutput()
@@ -351,7 +365,6 @@ class EnvVarRedeployTest(DeployE2ETestBase):
   def testRedeployEnvVarUpdate(self):
     """Test redeploy with no source change, just environment variable changes.
     """
-    self.track = calliope_base.ReleaseTrack.GA
     with self._DeployFunction('--trigger-http', source=self.function_path,
                               set_env_vars='FOO=bar',
                               runtime='nodejs10') as function_name:
@@ -374,7 +387,37 @@ class EnvVarRedeployTest(DeployE2ETestBase):
       self.assertEqual('boo', updated_env_vars.get('BAZ'))
 
 
-class MiscWorkflowTest(DeployE2ETestBase):
+class BuildEnvVarTestAlpha(DeployE2ETestBaseBeta):
+  """Test build environment variables."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testRebuildBuildEnvVarUpdate(self):
+    """Test rebuild with no source change, just environment variable changes.
+    """
+    with self._DeployFunction('--trigger-http', source=self.function_path,
+                              set_build_env_vars='FOO=bar',
+                              runtime='nodejs10') as function_name:
+      self.AssertOutputContains(function_name)
+      self.Run('functions call {}'.format(function_name))
+      self.AssertOutputContains('Hello World!')
+
+      # Update build env vars and redeploy
+      self.ClearOutput()
+      self.Run(
+          'functions deploy {name} --source {source} '
+          '--trigger-http --update-build-env-vars {env_vars}'.format(
+              name=function_name, source=self.function_path,
+              env_vars='BAZ=boo'))
+      describe_result = self.Run('functions describe {}'.format(
+          function_name))
+      updated_build_env_vars = self._ParseBuildEnvVars(describe_result)
+      self.assertEqual('bar', updated_build_env_vars.get('FOO'))
+      self.assertEqual('boo', updated_build_env_vars.get('BAZ'))
+
+
+class MiscWorkflowTestBeta(DeployE2ETestBaseBeta):
   """Misc Deploy Workflow Tests."""
 
   def _RunAndCheckLog(self, function_name):

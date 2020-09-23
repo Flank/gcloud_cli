@@ -52,6 +52,32 @@ Run \fB$ gcloud help\fR for details.
 .RE
 .sp
 
+.SH "EXAMPLES"
+
+To list the email addresses of all the developers in the active Cloud Platform
+project, run:
+
+.RS 2m
+$ gcloud alpha apigee developers list
+.RE
+
+To get that list as a JSON array and only include developers with
+\f5\fIexample.com\fR\fR addresses, run:
+
+.RS 2m
+$ gcloud alpha apigee developers list \-\-format=json \e
+  \-\-filter="email:(@example.com)"
+.RE
+
+To get details about a specific developer in the active Cloud Platform project,
+run:
+
+.RS 2m
+$ gcloud alpha apigee developers describe DEVELOPER_EMAIL
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this

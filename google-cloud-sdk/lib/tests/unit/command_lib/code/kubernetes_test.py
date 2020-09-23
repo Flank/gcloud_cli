@@ -96,7 +96,7 @@ class StartMinikubeTest(SdkPathTestCase):
          kubernetes.Minikube("cluster-name"):
       self.assertIn("cluster-name", mock_stream.call_args[0][0])
       self.assertIn("start", mock_stream.call_args[0][0])
-      self.assertEqual(mock_stream.call_args[1]["timeout_sec"], 240)
+      self.assertEqual(mock_stream.call_args[1]["event_timeout_sec"], 90)
 
     self.assertEqual(mock_run.call_args, self.MINIKUBE_TEARDOWN_CALL)
 

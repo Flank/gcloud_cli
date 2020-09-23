@@ -12,7 +12,8 @@ SYNOPSIS
         [--can-ip-forward] [--confidential-compute] [--count=COUNT]
         [--create-disk=[PROPERTY=VALUE,...]] [--deletion-protection]
         [--description=DESCRIPTION] [--enable-display-device]
-        [--erase-windows-vss-signature] [--labels=[KEY=VALUE,...]]
+        [--[no-]enable-nested-virtualization] [--erase-windows-vss-signature]
+        [--labels=[KEY=VALUE,...]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -245,6 +246,11 @@ OPTIONAL FLAGS
 
      --enable-display-device
         Enable a display device on VM instances. Disabled by default.
+
+     --[no-]enable-nested-virtualization
+        If set to true, enables nested virtualization for the instance. Use
+        --enable-nested-virtualization to enable and
+        --no-enable-nested-virtualization to disable.
 
      --erase-windows-vss-signature
         Specifies whether the disk restored from source snapshots or source

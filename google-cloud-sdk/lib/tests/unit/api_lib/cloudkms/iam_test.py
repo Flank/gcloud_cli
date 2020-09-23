@@ -65,7 +65,7 @@ class KmsIamTest(sdk_test_base.WithFakeAuth):
     actual = iam.TestCryptoKeyIamPermissions(self.key_ref, permissions)
     self.assertEqual(actual.permissions, expected.permissions)
 
-  def testAddPolicyBindingToCryptoKey(self):
+  def testAddPolicyBindingToCryptoKeyAddsNewBinding(self):
     old_policy = self.messages.Policy(
         version=1,
         etag=b'CAE3',
@@ -100,7 +100,7 @@ class KmsIamTest(sdk_test_base.WithFakeAuth):
         'roles/cloudkms.signerVerifier')
     self.assertEqual(actual_policy, expected_policy)
 
-  def testAddPolicyBindingsToCryptoKey(self):
+  def testAddPolicyBindingsToCryptoKeyAddsNewBindings(self):
     old_policy = self.messages.Policy(
         version=1,
         etag=b'CAE3',
@@ -137,6 +137,33 @@ class KmsIamTest(sdk_test_base.WithFakeAuth):
          ('user:test-user-2@gmail.com', 'roles/cloudkms.signerVerifier'),
          ('user:test-user@gmail.com', 'roles/viewer')])
     self.assertEqual(actual_policy, expected_policy)
+
+  def testAddPolicyBindingsToCryptoKeyDoesntCallSetForSameBindings(self):
+    policy = self.messages.Policy(
+        version=1,
+        etag=b'CAE3',
+        bindings=[
+            self.messages.Binding(
+                role='roles/cloudkms.signerVerifier',
+                members=[
+                    'user:test-user@gmail.com', 'user:test-user-2@gmail.com'
+                ]),
+            self.messages.Binding(
+                role='roles/viewer', members=['user:test-user@gmail.com']),
+        ])
+
+    self.mock_client.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
+        request=self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
+            resource=self._KEY_NAME, options_requestedPolicyVersion=3),
+        response=policy)
+
+    actual_policy = iam.AddPolicyBindingsToCryptoKey(
+        self.key_ref,
+        [('user:test-user@gmail.com', 'roles/cloudkms.signerVerifier'),
+         ('user:test-user-2@gmail.com', 'roles/cloudkms.signerVerifier'),
+         ('user:test-user@gmail.com', 'roles/viewer')])
+    self.assertEqual(actual_policy, policy)
 
 
 if __name__ == '__main__':

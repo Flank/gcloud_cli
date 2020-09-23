@@ -38,7 +38,6 @@ MISSING_VALUE = object()
 class Error(Exception):
 
   def __init__(self, failures):
-    # TODO(b/78588819): better error message
     super(Error, self).__init__(
         '\n\nThe following assertions failed and could not be updated:' +
         ''.join('\n\n    ' + six.text_type(f) for f in failures))
@@ -82,7 +81,6 @@ class Failure(object):
   @classmethod
   def _ForAssertion(cls, update_context, expected, actual, msg=None, e=None):
     """Creates a failure for an assertion error."""
-    # TODO(b/78588819): Need much better error messages.
     title = ('Missing Assertion' if update_context.WasMissing()
              else 'Assertion Error')
     expected_line = '        Expected: {expected}\n'.format(
@@ -117,6 +115,7 @@ class Failure(object):
     return '<<<{}>>>'.format(value)
 
   def __init__(self, update_context, actual, msg='', details=None):
+    # pylint: disable=super-init-not-called
     self._update_context = update_context
     self._actual = actual
     self._message = msg
@@ -124,6 +123,14 @@ class Failure(object):
 
   def Update(self, update_modes):
     return self._update_context.Update(self._actual, update_modes)
+
+  @property
+  def details(self):
+    return self._details
+
+  @details.setter
+  def details(self, details):
+    self._details = details
 
   def __str__(self):
     if self._details:
@@ -143,6 +150,7 @@ class FailureCollector(object):
 
   def __init__(self, update_modes,
                spec_name=None, action_location=None, execution_mode=None):
+    # pylint: disable=super-init-not-called
     self._failures = []
     self._update_modes = update_modes
     self._spec_name = spec_name
@@ -182,7 +190,6 @@ class FailureCollector(object):
 
     # If there are things that could not be updated, error.
     if unhandled:
-      # TODO(b/78588819): better error message
       raise Error(unhandled)
 
   def _Write(self, msg):
@@ -258,6 +265,7 @@ class EqualsAssertion(Assertion):
   """Asserts that a scalar equals a specific value."""
 
   def __init__(self, value):
+    # pylint: disable=super-init-not-called
     self._value = value
 
   def Check(self, context, value):
@@ -276,6 +284,7 @@ class MatchesAssertion(Assertion):
   """Asserts that a scalar matches a regular expression."""
 
   def __init__(self, value_regex):
+    # pylint: disable=super-init-not-called
     if not value_regex.endswith('$'):
       value_regex += '$'
     self._regex = value_regex
@@ -296,6 +305,7 @@ class IsNoneAssertion(Assertion):
   """Asserts that a scalar value is or is not None."""
 
   def __init__(self, is_none=True):
+    # pylint: disable=super-init-not-called
     self._is_none = is_none
 
   def Check(self, context, value):
@@ -308,9 +318,10 @@ class IsNoneAssertion(Assertion):
 
 
 class InAssertion(Assertion):
-  """Asserts that a scalar value is one of a set of items"""
+  """Asserts that a scalar value is one of a set of items."""
 
   def __init__(self, items):
+    # pylint: disable=super-init-not-called
     self._items = items
 
   def Check(self, context, value):
@@ -329,6 +340,7 @@ class DictAssertion(Assertion):
   """Asserts that a dictionary has a specific set of keys/values."""
 
   def __init__(self):
+    # pylint: disable=super-init-not-called
     self._assertions = {}
 
   def Equals(self, key, value):
@@ -362,6 +374,7 @@ class JsonAssertion(Assertion):
   """Asserts that a json object matches a given structure."""
 
   def __init__(self):
+    # pylint: disable=super-init-not-called
     self._field_structures = {}
 
   def Matches(self, field, sub_structure):
@@ -380,7 +393,6 @@ class JsonAssertion(Assertion):
           actual = self._GetJsonValueForKey(value, field)
           failures.append(Failure.ForDict(context, field, None, actual))
         except AttributeError:
-          # TODO(b/78588819): Actually handle this correctly.
           pass
       else:
         try:
@@ -394,8 +406,6 @@ class JsonAssertion(Assertion):
     return failures
 
   def _CheckNode(self, context, field, node, expected):
-    # TODO(b/78588819): There is a lot of duplication in here. Needs to be
-    # completely refactored.
     if yaml.dict_like(expected):
       return self._CheckDictValue(context, field, node, expected)
     elif yaml.list_like(expected):

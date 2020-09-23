@@ -11,7 +11,7 @@ gcloud alpha assured workloads delete \- delete Assured Workloads environment
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha assured workloads delete\fR \fIRESOURCE\fR [\fB\-\-etag\fR=\fIETAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha assured workloads delete\fR (\fIWORKLOAD\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fB\-\-etag\fR=\fIETAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,11 +25,28 @@ gcloud alpha assured workloads delete \- delete Assured Workloads environment
 
 .RS 2m
 .TP 2m
-\fIRESOURCE\fR
-The Assured Workloads resource to delete, for example,
-organizations/{ORG_ID}/locations/{LOCATION}/workloads/{WORKLOAD_ID}.
+
+Workload resource \- The Assured Workloads environment resource to delete. The
+arguments in this group can be used to specify the attributes of this resource.
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIWORKLOAD\fR
+ID of the workload or fully qualified identifier for the workload. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location for the workload.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The parent organization for the workload.
 
 
+.RE
 .RE
 .sp
 

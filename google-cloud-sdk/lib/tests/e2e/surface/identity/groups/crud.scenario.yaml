@@ -12,10 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-filters:
-  skip:
-    reason: param value EMPTY not valid
-    bug: b/166790005
 title: cloud identity groups create test scenario
 release_tracks: [BETA]
 summary:
@@ -140,7 +136,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=$$group-name$$%40novitas-gae.bigr.name
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=$$group-name$$%40novitas-gae.bigr.name
           method: GET
           headers: {}
           body: null
@@ -209,7 +205,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=$$group-name$$%40novitas-gae.bigr.name
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=$$group-name$$%40novitas-gae.bigr.name
           method: GET
           headers: {}
           body: null
@@ -280,7 +276,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=$$group-name$$%40novitas-gae.bigr.name
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=$$group-name$$%40novitas-gae.bigr.name
           method: GET
           headers: {}
           body: null

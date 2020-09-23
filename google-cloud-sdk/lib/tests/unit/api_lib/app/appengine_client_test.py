@@ -32,7 +32,7 @@ class AppengineClientTest(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.StartObjectPatch(
-        store, 'LoadIfEnabled'
+        store, 'LoadFreshCredential'
     ).return_value = oauth2client_gce.AppAssertionCredentials()
 
     self.mock_urlopen = self.StartObjectPatch(six.moves.urllib.request,

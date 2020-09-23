@@ -1,8 +1,3 @@
-filters:
-  skipAlways:
-    reason: E2E tests will fail during beta command migration, schedule delete issues.
-    bug: b/168122371
-    locally: true
 title: Issue a certificate from an existing root, describe it, and revoke it.
 release_tracks: [BETA]
 summary:
@@ -20,9 +15,6 @@ summary:
       --reusable-config subordinate-mtls-pathlen-0 --bucket $$bucket$$
   - progress_tracker:
     - message: Creating Certificate Authority.
-    - status: SUCCESS
-  - progress_tracker:
-    - message: Signing CA cert.
     - status: SUCCESS
   - progress_tracker:
     - message: Activating CA.
@@ -45,19 +37,17 @@ summary:
   - progress_tracker:
     - message: Scheduling Subordinate CA for deletion
     - status: SUCCESS
-  - stderr: Scheduled Subordinate CA \[projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$\]
-      for deletion at [0-9-:TZ]+\.$
+  - stderr: |-
+      Scheduled Subordinate CA \[projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$\] for deletion at [-0-9TZ:]+\.
+      $
 - execute:
-  - command: privateca certificates revoke --certificate $$subordinate-cert-id$$ --issuer
-      $$root-ca-id$$ --issuer-location $$location$$
+  - command: privateca certificates revoke --certificate $$subordinate-cert-name$$
   - prompt:
-    - message: You are about to revoke Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/$$subordinate-cert-id$$]
+    - message: You are about to revoke Certificate [$$subordinate-cert-name$$]
     - input: y
-  - progress_tracker:
-    - message: Revoking Certificate.
-    - status: SUCCESS
-  - stderr: |
-      Revoked certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/$$subordinate-cert-id$$] at 2020-09-01T21:43:55.952-07:00.
+  - stderr: |-
+      Revoked certificate \[$$subordinate-cert-name$$\] at [-0-9TZ:.]+\.
+      $
 - execute:
   - command: privateca roots disable $$root-ca-id$$ --location $$location$$
   - progress_tracker:
@@ -74,8 +64,9 @@ summary:
   - progress_tracker:
     - message: Scheduling Root CA for deletion
     - status: SUCCESS
-  - stderr: |
-      Scheduled Root CA [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$] for deletion at 2020-10-02T04:43Z.
+  - stderr: |-
+      Scheduled Root CA \[projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$\] for deletion at [-0-9TZ:.]+\.
+      $
 actions:
 - define_reference:
     reference: project
@@ -93,12 +84,10 @@ actions:
     reference: root-ca-id
     prefix: gcloud-e2e
     delimiter: '-'
-    requires_cleanup: false
 - generate_resource_id:
     reference: ca-id
     prefix: e2e
     delimiter: '-'
-    requires_cleanup: false
 - execute_command:
     command: privateca roots create $$root-ca-id$$ --kms-key-version $$kms-key$$/cryptoKeyVersions/1
       --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config
@@ -106,6 +95,12 @@ actions:
     validation_only: true
     validate_remote_api_calls: false
     events:
+    - expect_stderr: |
+        WARNING: CA Service is currently in preview.
+
+        Please remember that all resources created during preview will be deleted
+        when CA service transitions to General Availability (GA). Relying on these
+        certificate authorities for production traffic is discouraged.
     - expect_progress_tracker:
       - message: Creating Certificate Authority.
       - status: SUCCESS
@@ -134,8 +129,8 @@ actions:
             locations:
             - name: projects/$$project$$/locations/europe-west1
               locationId: europe-west1
-            - name: projects/$$project$$/locations/$$location$$
-              locationId: $$location$$
+            - name: projects/$$project$$/locations/us-central1
+              locationId: us-central1
             - name: projects/$$project$$/locations/us-east1
               locationId: us-east1
             - name: projects/$$project$$/locations/us-west1
@@ -150,7 +145,6 @@ actions:
             json:
               permissions:
               - privateca.certificateAuthorities.create
-              - storage.buckets.create
         return_response:
           headers:
             cache-control: private
@@ -160,7 +154,6 @@ actions:
           body:
             permissions:
             - privateca.certificateAuthorities.create
-            - storage.buckets.create
     - api_call:
         expect_request:
           uri: https://cloudkms.googleapis.com/v1/$$kms-key$$:testIamPermissions?alt=json
@@ -195,25 +188,6 @@ actions:
           body:
             permissions:
             - privateca.certificates.create
-    - api_call:
-        poll_operation: true
-        expect_request:
-          uri: https://serviceusage.googleapis.com/v1beta1/projects/$$project$$/services/privateca.googleapis.com:generateServiceIdentity?alt=json
-          method: POST
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '290'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            name: operations/finished.DONE_OPERATION
-            done: true
-            response:
-              '@type': type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity
-              email: service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
-              uniqueId: '100826546240526346186'
     - api_call:
         expect_request:
           uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json&projection=full
@@ -289,6 +263,25 @@ actions:
                 enabled: false
             locationType: region
     - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1beta1/projects/$$project$$/services/privateca.googleapis.com:generateServiceIdentity?alt=json
+          method: POST
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '290'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: operations/finished.DONE_OPERATION
+            done: true
+            response:
+              '@type': type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity
+              email: service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
+              uniqueId: '100826546240526346186'
+    - api_call:
         expect_request:
           uri: https://cloudkms.googleapis.com/v1/$$kms-key$$:getIamPolicy?alt=json&options.requestedPolicyVersion=3
           method: GET
@@ -310,6 +303,8 @@ actions:
               members:
               - serviceAccount:service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
     - api_call:
+        # Skipped if the existing IAM policy has correct IAM bindings.
+        optional: true
         expect_request:
           uri: https://cloudkms.googleapis.com/v1/$$kms-key$$:setIamPolicy?alt=json
           method: POST
@@ -365,6 +360,8 @@ actions:
               members:
               - serviceAccount:service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
     - api_call:
+        # Skipped if the existing IAM policy has correct IAM bindings.
+        optional: true
         expect_request:
           uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/iam?alt=json
           method: PUT
@@ -399,6 +396,12 @@ actions:
             - role: roles/storage.objectAdmin
               members:
               - serviceAccount:service-462803083913@gcp-sa-privateca.iam.gserviceaccount.com
+    - expect_stderr: |
+        WARNING: CA Service is currently in preview.
+
+        Please remember that all resources created during preview will be deleted
+        when CA service transitions to General Availability (GA). Relying on these
+        certificate authorities for production traffic is discouraged.
     - api_call:
         poll_operation: true
         expect_request:
@@ -408,7 +411,8 @@ actions:
           headers: {}
           body:
             json:
-              cloudKmsKeyVersion: $$kms-key$$/cryptoKeyVersions/1
+              keySpec:
+                cloudKmsKeyVersion: $$kms-key$$/cryptoKeyVersions/1
               gcsBucket: $$bucket$$
               config:
                 reusableConfig:
@@ -444,7 +448,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:getCsr?alt=json
+          uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:fetch?alt=json
           method: GET
           body: null
         return_response:
@@ -472,7 +476,6 @@ actions:
               kI5YH9kEOVOu
               -----END CERTIFICATE REQUEST-----
     - api_call:
-        poll_operation: false
         expect_request:
           uri:
             matches: https://privateca\.googleapis\.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates\?alt=json&certificateId=subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}&requestId=[^&]+$
@@ -486,132 +489,87 @@ actions:
           headers:
             status: '200'
           body:
-            name: projects/$$project$$/locations/$$location$$/operations/operation-9c7cb20a-a1c8-40c5-a153-d9df48054a46
-            done: false
-    - api_call:
-        repeatable: true
-        expect_request:
-          uri:
-            matches: https://privateca\.googleapis\.com/v1beta1/projects/$$project$$/locations/$$location$$/operations/operation-.*
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            name: projects/$$project$$/locations/$$location$$/operations/operation-9c7cb20a-a1c8-40c5-a153-d9df48054a46
-            done: true
-            response:
-              name: projects/foo/locations/us-east1/certificateAuthorities/prod-root/certificates/subordinate-20200220-ABC-DEF
-              pemCertificate: |
-                -----BEGIN CERTIFICATE-----
-                MIIEKDCCAtygAwIBAgIVAKDKBUAIdi0prnBNNn/6cS/r1mfIMEEGCSqGSIb3DQEB
-                CjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIB
-                BQCiAwIBIDB0MQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYD
-                VQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxJTAjBgNVBAMT
-                HFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDEwHhcNMjAwMzEwMTk0MTIwWhcN
-                MzAwMzExMDU0OTAxWjBnMQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMA
-                MQkwBwYDVQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxGDAW
-                BgNVBAMTD1NlcnZlciBUTFMgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
-                AQoCggEBAI0nmjtcKAI009Yh0x8w/niLDqpNcsp1gD1rAR1p5AvE2js95E0z8/P6
-                afZGWunE2hO2diMsUgp3EaF1o9LEFDtoUsUK6XojagTuZuaBVFL8UITzNBgZAPjN
-                HbymYvfmoJ5FYDHGibD96dFHmPhVTGRz7VZULmWNiNP4rTiUCC2/chBPfS7TbEoK
-                sQMtIF2QyBZ5BNvTTk/BdKnVDHjp5zayujBktTDifHqVQrC+44RQdD0G/SpsnLBe
-                MVyR+RyJz8vuW3INYD8ksL8n7qr+dCSAPCuVJLSVkRy8ghG4/24AomOGjePz//tT
-                j11bWXARNwdZuB4WcX08TWR+rYE/lJMCAwEAAaNWMFQwEgYDVR0TAQH/BAgwBgEB
-                /wIBADAdBgNVHQ4EFgQUJ62PA7yyHcai2nLdvYrKnPf2mKIwHwYDVR0jBBgwFoAU
-                J62PA7yyHcai2nLdvYrKnPf2mKIwQQYJKoZIhvcNAQEKMDSgDzANBglghkgBZQME
-                AgEFAKEcMBoGCSqGSIb3DQEBCDANBglghkgBZQMEAgEFAKIDAgEgA4IBAQBIYFii
-                PWUOqvxuwS+Anvanp6E8rrG8RuDEihVYNPMT4spodIJxP59RyU2JWYxZ6IDnX8oJ
-                CLaJMDW6GQKxfbj4pjCJOYk3BinrN2Ie7s7Sxtve9twturIura2wCpZtDzb8Dp1d
-                gsN4HtE7XRQbNlK4oZ5ehHzEoChMB2wosiuff7jvCiXtfakmZdA0iy15OyJTJlMD
-                axp9I3CHs3mOw+AngGRp8AgJtynTV2bEBaaP7pPz8xZryIyONmvFI7djI8qcnnyl
-                cdfxf+99tenQXw24EifjaEbGAT7zu23MRJAMpt7lacPgdcKtZNLXlzcS/RGenjMN
-                YhSedspfcIJw/STP
-                -----END CERTIFICATE-----
-              lifetime: P30D
-              pemCertificateChain:
-              - |
-                -----BEGIN CERTIFICATE-----
-                MIIENTCCAumgAwIBAgIVAKph5dh4fJiGQHCPRaCattongQLwMEEGCSqGSIb3DQEB
-                CjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIB
-                BQCiAwIBIDB0MQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYD
-                VQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxJTAjBgNVBAMT
-                HFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDEwHhcNMjAwMzEwMTgxNDQ4WhcN
-                MzAwMzExMDQyMjI5WjB0MQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMA
-                MQkwBwYDVQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxJTAj
-                BgNVBAMTHFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDEwggEiMA0GCSqGSIb3
-                DQEBAQUAA4IBDwAwggEKAoIBAQCNJ5o7XCgCNNPWIdMfMP54iw6qTXLKdYA9awEd
-                aeQLxNo7PeRNM/Pz+mn2RlrpxNoTtnYjLFIKdxGhdaPSxBQ7aFLFCul6I2oE7mbm
-                gVRS/FCE8zQYGQD4zR28pmL35qCeRWAxxomw/enRR5j4VUxkc+1WVC5ljYjT+K04
-                lAgtv3IQT30u02xKCrEDLSBdkMgWeQTb005PwXSp1Qx46ec2srowZLUw4nx6lUKw
-                vuOEUHQ9Bv0qbJywXjFckfkcic/L7ltyDWA/JLC/J+6q/nQkgDwrlSS0lZEcvIIR
-                uP9uAKJjho3j8//7U49dW1lwETcHWbgeFnF9PE1kfq2BP5STAgMBAAGjVjBUMBIG
-                A1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFCetjwO8sh3Gotpy3b2Kypz39pii
-                MB8GA1UdIwQYMBaAFCetjwO8sh3Gotpy3b2Kypz39piiMEEGCSqGSIb3DQEBCjA0
-                oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIBBQCi
-                AwIBIAOCAQEANqKeGZY7oDdsyPC8lP2ZR6ogaUX6KBLGLspfZ6Lb3RKCoe0NQoc7
-                GEAaunoGJnj7wTW1WoqBYdmRQBEBy6nVT40giuDHFGHIMwF7dBoxsTc60yHpyJid
-                HKBGWXo8Lsald+xalmjLLW3dmV0SF5j6pnHeIgWc2VCikInFDrD3wDvMBMuJFIsX
-                NbgncmafjGPvMyNueOrgZDJ9MQNYN53Fvx5owqtAMhbG6yHvT6ytoQ44WZP8svYr
-                Cxik0WWaDMtDTKP2uJ/dNAkVKQ5xRxtRt9Zzax4kTbLCWbC4+ugH1tyhzcuMJkJN
-                poYZu+i6CrUTys/chYitvwy2aAaz5Csf5Q==
-                -----END CERTIFICATE-----
+            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-20200220-ABC-DEF
+            pemCertificate: |
+              -----BEGIN CERTIFICATE-----
+              MIIEKDCCAtygAwIBAgIVAKDKBUAIdi0prnBNNn/6cS/r1mfIMEEGCSqGSIb3DQEB
+              CjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIB
+              BQCiAwIBIDB0MQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYD
+              VQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxJTAjBgNVBAMT
+              HFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDEwHhcNMjAwMzEwMTk0MTIwWhcN
+              MzAwMzExMDU0OTAxWjBnMQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMA
+              MQkwBwYDVQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxGDAW
+              BgNVBAMTD1NlcnZlciBUTFMgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+              AQoCggEBAI0nmjtcKAI009Yh0x8w/niLDqpNcsp1gD1rAR1p5AvE2js95E0z8/P6
+              afZGWunE2hO2diMsUgp3EaF1o9LEFDtoUsUK6XojagTuZuaBVFL8UITzNBgZAPjN
+              HbymYvfmoJ5FYDHGibD96dFHmPhVTGRz7VZULmWNiNP4rTiUCC2/chBPfS7TbEoK
+              sQMtIF2QyBZ5BNvTTk/BdKnVDHjp5zayujBktTDifHqVQrC+44RQdD0G/SpsnLBe
+              MVyR+RyJz8vuW3INYD8ksL8n7qr+dCSAPCuVJLSVkRy8ghG4/24AomOGjePz//tT
+              j11bWXARNwdZuB4WcX08TWR+rYE/lJMCAwEAAaNWMFQwEgYDVR0TAQH/BAgwBgEB
+              /wIBADAdBgNVHQ4EFgQUJ62PA7yyHcai2nLdvYrKnPf2mKIwHwYDVR0jBBgwFoAU
+              J62PA7yyHcai2nLdvYrKnPf2mKIwQQYJKoZIhvcNAQEKMDSgDzANBglghkgBZQME
+              AgEFAKEcMBoGCSqGSIb3DQEBCDANBglghkgBZQMEAgEFAKIDAgEgA4IBAQBIYFii
+              PWUOqvxuwS+Anvanp6E8rrG8RuDEihVYNPMT4spodIJxP59RyU2JWYxZ6IDnX8oJ
+              CLaJMDW6GQKxfbj4pjCJOYk3BinrN2Ie7s7Sxtve9twturIura2wCpZtDzb8Dp1d
+              gsN4HtE7XRQbNlK4oZ5ehHzEoChMB2wosiuff7jvCiXtfakmZdA0iy15OyJTJlMD
+              axp9I3CHs3mOw+AngGRp8AgJtynTV2bEBaaP7pPz8xZryIyONmvFI7djI8qcnnyl
+              cdfxf+99tenQXw24EifjaEbGAT7zu23MRJAMpt7lacPgdcKtZNLXlzcS/RGenjMN
+              YhSedspfcIJw/STP
+              -----END CERTIFICATE-----
+            lifetime: P30D
+            pemCertificateChain:
+            - |
+              -----BEGIN CERTIFICATE-----
+              MIIENTCCAumgAwIBAgIVAKph5dh4fJiGQHCPRaCattongQLwMEEGCSqGSIb3DQEB
+              CjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIB
+              BQCiAwIBIDB0MQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYD
+              VQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxJTAjBgNVBAMT
+              HFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDEwHhcNMjAwMzEwMTgxNDQ4WhcN
+              MzAwMzExMDQyMjI5WjB0MQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMA
+              MQkwBwYDVQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxJTAj
+              BgNVBAMTHFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDEwggEiMA0GCSqGSIb3
+              DQEBAQUAA4IBDwAwggEKAoIBAQCNJ5o7XCgCNNPWIdMfMP54iw6qTXLKdYA9awEd
+              aeQLxNo7PeRNM/Pz+mn2RlrpxNoTtnYjLFIKdxGhdaPSxBQ7aFLFCul6I2oE7mbm
+              gVRS/FCE8zQYGQD4zR28pmL35qCeRWAxxomw/enRR5j4VUxkc+1WVC5ljYjT+K04
+              lAgtv3IQT30u02xKCrEDLSBdkMgWeQTb005PwXSp1Qx46ec2srowZLUw4nx6lUKw
+              vuOEUHQ9Bv0qbJywXjFckfkcic/L7ltyDWA/JLC/J+6q/nQkgDwrlSS0lZEcvIIR
+              uP9uAKJjho3j8//7U49dW1lwETcHWbgeFnF9PE1kfq2BP5STAgMBAAGjVjBUMBIG
+              A1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFCetjwO8sh3Gotpy3b2Kypz39pii
+              MB8GA1UdIwQYMBaAFCetjwO8sh3Gotpy3b2Kypz39piiMEEGCSqGSIb3DQEBCjA0
+              oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIBBQCi
+              AwIBIAOCAQEANqKeGZY7oDdsyPC8lP2ZR6ogaUX6KBLGLspfZ6Lb3RKCoe0NQoc7
+              GEAaunoGJnj7wTW1WoqBYdmRQBEBy6nVT40giuDHFGHIMwF7dBoxsTc60yHpyJid
+              HKBGWXo8Lsald+xalmjLLW3dmV0SF5j6pnHeIgWc2VCikInFDrD3wDvMBMuJFIsX
+              NbgncmafjGPvMyNueOrgZDJ9MQNYN53Fvx5owqtAMhbG6yHvT6ytoQ44WZP8svYr
+              Cxik0WWaDMtDTKP2uJ/dNAkVKQ5xRxtRt9Zzax4kTbLCWbC4+ugH1tyhzcuMJkJN
+              poYZu+i6CrUTys/chYitvwy2aAaz5Csf5Q==
+              -----END CERTIFICATE-----
         expect_response:
           body:
             json: {}
           extract_references:
-          - field: response.name
-            reference: subordinate-cert-id
-          - field: response.pemCertificateChain[0]
+          - field: name
+            reference: subordinate-cert-name
+          - field: pemCertificateChain[0]
             reference: pem-0
-    - expect_progress_tracker:
-        message: Signing CA cert.
-        status: SUCCESS
     - api_call:
         poll_operation: true
         expect_request:
           uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:activate?alt=json
           method: POST
           body:
-            json:
-              pemCaCertificateChain:
-              - $$pem-0$$
+            json: {}
         return_response:
           headers:
             status: '200'
           body:
-            done: true
+            name: projects/$$project$$/locations/$$location$$/operations/activate-operation
+            done: false
     - expect_progress_tracker:
         message: Activating CA.
         status: SUCCESS
     - expect_stderr: |
         Created Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$].
-    - api_call:
-        expect_request:
-          uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:publishCrl?alt=json
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '659'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            pemCrl: |
-              -----BEGIN X509 CRL-----
-              MIIBqTCBkgIBATANBgkqhkiG9w0BAQsFADAtMRMwEQYDVQQKEwpHb29nbGUgTExD
-              MRYwFAYDVQQDEw1TY2VuYXJpbyBUZXN0Fw0yMDA2MDEyMzI5MjVaFw0yMDA2MDgy
-              MzI5MjVaMACgLzAtMAoGA1UdFAQDAgEAMB8GA1UdIwQYMBaAFGbxNPwiuNMmWZcN
-              Txhn/RDc0L8RMA0GCSqGSIb3DQEBCwUAA4IBAQCi8sqq94UYZVsGplOS4gntRUA0
-              D2S+BxQJEYmS6M5N0S47Va+WvJduhDTSQHSP5EoS9MM+WFH1jH+Wp/jwzYSwHz1Z
-              4Vl5fdEN1CvGpnq0j2ElNp0QqMFeM0crN7FeOvIXWhe+XbT3VwLsqYsF65NNO99q
-              5HJbpHDrzkjWOi4cnYVR+ffZWwtQzqUcYNPfRAVxadFqBBcSHUMqtupU3CguQcSs
-              2W61wAfkvm6eLX5IXPPpy+o0HY6UAElhNd6l9utssL/Rjfjb2ktXKAUTl8b4RnDa
-              YgM5Q+65s9zYwbz1DI/3nJAmLnXKNXyta71ZqmcnkfJO0DzOqiGLtTLH6a4A
-              -----END X509 CRL-----
     - expect_exit:
         code: 0
 - execute_command:
@@ -632,108 +590,7 @@ actions:
           body:
             name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
             type: SUBORDINATE
-            config:
-              subjectConfig:
-                subject:
-                  organization: Google LLC
-                commonName: Scenario Test
-                subjectAltName: {}
-              reusableConfig:
-                reusableConfig: projects/privateca-data/locations/$$location$$/reusableConfigs/subordinate-mtls-pathlen-0
-            lifetime: 315569261s
-            cloudKmsKeyVersion: $$kms-key$$/cryptoKeyVersions/1
-            issuingOptions:
-              includeCaCertUrl: true
-              includeCrlAccessUrl: true
-            pemIssuerCertChain:
-            - |
-              -----BEGIN CERTIFICATE-----
-              MIIDbDCCAlSgAwIBAgIVAJxOd2IM/cJIz/hoyCo7lcnhRwe4MA0GCSqGSIb3DQEB
-              CwUAMD0xEzARBgNVBAoTCkdvb2dsZSBMTEMxJjAkBgNVBAMTHUNlcnRpZmljYXRl
-              IElzc3VhbmNlIEUyRSBUZXN0MB4XDTIwMDkwMjA0NDM0NFoXDTMwMDkwMjE0NTEy
-              NVowPTETMBEGA1UEChMKR29vZ2xlIExMQzEmMCQGA1UEAxMdQ2VydGlmaWNhdGUg
-              SXNzdWFuY2UgRTJFIFRlc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
-              AQDDtxSu7+hZ7wJG2q0eSdJkHuB4zIYKQAcjQhJsh8d3OFrq1PyE3xI1/N0/luY9
-              kJ/0fEtgRgUjwfBdfMzMCuqgCs8/64qiRGRs49kX0iUGCFEG28wm7ah8Y8Ybjjph
-              QvxwYb7lLbr+nnGJeBfsvq/cXg9EBpnOGpqxwqwV7R4utZYPMh2zV5XXPqck+DxF
-              oMNmHbonoD65wgfIwmifIkDBnMD/L/OLrw34nDaEIvgk2l+zRdBv+PiuCL/tATun
-              rwpUGFj1LP/kOxdwYOJhQTtSW5WAL0czToOYhKeImL+8XR0lEUobuYNvPRmt511W
-              ncdsCX4mvImUfJtKoze35qrhAgMBAAGjYzBhMA4GA1UdDwEB/wQEAwIBBjAPBgNV
-              HRMBAf8EBTADAQH/MB0GA1UdDgQWBBRm8TT8IrjTJlmXDU8YZ/0Q3NC/ETAfBgNV
-              HSMEGDAWgBRm8TT8IrjTJlmXDU8YZ/0Q3NC/ETANBgkqhkiG9w0BAQsFAAOCAQEA
-              hwxa3LBNTfRgvarYWZ+vAIrWVOeqBL/cHeD9zufRNCkeHeAOR1MXUb+4DfumVB+h
-              IvlIbxjc+x4aLm5MVxYu9cn68K96X4uLDuS3pC1dizcseV2z5TAQQzT5XPxt7YXA
-              JnamOH6wNVBEYMtCpsUSHDLtsk80Vprlwb67lIdHJm3PQvHe/DuTKSFxrYd4GReQ
-              6MavEP2d025K2a1zcLOGKKONr8E/XKDtIVAifsjU1VGgps9Ca8hRrGBOfkeueGRq
-              3fhtwK4DTTbdk5RI506PzXF8INPByYN14IrdrjJs8Owuhgs56HTxuFaNUhbZa/b8
-              olyWkkDzmUZQjLPMV+Qmmg==
-              -----END CERTIFICATE-----
             state: ENABLED
-            pemCert: |
-              -----BEGIN CERTIFICATE-----
-              MIIEbzCCA1egAwIBAgIUHO/6MQBVUPSW2xd0aZEnaZaLsEcwDQYJKoZIhvcNAQEL
-              BQAwPTETMBEGA1UEChMKR29vZ2xlIExMQzEmMCQGA1UEAxMdQ2VydGlmaWNhdGUg
-              SXNzdWFuY2UgRTJFIFRlc3QwHhcNMjAwOTAyMDQ0MzQ5WhcNMzAwOTAyMTQ1MTI1
-              WjAtMRMwEQYDVQQKEwpHb29nbGUgTExDMRYwFAYDVQQDEw1TY2VuYXJpbyBUZXN0
-              MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw7cUru/oWe8CRtqtHknS
-              ZB7geMyGCkAHI0ISbIfHdzha6tT8hN8SNfzdP5bmPZCf9HxLYEYFI8HwXXzMzArq
-              oArPP+uKokRkbOPZF9IlBghRBtvMJu2ofGPGG446YUL8cGG+5S26/p5xiXgX7L6v
-              3F4PRAaZzhqascKsFe0eLrWWDzIds1eV1z6nJPg8RaDDZh26J6A+ucIHyMJonyJA
-              wZzA/y/zi68N+Jw2hCL4JNpfs0XQb/j4rgi/7QE7p68KVBhY9Sz/5DsXcGDiYUE7
-              UluVgC9HM06DmISniJi/vF0dJRFKG7mDbz0ZreddVp3HbAl+JryJlHybSqM3t+aq
-              4QIDAQABo4IBdTCCAXEwDgYDVR0PAQH/BAQDAgEGMB0GA1UdJQQWMBQGCCsGAQUF
-              BwMBBggrBgEFBQcDAjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBRm8TT8
-              IrjTJlmXDU8YZ/0Q3NC/ETAfBgNVHSMEGDAWgBRm8TT8IrjTJlmXDU8YZ/0Q3NC/
-              ETB6BggrBgEFBQcBAQRuMGwwagYIKwYBBQUHMAKGXmh0dHA6Ly9kby1ub3QtZGVs
-              ZXRlLXByaXZhdGVjYS1nY2xvdWQtdGVzdHMuc3RvcmFnZS5nb29nbGVhcGlzLmNv
-              bS8xMjQxZDZhODUyZjQzM2ZkMzU5Ny9jYS5jcnQwcAYDVR0fBGkwZzBloGOgYYZf
-              aHR0cDovL2RvLW5vdC1kZWxldGUtcHJpdmF0ZWNhLWdjbG91ZC10ZXN0cy5zdG9y
-              YWdlLmdvb2dsZWFwaXMuY29tLzEyNDFkNmE4NTJmNDMzZmQzNTk3L2NybC5jcmww
-              DQYJKoZIhvcNAQELBQADggEBAK6lxd5Z/IotOwXoMwJh32F1xHjOHC2BBgeAmr6S
-              kufr6HUuA5l2A3qyPGpILAHtNGEfRghWXwZzHOPOIvILW8rbIQLWsiL3DysbGLfo
-              lX1UgHFfuVfbrPlzMHLxxGkdf8pIS4JASDuJNckgCunwS8MyhVoSikU9Wu0buRVv
-              hN+kNPgIcIc5k2vTlSKHTCqe7PAdbOfTVBIabMzRO1FBvNV8KY7xNSkmfP5bFRoO
-              psAaR2MZIPDPNa1+XCXA2wQS9byOe8We6snYWPY6bf726WyL+XvXGFykFmbmKjrG
-              Zv1MmpFMstU/YNucEHS/NcHKQl/lhuYfrSDUWVl+fP0ayoA=
-              -----END CERTIFICATE-----
-            caCertificateDescription:
-              subjectDescription:
-                subject:
-                  organization: Google LLC
-                commonName: Scenario Test
-                hexSerialNumber: 1ceffa31005550f496db177469912769968bb047
-                lifetime: 315569256s
-                notBeforeTime: '2020-09-02T04:43:49Z'
-                notAfterTime: '2030-09-02T14:51:25Z'
-              configValues:
-                keyUsage:
-                  baseKeyUsage:
-                    certSign: true
-                    crlSign: true
-                  extendedKeyUsage:
-                    serverAuth: true
-                    clientAuth: true
-                caOptions:
-                  isCa: true
-                  maxIssuerPathLength: 0
-                crlDistributionPoints:
-                - http://$$bucket$$.storage.googleapis.com/1241d6a852f433fd3597/crl.crl
-                authorityInformationAccess:
-                  issuingCertificateUrls:
-                  - http://$$bucket$$.storage.googleapis.com/1241d6a852f433fd3597/ca.crt
-              publicKey:
-                type: PEM_RSA_KEY
-                key: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF3N2NVcnUvb1dlOENSdHF0SGtuUwpaQjdnZU15R0NrQUhJMElTYklmSGR6aGE2dFQ4aE44U05memRQNWJtUFpDZjlIeExZRVlGSThId1hYek16QXJxCm9BclBQK3VLb2tSa2JPUFpGOUlsQmdoUkJ0dk1KdTJvZkdQR0c0NDZZVUw4Y0dHKzVTMjYvcDV4aVhnWDdMNnYKM0Y0UFJBYVp6aHFhc2NLc0ZlMGVMcldXRHpJZHMxZVYxejZuSlBnOFJhRERaaDI2SjZBK3VjSUh5TUpvbnlKQQp3WnpBL3kvemk2OE4rSncyaENMNEpOcGZzMFhRYi9qNHJnaS83UUU3cDY4S1ZCaFk5U3ovNURzWGNHRGlZVUU3ClVsdVZnQzlITTA2RG1JU25pSmkvdkYwZEpSRktHN21EYnowWnJlZGRWcDNIYkFsK0pyeUpsSHliU3FNM3QrYXEKNFFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
-              subjectKeyId:
-                keyId: 66f134fc22b8d32659970d4f1867fd10dcd0bf11
-              authorityKeyId:
-                keyId: 66f134fc22b8d32659970d4f1867fd10dcd0bf11
-            gcsBucket: $$bucket$$
-            accessUrls:
-              caCertificateAccessUrl: http://$$bucket$$.storage.googleapis.com/f52d4c0b3aa8dcd62f51/ca.crt
-              crlAccessUrl: http://$$bucket$$.storage.googleapis.com/f52d4c0b3aa8dcd62f51/crl.crl
-            createTime: '2020-09-02T04:43:48.296669284Z'
-            updateTime: '2020-09-02T04:43:48.504782272Z'
     - api_call:
         expect_request:
           uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$:disable?alt=json
@@ -749,7 +606,7 @@ actions:
             content-length: '543'
             content-type: application/json; charset=UTF-8
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1599021832702-5ae4d48538875-09ec9060-a6e297ba
+            name: projects/$$project$$/locations/$$location$$/operations/operation-1599021832702-5ae4d48538875-09ec9060-a6e297ba
             metadata:
               '@type': type.googleapis.com/google.cloud.security.privateca.v1beta1.OperationMetadata
               createTime: '2020-09-02T04:43:52.710886160Z'
@@ -768,6 +625,7 @@ actions:
         code: 0
 - execute_command:
     command: privateca subordinates delete $$ca-id$$ --location $$location$$
+    cleanup_for: ca-id
     events:
     - expect_prompt_continue:
         message: You are about to schedule Certificate Authority [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$]
@@ -787,108 +645,7 @@ actions:
           body:
             name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
             type: SUBORDINATE
-            config:
-              subjectConfig:
-                subject:
-                  organization: Google LLC
-                commonName: Scenario Test
-                subjectAltName: {}
-              reusableConfig:
-                reusableConfig: projects/privateca-data/locations/$$location$$/reusableConfigs/subordinate-mtls-pathlen-0
-            lifetime: 315569261s
-            cloudKmsKeyVersion: $$kms-key$$/cryptoKeyVersions/1
-            issuingOptions:
-              includeCaCertUrl: true
-              includeCrlAccessUrl: true
-            pemIssuerCertChain:
-            - |
-              -----BEGIN CERTIFICATE-----
-              MIIDbDCCAlSgAwIBAgIVAJxOd2IM/cJIz/hoyCo7lcnhRwe4MA0GCSqGSIb3DQEB
-              CwUAMD0xEzARBgNVBAoTCkdvb2dsZSBMTEMxJjAkBgNVBAMTHUNlcnRpZmljYXRl
-              IElzc3VhbmNlIEUyRSBUZXN0MB4XDTIwMDkwMjA0NDM0NFoXDTMwMDkwMjE0NTEy
-              NVowPTETMBEGA1UEChMKR29vZ2xlIExMQzEmMCQGA1UEAxMdQ2VydGlmaWNhdGUg
-              SXNzdWFuY2UgRTJFIFRlc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
-              AQDDtxSu7+hZ7wJG2q0eSdJkHuB4zIYKQAcjQhJsh8d3OFrq1PyE3xI1/N0/luY9
-              kJ/0fEtgRgUjwfBdfMzMCuqgCs8/64qiRGRs49kX0iUGCFEG28wm7ah8Y8Ybjjph
-              QvxwYb7lLbr+nnGJeBfsvq/cXg9EBpnOGpqxwqwV7R4utZYPMh2zV5XXPqck+DxF
-              oMNmHbonoD65wgfIwmifIkDBnMD/L/OLrw34nDaEIvgk2l+zRdBv+PiuCL/tATun
-              rwpUGFj1LP/kOxdwYOJhQTtSW5WAL0czToOYhKeImL+8XR0lEUobuYNvPRmt511W
-              ncdsCX4mvImUfJtKoze35qrhAgMBAAGjYzBhMA4GA1UdDwEB/wQEAwIBBjAPBgNV
-              HRMBAf8EBTADAQH/MB0GA1UdDgQWBBRm8TT8IrjTJlmXDU8YZ/0Q3NC/ETAfBgNV
-              HSMEGDAWgBRm8TT8IrjTJlmXDU8YZ/0Q3NC/ETANBgkqhkiG9w0BAQsFAAOCAQEA
-              hwxa3LBNTfRgvarYWZ+vAIrWVOeqBL/cHeD9zufRNCkeHeAOR1MXUb+4DfumVB+h
-              IvlIbxjc+x4aLm5MVxYu9cn68K96X4uLDuS3pC1dizcseV2z5TAQQzT5XPxt7YXA
-              JnamOH6wNVBEYMtCpsUSHDLtsk80Vprlwb67lIdHJm3PQvHe/DuTKSFxrYd4GReQ
-              6MavEP2d025K2a1zcLOGKKONr8E/XKDtIVAifsjU1VGgps9Ca8hRrGBOfkeueGRq
-              3fhtwK4DTTbdk5RI506PzXF8INPByYN14IrdrjJs8Owuhgs56HTxuFaNUhbZa/b8
-              olyWkkDzmUZQjLPMV+Qmmg==
-              -----END CERTIFICATE-----
             state: DISABLED
-            pemCert: |
-              -----BEGIN CERTIFICATE-----
-              MIIEbzCCA1egAwIBAgIUHO/6MQBVUPSW2xd0aZEnaZaLsEcwDQYJKoZIhvcNAQEL
-              BQAwPTETMBEGA1UEChMKR29vZ2xlIExMQzEmMCQGA1UEAxMdQ2VydGlmaWNhdGUg
-              SXNzdWFuY2UgRTJFIFRlc3QwHhcNMjAwOTAyMDQ0MzQ5WhcNMzAwOTAyMTQ1MTI1
-              WjAtMRMwEQYDVQQKEwpHb29nbGUgTExDMRYwFAYDVQQDEw1TY2VuYXJpbyBUZXN0
-              MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw7cUru/oWe8CRtqtHknS
-              ZB7geMyGCkAHI0ISbIfHdzha6tT8hN8SNfzdP5bmPZCf9HxLYEYFI8HwXXzMzArq
-              oArPP+uKokRkbOPZF9IlBghRBtvMJu2ofGPGG446YUL8cGG+5S26/p5xiXgX7L6v
-              3F4PRAaZzhqascKsFe0eLrWWDzIds1eV1z6nJPg8RaDDZh26J6A+ucIHyMJonyJA
-              wZzA/y/zi68N+Jw2hCL4JNpfs0XQb/j4rgi/7QE7p68KVBhY9Sz/5DsXcGDiYUE7
-              UluVgC9HM06DmISniJi/vF0dJRFKG7mDbz0ZreddVp3HbAl+JryJlHybSqM3t+aq
-              4QIDAQABo4IBdTCCAXEwDgYDVR0PAQH/BAQDAgEGMB0GA1UdJQQWMBQGCCsGAQUF
-              BwMBBggrBgEFBQcDAjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBRm8TT8
-              IrjTJlmXDU8YZ/0Q3NC/ETAfBgNVHSMEGDAWgBRm8TT8IrjTJlmXDU8YZ/0Q3NC/
-              ETB6BggrBgEFBQcBAQRuMGwwagYIKwYBBQUHMAKGXmh0dHA6Ly9kby1ub3QtZGVs
-              ZXRlLXByaXZhdGVjYS1nY2xvdWQtdGVzdHMuc3RvcmFnZS5nb29nbGVhcGlzLmNv
-              bS8xMjQxZDZhODUyZjQzM2ZkMzU5Ny9jYS5jcnQwcAYDVR0fBGkwZzBloGOgYYZf
-              aHR0cDovL2RvLW5vdC1kZWxldGUtcHJpdmF0ZWNhLWdjbG91ZC10ZXN0cy5zdG9y
-              YWdlLmdvb2dsZWFwaXMuY29tLzEyNDFkNmE4NTJmNDMzZmQzNTk3L2NybC5jcmww
-              DQYJKoZIhvcNAQELBQADggEBAK6lxd5Z/IotOwXoMwJh32F1xHjOHC2BBgeAmr6S
-              kufr6HUuA5l2A3qyPGpILAHtNGEfRghWXwZzHOPOIvILW8rbIQLWsiL3DysbGLfo
-              lX1UgHFfuVfbrPlzMHLxxGkdf8pIS4JASDuJNckgCunwS8MyhVoSikU9Wu0buRVv
-              hN+kNPgIcIc5k2vTlSKHTCqe7PAdbOfTVBIabMzRO1FBvNV8KY7xNSkmfP5bFRoO
-              psAaR2MZIPDPNa1+XCXA2wQS9byOe8We6snYWPY6bf726WyL+XvXGFykFmbmKjrG
-              Zv1MmpFMstU/YNucEHS/NcHKQl/lhuYfrSDUWVl+fP0ayoA=
-              -----END CERTIFICATE-----
-            caCertificateDescription:
-              subjectDescription:
-                subject:
-                  organization: Google LLC
-                commonName: Scenario Test
-                hexSerialNumber: 1ceffa31005550f496db177469912769968bb047
-                lifetime: 315569256s
-                notBeforeTime: '2020-09-02T04:43:49Z'
-                notAfterTime: '2030-09-02T14:51:25Z'
-              configValues:
-                keyUsage:
-                  baseKeyUsage:
-                    certSign: true
-                    crlSign: true
-                  extendedKeyUsage:
-                    serverAuth: true
-                    clientAuth: true
-                caOptions:
-                  isCa: true
-                  maxIssuerPathLength: 0
-                crlDistributionPoints:
-                - http://$$bucket$$.storage.googleapis.com/1241d6a852f433fd3597/crl.crl
-                authorityInformationAccess:
-                  issuingCertificateUrls:
-                  - http://$$bucket$$.storage.googleapis.com/1241d6a852f433fd3597/ca.crt
-              publicKey:
-                type: PEM_RSA_KEY
-                key: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF3N2NVcnUvb1dlOENSdHF0SGtuUwpaQjdnZU15R0NrQUhJMElTYklmSGR6aGE2dFQ4aE44U05memRQNWJtUFpDZjlIeExZRVlGSThId1hYek16QXJxCm9BclBQK3VLb2tSa2JPUFpGOUlsQmdoUkJ0dk1KdTJvZkdQR0c0NDZZVUw4Y0dHKzVTMjYvcDV4aVhnWDdMNnYKM0Y0UFJBYVp6aHFhc2NLc0ZlMGVMcldXRHpJZHMxZVYxejZuSlBnOFJhRERaaDI2SjZBK3VjSUh5TUpvbnlKQQp3WnpBL3kvemk2OE4rSncyaENMNEpOcGZzMFhRYi9qNHJnaS83UUU3cDY4S1ZCaFk5U3ovNURzWGNHRGlZVUU3ClVsdVZnQzlITTA2RG1JU25pSmkvdkYwZEpSRktHN21EYnowWnJlZGRWcDNIYkFsK0pyeUpsSHliU3FNM3QrYXEKNFFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
-              subjectKeyId:
-                keyId: 66f134fc22b8d32659970d4f1867fd10dcd0bf11
-              authorityKeyId:
-                keyId: 66f134fc22b8d32659970d4f1867fd10dcd0bf11
-            gcsBucket: $$bucket$$
-            accessUrls:
-              caCertificateAccessUrl: http://$$bucket$$.storage.googleapis.com/f52d4c0b3aa8dcd62f51/ca.crt
-              crlAccessUrl: http://$$bucket$$.storage.googleapis.com/f52d4c0b3aa8dcd62f51/crl.crl
-            createTime: '2020-09-02T04:43:48.296669284Z'
-            updateTime: '2020-09-02T04:43:48.504782272Z'
           status: 200
     - api_call:
         poll_operation: false
@@ -905,7 +662,7 @@ actions:
             content-length: '550'
             content-type: application/json; charset=UTF-8
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1599021834341-5ae4d486c8e5e-3d958d2d-8dbb28f3
+            name: projects/$$project$$/locations/$$location$$/operations/operation-1599021834341-5ae4d486c8e5e-3d958d2d-8dbb28f3
             metadata:
               '@type': type.googleapis.com/google.cloud.security.privateca.v1beta1.OperationMetadata
               createTime: '2020-09-02T04:43:54.354744339Z'
@@ -916,7 +673,7 @@ actions:
             done: false
             response:
               name: $$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
-              deletionTime: '2018-10-17T15:14:00.105-07:00'
+              deleteTime: '2018-10-17T15:14:00.105-07:00'
           status: 200
         expect_response:
           extract_references:
@@ -936,7 +693,7 @@ actions:
             done: true
             response:
               name: $$project$$/locations/$$location$$/certificateAuthorities/$$ca-id$$
-              deletionTime: '2018-10-17T15:14:00.105-07:00'
+              deleteTime: '2018-10-17T15:14:00.105-07:00'
     - expect_progress_tracker:
         message: Scheduling Subordinate CA for deletion
         status: SUCCESS
@@ -946,19 +703,16 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: privateca certificates revoke --certificate $$subordinate-cert-id$$
+    command: privateca certificates revoke --certificate $$subordinate-cert-name$$
     validation_only: true
     validate_remote_api_calls: false
     events:
     - expect_prompt_continue:
-        message: You are about to revoke Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/$$subordinate-cert-id$$]
+        message: You are about to revoke Certificate [$$subordinate-cert-name$$]
         user_input: y
-    - expect_progress_tracker:
-        message: Revoking Certificate.
-        status: SUCCESS
     - expect_stderr:
         matches: |
-          Revoked certificate \[projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/$$subordinate-cert-id$$\] at [-0-9TZ:.]+\.
+          Revoked certificate \[$$subordinate-cert-name$$\] at [-0-9TZ:.]+\.
     - expect_exit:
         code: 0
 - execute_command:
@@ -975,6 +729,7 @@ actions:
         code: 0
 - execute_command:
     command: privateca roots delete $$root-ca-id$$ --location $$location$$
+    cleanup_for: root-ca-id
     validation_only: true
     validate_remote_api_calls: false
     events:

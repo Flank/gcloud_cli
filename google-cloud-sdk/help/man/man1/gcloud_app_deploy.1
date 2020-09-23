@@ -11,7 +11,7 @@ gcloud app deploy \- deploy the local code and/or configuration of your app to A
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-appyaml\fR=\fIAPPYAML\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-appyaml\fR=\fIAPPYAML\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-no\-cache\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -63,6 +63,11 @@ DEPLOYABLE.
 The Google Cloud Storage bucket used to stage files associated with the
 deployment. If this argument is not specified, the application's default code
 bucket is used.
+
+.TP 2m
+\fB\-\-no\-cache\fR
+Skip caching mechanisms involved in the deployment process, in particular do not
+use cached dependencies during the build step.
 
 .TP 2m
 \fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR

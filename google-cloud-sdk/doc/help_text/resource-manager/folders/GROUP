@@ -30,6 +30,9 @@ COMMANDS
      describe
         Show metadata for a folder.
 
+     get-ancestors-iam-policy
+        Get IAM policies for a folder and its ancestors.
+
      get-iam-policy
         Get IAM policy for a folder.
 

@@ -36,6 +36,9 @@ COMMANDS
      list
         (ALPHA) List the objects in Cloud Storage buckets.
 
+     ls
+        (ALPHA) List the objects in Cloud Storage buckets.
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change

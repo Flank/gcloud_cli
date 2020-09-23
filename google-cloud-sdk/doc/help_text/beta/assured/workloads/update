@@ -3,7 +3,8 @@ NAME
         environments
 
 SYNOPSIS
-    gcloud beta assured workloads update RESOURCE
+    gcloud beta assured workloads update
+        (WORKLOAD : --location=LOCATION --organization=ORGANIZATION)
         (--display-name=DISPLAY_NAME --labels=[KEY=VALUE,...]) [--etag=ETAG]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -11,9 +12,20 @@ DESCRIPTION
     (BETA) Update a given Assured Workloads environment.
 
 POSITIONAL ARGUMENTS
-     RESOURCE
-        The Assured Workloads environment resource to update, in the form:
-        organizations/{ORG_ID}/locations/{LOCATION}/workloads/{WORKLOAD_ID}.
+     Workload resource - The Assured Workloads environment resource to update.
+     The arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
+
+       WORKLOAD
+          ID of the workload or fully qualified identifier for the workload.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --location=LOCATION
+          The location for the workload.
+
+       --organization=ORGANIZATION
+          The parent organization for the workload.
 
 REQUIRED FLAGS
      Settings that can be updated on the Assured Workloads environment. At

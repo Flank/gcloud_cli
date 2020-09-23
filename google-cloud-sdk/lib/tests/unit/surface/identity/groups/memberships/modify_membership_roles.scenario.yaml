@@ -78,14 +78,14 @@ summary:
   - command: |
       identity groups memberships modify-membership-roles --group-email invalid-group@foo.com
       --member-email user@foo.com
-  - error: '1: Invalid value for [group_email]: There is no such a group associated
+  - error: '1: Invalid value for [--group-email]: There is no such a group associated
       with the specified argument:invalid-group@foo.com'
 - execute:
   - label: Modify membership roles with an invalid member email.
   - command: |
       identity groups memberships modify-membership-roles --group-email eng-discuss@foo.com
       --member-email invalid-user@foo.com
-  - error: '1: Invalid value for [group_email, member_email]: There is no such a membership
+  - error: '1: Invalid value for [--group-email, --member-email]: There is no such a membership
       associated with the specified arguments:eng-discuss@foo.com, invalid-user@foo.com'
 - execute:
   - label: Modify membership roles - Removing MEMBER role throws Invalid Argument
@@ -109,7 +109,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -122,7 +122,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=user%40foo.com
           method: GET
           headers: {}
           body: null
@@ -177,7 +177,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -190,7 +190,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=user%40foo.com
           method: GET
           headers: {}
           body: null
@@ -252,7 +252,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -265,7 +265,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=user%40foo.com
           method: GET
           headers: {}
           body: null
@@ -321,7 +321,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -334,7 +334,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=user%40foo.com
           method: GET
           headers: {}
           body: null
@@ -396,7 +396,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -409,7 +409,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=user%40foo.com
           method: GET
           headers: {}
           body: null
@@ -473,7 +473,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=invalid-group%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=invalid-group%40foo.com
           method: GET
           headers: {}
           body: null
@@ -500,7 +500,7 @@ actions:
             }
     - expect_exit:
         code: 1
-        message: 'Invalid value for [group_email]: There is no such a group associated
+        message: 'Invalid value for [--group-email]: There is no such a group associated
           with the specified argument:invalid-group@foo.com'
 - execute_command:
     label: Modify membership roles with an invalid member email.
@@ -510,7 +510,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -523,7 +523,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=invalid-user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=invalid-user%40foo.com
           method: GET
           headers: {}
           body: null
@@ -553,7 +553,7 @@ actions:
             }
     - expect_exit:
         code: 1
-        message: 'Invalid value for [group_email, member_email]: There is no such
+        message: 'Invalid value for [--group-email, --member-email]: There is no such
           a membership associated with the specified arguments:eng-discuss@foo.com,
           invalid-user@foo.com'
 - execute_command:
@@ -565,7 +565,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups:lookup?alt=json&groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -578,7 +578,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=invalid-user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/v1beta1/groups/11zu0gzc3tkdgn2/memberships:lookup?alt=json&memberKey.id=invalid-user%40foo.com
           method: GET
           headers: {}
           body: null

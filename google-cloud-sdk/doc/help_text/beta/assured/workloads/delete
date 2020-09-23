@@ -2,16 +2,28 @@ NAME
     gcloud beta assured workloads delete - delete Assured Workloads environment
 
 SYNOPSIS
-    gcloud beta assured workloads delete RESOURCE [--etag=ETAG]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta assured workloads delete
+        (WORKLOAD : --location=LOCATION --organization=ORGANIZATION)
+        [--etag=ETAG] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Delete a given Assured Workloads environment.
 
 POSITIONAL ARGUMENTS
-     RESOURCE
-        The Assured Workloads resource to delete, for example,
-        organizations/{ORG_ID}/locations/{LOCATION}/workloads/{WORKLOAD_ID}.
+     Workload resource - The Assured Workloads environment resource to delete.
+     The arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
+
+       WORKLOAD
+          ID of the workload or fully qualified identifier for the workload.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --location=LOCATION
+          The location for the workload.
+
+       --organization=ORGANIZATION
+          The parent organization for the workload.
 
 FLAGS
      --etag=ETAG

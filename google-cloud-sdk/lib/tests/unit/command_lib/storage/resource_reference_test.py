@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import collections
 
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
 from tests.lib import test_case
@@ -62,60 +61,69 @@ class ResourceEqualityTest(test_case.TestCase):
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
-class BucketResourceEqualityTest(test_case.TestCase):
+class CloudResourceEqualityTest(test_case.TestCase):
 
-  def SetUp(self):
-    self.messages = apis.GetMessagesModule('storage', 'v1')
+  def test_equal_resources(self):
+    resource1 = resource_reference.CloudResource(
+        storage_url.CloudUrl('gs', bucket_name='bucket'))
+
+    resource2 = resource_reference.CloudResource(
+        storage_url.CloudUrl('gs', bucket_name='bucket'))
+
+    self.assertEqual(resource1, resource2)
+
+  def test_resources_non_equal_schemes(self):
+    resource1 = resource_reference.Resource(
+        storage_url.CloudUrl('gs', bucket_name='bucket'))
+
+    resource2 = resource_reference.Resource(
+        storage_url.CloudUrl('s3', bucket_name='bucket'))
+
+    self.assertNotEqual(resource1, resource2)
+
+
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
+class BucketResourceEqualityTest(test_case.TestCase):
 
   def test_equal_bucket_resources(self):
     resource1 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        'bucket', 'e', {})
+        storage_url.CloudUrl('gs', bucket_name='bucket'), etag='e', metadata={})
     resource2 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        'bucket', 'e', {})
+        storage_url.CloudUrl('gs', bucket_name='bucket'), etag='e', metadata={})
 
     self.assertEqual(resource1, resource2)
 
   def test_bucket_resources_non_equal_storage_urls(self):
     resource1 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket1'), 'bucket')
+        storage_url.CloudUrl('gs', bucket_name='bucket1'))
     resource2 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket2'), 'bucket')
+        storage_url.CloudUrl('gs', bucket_name='bucket2'))
 
     self.assertNotEqual(resource1, resource2)
 
   def test_bucket_resources_non_equal_names(self):
     resource1 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket1')
+        storage_url.CloudUrl('gs', bucket_name='bucket1'))
     resource2 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket2')
+        storage_url.CloudUrl('gs', bucket_name='bucket2'))
 
     self.assertNotEqual(resource1, resource2)
 
   def test_bucket_resources_non_equal_etags(self):
     resource1 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket', 'e1')
+        storage_url.CloudUrl('gs', bucket_name='bucket'), etag='e1')
     resource2 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket', 'e2')
+        storage_url.CloudUrl('gs', bucket_name='bucket'), etag='e2')
 
     self.assertNotEqual(resource1, resource2)
 
   def test_bucket_resources_non_equal_metadata(self):
     resource1 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket',
+        storage_url.CloudUrl('gs', bucket_name='bucket'),
         metadata={1: 2})
     resource2 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket',
+        storage_url.CloudUrl('gs', bucket_name='bucket'),
         metadata={1: 3})
-
-    self.assertNotEqual(resource1, resource2)
-
-  def test_bucket_resources_non_equal_resource_types(self):
-    resource1 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket')
-    resource2 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket')
 
     self.assertNotEqual(resource1, resource2)
 
@@ -123,70 +131,53 @@ class BucketResourceEqualityTest(test_case.TestCase):
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class ObjectEqualityTest(test_case.TestCase):
 
-  def SetUp(self):
-    self.messages = apis.GetMessagesModule('storage', 'v1')
-
   def test_equal_object_resources(self):
     resource1 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data'})
-
+        storage_url.CloudUrl('gs', bucket_name='bucket'), 'e', metadata={})
     resource2 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data'})
+        storage_url.CloudUrl('gs', bucket_name='bucket'), 'e', metadata={})
 
     self.assertEqual(resource1, resource2)
 
   def test_object_resources_non_equal_storage_urls(self):
     resource1 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket1'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data'})
-
+        storage_url.CloudUrl('gs', bucket_name='bucket1'))
     resource2 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket2'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data'})
+        storage_url.CloudUrl('gs', bucket_name='bucket2'))
 
     self.assertNotEqual(resource1, resource2)
 
-  def test_object_resources_non_equal_messages(self):
+  def test_object_resources_non_equal_etags(self):
     resource1 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object1'),
-        additional_metadata={'meta': 'data'})
-
+        storage_url.CloudUrl('gs', bucket_name='bucket'), etag='e1')
     resource2 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object2'),
-        additional_metadata={'meta': 'data'})
+        storage_url.CloudUrl('gs', bucket_name='bucket'), etag='e2')
+
+    self.assertNotEqual(resource1, resource2)
+
+  def test_object_resources_non_equal_generations(self):
+    resource1 = resource_reference.ObjectResource(
+        storage_url.CloudUrl(
+            'gs', bucket_name='b', object_name='o', generation='g'))
+    resource2 = resource_reference.ObjectResource(
+        storage_url.CloudUrl(
+            'gs', bucket_name='b', object_name='o', generation='g2'))
 
     self.assertNotEqual(resource1, resource2)
 
   def test_object_resources_non_equal_metadata(self):
     resource1 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data1'})
-
+        storage_url.CloudUrl('gs', bucket_name='bucket'), metadata={1: 2})
     resource2 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data2'})
+        storage_url.CloudUrl('gs', bucket_name='bucket'), metadata={1: 3})
 
     self.assertNotEqual(resource1, resource2)
 
   def test_object_resources_non_equal_types(self):
     resource1 = resource_reference.ObjectResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'),
-        self.messages.Object(name='object'),
-        additional_metadata={'meta': 'data'})
-
+        storage_url.CloudUrl('gs', bucket_name='bucket'))
     resource2 = resource_reference.BucketResource(
-        storage_url.CloudUrl('gs', bucket_name='bucket'), 'bucket',
-        metadata=self.messages.Object(name='object'))
+        storage_url.CloudUrl('gs', bucket_name='bucket'))
 
     self.assertNotEqual(resource1, resource2)
 

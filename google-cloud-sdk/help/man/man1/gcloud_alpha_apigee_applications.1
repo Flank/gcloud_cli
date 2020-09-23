@@ -52,6 +52,24 @@ Run \fB$ gcloud help\fR for details.
 .RE
 .sp
 
+.SH "EXAMPLES"
+
+To get the names and UUIDs of all applications in the active Cloud Platform
+project, run:
+
+.RS 2m
+$ gcloud alpha apigee applications list
+.RE
+
+To get a JSON representation of an application in the active Cloud Platform
+project, including its API keys, run:
+
+.RS 2m
+$ gcloud alpha apigee applications describe APP_UUID \-\-format=json
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this

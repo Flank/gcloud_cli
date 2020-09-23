@@ -80,26 +80,20 @@ class CreateBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       self.gcs_client.CreateBucket(self.bucket, fields_scope='football field')
 
   @parameterized.parameters(
-      (cloud_api.FieldsScope.SHORT, 'noAcl', 'name,size'),
-      (cloud_api.FieldsScope.NO_ACL, 'noAcl', None),
-      (cloud_api.FieldsScope.FULL, 'full', None))
-  def test_create_bucket_valid_fields_scope(self, fields_scope, projection,
-                                            fields):
+      (cloud_api.FieldsScope.SHORT, 'noAcl'),
+      (cloud_api.FieldsScope.NO_ACL, 'noAcl'),
+      (cloud_api.FieldsScope.FULL, 'full'))
+  def test_create_bucket_valid_fields_scope(self, fields_scope, projection):
     request = self.messages.StorageBucketsInsertRequest(
         bucket=self.bucket,
         project=TEST_PROJECT,
         projection=getattr(self.messages.StorageBucketsInsertRequest
                            .ProjectionValueValuesEnum, projection))
-    global_params = self.messages.StandardQueryParameters()
-    global_params.fields = fields
 
     with mock.patch.object(self.apitools_client.buckets,
                            'Insert') as mock_insert:
       self.gcs_client.CreateBucket(self.bucket, fields_scope=fields_scope)
-
-      # Checks for correct projection value inside request.
-      # Checks for correct fields value inside global_params.
-      mock_insert.assert_called_once_with(request, global_params=global_params)
+      mock_insert.assert_called_once_with(request)
 
 
 class DeleteBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
@@ -172,25 +166,18 @@ class GetBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       self.gcs_client.GetBucket(TEST_BUCKET, fields_scope='football field')
 
   @parameterized.parameters(
-      (cloud_api.FieldsScope.SHORT, 'noAcl', 'name,size'),
-      (cloud_api.FieldsScope.NO_ACL, 'noAcl', None),
-      (cloud_api.FieldsScope.FULL, 'full', None))
-  def test_get_bucket_valid_fields_scope(self, fields_scope, projection,
-                                         fields):
-
+      (cloud_api.FieldsScope.SHORT, 'noAcl'),
+      (cloud_api.FieldsScope.NO_ACL, 'noAcl'),
+      (cloud_api.FieldsScope.FULL, 'full'))
+  def test_get_bucket_valid_fields_scope(self, fields_scope, projection):
     request = self.messages.StorageBucketsGetRequest(
         bucket=TEST_BUCKET,
         projection=getattr(self.messages.StorageBucketsGetRequest
                            .ProjectionValueValuesEnum, projection))
-    global_params = self.messages.StandardQueryParameters()
-    global_params.fields = fields
 
     with mock.patch.object(self.apitools_client.buckets, 'Get') as mock_get:
       self.gcs_client.GetBucket(TEST_BUCKET, fields_scope=fields_scope)
-
-      # Checks for correct projection value inside request.
-      # Checks for correct fields value inside global_params.
-      mock_get.assert_called_once_with(request, global_params=global_params)
+      mock_get.assert_called_once_with(request)
 
 
 class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
@@ -214,7 +201,7 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
             project=TEST_PROJECT, projection=self.default_projection),
         response=self.messages.Buckets(items=buckets))
 
-    names = [b.metadata_object.name for b in self.gcs_client.ListBuckets()]
+    names = [b.metadata.name for b in self.gcs_client.ListBuckets()]
     self.assertCountEqual(names, self._BUCKET_NAMES)
 
   def test_list_buckets_api_error(self):
@@ -231,7 +218,7 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       list(self.gcs_client.ListBuckets(fields_scope='football field'))
 
   @parameterized.parameters(
-      (cloud_api.FieldsScope.SHORT, 'noAcl', 'name,size'),
+      (cloud_api.FieldsScope.SHORT, 'noAcl', 'items/name'),
       (cloud_api.FieldsScope.NO_ACL, 'noAcl', None),
       (cloud_api.FieldsScope.FULL, 'full', None))
   def test_list_buckets_valid_fields_scope(self, fields_scope, projection,
@@ -241,8 +228,11 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         project=TEST_PROJECT,
         projection=getattr(self.messages.StorageBucketsListRequest
                            .ProjectionValueValuesEnum, projection))
-    global_params = self.messages.StandardQueryParameters()
-    global_params.fields = fields
+
+    global_params = None
+    if fields:
+      global_params = self.messages.StandardQueryParameters()
+      global_params.fields = fields
 
     with mock.patch.object(list_pager, 'YieldFromList') as mock_yield_from_list:
       list(self.gcs_client.ListBuckets(fields_scope))
@@ -280,8 +270,7 @@ class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         response=objects
     )
 
-    names = [o.metadata_object.name
-             for o in self.gcs_client.ListObjects(TEST_BUCKET)]
+    names = [o.name for o in self.gcs_client.ListObjects(TEST_BUCKET)]
     self.assertCountEqual(names, file_list)
 
   def test_list_objects_api_error(self):
@@ -318,7 +307,7 @@ class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     for resource in self.gcs_client.ListObjects(TEST_BUCKET):
       if isinstance(resource, resource_reference.ObjectResource):
-        object_names.append(resource.metadata_object.name)
+        object_names.append(resource.name)
       elif isinstance(resource, resource_reference.PrefixResource):
         prefixes_names.append(resource.prefix)
       else:
@@ -342,7 +331,8 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
     self.messages = core_apis.GetMessagesModule('storage', 'v1')
 
   @parameterized.parameters(
-      (cloud_api.FieldsScope.SHORT, 'noAcl', 'name,size'),
+      (cloud_api.FieldsScope.SHORT, 'noAcl',
+       'prefixes,items/name,items/size,items/generation'),
       (cloud_api.FieldsScope.NO_ACL, 'noAcl', None),
       (cloud_api.FieldsScope.FULL, 'full', None))
   def test_list_objects_valid_fields_scope(self, fields_scope,
@@ -361,8 +351,10 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
         ),
         maxResults=cloud_api.NUM_ITEMS_PER_LIST_PAGE
     )
-    expected_global_params = self.messages.StandardQueryParameters()
-    expected_global_params.fields = fields
+    global_params = None
+    if fields:
+      global_params = self.messages.StandardQueryParameters()
+      global_params.fields = fields
 
     with mock.patch.object(core_apis, 'GetClientInstance', autospec=True,
                            return_value=api_client) as mock_get_instance:
@@ -372,7 +364,7 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
       mock_get_instance.assert_called_once_with('storage', 'v1')
       api_client.objects.List.assert_called_once_with(
           expected_request,
-          global_params=expected_global_params)
+          global_params=global_params)
 
   @mock.patch.object(gcs_api.cloud_api, 'NUM_ITEMS_PER_LIST_PAGE', 3)
   @mock.patch.object(core_apis, 'GetClientInstance', autospec=True)
@@ -411,7 +403,7 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
 
     # Check that we looped over all the objects.
     self.assertCountEqual(
-        [o.metadata_object.name for o in objects],
+        [o.name for o in objects],
         filenames_batch1 + filenames_batch2 + filenames_batch3
     )
 
@@ -424,7 +416,7 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
               projection=default_projection,
               pageToken=page_token,
               maxResults=3),
-          global_params=self.messages.StandardQueryParameters()
+          global_params=None
       )
       expected_list_object_calls.append(expected_call)
 
@@ -525,8 +517,8 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     expected_object_reference = (
         resource_reference.ObjectResource.from_gcs_metadata_object(
             cloud_api.ProviderPrefix.GCS.value, metadata_object))
-    self.assertEqual(object_reference.metadata_object,
-                     expected_object_reference.metadata_object)
+    self.assertEqual(object_reference.metadata,
+                     expected_object_reference.metadata)
     self.assertEqual(object_reference.storage_url,
                      expected_object_reference.storage_url)
 
@@ -572,11 +564,11 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
                                         fields_scope='football field')
 
   @parameterized.parameters(
-      (cloud_api.FieldsScope.SHORT, 'noAcl', 'name,size'),
-      (cloud_api.FieldsScope.NO_ACL, 'noAcl', None),
-      (cloud_api.FieldsScope.FULL, 'full', None))
+      (cloud_api.FieldsScope.SHORT, 'noAcl'),
+      (cloud_api.FieldsScope.NO_ACL, 'noAcl'),
+      (cloud_api.FieldsScope.FULL, 'full'))
   def test_get_object_metadata_valid_fields_scope(self, fields_scope,
-                                                  projection, fields):
+                                                  projection):
     request = self.messages.StorageObjectsGetRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
@@ -586,12 +578,7 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     with mock.patch.object(self.apitools_client.objects, 'Get') as mock_get:
       self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT,
                                         fields_scope=fields_scope)
-
-      global_params = self.messages.StandardQueryParameters()
-      global_params.fields = fields
-      # Checks for correct projection value inside request.
-      # Checks for correct fields value inside global_params.
-      mock_get.assert_called_once_with(request, global_params=global_params)
+      mock_get.assert_called_once_with(request)
 
 
 class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
@@ -621,8 +608,8 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     expected_object_reference = (
         resource_reference.ObjectResource.from_gcs_metadata_object(
             cloud_api.ProviderPrefix.GCS.value, self.patched_object))
-    self.assertEqual(object_reference.metadata_object,
-                     expected_object_reference.metadata_object)
+    self.assertEqual(object_reference.metadata,
+                     expected_object_reference.metadata)
     self.assertEqual(object_reference.storage_url,
                      expected_object_reference.storage_url)
 
@@ -723,11 +710,11 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
                                           fields_scope='football field')
 
   @parameterized.parameters(
-      (cloud_api.FieldsScope.SHORT, 'noAcl', 'name,size'),
-      (cloud_api.FieldsScope.NO_ACL, 'noAcl', None),
-      (cloud_api.FieldsScope.FULL, 'full', None))
+      (cloud_api.FieldsScope.SHORT, 'noAcl'),
+      (cloud_api.FieldsScope.NO_ACL, 'noAcl'),
+      (cloud_api.FieldsScope.FULL, 'full'))
   def test_patch_object_metadata_valid_fields_scope(self, fields_scope,
-                                                    projection, fields):
+                                                    projection):
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
@@ -739,12 +726,7 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
       self.gcs_client.PatchObjectMetadata(TEST_BUCKET, TEST_OBJECT,
                                           self.patched_object,
                                           fields_scope=fields_scope)
-
-      global_params = self.messages.StandardQueryParameters()
-      global_params.fields = fields
-      # Checks for correct projection value inside request.
-      # Checks for correct fields value inside global_params.
-      mock_patch.assert_called_once_with(request, global_params=global_params)
+      mock_patch.assert_called_once_with(request)
 
 
 class CopyObjectTest(cloud_storage_util.WithGCSCalls, sdk_test_base.SdkBase):
@@ -774,8 +756,8 @@ class CopyObjectTest(cloud_storage_util.WithGCSCalls, sdk_test_base.SdkBase):
         resource_reference.ObjectResource.from_gcs_metadata_object(
             cloud_api.ProviderPrefix.GCS.value, self.destination_object))
 
-    self.assertEqual(object_reference.metadata_object,
-                     expected_object_reference.metadata_object)
+    self.assertEqual(object_reference.metadata,
+                     expected_object_reference.metadata)
     self.assertEqual(object_reference.storage_url,
                      expected_object_reference.storage_url)
 
@@ -956,8 +938,8 @@ class UploadObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       expected_object_reference = (
           resource_reference.ObjectResource.from_gcs_metadata_object(
               cloud_api.ProviderPrefix.GCS.value, self.upload_object))
-      self.assertEqual(object_reference.metadata_object,
-                       expected_object_reference.metadata_object)
+      self.assertEqual(object_reference.metadata,
+                       expected_object_reference.metadata)
       self.assertEqual(object_reference.storage_url,
                        expected_object_reference.storage_url)
 

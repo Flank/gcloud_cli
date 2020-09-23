@@ -1,0 +1,57 @@
+title: network-connectivity hub-tests delete tests
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: network-connectivity hubs delete testhub
+  - prompt:
+    - message: You are about to delete hub [testhub]
+    - input: y
+  - stderr: |
+      Create request issue for: [testhub]
+  - stdout: |
+      name: projects/fake-project/locations/global/operations/operation-1592460580381-5a8559f3662e5-dabbb29c-b6eada21
+      done: false
+actions:
+- define_reference:
+    reference: name
+    value: projects/fake-project/locations/global/operations/operation-1592460580381-5a8559f3662e5-dabbb29c-b6eada21
+- execute_command:
+    command: |
+      network-connectivity hubs delete testhub
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete hub [testhub]
+        user_input: y
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub?alt=json
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+             "name": "projects/fake-project/locations/global/operations/operation-1592460580381-5a8559f3662e5-dabbb29c-b6eada21",
+             "metadata": {
+               "@type": "type.googleapis.com/google.cloud.networkconnectivity.v1alpha1.OperationMetadata",
+               "createTime": "2020-09-06T07:34:03.133749586Z",
+               "target": "projects/connectivity-hub-e2e-testing/locations/global/hubs/hub2",
+               "verb": "delete",
+               "requestedCancellation": false,
+               "apiVersion": "v1alpha1"
+             },
+             "done": false
+            }
+    - expect_stderr: |
+        Delete request issued for: [testhub]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$name$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted hub [testhub].
+    - expect_exit:
+        code: 0

@@ -196,7 +196,7 @@ actions:
                   nameServers:
                   - ns-cloud-a1.googledomains.com
                   - ns-cloud-a2.googledomains.com
-              updateMask: dns_provider
+              updateMask: custom_dns
               validateOnly: true
         return_response:
           headers:
@@ -362,7 +362,7 @@ actions:
                   nameServers:
                   - ns1.com
                   - ns2.com
-              updateMask: dns_provider
+              updateMask: custom_dns
               validateOnly: false
         return_response:
           headers:
@@ -435,7 +435,7 @@ actions:
               dnsSettings:
                 googleDomainsDns:
                   dsState: DS_RECORDS_PUBLISHED
-              updateMask: dns_provider
+              updateMask: google_domains_dns
               validateOnly: false
         return_response:
           headers:
@@ -494,7 +494,7 @@ actions:
               dnsSettings:
                 googleDomainsDns:
                   dsState: DS_RECORDS_UNPUBLISHED
-              updateMask: dns_provider
+              updateMask: google_domains_dns
               validateOnly: true
         return_response:
           headers:

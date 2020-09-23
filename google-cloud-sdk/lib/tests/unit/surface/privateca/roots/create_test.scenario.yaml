@@ -7,16 +7,45 @@ summary:
   - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config
       root-ca --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
   - stderr: |
+      WARNING: CA Service is currently in preview.
+
+      Please remember that all resources created during preview will be deleted
+      when CA service transitions to General Availability (GA). Relying on these
+      certificate authorities for production traffic is discouraged.
+  - stderr: |
       Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-ca].
+- execute:
+  - command: privateca roots create new-devops --tier devops --subject CN=peter,O=Google
+      --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+  - stderr: |
+      WARNING: CA Service is currently in preview.
+
+      Please remember that all resources created during preview will be deleted
+      when CA service transitions to General Availability (GA). Relying on these
+      certificate authorities for production traffic is discouraged.
+  - stderr: |
+      Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-devops].
 - execute:
   - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config
       root-ca --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-west1
       --bucket my-bucket
   - stderr: |
+      WARNING: CA Service is currently in preview.
+
+      Please remember that all resources created during preview will be deleted
+      when CA service transitions to General Availability (GA). Relying on these
+      certificate authorities for production traffic is discouraged.
+  - stderr: |
       Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/new-ca].
 - execute:
   - command: privateca roots create new-ca --from-ca source-root --from-ca-location
       us-east1 --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+  - stderr: |
+      WARNING: CA Service is currently in preview.
+
+      Please remember that all resources created during preview will be deleted
+      when CA service transitions to General Availability (GA). Relying on these
+      certificate authorities for production traffic is discouraged.
   - stderr: |
       Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-ca].
 - execute:
@@ -28,8 +57,8 @@ summary:
   - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config
       root-ca --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-west1
   - error: '1: The current user does not have permissions for this operation. Please
-      ensure you have storage.buckets.create permissions on the project and that you
-      are logged-in as the correct user and try again.'
+      ensure you have privateca.certificateAuthorities.create permissions on the project
+      and that you are logged-in as the correct user and try again.'
 actions:
 - set_property:
     core/project: foo
@@ -61,14 +90,12 @@ actions:
             json:
               permissions:
               - privateca.certificateAuthorities.create
-              - storage.buckets.create
         return_response:
           headers:
             status: '200'
           body:
             permissions:
             - privateca.certificateAuthorities.create
-            - storage.buckets.create
     - api_call:
         expect_request:
           uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
@@ -100,54 +127,6 @@ actions:
                 "email": "service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com",
                 "uniqueId": "111511143951582361276"
               }
-            }
-    - api_call:
-        expect_request:
-          uri: https://storage.googleapis.com/storage/v1/b?alt=json&predefinedDefaultObjectAcl=publicRead&project=foo
-          method: POST
-          body:
-            text:
-              matches: '.*"name": "privateca_content_[0-9a-f-]+".*'
-            json:
-              location: us-east1
-              versioning:
-                enabled: true
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-             "kind": "storage#bucket",
-             "id": "privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-             "selfLink": "https://www.googleapis.com/storage/v1/b/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-             "projectNumber": "166289904856",
-             "name": "privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-             "timeCreated": "2020-02-12T20:10:10.558Z",
-             "updated": "2020-02-12T20:10:10.558Z",
-             "metageneration": "1",
-             "defaultObjectAcl": [
-              {
-               "kind": "storage#objectAccessControl",
-               "entity": "allUsers",
-               "role": "READER",
-               "etag": "CAE="
-              }
-             ],
-             "iamConfiguration": {
-              "bucketPolicyOnly": {
-               "enabled": false
-              },
-              "uniformBucketLevelAccess": {
-               "enabled": false
-              }
-             },
-             "location": "us-east1",
-             "locationType": "region",
-             "versioning": {
-              "enabled": true
-             },
-             "storageClass": "STANDARD",
-             "etag": "CAE="
             }
     - api_call:
         expect_request:
@@ -201,93 +180,12 @@ actions:
               "version": 3,
               "etag": "ACAC"
             }
-    - api_call:
-        expect_request:
-          uri:
-            matches: https://storage\.googleapis\.com/storage/v1/b/privateca_content_[0-9a-f-]+/iam\?alt=json&optionsRequestedPolicyVersion=3
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "kind": "storage#policy",
-              "resourceId": "projects/_/buckets/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-              "version": 1,
-              "etag": "CAE=",
-              "bindings": [
-                {
-                  "role": "roles/storage.legacyBucketOwner",
-                  "members": [
-                    "projectEditor:foo",
-                    "projectOwner:foo"
-                  ]
-                },
-                {
-                  "role": "roles/storage.legacyBucketReader",
-                  "members": [
-                    "projectViewer:foo"
-                  ]
-                }
-              ]
-            }
-    - api_call:
-        expect_request:
-          uri:
-            matches: https://storage\.googleapis\.com/storage/v1/b/privateca_content_[0-9a-f-]+/iam\?alt=json
-          method: PUT
-          body:
-            text:
-              matches: .*projects/_/buckets/privateca_content_[0-9a-f-]+.*
-            json:
-              kind: storage#policy
-              version: 3
-              etag: CAE=
-              bindings:
-              - members:
-                - projectEditor:foo
-                - projectOwner:foo
-                role: roles/storage.legacyBucketOwner
-              - members:
-                - projectViewer:foo
-                - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
-                role: roles/storage.legacyBucketReader
-              - members:
-                - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
-                role: roles/storage.objectAdmin
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "kind": "storage#policy",
-              "resourceId": "projects/_/buckets/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-              "version": 1,
-              "etag": "CAE=",
-              "bindings": [
-                {
-                  "role": "roles/storage.legacyBucketOwner",
-                  "members": [
-                    "projectEditor:foo",
-                    "projectOwner:foo"
-                  ]
-                },
-                {
-                  "role": "roles/storage.legacyBucketReader",
-                  "members": [
-                    "projectViewer:foo",
-                    "serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com"
-                  ]
-                },
-                {
-                  "role": "roles/storage.objectAdmin",
-                  "members": [
-                    "serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com"
-                  ]
-                }
-              ]
-            }
+    - expect_stderr: |
+        WARNING: CA Service is currently in preview.
+
+        Please remember that all resources created during preview will be deleted
+        when CA service transitions to General Availability (GA). Relying on these
+        certificate authorities for production traffic is discouraged.
     - api_call:
         expect_request:
           uri:
@@ -323,6 +221,113 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
+    command: privateca roots create new-devops --tier devops --subject CN=peter,O=Google
+      --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1beta1/projects/foo/locations?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/foo/locations/europe-west1
+              locationId: europe-west1
+            - name: projects/foo/locations/us-east1
+              locationId: us-east1
+            - name: projects/foo/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/foo:testIamPermissions?alt=json
+          method: POST
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body:
+            permissions:
+            - privateca.certificateAuthorities.create
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
+          method: POST
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body:
+            permissions:
+            - cloudkms.cryptoKeys.setIamPolicy
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1beta1/projects/foo/services/privateca.googleapis.com:generateServiceIdentity?alt=json
+          method: POST
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "operations/finished.DONE_OPERATION",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity",
+                "email": "service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com",
+                "uniqueId": "111511143951582361276"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:getIamPolicy?alt=json&options.requestedPolicyVersion=3
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            version: 1
+            etag: ACAB
+            bindings:
+            - members:
+              - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
+              role: roles/cloudkms.signerVerifier
+            - members:
+              - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
+              role: roles/viewer
+    - expect_stderr: |
+        WARNING: CA Service is currently in preview.
+
+        Please remember that all resources created during preview will be deleted
+        when CA service transitions to General Availability (GA). Relying on these
+        certificate authorities for production traffic is discouraged.
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://privateca\.googleapis\.com/v1beta1/projects/foo/locations/us-east1/certificateAuthorities\?alt=json&certificateAuthorityId=new-devops&requestId=[^&]+
+          method: POST
+          headers: {}
+          body:
+            json:
+              tier: DEVOPS
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/foo/locations/us-east1/operations/operation-123
+            done: true
+            response:
+              name: projects/foo/locations/us-east1/certificateAuthorities/new-devops
+    - expect_stderr: |
+        Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/new-devops].
+    - expect_exit:
+        code: 0
+- execute_command:
     command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config
       root-ca --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-west1
       --bucket my-bucket
@@ -351,14 +356,12 @@ actions:
             json:
               permissions:
               - privateca.certificateAuthorities.create
-              - storage.buckets.create
         return_response:
           headers:
             status: '200'
           body:
             permissions:
             - privateca.certificateAuthorities.create
-            - storage.buckets.create
     - api_call:
         expect_request:
           uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
@@ -373,24 +376,6 @@ actions:
           body:
             permissions:
             - cloudkms.cryptoKeys.setIamPolicy
-    - api_call:
-        expect_request:
-          uri: https://serviceusage.googleapis.com/v1beta1/projects/foo/services/privateca.googleapis.com:generateServiceIdentity?alt=json
-          method: POST
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "operations/finished.DONE_OPERATION",
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity",
-                "email": "service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com",
-                "uniqueId": "111511143951582361276"
-              }
-            }
     - api_call:
         expect_request:
           uri: https://storage.googleapis.com/storage/v1/b/my-bucket?alt=json&projection=full
@@ -432,6 +417,24 @@ actions:
              },
              "storageClass": "STANDARD",
              "etag": "CAE="
+            }
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1beta1/projects/foo/services/privateca.googleapis.com:generateServiceIdentity?alt=json
+          method: POST
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "operations/finished.DONE_OPERATION",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity",
+                "email": "service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com",
+                "uniqueId": "111511143951582361276"
+              }
             }
     - api_call:
         expect_request:
@@ -569,6 +572,12 @@ actions:
                 }
               ]
             }
+    - expect_stderr: |
+        WARNING: CA Service is currently in preview.
+
+        Please remember that all resources created during preview will be deleted
+        when CA service transitions to General Availability (GA). Relying on these
+        certificate authorities for production traffic is discouraged.
     - api_call:
         expect_request:
           uri:
@@ -676,14 +685,12 @@ actions:
             json:
               permissions:
               - privateca.certificateAuthorities.create
-              - storage.buckets.create
         return_response:
           headers:
             status: '200'
           body:
             permissions:
             - privateca.certificateAuthorities.create
-            - storage.buckets.create
     - api_call:
         expect_request:
           uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
@@ -715,54 +722,6 @@ actions:
                 "email": "service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com",
                 "uniqueId": "111511143951582361276"
               }
-            }
-    - api_call:
-        expect_request:
-          uri: https://storage.googleapis.com/storage/v1/b?alt=json&predefinedDefaultObjectAcl=publicRead&project=foo
-          method: POST
-          body:
-            text:
-              matches: '.*"name": "privateca_content_[0-9a-f-]+".*'
-            json:
-              location: us-east1
-              versioning:
-                enabled: true
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-             "kind": "storage#bucket",
-             "id": "privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-             "selfLink": "https://www.googleapis.com/storage/v1/b/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-             "projectNumber": "166289904856",
-             "name": "privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-             "timeCreated": "2020-02-12T20:10:10.558Z",
-             "updated": "2020-02-12T20:10:10.558Z",
-             "metageneration": "1",
-             "defaultObjectAcl": [
-              {
-               "kind": "storage#objectAccessControl",
-               "entity": "allUsers",
-               "role": "READER",
-               "etag": "CAE="
-              }
-             ],
-             "iamConfiguration": {
-              "bucketPolicyOnly": {
-               "enabled": false
-              },
-              "uniformBucketLevelAccess": {
-               "enabled": false
-              }
-             },
-             "location": "us-east1",
-             "locationType": "region",
-             "versioning": {
-              "enabled": true
-             },
-             "storageClass": "STANDARD",
-             "etag": "CAE="
             }
     - api_call:
         expect_request:
@@ -816,93 +775,12 @@ actions:
               "version": 3,
               "etag": "ACAC"
             }
-    - api_call:
-        expect_request:
-          uri:
-            matches: https://storage\.googleapis\.com/storage/v1/b/privateca_content_[0-9a-f-]+/iam\?alt=json&optionsRequestedPolicyVersion=3
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "kind": "storage#policy",
-              "resourceId": "projects/_/buckets/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-              "version": 1,
-              "etag": "CAE=",
-              "bindings": [
-                {
-                  "role": "roles/storage.legacyBucketOwner",
-                  "members": [
-                    "projectEditor:foo",
-                    "projectOwner:foo"
-                  ]
-                },
-                {
-                  "role": "roles/storage.legacyBucketReader",
-                  "members": [
-                    "projectViewer:foo"
-                  ]
-                }
-              ]
-            }
-    - api_call:
-        expect_request:
-          uri:
-            matches: https://storage\.googleapis\.com/storage/v1/b/privateca_content_[0-9a-f-]+/iam\?alt=json
-          method: PUT
-          body:
-            text:
-              matches: .*projects/_/buckets/privateca_content_[0-9a-f-]+.*
-            json:
-              kind: storage#policy
-              version: 3
-              etag: CAE=
-              bindings:
-              - members:
-                - projectEditor:foo
-                - projectOwner:foo
-                role: roles/storage.legacyBucketOwner
-              - members:
-                - projectViewer:foo
-                - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
-                role: roles/storage.legacyBucketReader
-              - members:
-                - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
-                role: roles/storage.objectAdmin
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "kind": "storage#policy",
-              "resourceId": "projects/_/buckets/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
-              "version": 1,
-              "etag": "CAE=",
-              "bindings": [
-                {
-                  "role": "roles/storage.legacyBucketOwner",
-                  "members": [
-                    "projectEditor:foo",
-                    "projectOwner:foo"
-                  ]
-                },
-                {
-                  "role": "roles/storage.legacyBucketReader",
-                  "members": [
-                    "projectViewer:foo",
-                    "serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com"
-                  ]
-                },
-                {
-                  "role": "roles/storage.objectAdmin",
-                  "members": [
-                    "serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com"
-                  ]
-                }
-              ]
-            }
+    - expect_stderr: |
+        WARNING: CA Service is currently in preview.
+
+        Please remember that all resources created during preview will be deleted
+        when CA service transitions to General Availability (GA). Relying on these
+        certificate authorities for production traffic is discouraged.
     - api_call:
         expect_request:
           uri:
@@ -990,18 +868,14 @@ actions:
             json:
               permissions:
               - privateca.certificateAuthorities.create
-              - storage.buckets.create
         return_response:
           headers:
             status: '200'
           body:
-            permissions:
-            - privateca.certificateAuthorities.create
+            permissions: []
     - expect_exit:
         code: 1
         message: >-
           The current user does not have permissions for this operation. Please ensure
-          you have
-          storage.buckets.create permissions on the project and that you are logged-in
-          as the
-          correct user and try again.
+          you have privateca.certificateAuthorities.create permissions on the project
+          and that you are logged-in as the correct user and try again.

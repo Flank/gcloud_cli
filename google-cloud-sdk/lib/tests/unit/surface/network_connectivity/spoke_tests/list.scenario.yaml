@@ -1,0 +1,67 @@
+title: network-connectivity spokes list tests
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: network-connectivity spokes list --region=us-central1
+  - stdout: |
+      [
+        {
+          "createTime": "2020-06-19T18:09:56.472373975Z",
+          "hub": "http://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub",
+          "linkedVpnTunnels": {
+            "value": [
+              "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
+            ]
+          },
+          "name": "projects/fake-project/locations/us-central1/spokes/testspoke",
+          "updateTime": "2020-06-19T18:09:56.656295248Z"
+        }
+      ]
+
+actions:
+- execute_command:
+    command: network-connectivity spokes list --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/spokes?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+           {
+             "spokes": [
+               {
+                 "name": "projects/fake-project/locations/us-central1/spokes/testspoke",
+                 "createTime": "2020-06-19T18:09:56.472373975Z",
+                 "updateTime": "2020-06-19T18:09:56.656295248Z",
+                 "hub": "http://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub",
+                 "linkedVpnTunnels": {
+                   "value": [
+                     "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
+                   ]
+                 }
+               }
+             ]
+           }
+    - expect_stdout: |
+        [
+          {
+            "createTime": "2020-06-19T18:09:56.472373975Z",
+            "hub": "http://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub",
+            "linkedVpnTunnels": {
+              "value": [
+                "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
+              ]
+            },
+            "name": "projects/fake-project/locations/us-central1/spokes/testspoke",
+            "updateTime": "2020-06-19T18:09:56.656295248Z"
+          }
+        ]
+    - expect_exit:
+        code: 0

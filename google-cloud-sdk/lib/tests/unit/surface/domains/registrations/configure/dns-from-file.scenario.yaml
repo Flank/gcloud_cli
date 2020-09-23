@@ -161,7 +161,7 @@ actions:
                   nameServers:
                   - new.ns1.com
                   - new.ns2.com
-              updateMask: dns_provider,glue_records
+              updateMask: glue_records,custom_dns
               validateOnly: false
         return_response:
           headers:
@@ -258,7 +258,7 @@ actions:
               dnsSettings:
                 googleDomainsDns:
                   dsState: DS_RECORDS_PUBLISHED
-              updateMask: dns_provider,glue_records
+              updateMask: glue_records,google_domains_dns
               validateOnly: true
         return_response:
           headers:
@@ -313,7 +313,7 @@ actions:
               dnsSettings:
                 googleDomainsDns:
                   dsState: DS_RECORDS_PUBLISHED
-              updateMask: dns_provider,glue_records
+              updateMask: glue_records,google_domains_dns
               validateOnly: false
         return_response:
           headers:
@@ -398,7 +398,7 @@ actions:
                   nameServers:
                   - new.ns1.com
                   - new.ns2.com
-              updateMask: dns_provider,glue_records
+              updateMask: glue_records,custom_dns
               validateOnly: false
         return_response:
           headers:

@@ -81,12 +81,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
                   "state": "DISABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
-                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                        "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                      }
                     }
-                  }
+                  ]
                 },
                 {
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/pending-activation1",
@@ -101,12 +103,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 },
                 {
                   "name": "projects/foo/locations/us-west1/certificateAuthorities/ca1",
@@ -114,12 +118,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
                   "state": "DISABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
-                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                        "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                      }
                     }
-                  }
+                  ]
                 },
                 {
                   "name": "projects/foo/locations/us-west1/certificateAuthorities/ca2",
@@ -127,12 +133,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 }
               ],
               "next_page_token": "",
@@ -188,12 +196,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
                   "state": "DISABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
-                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                        "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                      }
                     }
-                  }
+                  ]
                 },
                 {
                   "name": "projects/foo/locations/us-west1/certificateAuthorities/ca2",
@@ -201,12 +211,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 }
               ],
               "next_page_token": "",
@@ -238,12 +250,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
                   "state": "DISABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
-                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                        "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                      }
                     }
-                  }
+                  ]
                 },
                 {
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca2",
@@ -251,12 +265,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 }
               ],
               "next_page_token": "",
@@ -287,12 +303,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
                   "state": "DISABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
-                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                        "notAfterTime": "2020-10-17T15:14:00.105-07:00"
+                      }
                     }
-                  }
+                  ]
                 },
                 {
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca2",
@@ -300,12 +318,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 }
               ],
               "next_page_token": "",
@@ -340,12 +360,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 }
               ],
               "next_page_token": "",
@@ -377,12 +399,14 @@ actions:
                   "config": {},
                   "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
                   "state": "ENABLED",
-                  "ca_certificate_description": {
-                    "subjectDescription": {
-                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
-                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                  "ca_certificate_descriptions": [
+                    {
+                      "subjectDescription": {
+                        "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                        "notAfterTime": "2021-01-01T10:10:00.100-07:00"
+                      }
                     }
-                  }
+                  ]
                 }
               ],
               "next_page_token": "",

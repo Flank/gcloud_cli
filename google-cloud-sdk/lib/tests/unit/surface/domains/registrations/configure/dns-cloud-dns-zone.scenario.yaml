@@ -121,7 +121,7 @@ actions:
                   nameServers:
                   - ns-cloud-a1.googledomains.com
                   - ns-cloud-a2.googledomains.com
-              updateMask: dns_provider
+              updateMask: custom_dns
               validateOnly: false
         return_response:
           headers:
@@ -327,7 +327,7 @@ actions:
                     algorithm: RSASHA256
                     digestType: SHA256
                     digest: 2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d
-              updateMask: dns_provider
+              updateMask: custom_dns
               validateOnly: true
         return_response:
           headers:
@@ -524,7 +524,7 @@ actions:
                   nameServers:
                   - ns-cloud-a1.googledomains.com
                   - ns-cloud-a2.googledomains.com
-              updateMask: dns_provider
+              updateMask: custom_dns
               validateOnly: false
         return_response:
           headers:

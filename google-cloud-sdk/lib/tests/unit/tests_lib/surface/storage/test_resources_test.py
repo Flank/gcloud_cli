@@ -20,8 +20,6 @@ from __future__ import unicode_literals
 
 import os
 
-from googlecloudsdk.api_lib.storage import cloud_api
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
 from tests.lib import sdk_test_base
@@ -34,9 +32,6 @@ import mock
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class GetResourceFromUrlStringTest(sdk_test_base.SdkBase):
   """Tests for the from_url_string function."""
-
-  def SetUp(self):
-    self.messages = apis.GetMessagesModule('storage', 'v1')
 
   def test_gets_file_directory_resource(self):
     url_string = 'hi' + os.path.sep
@@ -51,19 +46,15 @@ class GetResourceFromUrlStringTest(sdk_test_base.SdkBase):
     self.assertEqual(test_resources.from_url_string(url_string), resource)
 
   def test_gets_bucket_resource(self):
-    name = 'bucket'
     url_string = 'gs://bucket'
     cloud_url = storage_url.storage_url_from_string(url_string)
-    metadata = self.messages.Bucket(name=name)
-    resource = resource_reference.BucketResource(cloud_url, name,
-                                                 metadata=metadata)
+    resource = resource_reference.BucketResource(cloud_url)
     self.assertEqual(test_resources.from_url_string(url_string), resource)
 
   def test_gets_object_resource(self):
     url_string = 'gs://bucket/object'
-    apitools_object = self.messages.Object(bucket='bucket', name='object')
-    resource = resource_reference.ObjectResource.from_gcs_metadata_object(
-        cloud_api.ProviderPrefix.GCS.value, apitools_object)
+    parsed_url = storage_url.storage_url_from_string(url_string)
+    resource = resource_reference.ObjectResource(parsed_url)
     self.assertEqual(test_resources.from_url_string(url_string), resource)
 
   def test_gets_prefix_resource(self):

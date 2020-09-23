@@ -112,7 +112,8 @@ class ConfigsTest(test_case.TestCase):
       configs.Add(self.cron)
 
 
-class TestGetDeployables(sdk_test_base.WithTempCWD):
+class TestGetDeployables(sdk_test_base.WithTempCWD,
+                         test_case.WithOutputCapture):
   """Test detection and precedence of deployable detection."""
 
   def SetUp(self):
@@ -271,6 +272,31 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.assertEqual(s.service_id, 'my-service')
     self.assertEqual(s.upload_dir, 'stage-dir')
     self.assertEqual(configs, [])
+
+  def testAppengineWebXmlWithVersion(self):
+    """WEB_INF/appengine-web.xml passed as deployable."""
+    self.service_yaml_mock.return_value = self.appinfo1  # synthesized app.yaml
+    self.config_yaml_mock.return_value = None
+    self.StartObjectPatch(staging.Stager, 'Stage', return_value='stage-dir')
+    self.Touch(
+        os.path.join(self.cwd_path, 'WEB-INF'),
+        makedirs=True,
+        name='appengine-web.xml',
+        contents='<version>test</version>')
+    services, configs = deployables.GetDeployables(
+        [os.path.join('WEB-INF', 'appengine-web.xml')], self.stager,
+        deployables.GetPathMatchers())
+    self.assertEqual(len(services), 1)
+    s = services[0]
+    self.assertEqual(
+        s.descriptor, os.path.join(self.cwd_path, 'WEB-INF',
+                                   'appengine-web.xml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, 'stage-dir')
+    self.assertEqual(configs, [])
+
+    self.AssertErrContains('WARNING: <application> and <version> elements in ' +
+                           '`appengine-web.xml` are not respected')
 
   def testDirWithAppYamlAndAppengineWebXml(self):
     """Directory with both app.yaml and WEB-INF/appengine-web.xml.

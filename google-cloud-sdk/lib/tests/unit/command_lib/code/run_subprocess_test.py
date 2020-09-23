@@ -22,7 +22,6 @@ import subprocess
 
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.command_lib.code import cross_platform_temp_file
-from googlecloudsdk.command_lib.code import json_stream
 from googlecloudsdk.command_lib.code import run_subprocess
 from googlecloudsdk.core import config
 from googlecloudsdk.core.updater import update_manager
@@ -156,17 +155,27 @@ class StreamOutputJsonTest(test_case.TestCase):
     with cross_platform_temp_file.NamedTempFile(text) as multi_line_file:
       cmd = ['cat', multi_line_file.name]
       self.assertSequenceEqual(
-          tuple(run_subprocess.StreamOutputJson(cmd, timeout_sec=10)), objs)
+          tuple(run_subprocess.StreamOutputJson(cmd, event_timeout_sec=10)),
+          objs)
 
   def testTimeout(self):
     with self.assertRaises(utils.TimeoutError):
       tuple(
           run_subprocess.StreamOutputJson(
-              cmd=['bash', '-c', 'sleep 2; echo {}'], timeout_sec=0.1))
+              cmd=['bash', '-c', 'sleep 2; echo {}'], event_timeout_sec=0.1))
+
+  def testNoTimeoutIfProgressEventsComeFastEnough(self):
+    tuple(
+        run_subprocess.StreamOutputJson(
+            cmd=[
+                'bash', '-c',
+                'sleep .1; echo {}; sleep .1; echo {}; sleep .1; echo {}'
+            ],
+            event_timeout_sec=0.2))
+    # (Assert no exception.)
 
   def testExitNonZero(self):
-    with mock.patch.object(subprocess, 'Popen') as mock_open, \
-         mock.patch.object(json_stream, 'ReadJsonStream', return_value=[]), \
-         self.assertRaises(subprocess.CalledProcessError):
-      mock_open.return_value.returncode = 1
-      tuple(run_subprocess.StreamOutputJson(['/mock/cmd'], timeout_sec=1))
+    with self.assertRaises(subprocess.CalledProcessError):
+      tuple(
+          run_subprocess.StreamOutputJson(['bash', '-c', 'exit 1'],
+                                          event_timeout_sec=1))

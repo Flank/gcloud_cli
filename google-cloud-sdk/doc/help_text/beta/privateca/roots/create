@@ -11,7 +11,8 @@ SYNOPSIS
         [--email-san=[EMAIL_SAN,...]] [--ip-san=[IP_SAN,...]]
         [--issuance-policy=ISSUANCE_POLICY] [--labels=[KEY=VALUE,...]]
         [--no-publish-ca-cert] [--no-publish-crl] [--subject=[SUBJECT,...]]
-        [--uri-san=[URI_SAN,...]] [--validity=VALIDITY; default="P10Y"]
+        [--tier=TIER; default="enterprise"] [--uri-san=[URI_SAN,...]]
+        [--validity=VALIDITY; default="P10Y"]
         [--from-ca=FROM_CA : --from-ca-location=FROM_CA_LOCATION
           --from-ca-project=FROM_CA_PROJECT]
         [[--reusable-config=REUSABLE_CONFIG
@@ -59,8 +60,8 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --bucket=BUCKET
         The name of an existing storage bucket to use for storing the CA
-        certificate and CRLs. If omitted, a new bucket with an auto-generated
-        name will be created in the same project and location as the CA.
+        certificate and CRLs. If omitted, a new bucket will be created and
+        managed by the service on your behalf.
 
      --dns-san=[DNS_SAN,...]
         One or more comma-separated DNS Subject Alternative Names.
@@ -107,6 +108,10 @@ OPTIONAL FLAGS
      --subject=[SUBJECT,...]
         X.501 name of the certificate subject. Example:--subject
         "C=US,ST=California,L=Mountain View,O=Google LLC,CN=google.com"
+
+     --tier=TIER; default="enterprise"
+        The tier for the Certificate Authority. TIER must be one of: devops,
+        enterprise.
 
      --uri-san=[URI_SAN,...]
         One or more comma-separated URI Subject Alternative Names.

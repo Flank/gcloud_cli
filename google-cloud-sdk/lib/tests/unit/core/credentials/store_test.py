@@ -325,7 +325,7 @@ gs_oauth2_refresh_token = fake-token
         '_private_key_pkcs8_pem':
             '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
         'token_uri':
-            'https://www.googleapis.com/oauth2/v4/token'
+            'https://oauth2.googleapis.com/token'
     }
     expected_expired = True
     self.AssertCredentials(creds_stored, c_creds.CredentialType.SERVICE_ACCOUNT,
@@ -358,7 +358,7 @@ gs_oauth2_refresh_token = fake-token
         'service_account_email': 'p12owner@developer.gserviceaccount.com',
         '_private_key_pkcs12': b'BASE64ENCODED',
         '_private_key_password': 'key-password',
-        'token_uri': 'https://www.googleapis.com/oauth2/v4/token'
+        'token_uri': 'https://oauth2.googleapis.com/token'
     }
     expected_expired = True
     self.AssertCredentials(creds_stored,
@@ -412,7 +412,7 @@ gs_oauth2_refresh_token = fake-token
         'client_id': 'client_id',
         'client_secret': 'client_secret',
         'refresh_token': 'fake-token',
-        'token_uri': 'https://oauth2.googleapis.com/token',
+        'token_uri': 'token_uri',
     }
     expected_expired = False
     self.AssertCredentials(creds_loaded,
@@ -524,7 +524,7 @@ gs_oauth2_refresh_token = fake-token
         '_private_key_pkcs8_pem':
             '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
         'token_uri':
-            'https://www.googleapis.com/oauth2/v4/token'
+            'https://oauth2.googleapis.com/token'
     }
     expected_expired = True
     self.AssertCredentials(creds_stored, c_creds.CredentialType.SERVICE_ACCOUNT,
@@ -574,7 +574,7 @@ gs_oauth2_refresh_token = fake-token
         'service_account_email': 'p12owner@developer.gserviceaccount.com',
         '_private_key_pkcs12': b'BASE64ENCODED',
         '_private_key_password': 'key-password',
-        'token_uri': 'https://www.googleapis.com/oauth2/v4/token'
+        'token_uri': 'https://oauth2.googleapis.com/token'
     }
     expected_expired = True
     self.AssertCredentials(creds_stored,
@@ -1306,6 +1306,17 @@ gs_oauth2_refresh_token = fake-token
                                 'Please run:'):
       with store.HandleGoogleAuthCredentialsRefreshError():
         raise reauth_errors.ReauthSamlLoginRequiredError()
+
+  def testUserCredsTokenHostOverride(self):
+    user_creds = self.MakeUserAccountCredentialsGoogleAuth()
+    store.Store(user_creds, self.fake_account)
+    properties.VALUES.auth.token_host.Set('fake-token-host')
+    loaded_oauth2client_creds = store.Load(
+        self.fake_account, use_google_auth=False)
+    self.assertEqual(loaded_oauth2client_creds.token_uri, 'fake-token-host')
+    loaded_google_auth_creds = store.Load(
+        self.fake_account, use_google_auth=True)
+    self.assertEqual(loaded_google_auth_creds._token_uri, 'fake-token-host')
 
 
 @test_case.Filters.RunOnlyOnLinux

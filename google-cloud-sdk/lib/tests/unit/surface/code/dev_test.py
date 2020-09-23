@@ -22,6 +22,7 @@ from googlecloudsdk.command_lib.code import kubernetes
 from googlecloudsdk.command_lib.code import run_subprocess
 from googlecloudsdk.command_lib.code import skaffold
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import platforms
 from surface import code
@@ -51,6 +52,8 @@ class DevTest(test_case.TestCase):
     self.find_executable_on_path = self.StartObjectPatch(
         file_utils, 'FindExecutableOnPath', return_value=True)
     self.mock_run = self.StartObjectPatch(run_subprocess, 'Run')
+    self.ensure_installed = self.StartObjectPatch(update_manager.UpdateManager,
+                                                  'EnsureInstalledAndRestart')
 
   def testSelectMinikube(self):
     args = self.parser.parse_args(['--minikube-profile=fake-profile'] +
@@ -61,6 +64,7 @@ class DevTest(test_case.TestCase):
       cmd.Run(args)
 
     mock_minikube.assert_called()
+    self.assertIn('minikube', self.ensure_installed.call_args[0][0])
 
   def testSelectMinikubeDefaultOnWindows(self):
     args = self.parser.parse_args(self.COMMON_ARGS)
@@ -95,6 +99,7 @@ class DevTest(test_case.TestCase):
       cmd.Run(args)
 
     mock_kind.assert_called()
+    self.assertIn('kind', self.ensure_installed.call_args[0][0])
 
   def testSelectMinikubeDefaultOnLinux(self):
     args = self.parser.parse_args(self.COMMON_ARGS)

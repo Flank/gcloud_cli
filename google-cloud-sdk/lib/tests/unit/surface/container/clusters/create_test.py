@@ -3861,6 +3861,23 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  def testEnableGcfs(self):
+    cluster_kwargs = {
+        'gcfsConfig': self.messages.GcfsConfig(enabled=True),
+    }
+    cluster_kwargs['nodePools'] = [
+        self._MakeDefaultNodePool(
+            nodePoolName='default-pool', **cluster_kwargs)
+    ]
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --enable-gcfs'.format(name=self.CLUSTER_NAME))
+
   def testApiserverLogs(self):
     config = self.msgs.MasterSignalsConfig(logEnabledComponents=[
         self.msgs.MasterSignalsConfig

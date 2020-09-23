@@ -1,0 +1,24 @@
+NAME
+    gcloud identity groups memberships - manage Cloud Identity Groups
+        Memberships
+
+SYNOPSIS
+    gcloud identity groups memberships [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Commands for managing Cloud Identity Groups Memberships.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha identity groups memberships
+        $ gcloud beta identity groups memberships
+

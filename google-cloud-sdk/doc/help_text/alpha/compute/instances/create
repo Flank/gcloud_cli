@@ -13,9 +13,9 @@ SYNOPSIS
         [--deletion-protection] [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],[boot=BOOT],
           [device-name=DEVICE-NAME],[mode=MODE],[name=NAME],[scope=SCOPE]]
-        [--enable-display-device] [--erase-windows-vss-signature]
-        [--hostname=HOSTNAME] [--labels=[KEY=VALUE,...]]
-        [--local-nvdimm=[size=SIZE]]
+        [--enable-display-device] [--[no-]enable-nested-virtualization]
+        [--erase-windows-vss-signature] [--hostname=HOSTNAME]
+        [--labels=[KEY=VALUE,...]] [--local-nvdimm=[size=SIZE]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -298,6 +298,11 @@ FLAGS
             with zonal SSD persistent disks. Disks in multi-writer mode do not
             support resize and snapshot operations. The default value is no.
 
+         replica-zones
+            If specified, the created disk is regional. The disk will be
+            replicated to the specified replica zone and the zone of the newly
+            created instance.
+
      --csek-key-file=FILE
         Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
         Google Compute Engine resources to user managed keys to be used when
@@ -354,6 +359,11 @@ FLAGS
 
      --enable-display-device
         Enable a display device on VM instances. Disabled by default.
+
+     --[no-]enable-nested-virtualization
+        If set to true, enables nested virtualization for the instance. Use
+        --enable-nested-virtualization to enable and
+        --no-enable-nested-virtualization to disable.
 
      --erase-windows-vss-signature
         Specifies whether the disk restored from source snapshots or source

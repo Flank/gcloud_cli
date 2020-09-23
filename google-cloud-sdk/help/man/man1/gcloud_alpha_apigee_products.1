@@ -19,7 +19,8 @@ gcloud alpha apigee products \- manage Apigee API products
 
 \fB(ALPHA)\fR Manage Apigee API products.
 
-An API product is a collection of API resources combined with quota settings and
+\f5gcloud alpha apigee products\fR manipulates API products. These are
+collections of deployed API resources, combined with quota settings and
 metadata, used to deliver customized and productized API bundles to the
 developer community.
 
@@ -64,6 +65,66 @@ Run \fB$ gcloud help\fR for details.
 
 .RE
 .sp
+
+.SH "EXAMPLES"
+
+To list all API products in the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee products list
+.RE
+
+To create an API product named \f5\fImy\-apis\fR\fR by answering interactive
+prompts about its included proxies and access policies, run:
+
+.RS 2m
+$ gcloud alpha apigee products create my\-apis
+.RE
+
+To create an API product named \f5\fIprod\-apis\fR\fR that makes every API proxy
+deployed to the \f5\fIprod\fR\fR environment publicly available, run:
+
+.RS 2m
+$ gcloud alpha apigee products create prod\-apis \e
+  \-\-environments=prod \-\-all\-proxies \-\-public\-access
+.RE
+
+To get a JSON object describing an existing API product, run:
+
+.RS 2m
+$ gcloud alpha apigee products describe PRODUCT_NAME \e
+  \-\-organization=ORG_NAME \-\-format=json
+.RE
+
+To add another API proxy to an existing API product, run:
+
+.RS 2m
+$ gcloud alpha apigee products update PRODUCT_NAME \-\-add\-api=API_NAME
+.RE
+
+To edit the publicly visible name and description of an API product, run:
+
+.RS 2m
+$ gcloud alpha apigee products update PRODUCT_NAME \e
+  \-\-display\-name="New Name" \e
+  \-\-description="A new description of this product."
+.RE
+
+To make an existing product publicly visible and automatically allow developers
+access to it, run:
+
+.RS 2m
+$ gcloud alpha apigee products update PRODUCT_NAME \-\-public\-access \e
+  \-\-automatic\-approval
+.RE
+
+To delete an existing API product, run:
+
+.RS 2m
+$ gcloud alpha apigee products delete PRODUCT_NAME
+.RE
+
+
 
 .SH "NOTES"
 

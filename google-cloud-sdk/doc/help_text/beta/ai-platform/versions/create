@@ -12,9 +12,9 @@ SYNOPSIS
         [--python-version=PYTHON_VERSION] [--region=REGION]
         [--runtime-version=RUNTIME_VERSION] [--service-account=SERVICE_ACCOUNT]
         [--staging-bucket=STAGING_BUCKET]
-        [--args=[ARG,...] --command=[COMMAND,...] --env-vars=[KEY=VALUE,...]
-          --image=IMAGE --ports=[ARG,...]
-          --health-route=HEALTH_ROUTE --predict-route=PREDICT_ROUTE]
+        [--args=[ARG,...] --command=[COMMAND,...]
+          --env-vars=[KEY=VALUE,...] --image=IMAGE --ports=[ARG,...]]
+        [--health-route=HEALTH_ROUTE --predict-route=PREDICT_ROUTE]
         [--package-uris=[PACKAGE_URI,...] --prediction-class=PREDICTION_CLASS]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -192,13 +192,13 @@ OPTIONAL FLAGS
           Container ports to receive requests at. Must be a number between 1
           and 65535, inclusive.
 
-       Flags to control the paths that requests and health checks are sent to.
+     Flags to control the paths that requests and health checks are sent to.
 
-         --health-route=HEALTH_ROUTE
-            HTTP path to send health checks to inside the container.
+       --health-route=HEALTH_ROUTE
+          HTTP path to send health checks to inside the container.
 
-         --predict-route=PREDICT_ROUTE
-            HTTP path to send prediction requests to inside the container.
+       --predict-route=PREDICT_ROUTE
+          HTTP path to send prediction requests to inside the container.
 
      Configure user code in prediction. AI Platform allows a model to have
      user-provided prediction code; these options configure that code.

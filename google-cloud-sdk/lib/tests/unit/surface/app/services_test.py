@@ -21,7 +21,11 @@ from __future__ import unicode_literals
 
 import re
 
+from apitools.base.py.testing import mock as apitools_mock
+
 from googlecloudsdk.api_lib.app import service_util
+from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
@@ -544,6 +548,76 @@ class BrowseTest(api_test_util.ApiTestBase):
                 self.Project())),
     ], any_order=True)
     self.assertEqual(self.open_mock.call_count, 2)
+
+
+class UpdateTest(api_test_util.ApiTestBase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.messages = core_apis.GetMessagesModule('appengine', 'v1beta')
+    self.mock_client = apitools_mock.Client(
+        core_apis.GetClientClass('appengine', 'v1beta'),
+        real_client=core_apis.GetClientInstance(
+            'appengine', 'v1beta', no_http=True))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+    self.services = {'service1': {}, 'service2': {}, 'service3': {}}
+
+  def testOneServiceOneVersion(self):
+    """Test `update` command with one service/version."""
+    self.ExpectListServicesRequest(self.Project(), self.services)
+    self.ExpectSetIngressTrafficAllowed(
+        self.Project(), 'service1',
+        self.messages.NetworkSettings.IngressTrafficAllowedValueValuesEnum
+        .INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY)
+    self.Run('app services update service1 --ingress internal-only')
+
+  def testMultiServicesOneVersion(self):
+    """Test `update` command with multiple services."""
+    self.ExpectListServicesRequest(self.Project(), self.services)
+    for service in ['service1', 'service2']:
+      self.ExpectSetIngressTrafficAllowed(
+          self.Project(), service,
+          self.messages.NetworkSettings.IngressTrafficAllowedValueValuesEnum
+          .INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY)
+    self.Run('app services update service1 service2 --ingress internal-only')
+
+  def testMultiServicesNoServicesSpecified(self):
+    """Test `update` command with multiple services."""
+    self.ExpectListServicesRequest(self.Project(), self.services)
+    for service in ['service1', 'service2', 'service3']:
+      self.ExpectSetIngressTrafficAllowed(
+          self.Project(), service,
+          self.messages.NetworkSettings.IngressTrafficAllowedValueValuesEnum
+          .INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY)
+    self.Run('app services update --ingress internal-only')
+
+  def testServiceDoesNotExistError(self):
+    """Test `update` command fails if service not found."""
+    self.ExpectListServicesRequest(self.Project(), self.services)
+    with self.assertRaises(exceptions.Error):
+      self.Run('app services update service1 badservice --ingress '
+               'internal-only')
+    self.AssertErrContains('The following service was not found: [badservice]')
+
+  def testApiError(self):
+    """Test `update` command raises error when one service fails."""
+    self.ExpectListServicesRequest(self.Project(), self.services)
+    error = http_error.MakeDetailedHttpError(code=501, message='Error')
+    self.ExpectSetIngressTrafficAllowed(
+        self.Project(),
+        'service1',
+        self.messages.NetworkSettings.IngressTrafficAllowedValueValuesEnum
+        .INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY,
+        exception=error)
+    self.ExpectSetIngressTrafficAllowed(
+        self.Project(), 'service2',
+        self.messages.NetworkSettings.IngressTrafficAllowedValueValuesEnum
+        .INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY)
+    with self.assertRaises(exceptions.Error):
+      self.Run('app services update service1 service2 --ingress internal-only')
+    self.AssertErrContains('Error updating service(s): \n- service1')
 
 
 if __name__ == '__main__':

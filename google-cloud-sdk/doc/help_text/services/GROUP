@@ -22,6 +22,9 @@ GROUPS
      operations
         Manage Operation for various services.
 
+     peered-dns-domains
+        Peered DNS domains for various private service connections.
+
      vpc-peerings
         VPC Peerings to various services.
 

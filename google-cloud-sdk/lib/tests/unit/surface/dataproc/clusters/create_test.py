@@ -232,6 +232,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     network = 'foo-network'
     network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
                    'foo-project/global/networks/foo-network')
+    private_ipv6_google_access = 'bidirectional'
     action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
     initialization_actions = [
         self.messages.NodeInitializationAction(
@@ -282,6 +283,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         serviceAccount=service_account,
         serviceAccountScopes=scope_uris,
         internalIpOnly=True,
+        privateIpv6GoogleAccess=private_ipv6_google_access,
         properties=encoding.DictToAdditionalPropertyMessage(
             cluster_properties, self.messages.SoftwareConfig.PropertiesValue),
         tags=['tag1', 'tag2'],
@@ -330,6 +332,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         '--service-account {service_account} '
         '--scopes {scopes} '
         '--no-address '
+        '--private-ipv6-google-access-type {private_ipv6_google_access} '
         '--master-min-cpu-platform="{master_min_cpu_platform}" '
         '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
         '--properties core:com.foo=foo,hdfs:com.bar=bar '
@@ -367,6 +370,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
             image_version=image_version,
             actions=','.join(action_uris),
             num_secondary=num_secondary_workers,
+            private_ipv6_google_access=private_ipv6_google_access,
             secondary_worker_type=secondary_worker_type,
             service_account=service_account,
             scopes=scope_list)
@@ -1307,6 +1311,33 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
                             cluster='test-cluster',
                             zone='test-zone',
                             reservation_affinity='specific'))
+
+  def testCreateClusterWithNodeGroup(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    node_group = 'foo-node-group'
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name, projectId=project, zoneUri=zone)
+    self.AddNodeGroupAffinity(expected_request_cluster, node_group)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--node-group {node_group}').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   node_group=node_group)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateCluster_autoscalingPolicyIdOnly(self):
     specified_policy = 'cool-policy'

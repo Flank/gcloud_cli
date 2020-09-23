@@ -11,7 +11,7 @@ gcloud beta ml\-engine versions create \- create a new AI Platform version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-args\fR=[\fIARG\fR,...]\ \fB\-\-command\fR=[\fICOMMAND\fR,...]\ \fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-image\fR=\fIIMAGE\fR\ \fB\-\-ports\fR=[\fIARG\fR,...]\ \fB\-\-health\-route\fR=\fIHEALTH_ROUTE\fR\ \fB\-\-predict\-route\fR=\fIPREDICT_ROUTE\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-args\fR=[\fIARG\fR,...]\ \fB\-\-command\fR=[\fICOMMAND\fR,...]\ \fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-image\fR=\fIIMAGE\fR\ \fB\-\-ports\fR=[\fIARG\fR,...]] [\fB\-\-health\-route\fR=\fIHEALTH_ROUTE\fR\ \fB\-\-predict\-route\fR=\fIPREDICT_ROUTE\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -243,6 +243,8 @@ Name of the container image to deploy (e.g. gcr.io/myproject/server:latest).
 Container ports to receive requests at. Must be a number between 1 and 65535,
 inclusive.
 
+.RE
+.sp
 .TP 2m
 
 Flags to control the paths that requests and health checks are sent to.
@@ -256,7 +258,6 @@ HTTP path to send health checks to inside the container.
 \fB\-\-predict\-route\fR=\fIPREDICT_ROUTE\fR
 HTTP path to send prediction requests to inside the container.
 
-.RE
 .RE
 .sp
 .TP 2m

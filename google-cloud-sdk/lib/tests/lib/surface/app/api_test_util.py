@@ -415,6 +415,38 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.mock_client.apps_services.Patch.Expect(
         patch_call, response=final_response, exception=exception)
 
+  def ExpectSetIngressTrafficAllowed(self,
+                                     project,
+                                     service,
+                                     ingress_traffic_allowed,
+                                     exception=None):
+    """Expects a set traffic call.
+
+    Args:
+      project: str, the project ID.
+      service: str, the name of the service being updated.
+      ingress_traffic_allowed: IngressTrafficAllowedValuesValueEnum
+      exception: None|apitools.base.py.exceptions.HttpError, the expected error,
+        if any.
+    """
+    network_settings = self.messages.NetworkSettings(
+        ingressTrafficAllowed=ingress_traffic_allowed)
+    patch_call = self.messages.AppengineAppsServicesPatchRequest(
+        name='apps/{0}/services/{1}'.format(project, service),
+        updateMask='networkSettings',
+        service=self.messages.Service(networkSettings=network_settings))
+    final_response = None
+    if not exception:
+      # TODO(b/30739284): Use resource parsing.
+      op_name = 'apps/{0}/operations/{1}'.format(project, service)
+      final_response = self.messages.Operation(
+          name=op_name,
+          done=True,
+          response=encoding.JsonToMessage(self.messages.Operation.ResponseValue,
+                                          encoding.MessageToJson(patch_call)))
+    self.mock_client.apps_services.Patch.Expect(
+        patch_call, response=final_response, exception=exception)
+
   def ExpectSetDefault(self, project, service, version, num_tries=1,
                        success=True):
     """Adds expected set-default call and response to mock client.
@@ -561,25 +593,33 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.mock_client.apps_services.List.Expect(request,
                                                response=response)
 
+  def _GetVersion(self, project, service, version_id, version_info=None):
+    """Creates a dummy Version resource."""
+    if version_info is None:
+      version_info = {}
+    default_serving_status = (
+        self.messages.Version.ServingStatusValueValuesEnum.SERVING)
+    return self.messages.Version(
+        id=version_id,
+        name='apps/{0}/services/{1}/versions/{2}'.format(
+            project, service, version_id),
+        servingStatus=version_info.get('serving_status',
+                                       default_serving_status),
+        env=version_info.get('env', None),
+        vm=version_info.get('vm', None),
+        manualScaling=version_info.get('manual_scaling', None),
+        basicScaling=version_info.get('basic_scaling', None),
+        createTime=version_info.get('creation_time', None),
+        versionUrl='https://{0}-dot-{1}-dot-{2}.appspot.com'.format(
+            version_id, service, project))
+
   def GetListVersionsResponse(self, project, service, existing_services):
     """Creates dummy responses for the Versions.List call."""
-    serving_status = self.messages.Version.ServingStatusValueValuesEnum.SERVING
     versions_responses = []
     service_info = existing_services.get(service, {})
     for version, version_info in six.iteritems(service_info):
       versions_responses.append(
-          self.messages.Version(
-              id=version,
-              name='apps/{0}/services/{1}/versions/{2}'.format(
-                  project, service, version),
-              servingStatus=serving_status,
-              env=version_info.get('env', None),
-              vm=version_info.get('vm', None),
-              manualScaling=version_info.get('manual_scaling', None),
-              basicScaling=version_info.get('basic_scaling', None),
-              createTime=version_info.get('creation_time', None),
-              versionUrl='https://{0}-dot-{1}-dot-{2}.appspot.com'.format(
-                  version, service, project)))
+          self._GetVersion(project, service, version, version_info))
 
     return self.messages.ListVersionsResponse(versions=versions_responses)
 
@@ -671,6 +711,32 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     else:
       self.mock_client.apps_services_versions.Delete.Expect(request,
                                                             exception=exception)
+
+  def ExpectGetVersionRequest(self, project, service, version,
+                              existing_services):
+    """Adds expected get version request and response to mock client.
+
+    Args:
+      project: str, the project ID.
+      service: str, the service ID.
+      version: str, the version ID to delete.
+      existing_services: {str: {}}, dict of service names to lookups of version
+          name to version information (e.g. {'traffic_split': 1.0})
+    """
+    request = self.messages.AppengineAppsServicesVersionsGetRequest(
+        name='apps/{0}/services/{1}/versions/{2}'.format(project, service,
+                                                         version),
+        view=(self.messages.AppengineAppsServicesVersionsGetRequest
+              .ViewValueValuesEnum.FULL))
+    service_info = (existing_services or {}).get(service, {})
+    version_resource = None
+    for version_id, version_info in six.iteritems(service_info):
+      if version_id == version:
+        version_resource = self._GetVersion(project, service, version_id,
+                                            version_info)
+        break
+    self.mock_client.apps_services_versions.Get.Expect(
+        request, response=version_resource)
 
   def _GetRepairApplicationRequest(self, project):
     return self.messages.AppengineAppsRepairRequest(

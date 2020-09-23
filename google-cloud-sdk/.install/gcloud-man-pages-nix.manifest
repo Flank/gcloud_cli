@@ -1122,6 +1122,7 @@ help/man/man1/gcloud_alpha_compute_url-maps_list.1
 help/man/man1/gcloud_alpha_compute_url-maps_remove-host-rule.1
 help/man/man1/gcloud_alpha_compute_url-maps_remove-path-matcher.1
 help/man/man1/gcloud_alpha_compute_url-maps_set-default-service.1
+help/man/man1/gcloud_alpha_compute_url-maps_validate.1
 help/man/man1/gcloud_alpha_compute_vpn-gateways.1
 help/man/man1/gcloud_alpha_compute_vpn-gateways_create.1
 help/man/man1/gcloud_alpha_compute_vpn-gateways_delete.1
@@ -2179,6 +2180,18 @@ help/man/man1/gcloud_alpha_monitoring_policies_delete.1
 help/man/man1/gcloud_alpha_monitoring_policies_describe.1
 help/man/man1/gcloud_alpha_monitoring_policies_list.1
 help/man/man1/gcloud_alpha_monitoring_policies_update.1
+help/man/man1/gcloud_alpha_network-connectivity.1
+help/man/man1/gcloud_alpha_network-connectivity_hubs.1
+help/man/man1/gcloud_alpha_network-connectivity_hubs_create.1
+help/man/man1/gcloud_alpha_network-connectivity_hubs_delete.1
+help/man/man1/gcloud_alpha_network-connectivity_hubs_describe.1
+help/man/man1/gcloud_alpha_network-connectivity_hubs_list.1
+help/man/man1/gcloud_alpha_network-connectivity_hubs_update.1
+help/man/man1/gcloud_alpha_network-connectivity_spokes.1
+help/man/man1/gcloud_alpha_network-connectivity_spokes_create.1
+help/man/man1/gcloud_alpha_network-connectivity_spokes_delete.1
+help/man/man1/gcloud_alpha_network-connectivity_spokes_describe.1
+help/man/man1/gcloud_alpha_network-connectivity_spokes_list.1
 help/man/man1/gcloud_alpha_network-security.1
 help/man/man1/gcloud_alpha_network-security_authorization-policies.1
 help/man/man1/gcloud_alpha_network-security_authorization-policies_delete.1
@@ -2516,6 +2529,10 @@ help/man/man1/gcloud_alpha_services_list.1
 help/man/man1/gcloud_alpha_services_operations.1
 help/man/man1/gcloud_alpha_services_operations_describe.1
 help/man/man1/gcloud_alpha_services_operations_wait.1
+help/man/man1/gcloud_alpha_services_peered-dns-domains.1
+help/man/man1/gcloud_alpha_services_peered-dns-domains_create.1
+help/man/man1/gcloud_alpha_services_peered-dns-domains_delete.1
+help/man/man1/gcloud_alpha_services_peered-dns-domains_list.1
 help/man/man1/gcloud_alpha_services_quota.1
 help/man/man1/gcloud_alpha_services_quota_create.1
 help/man/man1/gcloud_alpha_services_quota_delete.1
@@ -2955,6 +2972,7 @@ help/man/man1/gcloud_beta_app_services_delete.1
 help/man/man1/gcloud_beta_app_services_describe.1
 help/man/man1/gcloud_beta_app_services_list.1
 help/man/man1/gcloud_beta_app_services_set-traffic.1
+help/man/man1/gcloud_beta_app_services_update.1
 help/man/man1/gcloud_beta_app_ssl-certificates.1
 help/man/man1/gcloud_beta_app_ssl-certificates_create.1
 help/man/man1/gcloud_beta_app_ssl-certificates_delete.1
@@ -4930,6 +4948,10 @@ help/man/man1/gcloud_beta_secrets_locations.1
 help/man/man1/gcloud_beta_secrets_locations_describe.1
 help/man/man1/gcloud_beta_secrets_locations_list.1
 help/man/man1/gcloud_beta_secrets_remove-iam-policy-binding.1
+help/man/man1/gcloud_beta_secrets_replication.1
+help/man/man1/gcloud_beta_secrets_replication_get.1
+help/man/man1/gcloud_beta_secrets_replication_set.1
+help/man/man1/gcloud_beta_secrets_replication_update.1
 help/man/man1/gcloud_beta_secrets_set-iam-policy.1
 help/man/man1/gcloud_beta_secrets_update.1
 help/man/man1/gcloud_beta_secrets_versions.1
@@ -4980,6 +5002,7 @@ help/man/man1/gcloud_beta_services_list.1
 help/man/man1/gcloud_beta_services_operations.1
 help/man/man1/gcloud_beta_services_operations_describe.1
 help/man/man1/gcloud_beta_services_operations_wait.1
+help/man/man1/gcloud_beta_services_peered-dns-domains.1
 help/man/man1/gcloud_beta_services_vpc-peerings.1
 help/man/man1/gcloud_beta_services_vpc-peerings_connect.1
 help/man/man1/gcloud_beta_services_vpc-peerings_disable-vpc-service-controls.1
@@ -6321,6 +6344,10 @@ help/man/man1/gcloud_iap_web_enable.1
 help/man/man1/gcloud_iap_web_get-iam-policy.1
 help/man/man1/gcloud_iap_web_remove-iam-policy-binding.1
 help/man/man1/gcloud_iap_web_set-iam-policy.1
+help/man/man1/gcloud_identity.1
+help/man/man1/gcloud_identity_groups.1
+help/man/man1/gcloud_identity_groups_delete.1
+help/man/man1/gcloud_identity_groups_memberships.1
 help/man/man1/gcloud_info.1
 help/man/man1/gcloud_init.1
 help/man/man1/gcloud_iot.1
@@ -6611,6 +6638,7 @@ help/man/man1/gcloud_resource-manager_folders_add-iam-policy-binding.1
 help/man/man1/gcloud_resource-manager_folders_create.1
 help/man/man1/gcloud_resource-manager_folders_delete.1
 help/man/man1/gcloud_resource-manager_folders_describe.1
+help/man/man1/gcloud_resource-manager_folders_get-ancestors-iam-policy.1
 help/man/man1/gcloud_resource-manager_folders_get-iam-policy.1
 help/man/man1/gcloud_resource-manager_folders_list.1
 help/man/man1/gcloud_resource-manager_folders_move.1
@@ -6719,6 +6747,7 @@ help/man/man1/gcloud_services_list.1
 help/man/man1/gcloud_services_operations.1
 help/man/man1/gcloud_services_operations_describe.1
 help/man/man1/gcloud_services_operations_wait.1
+help/man/man1/gcloud_services_peered-dns-domains.1
 help/man/man1/gcloud_services_vpc-peerings.1
 help/man/man1/gcloud_services_vpc-peerings_connect.1
 help/man/man1/gcloud_services_vpc-peerings_list.1

@@ -631,7 +631,7 @@ class BucketIamPolicyTest(e2e_base.WithMockHttp):
     actual_policy = client.SetIamPolicy(self.bucket_reference, new_policy)
     self.assertEqual(actual_policy, expected_policy)
 
-  def testAddIamPolicyBinding(self):
+  def testAddIamPolicyBindingAddsNewBinding(self):
     old_policy = self.storage_v1_messages.Policy(
         kind='storage#policy',
         resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
@@ -672,7 +672,7 @@ class BucketIamPolicyTest(e2e_base.WithMockHttp):
                                                'roles/storage.objectAdmin')
     self.assertEqual(actual_policy, expected_policy)
 
-  def testAddIamPolicyBindings(self):
+  def testAddIamPolicyBindingsAddsNewBindings(self):
     old_policy = self.storage_v1_messages.Policy(
         kind='storage#policy',
         resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
@@ -716,6 +716,38 @@ class BucketIamPolicyTest(e2e_base.WithMockHttp):
          ('user:test-user-2@gmail.com', 'roles/storage.objectAdmin'),
          ('user:test-user@gmail.com', 'roles/storage.bucketAdmin')])
     self.assertEqual(actual_policy, expected_policy)
+
+  def testAddIamPolicyBindingsDoesntCallSetForSameBindings(self):
+    policy = self.storage_v1_messages.Policy(
+        kind='storage#policy',
+        resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
+        version=1,
+        etag=b'CAE3',
+        bindings=[
+            self.storage_v1_messages.Policy.BindingsValueListEntry(
+                role='roles/storage.legacyBucketOwner',
+                members=[
+                    'projectEditor:{}'.format(self._PROJECT_ID),
+                    'projectOwner:{}'.format(self._PROJECT_ID),
+                ]),
+            self.storage_v1_messages.Policy.BindingsValueListEntry(
+                role='roles/storage.objectAdmin',
+                members=[
+                    'user:test-user@gmail.com', 'user:test-user-2@gmail.com'
+                ]),
+        ])
+
+    self.mocked_storage_v1.buckets.GetIamPolicy.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, optionsRequestedPolicyVersion=3),
+        response=policy)
+
+    client = storage_api.StorageClient()
+    actual_policy = client.AddIamPolicyBindings(
+        self.bucket_reference,
+        [('user:test-user@gmail.com', 'roles/storage.objectAdmin'),
+         ('user:test-user-2@gmail.com', 'roles/storage.objectAdmin')])
+    self.assertEqual(actual_policy, policy)
 
 
 if __name__ == '__main__':

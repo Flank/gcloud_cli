@@ -1,0 +1,30 @@
+title: network-connectivity spoke-tests describe tests
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: network-connectivity spokes describe testspoke --region=us-central1
+
+actions:
+- execute_command:
+    command: |
+      network-connectivity spokes describe testspoke --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/spokes/testspoke?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/spokes/testspoke"
+            }
+    - expect_stdout: |
+         name: projects/fake-project/locations/us-central1/spokes/testspoke
+    - expect_exit:
+        code: 0

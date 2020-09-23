@@ -62,6 +62,8 @@ class StatusTest(base.FeaturesTestBase):
         featureState=self._MakeFeatureState(lifecycle_state,
                                             details_by_membership))
     self.features_api.ExpectGet(feature)
+    self.memberships_api.ExpectList([self.memberships_api._MakeMembership(
+        name='mock-cluster', description='config_membership')])
 
     self.RunCommand(['status'])
     out = yaml.load(self.GetOutput())

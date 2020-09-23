@@ -27,6 +27,23 @@ COMMANDS
      list
         (ALPHA) List Apigee developers by email address.
 
+EXAMPLES
+    To list the email addresses of all the developers in the active Cloud
+    Platform project, run:
+
+        $ gcloud alpha apigee developers list
+
+    To get that list as a JSON array and only include developers with
+    example.com addresses, run:
+
+        $ gcloud alpha apigee developers list --format=json \
+          --filter="email:(@example.com)"
+
+    To get details about a specific developer in the active Cloud Platform
+    project, run:
+
+        $ gcloud alpha apigee developers describe DEVELOPER_EMAIL
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

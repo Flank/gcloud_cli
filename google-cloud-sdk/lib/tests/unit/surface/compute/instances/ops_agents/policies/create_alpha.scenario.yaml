@@ -71,9 +71,9 @@ summary:
   - command: |
       compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=not-supported-type --os-types=short-name=centos,version=7
   - stderr: .*argument --agent-rules\:\ Invalid value \[not-supported-type\] from
-      field \[type\], expected one of \[logging, metrics\]..*$
+      field \[type\], expected one of \[logging, metrics, ops-agent\]..*$
   - error: '1: argument --agent-rules: Invalid value [not-supported-type] from field
-      [type], expected one of [logging, metrics].'
+      [type], expected one of [logging, metrics, ops-agent].'
 - execute:
   - command: |
       compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,package-state=not-supported-state --os-types=short-name=centos,version=7
@@ -375,11 +375,11 @@ actions:
     events:
     - expect_stderr:
         matches: .* argument --agent-rules\:\ Invalid value \[\] from field \[type\],
-          expected one of \[logging, metrics\]..*
+          expected one of \[logging, metrics, ops-agent\]..*
     - expect_exit:
         code: 1
         message: 'argument --agent-rules: Invalid value [] from field [type],
-          expected one of [logging, metrics].'
+          expected one of [logging, metrics, ops-agent].'
 - execute_command:
     command: |
       compute instances ops-agents policies create ops-agents-test-policy --agent-rules=not-a-list-of-maps --os-types=short-name=centos,version=7
@@ -419,11 +419,11 @@ actions:
     events:
     - expect_stderr:
         matches: .*argument --agent-rules\:\ Invalid value \[not-supported-type\]
-          from field \[type\], expected one of \[logging, metrics\]..*
+          from field \[type\], expected one of \[logging, metrics, ops-agent\]..*
     - expect_exit:
         code: 1
         message: 'argument --agent-rules: Invalid value [not-supported-type] from
-          field [type], expected one of [logging, metrics].'
+          field [type], expected one of [logging, metrics, ops-agent].'
 - execute_command:
     command: |
       compute instances ops-agents policies create ops-agents-test-policy --agent-rules=type=logging,package-state=not-supported-state --os-types=short-name=centos,version=7

@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud app deploy [DEPLOYABLES ...] [--appyaml=APPYAML] [--bucket=BUCKET]
-        [--ignore-file=IGNORE_FILE] [--image-url=IMAGE_URL] [--no-promote]
-        [--no-stop-previous-version] [--version=VERSION, -v VERSION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--no-cache] [--ignore-file=IGNORE_FILE] [--image-url=IMAGE_URL]
+        [--no-promote] [--no-stop-previous-version]
+        [--version=VERSION, -v VERSION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command is used to deploy both code and configuration to the App
@@ -44,6 +44,10 @@ FLAGS
         The Google Cloud Storage bucket used to stage files associated with the
         deployment. If this argument is not specified, the application's
         default code bucket is used.
+
+     --no-cache
+        Skip caching mechanisms involved in the deployment process, in
+        particular do not use cached dependencies during the build step.
 
      --ignore-file=IGNORE_FILE
         Override the .gcloudignore file and use the specified file instead.

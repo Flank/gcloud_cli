@@ -18,6 +18,7 @@ SYNOPSIS
         [--num-secondary-worker-local-ssds=NUM_SECONDARY_WORKER_LOCAL_SSDS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--optional-components=[COMPONENT,...]]
+        [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--properties=[PREFIX:PROPERTY=VALUE,...]]
         [--secondary-worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--secondary-worker-boot-disk-size=SECONDARY_WORKER_BOOT_DISK_SIZE]
@@ -183,6 +184,11 @@ FLAGS
         The following page documents the optional components that can be
         installed:
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
+
+     --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+        The private IPv6 Google access type for the cluster.
+        PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: inherit-subnetwork,
+        outbound, bidirectional.
 
      --properties=[PREFIX:PROPERTY=VALUE,...]
         Specifies configuration properties for installed packages, such as

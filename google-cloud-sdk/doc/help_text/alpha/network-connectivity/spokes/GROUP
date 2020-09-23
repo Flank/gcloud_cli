@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha network-connectivity spokes - manage Network Connectivity
+        Spokes
+
+SYNOPSIS
+    gcloud alpha network-connectivity spokes COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Network Connectivity Spokes.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new spoke.
+
+     delete
+        (ALPHA) Delete a spoke.
+
+     describe
+        (ALPHA) Describe a spoke.
+
+     list
+        (ALPHA) List spokes.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist.
+
