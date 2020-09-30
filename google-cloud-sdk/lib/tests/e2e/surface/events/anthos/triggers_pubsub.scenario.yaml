@@ -21,7 +21,8 @@ summary:
     - message: Deploying new service...
     - status: SUCCESS
   - stderr: |-
-      Service \[$$my-service$$\] revision \[$$my-service$$.*\] has been deployed and is serving 100 percent of traffic at http://$$my-service$$.default.example.com
+      Service \[$$my-service$$\] revision \[$$my-service$$.*\] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$my-service$$.default.example.com
       $
 - execute:
   - command: events triggers create $$my-trigger$$ --type google.cloud.pubsub.topic.v1.messagePublished
@@ -92,7 +93,8 @@ actions:
         status: SUCCESS
     - expect_stderr:
         matches: |
-          Service \[$$my-service$$\] revision \[$$my-service$$.*\] has been deployed and is serving 100 percent of traffic at http://$$my-service$$.default.example.com
+          Service \[$$my-service$$\] revision \[$$my-service$$.*\] has been deployed and is serving 100 percent of traffic.
+          Service URL: http://$$my-service$$.default.example.com
     - expect_exit:
         code: 0
 - generate_resource_id:
@@ -465,7 +467,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions\?alt=json&labelSelector=duck.knative.dev%2Fsource%3Dtrue&parent=namespaces%2Fcloud-sdk-integration-testing
+            matches: https://.*/apis/apiextensions.k8s.io/v1/customresourcedefinitions\?alt=json&labelSelector=duck.knative.dev%2Fsource%3Dtrue&parent=namespaces%2Fcloud-sdk-integration-testing
           method: GET
           headers: {}
           body: null
@@ -478,12 +480,12 @@ actions:
             kind: CustomResourceDefinitionList
             apiVersion: apiextensions.k8s.io/v1beta1
             metadata:
-              selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions
+              selfLink: /apis/apiextensions.k8s.io/v1/customresourcedefinitions
               resourceVersion: '19149724'
             items:
             - metadata:
                 name: cloudauditlogssources.events.cloud.google.com
-                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudauditlogssources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1/customresourcedefinitions/cloudauditlogssources.events.cloud.google.com
                 uid: fda2b4a1-8c83-4de9-a5fe-92b3ec709538
                 resourceVersion: '6264'
                 generation: 1
@@ -649,7 +651,7 @@ actions:
                 - v1beta1
             - metadata:
                 name: cloudpubsubsources.events.cloud.google.com
-                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudpubsubsources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1/customresourcedefinitions/cloudpubsubsources.events.cloud.google.com
                 uid: d5b8c120-a962-4979-95aa-3260252d97dd
                 resourceVersion: '6273'
                 generation: 1
@@ -857,7 +859,7 @@ actions:
                 - v1beta1
             - metadata:
                 name: cloudschedulersources.events.cloud.google.com
-                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudschedulersources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1/customresourcedefinitions/cloudschedulersources.events.cloud.google.com
                 uid: 5a5aca10-dafb-467b-83d0-5e0a449c78f9
                 resourceVersion: '6279'
                 generation: 1
@@ -1055,7 +1057,7 @@ actions:
                 - v1beta1
             - metadata:
                 name: cloudstoragesources.events.cloud.google.com
-                selfLink: /apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/cloudstoragesources.events.cloud.google.com
+                selfLink: /apis/apiextensions.k8s.io/v1/customresourcedefinitions/cloudstoragesources.events.cloud.google.com
                 uid: 146b4e7b-18c7-48ea-aaaf-3163c9050bd0
                 resourceVersion: '6288'
                 generation: 1

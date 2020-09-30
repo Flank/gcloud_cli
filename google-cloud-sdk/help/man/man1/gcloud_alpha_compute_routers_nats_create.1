@@ -11,7 +11,7 @@ gcloud alpha compute routers nats create \- add a NAT to a Compute Engine router
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers nats create\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR (\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]) (\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR) [\fB\-\-async\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers nats create\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR (\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]) (\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR) [\fB\-\-async\fR] [\fB\-\-enable\-endpoint\-independent\-mapping\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -88,6 +88,15 @@ Allow only primary IP ranges of all subnetworks in the region to use NAT.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-enable\-endpoint\-independent\-mapping\fR
+Enable endpoint\-independent mapping for the NAT (as defined in RFC 5128).
+
+If not specified, NATs have endpoint\-independent mapping enabled by default.
+
+Use \f5\-\-no\-enable\-endpoint\-independent\-mapping\fR to disable
+endpoint\-independent mapping.
 
 .TP 2m
 \fB\-\-enable\-logging\fR

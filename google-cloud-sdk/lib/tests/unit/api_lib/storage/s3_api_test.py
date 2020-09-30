@@ -24,8 +24,6 @@ import datetime
 import io
 import itertools
 
-import boto3
-import botocore
 from botocore import stub
 from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.api_lib.storage import errors
@@ -52,20 +50,13 @@ OWNER_ID = 'owner_id'
 OWNER_NAME = 'owner_name'
 SCHEME = 's3'
 
-GET_BUCKET_API_FUNCTION_NAMES = [
-    'get_bucket_location',
-    'get_bucket_cors',
-    'get_bucket_logging',
-    'get_bucket_request_payment',
-    'get_bucket_lifecycle_configuration',
-    'get_bucket_versioning',
-    'get_bucket_website',
-    'get_bucket_acl',
-]
-
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class GetBucketTest(test_base.StorageTestBase, parameterized.TestCase):
+
+  def SetUp(self):
+    self.s3_api = s3_api.S3Api()
+    self.stubber = stub.Stubber(self.s3_api.client)
 
   @parameterized.parameters(
       (cloud_api.FieldsScope.SHORT, 1, {'Name': BUCKET_NAME,
@@ -90,23 +81,19 @@ class GetBucketTest(test_base.StorageTestBase, parameterized.TestCase):
           'Payer': 'BucketOwner',
           'Versioning': {},
           'Website': {},
-          'Owner': {},
-          'Grants': []}))
+          'ACL': {'Owner': {}, 'Grants': []}}))
   def test_gets_bucket_with_different_fields_scopes(
       self, fields_scope, number_api_calls, expected_metadata):
-    api = s3_api.S3Api()
-    stubber = stub.Stubber(api.client)
-
     # Minimum amount of response data to pass Boto Stubber validation and
     # verify each API endpoint has returned a response.
     get_bucket_api_call_and_response = [
         ('get_bucket_location', {'LocationConstraint': ''}),
         ('get_bucket_cors', {'CORSRules': []}),
+        ('get_bucket_lifecycle_configuration', {'Rules': []}),
         ('get_bucket_logging', {
             'LoggingEnabled': {
                 'TargetBucket': '', 'TargetGrants': [], 'TargetPrefix': ''}}),
         ('get_bucket_request_payment', {'Payer': 'BucketOwner'}),
-        ('get_bucket_lifecycle_configuration', {'Rules': []}),
         ('get_bucket_versioning', {}),
         ('get_bucket_website', {}),
         ('get_bucket_acl', {'Owner': {}, 'Grants': []})
@@ -115,36 +102,108 @@ class GetBucketTest(test_base.StorageTestBase, parameterized.TestCase):
     # Don't loop over extra API functions to avoid the Stubber
     # complaining about expected uncalled functions.
     for method, response in get_bucket_api_call_and_response[:number_api_calls]:
-      stubber.add_response(method=method,
-                           expected_params={'Bucket': BUCKET_NAME},
-                           service_response=response)
+      self.stubber.add_response(method=method,
+                                expected_params={'Bucket': BUCKET_NAME},
+                                service_response=response)
 
     expected = resource_reference.BucketResource(
         storage_url.CloudUrl(SCHEME, BUCKET_NAME), metadata=expected_metadata)
-    with stubber:
-      observed = api.GetBucket(BUCKET_NAME, fields_scope)
+    with self.stubber:
+      observed = self.s3_api.GetBucket(BUCKET_NAME, fields_scope)
       self.assertEqual(observed, expected)
 
-  @parameterized.parameters(GET_BUCKET_API_FUNCTION_NAMES)
-  @mock.patch.object(boto3, 'client')
-  def test_gets_bucket_with_individual_api_function_errors(
-      self, error_method, mock_get_client):
-    mock_client = mock.Mock()
-    for method in GET_BUCKET_API_FUNCTION_NAMES:
-      # Have non-error API functions return empty dictionaries that dict.update
-      # will be called on.
-      setattr(mock_client, method, mock.MagicMock(return_value={}))
+  def test_gets_bucket_receives_all_api_errors(self):
+    get_bucket_api_method_names_and_metadata_key = [
+        ('get_bucket_location', 'GetBucketLocation', 'LocationConstraint'),
+        ('get_bucket_cors', 'GetBucketCors', 'CORSRules'),
+        ('get_bucket_lifecycle_configuration',
+         'GetBucketLifecycleConfiguration', 'LifecycleConfiguration'),
+        ('get_bucket_logging', 'GetBucketLogging', 'LoggingEnabled'),
+        ('get_bucket_request_payment', 'GetBucketRequestPayment', 'Payer'),
+        ('get_bucket_versioning', 'GetBucketVersioning', 'Versioning'),
+        ('get_bucket_website', 'GetBucketWebsite', 'Website'),
+        ('get_bucket_acl', 'GetBucketAcl', 'ACL'),
+    ]
+    expected_metadata = {'Name': BUCKET_NAME}
+    for (method_name, error_string_of_method_name,
+         metadata_key) in get_bucket_api_method_names_and_metadata_key:
+      self.stubber.add_client_error(method=method_name)
+      expected_metadata[metadata_key] = errors.S3ApiError(
+          'An error occurred () when calling the {} operation: '
+          .format(error_string_of_method_name))
 
-    # Have specific API function return an error.
-    mock_get_client.return_value = mock_client
-    setattr(getattr(mock_client, error_method), 'side_effect',
-            botocore.exceptions.ClientError({}, error_method))
-
-    # Don't initialize API client until after mocking done above.
-    patched_s3_api = s3_api.S3Api()
-    with self.assertRaises(errors.S3ApiError):
-      patched_s3_api.GetBucket(
+    expected_resource = resource_reference.BucketResource(
+        storage_url.CloudUrl(SCHEME, BUCKET_NAME), metadata=expected_metadata)
+    with self.stubber:
+      observed_resource = self.s3_api.GetBucket(
           BUCKET_NAME, fields_scope=cloud_api.FieldsScope.FULL)
+      self.assertEqual(observed_resource, expected_resource)
+
+  @parameterized.parameters([
+      'get_bucket_location', 'get_bucket_cors',
+      'get_bucket_lifecycle_configuration', 'get_bucket_logging',
+      'get_bucket_request_payment', 'get_bucket_versioning',
+      'get_bucket_website', 'get_bucket_acl'])
+  def test_gets_bucket_with_individual_calls_failing(self, failing_method_name):
+    # Method name, method name in error, metadata key, API response, and
+    # flag describing if API response has key mirroring metadata key.
+    get_bucket_api_call_data = [
+        (
+            'get_bucket_location', 'GetBucketLocation', 'LocationConstraint',
+            {'LocationConstraint': ''}, True
+        ),
+        (
+            'get_bucket_cors', 'GetBucketCors', 'CORSRules',
+            {'CORSRules': []}, True
+        ),
+        (
+            'get_bucket_lifecycle_configuration',
+            'GetBucketLifecycleConfiguration', 'LifecycleConfiguration',
+            {'Rules': []}, False
+        ),
+        (
+            'get_bucket_logging', 'GetBucketLogging', 'LoggingEnabled',
+            {'LoggingEnabled': {
+                'TargetBucket': '', 'TargetGrants': [], 'TargetPrefix': ''}},
+            True
+        ),
+        (
+            'get_bucket_request_payment', 'GetBucketRequestPayment', 'Payer',
+            {'Payer': 'BucketOwner'}, True
+        ),
+        (
+            'get_bucket_versioning', 'GetBucketVersioning', 'Versioning', {},
+            False
+        ),
+        (
+            'get_bucket_website', 'GetBucketWebsite', 'Website', {}, False
+        ),
+        (
+            'get_bucket_acl', 'GetBucketAcl', 'ACL',
+            {'Owner': {}, 'Grants': []}, False
+        ),
+    ]
+    expected_metadata = {'Name': BUCKET_NAME}
+    for (method_name, error_string_of_method_name, metadata_key, response,
+         result_has_key) in get_bucket_api_call_data:
+      if failing_method_name == method_name:
+        self.stubber.add_client_error(method=method_name)
+        expected_metadata[metadata_key] = errors.S3ApiError(
+            'An error occurred () when calling the {} operation: '
+            .format(error_string_of_method_name))
+      else:
+        self.stubber.add_response(method=method_name,
+                                  expected_params={'Bucket': BUCKET_NAME},
+                                  service_response=response)
+        expected_metadata[metadata_key] = (
+            response[metadata_key] if result_has_key else response)
+
+    expected_resource = resource_reference.BucketResource(
+        storage_url.CloudUrl(SCHEME, BUCKET_NAME), metadata=expected_metadata)
+    with self.stubber:
+      observed_resource = self.s3_api.GetBucket(
+          BUCKET_NAME, fields_scope=cloud_api.FieldsScope.FULL)
+      self.assertEqual(observed_resource, expected_resource)
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
@@ -268,7 +327,6 @@ class GetObjectMetadataTest(test_base.StorageTestBase, parameterized.TestCase):
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class CopyObjectTest(test_base.StorageTestBase, parameterized.TestCase):
-  # TODO(b/167691513): Refactor all instances of from_gcs_metadata_object.
   # TODO(b/168332070): Refactor all instances of messages.Object to Resource.
 
   def SetUp(self):
@@ -384,7 +442,6 @@ class CopyObjectTest(test_base.StorageTestBase, parameterized.TestCase):
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class DownloadObjectTest(test_base.StorageTestBase):
-  # TODO(b/167691513): Refactor all instances of from_gcs_metadata_object.
 
   def SetUp(self):
     self.s3_api = s3_api.S3Api()
@@ -444,7 +501,6 @@ class DownloadObjectTest(test_base.StorageTestBase):
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class UploadObjectTest(test_base.StorageTestBase, parameterized.TestCase):
-  # TODO(b/167691513): Refactor all instances of from_gcs_metadata_object.
   # TODO(b/168332070): Refactor all instances of messages.Object to Resource.
 
   def SetUp(self):

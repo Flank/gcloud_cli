@@ -1,5 +1,5 @@
 title: healthcare consent-stores data access scenario tests
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -27,6 +27,7 @@ actions:
     reference: api-version
     track_values:
       ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     label: check-data-access
     command: |

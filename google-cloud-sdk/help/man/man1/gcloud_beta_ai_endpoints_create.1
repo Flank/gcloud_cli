@@ -1,0 +1,90 @@
+
+.TH "GCLOUD_BETA_AI_ENDPOINTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ai endpoints create \- create a new AI Platform endpoint
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ai endpoints create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a new AI Platform endpoint.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Display name of the endpoint.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description of the endpoint.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+Region resource \- Cloud region to create endpoint. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[\-\-region] on the command line with a fully specified name; set the property
+[ai/region] with a fully specified name; region with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+ID of the region or fully qualified identifier for the region.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha ai endpoints create
+.RE
+

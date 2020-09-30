@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha kuberun devkits - top level command to interact with Kuberun
+        Development Kits
+
+SYNOPSIS
+    gcloud alpha kuberun devkits COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This set of commands can be used to list available Development Kits
+    and view details of a specific Development Kit.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        (ALPHA) Lists available Development Kits.
+
+EXAMPLES
+    To list all available Development Kits, run:
+
+        $ gcloud alpha kuberun devkits devkits list
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

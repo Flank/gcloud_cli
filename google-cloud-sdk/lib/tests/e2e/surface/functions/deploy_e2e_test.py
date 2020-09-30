@@ -387,11 +387,8 @@ class EnvVarRedeployTestGA(DeployE2ETestBaseBeta):
       self.assertEqual('boo', updated_env_vars.get('BAZ'))
 
 
-class BuildEnvVarTestAlpha(DeployE2ETestBaseBeta):
+class BuildEnvVarTestBeta(DeployE2ETestBaseBeta):
   """Test build environment variables."""
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testRebuildBuildEnvVarUpdate(self):
     """Test rebuild with no source change, just environment variable changes.

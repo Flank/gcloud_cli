@@ -10,9 +10,12 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) List Apigee organizations and their paired Cloud Platform projects.
 
-    gcloud alpha apigee organizations list lists all Apigee organizations to
-    which the user's gcloud auth credentials have access, even if they don't
-    match the active Cloud Platform project.
+    gcloud alpha apigee organizations list lists all organizations to which the
+    user's gcloud auth credentials have access, even if they don't match the
+    active Cloud Platform project.
+
+    Apigee organizations are distinct from Cloud Platform organizations, and
+    usually have a one-to-one relationship with Cloud Platform projects.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -52,14 +55,16 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To list all accessible organizations, run:
+    To list all accessible organizations and their associated Cloud Platform
+    projects, run:
 
-        $ gcloud apigee organizations list
+        $ gcloud alpha apigee organizations list
 
-    To get that list as a JSON array of organizations and their associated
-    Cloud Platform projects, run:
+    To get a JSON array of all organizations whose Cloud Platform project names
+    contain the word sandbox, run:
 
-        $ gcloud apigee organizations list --format=json
+        $ gcloud alpha apigee organizations list --format=json \
+          --filter="project:(sandbox)"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

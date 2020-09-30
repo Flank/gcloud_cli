@@ -11,7 +11,7 @@ gcloud beta container binauthz attestations sign\-and\-create \- sign and create
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container binauthz attestations sign\-and\-create\fR \fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR (\fB\-\-attestor\fR=\fIATTESTOR\fR\ :\ \fB\-\-attestor\-project\fR=\fIATTESTOR_PROJECT\fR) (\fB\-\-keyversion\fR=\fIKEYVERSION\fR\ :\ \fB\-\-keyversion\-key\fR=\fIKEYVERSION_KEY\fR\ \fB\-\-keyversion\-keyring\fR=\fIKEYVERSION_KEYRING\fR\ \fB\-\-keyversion\-location\fR=\fIKEYVERSION_LOCATION\fR\ \fB\-\-keyversion\-project\fR=\fIKEYVERSION_PROJECT\fR) [\fB\-\-public\-key\-id\-override\fR=\fIPUBLIC_KEY_ID_OVERRIDE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container binauthz attestations sign\-and\-create\fR \fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR (\fB\-\-attestor\fR=\fIATTESTOR\fR\ :\ \fB\-\-attestor\-project\fR=\fIATTESTOR_PROJECT\fR) (\fB\-\-keyversion\fR=\fIKEYVERSION\fR\ :\ \fB\-\-keyversion\-key\fR=\fIKEYVERSION_KEY\fR\ \fB\-\-keyversion\-keyring\fR=\fIKEYVERSION_KEYRING\fR\ \fB\-\-keyversion\-location\fR=\fIKEYVERSION_LOCATION\fR\ \fB\-\-keyversion\-project\fR=\fIKEYVERSION_PROJECT\fR) [\fB\-\-public\-key\-id\-override\fR=\fIPUBLIC_KEY_ID_OVERRIDE\fR] [\fB\-\-validate\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -102,6 +102,11 @@ found on the Attestor resource(s) which will use this Attestation.
 
 This parameter is only necessary if the \f5\-\-public\-key\-id\-override\fR flag
 was provided when this KMS key was added to the Attestor.
+
+.TP 2m
+\fB\-\-validate\fR
+Whether to validate that the Attestation can be verified by the provided
+Attestor.
 
 
 .RE

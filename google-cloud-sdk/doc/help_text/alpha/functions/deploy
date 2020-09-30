@@ -205,26 +205,26 @@ FLAGS
      At most one of these may be specified:
 
        --build-env-vars-file=FILE_PATH
-          Path to a local YAML file with definitions for all Build environment
-          variables. All existing Build environment variables will be removed
-          before the new Build environment variables are added.
+          Path to a local YAML file with definitions for all build environment
+          variables. All existing build environment variables will be removed
+          before the new build environment variables are added.
 
        --clear-build-env-vars
-          Remove all Build environment variables.
+          Remove all build environment variables.
 
        --set-build-env-vars=[KEY=VALUE,...]
-          List of key-value pairs to set as Build environment variables. All
-          existing Build environment variables will be removed first.
+          List of key-value pairs to set as build environment variables. All
+          existing build environment variables will be removed first.
 
        Only --update-build-env-vars and --remove-build-env-vars can be used
        together. If both are specified, --remove-build-env-vars will be applied
        first.
 
          --remove-build-env-vars=[KEY,...]
-            List of Build environment variables to be removed.
+            List of build environment variables to be removed.
 
          --update-build-env-vars=[KEY=VALUE,...]
-            List of key-value pairs to set as Build environment variables.
+            List of key-value pairs to set as build environment variables.
 
      At most one of these may be specified:
 

@@ -44,8 +44,9 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
     self.source_uri = 'gs://31dd/source-vm.ova'
     self.https_source_disk = ('https://storage.googleapis.com/'
                               '31dd/source-vm.ova')
-    self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format(
-        daisy_utils._DEFAULT_BUILDER_VERSION)
+    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
     self.os = 'ubuntu-1604'
     self.tags = ['gce-daisy', 'gce-ovf-import']
     self.zone = 'us-west1-c'
@@ -687,11 +688,14 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
                """.format(self.instance_name, 'not-a-gcs-path', self.os))
 
   def testDockerImageTag(self):
-    self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format(
-        daisy_utils._DEFAULT_BUILDER_VERSION)
+    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
     self.testCommonCase()
 
-    self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format('latest')
+    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+        docker_image_tag='latest')
     self.PrepareMocks(self.GetOVFImportStep())
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2}

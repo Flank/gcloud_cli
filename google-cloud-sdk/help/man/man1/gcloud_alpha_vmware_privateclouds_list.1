@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware privateclouds list \- list Cloud VMware privateclouds
+gcloud alpha vmware privateclouds list \- list VMware Engine private clouds in a location
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware privateclouds list \- list Cloud VMware privateclouds
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR List VMware privateclouds in a location.
+\fB(ALPHA)\fR List VMware Engine private clouds in a location.
 
 
 
@@ -96,17 +96,20 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-to list privateclouds in the current vmware/location:
+To list private clouds in the location \f5\fIus\-central1\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha vmware privateclouds list \-\-location=us\-central1
+.RE
+
+Or:
 
 .RS 2m
 $ gcloud alpha vmware privateclouds list
 .RE
 
-to list privateclouds in a specified location:
-
-.RS 2m
-$ gcloud alpha vmware privateclouds list \-\-location=us\-central2
-.RE
+In the second example, the location is taken from gcloud properties
+vmware/location.
 
 
 

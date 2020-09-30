@@ -134,6 +134,22 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
     cloudurl = storage_url.CloudUrl(*cloudurl_args)
     self.assertEqual(cloudurl.url_string, expected)
 
+  @parameterized.named_parameters([
+      {
+          'testcase_name': '_objecturl',
+          'cloudurl_args': ('gs', 'bucket', 'obj/a/b'),
+          'expected': 'gs://bucket/obj/a/b'
+      },
+      {
+          'testcase_name': '_objecturl_with_version',
+          'cloudurl_args': ('gs', 'bucket', 'obj/a/b', '1212'),
+          'expected': 'gs://bucket/obj/a/b'
+      },
+  ])
+  def test_versionless_url_string_property(self, cloudurl_args, expected):
+    cloudurl = storage_url.CloudUrl(*cloudurl_args)
+    self.assertEqual(cloudurl.versionless_url_string, expected)
+
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
@@ -183,6 +199,16 @@ class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
   def test_file_url_isdir_with_invalid_path(self):
     file_url_object = storage_url.storage_url_from_string('invalid/dirpath')
     self.assertFalse(file_url_object.isdir())
+
+  def test_url_string(self):
+    file_url = storage_url.FileUrl(os.path.join('dir', 'a.txt'))
+    self.assertEqual(file_url.url_string,
+                     'file://' + os.path.join('dir', 'a.txt'))
+
+  def test_versionless_url_string(self):
+    file_url = storage_url.FileUrl(os.path.join('dir', 'a.txt'))
+    self.assertEqual(file_url.versionless_url_string,
+                     'file://' + os.path.join('dir', 'a.txt'))
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')

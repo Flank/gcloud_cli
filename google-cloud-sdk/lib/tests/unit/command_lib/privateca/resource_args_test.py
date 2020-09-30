@@ -60,12 +60,11 @@ class ResourceArgsTest(cli_test_base.CliTestBase, test_case.TestCase):
     self.assertEqual(reusable_config.RelativeName(), resource_id)
 
 
-def GetSampleKmsKeyVersion(location):
+def GetSampleCertificateAuthority(location):
   return resources.REGISTRY.ParseRelativeName(
-      relative_name='projects/p1/locations/{}/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1'
+      relative_name='projects/p1/locations/{}/certificateAuthorities/ca'
       .format(location),
-      collection='cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions'
-  )
+      collection='privateca.projects.locations.certificateAuthorities')
 
 
 class LocationValidationTest(cli_test_base.CliTestBase):
@@ -74,16 +73,18 @@ class LocationValidationTest(cli_test_base.CliTestBase):
   def testValidationPassesForKmsKeyVersionInSupportedLocations(self, mock_fn):
     mock_fn.return_value = ['us-west1', 'europe-west1']
     for location in ['us-west1', 'europe-west1']:
-      version_ref = GetSampleKmsKeyVersion(location)
-      resource_args.ValidateKmsKeyVersionLocation(version_ref)
+      resource_ref = GetSampleCertificateAuthority(location)
+      resource_args.ValidateResourceLocation(resource_ref,
+                                             'CERTIFICATE_AUTHORITY')
 
   @mock.patch.object(locations, 'GetSupportedLocations', autospec=True)
   def testValidationFailsForKmsKeyVersionInUnsupportedLocation(self, mock_fn):
     mock_fn.return_value = ['us-west1', 'europe-west1']
-    version_ref = GetSampleKmsKeyVersion('us')
+    resource_ref = GetSampleCertificateAuthority('us')
     with self.AssertRaisesExceptionMatches(exceptions.InvalidArgumentException,
-                                           '--kms-key-version'):
-      resource_args.ValidateKmsKeyVersionLocation(version_ref)
+                                           'CERTIFICATE_AUTHORITY'):
+      resource_args.ValidateResourceLocation(resource_ref,
+                                             'CERTIFICATE_AUTHORITY')
 
 
 if __name__ == '__main__':

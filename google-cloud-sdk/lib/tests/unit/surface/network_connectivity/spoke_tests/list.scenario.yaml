@@ -10,11 +10,9 @@ summary:
         {
           "createTime": "2020-06-19T18:09:56.472373975Z",
           "hub": "http://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub",
-          "linkedVpnTunnels": {
-            "value": [
+          "linkedVpnTunnels": [
               "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
-            ]
-          },
+          ],
           "name": "projects/fake-project/locations/us-central1/spokes/testspoke",
           "updateTime": "2020-06-19T18:09:56.656295248Z"
         }
@@ -41,11 +39,7 @@ actions:
                  "createTime": "2020-06-19T18:09:56.472373975Z",
                  "updateTime": "2020-06-19T18:09:56.656295248Z",
                  "hub": "http://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub",
-                 "linkedVpnTunnels": {
-                   "value": [
-                     "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
-                   ]
-                 }
+                 "linkedVpnTunnels": ["REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"]
                }
              ]
            }
@@ -54,11 +48,9 @@ actions:
           {
             "createTime": "2020-06-19T18:09:56.472373975Z",
             "hub": "http://networkconnectivity.googleapis.com/v1alpha1/projects/fake-project/locations/global/hubs/testhub",
-            "linkedVpnTunnels": {
-              "value": [
-                "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
-              ]
-            },
+            "linkedVpnTunnels": [
+              "REGION:dev-central1/PROJECT:529254013417/VPN_TUNNEL:demo-ch-vpn-tunnel-1"
+            ],
             "name": "projects/fake-project/locations/us-central1/spokes/testspoke",
             "updateTime": "2020-06-19T18:09:56.656295248Z"
           }

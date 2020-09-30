@@ -20,9 +20,12 @@ gcloud alpha apigee organizations list \- list Apigee organizations and their pa
 \fB(ALPHA)\fR List Apigee organizations and their paired Cloud Platform
 projects.
 
-\f5gcloud alpha apigee organizations list\fR lists all Apigee organizations to
-which the user's \f5gcloud auth\fR credentials have access, even if they don't
-match the active Cloud Platform project.
+\f5gcloud alpha apigee organizations list\fR lists all organizations to which
+the user's \f5gcloud auth\fR credentials have access, even if they don't match
+the active Cloud Platform project.
+
+Apigee organizations are distinct from Cloud Platform organizations, and usually
+have a one\-to\-one relationship with Cloud Platform projects.
 
 
 
@@ -79,17 +82,19 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To list all accessible organizations, run:
+To list all accessible organizations and their associated Cloud Platform
+projects, run:
 
 .RS 2m
-$ gcloud apigee organizations list
+$ gcloud alpha apigee organizations list
 .RE
 
-To get that list as a JSON array of organizations and their associated Cloud
-Platform projects, run:
+To get a JSON array of all organizations whose Cloud Platform project names
+contain the word \f5\fIsandbox\fR\fR, run:
 
 .RS 2m
-$ gcloud apigee organizations list \-\-format=json
+$ gcloud alpha apigee organizations list \-\-format=json \e
+  \-\-filter="project:(sandbox)"
 .RE
 
 

@@ -34,7 +34,7 @@ actions:
             json:
               hub: "/projects/fake-project/locations/global/hubs/testhub"
               linked_vpn_tunnels:
-                value: [/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel1,/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel2]
+                [/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel1,/projects/fake-project/regions/us-central1/vpnTunnel/testvpntunnel2]
         return_response:
           headers:
             status: '200'

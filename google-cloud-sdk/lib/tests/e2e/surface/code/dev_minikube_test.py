@@ -146,7 +146,7 @@ class DevOnMinikubeTest(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
       if additional_gcloud_flags:
         gcloud_args += additional_gcloud_flags
 
-      match_strings = ['Service available at http://localhost']
+      match_strings = ['Service URL: http://localhost']
 
       with self.ExecuteLegacyScriptAsync(
           'gcloud', gcloud_args, match_strings=match_strings,

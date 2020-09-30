@@ -14,7 +14,7 @@ summary:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |
-      Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed and is serving 0 percent of traffic
+      Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed and is serving 0 percent of traffic.
 actions:
 - set_property:
     # container/use_client_certificate: true
@@ -495,7 +495,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [asdf] revision [asdf-a] has been deployed and is serving 100 percent of traffic at https://asdf-ixwc4imo7a-uc.a.run.app
+        Service [asdf] revision [asdf-a] has been deployed and is serving 100 percent of traffic.
+        Service URL: https://asdf-ixwc4imo7a-uc.a.run.app
         The revision can be reached directly at https://cool-asdf-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
@@ -965,7 +966,7 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed and is serving 0 percent of traffic
+        Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed and is serving 0 percent of traffic.
 
 
     - expect_exit:

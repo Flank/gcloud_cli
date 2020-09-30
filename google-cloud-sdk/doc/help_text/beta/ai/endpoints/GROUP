@@ -1,0 +1,57 @@
+NAME
+    gcloud beta ai endpoints - AI Platform endpoint commands
+
+SYNOPSIS
+    gcloud beta ai endpoints COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) An endpoint contains one or more deployed models, all of which must
+    have the same interface but may come from different models. An endpoint is
+    to obtain online prediction and explanation from one of its deployed
+    models.
+
+    When you communicate with AI Platform services, you identify a specific
+    endpoint that is deployed in the cloud using a combination of the current
+    project, the region, and the endpoint.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a new AI Platform endpoint.
+
+     delete
+        (BETA) Delete an existing AI Platform endpoint.
+
+     deploy-model
+        (BETA) Deploy a model to an existing AI Platform endpoint.
+
+     describe
+        (BETA) Describe an existing AI Platform endpoint.
+
+     list
+        (BETA) List existing AI Platform endpoints.
+
+     predict
+        (BETA) Run AI Platform online prediction.
+
+     undeploy-model
+        (BETA) Undeploy a model from an existing AI Platform endpoint.
+
+     update
+        (BETA) Update an existing AI Platform endpoint.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha ai endpoints
+

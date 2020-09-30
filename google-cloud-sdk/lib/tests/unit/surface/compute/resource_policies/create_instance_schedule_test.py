@@ -29,14 +29,25 @@ class CreateGroupPlacementGaTest(resource_policies_base.TestBase,
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _CreateInstanceSchedulePolicy(self, name, vm_start_cron, vm_stop_cron,
-                                    timezone):
+  def _CreateInstanceSchedulePolicy(self,
+                                    name,
+                                    vm_start_cron=None,
+                                    vm_stop_cron=None,
+                                    timezone=None):
+    vm_start_schedule = None
+    if vm_start_cron:
+      vm_start_schedule = self.messages.ResourcePolicyInstanceSchedulePolicySchedule(
+          schedule=vm_start_cron)
+
+    vm_stop_schedule = None
+    if vm_stop_cron:
+      vm_stop_schedule = self.messages.ResourcePolicyInstanceSchedulePolicySchedule(
+          schedule=vm_stop_cron)
+
     instance_schedule_policy = self.messages.ResourcePolicyInstanceSchedulePolicy(
         timeZone=timezone,
-        vmStartSchedule=self.messages
-        .ResourcePolicyInstanceSchedulePolicySchedule(schedule=vm_start_cron),
-        vmStopSchedule=self.messages
-        .ResourcePolicyInstanceSchedulePolicySchedule(schedule=vm_stop_cron))
+        vmStartSchedule=vm_start_schedule,
+        vmStopSchedule=vm_stop_schedule)
 
     policy = self.messages.ResourcePolicy(
         name=name,
@@ -72,6 +83,29 @@ class CreateGroupPlacementGaTest(resource_policies_base.TestBase,
             name=name,
             vm_start_cron=vm_start_cron,
             vm_stop_cron=vm_stop_cron,
+            timezone=timezone,
+            region=self.region))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, schedule_policy)
+
+  def testCreate_StartOnly(self):
+
+    name = 'test-schedule'
+    vm_start_cron = '30 5 * * *'
+    timezone = 'EST'
+
+    schedule_policy = self._CreateInstanceSchedulePolicy(
+        name=name, vm_start_cron=vm_start_cron, timezone=timezone)
+
+    request = self._ExpectCreate(schedule_policy)
+
+    result = self.Run(
+        'compute resource-policies create instance-schedule {name} '
+        '--vm-start-schedule="{vm_start_cron}" '
+        '--timezone={timezone} --region {region}'.format(
+            name=name,
+            vm_start_cron=vm_start_cron,
             timezone=timezone,
             region=self.region))
 

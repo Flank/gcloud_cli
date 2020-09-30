@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 title: cloud identity groups memberships list test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -64,6 +64,7 @@ actions:
     track_values:
       ALPHA: v1alpha1
       BETA: v1beta1
+      GA: v1
 
 - execute_command:
     label: List memberships for a specified group email.

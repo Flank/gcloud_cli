@@ -83,6 +83,13 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     self.compute_v1_messages = core_apis.GetMessagesModule(
         'compute', 'v1')
 
+    self.mocked_artifacts_v1beta1 = client_mocker.Client(
+        core_apis.GetClientClass('artifactregistry', 'v1beta1'))
+    self.mocked_artifacts_v1beta1.Mock()
+    self.addCleanup(self.mocked_artifacts_v1beta1.Unmock)
+    self.mocked_artifacts_v1beta1_messages = core_apis.GetMessagesModule(
+        'artifactregistry', 'v1beta1')
+
     make_requests_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.MakeRequests',
         autospec=True)
@@ -393,19 +400,32 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
       )
 
     daisy_bucket_name = self.GetScratchBucketNameWithRegion()
+    daisy_bucket = self.storage_v1_messages.Bucket(
+        id=daisy_bucket_name, location=self.GetScratchBucketRegion())
     self.mocked_storage_v1.buckets.Get.Expect(
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket=daisy_bucket_name),
-        response=self.storage_v1_messages.Bucket(
-            id=daisy_bucket_name, location=self.GetScratchBucketRegion()))
+        response=daisy_bucket)
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix=daisy_bucket.id,
+        ),
+        response=self.storage_v1_messages.Buckets(items=[daisy_bucket]))
 
   def PrepareDaisyBucketMocksWithoutRegion(self):
     daisy_bucket_name = self.GetScratchBucketNameWithoutRegion()
+    daisy_bucket = self.storage_v1_messages.Bucket(id=daisy_bucket_name)
     self.mocked_storage_v1.buckets.Get.Expect(
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket=daisy_bucket_name),
-        response=self.storage_v1_messages.Bucket(
-            id=daisy_bucket_name))
+        response=daisy_bucket)
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix=daisy_bucket.id,
+        ),
+        response=self.storage_v1_messages.Buckets(items=[daisy_bucket]))
 
   def GetNetworkStep(self, workflow, daisy_vars, operation, regionalized,
                      network=None, subnet=None, include_zone=True,

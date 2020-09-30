@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import math
+
 from googlecloudsdk.core.util import scaled_integer
 from tests.lib import parameterized
 from tests.lib.parameterized_line_no import LineNo as T
@@ -384,3 +386,41 @@ class GetUnitSizeTest(ExceptionalParameterizedTestBase):
       kwargs = {}
     self.RunTestCase(scaled_integer.GetBinaryUnitSize, unit, expected_size,
                      kwargs)
+
+
+class FormatBinaryNumberTest(ExceptionalParameterizedTestBase):
+  """Uses different conversion base than FormatInteger and adds precision."""
+
+  @parameterized.named_parameters(
+      # Decimal precision tests.
+      T(14, '14B', decimal_places=-1),
+      T(2000, '2000B', decimal_places=-1),
+      T(2048, '2kiB', decimal_places=-1),
+      T(1234567, '1234567B', decimal_places=-1),
+      T(2000, '2kiB', decimal_places=0),
+      T(2048, '2kiB', decimal_places=0),
+      T(2000, '2.0kiB', decimal_places=1),
+      T(2000, '1.95kiB', decimal_places=2),
+      T(2000, '1.9531250000kiB', decimal_places=10),
+      T(math.pi, '3.1415926536B', decimal_places=10),
+
+      # Unit tests. As in, metric system units. Not the test type.
+      T(0, '0B', decimal_places=2),
+      T(1, '1.00B', decimal_places=2),
+      T(2, '2.00B', decimal_places=2),
+      T(1014, '1014.00B', decimal_places=2),
+      T(1034, '1.01kiB', decimal_places=2),
+      T(1048576, '1.00MiB', decimal_places=2),
+      T(1073741824, '1.00GiB', decimal_places=2),
+      T(1099511627776, '1.00TiB', decimal_places=2),
+      T(562949953421312, '512.00TiB', decimal_places=2),
+      T(1125899906842624, '1.00PiB', decimal_places=2),
+      T(2251799813685248, '2.00PiB', decimal_places=2),
+      T(-1, '-1B', decimal_places=2),
+      T(-1024, '-1024B', decimal_places=2),
+      T(-1125899906842624, '-1125899906842624B', decimal_places=2),
+  )
+  def testFormatBinaryNumber(
+      self, value, expected_format, kwargs):
+    self.RunTestCase(
+        scaled_integer.FormatBinaryNumber, value, expected_format, kwargs)

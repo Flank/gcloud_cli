@@ -25,7 +25,8 @@ POSITIONAL ARGUMENTS
           The issuing certificate authority of the CERTIFICATE.
 
        --issuer-location=ISSUER_LOCATION
-          The location of the CERTIFICATE.
+          The location of the CERTIFICATE. Alternatively, you can set the
+          property [privateca/location].
 
 FLAGS
      --update-labels=[KEY=VALUE,...]

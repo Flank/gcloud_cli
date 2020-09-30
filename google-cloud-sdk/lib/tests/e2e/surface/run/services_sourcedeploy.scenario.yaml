@@ -17,7 +17,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name3$$] revision [$$service-revision-name-4$$] has been deployed and is serving 100 percent of traffic at https://$$service-name3$$-ixwc4imo7a-uc.a.run.app
+      Service [$$service-name3$$] revision [$$service-revision-name-4$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: https://$$service-name3$$-ixwc4imo7a-uc.a.run.app
 - execute:
   - command: run services delete $$service-name3$$ --region us-central1 --quiet
   - stderr: |
@@ -487,7 +488,8 @@ actions:
             json: {}
         repeatable: true
     - expect_stderr: |
-        Service [$$service-name3$$] revision [$$service-revision-name-4$$] has been deployed and is serving 100 percent of traffic at https://$$service-name3$$-ixwc4imo7a-uc.a.run.app
+        Service [$$service-name3$$] revision [$$service-revision-name-4$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: https://$$service-name3$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
 - execute_command:

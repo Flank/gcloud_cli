@@ -11,7 +11,7 @@ gcloud alpha artifacts repositories create \- create an Artifact Registry reposi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha artifacts repositories create\fR (\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-repository\-format\fR=\fIREPOSITORY_FORMAT\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha artifacts repositories create\fR (\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-repository\-format\fR=\fIREPOSITORY_FORMAT\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -89,6 +89,15 @@ Description for the repository.
 \fB\-\-kms\-key\fR=\fIKMS_KEY\fR
 Name of the encryption key that's used for encrypting the contents of the
 repository.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 
 .RE

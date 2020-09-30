@@ -291,8 +291,9 @@ class InitTestAlpha(base.EventsBase):
         message,
         ('Initialized cluster [my-cluster] for Cloud Run eventing. '
          'Next, initialize the namespace(s) you plan to use and create a '
-         'broker via `gcloud alpha events namespaces init` and `gcloud alpha '
-         'events brokers create`.'))
+         'broker via `gcloud alpha events namespaces init '
+         '--copy-default-secret` and `gcloud alpha events brokers create '
+         'default`.'))
 
 
 def _MockService(name):

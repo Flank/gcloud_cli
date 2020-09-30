@@ -16,7 +16,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
 - execute:
   - command: run services describe $$service-name$$ --region us-central1 --format='text(status.conditions[].status,status.conditions[].type)'
   - stdout: |
@@ -36,7 +37,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name-2$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+      Service [$$service-name$$] revision [$$service-revision-name-2$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
 - execute:
   - command: run services replace --region us-central1 service.yaml
   - stderr: |
@@ -48,7 +50,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name-3$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+      Service [$$service-name$$] revision [$$service-revision-name-3$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
 - execute:
   - command: run services delete $$service-name$$ --region us-central1 --quiet
   - stderr: |
@@ -334,7 +337,8 @@ actions:
             json: {}
         repeatable: true
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
 - execute_command:
@@ -809,7 +813,8 @@ actions:
             json: {}
         repeatable: true
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name-2$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+        Service [$$service-name$$] revision [$$service-revision-name-2$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
 - write_file:

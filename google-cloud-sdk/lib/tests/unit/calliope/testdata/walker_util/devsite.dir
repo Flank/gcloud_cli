@@ -1,9 +1,9 @@
 <<<DIRECTORY devsite>>>
 00346 _toc.yaml
-07296 index.html
+07323 index.html
 02444 version.html
 01160 alpha/_toc.yaml
-07410 alpha/index.html
+07437 alpha/index.html
 02707 alpha/version.html
 03125 alpha/internal/index.html
 03204 alpha/internal/internal-command.html
@@ -17,7 +17,7 @@
 02847 alpha/sdk/subgroup/subgroup-command-2.html
 04763 alpha/sdk/subgroup/subgroup-command-a.html
 01457 beta/_toc.yaml
-07227 beta/index.html
+07254 beta/index.html
 02534 beta/version.html
 02950 beta/internal/index.html
 03031 beta/internal/internal-command.html

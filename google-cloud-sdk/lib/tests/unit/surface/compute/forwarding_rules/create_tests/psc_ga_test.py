@@ -29,7 +29,7 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
 
   def testValidRequestAllApis(self):
     self.Run("""
-        compute forwarding-rules create forwarding-rule-1
+        compute forwarding-rules create forwardingrule1
         --global
         --address=192.168.2.100
         --target-google-apis-bundle all-apis
@@ -39,7 +39,7 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
         [(self.compute.globalForwardingRules, 'Insert',
           self.messages.ComputeGlobalForwardingRulesInsertRequest(
               forwardingRule=self.messages.ForwardingRule(
-                  name='forwarding-rule-1',
+                  name='forwardingrule1',
                   target=('all-apis'),
                   network=('{compute_uri}/projects/my-project/global/networks/'
                            'network1'.format(compute_uri=self.compute_uri)),
@@ -50,7 +50,7 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
     address_uri = ('http://www.googleapis.com/compute/alpha/projects/abcd/'
                    'global/addresses/efg')
     self.Run("""
-        compute forwarding-rules create forwarding-rule-1
+        compute forwarding-rules create forwardingrule1
         --global
         --address={}
         --target-google-apis-bundle vpc-sc
@@ -60,19 +60,19 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
         [(self.compute.globalForwardingRules, 'Insert',
           self.messages.ComputeGlobalForwardingRulesInsertRequest(
               forwardingRule=self.messages.ForwardingRule(
-                  name='forwarding-rule-1',
+                  name='forwardingrule1',
                   target='vpc-sc',
                   network=('{compute_uri}/projects/my-project/global/networks/'
                            'network1'.format(compute_uri=self.compute_uri)),
                   IPAddress=address_uri),
               project='my-project'))],)
 
-  def testBadBundleName(self):
+  def testBadBundleNamesRejected(self):
     with self.AssertRaisesExceptionRegexp(
         exceptions.InvalidArgumentException,
         '.*valid values for target-google-apis-bundle are.*'):
       self.Run("""
-          compute forwarding-rules create forwarding-rule-1
+          compute forwarding-rules create fr1
           --global
           --address=10.1.1.1
           --target-google-apis-bundle notabundle
@@ -80,15 +80,51 @@ class PscGoogleApisForwardingRulesCreateTestAlpha(
       """)
     self.CheckRequests()
 
-  def testBadLbType(self):
+  def testBadLbTypesRejected(self):
     with self.AssertRaisesExceptionRegexp(
         exceptions.InvalidArgumentException,
         '.*--load-balancing-scheme flag is not allowed for PSC-GoogleApis.*'):
       self.Run("""
-          compute forwarding-rules create forwarding-rule-1
+          compute forwarding-rules create forwardingrule1
           --global
           --address=10.1.1.1
           --load-balancing-scheme=INTERNAL_MANAGED
+          --target-google-apis-bundle vpc-sc
+          --network network1
+      """)
+    self.CheckRequests()
+
+  def testNonAlnumFrNamesRejected(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.ToolException, '.*alphanumeric, starting with a letter.*'):
+      self.Run("""
+          compute forwarding-rules create forwarding-rule-1
+          --global
+          --address=10.1.1.1
+          --target-google-apis-bundle vpc-sc
+          --network network1
+      """)
+    self.CheckRequests()
+
+  def testInitialDigitFrNamesRejected(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.ToolException, '.*alphanumeric, starting with a letter.*'):
+      self.Run("""
+          compute forwarding-rules create 123forwarding
+          --global
+          --address=10.1.1.1
+          --target-google-apis-bundle vpc-sc
+          --network network1
+      """)
+    self.CheckRequests()
+
+  def testOverlongFrName(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.ToolException, '.*alphanumeric, starting with a letter.*'):
+      self.Run("""
+          compute forwarding-rules create averylongforwardingrulename
+          --global
+          --address=10.1.1.1
           --target-google-apis-bundle vpc-sc
           --network network1
       """)

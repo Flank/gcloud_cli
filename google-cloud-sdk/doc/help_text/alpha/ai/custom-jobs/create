@@ -1,0 +1,88 @@
+NAME
+    gcloud alpha ai custom-jobs create - create a new custom job
+
+SYNOPSIS
+    gcloud alpha ai custom-jobs create --display-name=DISPLAY_NAME
+        (--config=CONFIG --worker-pool-spec=[WORKER_POOL_SPEC,...])
+        [--python-package-uris=[PYTHON_PACKAGE_URIS,...]] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A created custom job right away will be attempted to be run.
+
+REQUIRED FLAGS
+     --display-name=DISPLAY_NAME
+        Display name of the custom job to create.
+
+     Worker pool specification. At least one of these must be specified:
+
+       --config=CONFIG
+          Path to the job configuration file. This file should be a YAML
+          document containing a CustomJobSpec. If an option is specified both
+          in the configuration file **and** via command line arguments, the
+          command line arguments override the configuration file.
+
+          Example(YAML):
+
+              worker_pool_specs:
+                machine_spec:
+                  machine_type: n1-highmem-2
+                replica_count: 1
+                container_spec:
+                  image_uri: gcr.io/ucaip-test/ucaip-training-test
+
+       --worker-pool-spec=[WORKER_POOL_SPEC,...]
+          Define the worker pool configuration used by the custom job. You can
+          specify multiple worker pool specs in order to create a custom job
+          with multiple worker pools.
+
+          The spec can contain the following fields, which are listed with
+          corresponding fields in the WorkerPoolSpec API message:
+
+       machine-type
+          (Required): machineSpec.machineType
+       replica-count
+          replicaCount
+       container-image-uri
+          containerSpec.imageUri
+       python-image-uri
+          pythonPackageSpec.executorImageUri
+       python-module
+          pythonPackageSpec.pythonModule
+
+          For example:
+          --worker-pool-spec=replica-count=1,machine-type=n1-highmem-2,container-image-uri=gcr.io/ucaip-test/ucaip-training-test
+
+OPTIONAL FLAGS
+     --python-package-uris=[PYTHON_PACKAGE_URIS,...]
+        The common python package uris that will be used by python image. e.g.
+        --python-package-uri=path1,path2If customizing the python package is
+        needed, please use config instead.
+
+     Region resource - Cloud region to create a custom job. This represents a
+     Cloud resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute:
+     provide the argument [--region] on the command line with a fully specified
+     name; set the property [ai/region] with a fully specified name; region
+     with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project].
+
+       --region=REGION
+          ID of the region or fully qualified identifier for the region.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta ai custom-jobs create
+

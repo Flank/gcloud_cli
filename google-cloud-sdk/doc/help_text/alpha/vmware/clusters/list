@@ -1,5 +1,6 @@
 NAME
-    gcloud alpha vmware clusters list - list Cloud VMware clusters
+    gcloud alpha vmware clusters list - list clusters in a VMware Engine
+        private cloud
 
 SYNOPSIS
     gcloud alpha vmware clusters list
@@ -8,7 +9,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) list VMware clusters in a privatecloud.
+    (ALPHA) List clusters in a VMware Engine private cloud.
 
 REQUIRED FLAGS
      Privatecloud resource - privatecloud. The arguments in this group can be
@@ -65,7 +66,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-        $ gcloud alpha vmware clusters list --cluster-group=my-privatecloud
+    To list clusters in the my-privatecloud private cloud, run:
+
+        $ gcloud alpha vmware clusters list --privatecloud=my-privatecloud
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

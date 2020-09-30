@@ -6,11 +6,21 @@ SYNOPSIS
     gcloud alpha cloud-shell ssh [--authorize-session] [--boosted]
         [--command=COMMAND] [--dry-run] [--force-key-file-overwrite]
         [--ssh-flag=SSH_FLAG] [--ssh-key-file] [GCLOUD_WIDE_FLAG ...]
+        [-- SSH_ARGS ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha cloud-shell ssh lets you remotely log in to Cloud
     Shell. If your Cloud Shell is not currently running, this will cause it to
     be started before establishing the SSH session.
+
+POSITIONAL ARGUMENTS
+     [-- SSH_ARGS ...]
+        Flags and positionals passed to the underlying ssh implementation.
+
+        The '--' argument must be specified between gcloud specific args on the
+        left and SSH_ARGS on the right. Example:
+
+            $ gcloud alpha cloud-shell ssh -- -vvv
 
 FLAGS
      --authorize-session

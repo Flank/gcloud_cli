@@ -125,6 +125,15 @@ class IamUtilsTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'KMS key'):
       iam.CheckCreateCertificateAuthorityPermissions(project_ref, key_ref)
 
+  def testCreateCertificatePermissionsIgnoresMissingKmsKey(self):
+    project_ref = projects_command_util.ParseProject(self._PROJECT_NAME)
+    self._ExpectProjectIamCall(
+        project_ref,
+        ['privateca.certificateAuthorities.create'],
+        ['privateca.certificateAuthorities.create'])
+
+    iam.CheckCreateCertificateAuthorityPermissions(project_ref, None)
+
 
 if __name__ == '__main__':
   test_case.main()

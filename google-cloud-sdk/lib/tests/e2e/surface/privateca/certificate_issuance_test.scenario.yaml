@@ -91,6 +91,8 @@ actions:
     prefix: gcloud-test
     delimiter: '-'
     requires_cleanup: false
+- set_property:
+    privateca/location: us-central1
 - execute_command:
     command: privateca roots create $$ca-id$$ --kms-key-version $$kms-key-version$$
       --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config

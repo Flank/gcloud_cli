@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.functions import env_vars
 from googlecloudsdk.api_lib.functions import util as api_util
-from googlecloudsdk.calliope import base
 from tests.lib import parameterized
 from tests.lib import test_case
 
@@ -31,7 +30,6 @@ class EnvVarsTest(parameterized.TestCase):
   """
 
   _BUILD_ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
-      track=base.ReleaseTrack.ALPHA
   ).CloudFunction.BuildEnvironmentVariablesValue
   _ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
   ).CloudFunction.EnvironmentVariablesValue

@@ -40,7 +40,10 @@ SYNOPSIS
           --reservation-affinity=RESERVATION_AFFINITY; default="any"]
         [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
-        [GCLOUD_WIDE_FLAG ...]
+        [--service-proxy=[enabled],[access-log=ACCESS-LOG],[network=NETWORK],
+          [proxy-port=PROXY-PORT],
+          [serving-ports=SERVING-PORTS],[tracing=TRACING]
+          --service-proxy-labels=[KEY=VALUE, ...,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute instance-templates create facilitates the creation of
@@ -724,6 +727,60 @@ FLAGS
 
        --no-service-account
           Create instance without service account
+
+     --service-proxy=[enabled],[access-log=ACCESS-LOG],[network=NETWORK],[proxy-port=PROXY-PORT],[serving-ports=SERVING-PORTS],[tracing=TRACING]
+        Controls whether the Traffic Director service proxy (Envoy) and agent
+        are installed and configured on the VM. "cloud-platform" scope is
+        enabled automatically to allow connections to the Traffic Director API.
+        Do not use the --no-scopes flag.
+
+         enabled
+            If specified, the service-proxy software will be installed when the
+            instance is created. The instance is configured to work with
+            Traffic Director.
+
+         serving-ports
+            Semi-colon-separated (;) list of the ports, specified inside
+            quotation marks ("), on which the customer's application/workload
+            is serving.
+
+            For example:
+
+                --serving-ports="80;8080"
+
+            The service proxy will intercept inbound traffic, then forward it
+            to the specified serving port(s) on localhost. If not provided, no
+            incoming traffic is intercepted.
+
+         proxy-port
+            The port on which the service proxy listens. The VM intercepts
+            traffic and redirects it to this port to be handled by the service
+            proxy. If omitted, the default value is '15001'.
+
+         tracing
+            Enables the service proxy to generate distributed tracing
+            information. If set to ON, the service proxy's control plane
+            generates a configuration that enables request ID-based tracing.
+            For more information, refer to the generate_request_id
+            documentation for the Envoy proxy. Allowed values are ON and OFF.
+
+         access-log
+            The filepath for access logs sent to the service proxy by the
+            control plane. All incoming and outgoing requests are recorded in
+            this file. For more information, refer to the file access log
+            documentation for the Envoy proxy.
+
+         network
+            The name of a valid VPC network. The Google Cloud Platform VPC
+            network used by the service proxy's control plane to generate
+            dynamic configuration for the service proxy.
+
+     --service-proxy-labels=[KEY=VALUE, ...,...]
+        Labels that you can apply to your service proxy. These will be
+        reflected in your Envoy proxy's bootstrap metadata. These can be any
+        key=value pairs that you want to set as proxy metadata (for example,
+        for use with config filtering). You might use these flags for
+        application and version labels: app=review and/or version=canary.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -18,6 +18,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add an IAM policy binding to a Cloud Billing account.
+
      describe
         (BETA) Show metadata for a billing account.
 
@@ -26,6 +29,9 @@ COMMANDS
 
      list
         (BETA) List all active billing accounts.
+
+     remove-iam-policy-binding
+        (BETA) Remove an IAM policy binding from a Cloud Billing account.
 
      set-iam-policy
         (BETA) Set the IAM policy for a Cloud Billing account.

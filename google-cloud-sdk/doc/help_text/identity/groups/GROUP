@@ -27,6 +27,9 @@ COMMANDS
      delete
         Delete an existing group.
 
+     describe
+        Describe an existing group.
+
 NOTES
     These variants are also available:
 

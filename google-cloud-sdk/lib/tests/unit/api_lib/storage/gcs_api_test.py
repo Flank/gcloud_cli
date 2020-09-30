@@ -514,9 +514,8 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
 
     object_reference = self.gcs_client.GetObjectMetadata(TEST_BUCKET,
                                                          TEST_OBJECT)
-    expected_object_reference = (
-        resource_reference.ObjectResource.from_gcs_metadata_object(
-            cloud_api.ProviderPrefix.GCS.value, metadata_object))
+    expected_object_reference = gcs_api._ObjectResourceFromMetadata(
+        metadata_object)
     self.assertEqual(object_reference.metadata,
                      expected_object_reference.metadata)
     self.assertEqual(object_reference.storage_url,
@@ -605,9 +604,8 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     object_reference = self.gcs_client.PatchObjectMetadata(TEST_BUCKET,
                                                            TEST_OBJECT,
                                                            self.patched_object)
-    expected_object_reference = (
-        resource_reference.ObjectResource.from_gcs_metadata_object(
-            cloud_api.ProviderPrefix.GCS.value, self.patched_object))
+    expected_object_reference = gcs_api._ObjectResourceFromMetadata(
+        self.patched_object)
     self.assertEqual(object_reference.metadata,
                      expected_object_reference.metadata)
     self.assertEqual(object_reference.storage_url,
@@ -752,9 +750,8 @@ class CopyObjectTest(cloud_storage_util.WithGCSCalls, sdk_test_base.SdkBase):
 
     object_reference = self.gcs_client.CopyObject(
         self.source_object, self.destination_object)
-    expected_object_reference = (
-        resource_reference.ObjectResource.from_gcs_metadata_object(
-            cloud_api.ProviderPrefix.GCS.value, self.destination_object))
+    expected_object_reference = gcs_api._ObjectResourceFromMetadata(
+        self.destination_object)
 
     self.assertEqual(object_reference.metadata,
                      expected_object_reference.metadata)
@@ -935,9 +932,8 @@ class UploadObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       object_reference = self.gcs_client.UploadObject(
           self.upload_stream,
           self.upload_object)
-      expected_object_reference = (
-          resource_reference.ObjectResource.from_gcs_metadata_object(
-              cloud_api.ProviderPrefix.GCS.value, self.upload_object))
+      expected_object_reference = gcs_api._ObjectResourceFromMetadata(
+          self.upload_object)
       self.assertEqual(object_reference.metadata,
                        expected_object_reference.metadata)
       self.assertEqual(object_reference.storage_url,

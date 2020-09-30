@@ -301,6 +301,14 @@ class BetaCreateTest(CreateTest):
     self.orig = router_test_utils.CreateEmptyRouterMessage(
         self.messages, track='beta')
 
+  def testEndpointIndependentMappingUnsupported(self):
+    with self.AssertRaisesArgumentErrorRegexp('unrecognized arguments'):
+      self.Run("""
+          compute routers nats create my-nat --router my-router
+          --region us-central1 --auto-allocate-nat-external-ips
+          --nat-all-subnet-ip-ranges --enable-endpoint-independent-mapping
+          """)
+
 
 class AlphaCreateTest(CreateTest):
 
@@ -310,6 +318,35 @@ class AlphaCreateTest(CreateTest):
 
     self.orig = router_test_utils.CreateEmptyRouterMessage(
         self.messages, track='alpha')
+
+  def testEndpointIndependentMapping(self):
+    expected_router = copy.deepcopy(self.orig)
+    expected_router.nats = [
+        self.messages.RouterNat(
+            name='my-nat',
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.AUTO_ONLY,
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_IP_RANGES,
+            minPortsPerVm=None,
+            icmpIdleTimeoutSec=None,
+            udpIdleTimeoutSec=None,
+            tcpTransitoryIdleTimeoutSec=None,
+            tcpEstablishedIdleTimeoutSec=None,
+            enableEndpointIndependentMapping=True)
+    ]
+
+    self.ExpectGet(self.orig)
+    self.ExpectPatch(expected_router)
+    self.ExpectOperationsPolling()
+    self.ExpectGet(expected_router)
+
+    self.Run("""
+        compute routers nats create my-nat --router my-router
+        --region us-central1 --auto-allocate-nat-external-ips
+        --nat-all-subnet-ip-ranges --enable-endpoint-independent-mapping
+        """)
 
 if __name__ == '__main__':
   test_case.main()

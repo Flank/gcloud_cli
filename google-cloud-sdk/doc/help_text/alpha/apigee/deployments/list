@@ -11,26 +11,30 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) List Apigee API proxy deployments.
 
-        gcloud alpha apigee deployments list can filter listed deployments by environment, API proxy,
-        proxy revision, or a combination of these.
+    gcloud alpha apigee deployments list lists deployments of API proxies,
+    optionally filtered by environment, proxy name, proxy revision, or a
+    combination of these.
 
 FLAGS
-     Revision resource - The API proxy revision and environment whose
-     deployments should be listed. Providing a --revision is only valid if
-     --api is also specified. If no --revision is provided, all deployed
-     revisions that match the other arguments will be included. The arguments
-     in this group can be used to specify the attributes of this resource.
+     Revision resource - API proxy revision and environment whose deployments
+     should be listed. Providing a REVISION is only valid if API is also
+     specified. If no REVISION is provided, all deployed revisions that match
+     the other arguments will be included. The arguments in this group can be
+     used to specify the attributes of this resource.
 
        --api=API
           The API proxy whose deployments should be listed. If not provided,
-          all proxies will be listed.
+          all proxies will be listed. To get a list of existing API proxies,
+          run gcloud alpha apigee apis list.
 
        --environment=ENVIRONMENT
           The environment whose deployments should be listed. If not provided,
-          all environments will be listed.
+          all environments will be listed. To get a list of available
+          environments, run gcloud alpha apigee environments list.
 
        --organization=ORGANIZATION
-          The organization whose deployments should be listed.
+          The organization whose deployments should be listed.If unspecified,
+          the Cloud Platform project's associated organization will be used.
 
        --revision=REVISION
           ID of the revision or fully qualified identifier for the revision.
@@ -87,9 +91,10 @@ EXAMPLES
         $ gcloud alpha apigee deployments list --api=my-proxy
 
     To list all deployments to the test environment of the active Cloud
-    Platform project, run:
+    Platform project, formatted as a JSON array, run:
 
-        $ gcloud alpha apigee deployments list --environment=test
+        $ gcloud alpha apigee deployments list --environment=test \
+          --format=json
 
     To list all deployments of my-proxy to the test environment in an Apigee
     organization called my-org, run:

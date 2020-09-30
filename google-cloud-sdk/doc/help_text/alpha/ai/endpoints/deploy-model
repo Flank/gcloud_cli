@@ -1,0 +1,87 @@
+NAME
+    gcloud alpha ai endpoints deploy-model - deploy a model to an existing AI
+        Platform endpoint
+
+SYNOPSIS
+    gcloud alpha ai endpoints deploy-model (ENDPOINT : --region=REGION)
+        --display-name=DISPLAY_NAME --min-replica-count=MIN_REPLICA_COUNT
+        --model=MODEL [--accelerator=[count=COUNT],[type=TYPE]]
+        [--machine-type=MACHINE_TYPE] [--max-replica-count=MAX_REPLICA_COUNT]
+        [--traffic-split=[DEPLOYED_MODEL_ID=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Deploy a model to an existing AI Platform endpoint.
+
+POSITIONAL ARGUMENTS
+     Endpoint resource - The endpoint to deploy a model to. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument
+     [endpoint] on the command line with a fully specified name; provide the
+     argument [--project] on the command line; set the property [core/project].
+     This must be specified.
+
+       ENDPOINT
+          ID of the endpoint or fully qualified identifier for the endpoint.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --region=REGION
+          Cloud region for the endpoint.
+
+REQUIRED FLAGS
+     --display-name=DISPLAY_NAME
+        Display name of the deployed model.
+
+     --min-replica-count=MIN_REPLICA_COUNT
+        Minimum number of machine replicas the deployed model will be always
+        deployed on.
+
+     --model=MODEL
+        Id of the uploaded model.
+
+OPTIONAL FLAGS
+     --accelerator=[count=COUNT],[type=TYPE]
+        Manage the accelerator config for GPU serving. When deploying a model
+        with Compute Engine Machine Types, a GPU accelerator may also be
+        selected.
+
+         type
+            The type of the accelerator. Choices are 'nvidia-tesla-k80',
+            'nvidia-tesla-p100', 'nvidia-tesla-p4', 'nvidia-tesla-t4',
+            'nvidia-tesla-v100'.
+
+         count
+            The number of accelerators to attach to each machine running the
+            job. This is usually 1. If not specified, the default value is 1.
+
+            For example: --accelerator=type=nvidia-tesla-k80,count=1
+
+     --machine-type=MACHINE_TYPE
+        Type of machine on which to serve the model. Currently only applies to
+        online prediction. If the uploaded models use dedicated resources, the
+        machine type is a required field for deployment.
+
+     --max-replica-count=MAX_REPLICA_COUNT
+        Maximum number of machine replicas the deployed model will be always
+        deployed on.
+
+     --traffic-split=[DEPLOYED_MODEL_ID=VALUE,...]
+        List of paris of deployed model id and value to set as traffic split.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta ai endpoints deploy-model
+

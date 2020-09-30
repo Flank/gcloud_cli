@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) Create, delete, list, and view instances for remote build
-    execution.
+    execution. Also manage per-instance feature policies.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -27,11 +27,17 @@ COMMANDS
      delete
         (ALPHA) Delete a given instance and all contained worker pools.
 
+     delete-feature-policy
+        (ALPHA) Deletes the feature policy for an instance.
+
      describe
         (ALPHA) Describe an instance.
 
      list
         (ALPHA) List instances in given project.
+
+     set-feature-policy
+        (ALPHA) Sets the feature policy for an instance.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

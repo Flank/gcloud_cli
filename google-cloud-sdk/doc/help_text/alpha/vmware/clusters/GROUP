@@ -19,16 +19,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Cloud VMware cluster.
+        (ALPHA) Create a cluster in a VMware Engine private cloud.
 
      delete
-        (ALPHA) Delete a Cloud VMware cluster.
+        (ALPHA) Delete a cluster in a VMware Engine private cloud.
 
      describe
-        (ALPHA) Describe a Cloud VMware cluster.
+        (ALPHA) Describe a cluster in a VMware Engine private cloud.
 
      list
-        (ALPHA) List Cloud VMware clusters.
+        (ALPHA) List clusters in a VMware Engine private cloud.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

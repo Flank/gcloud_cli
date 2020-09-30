@@ -40,13 +40,13 @@ osconfig_metadata_value = (
 )
 
 
-class InstanceTemplatesCreateWithServiceProxyBeta(
+class InstanceTemplatesCreateWithServiceProxyGA(
     create_test_base.InstanceTemplatesCreateTestBase):
-  """Test creation of Instance Templates with --service-proxy configuration argument in Beta."""
+  """Test creation of Instance Templates with --service-proxy configuration argument in GA."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def testCreateWithBasicCall(self):
     m = self.messages
@@ -617,8 +617,17 @@ cat <<EOF > /var/www/html/index.html
     )
 
 
+class InstanceTemplatesCreateWithServiceProxyBeta(
+    InstanceTemplatesCreateWithServiceProxyGA):
+  """Test creation of Instance Templates with --service-proxy configuration argument in Beta."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
 class InstanceTemplatesCreateWithServiceProxyAlpha(
-    InstanceTemplatesCreateWithServiceProxyBeta):
+    InstanceTemplatesCreateWithServiceProxyGA):
   """Test creation of Instance Templates with --service-proxy configuration argument in Alpha."""
 
   def PreSetUp(self):

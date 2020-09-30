@@ -1,5 +1,6 @@
 NAME
-    gcloud alpha vmware privateclouds list - list Cloud VMware privateclouds
+    gcloud alpha vmware privateclouds list - list VMware Engine private clouds
+        in a location
 
 SYNOPSIS
     gcloud alpha vmware privateclouds list [--location=LOCATION]
@@ -7,7 +8,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List VMware privateclouds in a location.
+    (ALPHA) List VMware Engine private clouds in a location.
 
 FLAGS
      Location resource - location. This represents a Cloud resource. (NOTE)
@@ -58,13 +59,16 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    to list privateclouds in the current vmware/location:
+    To list private clouds in the location us-central1, run:
+
+        $ gcloud alpha vmware privateclouds list --location=us-central1
+
+    Or:
 
         $ gcloud alpha vmware privateclouds list
 
-    to list privateclouds in a specified location:
-
-        $ gcloud alpha vmware privateclouds list --location=us-central2
+    In the second example, the location is taken from gcloud properties
+    vmware/location.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

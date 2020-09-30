@@ -11,7 +11,7 @@ gcloud pubsub subscriptions create \- creates one or more Cloud Pub/Sub subscrip
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-max\-delivery\-attempts\fR=\fIMAX_DELIVERY_ATTEMPTS\fR\ [\fB\-\-dead\-letter\-topic\fR=\fIDEAD_LETTER_TOPIC\fR\ :\ \fB\-\-dead\-letter\-topic\-project\fR=\fIDEAD_LETTER_TOPIC_PROJECT\fR]] [\fB\-\-max\-retry\-delay\fR=\fIMAX_RETRY_DELAY\fR\ \fB\-\-min\-retry\-delay\fR=\fIMIN_RETRY_DELAY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-enable\-message\-ordering\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-max\-delivery\-attempts\fR=\fIMAX_DELIVERY_ATTEMPTS\fR\ [\fB\-\-dead\-letter\-topic\fR=\fIDEAD_LETTER_TOPIC\fR\ :\ \fB\-\-dead\-letter\-topic\-project\fR=\fIDEAD_LETTER_TOPIC_PROJECT\fR]] [\fB\-\-max\-retry\-delay\fR=\fIMAX_RETRY_DELAY\fR\ \fB\-\-min\-retry\-delay\fR=\fIMIN_RETRY_DELAY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -77,6 +77,12 @@ Project ID of the Google Cloud Platform project for the topic.
 \fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR
 The number of seconds the system will wait for a subscriber to acknowledge
 receiving a message before re\-attempting delivery.
+
+.TP 2m
+\fB\-\-enable\-message\-ordering\fR
+Whether to receive messages with the same ordering key in order. If set,
+messages with the same ordering key are sent to subscribers in the order that
+Pub/Sub receives them.
 
 .TP 2m
 \fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR

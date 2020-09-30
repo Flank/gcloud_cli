@@ -26,7 +26,8 @@ DESCRIPTION
 
 FLAGS
      --mode=MODE; default="python"
-        The debug console mode to run in. MODE must be one of: pdb, python.
+        The debug console mode to run in. MODE must be one of: ipdb, pdb, pudb,
+        python.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the requests module."""
 
 from __future__ import absolute_import
@@ -53,6 +52,12 @@ def MakeRequestsResponse(status_code, headers, body):
   http_resp.raw = io.BytesIO(six.ensure_binary(body))
   http_resp.headers = headers
   return http_resp
+
+
+def EncodeHeaders(headers):
+  return {
+      k.encode('ascii'): v.encode('ascii') for k, v in six.iteritems(headers)
+  }
 
 
 class CredentialsTest(sdk_test_base.WithFakeAuth):
@@ -122,8 +127,8 @@ class FakeService(object):
     return {}
 
   # pylint: disable=unused-argument
-  def PrepareHttpRequest(
-      self, method_config, request, global_params, upload_config):
+  def PrepareHttpRequest(self, method_config, request, global_params,
+                         upload_config):
     return global_params['desired_request']
 
   def ProcessHttpResponse(self, _, http_response):
@@ -162,8 +167,8 @@ class BatchTokenRefreshTest(sdk_test_base.WithFakeAuth):
         'content-length': 80,
     }, 'x' * 80)
 
-    mock_request = self.StartObjectPatch(http_wrapper, 'MakeRequest',
-                                         autospec=True)
+    mock_request = self.StartObjectPatch(
+        http_wrapper, 'MakeRequest', autospec=True)
     self.__ConfigureMock(
         mock_request,
         http_wrapper.Request(
@@ -215,12 +220,11 @@ class HttpTestBase(sdk_test_base.SdkBase):
   def FakeAuthUserAgent(self):
     return ''
 
-  def EncodeHeaders(self, headers):
-    return {
-        k.encode('ascii'): v.encode('ascii') for k, v in six.iteritems(headers)
-    }
-
-  def UserAgent(self, cmd_path, invocation_id, python_version, interactive,
+  def UserAgent(self,
+                cmd_path,
+                invocation_id,
+                python_version,
+                interactive,
                 fromscript=False):
     template = ('{0} gcloud/{1} command/{2} invocation-id/{3} environment/{4} '
                 'environment-version/{5} interactive/{6} from-script/{9} '
@@ -248,12 +252,13 @@ class HttpTestBase(sdk_test_base.SdkBase):
     is_interactive_mock.return_value = False
     python_version = '2.7.6'
     self.StartPatch('platform.python_version').return_value = python_version
-    self.StartObjectPatch(console_io, 'IsRunFromShellScript',
-                          return_value=False)
-    self.StartObjectPatch(console_attr.ConsoleAttr, 'GetTermIdentifier',
-                          return_value='xterm')
-    self.expected_user_agent = self.UserAgent(
-        'None', uuid_mock.return_value.hex, python_version, False)
+    self.StartObjectPatch(
+        console_io, 'IsRunFromShellScript', return_value=False)
+    self.StartObjectPatch(
+        console_attr.ConsoleAttr, 'GetTermIdentifier', return_value='xterm')
+    self.expected_user_agent = self.UserAgent('None',
+                                              uuid_mock.return_value.hex,
+                                              python_version, False)
     self.url = 'http://foo.com'
 
 
@@ -267,7 +272,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     properties.VALUES.auth.authority_selector.Set(authority_selector)
 
     expected_headers = {'x-goog-iam-authority-selector': authority_selector}
-    expected_headers = self.EncodeHeaders(expected_headers)
+    expected_headers = EncodeHeaders(expected_headers)
 
     creds_requests.GetSession().request('GET', self.url)
     self.assertDictContainsSubset(expected_headers,
@@ -281,7 +286,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
         authorization_token_file)
 
     expected_headers = {'x-goog-iam-authorization-token': authorization_token}
-    expected_headers = self.EncodeHeaders(expected_headers)
+    expected_headers = EncodeHeaders(expected_headers)
     creds_requests.GetSession().request('GET', self.url)
     self.assertDictContainsSubset(expected_headers,
                                   self.request_mock.call_args[1]['headers'])
@@ -289,7 +294,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
   def testDisabledAuth(self):
     properties.VALUES.auth.disable_credentials.Set(True)
     expected_headers = {'user-agent': self.expected_user_agent}
-    expected_headers = self.EncodeHeaders(expected_headers)
+    expected_headers = EncodeHeaders(expected_headers)
     http_client = creds_requests.GetSession()
     http_client.request('GET', self.url)
     self.request_mock.assert_called_once_with(
@@ -302,14 +307,21 @@ class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
     self.use_google_auth = True
 
   def testComputeServiceAccount(self):
-    # Don't do it for service accounts.
-    properties.VALUES.billing.quota_project.Set('bar')
+    # Don't add x-goog-user-project header for service accounts, unless
+    # billing/quota project is set. In that case, use the value for the header.
     creds_requests.GetSession(enable_resource_quota=True).request(
         'GET', self.url)
     self.assertNotIn('X-Goog-User-Project',
                      self.request_mock.call_args[1]['headers'])
     self.assertNotIn(b'X-Goog-User-Project',
                      self.request_mock.call_args[1]['headers'])
+
+    properties.VALUES.billing.quota_project.Set('bar')
+    creds_requests.GetSession(enable_resource_quota=True).request(
+        'GET', 'http://foo.com')
+    expected_headers = EncodeHeaders({'X-Goog-User-Project': 'bar'})
+    self.assertDictContainsSubset(expected_headers,
+                                  self.request_mock.call_args[1]['headers'])
 
 
 class ApitoolsRequestsTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
@@ -331,10 +343,12 @@ class ApitoolsRequestsTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
     session = creds_requests.GetSession(response_encoding=encoding)
     apitools_requests = creds_requests.GetApitoolsRequests(session)
     response = apitools_requests.request('url')
-    self.assertEqual(response[0], httplib2.Response({
-        'status': httplib.OK,
-        'header': 'value',
-    }))
+    self.assertEqual(
+        response[0],
+        httplib2.Response({
+            'status': httplib.OK,
+            'header': 'value',
+        }))
     self.assertEqual(response[1], expected_response)
 
 
@@ -348,7 +362,7 @@ class HttpTestUserProjectQuota(HttpTestBase, sdk_test_base.WithFakeAuth):
         'user-agent': self.expected_user_agent,
         'authorization': 'Bearer ' + self.FakeAuthAccessToken()
     }
-    self.common_headers = self.EncodeHeaders(common_headers)
+    self.common_headers = EncodeHeaders(common_headers)
 
     self.permission_denied_response = MakeRequestsResponse(
         403, {},

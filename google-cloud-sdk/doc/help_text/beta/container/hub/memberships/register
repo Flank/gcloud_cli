@@ -4,9 +4,11 @@ NAME
 
 SYNOPSIS
     gcloud beta container hub memberships register CLUSTER_NAME
-        --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
         (--gke-cluster=LOCATION/CLUSTER_NAME | --gke-uri=GKE_URI
           | [--context=CONTEXT : --kubeconfig=KUBECONFIG])
+        (--service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
+          | [--enable-workload-identity
+          : --public-issuer-url=PUBLIC_ISSUER_URL])
         [--manifest-output-file=MANIFEST_OUTPUT_FILE] [--proxy=PROXY]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -48,18 +50,6 @@ POSITIONAL ARGUMENTS
         being registered on the Hub.
 
 REQUIRED FLAGS
-     --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
-        The JSON file of a Google Cloud service account private key. This
-        service account key is stored as a secret named creds-gcp in
-        gke-connect namespace. To update the creds-gcp secret in gke-connect
-        namespace with a new service account key file, run the following
-        command:
-
-        kubectl delete secret creds-gcp -n gke-connect
-
-        kubectl create secret generic creds-gcp -n gke-connect
-        --from-file=creds-gcp.json=/path/to/file
-
      Cluster identifier. Exactly one of these must be specified:
 
        --gke-cluster=LOCATION/CLUSTER_NAME
@@ -86,6 +76,36 @@ REQUIRED FLAGS
             The kubeconfig file containing an entry for the cluster. Defaults
             to $KUBECONFIG if it is set in the environment, otherwise defaults
             to $HOME/.kube/config.
+
+     Exactly one of these must be specified:
+
+       --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
+          The JSON file of a Google Cloud service account private key. This
+          service account key is stored as a secret named creds-gcp in
+          gke-connect namespace. To update the creds-gcp secret in gke-connect
+          namespace with a new service account key file, run the following
+          command:
+
+          kubectl delete secret creds-gcp -n gke-connect
+
+          kubectl create secret generic creds-gcp -n gke-connect
+          --from-file=creds-gcp.json=/path/to/file
+
+       Workload Identity
+
+         --enable-workload-identity
+            Enable Workload Identity when registering the cluster with Hub.
+            Requires gcloud alpha or beta. --service_account_key_file flag
+            should not be set if this is set. This flag must be specified if
+            any of the other arguments in this group are specified.
+
+         --public-issuer-url=PUBLIC_ISSUER_URL
+            Skip auto-discovery and register the cluster with this issuer URL.
+            Use this option when the OpenID Provider Configuration and
+            associated JSON Web Key Set for validating the cluster's service
+            account JWTs are served at a public endpoint different from the
+            cluster API server. Requires gcloud alpha or beta and
+            --enable-workload-identity.
 
 OPTIONAL FLAGS
      --manifest-output-file=MANIFEST_OUTPUT_FILE

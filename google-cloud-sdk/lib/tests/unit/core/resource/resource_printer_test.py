@@ -27,6 +27,8 @@ from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.resource import resource_printer_base
 from tests.lib.core.resource import resource_printer_test_base
 
+import mock
+
 
 class MockPrinter(resource_printer_base.ResourcePrinter):
 
@@ -111,14 +113,28 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
     self.assertIn('yaml', formats)
 
   def testGetFormatRegistry(self):
-    registry = resource_printer.GetFormatRegistry()
-    self.assertIn('default', registry)
-    self.assertIn('none', registry)
-    self.assertIn('yaml', registry)
+    with mock.patch.object(resource_printer, '_FORMATTERS', {
+        'default': {},
+        'none': {},
+        'yaml': {},
+    }):
+      resource_printer.RegisterFormatter('hidden', {}, hidden=True)
+      registry = resource_printer.GetFormatRegistry()
+      self.assertIn('default', registry)
+      self.assertIn('none', registry)
+      self.assertIn('yaml', registry)
+      self.assertNotIn('hidden', registry)
+
+  def testGetFormatRegistryHidden(self):
+    with mock.patch.object(resource_printer, '_FORMATTERS', {'default': {}}):
+      resource_printer.RegisterFormatter('hidden', {}, hidden=True)
+      registry = resource_printer.GetFormatRegistry(hidden=True)
+      self.assertIn('default', registry)
+      self.assertIn('hidden', registry)
 
   def testGetSupportedFormatsAndFormatRegistry(self):
     expected = resource_printer.SupportedFormats()
-    registry = resource_printer.GetFormatRegistry()
+    registry = resource_printer.GetFormatRegistry(hidden=True)
     actual = sorted(registry)
     self.assertEqual(expected, actual)
 

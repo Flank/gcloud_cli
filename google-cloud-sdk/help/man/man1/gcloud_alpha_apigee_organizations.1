@@ -19,6 +19,13 @@ gcloud alpha apigee organizations \- manage Apigee organizations
 
 \fB(ALPHA)\fR Manage Apigee organizations.
 
+\f5gcloud alpha apigee organizations\fR contains commands for managing Apigee
+organizations, the highest\-level grouping of Apigee objects. All API proxies,
+environments, and so forth each belong to one organization.
+
+Apigee organizations are distinct from Cloud Platform organizations, being more
+similar to Cloud Platform projects in scope and purpose.
+
 
 
 .SH "GCLOUD WIDE FLAGS"
@@ -53,6 +60,25 @@ projects.
 
 .RE
 .sp
+
+.SH "EXAMPLES"
+
+To list all accessible organizations and their associated Cloud Platform
+projects, run:
+
+.RS 2m
+$ gcloud alpha apigee organizations list
+.RE
+
+To get a JSON array of all organizations whose Cloud Platform project names
+contain the word \f5\fIsandbox\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha apigee organizations list \-\-format=json \e
+  \-\-filter="project:(sandbox)"
+.RE
+
+
 
 .SH "NOTES"
 

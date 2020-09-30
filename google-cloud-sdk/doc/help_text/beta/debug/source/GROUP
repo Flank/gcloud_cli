@@ -23,9 +23,6 @@ COMMANDS
      gen-repo-info-file
         (BETA) Generates repository information files for the Cloud Debugger.
 
-     upload
-        (BETA) Upload a directory tree.
-
 NOTES
     This command is currently in BETA and may change without notice. This
     variant is also available:

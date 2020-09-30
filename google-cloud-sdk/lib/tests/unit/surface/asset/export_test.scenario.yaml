@@ -466,3 +466,37 @@ actions:
         Use [gcloud asset operations describe None] to check the status of the operation.
     - expect_exit:
         code: 0
+- execute_command:
+    command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
+      --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall --per-asset-type --partition-key read-time
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - compute.googleapis.com/Disk
+              - compute.googleapis.com/Firewall
+              contentType: IAM_POLICY
+              outputConfig:
+                bigqueryDestination:
+                  dataset: projects/google.com:test-project/datasets/test_dataset
+                  force: false
+                  separateTablesPerAssetType: true
+                  partitionSpec:
+                    partitionKey: READ_TIME
+                  table: test_table
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Export in progress for root asset [organizations/test-organization].
+        Use [gcloud asset operations describe None] to check the status of the operation.
+    - expect_exit:
+        code: 0

@@ -131,6 +131,9 @@ GROUPS
      active-directory
         (ALPHA) Manage Managed Microsoft AD resources.
 
+     ai
+        (ALPHA) Manages entities in AI Platform.
+
      ai-platform
         (ALPHA) Manage AI Platform jobs and models.
 

@@ -11,7 +11,7 @@ gcloud compute instance\-templates create \- create a Compute Engine virtual mac
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-templates create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-configure\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR] [\fB\-\-source\-instance\-zone\fR=\fISOURCE_INSTANCE_ZONE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-templates create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-configure\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR] [\fB\-\-source\-instance\-zone\fR=\fISOURCE_INSTANCE_ZONE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fB\-\-service\-proxy\fR=[\fIenabled\fR],[\fIaccess\-log\fR=\fIACCESS\-LOG\fR],[\fInetwork\fR=\fINETWORK\fR],[\fIproxy\-port\fR=\fIPROXY\-PORT\fR],[\fIserving\-ports\fR=\fISERVING\-PORTS\fR],[\fItracing\fR=\fITRACING\fR]\ \fB\-\-service\-proxy\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -869,8 +869,73 @@ If not provided, the instance will use the project's default service account.
 \fB\-\-no\-service\-account\fR
 Create instance without service account
 
+.RE
+.sp
+.TP 2m
+\fB\-\-service\-proxy\fR=[\fIenabled\fR],[\fIaccess\-log\fR=\fIACCESS\-LOG\fR],[\fInetwork\fR=\fINETWORK\fR],[\fIproxy\-port\fR=\fIPROXY\-PORT\fR],[\fIserving\-ports\fR=\fISERVING\-PORTS\fR],[\fItracing\fR=\fITRACING\fR]
+Controls whether the Traffic Director service proxy (Envoy) and agent are
+installed and configured on the VM. "cloud\-platform" scope is enabled
+automatically to allow connections to the Traffic Director API. Do not use the
+\-\-no\-scopes flag.
+
+.RS 2m
+.TP 2m
+\fBenabled\fR
+If specified, the service\-proxy software will be installed when the instance is
+created. The instance is configured to work with Traffic Director.
+
+.TP 2m
+\fBserving\-ports\fR
+Semi\-colon\-separated (;) list of the ports, specified inside quotation marks
+("), on which the customer's application/workload is serving.
+
+For example:
+
+.RS 2m
+\-\-serving\-ports="80;8080"
+.RE
+
+The service proxy will intercept inbound traffic, then forward it to the
+specified serving port(s) on localhost. If not provided, no incoming traffic is
+intercepted.
+
+.TP 2m
+\fBproxy\-port\fR
+The port on which the service proxy listens. The VM intercepts traffic and
+redirects it to this port to be handled by the service proxy. If omitted, the
+default value is '15001'.
+
+.TP 2m
+\fBtracing\fR
+Enables the service proxy to generate distributed tracing information. If set to
+ON, the service proxy's control plane generates a configuration that enables
+request ID\-based tracing. For more information, refer to the
+\f5generate_request_id\fR documentation for the Envoy proxy. Allowed values are
+\f5ON\fR and \f5OFF\fR.
+
+.TP 2m
+\fBaccess\-log\fR
+The filepath for access logs sent to the service proxy by the control plane. All
+incoming and outgoing requests are recorded in this file. For more information,
+refer to the file access log documentation for the Envoy proxy.
+
+.TP 2m
+\fBnetwork\fR
+The name of a valid VPC network. The Google Cloud Platform VPC network used by
+the service proxy's control plane to generate dynamic configuration for the
+service proxy.
 
 .RE
+.sp
+.TP 2m
+\fB\-\-service\-proxy\-labels\fR=[\fIKEY\fR=\fIVALUE\fR, ...,...]
+Labels that you can apply to your service proxy. These will be reflected in your
+Envoy proxy's bootstrap metadata. These can be any \f5key=value\fR pairs that
+you want to set as proxy metadata (for example, for use with config filtering).
+You might use these flags for application and version labels: \f5app=review\fR
+and/or \f5version=canary\fR.
+
+
 .RE
 .sp
 

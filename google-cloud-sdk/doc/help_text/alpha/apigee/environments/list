@@ -10,8 +10,9 @@ DESCRIPTION
     (ALPHA) List Apigee deployment environments.
 
 FLAGS
-     Organization resource - The Apigee organization whose environments should
-     be listed. This represents a Cloud resource.
+     Organization resource - Apigee organization whose environments should be
+     listed. If unspecified, the Cloud Platform project's associated
+     organization will be used. This represents a Cloud resource.
 
        --organization=ORGANIZATION
           ID of the organization or fully qualified identifier for the
@@ -55,14 +56,15 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To list all Apigee environments for the active Cloud Platform project, run:
+    To list all environments for the active Cloud Platform project, run:
 
         $ gcloud alpha apigee environments list
 
-    To list all Apigee environments in an Apigee organization called my-org,
+    To get a JSON array of all environments in an organization called my-org,
     run:
 
-        $ gcloud alpha apigee environments list --organization=my-org
+        $ gcloud alpha apigee environments list --organization=my-org \
+          --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

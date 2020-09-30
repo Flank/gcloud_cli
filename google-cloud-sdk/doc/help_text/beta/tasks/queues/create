@@ -9,7 +9,8 @@ SYNOPSIS
         [--max-dispatches-per-second=MAX_DISPATCHES_PER_SECOND]
         [--max-doublings=MAX_DOUBLINGS]
         [--max-retry-duration=MAX_RETRY_DURATION] [--min-backoff=MIN_BACKOFF]
-        [--routing-override=KEY:VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
+        [--routing-override=KEY:VALUE,[...]] [--type=TYPE; default="push"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) The flags available to this command represent the fields of a queue
@@ -73,6 +74,10 @@ FLAGS
 
         KEY must be at least one of: [service, version, instance]. Any missing
         keys will use the default.
+
+     --type=TYPE; default="push"
+        Specifies the type of queue. Only available options are 'push' and
+        'pull'. The default option is 'push'.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

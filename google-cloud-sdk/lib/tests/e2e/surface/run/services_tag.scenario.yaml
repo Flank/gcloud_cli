@@ -15,7 +15,9 @@ summary:
     - message: Deploying new service...
     - status: SUCCESS
   - stderr: |
-      Service [$$service-name$$] revision [$$service-name$$-00001-kuy] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+      Service [$$service-name$$] revision [$$service-name$$-00001-kuy] has been deployed and is serving 100 percent of traffic.
+      Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+      The revision can be reached directly at https://cool---$$service-name$$-ixwc4imo7a-uc.a.run.app
 - execute:
   - command: run services update --region us-central1 --update-env-vars FOO=bar --tag
       beans --no-traffic $$service-name$$
@@ -23,7 +25,7 @@ summary:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |
-      Service [$$service-name$$] revision [$$service-name$$-00002-duz] has been deployed and is serving 0 percent of traffic
+      Service [$$service-name$$] revision [$$service-name$$-00002-duz] has been deployed and is serving 0 percent of traffic.
 - execute:
   - command: run services delete $$service-name$$ --region us-central1 --quiet
   - stderr: |
@@ -293,7 +295,8 @@ actions:
         repeatable: true
     - expect_stderr:
         matches: |
-          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic.
+          Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
           The revision can be reached directly at https://cool---$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
@@ -751,7 +754,7 @@ actions:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_stderr:
         matches: |
-          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 0 percent of traffic
+          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 0 percent of traffic.
           The revision can be reached directly at https://beans---$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0

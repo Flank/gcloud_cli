@@ -53,7 +53,7 @@ class CredentialsTestBase(test_case.Base):
           "type": "authorized_user"
         }""")
 
-  # JSON representation for extened user credentials.
+  # JSON representation for extended user credentials.
   EXTENDED_USER_CREDENTIALS_JSON = textwrap.dedent("""\
         {
           "client_id": "foo.apps.googleusercontent.com",
@@ -63,7 +63,7 @@ class CredentialsTestBase(test_case.Base):
           "type": "authorized_user"
         }""")
 
-  # JSON representation for serivce account credentials.
+  # JSON representation for service account credentials.
   SERVICE_ACCOUNT_CREDENTIALS_JSON = textwrap.dedent("""\
         {
           "client_email": "bar@developer.gserviceaccount.com",
@@ -73,10 +73,10 @@ class CredentialsTestBase(test_case.Base):
           "type": "service_account"
         }""")
 
-  # JSON representation for exteneded serivce account credentials.
-  # For testing google-auth credentials serialiaztion and deserialiaztion.
-  # Unlike oauth2client credentials, google-auth serialiaztion and
-  # deserialiaztion includes token URI and project ID.
+  # JSON representation for extended service account credentials.
+  # For testing google-auth credentials serialization and deserialization.
+  # Unlike oauth2client credentials, google-auth serialization and
+  # deserialization includes token URI and project ID.
   EXTENDED_SERVICE_ACCOUNT_CREDENTIALS_JSON = textwrap.dedent("""\
         {
           "client_email": "bar@developer.gserviceaccount.com",
@@ -88,7 +88,7 @@ class CredentialsTestBase(test_case.Base):
           "type": "service_account"
         }""")
 
-  # Returns a JSON representation for P12 serivce account credentials.
+  # Returns a JSON representation for P12 service account credentials.
   P12_SERVICE_ACCOUNT_CREDENTIALS_JSON = textwrap.dedent("""\
         {
           "client_email": "p12owner@developer.gserviceaccount.com",

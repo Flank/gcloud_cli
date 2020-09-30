@@ -29,6 +29,8 @@ from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.tasks import test_base
 
+import six
+
 
 class UpdatePullQueueTest(test_base.CloudTasksAlphaTestBase):
 
@@ -134,7 +136,8 @@ class UpdatePullQueueTest(test_base.CloudTasksAlphaTestBase):
             updateMask=('retryConfig.maxAttempts,'
                         'retryConfig.maxRetryDuration')),
         exception=http_error.MakeDetailedHttpError(
-            code=404, message='Requested entity was not found.'))
+            code=six.moves.http_client.NOT_FOUND,
+            message='Requested entity was not found.'))
 
     with self.assertRaises(exceptions.HttpException):
       self.Run('tasks queues update-pull-queue my-queue '
@@ -154,7 +157,8 @@ class UpdatePullQueueTest(test_base.CloudTasksAlphaTestBase):
             updateMask=('retryConfig.maxAttempts,'
                         'retryConfig.maxRetryDuration')),
         exception=http_error.MakeDetailedHttpError(
-            code=400, message='Queue.target_type is immutable.'))
+            code=six.moves.http_client.BAD_REQUEST,
+            message='Queue.target_type is immutable.'))
 
     with self.assertRaises(exceptions.HttpException):
       self.Run('tasks queues update-pull-queue my-queue '
@@ -313,7 +317,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'retryConfig.maxRetryDuration,'
                         'retryConfig.minBackoff')),
         exception=http_error.MakeDetailedHttpError(
-            code=404,
+            code=six.moves.http_client.NOT_FOUND,
             message='Requested entity was not found.'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -349,7 +353,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'retryConfig.maxRetryDuration,'
                         'retryConfig.minBackoff')),
         exception=http_error.MakeDetailedHttpError(
-            code=400,
+            code=six.moves.http_client.BAD_REQUEST,
             message='Queue.target_type is immutable.'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -499,7 +503,7 @@ class UpdateAppEngineQueueTestBeta(UpdateAppEngineQueueTest):
                         'retryConfig.maxRetryDuration,'
                         'retryConfig.minBackoff')),
         exception=http_error.MakeDetailedHttpError(
-            code=404,
+            code=six.moves.http_client.NOT_FOUND,
             message='Requested entity was not found.'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -537,7 +541,7 @@ class UpdateAppEngineQueueTestBeta(UpdateAppEngineQueueTest):
                         'retryConfig.maxRetryDuration,'
                         'retryConfig.minBackoff')),
         exception=http_error.MakeDetailedHttpError(
-            code=400,
+            code=six.moves.http_client.BAD_REQUEST,
             message='Queue.target_type is immutable.'))
 
     with self.assertRaises(exceptions.HttpException):
@@ -546,6 +550,114 @@ class UpdateAppEngineQueueTestBeta(UpdateAppEngineQueueTest):
                '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
                '--max-dispatches-per-second=100 '
                '--max-concurrent-dispatches=10 --routing-override=service:abc')
+
+    self.AssertErrNotContains('Updated queue [my-queue].')
+
+
+class UpdateCloudTasksPullQueueTestBeta(test_base.CloudTasksTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.command = 'tasks queues update my-queue --type=pull '
+
+  def SetUp(self):
+    self.queue_type = self.messages.Queue.TypeValueValuesEnum.PULL
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation('us-central1').SelfLink())
+
+    properties.VALUES.core.user_output_enabled.Set(False)
+
+  def testUpdate_NoOptions(self):
+    with self.assertRaises(parsers.NoFieldsSpecifiedError):
+      self.Run(self.command)
+
+  def testUpdate_AllOptions(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        retryConfig=self.messages.RetryConfig(maxAttempts=10,
+                                              maxRetryDuration='5s'),
+        type=self.queue_type)
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig.maxAttempts,'
+                        'retryConfig.maxRetryDuration,'
+                        'type')),
+        response=expected_queue)
+
+    actual_queue = self.Run(self.command +
+                            '--max-attempts=10 --max-retry-duration=5s')
+
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testUpdate_ClearAll(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        retryConfig=self.messages.RetryConfig(),
+        type=self.queue_type)
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig.maxAttempts,'
+                        'retryConfig.maxRetryDuration,'
+                        'type')),
+        response=expected_queue)
+
+    actual_queue = self.Run(self.command +
+                            '--clear-max-attempts --clear-max-retry-duration')
+
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testUpdate_NonExistentQueue(self):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
+                                              maxRetryDuration='5s'),
+        type=self.queue_type)
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig.maxAttempts,'
+                        'retryConfig.maxRetryDuration,'
+                        'type')),
+        exception=http_error.MakeDetailedHttpError(
+            code=six.moves.http_client.NOT_FOUND,
+            message='Requested entity was not found.'))
+
+    with self.assertRaises(exceptions.HttpException):
+      self.Run(self.command +
+               '--max-attempts=unlimited --max-retry-duration=5s')
+
+    self.AssertErrNotContains('Updated queue [my-queue].')
+    self.AssertErrContains('Requested entity was not found.')
+
+  def testUpdate_WrongQueueType(self):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
+                                              maxRetryDuration='5s'),
+        type=self.queue_type)
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig.maxAttempts,'
+                        'retryConfig.maxRetryDuration,'
+                        'type')),
+        exception=http_error.MakeDetailedHttpError(
+            code=six.moves.http_client.BAD_REQUEST,
+            message='Queue.target_type is immutable.'))
+
+    with self.assertRaises(exceptions.HttpException):
+      self.Run(self.command +
+               '--max-attempts=unlimited --max-retry-duration=5s ')
 
     self.AssertErrNotContains('Updated queue [my-queue].')
 

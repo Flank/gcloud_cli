@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.code import run_subprocess
 from googlecloudsdk.core import config
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import platforms
 from tests.lib import test_case
 import mock
 
@@ -200,6 +201,46 @@ class StartMinikubeTest(SdkPathTestCase):
     expected_error_message = ("Not enough CPUs. Cloud Run Emulator requires "
                               "2 CPUs.")
     with mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
+         self.assertRaisesRegex(kubernetes.MinikubeStartError, expected_error_message), \
+         kubernetes.Minikube("cluster-name"):
+      pass
+
+  def testNotEnoughCpuErrorWindows(self):
+    stream_output = [
+        {
+            "type": "io.k8s.sigs.minikube.error",
+            "data": {
+                "message": "Ensure your  system has enough CPUs. The minimum "
+                           "allowed is 2 CPUs.\n",
+                "exitcode": "64"
+            }
+        },
+    ]
+    expected_error_message = ("Not enough CPUs. Cloud Run Emulator requires "
+                              "2 CPUs. Increase Docker VM CPUs to 2.")
+    with mock.patch.object(platforms.OperatingSystem, "Current", return_value=platforms.OperatingSystem.WINDOWS), \
+         mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
+         mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
+         self.assertRaisesRegex(kubernetes.MinikubeStartError, expected_error_message), \
+         kubernetes.Minikube("cluster-name"):
+      pass
+
+  def testNotEnoughCpuErrorMac(self):
+    stream_output = [
+        {
+            "type": "io.k8s.sigs.minikube.error",
+            "data": {
+                "message": "Ensure your  system has enough CPUs. The minimum "
+                           "allowed is 2 CPUs.\n",
+                "exitcode": "64"
+            }
+        },
+    ]
+    expected_error_message = ("Not enough CPUs. Cloud Run Emulator requires "
+                              "2 CPUs. Increase Docker VM CPUs to 2.")
+    with mock.patch.object(platforms.OperatingSystem, "Current", return_value=platforms.OperatingSystem.MACOSX), \
+         mock.patch.object(run_subprocess, "GetOutputJson", return_value={}), \
          mock.patch.object(run_subprocess, "StreamOutputJson", return_value=stream_output), \
          self.assertRaisesRegex(kubernetes.MinikubeStartError, expected_error_message), \
          kubernetes.Minikube("cluster-name"):

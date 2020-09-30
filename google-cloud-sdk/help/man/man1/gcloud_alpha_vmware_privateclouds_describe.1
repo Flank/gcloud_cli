@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware privateclouds describe \- describe a Cloud VMware privatecloud
+gcloud alpha vmware privateclouds describe \- describe a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware privateclouds describe \- describe a Cloud VMware privateclo
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Describe a VMware privatecloud.
+\fB(ALPHA)\fR Describe a VMware Engine private cloud.
 
 
 
@@ -62,14 +62,10 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To describe a privatecloud called example\-privatecloud in project my\-project
-and location us\-central1:
+To get a description of a private cloud called \f5\fImy\-privatecloud\fR\fR in.RS 2m
+project `_my\-project_` and location `_us\-central1_`, run:
 
-.RS 2m
-$ gcloud alpha vmware privateclouds describe example\-privatecloud
 .RE
-
-Or:
 
 .RS 2m
 $ gcloud alpha vmware privateclouds describe example\-privatecloud \e
@@ -79,11 +75,10 @@ $ gcloud alpha vmware privateclouds describe example\-privatecloud \e
 Or:
 
 .RS 2m
-$ gcloud alpha vmware privateclouds describe \e
-    /projects/my\-project/locations/us\-central1/example\-privatecloud
+$ gcloud alpha vmware privateclouds describe example\-privatecloud
 .RE
 
-In the first example, the project and location are taken from gcloud properties
+In the second example, the project and location are taken from gcloud properties
 core/project and vmware/location.
 
 

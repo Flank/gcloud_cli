@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware privateclouds create \- create a Cloud VMware privatecloud
+gcloud alpha vmware privateclouds create \- create a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware privateclouds create \- create a Cloud VMware privatecloud
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a vmware privatecloud.
+\fB(ALPHA)\fR Create a VMware Engine private cloud.
 
 
 
@@ -103,28 +103,21 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a privatecloud called example\-privatecloud in project my\-project and
-location us\-central1:
+To create a private cloud called \f5\fImy\-privatecloud\fR\fR in project
+\f5\fImy\-project\fR\fR and location \f5\fIus\-central1\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha vmware privateclouds create example\-privatecloud
-.RE
-
-Or:
-
-.RS 2m
-$ gcloud alpha vmware privateclouds create example\-privatecloud \e
+$ gcloud alpha vmware privateclouds create my\-privatecloud \e
     \-\-project=my\-project \-\-location=us\-central1
 .RE
 
 Or:
 
 .RS 2m
-$ gcloud alpha vmware privateclouds create \e
-    /projects/my\-project/locations/us\-central1/example\-privatecloud
+$ gcloud alpha vmware privateclouds create my\-privatecloud
 .RE
 
-In the first example, the project and location are taken from gcloud properties
+In the second example, the project and location are taken from gcloud properties
 core/project and vmware/location.
 
 

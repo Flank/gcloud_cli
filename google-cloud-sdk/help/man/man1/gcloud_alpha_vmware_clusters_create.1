@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware clusters create \- create a Cloud VMware cluster
+gcloud alpha vmware clusters create \- create a cluster in a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware clusters create \- create a Cloud VMware cluster
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a Vmware cluster.
+\fB(ALPHA)\fR Create a cluster in a VMware Engine private cloud.
 
 
 
@@ -96,34 +96,25 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a cluster called my\-cluster in example\-privatecloud, location
-us\-central1, with a specified zone (in which nodes are created):
+To create a cluster called \f5\fImy\-cluster\fR\fR in private cloud
+\f5\fImy\-privatecloud\fR\fR, with three initial nodes created in zone
+\f5\fIus\-central1\-a\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha vmware clusters create \e
-    /projects/my\-project/locations/us\-central1/privateclouds/\e
-example\-privatecloud/clusters/my\-cluster \-zone=us\-central1\-a \e
-    \-\-node\-count=3
+$ gcloud alpha vmware clusters create my\-cluster \e
+    \-\-privatecloud=my\-privatecloud \-\-location=us\-central1 \e
+    \-\-project=my\-project \-\-zone=us\-central1\-a \-\-node\-count=3
 .RE
 
 Or:
 
 .RS 2m
 $ gcloud alpha vmware clusters create my\-cluster \e
-    \-\-privatecloud=example\-privatecloud \-\-location=us\-central1 \e
-    \-\-project=my\-project \-zone=us\-central1\-a \-\-node\-count=3
-.RE
-
-Or:
-
-.RS 2m
-$ gcloud alpha vmware clusters create my\-cluster \e
-    \-\-privatecloud=example\-privatecloud \-zone=us\-central1\-a \e
+    \-\-privatecloud=my\-privatecloud \-zone=us\-central1\-a \e
     \-\-node\-count=3
 .RE
 
-
-In the third example, the project and location are taken from gcloud properties
+In the second example, the project and location are taken from gcloud properties
 core/project and vmware/location.
 
 

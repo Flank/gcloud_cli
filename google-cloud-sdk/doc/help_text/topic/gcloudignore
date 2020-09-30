@@ -19,7 +19,6 @@ DESCRIPTION
       o gcloud builds submit
       o gcloud composer environments storage {dags, data, plugins} import
       o gcloud container builds submit
-      o gcloud beta debug source upload
       o gcloud alpha run deploy
 
     To globally disable .gcloudignore parsing (including default file-ignore

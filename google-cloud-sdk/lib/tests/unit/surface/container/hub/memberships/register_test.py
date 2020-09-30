@@ -1066,13 +1066,6 @@ class RegisterTestBeta(RegisterTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
-
-class RegisterTestAlpha(RegisterTestBeta):
-  """gcloud Alpha track using GKE Hub API."""
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testNoServiceAccountKeyFileFlagWithWI(self):
     with self.AssertRaisesArgumentErrorMatches('service-account-key-file'):
       self.RunCommand([
@@ -1082,6 +1075,8 @@ class RegisterTestAlpha(RegisterTestBeta):
           '--enable-workload-identity'])
 
   def testCreateWIMembershipContext(self):
+    # TODO(b/169163486): cleanup and extract the common code
+    # to a separate method
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
@@ -1109,48 +1104,6 @@ class RegisterTestAlpha(RegisterTestBeta):
         'fake-project', 'my-cluster', 'my-cluster',
         None,
         TEST_UID, self.track, TEST_ISSUER_URL
-    )
-
-  def testCreateWIMembershipContextManageBucket(self):
-    self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
-    self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
-    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
-        {'issuer': TEST_BUCKET_ISSUER_URL})
-    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDKeyset.return_value = json.dumps(
-        {'keys': [{'alg': 'RSA256'}]})
-    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
-
-    mock_create_bucket = self.StartObjectPatch(
-        api_util, 'CreateWorkloadIdentityBucket')
-
-    # Mock to create a new membership.
-    mock_create_membership = self.MockOutCreateMembershipNotFound()
-    self.mockValidateExclusivitySucceed()
-    self.StartObjectPatch(
-        kube_util, 'IsGKECluster', return_value=False)
-
-    # This test is not concerned about exceptions thrown during the command,
-    # only that the parameters downstream methods are called with valid args.
-    with self.assertRaises(Exception):
-      self.RunCommand([
-          'my-cluster', '--kubeconfig=' + self.kubeconfig,
-          '--context=test-context', '--project=fake-project',
-          '--enable-workload-identity',
-          '--manage-workload-identity-bucket',
-      ])
-
-    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.assert_called_once_with(
-        )  # The linter prefers a hanging paren due to above line length.
-
-    mock_create_bucket.assert_called_once_with(
-        'fake-project', TEST_BUCKET_ISSUER_URL,
-        json.dumps({'issuer': TEST_BUCKET_ISSUER_URL}),
-        json.dumps({'keys': [{'alg': 'RSA256'}]}))
-
-    mock_create_membership.assert_called_once_with(
-        'fake-project', 'my-cluster', 'my-cluster',
-        None,
-        TEST_UID, self.track, TEST_BUCKET_ISSUER_URL
     )
 
   def testCreateWIMembershipPublicIssuer(self):
@@ -1442,6 +1395,56 @@ class RegisterTestAlpha(RegisterTestBeta):
           '--enable-workload-identity',
           '--public-issuer-url=' + TEST_ANOTHER_ISSUER_URL
       ])
+
+
+class RegisterTestAlpha(RegisterTestBeta):
+  """gcloud Alpha track using GKE Hub API."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateWIMembershipContextManageBucket(self):
+    self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
+    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
+        {'issuer': TEST_BUCKET_ISSUER_URL})
+    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDKeyset.return_value = json.dumps(
+        {'keys': [{'alg': 'RSA256'}]})
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+
+    mock_create_bucket = self.StartObjectPatch(
+        api_util, 'CreateWorkloadIdentityBucket')
+
+    # Mock to create a new membership.
+    mock_create_membership = self.MockOutCreateMembershipNotFound()
+    self.mockValidateExclusivitySucceed()
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+
+    # This test is not concerned about exceptions thrown during the command,
+    # only that the parameters downstream methods are called with valid args.
+    with self.assertRaises(Exception):
+      self.RunCommand([
+          'my-cluster', '--kubeconfig=' + self.kubeconfig,
+          '--context=test-context', '--project=fake-project',
+          '--enable-workload-identity',
+          '--manage-workload-identity-bucket',
+      ])
+
+    self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.assert_called_once_with(
+        )  # The linter prefers a hanging paren due to above line length.
+
+    mock_create_bucket.assert_called_once_with(
+        'fake-project', TEST_BUCKET_ISSUER_URL,
+        json.dumps({'issuer': TEST_BUCKET_ISSUER_URL}),
+        json.dumps({'keys': [{'alg': 'RSA256'}]}))
+
+    mock_create_membership.assert_called_once_with(
+        'fake-project', 'my-cluster', 'my-cluster',
+        None,
+        TEST_UID, self.track, TEST_BUCKET_ISSUER_URL
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

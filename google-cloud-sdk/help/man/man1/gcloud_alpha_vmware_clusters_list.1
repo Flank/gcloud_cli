@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware clusters list \- list Cloud VMware clusters
+gcloud alpha vmware clusters list \- list clusters in a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware clusters list \- list Cloud VMware clusters
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR list VMware clusters in a privatecloud.
+\fB(ALPHA)\fR List clusters in a VMware Engine private cloud.
 
 
 
@@ -102,8 +102,10 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
+To list clusters in the \f5\fImy\-privatecloud\fR\fR private cloud, run:
+
 .RS 2m
-$ gcloud alpha vmware clusters list \-\-cluster\-group=my\-privatecloud
+$ gcloud alpha vmware clusters list \-\-privatecloud=my\-privatecloud
 .RE
 
 

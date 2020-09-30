@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 import abc
 import contextlib
+import datetime
 import enum
 import json
 import os
@@ -29,6 +30,10 @@ import tempfile
 
 from apitools.base.py import batch
 from apitools.base.py import http_wrapper
+
+import botocore.awsrequest
+import botocore.endpoint
+import botocore.response
 
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import config
@@ -47,6 +52,7 @@ from six.moves import http_client as httplib
 
 _UX_TYPES = [ux.name for ux in console_io.UXElementType]
 _UX_RE = re.compile(r'^{{\"ux\": \"({})\"'.format('|'.join(_UX_TYPES)))
+_BOTOCORE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 
 class Error(Exception):
@@ -160,6 +166,57 @@ class RequestsTransport(Transport):
     return resp
 
 
+class BotocoreTransport(Transport):
+  """botocore transport for scenario test sessions."""
+
+  def __init__(self, orig_request_method):
+    self.url = ''
+    super(BotocoreTransport, self).__init__(orig_request_method)
+
+  def RequestFromArgs(self, operation_model, request_dict):
+    """Returns a Request object from the args used in a request call."""
+    self.url = request_dict['url']
+    # pylint: disable=protected-access
+    return events_lib.Request(request_dict['url'], request_dict['method'],
+                              request_dict['headers'], request_dict['body'])
+
+  def ResponseFromTransportResponse(self, response):
+    """Returns a Response object from the transport's raw response."""
+
+    def Default(value):
+      if isinstance(value, datetime.datetime):
+        return {'_datetime': value.strftime(_BOTOCORE_DATE_FORMAT)}
+      if isinstance(value, botocore.response.StreamingBody):
+        return {'_streamingbody': http_encoding.Decode(value.read())}
+      return json.JSONEncoder.default(json.JSONEncoder, value)
+
+    http, parsed_response = response
+
+    if isinstance(parsed_response, dict):
+      parsed_response.pop('ResponseMetadata', None)
+      parsed_response = json.dumps(
+          parsed_response, default=Default, sort_keys=True)
+
+    return events_lib.Response(http.status_code, http.headers, parsed_response)
+
+  def ResponseToTransportResponse(self, response):
+    """Converts a Response object to the response returned by the transport."""
+
+    def ObjectHook(value):
+      value_datetime = value.get('_datetime')
+      if value_datetime is not None:
+        return datetime.datetime.strptime(value_datetime, _BOTOCORE_DATE_FORMAT)
+      value_streamingbody = value.get('_streamingbody')
+      if value_streamingbody is not None:
+        body = six.BytesIO(http_encoding.Encode(value_streamingbody))
+        return botocore.response.StreamingBody(body, len(value_streamingbody))
+      return value
+
+    resp = botocore.awsrequest.AWSResponse(self.url, response.status,
+                                           response.headers, {})
+    return resp, json.loads(response.body, object_hook=ObjectHook)
+
+
 class Session(object):
   """Runs a scenario session and checks assertions."""
 
@@ -202,6 +259,12 @@ class Session(object):
         autospec=True,
         side_effect=self._RequestHandler(
             RequestsTransport(requests.Session.request)))
+    self._botocore_patch = mock.patch.object(
+        botocore.endpoint.Endpoint,
+        'make_request',
+        autospec=True,
+        side_effect=self._RequestHandler(
+            BotocoreTransport(botocore.endpoint.Endpoint.make_request)))
     # pylint:disable=protected-access
     self._orig_batch_request_method = batch.BatchHttpRequest._Execute
     self._batch_request_patch = mock.patch.object(
@@ -458,6 +521,7 @@ class Session(object):
     """Handle a remote request by making a real API call."""
     self._Debug('Handling API request: [{}]', request.uri)
     self._Debug('  Method: [{}]', request.method)
+    self._Debug('  Headers: [{}]', request.headers)
     self._Debug('  Body: [{}]', request.body)
     self._Debug('  Response Body: [{}]', response.body)
 
@@ -682,6 +746,7 @@ class Session(object):
     if not self._ignore_api_calls:
       self._httplib2_patch.start()
       self._requests_patch.start()
+      self._botocore_patch.start()
       self._batch_request_patch.start()
     self._file_writer_patch.start()
     self._binary_file_writer_patch.start()
@@ -698,6 +763,7 @@ class Session(object):
     if not self._ignore_api_calls:
       self._httplib2_patch.stop()
       self._requests_patch.stop()
+      self._botocore_patch.stop()
       self._batch_request_patch.stop()
     self._file_writer_patch.stop()
     self._binary_file_writer_patch.stop()

@@ -11,7 +11,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Analyzes accessible IAM policies that match a request.
+    (ALPHA) (REMOVED) This command has been removed. Please use gcloud beta
+    asset analyze-iam-policy instead.
+
+    Analyzes accessible IAM policies that match a request.
 
 REQUIRED FLAGS
      --organization=ORGANIZATION_ID
@@ -97,10 +100,11 @@ EXAMPLES
             --identity='user:u1@foo.com'
 
 NOTES
-    This command is currently in ALPHA and may change without notice. If this
-    command fails with API permission errors despite specifying the right
-    project, you may be trying to access an API with an invitation-only early
-    access allowlist. This variant is also available:
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist. This variant is also available:
 
         $ gcloud beta asset analyze-iam-policy
 

@@ -1,5 +1,5 @@
 title: healthcare consent-stores crud scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -79,13 +79,18 @@ summary:
   - stderr: |
       Deleted consentStore [my-store].
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: healthcare consent-stores create my-store --location us-central1 --dataset
       my-dataset
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores?alt=json&consentStoreId=my-store
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores?alt=json&consentStoreId=my-store
           method: POST
           headers: {}
           body: null
@@ -104,7 +109,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
           method: GET
           headers: {}
           body: null
@@ -130,7 +135,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
           method: GET
           headers: {}
           body: null
@@ -147,7 +152,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
           method: PATCH
           headers: {}
           body:
@@ -173,7 +178,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -207,7 +212,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
@@ -250,7 +255,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -272,7 +277,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
@@ -330,7 +335,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -358,7 +363,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
@@ -419,7 +424,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/consentStores/my-store?alt=json
           method: DELETE
           headers: {}
           body: null

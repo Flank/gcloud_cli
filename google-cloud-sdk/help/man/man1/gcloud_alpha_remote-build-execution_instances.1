@@ -18,7 +18,7 @@ gcloud alpha remote\-build\-execution instances \- manage Remote Build Execution
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Create, delete, list, and view instances for remote build
-execution.
+execution. Also manage per\-instance feature policies.
 
 
 
@@ -47,12 +47,20 @@ Run \fB$ gcloud help\fR for details.
 \fB(ALPHA)\fR Delete a given instance and all contained worker pools.
 
 .TP 2m
+\fBdelete\-feature\-policy\fR
+\fB(ALPHA)\fR Deletes the feature policy for an instance.
+
+.TP 2m
 \fBdescribe\fR
 \fB(ALPHA)\fR Describe an instance.
 
 .TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List instances in given project.
+
+.TP 2m
+\fBset\-feature\-policy\fR
+\fB(ALPHA)\fR Sets the feature policy for an instance.
 
 
 .RE

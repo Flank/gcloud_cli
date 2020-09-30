@@ -2,7 +2,7 @@ NAME
     gcloud beta tasks queues update - update a Cloud Tasks queue
 
 SYNOPSIS
-    gcloud beta tasks queues update QUEUE
+    gcloud beta tasks queues update QUEUE [--type=TYPE; default="push"]
         [--clear-log-sampling-ratio | --log-sampling-ratio=LOG_SAMPLING_RATIO]
         [--clear-max-attempts | --max-attempts=MAX_ATTEMPTS]
         [--clear-max-backoff | --max-backoff=MAX_BACKOFF]
@@ -25,6 +25,10 @@ POSITIONAL ARGUMENTS
         The queue to update.
 
 FLAGS
+     --type=TYPE; default="push"
+        Specifies the type of queue. Only available options are 'push' and
+        'pull'. The default option is 'push'.
+
      At most one of these may be specified:
 
        --clear-log-sampling-ratio

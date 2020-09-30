@@ -11,7 +11,7 @@ gcloud alpha asset export \- export the cloud assets to Google Cloud Storage
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha asset export\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) (\fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR\ |\ \fB\-\-output\-path\-prefix\fR=\fIOUTPUT_PATH_PREFIX\fR\ |\ [(\fB\-\-bigquery\-table\fR=\fIBIGQUERY_TABLE\fR\ :\ \fB\-\-bigquery\-dataset\fR=\fIBIGQUERY_DATASET\fR)\ :\ \fB\-\-output\-bigquery\-force\fR]) [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha asset export\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) (\fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR\ |\ \fB\-\-output\-path\-prefix\fR=\fIOUTPUT_PATH_PREFIX\fR\ |\ [(\fB\-\-bigquery\-table\fR=\fIBIGQUERY_TABLE\fR\ :\ \fB\-\-bigquery\-dataset\fR=\fIBIGQUERY_DATASET\fR)\ :\ \fB\-\-output\-bigquery\-force\fR\ \fB\-\-partition\-key\fR=\fIPARTITION_KEY\fR\ \fB\-\-per\-asset\-type\fR]) [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -88,6 +88,18 @@ If the destination table already exists and this flag is specified, the table
 will be overwritten by the contents of assets snapshot. If the flag is not
 specified and the destination table already exists, the export call returns an
 error.
+
+.TP 2m
+\fB\-\-partition\-key\fR=\fIPARTITION_KEY\fR
+If specified. the snapshot results will be written to partitioned table(s) with
+two additional timestamp columns, readTime and requestTime, one of which will be
+the partition key. \fIPARTITION_KEY\fR must be one of: \fBread\-time\fR,
+\fBrequest\-time\fR.
+
+.TP 2m
+\fB\-\-per\-asset\-type\fR
+If the flag is specified, the snapshot results will be written to one or more
+tables, each of which contains results of one asset type.
 
 .TP 2m
 

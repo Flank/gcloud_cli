@@ -22,7 +22,8 @@ POSITIONAL ARGUMENTS
           the other arguments in this group are specified.
 
        --location=LOCATION
-          The location of the CERTIFICATE_AUTHORITY.
+          The location of the CERTIFICATE_AUTHORITY. Alternatively, you can set
+          the property [privateca/location].
 
 REQUIRED FLAGS
      --pem-chain=PEM_CHAIN

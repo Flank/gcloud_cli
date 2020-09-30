@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-
 import os
 
 from googlecloudsdk.command_lib.util.anthos import binary_operations
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
+from googlecloudsdk.core import log
 from googlecloudsdk.core.updater import local_state
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files
@@ -90,8 +90,8 @@ class CheckBinaryTests(parameterized.TestCase, sdk_test_base.WithLogCapture):
 
   def testCheckForInstalledBinaryMissing(self):
     self.StartObjectPatch(files, 'FindExecutableOnPath', return_value=None)
-    with self.assertRaisesRegex(
-        binary_operations.MissingExecutableException, r'Not Found!!'):
+    with self.assertRaisesRegex(binary_operations.MissingExecutableException,
+                                r'Not Found!!'):
       binary_operations.CheckForInstalledBinary('myexc', 'Not Found!!')
 
 
@@ -178,18 +178,23 @@ class BinaryOperationsTests(parameterized.TestCase,
         '1'
     ]
     context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
-    expected_out = 'GOT value for -a foo\nGOT value for -b 1\n'
-    expected_err = ''
+    expected_out = 'GOT value for -a foo\nGOT value for -b 1'
+    expected_err = None
     expected_status = 0
     expected_failed = False
-    expected_result = GetOperationResult(command, expected_out, expected_err,
-                                         expected_status, expected_failed,
-                                         context=context)
-    actual_result = operation(string_val='foo',
-                              int_val=1,
-                              env={'FOO': 'bar'},
-                              stdin='input',
-                              execution_dir='.')
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='foo',
+        int_val=1,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
     self.assertEqual(expected_result, actual_result)
 
   def testBasicOperationSuccessResultWithDefaults(self):
@@ -198,8 +203,8 @@ class BinaryOperationsTests(parameterized.TestCase,
         os.path.join(self.scripts_dir, self.basic_binary), '-a', 'foo', '-b',
         '27'
     ]
-    expected_out = 'GOT value for -a foo\nGOT value for -b 27\n'
-    expected_err = ''
+    expected_out = 'GOT value for -a foo\nGOT value for -b 27'
+    expected_err = None
     expected_status = 0
     expected_failed = False
     expected_result = GetOperationResult(command, expected_out, expected_err,
@@ -211,11 +216,11 @@ class BinaryOperationsTests(parameterized.TestCase,
         self.basic_binary,
         failure_func=binary_operations.NonZeroSuccessFailureHandler)
     command = [
-        os.path.join(self.scripts_dir, self.basic_binary),
-        '-a', 'EXIT_WITH_ERROR', '-b', '1'
+        os.path.join(self.scripts_dir, self.basic_binary), '-a',
+        'EXIT_WITH_ERROR', '-b', '1'
     ]
-    expected_out = 'GOT value for -a EXIT_WITH_ERROR\nGOT value for -b 1\n'
-    expected_err = ''
+    expected_out = 'GOT value for -a EXIT_WITH_ERROR\nGOT value for -b 1'
+    expected_err = None
     expected_status = 1
     expected_failed = False
     expected_result = GetOperationResult(command, expected_out, expected_err,
@@ -229,18 +234,26 @@ class BinaryOperationsTests(parameterized.TestCase,
         os.path.join(self.scripts_dir, self.basic_binary), '-a', '', '-b', '1'
     ]
     context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
-    expected_out = ''
-    expected_err = 'Parameter -a required.\n'
+    expected_out = None
+    expected_err = 'Parameter -a required.'
     expected_status = 1
     expected_failed = True
-    expected_result = GetOperationResult(command, expected_out, expected_err,
-                                         expected_status, expected_failed,
-                                         context=context)
-    self.assertEqual(expected_result, operation(string_val='', int_val=1,
-                                                show_exec_error=True,
-                                                env={'FOO': 'bar'},
-                                                stdin='input',
-                                                execution_dir='.'))
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    self.assertEqual(
+        expected_result,
+        operation(
+            string_val='',
+            int_val=1,
+            show_exec_error=True,
+            env={'FOO': 'bar'},
+            stdin='input',
+            execution_dir='.'))
     self.AssertLogContains('Error executing command')
 
   def testBasicOperationArgumentFailure(self):
@@ -255,6 +268,7 @@ class BinaryOperationsTests(parameterized.TestCase,
     operation = BasicBinaryOperation(self.basic_binary)
     with self.assertRaisesRegexp(binary_operations.ExecutionError, 'Bad Perms'):
       operation(string_val='foo', int_val=2)
+      self.AssertErrNotContains('Error executing command')
 
   def testBasicOperationMissingExecutable(self):
     error_msgs = {
@@ -317,49 +331,77 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
     expected_err = None
     expected_status = 0
     expected_failed = False
-    expected_result = GetOperationResult(command, expected_out, expected_err,
-                                         expected_status, expected_failed,
-                                         context=context)
-    actual_result = operation(string_val='LONG_OUTPUT',
-                              int_val=10,
-                              env={'FOO': 'bar'},
-                              stdin='input',
-                              execution_dir='.')
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='LONG_OUTPUT',
+        int_val=10,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
     for line in expected_out:
       self.AssertLogContains(line)
     self.AssertErrEquals('')
     self.assertEqual(expected_result, actual_result)
 
   def testStreamOperationResult_NoCapture(self):
-    operation = StreamingBinaryOperation(self.basic_binary,
-                                         capture_output=False)
+    operation = StreamingBinaryOperation(
+        self.basic_binary, capture_output=False)
     command = [
         os.path.join(self.scripts_dir, self.basic_binary), '-a',
-        'LONG_OUTPUT_W_ERRORS',
-        '-b', '100'
+        'LONG_OUTPUT_W_ERRORS', '-b', '100'
     ]
     context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
     expected_out = None
     expected_err = None
     expected_status = 0
     expected_failed = False
-    expected_result = GetOperationResult(command, expected_out, expected_err,
-                                         expected_status, expected_failed,
-                                         context=context)
-    actual_result = operation(string_val='LONG_OUTPUT_W_ERRORS',
-                              int_val=100,
-                              env={'FOO': 'bar'},
-                              stdin='input',
-                              execution_dir='.')
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='LONG_OUTPUT_W_ERRORS',
+        int_val=100,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
     self.assertEqual(expected_result, actual_result)
     long_output = ['Output value {}'.format(x) for x in range(10)]
-    expected_log = (['GOT value for -a LONG_OUTPUT_W_ERRORS',
-                     'GOT value for -b 100'] +
-                    long_output)
+    expected_log = (
+        ['GOT value for -a LONG_OUTPUT_W_ERRORS', 'GOT value for -b 100'] +
+        long_output)
     for line in expected_log:
       self.AssertLogContains(line)
     self.AssertErrContains(
         '\n'.join(('StdErr value {}'.format(x) for x in range(100))))
+
+  def _FakeStdOutHandler(self, result_holder, **kwargs):
+    return lambda x: log.out.Print('CUSTOM STDOUT:{}'.format(x))
+
+  def _FakeStdErrHandler(self, result_holder, **kwargs):
+    return lambda x: log.error('CUSTOM STDERR:{}'.format(x))
+
+  def testStreamOperationResult_CustomHandlers(self):
+    operation = StreamingBinaryOperation(
+        self.basic_binary, std_out_func=self._FakeStdOutHandler,
+        std_err_func=self._FakeStdErrHandler, capture_output=False)
+    operation(
+        string_val='LONG_OUTPUT_W_ERRORS',
+        int_val=100,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    self.AssertLogContains('CUSTOM STDOUT:')
+    self.AssertErrContains('CUSTOM STDERR:')
 
   def testStreamingOperationResult_WithNonZeroExit(self):
     # NOTE: MUST USE capture_output=True OR THIS WILL LOG AS A FAILURE
@@ -393,16 +435,357 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
     expected_err = None
     expected_status = 1
     expected_failed = True
-    expected_result = GetOperationResult(command, expected_out, expected_err,
-                                         expected_status, expected_failed,
-                                         context=context)
-    self.assertEqual(expected_result, operation(string_val='', int_val=1,
-                                                show_exec_error=True,
-                                                env={'FOO': 'bar'},
-                                                stdin='input',
-                                                execution_dir='.'))
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    self.assertEqual(
+        expected_result,
+        operation(
+            string_val='',
+            int_val=1,
+            show_exec_error=True,
+            env={'FOO': 'bar'},
+            stdin='input',
+            execution_dir='.'))
     self.AssertLogContains('Error executing command')
     self.AssertErrContains('Parameter -a required.')
+
+
+@test_case.Filters.DoNotRunInDebPackage('packaging does not contain test_data')
+@test_case.Filters.DoNotRunInRpmPackage('packaging does not contain test_data')
+class StructuredOutputTests(sdk_test_base.WithLogCapture,
+                            sdk_test_base.WithOutputCapture):
+  """Test parsing JSON/YAML output from binary operation."""
+
+  def SetUp(self):
+    """Configure test binary(ies)."""
+    if test_case.Filters.IsOnWindows():
+      suffix = 'windows_go'
+    elif test_case.Filters.IsOnMac():
+      suffix = 'darwin_go'
+    else:
+      suffix = 'linux_go'
+
+    self.basic_binary = 'structured_out_' + suffix
+    self.sdk_root_path = self.CreateTempDir('cloudsdk')
+    self.StartObjectPatch(config.Paths, 'sdk_root', self.sdk_root_path)
+    self.scripts_dir = self.Resource('tests', 'unit', 'command_lib',
+                                     'test_data', 'util', 'anthos')
+    self.StartObjectPatch(config.Paths, 'sdk_bin_path', self.scripts_dir)
+    installed = {self.basic_binary: 1}
+
+    mock_updater = self.StartObjectPatch(
+        update_manager, 'UpdateManager', autospec=True)
+    mock_updater.return_value = update_manager.UpdateManager(
+        sdk_root=self.sdk_root_path,
+        url='file://some/path/components.json',
+        warn=False)
+    (mock_updater.return_value.GetCurrentVersionsInformation.return_value
+    ) = installed
+
+  def testOperationResultSuccess(self):
+    operation = BasicBinaryOperation(self.basic_binary)
+    expected_messages = ['An output message: 1.']
+    expected_resources = []
+    result = operation(
+        string_val='SIMPLE_OUTPUT', int_val=1, env={'FOO': 'bar'},
+        stdin='input', execution_dir='.')
+    actual_messages, actual_resources = (
+        binary_operations.ProcessStructuredOut(result)
+        )
+    self.assertFalse(result.failed)
+    self.assertEqual(expected_messages, actual_messages)
+    self.assertEqual(expected_resources, actual_resources)
+
+  def testOperationResultSuccess_WithWarning(self):
+    operation = BasicBinaryOperation(self.basic_binary)
+    expected_err_messages = ['A status message: 10.']
+    expected_errors = []
+    result = operation(
+        string_val='SIMPLE_STATUS_TO_STDERR',
+        int_val=10,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    actual_out_messages, actual_resources = (
+        binary_operations.ProcessStructuredOut(result)
+        )
+    actual_err_messages, actual_errors = (
+        binary_operations.ProcessStructuredErr(result)
+        )
+    self.assertFalse(result.failed)
+    self.assertIsNone(actual_out_messages)
+    self.assertIsNone(actual_resources)
+    self.assertEqual(expected_err_messages, actual_err_messages)
+    self.assertEqual(expected_errors, actual_errors)
+
+  def testOperationResultSuccess_WithResources(self):
+    operation = BasicBinaryOperation(self.basic_binary)
+    expected_messages = ['A status message.']
+    expected_resource_match = r"\'name\': \'Resource1\'"
+    result = operation(
+        string_val='SIMPLE_RESOURCE_OUTPUT',
+        int_val=10,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    actual_out_messages, actual_resources = (
+        binary_operations.ProcessStructuredOut(result)
+        )
+    actual_err_messages, actual_errors = (
+        binary_operations.ProcessStructuredErr(result)
+        )
+    self.assertFalse(result.failed)
+    self.assertEqual(expected_messages, actual_out_messages)
+    self.assertRegex(six.text_type(actual_resources[0]),
+                     expected_resource_match)
+    self.assertIsNone(actual_err_messages)
+    self.assertIsNone(actual_errors)
+
+  def testOperationResultError(self):
+    operation = BasicBinaryOperation(self.basic_binary)
+    expected_errors = [
+        'Error: [Error]. Additional details: [Exiting with error 5.]']
+    expected_err_messages = []
+    result = operation(
+        string_val='EXIT_WITH_ERROR',
+        int_val=5,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    actual_out_messages, actual_resources = (
+        binary_operations.ProcessStructuredOut(result)
+        )
+    actual_err_messages, actual_errors = (
+        binary_operations.ProcessStructuredErr(result)
+        )
+    self.assertTrue(result.failed)
+    self.assertIsNone(actual_out_messages)
+    self.assertIsNone(actual_resources)
+    self.assertEqual(expected_errors, actual_errors)
+    self.assertEqual(expected_err_messages, actual_err_messages)
+
+  def testOperationResultError_WithWarning(self):
+    operation = BasicBinaryOperation(self.basic_binary)
+    expected_errors = [
+        'Error: [Error]. Additional details: [Exiting with error 10.]']
+    expected_err_messages = ['A status message.']
+    result = operation(
+        string_val='EXIT_WITH_WARNING_AND_ERROR',
+        int_val=10,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    actual_out_messages, actual_resources = (
+        binary_operations.ProcessStructuredOut(result)
+        )
+    actual_err_messages, actual_errors = (
+        binary_operations.ProcessStructuredErr(result)
+        )
+    self.assertTrue(result.failed)
+    self.assertIsNone(actual_out_messages)
+    self.assertIsNone(actual_resources)
+    self.assertEqual(expected_errors, actual_errors)
+    self.assertEqual(expected_err_messages, actual_err_messages)
+
+  def testOperationResultMixedOutput(self):
+    operation = BasicBinaryOperation(self.basic_binary)
+    result = operation(string_val='MIXED_OUTPUT', int_val=10)
+    with self.assertRaisesRegex(binary_operations.StructuredOutputError,
+                                r'Error processing message '
+                                r'\[Raw Status Message.\]'):
+      binary_operations.ProcessStructuredErr(result)
+
+
+@test_case.Filters.DoNotRunInDebPackage('packaging does not contain test_data')
+@test_case.Filters.DoNotRunInRpmPackage('packaging does not contain test_data')
+class StreamingStructuredOutputTests(sdk_test_base.WithLogCapture,
+                                     sdk_test_base.WithOutputCapture):
+  """Test parsing JSON/YAML output from binary operation."""
+
+  def SetUp(self):
+    """Configure test binary(ies)."""
+    if test_case.Filters.IsOnWindows():
+      suffix = 'windows_go'
+    elif test_case.Filters.IsOnMac():
+      suffix = 'darwin_go'
+    else:
+      suffix = 'linux_go'
+
+    self.basic_binary = 'structured_out_' + suffix
+    self.sdk_root_path = self.CreateTempDir('cloudsdk')
+    self.StartObjectPatch(config.Paths, 'sdk_root', self.sdk_root_path)
+    self.scripts_dir = self.Resource('tests', 'unit', 'command_lib',
+                                     'test_data', 'util', 'anthos')
+    self.StartObjectPatch(config.Paths, 'sdk_bin_path', self.scripts_dir)
+    installed = {self.basic_binary: 1}
+
+    mock_updater = self.StartObjectPatch(
+        update_manager, 'UpdateManager', autospec=True)
+    mock_updater.return_value = update_manager.UpdateManager(
+        sdk_root=self.sdk_root_path,
+        url='file://some/path/components.json',
+        warn=False)
+    (mock_updater.return_value.GetCurrentVersionsInformation.return_value
+    ) = installed
+
+  def GetStreamingStructredOutOperation(self, capture_output=False):
+    return StreamingBinaryOperation(
+        self.basic_binary,
+        structured_output=True,
+        capture_output=capture_output)
+
+  def testOperationResultSuccess(self):
+    operation = self.GetStreamingStructredOutOperation()
+    command = [
+        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'LONG_OUTPUT',
+        '-b', '100'
+    ]
+    context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
+    expected_out = None
+    expected_err = None
+    expected_status = 0
+    expected_failed = False
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='LONG_OUTPUT',
+        int_val=100,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    self.assertEqual(expected_result, actual_result)
+    expected_log = ['An output message: {}'.format(x) for x in range(100)]
+    for line in expected_log:
+      self.AssertLogContains(line)
+
+  def testOperationResultSuccess_WithWarnings(self):
+    operation = self.GetStreamingStructredOutOperation()
+    command = [
+        os.path.join(self.scripts_dir, self.basic_binary), '-a',
+        'LONG_OUTPUT_W_ERRORS', '-b', '100'
+    ]
+    context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
+    expected_out = None
+    expected_err = None
+    expected_status = 0
+    expected_failed = False
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='LONG_OUTPUT_W_ERRORS',
+        int_val=100,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    self.assertEqual(expected_result, actual_result)
+    expected_log = ['An output message: {}'.format(x) for x in range(100)]
+    for line in expected_log:
+      self.AssertLogContains(line)
+    self.AssertErrContains('\n'.join(
+        ('A status message: {}.'.format(x) for x in range(0, 100, 2))))
+
+  def testOperationResultSuccess_Resources(self):
+    operation = self.GetStreamingStructredOutOperation()
+    command = [
+        os.path.join(self.scripts_dir, self.basic_binary), '-a',
+        'LONG_OUTPUT_W_RESOURCES', '-b', '100'
+    ]
+    context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
+    expected_out = None
+    expected_err = None
+    expected_status = 0
+    expected_failed = False
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='LONG_OUTPUT_W_RESOURCES',
+        int_val=100,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    self.assertEqual(expected_result, actual_result)
+    output_log = ('An output message: {}'.format(x) for x in range(100))
+    for line in output_log:
+      self.AssertLogContains(line)
+    for x in range(0, 100, 3):
+      self.AssertErrContains('A resource message: {}.'.format(x))
+      self.AssertOutputContains("'name': 'Resource{}'".format(x))
+
+  def testOperationResultSuccess_WithCapture(self):
+    operation = self.GetStreamingStructredOutOperation(capture_output=True)
+    command = [
+        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'LONG_OUTPUT',
+        '-b', '100'
+    ]
+    context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
+    expected_log = ['An output message: {}.'.format(x) for x in range(100)]
+    expected_out = expected_log
+    expected_err = None
+    expected_status = 0
+    expected_failed = False
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='LONG_OUTPUT',
+        int_val=100,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    self.assertEqual(expected_result, actual_result)
+    for line in expected_log:
+      self.AssertLogContains(line)
+
+  def testOperationResultFallback(self):
+    operation = self.GetStreamingStructredOutOperation(capture_output=True)
+    command = [
+        os.path.join(self.scripts_dir, self.basic_binary), '-a', 'MIXED_OUTPUT',
+        '-b', '10'
+    ]
+    context = {'env': {'FOO': 'bar'}, 'exec_dir': '.', 'stdin': 'input'}
+    expected_out = None
+    expected_err = ['A status message: 10.', 'Raw Status Message.']
+    expected_status = 0
+    expected_failed = False
+    expected_result = GetOperationResult(
+        command,
+        expected_out,
+        expected_err,
+        expected_status,
+        expected_failed,
+        context=context)
+    actual_result = operation(
+        string_val='MIXED_OUTPUT',
+        int_val=10,
+        env={'FOO': 'bar'},
+        stdin='input',
+        execution_dir='.')
+    self.AssertErrContains('Expected structured message, logging as raw text')
+    self.assertEqual(expected_result, actual_result)
 
 
 if __name__ == '__main__':

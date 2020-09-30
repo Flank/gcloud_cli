@@ -130,8 +130,8 @@ Workload Identity
 .TP 2m
 \fB\-\-enable\-workload\-identity\fR
 Enable Workload Identity when registering the cluster with Hub. Requires gcloud
-alpha. \-\-service_account_key_file flag should not be set if this is set. This
-flag must be specified if any of the other arguments in this group are
+alpha or beta. \-\-service_account_key_file flag should not be set if this is
+set. This flag must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
@@ -139,8 +139,8 @@ specified.
 Skip auto\-discovery and register the cluster with this issuer URL. Use this
 option when the OpenID Provider Configuration and associated JSON Web Key Set
 for validating the cluster's service account JWTs are served at a public
-endpoint different from the cluster API server. Requires gcloud alpha and
-\-\-enable\-workload\-identity.
+endpoint different from the cluster API server. Requires gcloud alpha or beta
+and \-\-enable\-workload\-identity.
 
 
 .RE

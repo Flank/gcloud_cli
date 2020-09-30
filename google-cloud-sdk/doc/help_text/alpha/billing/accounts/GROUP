@@ -25,6 +25,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (ALPHA) Add an IAM policy binding to a Cloud Billing account.
+
      describe
         (ALPHA) Show metadata for a billing account.
 
@@ -33,6 +36,9 @@ COMMANDS
 
      list
         (ALPHA) List all active billing accounts.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove an IAM policy binding from a Cloud Billing account.
 
      set-iam-policy
         (ALPHA) Set the IAM policy for a Cloud Billing account.

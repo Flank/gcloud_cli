@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware clusters delete \- delete a Cloud VMware cluster
+gcloud alpha vmware clusters delete \- delete a cluster in a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware clusters delete \- delete a Cloud VMware cluster
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Delete a VMware cluster.
+\fB(ALPHA)\fR Delete a cluster in a VMware Engine private cloud.
 
 
 
@@ -65,20 +65,12 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To delete a cluster called my\-cluster in example\-privatecloud, location
-us\-central1, run:
-
-.RS 2m
-$ gcloud alpha vmware clusters delete \e
-    /projects/my\-project/locations/us\-central1/privateclouds/\e
-example\-privatecloud/clusters/my\-cluster
-.RE
-
-Or:
+To delete a cluster called \f5\fImy\-cluster\fR\fR in private cloud
+\f5\fImy\-privatecloud\fR\fR and location \f5\fIus\-central1\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha vmware clusters delete my\-cluster \e
-    \-\-privatecloud=example\-privatecloud \-\-location=us\-central1 \e
+    \-\-privatecloud=my\-privatecloud \-\-location=us\-central1 \e
     \-\-project=my\-project
 .RE
 
@@ -86,10 +78,10 @@ Or:
 
 .RS 2m
 $ gcloud alpha vmware clusters delete my\-cluster \e
-    \-\-privatecloud=example\-privatecloud
+    \-\-privatecloud=my\-privatecloud
 .RE
 
-In the third example, the project and location are taken from gcloud properties
+In the second example, the project and location are taken from gcloud properties
 core/project and vmware/location.
 
 

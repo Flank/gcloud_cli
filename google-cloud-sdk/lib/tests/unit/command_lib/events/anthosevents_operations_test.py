@@ -88,8 +88,8 @@ class EventflowOperationsTest(base.EventsBase):
 
   def SetUp(self):
     self.anthosevents_client = anthosevents_operations.AnthosEventsOperations(
-        self.mock_client, self.api_version, self.region, self.mock_core_client,
-        self.mock_crd_client, self.mock_operator_client)
+        self.api_version, self.region, self.mock_core_client,
+        self.mock_operator_client, self.mock_client)
     self.StartObjectPatch(random, 'random', return_value=0)
     self.StartObjectPatch(util, 'WaitForCondition')
     gsa_key = apis.GetMessagesModule('iam', 'v1').ServiceAccountKey(
@@ -592,13 +592,19 @@ class EventflowOperationsTest(base.EventsBase):
         self.crd_messages.AnthoseventsCustomresourcedefinitionsListRequest(
             parent=self._NamespaceRef(project='fake-project').RelativeName(),
             labelSelector='duck.knative.dev/source=true'))
-
     crds = [
         self.crd_messages.CustomResourceDefinition(apiVersion='1')
         for _ in range(5)
     ]
     for crd in crds:
       arg_utils.SetFieldInMessage(crd, 'spec.names.kind', 'UnknownSourceKind')
+      custom_resource_definition_versions = [
+          self.crd_messages.CustomResourceDefinitionVersion(
+              name='v1',
+              schema=self.crd_messages.CustomResourceValidation(
+                  openAPIV3Schema=self._SourceSchemaProperties(None, None)))
+      ]
+      crd.spec.versions = custom_resource_definition_versions
     arg_utils.SetFieldInMessage(crds[0], 'spec.names.kind', 'CloudPubSubSource')
 
     expected_response = self.crd_messages.ListCustomResourceDefinitionsResponse(
@@ -610,30 +616,12 @@ class EventflowOperationsTest(base.EventsBase):
 
     self.assertEqual(1, len(source_crds))
     self.assertEqual(source_crds[0].source_kind, 'CloudPubSubSource')
+    self.assertEqual(source_crds[0].source_version, 'v1')
 
   def _MakeNamespace(self, **kwargs):
     namespace = self.core_messages.Namespace()
     arg_utils.ParseStaticFieldsIntoMessage(namespace, kwargs)
     return namespace
-
-  def testUpdateNamespaceWithLabels(self):
-    namespace = self._MakeNamespace(**{
-        'metadata.labels.additionalProperties': [{
-            'key': 'labelkey',
-            'value': 'labelvalue'
-        }]
-    })
-
-    expected_request = self.core_messages.AnthoseventsApiV1NamespacesPatchRequest(
-        name=self._CoreNamespaceRef('my-namespace').RelativeName(),
-        namespace=namespace,
-        updateMask='metadata.labels')
-
-    self.mock_core_client.api_v1_namespaces.Patch.Expect(
-        expected_request, self.core_messages.Namespace())
-
-    self.anthosevents_client.UpdateNamespaceWithLabels(
-        self._CoreNamespaceRef('my-namespace'), {'labelkey': 'labelvalue'})
 
   def _MakeSecret(self, **kwargs):
     secret_obj = secret.Secret.New(self.mock_core_client, 'default')

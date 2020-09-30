@@ -67,10 +67,16 @@ class FlagsTest(base.EventsBase):
           for i in range(start, start + 2)
       ])
       required_properties.append('prop{}Secret'.format(start))
-    self.source_crd.spec.validation = (
-        self.crd_messages.CustomResourceValidation(
-            openAPIV3Schema=self._SourceSchemaProperties(
-                spec_properties, required_properties)))
+
+    custom_resource_definition_versions = [
+        self.crd_messages.CustomResourceDefinitionVersion(
+            name='v1',
+            schema=self.crd_messages.CustomResourceValidation(
+                openAPIV3Schema=self._SourceSchemaProperties(
+                    spec_properties, required_properties)))
+    ]
+
+    self.source_crd.spec.versions = custom_resource_definition_versions
 
   def testParseSecretParameters(self):
     args = self.parser.parse_args(

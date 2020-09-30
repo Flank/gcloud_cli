@@ -10,7 +10,7 @@ SYNOPSIS
           --keyversion-keyring=KEYVERSION_KEYRING
           --keyversion-location=KEYVERSION_LOCATION
           --keyversion-project=KEYVERSION_PROJECT)
-        [--public-key-id-override=PUBLIC_KEY_ID_OVERRIDE]
+        [--public-key-id-override=PUBLIC_KEY_ID_OVERRIDE] [--validate]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -72,6 +72,10 @@ OPTIONAL FLAGS
 
         This parameter is only necessary if the --public-key-id-override flag
         was provided when this KMS key was added to the Attestor.
+
+     --validate
+        Whether to validate that the Attestation can be verified by the
+        provided Attestor.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

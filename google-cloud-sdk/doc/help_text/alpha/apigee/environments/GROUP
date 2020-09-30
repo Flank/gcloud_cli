@@ -21,6 +21,17 @@ COMMANDS
      list
         (ALPHA) List Apigee deployment environments.
 
+EXAMPLES
+    To list all environments for the active Cloud Platform project, run:
+
+        $ gcloud alpha apigee environments list
+
+    To get a JSON array of all environments in an Apigee organization called
+    my-org, run:
+
+        $ gcloud alpha apigee environments list --organization=my-org \
+          --format=json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

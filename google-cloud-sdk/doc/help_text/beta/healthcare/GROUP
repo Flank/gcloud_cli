@@ -21,6 +21,9 @@ GROUPS
      annotation-stores
         (BETA) Manage Cloud Healthcare API annotation stores.
 
+     consent-stores
+        (BETA) Manage Cloud Healthcare API consent stores.
+
      datasets
         (BETA) Manage Cloud Healthcare API datasets.
 

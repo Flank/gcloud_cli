@@ -74,7 +74,7 @@ class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
         'compute interconnects attachments partner create my-attachment '
         '--region us-central1 --router my-router --description "this is my '
         'attachment" --edge-availability-domain availability-domain-2 '
-        '--admin-enabled')
+        '--enable-admin')
 
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
@@ -121,7 +121,7 @@ class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
 
     self.Run('compute interconnects attachments partner create my-attachment '
              '--router my-router --description "this is my attachment" '
-             '--edge-availability-domain any --admin-enabled')
+             '--edge-availability-domain any --no-enable-admin')
 
     self.CheckRequests(
         [(self.compute.regions, 'List',
@@ -139,10 +139,10 @@ class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
                   'routers/my-router',
                   type=messages.InterconnectAttachment.TypeValueValuesEnum(
                       'PARTNER'),
-                  edgeAvailabilityDomain=messages.InterconnectAttachment.
-                  EdgeAvailabilityDomainValueValuesEnum(
+                  edgeAvailabilityDomain=messages.InterconnectAttachment
+                  .EdgeAvailabilityDomainValueValuesEnum(
                       'AVAILABILITY_DOMAIN_ANY'),
-                  adminEnabled=True),
+                  adminEnabled=False),
           ))],
     )
     self.AssertErrContains('PROMPT_CHOICE')

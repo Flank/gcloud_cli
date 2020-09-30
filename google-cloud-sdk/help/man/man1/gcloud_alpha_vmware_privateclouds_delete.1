@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware privateclouds delete \- delete a Cloud VMware privatecloud
+gcloud alpha vmware privateclouds delete \- delete a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware privateclouds delete \- delete a Cloud VMware privatecloud
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Delete a VMware privatecloud.
+\fB(ALPHA)\fR Delete a VMware Engine private cloud.
 
 
 
@@ -62,25 +62,18 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To delete a privatecloud called example\-privatecloud in project my\-project and
-location us\-central1:
+To delete a private cloud called \f5\fImy\-privatecloud\fR\fR in project
+\f5\fImy\-project\fR\fR and location \f5\fIus\-central1\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha vmware privateclouds delete example\-privatecloud
-.RE
-
-Or:
-
-.RS 2m
-$ gcloud alpha vmware privateclouds delete example\-privatecloud \e
+$ gcloud alpha vmware privateclouds delete my\-privatecloud \e
     \-\-project=my\-project \-\-location=us\-central1
 .RE
 
 Or:
 
 .RS 2m
-$ gcloud alpha vmware privateclouds delete \e
-    /projects/my\-project/locations/us\-central1/example\-privatecloud
+$ gcloud alpha vmware privateclouds delete my\-privatecloud
 .RE
 
 In the first example, the project and location are taken from gcloud properties

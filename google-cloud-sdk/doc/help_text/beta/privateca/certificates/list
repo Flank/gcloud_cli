@@ -27,7 +27,8 @@ REQUIRED FLAGS
           other arguments in this group are specified.
 
        --issuer-location=ISSUER_LOCATION
-          The location of the CERTIFICATE_AUTHORITY.
+          The location of the CERTIFICATE_AUTHORITY. Alternatively, you can set
+          the property [privateca/location].
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

@@ -14,7 +14,7 @@ SYNOPSIS
         [--master-boot-disk-size=MASTER_BOOT_DISK_SIZE]
         [--master-boot-disk-type=MASTER_BOOT_DISK_TYPE]
         [--master-machine-type=MASTER_MACHINE_TYPE]
-        [--master-min-cpu-platform=PLATFORM]
+        [--master-min-cpu-platform=PLATFORM] [--node-group=NODE_GROUP]
         [--num-master-local-ssds=NUM_MASTER_LOCAL_SSDS]
         [--num-masters=NUM_MASTERS]
         [--num-secondary-worker-local-ssds=NUM_SECONDARY_WORKER_LOCAL_SSDS]
@@ -152,6 +152,11 @@ FLAGS
 
         You can find more information online:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
+     --node-group=NODE_GROUP
+        The name of the sole-tenant node group to create the cluster on. Can be
+        a short name ("node-group-name") or in the format
+        "projects/{project-id}/zones/{zone}/nodeGroups/{node-group-name}".
 
      --num-master-local-ssds=NUM_MASTER_LOCAL_SSDS
         The number of local SSDs to attach to the master in a cluster.

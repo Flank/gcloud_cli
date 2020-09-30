@@ -512,8 +512,16 @@ class BetaUpdateTest(UpdateTest):
         self.messages, track='beta')
     self.orig.nats = [self.messages.RouterNat(name='my-nat')]
 
+  def testEndpointIndependentMappingUnsupported(self):
+    with self.AssertRaisesArgumentErrorMatches('unrecognized arguments:'):
+      self.Run("""
+          compute routers nats update my-nat --router my-router
+          --region us-central1 --auto-allocate-nat-external-ips
+          --nat-all-subnet-ip-ranges --enable-endpoint-independent-mapping
+          """)
 
-class AlphaUpdateTest(BetaUpdateTest):
+
+class AlphaUpdateTest(UpdateTest):
 
   def SetUp(self):
     self.api_version = 'alpha'
@@ -522,6 +530,34 @@ class AlphaUpdateTest(BetaUpdateTest):
     self.orig = router_test_utils.CreateEmptyRouterMessage(
         self.messages, track='alpha')
     self.orig.nats = [self.messages.RouterNat(name='my-nat')]
+
+  def testDisableEndpointIndependentMapping(self):
+    orig_nat = self.messages.RouterNat(
+        name='my-nat',
+        enableEndpointIndependentMapping=True,
+        natIpAllocateOption=self.messages.RouterNat
+        .NatIpAllocateOptionValueValuesEnum.AUTO_ONLY,
+        sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+        .SourceSubnetworkIpRangesToNatValueValuesEnum
+        .ALL_SUBNETWORKS_ALL_IP_RANGES)
+    orig_router = copy.deepcopy(self.orig)
+    orig_router.nats = [orig_nat]
+
+    expected_nat = copy.deepcopy(orig_nat)
+    expected_nat.enableEndpointIndependentMapping = False
+    expected_router = copy.deepcopy(self.orig)
+    expected_router.nats = [expected_nat]
+
+    self.ExpectGet(self.orig)
+    self.ExpectPatch(expected_router)
+    self.ExpectOperationsPolling()
+    self.ExpectGet(expected_router)
+
+    self.Run("""
+        compute routers nats update my-nat --router my-router
+        --region us-central1 --auto-allocate-nat-external-ips
+        --nat-all-subnet-ip-ranges --no-enable-endpoint-independent-mapping
+        """)
 
 
 if __name__ == '__main__':

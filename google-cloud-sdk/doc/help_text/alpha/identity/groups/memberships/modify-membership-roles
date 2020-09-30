@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha identity groups memberships modify-membership-roles
         --group-email=GROUP_EMAIL --member-email=MEMBER_EMAIL
-        [--update-roles-params=[UPDATE_ROLES_PARAMS,...]
+        [--update-roles-params=UPDATE_ROLES_PARAMS
           | --add-roles=ADD_ROLES --remove-roles=[REMOVE_ROLES,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -23,10 +23,10 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      At most one of these may be specified:
 
-       --update-roles-params=[UPDATE_ROLES_PARAMS,...]
+       --update-roles-params=UPDATE_ROLES_PARAMS
           Resource representing the parameters to update membership roles. An
-          example whould be --update-roles-params
-          MEMBER=expiry_detail.expire_time
+          example would be --update-roles-params
+          MEMBER=expiry_details.expire_time.
 
        --add-roles=ADD_ROLES
           Membership roles to be added. Currently supported MembershipRole:

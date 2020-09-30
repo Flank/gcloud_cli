@@ -68,7 +68,7 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.AssertErrContains('to Cloud Run')
     self.AssertErrContains(
         'Service [{serv}] revision [{rev}] has been deployed '
-        'and is serving 100 percent of traffic at {url}'.format(
+        'and is serving 100 percent of traffic.\nService URL: {url}'.format(
             serv=serv, rev='rev.1', url='https://foo-bar.baz'))
 
   def testDeployWithService(self):

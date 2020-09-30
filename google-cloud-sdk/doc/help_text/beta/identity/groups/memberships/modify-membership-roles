@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta identity groups memberships modify-membership-roles
         --group-email=GROUP_EMAIL --member-email=MEMBER_EMAIL
-        [--add-roles=ADD_ROLES --remove-roles=[REMOVE_ROLES,...]]
+        [--update-roles-params=UPDATE_ROLES_PARAMS
+          | --add-roles=ADD_ROLES --remove-roles=[REMOVE_ROLES,...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -20,14 +21,21 @@ REQUIRED FLAGS
         The email address of the group or user that is being updated
 
 OPTIONAL FLAGS
-     --add-roles=ADD_ROLES
-        Membership roles to be added. Currently supported MembershipRole:
-        'MEMBER', 'OWNER', 'MANAGER'.
+     At most one of these may be specified:
 
-     --remove-roles=[REMOVE_ROLES,...]
-        Membership role names to be removed. Currently supported
-        MembershipRole: 'OWNER', 'MANAGER'. MEMBER-less owner is not supported
-        so removing just MEMBER role won't be possible.
+       --update-roles-params=UPDATE_ROLES_PARAMS
+          Resource representing the parameters to update membership roles. An
+          example would be --update-roles-params
+          MEMBER=expiry_details.expire_time.
+
+       --add-roles=ADD_ROLES
+          Membership roles to be added. Currently supported MembershipRole:
+          'MEMBER', 'OWNER', 'MANAGER'.
+
+       --remove-roles=[REMOVE_ROLES,...]
+          Membership role names to be removed. Currently supported
+          MembershipRole: 'OWNER', 'MANAGER'. MEMBER-less owner is not
+          supported so removing just MEMBER role won't be possible.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

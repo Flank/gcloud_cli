@@ -12,7 +12,8 @@ summary:
     - message: Deploying new service...
     - status: SUCCESS
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$service-name$$.default.example.com
 - execute:
   - command: run domain-mappings create --service $$service-name$$ --domain $$subdomain$$.$$domain-name$$
       --cluster $$cluster$$ --cluster-location $$cluster-location$$
@@ -416,7 +417,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: http://$$service-name$$.default.example.com
     - expect_exit:
         code: 0
 - execute_command:

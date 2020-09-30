@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_ALPHA_AI_ENDPOINTS_PREDICT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ai endpoints predict \- run AI Platform online prediction
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ai endpoints predict\fR (\fIENDPOINT\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-json\-request\fR=\fIJSON_REQUEST\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \f5gcloud alpha ai endpoints predict\fR sends a prediction request
+to AI Platform endpoint for the given instances. This command will read up to
+100 instances, though the service itself will accept instances up to the payload
+limit size (currently, 1.5MB).
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Endpoint resource \- The endpoint to do online prediction. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [endpoint] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIENDPOINT\fR
+ID of the endpoint or fully qualified identifier for the endpoint. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud region for the endpoint.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-json\-request\fR=\fIJSON_REQUEST\fR
+Path to a local file containing the body of a JSON request.
+
+An example of a JSON request:
+
+.RS 2m
+{
+  "instances": [
+    {"x": [1, 2], "y": [3, 4]},
+    {"x": [\-1, \-2], "y": [\-3, \-4]}
+  ]
+}
+.RE
+
+This flag accepts "\-" for stdin.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta ai endpoints predict
+.RE
+

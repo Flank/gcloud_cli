@@ -138,6 +138,12 @@ AVAILABLE PROPERTIES
          screen_reader
             Make gcloud more screen reader friendly.
 
+     ai
+         region
+            Default region to use when working withAI Platform resources. When
+            a --region flag is required but not provided, the command will fall
+            back to this value, if set.
+
      app
          cloud_build_timeout
             Timeout, in seconds, to wait for Docker builds to complete during

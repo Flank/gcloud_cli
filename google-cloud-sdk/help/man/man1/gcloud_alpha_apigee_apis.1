@@ -57,6 +57,54 @@ Run \fB$ gcloud help\fR for details.
 .RE
 .sp
 
+.SH "EXAMPLES"
+
+To list all the API proxies in the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee apis list
+.RE
+
+To get details about a specific API proxy in a specific Apigee organization,
+run:
+
+.RS 2m
+$ gcloud alpha apigee apis describe PROXY_NAME \e
+  \-\-organization=ORG_NAME
+.RE
+
+To get a JSON object containing revision\-level details about an API proxy, run:
+
+.RS 2m
+$ gcloud alpha apigee apis describe PROXY_NAME \-\-verbose \e
+  \-\-format=json
+.RE
+
+To deploy the most recent revision of an API proxy into the \f5\fIeval\fR\fR
+deployment environment, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deploy \-\-api=PROXY_NAME \-\-environment=eval
+.RE
+
+To deploy the first revision of that API proxy into the \f5\fIrelease\fR\fR
+deployment environment, run:
+
+.RS 2m
+$ gcloud alpha apigee apis deploy 1 \-\-api=PROXY_NAME \e
+  \-\-environment=release
+.RE
+
+To undeploy whatever revision of PROXY_NAME is currently deployed in
+ENVIRONMENT, run:
+
+.RS 2m
+$ gcloud alpha apigee apis undeploy \-\-api=PROXY_NAME \e
+  \-\-environment=ENVIRONMENT
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this

@@ -29,7 +29,6 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 import six
 
-
 RESOURCE_JSON = collections.OrderedDict({
     'name': 'do-not-delete-gke-knative-test-cluster',
     'nodeConfig': collections.OrderedDict({
@@ -50,12 +49,11 @@ RESOURCE_JSON = collections.OrderedDict({
     'endpoint': '35.239.121.203',
 })
 
-RESOURCE_LIST = six.text_type([RESOURCE_JSON] * 3)
+RESOURCE_LIST = [RESOURCE_JSON] * 3
 DICT_TEST_DATA = {
     'ERROR': collections.OrderedDict({
         'version': '1.0.0',
         'timestamp': '2020-01-01T00:00:00.000Z',
-        'body': 'Error',
         'error_details': collections.OrderedDict({
             'error': 'Processing Error'
         })
@@ -63,7 +61,6 @@ DICT_TEST_DATA = {
     'ERROR_WITH_CTX': collections.OrderedDict({
         'version': '1.0.0',
         'timestamp': '2020-01-01T00:00:00.000Z',
-        'body': 'Error',
         'error_details': collections.OrderedDict({
             'error': 'Processing Error',
             'context': 'Line 1:Foo -> Bar -> Call foo_bar()'
@@ -97,6 +94,12 @@ DICT_TEST_DATA = {
         'body': 'resources',
         'resource_body': RESOURCE_LIST
     }),
+    'BAD_RESOURCES': collections.OrderedDict({
+        'version': '1.0.0',
+        'timestamp': '2020-01-01T00:00:00.000Z',
+        'body': 'resources',
+        'resource_body': 'BAD_DATA'
+    }),
     'MISSING_REQUIRED': collections.OrderedDict({
         'version': '1.0.0',
         'timestamp': '2020-01-01T00:00:00.000Z'
@@ -126,14 +129,27 @@ class MessagesTests(parameterized.TestCase, sdk_test_base.WithLogCapture):
   """Test messages module functions."""
 
   @parameterized.named_parameters(
+      ('MinimalValues', 'STATUS'),
+      ('ErrorOnly', 'ERROR'),)
+  def testCreateOutputMessage(self, item):
+    self.assertIsNotNone(BuildTestMessage(DICT_TEST_DATA[item]))
+
+  @parameterized.named_parameters(
+      ('Bad Resource Body', 'BAD_RESOURCES', ValueError),
+      ('TooFewValues', 'MISSING_REQUIRED', sm.InvalidMessageError),
+      ('TooManyValues', 'STATUS_WITH_RESOURCES_AND_ERROR',
+       sm.InvalidMessageError),)
+  def testCreateOutputMessageErrors(self, test_value, raised):
+    with self.assertRaises(raised):
+      BuildTestMessage(DICT_TEST_DATA[test_value])
+
+  @parameterized.named_parameters(
       ('MinimalValues', 'STATUS', BuildTestMessage(DICT_TEST_DATA['STATUS'])),
       ('ErrorOnly', 'ERROR', BuildTestMessage(DICT_TEST_DATA['ERROR'])),
       ('ErrorWithContext', 'ERROR_WITH_CTX',
        BuildTestMessage(DICT_TEST_DATA['ERROR_WITH_CTX'])),
       ('ListOfResources', 'RESOURCE_LIST',
-       BuildTestMessage(DICT_TEST_DATA['RESOURCE_LIST'])),
-      ('MaximumValues', 'STATUS_WITH_RESOURCES_AND_ERROR',
-       BuildTestMessage(DICT_TEST_DATA['STATUS_WITH_RESOURCES_AND_ERROR'])),)
+       BuildTestMessage(DICT_TEST_DATA['RESOURCE_LIST'])),)
   def testFromString(self, dict_key, expected):
     self.assertEqual(expected,
                      sm.OutputMessage.FromString(JSON_TEST_DATA[dict_key]))
@@ -143,7 +159,11 @@ class MessagesTests(parameterized.TestCase, sdk_test_base.WithLogCapture):
       ('InvalidType', JSON_TEST_DATA['MISSING_REQUIRED'],
        sm.InvalidMessageError),
       ('Empty', '{}', sm.InvalidMessageError),
-      ('Bad Date', JSON_TEST_DATA['BAD_DATE'], sm.MessageParsingError),)
+      ('Bad Resource Body', JSON_TEST_DATA['BAD_RESOURCES'],
+       sm.InvalidMessageError),
+      ('Bad Date', JSON_TEST_DATA['BAD_DATE'], sm.MessageParsingError),
+      ('TooManyValues', JSON_TEST_DATA['STATUS_WITH_RESOURCES_AND_ERROR'],
+       sm.InvalidMessageError),)
   def testFromStringErrors(self, test_value, raised):
     with self.assertRaises(raised):
       sm.OutputMessage.FromString(test_value)
@@ -155,12 +175,10 @@ class MessagesTests(parameterized.TestCase, sdk_test_base.WithLogCapture):
        BuildTestMessage(DICT_TEST_DATA['ERROR_WITH_CTX'])),
       ('WithResources', 'STATUS_WITH_RESOURCES',
        BuildTestMessage(DICT_TEST_DATA['STATUS_WITH_RESOURCES'])),
-      ('MaximumValues', 'STATUS_WITH_RESOURCES_AND_ERROR',
-       BuildTestMessage(DICT_TEST_DATA['STATUS_WITH_RESOURCES_AND_ERROR'])),
   )
   def testToYamlString(self, msg_key, msg):
     expected = YAML_TEST_DATA[msg_key]
-    actual = str(msg)
+    actual = six.text_type(msg)
     self.assertEqual(expected, actual)
 
   @parameterized.named_parameters(
@@ -170,14 +188,31 @@ class MessagesTests(parameterized.TestCase, sdk_test_base.WithLogCapture):
        BuildTestMessage(DICT_TEST_DATA['ERROR_WITH_CTX'])),
       ('WithResources', 'STATUS_WITH_RESOURCES',
        BuildTestMessage(DICT_TEST_DATA['STATUS_WITH_RESOURCES'])),
-      ('MaximumValues', 'STATUS_WITH_RESOURCES_AND_ERROR',
-       BuildTestMessage(DICT_TEST_DATA['STATUS_WITH_RESOURCES_AND_ERROR'])),
   )
   def testToJSONString(self, msg_key, msg):
     expected = JSON_TEST_DATA[msg_key]
     print(expected)
     actual = msg.ToJSON()
     self.assertEqual(expected, actual)
+
+  @parameterized.named_parameters(
+      ('ErrorOnly', 'ERROR', 'Error: [Processing Error].', None),
+      ('ErrorWithContext', 'ERROR_WITH_CTX',
+       'Error: [Processing Error]. Additional details: '
+       '[Line 1:Foo -> Bar -> Call foo_bar()]', None),
+      ('CustomFormat', 'ERROR_WITH_CTX',
+       'Error=>[Processing Error]. Details=> '
+       '[Line 1:Foo -> Bar -> Call foo_bar()]',
+       ['Error=>[{error}]. Details=>',
+        ' [{context}]'])
+  )
+  def testErrorDetailFormat(self, msg_key, expected, custom_format):
+    error_msg = BuildTestMessage(DICT_TEST_DATA[msg_key])
+    if custom_format:
+      self.assertEqual(expected, error_msg.error_details.Format(
+          error_format=custom_format[0], context_format=custom_format[1]))
+    else:
+      self.assertEqual(expected, error_msg.error_details.Format())
 
 
 if __name__ == '__main__':

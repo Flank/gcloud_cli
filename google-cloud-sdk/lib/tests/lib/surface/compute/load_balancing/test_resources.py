@@ -51,6 +51,35 @@ TARGET_HTTP_PROXIES = [
 ]
 
 
+def MakeTargetHttpProxies(msgs, api):
+  prefix = _COMPUTE_PATH + '/' + api
+  long_prefix = prefix + '/projects/my-project'
+  return [
+      msgs.TargetHttpProxy(
+          name='target-http-proxy-1',
+          description='My first proxy',
+          urlMap=long_prefix + 'global/urlMaps/url-map-1',
+          selfLink=(long_prefix +
+                    'global/targetHttpProxies/target-http-proxy-1')),
+      msgs.TargetHttpProxy(
+          name='target-http-proxy-2',
+          urlMap=long_prefix + 'global/urlMaps/url-map-2',
+          selfLink=(long_prefix +
+                    'global/targetHttpProxies/target-http-proxy-2')),
+      msgs.TargetHttpProxy(
+          name='target-http-proxy-3',
+          description='My last proxy',
+          urlMap=long_prefix + 'global/urlMaps/url-map-3',
+          selfLink=(long_prefix +
+                    'global/targetHttpProxies/target-http-proxy-3')),
+  ]
+
+
+TARGET_HTTP_PROXIES_ALPHA = MakeTargetHttpProxies(alpha_messages, 'alpha')
+TARGET_HTTP_PROXIES_BETA = MakeTargetHttpProxies(beta_messages, 'beta')
+TARGET_HTTP_PROXIES_V1 = MakeTargetHttpProxies(messages, 'v1')
+
+
 def MakeTargetGrpcProxies(msgs, api):
   prefix = _COMPUTE_PATH + '/' + api
   long_prefix = prefix + '/projects/my-project'

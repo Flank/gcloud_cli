@@ -47,6 +47,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
   def test_create_scheduled_trigger_configfile(self):
     gfs = self.msg.GitFileSource
     trigger = self.msg.BuildTrigger(
+        name='my-trigger',
         cron=self.msg.CronConfig(
             schedule='0 9 * * *',
             timeZone='America/New_York',

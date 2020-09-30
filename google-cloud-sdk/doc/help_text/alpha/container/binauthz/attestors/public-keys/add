@@ -64,7 +64,8 @@ REQUIRED FLAGS
          --pkix-public-key-algorithm=PKIX_PUBLIC_KEY_ALGORITHM
             The signing algorithm of the associated key. This will be used to
             verify the signatures associated with this key.
-            PKIX_PUBLIC_KEY_ALGORITHM must be one of: ecdsa-p256-sha256,
+            PKIX_PUBLIC_KEY_ALGORITHM must be one of: ec-sign-p256-sha256,
+            ec-sign-p384-sha384, ec-sign-p521-sha512, ecdsa-p256-sha256,
             ecdsa-p384-sha384, ecdsa-p521-sha512, rsa-pss-2048-sha256,
             rsa-pss-3072-sha256, rsa-pss-4096-sha256, rsa-pss-4096-sha512,
             rsa-sign-pkcs1-2048-sha256, rsa-sign-pkcs1-3072-sha256,

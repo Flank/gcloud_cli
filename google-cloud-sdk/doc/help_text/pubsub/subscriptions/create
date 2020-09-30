@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
-        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
-        [--labels=[KEY=VALUE,...]]
+        [--ack-deadline=ACK_DEADLINE] [--enable-message-ordering]
+        [--expiration-period=EXPIRATION_PERIOD] [--labels=[KEY=VALUE,...]]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
         [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
         [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
@@ -52,6 +52,11 @@ OPTIONAL FLAGS
      --ack-deadline=ACK_DEADLINE
         The number of seconds the system will wait for a subscriber to
         acknowledge receiving a message before re-attempting delivery.
+
+     --enable-message-ordering
+        Whether to receive messages with the same ordering key in order. If
+        set, messages with the same ordering key are sent to subscribers in the
+        order that Pub/Sub receives them.
 
      --expiration-period=EXPIRATION_PERIOD
         The subscription will expire if it is inactive for the given period.

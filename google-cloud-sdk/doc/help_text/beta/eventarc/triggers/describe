@@ -23,7 +23,8 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --location=LOCATION
-          The location for the Eventarc resource. Alternatively, set the
+          The location for the Eventarc trigger, which should be either global
+          or one of the supported regions. Alternatively, set the
           [eventarc/location] property.
 
 GCLOUD WIDE FLAGS

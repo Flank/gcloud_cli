@@ -11,7 +11,7 @@ gcloud alpha identity groups memberships modify\-membership\-roles \- add/remove
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha identity groups memberships modify\-membership\-roles\fR \fB\-\-group\-email\fR=\fIGROUP_EMAIL\fR \fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR [\fB\-\-update\-roles\-params\fR=[\fIUPDATE_ROLES_PARAMS\fR,...]\ |\ \fB\-\-add\-roles\fR=\fIADD_ROLES\fR\ \fB\-\-remove\-roles\fR=[\fIREMOVE_ROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha identity groups memberships modify\-membership\-roles\fR \fB\-\-group\-email\fR=\fIGROUP_EMAIL\fR \fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR [\fB\-\-update\-roles\-params\fR=\fIUPDATE_ROLES_PARAMS\fR\ |\ \fB\-\-add\-roles\fR=\fIADD_ROLES\fR\ \fB\-\-remove\-roles\fR=[\fIREMOVE_ROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -46,9 +46,10 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-update\-roles\-params\fR=[\fIUPDATE_ROLES_PARAMS\fR,...]
+\fB\-\-update\-roles\-params\fR=\fIUPDATE_ROLES_PARAMS\fR
 Resource representing the parameters to update membership roles. An example
-whould be \-\-update\-roles\-params MEMBER=expiry_detail.expire_time
+would be \f5\fI\-\-update\-roles\-params
+MEMBER=expiry_details.expire_time\fR\fR.
 
 .TP 2m
 \fB\-\-add\-roles\fR=\fIADD_ROLES\fR

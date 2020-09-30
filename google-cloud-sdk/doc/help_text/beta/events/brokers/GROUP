@@ -79,6 +79,15 @@ COMMANDS
      create
         (BETA) Create a broker to initialize a namespace for eventing.
 
+     delete
+        (BETA) Delete a broker.
+
+     describe
+        (BETA) Get details about a given broker.
+
+     list
+        (BETA) List brokers.
+
 EXAMPLES
     To create a broker, run:
 

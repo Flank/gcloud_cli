@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.events import broker
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
@@ -31,35 +32,76 @@ class CreateAnthosTestBeta(base.EventsBase):
     self.track = calliope_base.ReleaseTrack.BETA
     self.core_api_name = 'anthosevents'
 
+  def _MakeBroker(self, broker_name, namespace_name='default'):
+    messages = self.mock_client.MESSAGES_MODULE
+    broker_obj = broker.Broker.New(self.mock_client, namespace_name)
+    broker_obj.name = broker_name
+    broker_obj.spec = messages.BrokerSpec()
+    return broker_obj
+
   def testEventTypesFailFailNonGKE(self):
     """This command is for Anthos only."""
     with self.assertRaises(serverless_exceptions.ConfigurationError):
-      self.Run('events brokers create default ' '--platform=managed')
+      self.Run('events brokers create default --platform=managed')
 
   def testCreate(self):
-    """Tests successful init with success message."""
+    """Tests successful create broker."""
+
+    # Arrange
+    namespace_name = 'default'
+    broker_name = 'default'
+    broker_obj = self._MakeBroker(broker_name)
+    self.operations.CreateBroker.return_value = broker_obj
+
+    # Act
     self.Run('events brokers create default '
              '--platform=gke --cluster=cluster-1 '
              '--cluster-location=us-central1-a')
-    self.operations.UpdateNamespaceWithLabels.assert_called_once_with(
-        self._CoreNamespaceRef('default'),
-        {'knative-eventing-injection': 'enabled'})
+
+    # Assert
+    self.operations.CreateBroker.assert_called_once_with(
+        namespace_name,
+        broker_name,
+    )
     self.AssertErrContains('Created broker [default]')
 
   def testUsesCustomNamespace(self):
+    # Arrange
+    namespace_name = 'roberto'
+    broker_name = 'default'
+    broker_obj = self._MakeBroker(broker_name)
+    self.operations.CreateBroker.return_value = broker_obj
+
+    # Act
     self.Run('events brokers create default --namespace=roberto '
              '--platform=gke --cluster=cluster-1 '
              '--cluster-location=us-central1-a')
-    self.operations.UpdateNamespaceWithLabels.assert_called_once_with(
-        self._CoreNamespaceRef('roberto'),
-        {'knative-eventing-injection': 'enabled'})
 
-  def testNonDefaultBrokerNameFails(self):
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events brokers create not-default '
-               '--platform=gke --cluster=cluster-1 '
-               '--cluster-location=us-central1-a')
-    self.AssertErrContains('Only brokers named "default" may be created.')
+    # Assert
+    self.operations.CreateBroker.assert_called_once_with(
+        namespace_name,
+        broker_name,
+    )
+    self.AssertErrContains('Created broker [default]')
+
+  def testNonDefaultBrokerNameSucceeds(self):
+    # Arrange
+    namespace_name = 'default'
+    broker_name = 'not-default'
+    broker_obj = self._MakeBroker(broker_name)
+    self.operations.CreateBroker.return_value = broker_obj
+
+    # Act
+    self.Run('events brokers create not-default '
+             '--platform=gke --cluster=cluster-1 '
+             '--cluster-location=us-central1-a')
+
+    # Assert
+    self.operations.CreateBroker.assert_called_once_with(
+        namespace_name,
+        broker_name,
+    )
+    self.AssertErrContains('Created broker [{}]'.format(broker_name))
 
 
 class CreateAnthosTestAlpha(CreateAnthosTestBeta):

@@ -20,9 +20,7 @@ from __future__ import unicode_literals
 
 import os
 import subprocess
-import time
 
-from googlecloudsdk.command_lib.util import time_util
 from tests.lib.surface.compute import e2e_test_base
 from tests.lib.surface.compute import ssl_certificates_base
 
@@ -35,7 +33,6 @@ class SelfManagedSslCertificateTest(
     self.key_fname = os.path.join(temp_dir, 'foo.key')
     self.crt_fname = os.path.join(temp_dir, 'foo.crt')
 
-    self.start_time = time.time()
     self.assertEqual(
         subprocess.call(
             ['openssl', 'req', '-x509', '-nodes', '-days', '365',
@@ -49,23 +46,12 @@ class SelfManagedSslCertificateTest(
     name = self.UniqueName()
     description = 'CertDescription'
 
-    def CheckCert(cert, after):
+    def CheckCert(cert):
       self.assertEqual(name, cert.name)
       self.assertEqual(
           self.messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
           cert.type)
       self.assertEqual(description, cert.description)
-
-      creation_timestamp = time_util.Strptime(cert.creationTimestamp)
-      # Metastore, TrueTime and server time can be different on different
-      # machines and you should compare timestamp with some accuracy.
-      time_accuracy = 60
-      self.assertLessEqual(self.start_time - time_accuracy, creation_timestamp)
-      self.assertGreaterEqual(after + time_accuracy, creation_timestamp)
-
-      expire_time = time_util.Strptime(cert.expireTime)
-      self.assertLessEqual(self.start_time + 364*24*3600, expire_time)
-      self.assertGreaterEqual(after + 366*24*3600, expire_time)
 
     # test create
     result = self.Run('compute ssl-certificates create {0} --certificate {1} '
@@ -75,19 +61,18 @@ class SelfManagedSslCertificateTest(
 
     self.ssl_cert_names.append(name)
     self.assertEqual(1, len(result_list))
-    after = time.time()
-    CheckCert(result_list[0], after)
+    CheckCert(result_list[0])
 
     # test describe
     result = self.Run('compute ssl-certificates describe {0}'.format(name))
-    CheckCert(result, after)
+    CheckCert(result)
 
     # test list
     result = self.Run('compute ssl-certificates list')
     result_list = [self.DictToCert(cert)
                    for cert in result if cert['name'] == name]
     self.assertEqual(1, len(result_list))
-    CheckCert(result_list[0], after)
+    CheckCert(result_list[0])
 
   def testDescriptionOnlyShouldFail(self):
     name = self.UniqueName()

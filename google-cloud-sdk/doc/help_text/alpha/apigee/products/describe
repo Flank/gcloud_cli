@@ -1,17 +1,21 @@
 NAME
-    gcloud alpha apigee products describe - describes an Apigee API product
+    gcloud alpha apigee products describe - describe an Apigee API product
 
 SYNOPSIS
     gcloud alpha apigee products describe
         (PRODUCT : --organization=ORGANIZATION) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describes an Apigee API product.
+    (ALPHA) Describe an Apigee API product.
 
 POSITIONAL ARGUMENTS
-     API product resource - The API product to be described. The arguments in
-     this group can be used to specify the attributes of this resource. This
-     must be specified.
+     API product resource - API product to be described. To get a list of
+     available API products, run:
+
+     $ gcloud alpha apigee products list
+
+     The arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
 
        PRODUCT
           ID of the API product or fully qualified identifier for the API
@@ -36,7 +40,7 @@ EXAMPLES
 
         $ gcloud alpha apigee products describe product-name
 
-    To describe an API product called other-product from an Apigee organization
+    To describe an API product called other-product in an Apigee organization
     called org-name, run:
 
         $ gcloud alpha apigee products describe other-product \

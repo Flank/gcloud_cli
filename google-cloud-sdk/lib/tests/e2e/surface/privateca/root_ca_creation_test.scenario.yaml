@@ -46,6 +46,8 @@ actions:
     reference: ca-id
     prefix: gcloud-test
     delimiter: '-'
+- set_property:
+    privateca/location: us-central1
 - execute_command:
     command: privateca roots create $$ca-id$$ --subject "CN=Scenario Test,O=Google
       LLC" --kms-key-version $$kms-key$$/cryptoKeyVersions/1 --reusable-config root-unconstrained

@@ -1,0 +1,366 @@
+
+.TH "GCLOUD_ALPHA_REMOTE\-BUILD\-EXECUTION_INSTANCES_SET\-FEATURE\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha remote\-build\-execution instances set\-feature\-policy \- sets the feature policy for an instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha remote\-build\-execution instances set\-feature\-policy\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-docker\-privileged\fR=\fIDOCKER_PRIVILEGED\fR] [\fB\-\-docker\-run\-as\-root\fR=\fIDOCKER_RUN_AS_ROOT\fR] [\fB\-\-docker\-sibling\-containers\fR=\fIDOCKER_SIBLING_CONTAINERS\fR] [\fB\-\-linux\-isolation\fR=\fILINUX_ISOLATION\fR] [\fB\-\-container\-image\-sources\fR=\fICONTAINER_IMAGE_SOURCES\fR\ :\ \fB\-\-container\-image\-sources\-allowlist\fR=[\fICONTAINER_IMAGE_SOURCES_ALLOWLIST\fR,...]] [\fB\-\-docker\-add\-capabilities\fR=\fIDOCKER_ADD_CAPABILITIES\fR\ :\ \fB\-\-docker\-add\-capabilities\-allowlist\fR=[\fIDOCKER_ADD_CAPABILITIES_ALLOWLIST\fR,...]] [\fB\-\-docker\-chroot\-path\fR=\fIDOCKER_CHROOT_PATH\fR\ :\ \fB\-\-docker\-chroot\-path\-allowlist\fR=[\fIDOCKER_CHROOT_PATH_ALLOWLIST\fR,...]] [\fB\-\-docker\-network\fR=\fIDOCKER_NETWORK\fR\ :\ \fB\-\-docker\-network\-allowlist\fR=[\fIDOCKER_NETWORK_ALLOWLIST\fR,...]] [\fB\-\-docker\-runtime\fR=\fIDOCKER_RUNTIME\fR\ :\ \fB\-\-docker\-runtime\-allowlist\fR=[\fIDOCKER_RUNTIME_ALLOWLIST\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Sets the feature policy for a Remote Build Execution instance,
+which will control which RBE execution features can be used with commands run
+against that instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- Arguments describing the feature policy to set. This
+represents a Cloud resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [instance] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-docker\-privileged\fR=\fIDOCKER_PRIVILEGED\fR
+Whether dockerPrivileged can be used. If unspecified, the default is equivalent
+to "forbidden". \fIDOCKER_PRIVILEGED\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+dockerPrivileged can be used.
+
+.TP 2m
+\fBforbidden\fR
+dockerPrivileged cannot be used.
+
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-docker\-run\-as\-root\fR=\fIDOCKER_RUN_AS_ROOT\fR
+Whether dockerRunAsRoot can be used. If unspecified, the default is equivalent
+to "forbidden". \fIDOCKER_RUN_AS_ROOT\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+dockerRunAsRoot can be used.
+
+.TP 2m
+\fBforbidden\fR
+dockerRunAsRoot cannot be used.
+
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-docker\-sibling\-containers\fR=\fIDOCKER_SIBLING_CONTAINERS\fR
+Whether dockerSiblingSontainers can be used. If unspecified, the default is
+equivalent to "forbidden". \fIDOCKER_SIBLING_CONTAINERS\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+The feature can be used.
+
+.TP 2m
+\fBforbidden\fR
+The feature cannot be used.
+
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-linux\-isolation\fR=\fILINUX_ISOLATION\fR
+Which Linux isolation mechanism should be used for execution. If unspecified,
+the default Linux runtime will be used. \fILINUX_ISOLATION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBgvisor\fR
+gVisor will be used as the isolation mechanism for all linux execution.
+
+.TP 2m
+\fBoff\fR
+No additional isolation mechanisms will be used beyond the default linux
+runtime.
+
+.RE
+.sp
+
+
+.TP 2m
+
+Flags for container image sources \- either only container\-image\-sources or
+both flags may be specified.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-container\-image\-sources\fR=\fICONTAINER_IMAGE_SOURCES\fR
+Whether container image sources can be used. Note that all RBE actions require a
+container image so if this is set to "forbidden", all tasks will fail. If
+unspecified, the default is equivalent to "allowed".
+\fICONTAINER_IMAGE_SOURCES\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+Images from any container image sources can be used.
+
+.TP 2m
+\fBforbidden\fR
+No images from any container image sources can be used.
+
+.TP 2m
+\fBrestricted\fR
+Container images can be used, if and only if, they are stored in one of the
+allowed container image sources.
+
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-container\-image\-sources\-allowlist\fR=[\fICONTAINER_IMAGE_SOURCES_ALLOWLIST\fR,...]
+The list of allowed container image sources. Note: this will only be used if the
+corresponding policy is set to "restricted".
+
+.RE
+.sp
+.TP 2m
+
+Flags for dockerAddCapabilities \- either only docker\-add\-capabilities or both
+flags may be specified.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-docker\-add\-capabilities\fR=\fIDOCKER_ADD_CAPABILITIES\fR
+Whether dockerAddCapabilities can be used. If unspecified, the default is
+equivalent to "forbidden". \fIDOCKER_ADD_CAPABILITIES\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+The feature can be used.
+
+.TP 2m
+\fBforbidden\fR
+The feature cannot be used.
+
+.TP 2m
+\fBrestricted\fR
+The feature can be used, if and only if, it is set to one of the allowed values.
+
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-docker\-add\-capabilities\-allowlist\fR=[\fIDOCKER_ADD_CAPABILITIES_ALLOWLIST\fR,...]
+The list of allowed dockerAddCapabilities values. Note: this will only be used
+if the corresponding policy is set to "restricted".
+
+.RE
+.sp
+.TP 2m
+
+Flags for dockerChrootPath \- either only docker\-chroot\-path or both flags may
+be specified.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-docker\-chroot\-path\fR=\fIDOCKER_CHROOT_PATH\fR
+Whether dockerChrootPath can be used. If unspecified, the default is equivalent
+to "forbidden". \fIDOCKER_CHROOT_PATH\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+The feature can be used.
+
+.TP 2m
+\fBforbidden\fR
+The feature cannot be used.
+
+.TP 2m
+\fBrestricted\fR
+The feature can be used, if and only if, it is set to one of the allowed values.
+
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-docker\-chroot\-path\-allowlist\fR=[\fIDOCKER_CHROOT_PATH_ALLOWLIST\fR,...]
+The list of allowed dockerChrootPath values. Note: this will only be used if the
+corresponding policy is set to "restricted".
+
+.RE
+.sp
+.TP 2m
+
+Flags for dockerNetwork \- either only docker\-network or both flags may be
+specified.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-docker\-network\fR=\fIDOCKER_NETWORK\fR
+Whether dockerNetwork can be used. If unspecified, the default is equivalent to
+"forbidden". \fIDOCKER_NETWORK\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+The feature can be used.
+
+.TP 2m
+\fBforbidden\fR
+The feature cannot be used.
+
+.TP 2m
+\fBrestricted\fR
+The feature can be used, if and only if, it is set to one of the allowed values.
+
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-docker\-network\-allowlist\fR=[\fIDOCKER_NETWORK_ALLOWLIST\fR,...]
+The list of allowed dockerNetwork values. Note: this will only be used if the
+corresponding policy is set to "restricted".
+
+.RE
+.sp
+.TP 2m
+
+Flags for dockerRuntime \- either only docker\-runtime or both flags may be
+specified.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-docker\-runtime\fR=\fIDOCKER_RUNTIME\fR
+Whether dockerRuntime can be used. If unspecified, the default is equivalent to
+"forbidden". \fIDOCKER_RUNTIME\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBallowed\fR
+The feature can be used.
+
+.TP 2m
+\fBforbidden\fR
+The feature cannot be used.
+
+.TP 2m
+\fBrestricted\fR
+The feature can be used, if and only if, it is set to one of the allowed values.
+
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-docker\-runtime\-allowlist\fR=[\fIDOCKER_RUNTIME_ALLOWLIST\fR,...]
+The list of allowed dockerRuntime values. Note: this will only be used if the
+corresponding policy is set to "restricted".
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBremotebuildexecution/v1alpha\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/remote\-build\-execution/docs/
+
+
+
+.SH "EXAMPLES"
+
+The following sets a simple feature policy for an instance called
+\'default_instance':
+
+.RS 2m
+$ gcloud alpha remote\-build\-execution instances set\-feature\-policy \e
+    default_instance \-\-linux\-isolation=gvisor \e
+    \-\-docker\-privileged=forbidden \-\-docker\-runtime=restricted \e
+    \-\-docker\-runtime\-allowlist=runc,runsc
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist.
+

@@ -301,10 +301,7 @@ class WildcardWithoutApitoolsMockTest(parameterized.TestCase,
     objects = self.messages.Objects(items=objects, prefixes=prefixes)
 
     for o in objects.items:
-      yield resource_reference.ObjectResource.from_gcs_metadata_object(
-          provider=cloud_api.DEFAULT_PROVIDER.value,
-          metadata_object=o
-      )
+      yield gcs_api._ObjectResourceFromMetadata(o)
 
     for prefix_string in objects.prefixes:
       yield resource_reference.PrefixResource(

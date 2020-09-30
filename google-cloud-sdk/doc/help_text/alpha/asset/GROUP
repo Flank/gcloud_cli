@@ -27,9 +27,6 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
-     analyze-iam-policy
-        (ALPHA) Analyzes accessible IAM policies that match a request.
-
      export
         (ALPHA) Export the cloud assets to Google Cloud Storage.
 

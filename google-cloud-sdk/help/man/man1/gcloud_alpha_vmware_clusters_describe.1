@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha vmware clusters describe \- describe a Cloud VMware cluster
+gcloud alpha vmware clusters describe \- describe a cluster in a VMware Engine private cloud
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha vmware clusters describe \- describe a Cloud VMware cluster
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Describe a VMware cluster.
+\fB(ALPHA)\fR Describe a cluster in a VMware Engine private cloud.
 
 
 
@@ -65,28 +65,24 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To describe a cluster called example\-cluster in project my\-project and
-location us\-central1:
+To get a description of a cluster called \f5\fImy\-cluster\fR\fR in the
+\f5\fImy\-privatecloud\fR\fR private cloud in the \f5\fIus\-central1\fR\fR
+location, run:
 
 .RS 2m
-$ gcloud alpha vmware clusters describe example\-cluster
+$ gcloud alpha vmware clusters describe my\-cluster \e
+    \-\-privatecloud=my\-privatecloud \-\-location=us\-central1 \e
+    \-\-project=my\-project
 .RE
 
 Or:
 
 .RS 2m
-$ gcloud alpha vmware clusters describe example\-cluster \e
-    \-\-project=my\-project \-\-location=us\-central1
+$ gcloud alpha vmware clusters describe my\-cluster \e
+    \-\-privatecloud=my\-privatecloud
 .RE
 
-Or:
-
-.RS 2m
-$ gcloud alpha vmware clusters describe \e
-    /projects/my\-project/locations/us\-central1/example\-cluster
-.RE
-
-In the first example, the project and location are taken from gcloud properties
+In the second example, the project and location are taken from gcloud properties
 core/project and vmware/location.
 
 

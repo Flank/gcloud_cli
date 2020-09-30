@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha apigee deployments \- manage deployments of Apigee proxies in runtime environments
+gcloud alpha apigee deployments \- manage deployments of Apigee API proxies in runtime environments
 
 
 
@@ -17,7 +17,10 @@ gcloud alpha apigee deployments \- manage deployments of Apigee proxies in runti
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Manage deployments of Apigee proxies in runtime environments.
+\fB(ALPHA)\fR Manage deployments of Apigee API proxies in runtime environments.
+
+\f5gcloud alpha apigee deployments\fR contains commands for enumerating and
+checking the status of deployments of proxies to runtime environments.
 
 
 
@@ -48,6 +51,31 @@ Run \fB$ gcloud help\fR for details.
 
 .RE
 .sp
+
+.SH "EXAMPLES"
+
+To list all deployments for the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud alpha apigee deployments list
+.RE
+
+To list all deployments in a particular environment of a particular Apigee
+organization, run:
+
+.RS 2m
+$ gcloud alpha apigee deployments list \-\-environment=ENVIRONMENT \e
+  \-\-organization=ORG_NAME
+.RE
+
+To get the status of a specific deployment as a JSON object, run:
+
+.RS 2m
+$ gcloud alpha apigee deployments describe \-\-api=API_NAME \e
+  \-\-environment=ENVIRONMENT \-\-format=json
+.RE
+
+
 
 .SH "NOTES"
 

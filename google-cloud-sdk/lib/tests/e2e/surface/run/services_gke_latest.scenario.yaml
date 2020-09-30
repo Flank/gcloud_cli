@@ -14,7 +14,8 @@ summary:
     - message: Deploying new service...
     - status: SUCCESS
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$service-name$$.default.example.com
 - execute:
   - command: run services describe $$service-name$$ --format="value(metadata.name)"
   - stdout: |
@@ -413,7 +414,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: http://$$service-name$$.default.example.com
     - expect_exit:
         code: 0
 
@@ -1114,7 +1116,7 @@ actions:
                 revisionName: $$service-revision-name-2$$
               url: http://$$service-name$$.default.svc.cluster.local
     - expect_stderr:
-        matches: .*has\sbeen\sdeployed\sand\sis\sserving\s100\spercent\sof\straffic\sat.*
+        matches: .*has\sbeen\sdeployed\sand\sis\sserving\s100\spercent\sof\straffic\..*\s+Service URL:.*
     - expect_exit:
         code: 0
 - execute_command:

@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha vmware privateclouds create - create a Cloud VMware
-        privatecloud
+    gcloud alpha vmware privateclouds create - create a VMware Engine private
+        cloud
 
 SYNOPSIS
     gcloud alpha vmware privateclouds create
@@ -10,7 +10,7 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a vmware privatecloud.
+    (ALPHA) Create a VMware Engine private cloud.
 
 POSITIONAL ARGUMENTS
      Privatecloud resource - privatecloud. The arguments in this group can be
@@ -62,22 +62,17 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To create a privatecloud called example-privatecloud in project my-project
-    and location us-central1:
+    To create a private cloud called my-privatecloud in project my-project and
+    location us-central1, run:
 
-        $ gcloud alpha vmware privateclouds create example-privatecloud
-
-    Or:
-
-        $ gcloud alpha vmware privateclouds create example-privatecloud \
+        $ gcloud alpha vmware privateclouds create my-privatecloud \
             --project=my-project --location=us-central1
 
     Or:
 
-        $ gcloud alpha vmware privateclouds create \
-            /projects/my-project/locations/us-central1/example-privatecloud
+        $ gcloud alpha vmware privateclouds create my-privatecloud
 
-    In the first example, the project and location are taken from gcloud
+    In the second example, the project and location are taken from gcloud
     properties core/project and vmware/location.
 
 NOTES

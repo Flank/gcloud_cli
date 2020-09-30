@@ -3,61 +3,43 @@ NAME
         authority
 
 SYNOPSIS
-    gcloud beta privateca roots create CERTIFICATE_AUTHORITY
-        (--kms-key-version=KMS_KEY_VERSION : --kms-key=KMS_KEY
-          --kms-keyring=KMS_KEYRING
-          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT)
-        [--bucket=BUCKET] [--dns-san=[DNS_SAN,...]]
-        [--email-san=[EMAIL_SAN,...]] [--ip-san=[IP_SAN,...]]
-        [--issuance-policy=ISSUANCE_POLICY] [--labels=[KEY=VALUE,...]]
-        [--no-publish-ca-cert] [--no-publish-crl] [--subject=[SUBJECT,...]]
-        [--tier=TIER; default="enterprise"] [--uri-san=[URI_SAN,...]]
-        [--validity=VALIDITY; default="P10Y"]
+    gcloud beta privateca roots create
+        (CERTIFICATE_AUTHORITY : --location=LOCATION) [--bucket=BUCKET]
+        [--dns-san=[DNS_SAN,...]] [--email-san=[EMAIL_SAN,...]]
+        [--ip-san=[IP_SAN,...]] [--issuance-policy=ISSUANCE_POLICY]
+        [--labels=[KEY=VALUE,...]] [--no-publish-ca-cert] [--no-publish-crl]
+        [--subject=[SUBJECT,...]] [--tier=TIER; default="enterprise"]
+        [--uri-san=[URI_SAN,...]] [--validity=VALIDITY; default="P10Y"]
         [--from-ca=FROM_CA : --from-ca-location=FROM_CA_LOCATION
           --from-ca-project=FROM_CA_PROJECT]
+        [--key-algorithm=KEY_ALGORITHM; default="rsa-pss-4096-sha256"
+          | [--kms-key-version=KMS_KEY_VERSION : --kms-key=KMS_KEY
+          --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]]
         [[--reusable-config=REUSABLE_CONFIG
           : --extended-key-usages=[EXTENDED_KEY_USAGES,...]
           --key-usages=[KEY_USAGES,...] --max-chain-length=MAX_CHAIN_LENGTH]]
         [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
-     Certificate Authority resource - The name of the root CA to create. This
-     represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the argument [CERTIFICATE_AUTHORITY] on the command
-     line with a fully specified name; provide the argument [--project] on the
-     command line; set the property [core/project]. To set the [location]
-     attribute: provide the argument [CERTIFICATE_AUTHORITY] on the command
-     line with a fully specified name; set the property [privateca/location].
-     This must be specified.
+     Certificate Authority resource - The name of the root CA to create. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [CERTIFICATE_AUTHORITY] on the command line with a fully
+     specified name; provide the argument [--project] on the command line; set
+     the property [core/project]. This must be specified.
 
        CERTIFICATE_AUTHORITY
           ID of the Certificate Authority or fully qualified identifier for the
-          Certificate Authority.
+          Certificate Authority. This positional must be specified if any of
+          the other arguments in this group are specified.
 
-REQUIRED FLAGS
-     Key version resource - The KMS key version backing this CA. The arguments
-     in this group can be used to specify the attributes of this resource. This
-     must be specified.
+       --location=LOCATION
+          The location of the Certificate Authority. Alternatively, you can set
+          the property [privateca/location].
 
-       --kms-key-version=KMS_KEY_VERSION
-          ID of the key version or fully qualified identifier for the key
-          version. This flag must be specified if any of the other arguments in
-          this group are specified.
-
-       --kms-key=KMS_KEY
-          The KMS key of the key version.
-
-       --kms-keyring=KMS_KEYRING
-          The KMS keyring of the key version.
-
-       --kms-location=KMS_LOCATION
-          The Cloud location for the key version.
-
-       --kms-project=KMS_PROJECT
-          The Cloud project for the key version.
-
-OPTIONAL FLAGS
+FLAGS
      --bucket=BUCKET
         The name of an existing storage bucket to use for storing the CA
         certificate and CRLs. If omitted, a new bucket will be created and
@@ -130,10 +112,45 @@ OPTIONAL FLAGS
           group are specified.
 
        --from-ca-location=FROM_CA_LOCATION
-          The location of the source CA.
+          The location of the source CA. Alternatively, you can set the
+          property [privateca/location].
 
        --from-ca-project=FROM_CA_PROJECT
           Project ID of the Google Cloud Platform project for the source CA.
+
+     The key configuration used for the CA certificate. Defaults to a managed
+     key if not specified. At most one of these may be specified:
+
+       --key-algorithm=KEY_ALGORITHM; default="rsa-pss-4096-sha256"
+          The crypto algorithm to use for creating a managed KMS key for the
+          Certificate Authority. KEY_ALGORITHM must be one of: ec-p256-sha256,
+          ec-p384-sha384, rsa-pss-2048-sha256, rsa-pss-3078-sha256,
+          rsa-pss-4096-sha256.
+
+       Key version resource - An existing KMS key version to back this CA. The
+       arguments in this group can be used to specify the attributes of this
+       resource.
+
+         --kms-key-version=KMS_KEY_VERSION
+            ID of the key version or fully qualified identifier for the key
+            version. This flag must be specified if any of the other arguments
+            in this group are specified.
+
+         --kms-key=KMS_KEY
+            The KMS key of the key version.
+
+         --kms-keyring=KMS_KEYRING
+            The KMS keyring of the key version.
+
+         --kms-location=KMS_LOCATION
+            The location of the key version. Alternatively, you can provide the
+            argument [location] on the command line, or set the property
+            [privateca/location].
+
+         --kms-project=KMS_PROJECT
+            The project containing the key version. Alternatively, you can
+            provide the argument [project] on the command line, or set the
+            property [core/project].
 
      The X.509 configuration used for the CA certificate. At most one of these
      may be specified:

@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud pubsub topics publish TOPIC [--attribute=[ATTRIBUTE,...]]
-        [--message=MESSAGE] [GCLOUD_WIDE_FLAG ...]
+        [--message=MESSAGE] [--ordering-key=ORDERING_KEY]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Publishes a message to the specified topic name for testing and
@@ -31,6 +32,11 @@ FLAGS
         The body of the message to publish to the given topic name. Information
         on message formatting and size limits can be found at:
         https://cloud.google.com/pubsub/docs/publisher#publish
+
+     --ordering-key=ORDERING_KEY
+        The key for ordering delivery to subscribers. All messages with the
+        same ordering key are sent to subscribers in the order that Pub/Sub
+        receives them.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

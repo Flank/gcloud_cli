@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import contextlib
+import datetime
 import io
 import json
 import os
@@ -28,7 +29,8 @@ import textwrap
 
 from apitools.base.py import batch
 from apitools.base.py import http_wrapper
-
+import botocore.awsrequest
+import botocore.response
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import config
 from googlecloudsdk.core import http
@@ -37,7 +39,6 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.console import progress_tracker
 from googlecloudsdk.core.util import files
-
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -48,7 +49,6 @@ from tests.lib.scenario import schema
 from tests.lib.scenario import session
 from tests.lib.scenario import test_base
 from tests.lib.scenario import updates
-
 import httplib2
 import mock
 import requests
@@ -64,14 +64,46 @@ def make_requests_response(status_code, headers, body):
   return http_resp
 
 
+def make_botocore_response(status_code, headers, parsed_response):
+  resp = botocore.awsrequest.AWSResponse('url', status_code, headers, {})
+  return resp, parsed_response
+
+
+def make_botocore_parsed_body(str_value, date_value):
+  bytes_value = bytes(str_value.encode('utf-8'))
+  length = len(str_value)
+  return {
+      'Body': botocore.response.StreamingBody(six.BytesIO(bytes_value), length),
+      'ContentLength': length,
+      'ContentLanguage': 'en',
+      'LastModified': date_value,
+  }
+
+
+def make_botocore_json_body(str_value, date_value):
+  return (
+      '{{"Body": {{"_streamingbody": "{0}"}}, '
+      '"ContentLanguage": "en", "ContentLength": {2}, "LastModified": {{'
+      '"_datetime": "{1}"}}}}').format(str_value,
+                                       date_value.strftime('%Y-%m-%dT%H:%M:%S'),
+                                       len(str_value))
+
+
 class TransportTest(test_case.TestCase, parameterized.TestCase):
 
   @parameterized.parameters(
       (session.Httplib2Transport(None).RequestFromArgs(
           'url', method='POST', body='test', headers={'header': 'val'}),),
       (session.RequestsTransport(None).RequestFromArgs(
-          'POST', 'url', data='test', headers={'header': 'val'}),)
-  )
+          'POST', 'url', data='test', headers={'header': 'val'}),),
+      (session.BotocoreTransport(None).RequestFromArgs({}, {
+          'url': 'url',
+          'method': 'POST',
+          'headers': {
+              'header': 'val'
+          },
+          'body': 'test'
+      })))
   def testRequestFromArgs(self, request):
     self.assertEqual(request.uri, 'url')
     self.assertEqual(request.method, 'POST')
@@ -79,18 +111,31 @@ class TransportTest(test_case.TestCase, parameterized.TestCase):
     self.assertEqual(request.body, 'test')
 
   @parameterized.parameters(
-      (session.Httplib2Transport(None),
-       (httplib2.Response({'status': httplib.OK, 'header': 'val'}),
-        'test'.encode('utf-8'))),
+      (session.Httplib2Transport(None), (httplib2.Response({
+          'status': httplib.OK,
+          'header': 'val'
+      }), 'test'.encode('utf-8'))),
       (session.RequestsTransport(None),
-       make_requests_response(
-           httplib.OK, {'header': 'val'}, 'test'.encode('utf-8')))
-  )
+       make_requests_response(httplib.OK, {'header': 'val'},
+                              'test'.encode('utf-8'))),
+      (session.BotocoreTransport(None),
+       make_botocore_response(httplib.OK, {'header': 'val'}, 'test')))
   def testResponseFromTransportResponse(self, transport, transport_response):
     response = transport.ResponseFromTransportResponse(transport_response)
     self.assertEqual(response.status, httplib.OK)
     self.assertEqual(response.headers, {'header': 'val'})
     self.assertEqual(response.body, 'test')
+
+  def testBotocoreJsonResponseFromTransportResponse(self):
+    transport = session.BotocoreTransport(None)
+    str_value = 'test'
+    date_value = datetime.datetime(2020, 3, 14, 0, 0, 0)
+    transport_response = make_botocore_response(
+        httplib.OK, {'header': 'val'},
+        make_botocore_parsed_body(str_value, date_value))
+    response = transport.ResponseFromTransportResponse(transport_response)
+    self.assertEqual(response.body,
+                     make_botocore_json_body(str_value, date_value))
 
   def testToHttplib2TransportResponse(self):
     response = events.Response(
@@ -117,6 +162,29 @@ class TransportTest(test_case.TestCase, parameterized.TestCase):
                      expected_response.headers)
     self.assertEqual(transport_response.content,
                      expected_response.content)
+
+  def testToBotocoreTransportResponse(self):
+    date_value = datetime.datetime(2020, 3, 14, 0, 0, 0)
+    response = events.Response(httplib.OK, {'header': 'val'},
+                               make_botocore_json_body('test', date_value))
+    transport = session.BotocoreTransport(None)
+    transport_response = transport.ResponseToTransportResponse(response)
+
+    expected_response = make_botocore_response(
+        httplib.OK, {'header': 'val'},
+        make_botocore_parsed_body('test', date_value))
+    self.assertEqual(transport_response[0].status_code,
+                     expected_response[0].status_code)
+    self.assertEqual(transport_response[0].headers,
+                     expected_response[0].headers)
+    self.assertEqual(transport_response[1]['Body'].read(),
+                     expected_response[1]['Body'].read())
+    self.assertEqual(transport_response[1]['ContentLanguage'],
+                     expected_response[1]['ContentLanguage'])
+    self.assertEqual(transport_response[1]['ContentLength'],
+                     expected_response[1]['ContentLength'])
+    self.assertEqual(transport_response[1]['LastModified'],
+                     expected_response[1]['LastModified'])
 
 
 class _SessionTestsBase(sdk_test_base.WithOutputCapture,
@@ -316,8 +384,9 @@ class SessionTests(_SessionTestsBase):
       (session.Httplib2Transport(None),
        (httplib2.Response({'status': httplib.OK}), 'test'.encode('utf-8'))),
       (session.RequestsTransport(None),
-       make_requests_response(httplib.OK, {}, 'test'.encode('utf-8')))
-  )
+       make_requests_response(httplib.OK, {}, 'test'.encode('utf-8'))),
+      (session.BotocoreTransport(None),
+       make_botocore_response(httplib.OK, {}, 'test')))
   def testMakeRealRequest(self, transport, response):
     client_mock = mock.Mock()
     args = ['arg1']

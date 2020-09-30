@@ -4,8 +4,8 @@
 02453 _menu_.js
 01108 _title_.html
 02222 favicon.ico
-07074 gcloud.html
-07165 gcloud_alpha.html
+07101 gcloud.html
+07192 gcloud_alpha.html
 02706 gcloud_alpha_internal.html
 02782 gcloud_alpha_internal_internal-command.html
 03885 gcloud_alpha_sdk.html
@@ -18,7 +18,7 @@
 04318 gcloud_alpha_sdk_subgroup_subgroup-command-a.html
 04413 gcloud_alpha_sdk_xyzzy.html
 02323 gcloud_alpha_version.html
-06982 gcloud_beta.html
+07009 gcloud_beta.html
 02531 gcloud_beta_internal.html
 02609 gcloud_beta_internal_internal-command.html
 03697 gcloud_beta_sdk.html

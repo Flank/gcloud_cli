@@ -11,7 +11,7 @@ gcloud alpha builds triggers create scheduled \- create a build trigger that fir
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds triggers create scheduled\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\-type\fR=\fIREPO_TYPE\fR\ \fB\-\-repo\-uri\fR=\fIREPO_URI\fR\ \fB\-\-revision\fR=\fIREVISION\fR\ \fB\-\-schedule\fR=\fISCHEDULE\fR\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...])\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-time\-zone\fR=\fITIME_ZONE\fR]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds triggers create scheduled\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\-type\fR=\fIREPO_TYPE\fR\ \fB\-\-repo\-uri\fR=\fIREPO_URI\fR\ \fB\-\-revision\fR=\fIREVISION\fR\ \fB\-\-schedule\fR=\fISCHEDULE\fR\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...])\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-name\fR=\fINAME\fR\ \fB\-\-time\-zone\fR=\fITIME_ZONE\fR]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,6 +67,10 @@ specified.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Build trigger description.
+
+.TP 2m
+\fB\-\-name\fR=\fINAME\fR
+Build trigger name.
 
 .TP 2m
 \fB\-\-time\-zone\fR=\fITIME_ZONE\fR
@@ -144,6 +148,7 @@ To create a scheduled trigger for a CSR repository:
 
 .RS 2m
 $ gcloud alpha builds triggers create scheduled \e
+    \-\-name="my\-trigger" \e
     \-\-repo\-uri="https://source.developers.google.com/p/projectid/r/r\e
 epo" \-\-repo\-type="CLOUD_SOURCE_REPOSITORIES" \e
     \-\-revision="refs/heads/master" \e
@@ -155,7 +160,7 @@ To create a scheduled trigger for a GitHub repository:
 
 .RS 2m
 $ gcloud alpha builds triggers create scheduled \e
-    \-\-repo\-uri="https://github.com/owner/repo" \e
+    \-\-name="my\-trigger" \-\-repo\-uri="https://github.com/owner/repo" \e
     \-\-repo\-type="GITHUB" \-\-revision="refs/heads/master" \e
     \-\-build\-config="cloudbuild.yaml" \-\-schedule="0 9 * * *" \e
     \-\-time\-zone="America/New_York"

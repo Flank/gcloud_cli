@@ -19,16 +19,16 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a Cloud VMware privatecloud.
+        (ALPHA) Create a VMware Engine private cloud.
 
      delete
-        (ALPHA) Delete a Cloud VMware privatecloud.
+        (ALPHA) Delete a VMware Engine private cloud.
 
      describe
-        (ALPHA) Describe a Cloud VMware privatecloud.
+        (ALPHA) Describe a VMware Engine private cloud.
 
      list
-        (ALPHA) List Cloud VMware privateclouds.
+        (ALPHA) List VMware Engine private clouds in a location.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

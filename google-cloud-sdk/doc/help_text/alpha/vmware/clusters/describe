@@ -1,5 +1,6 @@
 NAME
-    gcloud alpha vmware clusters describe - describe a Cloud VMware cluster
+    gcloud alpha vmware clusters describe - describe a cluster in a VMware
+        Engine private cloud
 
 SYNOPSIS
     gcloud alpha vmware clusters describe
@@ -7,7 +8,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a VMware cluster.
+    (ALPHA) Describe a cluster in a VMware Engine private cloud.
 
 POSITIONAL ARGUMENTS
      Cluster resource - cluster. The arguments in this group can be used to
@@ -37,22 +38,19 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To describe a cluster called example-cluster in project my-project and
-    location us-central1:
+    To get a description of a cluster called my-cluster in the my-privatecloud
+    private cloud in the us-central1 location, run:
 
-        $ gcloud alpha vmware clusters describe example-cluster
-
-    Or:
-
-        $ gcloud alpha vmware clusters describe example-cluster \
-            --project=my-project --location=us-central1
+        $ gcloud alpha vmware clusters describe my-cluster \
+            --privatecloud=my-privatecloud --location=us-central1 \
+            --project=my-project
 
     Or:
 
-        $ gcloud alpha vmware clusters describe \
-            /projects/my-project/locations/us-central1/example-cluster
+        $ gcloud alpha vmware clusters describe my-cluster \
+            --privatecloud=my-privatecloud
 
-    In the first example, the project and location are taken from gcloud
+    In the second example, the project and location are taken from gcloud
     properties core/project and vmware/location.
 
 NOTES

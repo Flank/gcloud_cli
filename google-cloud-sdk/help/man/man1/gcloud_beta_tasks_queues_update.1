@@ -11,7 +11,7 @@ gcloud beta tasks queues update \- update a Cloud Tasks queue
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta tasks queues update\fR \fIQUEUE\fR [\fB\-\-clear\-log\-sampling\-ratio\fR\ |\ \fB\-\-log\-sampling\-ratio\fR=\fILOG_SAMPLING_RATIO\fR] [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-dispatches\fR\ |\ \fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-clear\-max\-dispatches\-per\-second\fR\ |\ \fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta tasks queues update\fR \fIQUEUE\fR [\fB\-\-type\fR=\fITYPE\fR;\ default="push"] [\fB\-\-clear\-log\-sampling\-ratio\fR\ |\ \fB\-\-log\-sampling\-ratio\fR=\fILOG_SAMPLING_RATIO\fR] [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-dispatches\fR\ |\ \fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-clear\-max\-dispatches\-per\-second\fR\ |\ \fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,6 +37,11 @@ The queue to update.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR; default="push"
+Specifies the type of queue. Only available options are 'push' and 'pull'. The
+default option is 'push'.
+
 .TP 2m
 
 At most one of these may be specified:

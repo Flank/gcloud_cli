@@ -87,6 +87,15 @@ COMMANDS
      create
         (ALPHA) Create a broker to initialize a namespace for eventing.
 
+     delete
+        (ALPHA) Delete a broker.
+
+     describe
+        (ALPHA) Get details about a given broker.
+
+     list
+        (ALPHA) List brokers.
+
 EXAMPLES
     To create a broker, run:
 

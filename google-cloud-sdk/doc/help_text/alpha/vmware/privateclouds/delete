@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha vmware privateclouds delete - delete a Cloud VMware
-        privatecloud
+    gcloud alpha vmware privateclouds delete - delete a VMware Engine private
+        cloud
 
 SYNOPSIS
     gcloud alpha vmware privateclouds delete
         (PRIVATECLOUD : --location=LOCATION) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a VMware privatecloud.
+    (ALPHA) Delete a VMware Engine private cloud.
 
 POSITIONAL ARGUMENTS
      Privatecloud resource - privatecloud. The arguments in this group can be
@@ -35,20 +35,15 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To delete a privatecloud called example-privatecloud in project my-project
-    and location us-central1:
+    To delete a private cloud called my-privatecloud in project my-project and
+    location us-central1, run:
 
-        $ gcloud alpha vmware privateclouds delete example-privatecloud
-
-    Or:
-
-        $ gcloud alpha vmware privateclouds delete example-privatecloud \
+        $ gcloud alpha vmware privateclouds delete my-privatecloud \
             --project=my-project --location=us-central1
 
     Or:
 
-        $ gcloud alpha vmware privateclouds delete \
-            /projects/my-project/locations/us-central1/example-privatecloud
+        $ gcloud alpha vmware privateclouds delete my-privatecloud
 
     In the first example, the project and location are taken from gcloud
     properties core/project and vmware/location.

@@ -126,7 +126,7 @@ class InterconnectAttachmentsDedicatedCreateGaTest(test_base.BaseTest):
              self.compute_uri +
              '/projects/my-project/regions/us-central1/interconnectAttachments/'
              'my-attachment --interconnect my-interconnect --router my-router '
-             '--description "this is my attachment" --vlan 400 --admin-enabled '
+             '--description "this is my attachment" --vlan 400 --enable-admin '
              '--candidate-subnets 169.254.0.0/29,169.254.4.0/28,169.254.8.0/27')
 
     self.CheckInterconnectAttachmentRequest(
@@ -242,7 +242,7 @@ class InterconnectAttachmentsDedicatedCreateGaTest(test_base.BaseTest):
     self.Run('compute interconnects attachments dedicated create my-attachment '
              '--region us-central1 --interconnect my-interconnect --router '
              'my-router --description "this is my attachment" --vlan 400 '
-             '--admin-enabled --candidate-subnets '
+             '--no-enable-admin --candidate-subnets '
              '169.254.0.0/29,169.254.4.0/28,169.254.8.0/27 --bandwidth 50g')
 
     self.CheckInterconnectAttachmentRequest(
@@ -253,7 +253,7 @@ class InterconnectAttachmentsDedicatedCreateGaTest(test_base.BaseTest):
         router=self.compute_uri + '/projects/my-project/regions/us-central1/'
         'routers/my-router',
         type=messages.InterconnectAttachment.TypeValueValuesEnum('DEDICATED'),
-        adminEnabled=True,
+        adminEnabled=False,
         vlanTag8021q=400,
         candidateSubnets=['169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'],
         bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(

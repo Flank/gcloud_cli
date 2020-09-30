@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud alpha artifacts repositories create
         (REPOSITORY : --location=LOCATION)
         --repository-format=REPOSITORY_FORMAT [--async]
-        [--description=DESCRIPTION] [--kms-key=KMS_KEY] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--kms-key=KMS_KEY]
+        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new Artifact Registry repository.
@@ -51,6 +52,14 @@ OPTIONAL FLAGS
      --kms-key=KMS_KEY
         Name of the encryption key that's used for encrypting the contents of
         the repository.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

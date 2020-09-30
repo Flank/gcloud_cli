@@ -15,7 +15,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
 - set_property: run/region us-central1
 - execute:
   - command: run domain-mappings create --service $$service-name$$ --domain $$subdomain$$.$$domain-name$$
@@ -339,7 +340,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
 - set_property:

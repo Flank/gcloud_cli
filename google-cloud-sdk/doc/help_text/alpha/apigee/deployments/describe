@@ -12,27 +12,36 @@ DESCRIPTION
     (ALPHA) Describe an Apigee API proxy deployment.
 
     gcloud alpha apigee deployments describe retrieves the status of a specific
-    Apigee API proxy's deployment to a specific environment.
+    API proxy's deployment to a specific environment.
 
 POSITIONAL ARGUMENTS
-     Revision resource - The API proxy revision and environment of the
-     deployment to be described. REVISION defaults to auto, which will describe
-     whichever revision is currently deployed. However, if more than one
-     revision of API is deployed in ENVIRONMENT, then an explicit REVISION is
-     required or the command will fail. The arguments in this group can be used
-     to specify the attributes of this resource.
+     Revision resource - API proxy revision and environment of the deployment
+     to be described.
 
-       [REVISION]
-          ID of the revision or fully qualified identifier for the revision.
+    To get a list of deployed proxies and their environments, run:
 
-       --api=API
-          The deployed API proxy.
+        $ gcloud alpha apigee deployments list
 
-       --environment=ENVIRONMENT
-          The environment in which the proxy was deployed.
+    REVISION can either be a positive revision number, or the special value
+    auto, which will choose whichever revision of API is currently deployed in
+    ENVIRONMENT, or return an error if more than one revision is deployed.
 
-       --organization=ORGANIZATION
-          The organization of the proxy and environment.
+    If REVISION is unspecified, the default is auto.
+
+        The arguments in this group can be used to specify the attributes of this resource.
+
+         [REVISION]
+            ID of the revision or fully qualified identifier for the revision.
+
+         --api=API
+            Deployed API proxy.
+
+         --environment=ENVIRONMENT
+            Environment in which the proxy was deployed.
+
+         --organization=ORGANIZATION
+            Apigee Organization of the proxy and environment. If unspecified,
+            the Cloud Platform project's associated organization will be used.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -46,13 +55,19 @@ EXAMPLES
     To get the status of a deployment in the active Cloud Platform project,
     which deploys my-proxy into the prod environment, run:
 
-        gcloud alpha apigee deployments describe --api=my-proxy --environment=prod
+        $ gcloud alpha apigee deployments describe --api=my-proxy \
+          --environment=prod
 
-    To get the status of a deployment in an Apigee organization called my-org,
-    which deploys version 3 of the proxy my-proxy into the test environment,
-    run:
+    To get the status of that deployment as a JSON object, run:
 
-        gcloud alpha apigee deployments describe 3 --organization=my-org --environment=test --api=my-proxy
+        $ gcloud alpha apigee deployments describe --api=my-proxy \
+          --environment=prod --format=json
+
+    To get the status of a deployment in an organization called my-org, which
+    deploys version 3 of the proxy my-proxy into the test environment, run:
+
+        $ gcloud alpha apigee deployments describe 3 --organization=my-org \
+          --environment=test --api=my-proxy
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

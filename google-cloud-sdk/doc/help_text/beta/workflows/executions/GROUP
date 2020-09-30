@@ -28,6 +28,9 @@ COMMANDS
      list
         (BETA) List workflow executions.
 
+     wait
+        (BETA) Wait for an execution to complete.
+
 NOTES
     This command is currently in BETA and may change without notice.
 

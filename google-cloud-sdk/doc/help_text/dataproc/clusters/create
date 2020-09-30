@@ -13,6 +13,7 @@ SYNOPSIS
         [--master-boot-disk-type=MASTER_BOOT_DISK_TYPE]
         [--master-machine-type=MASTER_MACHINE_TYPE]
         [--master-min-cpu-platform=PLATFORM] [--max-idle=MAX_IDLE]
+        [--node-group=NODE_GROUP]
         [--num-master-local-ssds=NUM_MASTER_LOCAL_SSDS]
         [--num-masters=NUM_MASTERS]
         [--num-secondary-worker-local-ssds=NUM_SECONDARY_WORKER_LOCAL_SSDS]
@@ -160,6 +161,11 @@ FLAGS
         The duration before cluster is auto-deleted after last job completes,
         such as "2h" or "1d". See $ gcloud topic datetimes for information on
         duration formats.
+
+     --node-group=NODE_GROUP
+        The name of the sole-tenant node group to create the cluster on. Can be
+        a short name ("node-group-name") or in the format
+        "projects/{project-id}/zones/{zone}/nodeGroups/{node-group-name}".
 
      --num-master-local-ssds=NUM_MASTER_LOCAL_SSDS
         The number of local SSDs to attach to the master in a cluster.

@@ -16,7 +16,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$service-name$$.default.example.com
 - execute:
   - command: run services describe $$service-name$$ --format="value(metadata.name)"
   - stdout: |
@@ -28,7 +29,8 @@ summary:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |-
-      Service \[$$service-name$$\] revision \[$$service-revision-name-2$$\] is active and serving traffic at http://$$service-name$$\.default\..*
+      Service \[$$service-name$$\] revision \[$$service-revision-name-2$$\] is active and serving traffic.
+      Service URL: http://$$service-name$$\.default\..*
       $
 - execute:
   - command: run services replace service.yaml
@@ -38,7 +40,8 @@ summary:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |
-      Service [$$service-name$$] revision [$$service-revision-name-3$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+      Service [$$service-name$$] revision [$$service-revision-name-3$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$service-name$$.default.example.com
 - execute:
   - command: run deploy --image gcr.io/knative-samples/helloworld-nodejs $$service-name2$$
       --min-instances 1 --max-instances default
@@ -51,7 +54,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |
-      Service [$$service-name2$$] revision [$$service2-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name2$$.default.example.com
+      Service [$$service-name2$$] revision [$$service2-revision-name$$] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$service-name2$$.default.example.com
 - execute:
   - command: run services delete $$service-name$$ -q
   - stderr: |
@@ -423,7 +427,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: http://$$service-name$$.default.example.com
     - expect_exit:
         code: 0
 - execute_command:
@@ -1108,7 +1113,8 @@ actions:
     - expect_stderr:
         # TODO(b/138313012): Update
         matches: |
-          Service \[$$service-name$$\] revision \[$$service-revision-name-2$$\] has been deployed and is serving 100 percent of traffic at http://$$service-name$$\.default\..*
+          Service \[$$service-name$$\] revision \[$$service-revision-name-2$$\] has been deployed and is serving 100 percent of traffic.
+          Service URL: http://$$service-name$$\.default\..*
     - expect_exit:
         code: 0
 - write_file:
@@ -1952,7 +1958,8 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [$$service-name2$$] revision [$$service2-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name2$$.default.example.com
+        Service [$$service-name2$$] revision [$$service2-revision-name$$] has been deployed and is serving 100 percent of traffic.
+        Service URL: http://$$service-name2$$.default.example.com
     - expect_exit:
         code: 0
 - execute_command:

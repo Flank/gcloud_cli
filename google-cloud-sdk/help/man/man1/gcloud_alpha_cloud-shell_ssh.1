@@ -11,7 +11,7 @@ gcloud alpha cloud\-shell ssh \- allows you to establish an interactive SSH sess
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha cloud\-shell ssh\fR [\fB\-\-authorize\-session\fR] [\fB\-\-boosted\fR] [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha cloud\-shell ssh\fR  [\fB\-\-authorize\-session\fR] [\fB\-\-boosted\fR] [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
 
 
 
@@ -22,6 +22,25 @@ Cloud Shell. If your Cloud Shell is not currently running, this will cause it to
 be started before establishing the SSH session.
 
 
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+[\-\- \fISSH_ARGS\fR ...]
+Flags and positionals passed to the underlying ssh implementation.
+
+
+The '\-\-' argument must be specified between gcloud specific args on the left
+and SSH_ARGS on the right. Example:
+
+.RS 2m
+$ gcloud alpha cloud\-shell ssh \-\- \-vvv
+.RE
+
+
+.RE
+.sp
 
 .SH "FLAGS"
 

@@ -108,6 +108,8 @@ actions:
     reference: ca-id
     prefix: e2e
     delimiter: '-'
+- set_property:
+    privateca/location: us-central1
 - execute_command:
     command: privateca roots create $$root-ca-id$$ --kms-key-version $$kms-key$$/cryptoKeyVersions/1
       --subject "CN=Certificate Issuance E2E Test, O=Google LLC" --reusable-config

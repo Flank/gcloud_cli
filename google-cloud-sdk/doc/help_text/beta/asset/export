@@ -7,7 +7,8 @@ SYNOPSIS
           | --project=PROJECT_ID)
         (--output-path=OUTPUT_PATH | --output-path-prefix=OUTPUT_PATH_PREFIX
           | [(--bigquery-table=BIGQUERY_TABLE
-          : --bigquery-dataset=BIGQUERY_DATASET) : --output-bigquery-force])
+          : --bigquery-dataset=BIGQUERY_DATASET) : --output-bigquery-force
+          --partition-key=PARTITION_KEY --per-asset-type])
         [--asset-types=[ASSET_TYPES,...]] [--content-type=CONTENT_TYPE]
         [--snapshot-time=SNAPSHOT_TIME] [GCLOUD_WIDE_FLAG ...]
 
@@ -63,6 +64,17 @@ REQUIRED FLAGS
             the table will be overwritten by the contents of assets snapshot.
             If the flag is not specified and the destination table already
             exists, the export call returns an error.
+
+         --partition-key=PARTITION_KEY
+            If specified. the snapshot results will be written to partitioned
+            table(s) with two additional timestamp columns, readTime and
+            requestTime, one of which will be the partition key. PARTITION_KEY
+            must be one of: read-time, request-time.
+
+         --per-asset-type
+            If the flag is specified, the snapshot results will be written to
+            one or more tables, each of which contains results of one asset
+            type.
 
          Table resource - The bigquery-table export to. The arguments in this
          group can be used to specify the attributes of this resource. (NOTE)

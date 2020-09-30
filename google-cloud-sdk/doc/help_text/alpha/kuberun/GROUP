@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha kuberun - top level command to interact with Kubernetes
+        Applications
+
+SYNOPSIS
+    gcloud alpha kuberun GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This set of commands can be used create or change Knative services,
+    events or manage local projects.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     clusters
+        (ALPHA) Top level command to interact with Kubernetes applications on a
+        cluster.
+
+     devkits
+        (ALPHA) Top level command to interact with Kuberun Development Kits.
+
+EXAMPLES
+    To list your Knative services, run:
+
+        $ gcloud alpha kuberun clusters services list
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

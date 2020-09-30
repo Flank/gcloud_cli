@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha apigee products describe \- describes an Apigee API product
+gcloud alpha apigee products describe \- describe an Apigee API product
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha apigee products describe \- describes an Apigee API product
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Describes an Apigee API product.
+\fB(ALPHA)\fR Describe an Apigee API product.
 
 
 
@@ -26,9 +26,14 @@ gcloud alpha apigee products describe \- describes an Apigee API product
 .RS 2m
 .TP 2m
 
-API product resource \- The API product to be described. The arguments in this
-group can be used to specify the attributes of this resource. This must be
-specified.
+API product resource \- API product to be described. To get a list of available
+API products, run:
+
+$ gcloud alpha apigee products list
+
+The arguments in this group can be used to specify the attributes of this
+resource. This must be specified.
+
 
 .RS 2m
 .TP 2m
@@ -67,7 +72,7 @@ Platform project, run:
 $ gcloud alpha apigee products describe product\-name
 .RE
 
-To describe an API product called \f5\fIother\-product\fR\fR from an Apigee
+To describe an API product called \f5\fIother\-product\fR\fR in an Apigee
 organization called \f5\fIorg\-name\fR\fR, run:
 
 .RS 2m

@@ -122,6 +122,82 @@ class CreatePullQueueTest(test_base.CloudTasksAlphaTestBase):
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
 
 
+class CreatePullQueueTestBeta(test_base.CloudTasksTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.queue_type = self.messages.Queue.TypeValueValuesEnum.PULL
+    self.location_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations', locationsId='us-central1',
+        projectsId=self.Project())
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation('us-central1').SelfLink())
+
+  def testCreate_NoOptions(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name, type=self.queue_type)
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues create my-queue --type pull')
+
+    self.assertEqual(actual_queue, expected_queue)
+    self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+  def testCreate_AllOptions(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        retryConfig=self.messages.RetryConfig(maxAttempts=10,
+                                              maxRetryDuration='5s'),
+        type=self.queue_type)
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues create my-queue --type pull '
+                            '--max-attempts=10 --max-retry-duration=5s')
+
+    self.assertEqual(actual_queue, expected_queue)
+    self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+  def testCreate_AllOptions_Location(self):
+    location_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations', locationsId='us-central2',
+        projectsId=self.Project())
+    queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central2',
+        projectsId=self.Project(), queuesId='my-queue')
+    queue_name = queue_ref.RelativeName()
+
+    expected_queue = self.messages.Queue(
+        name=queue_name,
+        retryConfig=self.messages.RetryConfig(maxAttempts=10,
+                                              maxRetryDuration='5s'),
+        type=self.queue_type)
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=location_ref.RelativeName(), queue=expected_queue),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues create my-queue --type pull '
+                            '--max-attempts=10 --max-retry-duration=5s '
+                            '--location=us-central2')
+
+    self.assertEqual(actual_queue, expected_queue)
+    self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+
 class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
 
   def SetUp(self):
@@ -207,16 +283,20 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
 
 
-class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
+class CreatePushQueueTestBeta(CreateAppEngineQueueTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.command = 'tasks queues create'
 
+  def SetUp(self):
+    self.queue_type = self.messages.Queue.TypeValueValuesEnum.PUSH
+
   def testCreate_NoOptions(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpQueue=self.messages.AppEngineHttpQueue())
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(),
+        type=self.queue_type)
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -240,7 +320,8 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
         rateLimits=self.messages.RateLimits(
             maxDispatchesPerSecond=100, maxConcurrentDispatches=10),
         stackdriverLoggingConfig=self.messages.StackdriverLoggingConfig(
-            samplingRatio=0.1))
+            samplingRatio=0.1),
+        type=self.queue_type)
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -270,7 +351,8 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
                                               minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10),
+        type=self.queue_type)
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -313,11 +395,14 @@ class CreateAppEngineQueueTestNoLocMock(test_base.CloudTasksTestBase):
       self.Run(self.command + ' my-queue --quiet')
 
 
-class CreateAppEngineQueueTestBetaDeprecated(CreateAppEngineQueueTestBeta):
+class CreateAppEngineQueueTestBetaDeprecated(CreatePushQueueTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.command = 'tasks queues create-app-engine-queue'
+
+  def SetUp(self):
+    self.queue_type = None
 
 
 if __name__ == '__main__':

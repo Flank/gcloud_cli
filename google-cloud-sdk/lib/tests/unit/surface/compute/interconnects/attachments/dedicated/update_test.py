@@ -53,14 +53,33 @@ class InterconnectAttachmentsDedicatedUpdateGaTest(test_base.BaseTest):
         ],
     ])
 
-    self.Run('compute interconnects attachments dedicated update my-attachment '
-             '--region us-central1 --description "this is my attachment" '
-             '--no-admin-enabled')
+    self.Run(
+        'compute interconnects attachments dedicated update my-attachment '
+        '--region us-central1 --description "this is my updated attachment" '
+        '--enable-admin')
 
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
-        description='this is my attachment',
-        adminEnabled=False)
+        description='this is my updated attachment',
+        adminEnabled=True)
+
+  def testUpdateInterconnectAttachmentDisableAdmin(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='this is my attachment',
+                region='us-central1',
+                adminEnabled=True),
+        ],
+    ])
+
+    self.Run('compute interconnects attachments dedicated update my-attachment '
+             '--region us-central1 --no-enable-admin')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment', adminEnabled=False)
 
   def testUpdateInterconnectAttachmentWithBandwidth(self):
     messages = self.messages

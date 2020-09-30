@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute routers nats update NAME --router=ROUTER [--async]
-        [--enable-logging] [--log-filter=LOG_FILTER] [--region=REGION]
+        [--enable-endpoint-independent-mapping] [--enable-logging]
+        [--log-filter=LOG_FILTER] [--region=REGION]
         [--auto-allocate-nat-external-ips
           | --nat-external-ip-pool=IP_ADDRESS,[IP_ADDRESS,...]]
         [--clear-icmp-idle-timeout | --icmp-idle-timeout=ICMP_IDLE_TIMEOUT]
@@ -36,6 +37,16 @@ OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --enable-endpoint-independent-mapping
+        Enable endpoint-independent mapping for the NAT (as defined in RFC
+        5128).
+
+        If not specified, NATs have endpoint-independent mapping enabled by
+        default.
+
+        Use --no-enable-endpoint-independent-mapping to disable
+        endpoint-independent mapping.
 
      --enable-logging
         Enable logging for the NAT. Logs will be exported to Stackdriver. NAT

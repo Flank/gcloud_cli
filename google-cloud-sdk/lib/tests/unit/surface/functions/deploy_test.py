@@ -1239,6 +1239,229 @@ class FunctionsBetaTests(FunctionsDeployTest):
         '--build-worker-pool "" --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
 
+  _BUILD_ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
+  ).CloudFunction.BuildEnvironmentVariablesValue
+
+  @parameterized.named_parameters(('Set build env vars for a new function', {
+      'FOO': 'bar',
+      'BAZ': 'boo'
+  }, '--set-build-env-vars FOO=bar,BAZ=boo'),
+                                  ('Update build env vars for a new function', {
+                                      'FOO': 'bar',
+                                      'BAZ': 'boo'
+                                  }, '--update-build-env-vars FOO=bar,BAZ=boo'))
+  def testBuildEnvVarsFromFlagsCreateFunction(self, build_env_vars_dict,
+                                              cli_args):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, build_env_vars_dict)
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp,
+            allow_unauthenticated=True,
+            runtime='nodejs10',
+            build_env_vars=build_env_vars))
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+
+    self.Run('functions deploy my-test --trigger-http --stage-bucket buck {} '
+             '--runtime=nodejs10  --allow-unauthenticated'.format(cli_args))
+
+  @parameterized.named_parameters(
+      ('Set build env vars for an existing function without build env vars',
+       None, {
+           'FOO': 'bar',
+           'BAZ': 'boo'
+       }, '--set-build-env-vars FOO=bar,BAZ=boo'),
+      ('Set build env vars for an existing function with build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, {
+          'FOO': 'new bar',
+          'BOO': 'baz'
+      }, '--set-build-env-vars "FOO=new bar,BOO=baz"'),
+      ('Clear build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, None, '--clear-build-env-vars'),
+      ('Update build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, {
+          'FOO': 'bar',
+          'BAZ': 'bam',
+          'BAR': 'baa'
+      }, '--update-build-env-vars BAZ=bam,BAR=baa'),
+      ('Remove build env vars', {
+          'FOO': 'bar',
+          'BAZ': 'boo'
+      }, {
+          'FOO': 'bar'
+      }, '--remove-build-env-vars BAZ,BAR'),
+  )
+  def testBuildEnvVarsFromFlagsUpdateFunction(self,
+                                              existing_build_env_vars_dict,
+                                              updated_build_env_vars_dict,
+                                              cli_args):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    existing_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, existing_build_env_vars_dict)
+    updated_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, updated_build_env_vars_dict)
+    existing_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=existing_build_env_vars)
+    updated_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=updated_build_env_vars)
+
+    self._ExpectFunctionUpdate(
+        existing_function,
+        updated_function,
+        update_mask='buildEnvironmentVariables')
+
+    self.Run('functions deploy my-test {}'.format(cli_args))
+
+  def testBuildEnvVarsFromFileCreateFunction(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    build_env_vars_dict = {'FOO': 'bar', 'BAZ': 'boo'}
+    build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, build_env_vars_dict)
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp,
+            allow_unauthenticated=True,
+            runtime='nodejs10',
+            build_env_vars=build_env_vars))
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+
+    with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+      yaml_load_path.return_value = build_env_vars_dict
+
+      self.Run('functions deploy my-test --trigger-http --stage-bucket buck '
+               '--build-env-vars-file build-env-vars.yml --runtime=nodejs10 '
+               '--allow-unauthenticated')
+
+  def testBuildEnvVarsFromFileUpdateFunction(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    existing_build_env_vars_dict = {'FOO': 'bar', 'BAZ': 'boo'}
+    existing_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, existing_build_env_vars_dict)
+    updated_build_env_vars_dict = {'BAR': 'foo', 'BOO': 'baz'}
+    updated_build_env_vars = env_vars_api_util.DictToEnvVarsProperty(
+        self._BUILD_ENV_VARS_TYPE_CLASS, updated_build_env_vars_dict)
+    existing_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=existing_build_env_vars)
+    updated_function = self._GenerateFunctionWithPubsub(
+        test_name,
+        'gs://bucket/src.zip',
+        'topic',
+        runtime='nodejs10',
+        build_env_vars=updated_build_env_vars)
+
+    self._ExpectFunctionUpdate(
+        existing_function,
+        updated_function,
+        update_mask='buildEnvironmentVariables')
+
+    with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+      yaml_load_path.return_value = updated_build_env_vars_dict
+
+      self.Run(
+          'functions deploy my-test --build-env-vars-file build-env-vars.yml')
+
+  @parameterized.parameters(
+      ('--set-build-env-vars GOOGLE_ENTRYPOINT=foo',
+       'GOOGLE_ENTRYPOINT is reserved for internal use by GCF deployments and '
+       'cannot be used.'),
+      ('--update-build-env-vars GOOGLE_FUNCTION_TARGET=foo',
+       'GOOGLE_FUNCTION_TARGET is reserved for internal use by GCF deployments '
+       'and cannot be used.'),
+      ('--update-build-env-vars GOOGLE_RUNTIME=foo',
+       'GOOGLE_RUNTIME is reserved for internal use by GCF deployments and '
+       'cannot be used.'),
+      ('--remove-build-env-vars GOOGLE_RUNTIME_VERSION',
+       'GOOGLE_RUNTIME_VERSION is reserved for internal use by GCF deployments '
+       'and cannot be used.'),
+      ('--remove-build-env-vars X_GOOGLE_VAR',
+       'Environment variable keys that start with `X_GOOGLE_` are reserved for '
+       'use by deployment tools and cannot be specified manually.'))
+  def testBuildEnvVarsFromFlagsWithInvalidKeysFails(self, cli_args,
+                                                    expected_error_message):
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           expected_error_message):
+      self.Run(
+          'functions deploy my-test {} --runtime=nodejs10'.format(cli_args))
+
+  @parameterized.parameters(
+      ({
+          'GOOGLE_ENTRYPOINT': 'foo'
+      }, 'GOOGLE_ENTRYPOINT is reserved for internal use by GCF deployments '
+       'and cannot be used.'),
+      ({
+          'GOOGLE_FUNCTION_TARGET': 'foo'
+      }, 'GOOGLE_FUNCTION_TARGET is reserved for internal use by GCF '
+       'deployments and cannot be used.'),
+      ({
+          'GOOGLE_RUNTIME': 'foo'
+      }, 'GOOGLE_RUNTIME is reserved for internal use by GCF deployments and '
+       'cannot be used.'),
+      ({
+          'GOOGLE_RUNTIME_VERSION': 'foo'
+      }, 'GOOGLE_RUNTIME_VERSION is reserved for internal use by GCF '
+       'deployments and cannot be used.'),
+      ({
+          '': 'bar'
+      }, 'Environment variable keys cannot be empty.'),
+      ({
+          'X_GOOGLE_FOO': 'boo'
+      }, 'Environment variable keys that start with `X_GOOGLE_` are reserved '
+       'for use by deployment tools and cannot be specified manually.'),
+      ({
+          'FOO=BAR': 'boo'
+      }, 'Environment variable keys cannot contain `=`.'),
+  )
+  def testBuildEnvVarsFromFileWithInvalidKeysFails(self, build_env_vars,
+                                                   expected_error_message):
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           expected_error_message):
+      with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+        yaml_load_path.return_value = build_env_vars
+
+        self.Run('functions deploy my-test --build-env-vars-file '
+                 'build-env-vars.yml --runtime=nodejs10')
+
 
 class FunctionsAlphaTests(FunctionsBetaTests):
 
@@ -1277,7 +1500,6 @@ class FunctionsAlphaTests(FunctionsBetaTests):
              '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
 
   _BUILD_ENV_VARS_TYPE_CLASS = api_util.GetApiMessagesModule(
-      track=calliope_base.ReleaseTrack.ALPHA
   ).CloudFunction.BuildEnvironmentVariablesValue
 
   @parameterized.named_parameters(('Set build env vars for a new function', {

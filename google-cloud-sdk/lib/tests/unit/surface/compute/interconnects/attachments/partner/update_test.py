@@ -55,11 +55,11 @@ class InterconnectAttachmentsPartnerUpdateGaTest(test_base.BaseTest):
 
     self.Run('compute interconnects attachments partner update my-attachment '
              '--region us-central1 --description "this is my attachment" '
-             '--no-admin-enabled')
+             '--enable-admin')
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
         description='this is my attachment',
-        adminEnabled=False,
+        adminEnabled=True,
     )
 
 
@@ -102,7 +102,7 @@ class InterconnectAttachmentsPartnerUpdateBetaTest(
 
     self.Run('compute interconnects attachments partner update my-attachment '
              '--region us-central1 --description "this is my attachment" '
-             '--no-admin-enabled --update-labels key3=value3,key2=new_value')
+             '--no-enable-admin --update-labels key3=value3,key2=new_value')
 
     self.CheckRequests(
         [(self.message_version.interconnectAttachments, 'Get',
@@ -209,4 +209,3 @@ class InterconnectAttachmentsPartnerUpdateAlphaTest(
                   description='this is my attachment',
                   mtu=1500)))],
     )
-

@@ -25,7 +25,8 @@ GROUPS
         (ALPHA) Manage third-party applications which call Apigee API proxies.
 
      deployments
-        (ALPHA) Manage deployments of Apigee proxies in runtime environments.
+        (ALPHA) Manage deployments of Apigee API proxies in runtime
+        environments.
 
      developers
         (ALPHA) Manage Apigee developers.

@@ -507,6 +507,47 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     issuance_policy = flags.ParseIssuancePolicy(args)
     self.assertIsNone(issuance_policy)
 
+  def testParseKeySpecWithKeyAlgorithm(self):
+    concept_parsers.ConceptParser.ForResource(
+        '--kms-key-version',
+        resource_args.CreateKmsKeyVersionResourceSpec(),
+        'KMS key version.'
+    ).AddToParser(self.parser)
+    flags.AddKeyAlgorithmFlag(self.parser)
+    args = self.parser.parse_args(['--key-algorithm=ec-p384-sha384'])
+    key_spec = flags.ParseKeySpec(args)
+    self.assertIsNone(key_spec.cloudKmsKeyVersion)
+    self.assertEqual(
+        key_spec.algorithm,
+        self.messages.KeyVersionSpec.AlgorithmValueValuesEnum.EC_P384_SHA384)
+
+  def testParseKeySpecWithKeyVersion(self):
+    concept_parsers.ConceptParser.ForResource(
+        '--kms-key-version',
+        resource_args.CreateKmsKeyVersionResourceSpec(),
+        'KMS key version.'
+    ).AddToParser(self.parser)
+    flags.AddKeyAlgorithmFlag(self.parser)
+    key_version_resource = 'projects/foo/locations/bar/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1'
+    args = self.parser.parse_args(['--kms-key-version', key_version_resource])
+    key_spec = flags.ParseKeySpec(args)
+    self.assertIsNone(key_spec.algorithm)
+    self.assertEqual(key_spec.cloudKmsKeyVersion, key_version_resource)
+
+  def testParseKeySpecUsesDefaultKeyAlgorithmIfNotSpecified(self):
+    concept_parsers.ConceptParser.ForResource(
+        '--kms-key-version',
+        resource_args.CreateKmsKeyVersionResourceSpec(),
+        'KMS key version.'
+    ).AddToParser(self.parser)
+    flags.AddKeyAlgorithmFlag(self.parser)
+    args = self.parser.parse_args([])
+    key_spec = flags.ParseKeySpec(args)
+    self.assertIsNone(key_spec.cloudKmsKeyVersion)
+    self.assertEqual(key_spec.algorithm,
+                     self.messages.KeyVersionSpec
+                     .AlgorithmValueValuesEnum.RSA_PSS_4096_SHA256)
+
 
 if __name__ == '__main__':
   test_case.main()

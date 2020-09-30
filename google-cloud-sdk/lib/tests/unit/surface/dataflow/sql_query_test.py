@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import os
 import tempfile
-from googlecloudsdk.api_lib.dataflow import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dataflow import base
@@ -67,7 +67,7 @@ class SqlQueryTestGA(base.DataflowMockingTestBase,
         location='us-central1',
         parameters=params)
 
-  def testQuery_bqDefaultProject(self):
+  def testQuery_bqUnqualifiedTableDefaultProject(self):
     self.expectParameters({
         'dryRun': 'false',
         'outputs': self.test_bq_output,
@@ -79,6 +79,74 @@ class SqlQueryTestGA(base.DataflowMockingTestBase,
                       '--region=us-central1 '
                       '--bigquery-table=fake-table '
                       '--bigquery-dataset=fake-dataset'.format(self.command))
+    self.assertEqual(JOB_1_ID, result.job.id)
+    self.assertEqual('myjob', result.job.name)
+
+  def testQuery_bqFullyQualifiedTableOnly(self):
+    self.expectParameters({
+        'dryRun': 'false',
+        'outputs': ('[{"type": "bigquery", '
+                    '"table": {'
+                    '"projectId": "different-project", '
+                    '"datasetId": "fake-dataset", '
+                    '"tableId": "fake-table"'
+                    '}, "writeDisposition": "WRITE_EMPTY"}]'),
+        'queryParameters': '[]',
+        'queryString': 'SELECT 1 AS x',
+    })
+    result = self.Run(
+        '{} "SELECT 1 AS x" '
+        '--job-name=myjob '
+        '--region=us-central1 '
+        '--bigquery-table=different-project.fake-dataset.fake-table'.format(
+            self.command))
+    self.assertEqual(JOB_1_ID, result.job.id)
+    self.assertEqual('myjob', result.job.name)
+
+  def testQuery_bqPartiallyQualifiedTableDifferentDataset(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--bigquery-dataset]: "different-dataset" does not match dataset "fake-dataset" set in qualified `--bigquery-table`.'
+    ):
+      self.Run('{} "SELECT 1 AS x" '
+               '--job-name=myjob '
+               '--region=us-central1 '
+               '--bigquery-table=fake-dataset.fake-table '
+               '--bigquery-dataset=different-dataset'.format(self.command))
+
+  def testQuery_bqPartiallyQualifiedTableDifferentProject(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--bigquery-project]: "different-project" does not match project "fake-project" set in qualified `--bigquery-table`.'
+    ):
+      self.Run('{} "SELECT 1 AS x" '
+               '--job-name=myjob '
+               '--region=us-central1 '
+               '--bigquery-table=fake-project.fake-dataset.fake-table '
+               '--bigquery-project=different-project'.format(self.command))
+
+  def testQuery_bqTableTooManyParts(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--bigquery-table]: Malformed table identifier. Use format "project.dataset.table".'
+    ):
+      self.Run('{} "SELECT 1 AS x" '
+               '--job-name=myjob '
+               '--region=us-central1 '
+               '--bigquery-table=one.two.three.four'.format(self.command))
+
+  def testQuery_bqPartiallyQualifiedTableDefaultProject(self):
+    self.expectParameters({
+        'dryRun': 'false',
+        'outputs': self.test_bq_output,
+        'queryParameters': '[]',
+        'queryString': 'SELECT 1 AS x',
+    })
+    result = self.Run('{} "SELECT 1 AS x" '
+                      '--job-name=myjob '
+                      '--region=us-central1 '
+                      '--bigquery-table=fake-dataset.fake-table'.format(
+                          self.command))
     self.assertEqual(JOB_1_ID, result.job.id)
     self.assertEqual('myjob', result.job.name)
 
@@ -185,7 +253,9 @@ class SqlQueryTestGA(base.DataflowMockingTestBase,
 
   def testQuery_noBigQueryDataset(self):
     with self.AssertRaisesExceptionMatches(
-        exceptions.Error, 'argument --bigquery-dataset: Must be specified.'):
+        exceptions.RequiredArgumentException,
+        'Missing required argument [--bigquery-dataset]: Must be specified when `--bigquery-table` is unqualified.'
+    ):
       self.Run('{} "SELECT 1 AS x" '
                '--job-name=myjob '
                '--region=us-central1 '

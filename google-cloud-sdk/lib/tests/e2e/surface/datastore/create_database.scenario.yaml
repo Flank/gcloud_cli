@@ -9,7 +9,7 @@ summary:
   - command: |
       datastore databases create --region us-east1 --project=firestore-gcloud-create-test
   - stderr: |
-      Success! The Google Cloud Firestore in Datastore Mode database was already created for firestore-gcloud-create-test
+      Success! Confirmed selection of a Google Cloud Firestore in Datastore Mode database for firestore-gcloud-create-test
 - execute:
   - command: |
       firestore databases create --region us-east1 --project=firestore-gcloud-create-test
@@ -17,12 +17,12 @@ summary:
     - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
-      Success! The Google Cloud Firestore Native database has been created for firestore-gcloud-create-test
+      Success! Selected Google Cloud Firestore Native database for firestore-gcloud-create-test
 - execute:
   - command: |
       firestore databases create --region us-east1 --project=firestore-gcloud-create-test
   - stderr: |
-      Success! The Google Cloud Firestore Native database was already created for firestore-gcloud-create-test
+      Success! Confirmed selection of a Google Cloud Firestore Native database for firestore-gcloud-create-test
 - execute:
   - command: |
       datastore databases create --region us-east1 --project=firestore-gcloud-create-test
@@ -30,7 +30,7 @@ summary:
     - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
-      Success! The Google Cloud Firestore in Datastore Mode database has been created for firestore-gcloud-create-test
+      Success! Selected Google Cloud Firestore in Datastore Mode database for firestore-gcloud-create-test
 actions:
 - execute_command:
     command: |
@@ -63,7 +63,7 @@ actions:
               splitHealthChecks: true
               useContainerOptimizedOs: true
     - expect_stderr: |
-        Success! The Google Cloud Firestore in Datastore Mode database was already created for firestore-gcloud-create-test
+        Success! Confirmed selection of a Google Cloud Firestore in Datastore Mode database for firestore-gcloud-create-test
     - expect_exit:
         code: 0
 - execute_command:
@@ -111,11 +111,11 @@ actions:
             content-length: '450'
             content-type: application/json; charset=UTF-8
           body:
-            name: apps/firestore-gcloud-create-test/operations/3e9a851a-cd29-4211-985c-3ea238c2716b
+            name: apps/firestore-gcloud-create-test/operations/ed9df999-4f05-4422-9ed5-73f8569fa5fe
             metadata:
               '@type': type.googleapis.com/google.appengine.v1.OperationMetadataV1
               method: google.appengine.v1.Applications.UpdateApplication
-              insertTime: '2020-08-25T23:35:32.566Z'
+              insertTime: '2020-09-22T19:09:29.192Z'
               user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               target: apps/firestore-gcloud-create-test
         poll_operation: true
@@ -123,7 +123,7 @@ actions:
         message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
-        Success! The Google Cloud Firestore Native database has been created for firestore-gcloud-create-test
+        Success! Selected Google Cloud Firestore Native database for firestore-gcloud-create-test
     - expect_exit:
         code: 0
 - execute_command:
@@ -157,7 +157,7 @@ actions:
               splitHealthChecks: true
               useContainerOptimizedOs: true
     - expect_stderr: |
-        Success! The Google Cloud Firestore Native database was already created for firestore-gcloud-create-test
+        Success! Confirmed selection of a Google Cloud Firestore Native database for firestore-gcloud-create-test
     - expect_exit:
         code: 0
 - execute_command:
@@ -205,11 +205,11 @@ actions:
             content-length: '450'
             content-type: application/json; charset=UTF-8
           body:
-            name: apps/firestore-gcloud-create-test/operations/6b329e9b-e8e0-4f7d-8dca-748675b90acb
+            name: apps/firestore-gcloud-create-test/operations/41c00d1e-62a0-4dfd-8a87-ca8efc51bc5d
             metadata:
               '@type': type.googleapis.com/google.appengine.v1.OperationMetadataV1
               method: google.appengine.v1.Applications.UpdateApplication
-              insertTime: '2020-08-25T23:35:35.300Z'
+              insertTime: '2020-09-22T19:09:36.760Z'
               user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               target: apps/firestore-gcloud-create-test
         poll_operation: true
@@ -217,6 +217,6 @@ actions:
         message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
-        Success! The Google Cloud Firestore in Datastore Mode database has been created for firestore-gcloud-create-test
+        Success! Selected Google Cloud Firestore in Datastore Mode database for firestore-gcloud-create-test
     - expect_exit:
         code: 0

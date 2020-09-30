@@ -19,10 +19,9 @@ gcloud alpha apigee deployments list \- list Apigee API proxy deployments
 
 \fB(ALPHA)\fR List Apigee API proxy deployments.
 
-.RS 2m
-gcloud alpha apigee deployments list can filter listed deployments by environment, API proxy,
-proxy revision, or a combination of these.
-.RE
+\f5gcloud alpha apigee deployments list\fR lists deployments of API proxies,
+optionally filtered by environment, proxy name, proxy revision, or a combination
+of these.
 
 
 
@@ -31,26 +30,29 @@ proxy revision, or a combination of these.
 .RS 2m
 .TP 2m
 
-Revision resource \- The API proxy revision and environment whose deployments
-should be listed. Providing a \f5\-\-revision\fR is only valid if \f5\-\-api\fR
-is also specified. If no \f5\-\-revision\fR is provided, all deployed revisions
-that match the other arguments will be included. The arguments in this group can
-be used to specify the attributes of this resource.
+Revision resource \- API proxy revision and environment whose deployments should
+be listed. Providing a REVISION is only valid if API is also specified. If no
+REVISION is provided, all deployed revisions that match the other arguments will
+be included. The arguments in this group can be used to specify the attributes
+of this resource.
 
 .RS 2m
 .TP 2m
 \fB\-\-api\fR=\fIAPI\fR
 The API proxy whose deployments should be listed. If not provided, all proxies
-will be listed.
+will be listed. To get a list of existing API proxies, run \f5gcloud alpha
+apigee apis list\fR.
 
 .TP 2m
 \fB\-\-environment\fR=\fIENVIRONMENT\fR
 The environment whose deployments should be listed. If not provided, all
-environments will be listed.
+environments will be listed. To get a list of available environments, run
+\f5gcloud alpha apigee environments list\fR.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
-The organization whose deployments should be listed.
+The organization whose deployments should be listed.If unspecified, the Cloud
+Platform project's associated organization will be used.
 
 .TP 2m
 \fB\-\-revision\fR=\fIREVISION\fR
@@ -135,10 +137,11 @@ $ gcloud alpha apigee deployments list \-\-api=my\-proxy
 .RE
 
 To list all deployments to the \f5\fItest\fR\fR environment of the active Cloud
-Platform project, run:
+Platform project, formatted as a JSON array, run:
 
 .RS 2m
-$ gcloud alpha apigee deployments list \-\-environment=test
+$ gcloud alpha apigee deployments list \-\-environment=test \e
+  \-\-format=json
 .RE
 
 To list all deployments of \f5\fImy\-proxy\fR\fR to the \f5\fItest\fR\fR

@@ -15,7 +15,8 @@ summary:
       - Creating Revision...
       - Routing traffic...
   - stderr: |-
-      Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+      Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$service-name$$.default.example.com
       $
 - execute:
   - command: run services delete --kubeconfig robot-kubeconfig.yaml $$service-name$$
@@ -268,7 +269,8 @@ actions:
         repeatable: true
     - expect_stderr:
         matches: |
-          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic.
+          Service URL: http://$$service-name$$.default.example.com
     - expect_exit:
         code: 0
 - execute_command:

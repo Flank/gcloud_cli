@@ -211,7 +211,8 @@ class WithMockHttp(cli_test_base.CliTestBase):
     request_headers = request_headers or {}
     request_headers_tuple = tuple(request_headers.items())
     responses = self._responses.setdefault((url, request_headers_tuple), [])
-    responses.append((expected_params, expected_body, status, headers, body))
+    responses.append((expected_params, expected_body, status, headers or {},
+                      body))
 
 
 def _LoadTestConfig():

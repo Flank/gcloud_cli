@@ -414,7 +414,7 @@ Created subscription [{}].
       self.Run('pubsub subscriptions create subs1 --topic topic1' + retry_flags)
 
 
-class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
+class SubscriptionsCreateGATest(SubscriptionsCreateTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -566,6 +566,25 @@ class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
                      'account@example.com')
     self.assertEqual(result[0].pushConfig.oidcToken.audience, None)
 
+  @parameterized.parameters((' --enable-message-ordering', True),
+                            (' --no-enable-message-ordering', False))
+  def testOrderedPullSubscriptionsCreate(self, ordering_flag,
+                                         ordering_property):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        enableMessageOrdering=ordering_property,
+        topic=topic_ref.RelativeName())
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1' + ordering_flag),
+        [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].enableMessageOrdering, ordering_property)
+
 
 class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
 
@@ -588,25 +607,6 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
     self.assertEqual(result[0]['subscriptionId'], sub_ref.RelativeName())
     self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
     self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
-
-  @parameterized.parameters((' --enable-message-ordering', True),
-                            (' --no-enable-message-ordering', False))
-  def testOrderedPullSubscriptionsCreate(self, ordering_flag,
-                                         ordering_property):
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    req_subscription = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        enableMessageOrdering=ordering_property,
-        topic=topic_ref.RelativeName())
-
-    result = self.ExpectCreatedSubscriptions(
-        ('pubsub subscriptions create subs1 --topic topic1' + ordering_flag),
-        [req_subscription])
-
-    self.assertEqual(result[0].name, sub_ref.RelativeName())
-    self.assertEqual(result[0].topic, topic_ref.RelativeName())
-    self.assertEqual(result[0].enableMessageOrdering, ordering_property)
 
 
 if __name__ == '__main__':

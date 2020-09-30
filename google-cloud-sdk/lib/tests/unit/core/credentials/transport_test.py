@@ -219,11 +219,16 @@ class QuotaHandlerMixinTest(sdk_test_base.SdkBase, parameterized.TestCase):
       (False, True, True, 'LEGACY', 'project', 'project'),
       (False, False, True, 'quota_project', 'project', None),
       # non-user credentials
-      (True, False, False, 'quota_project', 'project', None),
-      (True, True, False, 'quota_project', 'project', None),
+      (True, False, False, 'quota_project', 'project', 'quota_project'),
+      (True, True, False, 'quota_project', 'project', 'quota_project'),
       (True, True, False, 'CURRENT_PROJECT', 'project', None),
       (True, True, False, 'CURRENT_PROJECT_WITH_FALLBACK', 'project', None),
+      (True, False, False, 'LEGACY', 'project', None),
+      (True, True, False, 'LEGACY', 'project', 'project'),
+      (False, True, False, 'LEGACY', 'project', 'project'),
+      (False, False, False, 'quota_project', 'project', None),
   )
+
   def testQuotaProjects(self, enable_resource_quota, force_resource_quota,
                         is_user_creds, quota_project_property, project_property,
                         returned_quota_project):

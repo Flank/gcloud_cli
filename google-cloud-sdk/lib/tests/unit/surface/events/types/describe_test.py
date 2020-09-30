@@ -62,11 +62,26 @@ class TypesDescribeAnthosTestBeta(base.EventsBase):
       required_properties = [
           'p{}-{}'.format(i, j) for j in range(1, num_properties_per_source, 3)
       ]
-      crd.spec.validation = self.crd_messages.CustomResourceValidation(
-          openAPIV3Schema=self._SourceSchemaProperties(
-              spec_properties,
-              required_properties,
-          ))
+
+      schema = self._SourceSchemaProperties(
+          spec_properties,
+          required_properties,
+      )
+
+      # Attempt setting validation under spec for api 'run' v1beta1
+      try:
+        crd.spec.version = 'v1beta1'
+        crd.spec.validation = self.crd_messages.CustomResourceValidation(
+            openAPIV3Schema=schema)
+      except AttributeError:
+        custom_resource_definition_versions = [
+            self.crd_messages.CustomResourceDefinitionVersion(
+                name='v1',
+                schema=self.crd_messages.CustomResourceValidation(
+                    openAPIV3Schema=schema))
+        ]
+        crd.spec.versions = custom_resource_definition_versions
+
     self.operations.ListSourceCustomResourceDefinitions.return_value = (
         self.source_crds)
 

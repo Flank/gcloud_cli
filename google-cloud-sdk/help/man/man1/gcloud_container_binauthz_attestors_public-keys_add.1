@@ -98,13 +98,15 @@ PKIX key definition
 \fB\-\-pkix\-public\-key\-algorithm\fR=\fIPKIX_PUBLIC_KEY_ALGORITHM\fR
 The signing algorithm of the associated key. This will be used to verify the
 signatures associated with this key. \fIPKIX_PUBLIC_KEY_ALGORITHM\fR must be one
-of: \fBecdsa\-p256\-sha256\fR, \fBecdsa\-p384\-sha384\fR,
-\fBecdsa\-p521\-sha512\fR, \fBrsa\-pss\-2048\-sha256\fR,
-\fBrsa\-pss\-3072\-sha256\fR, \fBrsa\-pss\-4096\-sha256\fR,
-\fBrsa\-pss\-4096\-sha512\fR, \fBrsa\-sign\-pkcs1\-2048\-sha256\fR,
-\fBrsa\-sign\-pkcs1\-3072\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha256\fR,
-\fBrsa\-sign\-pkcs1\-4096\-sha512\fR. This flag must be specified if any of the
-other arguments in this group are specified.
+of: \fBec\-sign\-p256\-sha256\fR, \fBec\-sign\-p384\-sha384\fR,
+\fBec\-sign\-p521\-sha512\fR, \fBecdsa\-p256\-sha256\fR,
+\fBecdsa\-p384\-sha384\fR, \fBecdsa\-p521\-sha512\fR,
+\fBrsa\-pss\-2048\-sha256\fR, \fBrsa\-pss\-3072\-sha256\fR,
+\fBrsa\-pss\-4096\-sha256\fR, \fBrsa\-pss\-4096\-sha512\fR,
+\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR. This
+flag must be specified if any of the other arguments in this group are
+specified.
 
 .TP 2m
 \fB\-\-pkix\-public\-key\-file\fR=\fIPKIX_PUBLIC_KEY_FILE\fR

@@ -21,8 +21,9 @@ summary:
     - succeeded_stages: &id001
       - Creating Revision...
       - Routing traffic...
-  - stderr: |-
-      Service \[$$event-display$$\] revision \[$$event-display$$.*\] has been deployed and is serving 100 percent of traffic at http://$$event-display$$.default.example.com
+  - stderr: |
+      Service \[$$event-display$$\] revision \[$$event-display$$.*\] has been deployed and is serving 100 percent of traffic.
+      Service URL: http://$$event-display$$.default.example.com
       $
 - execute:
   - command: events triggers create $$my-trigger$$ --namespace default --target-service=event-display
@@ -75,7 +76,8 @@ actions:
         succeeded_stages: *id001
     - expect_stderr:
         matches: |
-          Service \[$$event-display$$\] revision \[$$event-display$$.*\] has been deployed and is serving 100 percent of traffic at http://$$event-display$$.default.example.com
+          Service \[$$event-display$$\] revision \[$$event-display$$.*\] has been deployed and is serving 100 percent of traffic.
+          Service URL: http://$$event-display$$.default.example.com
     - expect_exit:
         code: 0
 - generate_resource_id:

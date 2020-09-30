@@ -40,8 +40,9 @@ class OsUpgradeTestBeta(daisy_test_base.DaisyBaseTest):
     self.source_os = 'windows-2008r2'
     self.target_os = 'windows-2012r2'
     self.tags = ['gce-os-upgrade']
-    self.builder = daisy_utils._OS_UPGRADE_BUILDER.format(
-        daisy_utils._DEFAULT_BUILDER_VERSION)
+    self.builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OS_UPGRADE_BUILDER_EXECUTABLE,
+        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
 
   def PrepareMocks(self, step, async_flag=False, permissions=None,
                    timeout='7200s'):

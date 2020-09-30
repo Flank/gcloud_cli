@@ -18,12 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import datetime
 import textwrap
 
 from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.api_lib.storage import errors as api_errors
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.storage import errors
+from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import wildcard_iterator
 from googlecloudsdk.command_lib.storage.tasks.ls import cloud_list_task
@@ -38,6 +40,7 @@ from tests.lib.surface.storage import test_resources
 import mock
 
 
+DATETIME = datetime.datetime(1111, 1, 1)
 TEST_PROJECT = 'fake-project'
 
 
@@ -64,8 +67,9 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.bucket1 = test_resources.from_url_string('gs://bucket1')
     self.bucket2 = test_resources.from_url_string('gs://bucket2')
 
-    self.object1 = test_resources.from_url_string(
-        'gs://bucket1/object1')
+    self.object1 = resource_reference.ObjectResource(
+        storage_url.storage_url_from_string('gs://bucket1/object1#1'),
+        creation_time=DATETIME, size=0)
     self.object2 = test_resources.from_url_string(
         'gs://bucket1/dir1/object2')
     self.object3 = test_resources.from_url_string(
@@ -804,11 +808,213 @@ class CloudListTaskTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     cloud_url = storage_url.storage_url_from_string('gs://bucket1/object1')
 
     task = cloud_list_task.CloudListTask(
-        cloud_url, display_detail=display_detail, recursion_flag=True)
+        cloud_url, display_detail=display_detail)
     task.execute()
 
     mock_wildcard_iterator.assert_called_once_with(
         cloud_url, fields_scope=fields_scope)
+
+  @mock_cloud_api.patch
+  def test_execute_with_all_versions_displays_generation(self, client):
+    """All versions flag should add generation to URL."""
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'), all_versions=True)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+        gs://bucket1/object1#1
+        gs://bucket1/dir1/
+        gs://bucket1/dir2/
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_object_details_with_no_size(self, client):
+    """Zero-size object metadata line is shown, and prefixes are aligned."""
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'),
+        display_detail=cloud_list_task.DisplayDetail.LONG)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+                 0  1111-01-01 00:00:00  gs://bucket1/object1
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+        TOTAL: 1 objects, 0 bytes (0B)
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_object_details_with_full_size(
+      self, client):
+    """Max-size object metadata line is shown, and prefixes are aligned."""
+    self.object1.size = 9876543210
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'),
+        display_detail=cloud_list_task.DisplayDetail.LONG)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+        9876543210  1111-01-01 00:00:00  gs://bucket1/object1
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+        TOTAL: 1 objects, 9876543210 bytes (9.20GiB)
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_object_details_with_etag(self, client):
+    """Etag shown in metadata line, and prefixes are aligned."""
+    self.object1.etag = 'CJqt6aup7uoCEAQ='
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'),
+        display_detail=cloud_list_task.DisplayDetail.LONG,
+        include_etag=True)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+                 0  1111-01-01 00:00:00  gs://bucket1/object1  etag=CJqt6aup7uoCEAQ=
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+        TOTAL: 1 objects, 0 bytes (0B)
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_object_details_with_metageneration(
+      self, client):
+    """Generation and metageneration shown, and prefixes are aligned."""
+    self.object1.metageneration = 1
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'),
+        display_detail=cloud_list_task.DisplayDetail.LONG,
+        all_versions=True)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+                 0  1111-01-01 00:00:00  gs://bucket1/object1#1  metageneration=1
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+        TOTAL: 1 objects, 0 bytes (0B)
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_object_etag_and_metageneration(
+      self, client):
+    """Etag, generation, and metageneration shown, and prefixes are aligned."""
+    self.object1.etag = 'CJqt6aup7uoCEAQ='
+    self.object1.metageneration = 1
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'),
+        display_detail=cloud_list_task.DisplayDetail.LONG,
+        all_versions=True,
+        include_etag=True)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+                 0  1111-01-01 00:00:00  gs://bucket1/object1#1  metageneration=1  etag=CJqt6aup7uoCEAQ=
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+        TOTAL: 1 objects, 0 bytes (0B)
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_null_object_details(
+      self, client):
+    """Unknown values print 'None', and prefixes are aligned."""
+    self.object1.creation_time = self.object1.size = None
+    self.object1.storage_url = storage_url.storage_url_from_string(
+        'gs://bucket1/object1')
+    client.GetBucket.side_effect = [self.bucket1]
+    client.ListObjects.side_effect = [self.bucket1_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://bucket1/'),
+        display_detail=cloud_list_task.DisplayDetail.LONG,
+        all_versions=True,
+        include_etag=True)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+              None                 None  gs://bucket1/object1  metageneration=None  etag=None
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+        TOTAL: 1 objects, 0 bytes (0B)
+        """
+    )
+    self.assertEqual(output, expected_output)
+
+  @mock_cloud_api.patch
+  def test_long_display_detail_prints_multiple_object_details(
+      self, client):
+    """Long lists multiple objects and adds their sizes for a TOTAL stat."""
+    self.object1.size = 1000
+    self.object_duplicate_of_dir.size = 50000000
+    self.object_duplicate_of_dir.creation_time = DATETIME
+    client.ListBuckets.side_effect = [self.bucket_resources]
+    client.ListObjects.side_effect = [
+        self.bucket1_top_level_resources, self.bucket2_top_level_resources]
+
+    task = cloud_list_task.CloudListTask(
+        storage_url.storage_url_from_string('gs://*'),
+        display_detail=cloud_list_task.DisplayDetail.LONG)
+    task.execute()
+
+    output = self.GetOutput()
+    expected_output = textwrap.dedent(
+        """\
+        gs://bucket1:
+              1000  1111-01-01 00:00:00  gs://bucket1/object1
+                                         gs://bucket1/dir1/
+                                         gs://bucket1/dir2/
+
+        gs://bucket2:
+          50000000  1111-01-01 00:00:00  gs://bucket2/dir_object
+                                         gs://bucket2/dir_object/
+        TOTAL: 2 objects, 50001000 bytes (47.68MiB)
+        """
+    )
+    self.assertEqual(output, expected_output)
 
 
 if __name__ == '__main__':

@@ -29,9 +29,7 @@ REQUIRED FLAGS
      --location=LOCATION
         The location of the new Assured Workloads environment. For a current
         list of supported LOCATION values, see Assured Workloads locations
-        (http://cloud/assured-workloads/docs/locations). LOCATION must be one
-        of: us-central1, us-east1, us-east4, us-west1, us-west2, us-west3,
-        us-west4.
+        (http://cloud/assured-workloads/docs/locations).
 
      --next-rotation-time=NEXT_ROTATION_TIME
         The next rotation time of the new Assured Workloads environment, for

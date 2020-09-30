@@ -3,7 +3,7 @@ NAME
         Memberships
 
 SYNOPSIS
-    gcloud identity groups memberships [GCLOUD_WIDE_FLAG ...]
+    gcloud identity groups memberships COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Commands for managing Cloud Identity Groups Memberships.
@@ -15,6 +15,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        Delete a membership from an existing group.
+
+     list
+        List memberships in an existing group.
 
 NOTES
     These variants are also available:

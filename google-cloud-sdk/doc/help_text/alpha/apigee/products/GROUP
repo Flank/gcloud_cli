@@ -27,10 +27,10 @@ COMMANDS
         (ALPHA) Create an Apigee API product.
 
      delete
-        (ALPHA) Deletes an Apigee API product.
+        (ALPHA) Delete an Apigee API product.
 
      describe
-        (ALPHA) Describes an Apigee API product.
+        (ALPHA) Describe an Apigee API product.
 
      list
         (ALPHA) List Apigee API products.

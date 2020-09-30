@@ -18,17 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import datetime
+
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import google_auth_credentials
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
-
 import httplib2
 
 
-def _SetUp(self):
+def _SetUpWithUserAccount(self):
   properties.VALUES.core.account.Set('fakeuser')
   fake_creds = self.MakeUserAccountCredentialsGoogleAuth()
   fake_creds.token = 'access-token'
@@ -42,12 +43,24 @@ def _SetUp(self):
                                     b'{"projects": []}')
 
 
+def _SetUpWithServiceAccount(self):
+  properties.VALUES.core.account.Set('fakeuser')
+  fake_creds = self.MakeServiceAccountCredentialsGoogleAuth()
+  fake_creds.expiry = datetime.datetime.utcnow() + datetime.timedelta(
+      seconds=3600)
+  store.Store(fake_creds)
+  self.request_mock = self.StartObjectPatch(
+      httplib2.Http, 'request', autospec=True)
+  self.request_mock.return_value = (httplib2.Response({'status': 200}),
+                                    b'{"projects": []}')
+
+
 # Use asset surface as an example, asset API supports project override
 class BillingProjectAPISupportsProjectOverride(
     cli_test_base.CliTestBase, credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
-    _SetUp(self)
+    _SetUpWithUserAccount(self)
 
   def testDifferentProjectForBilling_UnsetProperty(self):
 
@@ -81,7 +94,7 @@ class BillingProjectAPIDoesNotSupportsProjectOverride(
     cli_test_base.CliTestBase, credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
-    _SetUp(self)
+    _SetUpWithUserAccount(self)
 
   def testDifferentProjectForBilling_UnsetProperty(self):
 
@@ -106,6 +119,36 @@ class BillingProjectAPIDoesNotSupportsProjectOverride(
     project_override_header = self.request_mock.call_args[1]['headers'][
         b'X-Goog-User-Project']
     self.assertEqual(project_override_header, b'billing_project_in_flag')
+
+
+# Test override when using a service account and --billing-project flag or
+# quota_project property are set.
+class BillingProjectOverrideWithServiceAccount(
+    cli_test_base.CliTestBase, credentials_test_base.CredentialsTestBase):
+
+  def SetUp(self):
+    _SetUpWithServiceAccount(self)
+
+  def testServiceAccount_SetBillingProjectFlag(self):
+
+    properties.PersistProperty(properties.VALUES.billing.quota_project,
+                               'billing_project_in_property',
+                               properties.Scope.USER)
+    self.Run('iot registries list --region=us-central1 --project fake-project '
+             '--billing-project billing_project_in_flag')
+    project_override_header = self.request_mock.call_args[1]['headers'][
+        b'X-Goog-User-Project']
+    self.assertEqual(project_override_header, b'billing_project_in_flag')
+
+  def testServiceAccount_SetQuotaProjectProperty(self):
+
+    properties.PersistProperty(properties.VALUES.billing.quota_project,
+                               'billing_project_in_property',
+                               properties.Scope.USER)
+    self.Run('iot registries list --region=us-central1 --project fake-project ')
+    project_override_header = self.request_mock.call_args[1]['headers'][
+        b'X-Goog-User-Project']
+    self.assertEqual(project_override_header, b'billing_project_in_property')
 
 
 if __name__ == '__main__':

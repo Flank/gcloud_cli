@@ -54,7 +54,8 @@ OPTIONAL FLAGS
           group are specified.
 
        --issuer-location=ISSUER_LOCATION
-          The location of the Issuing CA.
+          The location of the Issuing CA. Alternatively, you can set the
+          property [privateca/location].
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

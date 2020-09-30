@@ -397,7 +397,9 @@ actions:
             kind: compute#zone
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/alpha/projects/cos-cloud/global/images?alt=json&maxResults=500
+          uri:
+            matches:
+              https://$$compute-uri$$/alpha/projects/cos-cloud/global/images\?alt=json&maxResults=500.*
           method: GET
           headers: {}
           body: null
@@ -5945,6 +5947,7 @@ actions:
               kind: compute#image
             selfLink: https://www.googleapis.com/compute/alpha/projects/cos-cloud/global/images
             kind: compute#imageList
+        repeatable: true
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fcompute.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$

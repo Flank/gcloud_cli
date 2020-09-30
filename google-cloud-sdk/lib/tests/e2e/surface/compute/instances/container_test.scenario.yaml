@@ -77,7 +77,8 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cos-cloud/global/images?alt=json&maxResults=500
+          uri:
+            matches: https://$$compute-uri$$/v1/projects/cos-cloud/global/images\?alt=json&maxResults=500.*
           method: GET
           headers: {}
           body: null
@@ -5317,6 +5318,7 @@ actions:
               licenseCodes:
               - '1001010'
             selfLink: https://www.googleapis.com/compute/v1/projects/cos-cloud/global/images
+        repeatable: true
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
