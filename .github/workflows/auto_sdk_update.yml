@@ -22,8 +22,8 @@ jobs:
         
     - name: Set current and latest SDK version variables
       run: |
-        echo "::set-env name=LATEST_GCLOUD_SDK::$(gcloud version | grep "Google Cloud SDK" |  sed 's/Google Cloud SDK //')"
-        echo "::set-env name=CURRENT_GCLOUD_SDK::$(cat google-cloud-sdk/VERSION)"
+        echo "LATEST_GCLOUD_SDK=$(gcloud version | grep "Google Cloud SDK" |  sed 's/Google Cloud SDK //')" >> $GITHUB_ENV
+        echo "CURRENT_GCLOUD_SDK=$(cat google-cloud-sdk/VERSION)" >> $GITHUB_ENV
         
     - name: Update version
       if: ${{ env.LATEST_GCLOUD_SDK != env.CURRENT_GCLOUD_SDK }}
