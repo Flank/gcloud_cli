@@ -1,5 +1,6 @@
 NAME
-    gcloud beta identity groups search - search groups
+    gcloud beta identity groups search - searches for Groups matching a
+        specified query
 
 SYNOPSIS
     gcloud beta identity groups search --labels=LABELS
@@ -8,34 +9,61 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Search groups.
+    (BETA) Searches for Groups matching a specified query.
 
 REQUIRED FLAGS
      --labels=LABELS
-        Labels of the group resource. Example of labels "--labels
-        cloudidentity.googleapis.com/groups.discussion_forum"
+        One or more label entries that apply to the Group. Currently supported
+        labels contain a key with an empty value.
+
+        Google Groups are the default type of group and have a label with a key
+        of 'cloudidentity.googleapis.com/groups.discussion_forum' and an empty
+        value.
+
+        Existing Google Groups can have an additional label with a key of
+        'cloudidentity.googleapis.com/groups.security' and an empty value added
+        to them. This is an immutable change and the security label cannot be
+        removed once added.
+
+        Dynamic groups have a label with a key of
+        'cloudidentity.googleapis.com/groups.dynamic'.
+
+        Identity-mapped groups for Cloud Search have a label with a key of
+        'system/groups/external' and an empty value.
+
+        Examples: {"cloudidentity.googleapis.com/groups.discussion_forum": ""}
+        or {"system/groups/external": ""}.
 
      --organization=ORGANIZATION
-        The organization the Group being searched.
+        The organization ID for the groups being searched.
 
 OPTIONAL FLAGS
      --page-size=PAGE_SIZE
-        The default page size is 200 (max 1000) for the BASIC view, and 50 (max
-        500) for the FULL view.
+        The maximum number of results to return.
+
+        Note that the number of results returned may be less than this value
+        even if there are more available results. To fetch all results, clients
+        must continue calling this method repeatedly until the response no
+        longer contains a nextPageToken.
+
+        If unspecified, defaults to 200 'basic' view and to 50 for 'full' view.
+
+        Must not be greater than 1000 for 'basic' view or 500 for 'full' view.
 
      --page-token=PAGE_TOKEN
-        The next_page_token value returned from a previous search request, if
+        The nextPageToken value returned from a previous search request, if
         any.
 
      --view=VIEW; default="basic"
-        There are two possible views, 'basic' and 'full', default is 'basic'.
-        VIEW must be one of:
+        The level of detail to be returned. There are two possible views:
+        'basic' and 'full'. If unspecified, default to 'basic'. VIEW must be
+        one of:
 
          basic
-            Response only basic information of the groups.
+            Default. Only basic group information is returned.
 
          full
-            Response includes all the fields of the groups.
+            All group information is returned.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -58,8 +86,9 @@ EXAMPLES
             --page-token="ala9glealanal908"
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud identity groups search
         $ gcloud alpha identity groups search
 

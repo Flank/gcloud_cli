@@ -37,7 +37,7 @@ COMMANDS
         (ALPHA) Retrieve a list of users in a customer account using CEL query.
 
      search
-        (ALPHA) Search groups.
+        (ALPHA) Searches for Groups matching a specified query.
 
      update
         (ALPHA) Update a group.

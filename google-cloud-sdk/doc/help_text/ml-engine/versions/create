@@ -37,8 +37,10 @@ OPTIONAL FLAGS
 
          count
             The number of accelerators to attach to each machine running the
-            job. This is usually 1; scaling parameters are configured using
-            manualScaling or autoScaling flags.
+            job. If not specified, the default value is 1. Your model must be
+            specially designed to accommodate more than 1 accelerator per
+            machine. To configure how many replicas your model has, set the
+            manualScaling or autoScaling parameters.
 
      --async
         Return immediately, without waiting for the operation in progress to
@@ -75,12 +77,12 @@ OPTIONAL FLAGS
         configuration file.
 
      --description=DESCRIPTION
-        The description of the version.
+        Description of the version.
 
      --framework=FRAMEWORK
-        The ML framework used to train this version of the model. If not
-        specified, defaults to 'tensorflow'. FRAMEWORK must be one of:
-        scikit-learn, tensorflow, xgboost.
+        ML framework used to train this version of the model. If not specified,
+        defaults to 'tensorflow'. FRAMEWORK must be one of: scikit-learn,
+        tensorflow, xgboost.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

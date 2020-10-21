@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha network-connectivity hubs update HUB --description=DESCRIPTION
-        [GCLOUD_WIDE_FLAG ...]
+        [--labels=KEY=VALUE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Update the detail of a hub.
@@ -23,6 +23,10 @@ REQUIRED FLAGS
      --description=DESCRIPTION
         New description of the hub.
 
+OPTIONAL FLAGS
+     --labels=KEY=VALUE
+        List of label KEY=VALUE pairs to add.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -40,7 +44,7 @@ EXAMPLES
     description of my-hub'.
 
         $ gcloud alpha network-connectivity hubs update my-hub \
-            --description "The new description of my-hub".
+            --description="The new description of my-hub".
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

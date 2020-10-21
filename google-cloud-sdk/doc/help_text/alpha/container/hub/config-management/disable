@@ -1,13 +1,13 @@
 NAME
     gcloud alpha container hub config-management disable - disable Config
-        Management feature
+        Management Feature
 
 SYNOPSIS
     gcloud alpha container hub config-management disable [--force]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command disables Config Management feature in Hub.
+    (ALPHA) This command disables Config Management Feature in Hub.
 
 FLAGS
      --force

@@ -29,6 +29,9 @@ COMMANDS
         (ALPHA) Get detail information about the hyperparameter tuning job by
         given id.
 
+     list
+        (ALPHA) List existing hyperparameter tuning jobs.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

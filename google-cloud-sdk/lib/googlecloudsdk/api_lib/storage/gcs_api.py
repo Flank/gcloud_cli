@@ -32,8 +32,9 @@ from apitools.base.py import transfer as apitools_transfer
 from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.api_lib.storage import errors as cloud_errors
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
+from googlecloudsdk.command_lib.storage.resources import gcs_resource_reference
+from googlecloudsdk.command_lib.storage.resources import resource_reference
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import transports
@@ -44,7 +45,7 @@ DEFAULT_CONTENT_TYPE = 'application/octet-stream'
 DEFAULT_NUM_RETRIES = 23
 
 
-def _BucketResourceFromMetadata(metadata):
+def _bucket_resource_from_metadata(metadata):
   """Helper method to generate a BucketResource instance from GCS metadata.
 
   Args:
@@ -53,13 +54,13 @@ def _BucketResourceFromMetadata(metadata):
   Returns:
     BucketResource with properties populated by metadata.
   """
-  url = storage_url.CloudUrl(scheme=cloud_api.ProviderPrefix.GCS.value,
+  url = storage_url.CloudUrl(scheme=storage_url.ProviderPrefix.GCS,
                              bucket_name=metadata.name)
-  return resource_reference.BucketResource(
+  return gcs_resource_reference.GcsBucketResource(
       url, etag=metadata.etag, metadata=metadata)
 
 
-def _ObjectResourceFromMetadata(metadata):
+def _object_resource_from_metadata(metadata):
   """Helper method to generate a ObjectResource instance from GCS metadata.
 
   Args:
@@ -69,16 +70,17 @@ def _ObjectResourceFromMetadata(metadata):
     ObjectResource with properties populated by metadata.
   """
   url = storage_url.CloudUrl(
-      scheme=cloud_api.ProviderPrefix.GCS.value,
+      scheme=storage_url.ProviderPrefix.GCS,
       bucket_name=metadata.bucket,
       object_name=metadata.name,
       generation=getattr(metadata, 'generation', None))
-  return resource_reference.ObjectResource(
-      url, etag=metadata.etag, metadata=metadata)
+  return gcs_resource_reference.GcsObjectResource(
+      url, creation_time=metadata.timeCreated, etag=metadata.etag,
+      metadata=metadata, size=metadata.size)
 
 
 # Disable Apitools' default print callbacks.
-def _NoOpCallback(unused_response, unused_object):
+def _no_op_callback(unused_response, unused_object):
   pass
 
 
@@ -153,25 +155,25 @@ class GcsApi(cloud_api.CloudApi):
     return projection_enum.noAcl
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def CreateBucket(self,
-                   metadata,
-                   fields_scope=cloud_api.FieldsScope.NO_ACL):
+  def create_bucket(self,
+                    bucket_resource,
+                    fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
     projection = self._GetProjection(fields_scope,
                                      self.messages.StorageBucketsInsertRequest)
+    if not bucket_resource.metadata:
+      bucket_resource.metadata = self.messages.Bucket(name=bucket_resource.name)
 
     request = self.messages.StorageBucketsInsertRequest(
-        bucket=metadata,
+        bucket=bucket_resource.metadata,
         project=properties.VALUES.core.project.GetOrFail(),
         projection=projection)
 
     created_bucket_metadata = self.client.buckets.Insert(request)
-    return _BucketResourceFromMetadata(created_bucket_metadata)
+    return _bucket_resource_from_metadata(created_bucket_metadata)
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def DeleteBucket(self,
-                   bucket_name,
-                   request_config=None):
+  def delete_bucket(self, bucket_name, request_config=None):
     """See super class."""
     if not request_config:
       request_config = GcsRequestConfig()
@@ -183,7 +185,7 @@ class GcsApi(cloud_api.CloudApi):
     self.client.buckets.Delete(request)
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def GetBucket(self, bucket_name, fields_scope=cloud_api.FieldsScope.NO_ACL):
+  def get_bucket(self, bucket_name, fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
     projection = self._GetProjection(
         fields_scope, self.messages.StorageBucketsGetRequest)
@@ -192,9 +194,9 @@ class GcsApi(cloud_api.CloudApi):
         projection=projection)
 
     metadata = self.client.buckets.Get(request)
-    return _BucketResourceFromMetadata(metadata)
+    return _bucket_resource_from_metadata(metadata)
 
-  def ListBuckets(self, fields_scope=cloud_api.FieldsScope.NO_ACL):
+  def list_buckets(self, fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
     projection = self._GetProjection(
         fields_scope, self.messages.StorageBucketsListRequest)
@@ -214,16 +216,16 @@ class GcsApi(cloud_api.CloudApi):
         global_params=global_params)
     try:
       for bucket in bucket_iter:
-        yield _BucketResourceFromMetadata(bucket)
+        yield _bucket_resource_from_metadata(bucket)
     except apitools_exceptions.HttpError as error:
       core_exceptions.reraise(cloud_errors.GcsApiError(error))
 
-  def ListObjects(self,
-                  bucket_name,
-                  prefix=None,
-                  delimiter=None,
-                  all_versions=None,
-                  fields_scope=cloud_api.FieldsScope.NO_ACL):
+  def list_objects(self,
+                   bucket_name,
+                   prefix=None,
+                   delimiter=None,
+                   all_versions=None,
+                   fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
     projection = self._GetProjection(
         fields_scope, self.messages.StorageObjectsListRequest)
@@ -253,16 +255,15 @@ class GcsApi(cloud_api.CloudApi):
       # TODO(b/160238394) Decrypt metadata fields if necessary.
       for object_metadata in object_list.items:
         object_metadata.bucket = bucket_name
-        yield _ObjectResourceFromMetadata(object_metadata)
+        yield _object_resource_from_metadata(object_metadata)
 
       # Yield prefixes.
       for prefix_string in object_list.prefixes:
         yield resource_reference.PrefixResource(
-            storage_url=storage_url.CloudUrl(
-                scheme=cloud_api.ProviderPrefix.GCS.value,
+            storage_url.CloudUrl(
+                scheme=storage_url.ProviderPrefix.GCS,
                 bucket_name=bucket_name,
-                object_name=prefix_string
-            ),
+                object_name=prefix_string),
             prefix=prefix_string
         )
 
@@ -270,11 +271,11 @@ class GcsApi(cloud_api.CloudApi):
         break
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def DeleteObject(self,
-                   bucket_name,
-                   object_name,
-                   generation=None,
-                   request_config=None):
+  def delete_object(self,
+                    bucket_name,
+                    object_name,
+                    generation=None,
+                    request_config=None):
     """See super class."""
     if not request_config:
       request_config = GcsRequestConfig()
@@ -290,11 +291,11 @@ class GcsApi(cloud_api.CloudApi):
     self.client.objects.Delete(request)
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def GetObjectMetadata(self,
-                        bucket_name,
-                        object_name,
-                        generation=None,
-                        fields_scope=cloud_api.FieldsScope.NO_ACL):
+  def get_object_metadata(self,
+                          bucket_name,
+                          object_name,
+                          generation=None,
+                          fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
 
     # S3 requires a string, but GCS uses an int for generation.
@@ -315,18 +316,19 @@ class GcsApi(cloud_api.CloudApi):
     except apitools_exceptions.HttpNotFoundError:
       raise cloud_errors.NotFoundError(
           'Object not found: {}'.format(storage_url.CloudUrl(
-              'gs', bucket_name, object_name, generation).url_string)
+              storage_url.ProviderPrefix.GCS, bucket_name, object_name,
+              generation).url_string)
       )
-    return _ObjectResourceFromMetadata(object_metadata)
+    return _object_resource_from_metadata(object_metadata)
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def PatchObjectMetadata(self,
-                          bucket_name,
-                          object_name,
-                          metadata,
-                          fields_scope=cloud_api.FieldsScope.NO_ACL,
-                          generation=None,
-                          request_config=None):
+  def patch_object_metadata(self,
+                            bucket_name,
+                            object_name,
+                            object_resource,
+                            fields_scope=cloud_api.FieldsScope.NO_ACL,
+                            generation=None,
+                            request_config=None):
     """See super class."""
     # S3 requires a string, but GCS uses an int for generation.
     if generation:
@@ -344,61 +346,63 @@ class GcsApi(cloud_api.CloudApi):
     projection = self._GetProjection(
         fields_scope, self.messages.StorageObjectsPatchRequest)
 
+    # Assume parameters are only for identifying what needs to be patched, and
+    # the resource contains the desired patched metadata values.
+    patched_metadata = object_resource.metadata
+    if not patched_metadata:
+      object_resource.metadata = self.messages.Object(
+          name=object_resource.name, bucket=object_resource.bucket)
+
     request = self.messages.StorageObjectsPatchRequest(
         bucket=bucket_name,
         object=object_name,
-        objectResource=metadata,
+        objectResource=object_resource.metadata,
         generation=generation,
         ifGenerationMatch=request_config.precondition_generation_match,
         ifMetagenerationMatch=request_config.precondition_metageneration_match,
         predefinedAcl=predefined_acl,
-        projection=projection
-    )
+        projection=projection)
 
-    object_metadata = self.client.objects.Patch(request)
-    return _ObjectResourceFromMetadata(object_metadata)
+    updated_metadata = self.client.objects.Patch(request)
+    return _object_resource_from_metadata(updated_metadata)
 
-  # pylint: disable=unused-argument
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def CopyObject(self,
-                 source_object_metadata,
-                 destination_object_metadata,
-                 source_object_generation=None,
-                 progress_callback=None,
-                 request_config=None):
+  def copy_object(self,
+                  source_resource,
+                  destination_resource,
+                  progress_callback=None,
+                  request_config=None):
     """See super class."""
     # TODO(b/161900052): Implement resumable copies.
     # TODO(b/161898251): Implement encryption and decryption.
-    if not getattr(source_object_metadata, 'etag', None):
-      raise ValueError('Etag is required for source objects in copy.')
-    cloud_api.ValidateObjectMetadata(source_object_metadata)
-    cloud_api.ValidateObjectMetadata(destination_object_metadata)
+    del progress_callback
 
-    # S3 requires a string, but GCS uses an int for generation.
-    if source_object_generation:
-      source_object_generation = int(source_object_generation)
+    if not request_config:
+      request_config = GcsRequestConfig()
 
-    object_metadata = self.client.objects.Copy(
+    result_metadata = self.client.objects.Copy(
         self.messages.StorageObjectsCopyRequest(
-            sourceBucket=source_object_metadata.bucket,
-            sourceObject=source_object_metadata.name,
-            destinationBucket=destination_object_metadata.bucket,
-            destinationObject=destination_object_metadata.name))
-    return _ObjectResourceFromMetadata(object_metadata)
+            sourceBucket=source_resource.storage_url.bucket_name,
+            sourceObject=source_resource.storage_url.object_name,
+            destinationBucket=destination_resource.storage_url.bucket_name,
+            destinationObject=destination_resource.storage_url.object_name,
+            ifSourceGenerationMatch=(
+                request_config.precondition_generation_match)))
+    return _object_resource_from_metadata(result_metadata)
 
   # pylint: disable=unused-argument
-  def _DownloadObject(self,
-                      bucket_name,
-                      object_name,
-                      download_stream,
-                      apitools_download,
-                      apitools_request,
-                      compressed_encoding=False,
-                      decryption_wrapper=None,
-                      generation=None,
-                      serialization_data=None,
-                      start_byte=0,
-                      end_byte=None):
+  def _download_object(self,
+                       bucket_name,
+                       object_name,
+                       download_stream,
+                       apitools_download,
+                       apitools_request,
+                       compressed_encoding=False,
+                       decryption_wrapper=None,
+                       generation=None,
+                       serialization_data=None,
+                       start_byte=0,
+                       end_byte=None):
     """GCS-specific download implementation.
 
     Args:
@@ -443,28 +447,29 @@ class GcsApi(cloud_api.CloudApi):
                                  end=end_byte,
                                  use_chunks=False)
     else:
-      apitools_download.StreamMedia(additional_headers=additional_headers,
-                                    callback=_NoOpCallback,
-                                    finish_callback=_NoOpCallback,
-                                    use_chunks=False)
+      apitools_download.StreamMedia(
+          additional_headers=additional_headers,
+          callback=_no_op_callback,
+          finish_callback=_no_op_callback,
+          use_chunks=False)
     return apitools_download.encoding
 
   # pylint: disable=unused-argument
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def DownloadObject(self,
-                     bucket_name,
-                     object_name,
-                     download_stream,
-                     compressed_encoding=False,
-                     decryption_wrapper=None,
-                     digesters=None,
-                     download_strategy=cloud_api.DownloadStrategy.ONE_SHOT,
-                     generation=None,
-                     object_size=None,
-                     progress_callback=None,
-                     serialization_data=None,
-                     start_byte=0,
-                     end_byte=None):
+  def download_object(self,
+                      bucket_name,
+                      object_name,
+                      download_stream,
+                      compressed_encoding=False,
+                      decryption_wrapper=None,
+                      digesters=None,
+                      download_strategy=cloud_api.DownloadStrategy.ONE_SHOT,
+                      generation=None,
+                      object_size=None,
+                      progress_callback=None,
+                      serialization_data=None,
+                      start_byte=0,
+                      end_byte=None):
     """See super class."""
     # S3 requires a string, but GCS uses an int for generation.
     if generation:
@@ -490,35 +495,38 @@ class GcsApi(cloud_api.CloudApi):
         generation=generation)
 
     if download_strategy == cloud_api.DownloadStrategy.ONE_SHOT:
-      return self._DownloadObject(bucket_name,
-                                  object_name,
-                                  download_stream,
-                                  apitools_download,
-                                  request,
-                                  compressed_encoding=compressed_encoding,
-                                  decryption_wrapper=decryption_wrapper,
-                                  generation=generation,
-                                  serialization_data=serialization_data,
-                                  start_byte=start_byte,
-                                  end_byte=end_byte)
+      return self._download_object(
+          bucket_name,
+          object_name,
+          download_stream,
+          apitools_download,
+          request,
+          compressed_encoding=compressed_encoding,
+          decryption_wrapper=decryption_wrapper,
+          generation=generation,
+          serialization_data=serialization_data,
+          start_byte=start_byte,
+          end_byte=end_byte)
     else:
       # TODO(b/161437901): Handle resumable download.
       pass
 
   # pylint: disable=unused-argument
-  def _UploadObject(self,
-                    upload_stream,
-                    object_metadata,
-                    request_config,
-                    apitools_strategy=apitools_transfer.SIMPLE_UPLOAD,
-                    progress_callback=None,
-                    serialization_data=None,
-                    total_size=0,
-                    tracker_callback=None):
+  def _upload_object(self,
+                     upload_stream,
+                     object_metadata,
+                     request_config,
+                     apitools_strategy=apitools_transfer.SIMPLE_UPLOAD,
+                     progress_callback=None,
+                     serialization_data=None,
+                     total_size=0,
+                     tracker_callback=None):
     # pylint: disable=g-doc-args
     """GCS-specific upload implementation. Adds args to Cloud API interface.
 
     Additional args:
+      object_metadata (messages.Object): Apitools metadata for object to
+          upload.
       apitools_strategy (str): SIMPLE_UPLOAD or RESUMABLE_UPLOAD constant in
           apitools.base.py.transfer.
       serialization_data (str): Implementation-specific JSON string of a dict
@@ -528,10 +536,11 @@ class GcsApi(cloud_api.CloudApi):
       tracker_callback (function): Callback that keeps track of upload progress.
 
     Returns:
-      Uploaded object metadata as an Apitools message Object.
-    """
-    cloud_api.ValidateObjectMetadata(object_metadata)
+      Uploaded object metadata in an ObjectResource.
 
+    Raises:
+      ValueError if an object can't be uploaded with the provided metadata.
+    """
     predefined_acl = None
     if request_config.predefined_acl_string:
       predefined_acl = getattr(self.messages.StorageObjectsInsertRequest.
@@ -567,27 +576,32 @@ class GcsApi(cloud_api.CloudApi):
       # Not settable through the Apitools Upload class constructor.
       apitools_upload.strategy = apitools_strategy
 
-      object_metadata = self.client.objects.Insert(request,
-                                                   upload=apitools_upload)
-      return _ObjectResourceFromMetadata(object_metadata)
+      result_object_metadata = self.client.objects.Insert(
+          request, upload=apitools_upload)
+      return _object_resource_from_metadata(result_object_metadata)
     else:
       # TODO(b/160998556): Implement resumable upload.
       pass
 
   @cloud_errors.catch_http_error_raise_gcs_api_error()
-  def UploadObject(self,
-                   upload_stream,
-                   object_metadata,
-                   progress_callback=None,
-                   request_config=None):
+  def upload_object(self,
+                    upload_stream,
+                    upload_resource,
+                    progress_callback=None,
+                    request_config=None):
     """See CloudApi class for function doc strings."""
     # Doing this as a default argument above can lead to unexpected bugs:
     # https://docs.python-guide.org/writing/gotchas/#mutable-default-arguments
     if request_config is None:
       request_config = GcsRequestConfig()
-    return self._UploadObject(
+
+    upload_metadata = self.messages.Object(
+        name=upload_resource.storage_url.object_name,
+        bucket=upload_resource.storage_url.bucket_name)
+
+    return self._upload_object(
         upload_stream,
-        object_metadata,
+        upload_metadata,
         apitools_strategy=apitools_transfer.SIMPLE_UPLOAD,
         progress_callback=progress_callback,
         request_config=request_config,

@@ -1,0 +1,134 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_CERTIFICATES_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca certificates export \- export a pem\-encoded certificate to a file
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca certificates export\fR (\fICERTIFICATE\fR\ :\ \fB\-\-issuer\fR=\fIISSUER\fR\ \fB\-\-issuer\-location\fR=\fIISSUER_LOCATION\fR) \fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR [\fB\-\-include\-chain\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Export a pem\-encoded certificate to a file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+CERTIFICATE resource \- The certificate to export. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [CERTIFICATE] on the command line with
+a fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE\fR
+ID of the CERTIFICATE or fully qualified identifier for the CERTIFICATE. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-issuer\fR=\fIISSUER\fR
+The issuing certificate authority of the CERTIFICATE.
+
+.TP 2m
+\fB\-\-issuer\-location\fR=\fIISSUER_LOCATION\fR
+The location of the CERTIFICATE. Alternatively, you can set the property
+[privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR
+The path where the resulting PEM\-encoded certificate will be written.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-include\-chain\fR
+Whether to include the certificate's issuer chain in the exported file. If this
+is set, the resulting file will contain the pem\-encoded certificate and its
+issuing chain, ordered from leaf to root.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To export a single pem\-encoded certificate to a file, run the following:
+
+.RS 2m
+$ gcloud beta privateca certificates export my\-cert \-\-issuer=my\-ca \e
+    \-\-issuer\-location=us\-west1 \-\-output\-file=cert.pem
+.RE
+
+To export a pem\-encoded certificate along with its issuing chain in the same
+file, run the following:
+
+.RS 2m
+$ gcloud beta privateca certificates export my\-cert \-\-issuer=my\-ca \e
+    \-\-issuer\-location=us\-west1 \-\-include\-chain \e
+    \-\-output\-file=chain.pem
+.RE
+
+You can omit the \-\-issuer\-location flag in both of the above examples if
+you've already set the privateca/location property. For example:
+
+.RS 2m
+$ gcloud config set privateca/location us\-west1
+.RE
+
+.RS 2m
+# The following is equivalent to the first example above.
+$ gcloud beta privateca certificates export my\-cert \-\-issuer=my\-ca \e
+    \-\-output\-file=cert.pem
+.RE
+
+.RS 2m
+# The following is equivalent to the second example above.
+$ gcloud beta privateca certificates export my\-cert \-\-issuer=my\-ca \e
+    \-\-include\-chain \-\-output\-file=chain.pem
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

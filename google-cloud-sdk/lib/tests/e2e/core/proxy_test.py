@@ -44,7 +44,7 @@ from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
-PROXY_HOST = '10.128.0.8'
+PROXY_HOST = '10.240.0.14'
 
 
 def MakeProxyParams(protocol, proxy_port, with_pass=False):
@@ -102,12 +102,14 @@ class ProxyTest(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
 
     self.StartEnvPatch({'HTTPS_PROXY': proxy})
 
-  def testNoProxyDoesNotConnect(self):
-    self.Run('compute instances list --limit=1')
+  def testInvalidProxyDoesNotConnect(self):
+    self.setProxyViaProps(MakeProxyParams('http', 1234, with_pass=False))
+
     with self.assertRaises(exec_utils.ExecutionError) as cm:
       results = self.ExecuteScript(
           'gcloud',
           ['compute', 'instances', 'list', '--limit', '1'])
+
       # The above should have thrown, if it did not, print the result so we can
       # see what happened.
       print(results)

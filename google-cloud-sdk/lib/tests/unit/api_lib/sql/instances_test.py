@@ -153,6 +153,28 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
         list(instances_util._BaseInstances.GetDatabaseInstances(batch_size=10)))
 
 
+class IsMysqlDatabaseVersionTest(base.SqlMockTestBeta):
+  """Tests instances_util.InstancesV1Beta4.IsMysqlDatabaseVersion."""
+
+  def testMySQLInstance(self):
+    mysql_instance = self.messages.DatabaseInstance(
+        kind='sql#instance',
+        databaseVersion=self.messages.DatabaseInstance
+        .DatabaseVersionValueValuesEnum.MYSQL_8_0)
+    self.assertTrue(
+        instances_util._BaseInstances.IsMysqlDatabaseVersion(
+            mysql_instance.databaseVersion))
+
+  def testPostgresInstance(self):
+    postgres_instance = self.messages.DatabaseInstance(
+        kind='sql#instance',
+        databaseVersion=self.messages.DatabaseInstance
+        .DatabaseVersionValueValuesEnum.POSTGRES_12)
+    self.assertFalse(
+        instances_util._BaseInstances.IsMysqlDatabaseVersion(
+            postgres_instance.databaseVersion))
+
+
 class IsPostgresDatabaseVersionTest(base.SqlMockTestBeta):
   """Tests instances_util.InstancesV1Beta4.IsPostgresDatabaseVersion."""
 

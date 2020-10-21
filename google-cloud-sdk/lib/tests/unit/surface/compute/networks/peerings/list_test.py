@@ -28,7 +28,6 @@ from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute.networks import test_resources
 
 
 # This test can be deleted once list_test.scenario.yaml is promoted to GA.
@@ -38,14 +37,15 @@ def MakePeeringsForTest(api_version):
       messages.Network(
           name='network-1',
           autoCreateSubnetworks=True,
-          selfLink=('https://compute.googleapis.com/compute/{}/projects/my-project/'
-                    'global/networks/network-1'.format(api_version)),
+          selfLink=('https://compute.googleapis.com/compute/{}/projects/'
+                    'my-project/global/networks/network-1'.format(api_version)),
           subnetworks=[],
           peerings=[
               messages.NetworkPeering(
                   name='peering-1',
                   network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project/global/networks/network-2'.format(api_version),
+                  peerMtu=1500,
                   autoCreateRoutes=True,
                   exportCustomRoutes=False,
                   importCustomRoutes=True,
@@ -56,6 +56,7 @@ def MakePeeringsForTest(api_version):
                   network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project-2/global/networks/network-3'.format(api_version),
                   autoCreateRoutes=True,
+                  peerMtu=1460,
                   exportCustomRoutes=False,
                   importCustomRoutes=False,
                   state=messages.NetworkPeering.StateValueValuesEnum.ACTIVE,
@@ -73,8 +74,8 @@ def MakePeeringsForTest(api_version):
       messages.Network(
           name='network-2',
           autoCreateSubnetworks=True,
-          selfLink=('https://compute.googleapis.com/compute/{}/projects/my-project/'
-                    'global/networks/network-2'.format(api_version)),
+          selfLink=('https://compute.googleapis.com/compute/{}/projects/'
+                    'my-project/global/networks/network-1'.format(api_version)),
           subnetworks=[],
           peerings=[
               messages.NetworkPeering(
@@ -82,6 +83,7 @@ def MakePeeringsForTest(api_version):
                   network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project/global/networks/network-1'.format(api_version),
                   autoCreateRoutes=True,
+                  peerMtu=1500,
                   exportCustomRoutes=True,
                   importCustomRoutes=False,
                   state=messages.NetworkPeering.StateValueValuesEnum.ACTIVE,
@@ -109,46 +111,51 @@ class PeeringsListTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.client.networks.List.Expect(
         self.messages.ComputeNetworksListRequest(
             pageToken=None,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         response=self.messages.NetworkList(
-            items=test_resources.NETWORK_PEERINGS_V1,))
+            items=MakePeeringsForTest(self.api_version),))
 
     self.Run('compute networks peerings list')
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME    NETWORK PEER_PROJECT PEER_NETWORK AUTO_CREATE_ROUTES STATE STATE_DETAILS
-            peering-1 network-1 my-project network-2 True ACTIVE Matching configuration is found on peer network.
-            peering-2 network-1 my-project-2 network-3 True ACTIVE Matching configuration is found on peer network.
-            peering-3 network-1 my-project-3 network-3 True INACTIVE Peering is created.
-            my-peering-1 network-2 my-project network-1 True ACTIVE Matching configuration is found on peer network.
-            """), normalize_space=True)
+            NAME NETWORK PEER_PROJECT PEER_NETWORK PEER_MTU IMPORT_CUSTOM_ROUTES EXPORT_CUSTOM_ROUTES STATE STATE_DETAILS
+            peering-1 network-1 my-project network-2 1500 True False ACTIVE Connected.
+            peering-2 network-1 my-project-2 network-3 1460 False False ACTIVE Connected.
+            peering-3 network-1 my-project-3 network-3  True True INACTIVE Waiting for peer network to connect.
+            my-peering-1 network-1 my-project network-1 1500 False True ACTIVE Connected.
+            """),
+        normalize_space=True)
 
   def testTableOutputNetworkFilter(self):
     self.client.networks.List.Expect(
         self.messages.ComputeNetworksListRequest(
             pageToken=None,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         response=self.messages.NetworkList(
-            items=test_resources.NETWORK_PEERINGS_V1,))
+            items=MakePeeringsForTest(self.api_version),))
 
     self.Run('compute networks peerings list --network network-1')
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME    NETWORK PEER_PROJECT PEER_NETWORK AUTO_CREATE_ROUTES STATE STATE_DETAILS
-            peering-1 network-1 my-project network-2 True ACTIVE Matching configuration is found on peer network.
-            peering-2 network-1 my-project-2 network-3 True ACTIVE Matching configuration is found on peer network.
-            peering-3 network-1 my-project-3 network-3 True INACTIVE Peering is created.
-            """), normalize_space=True)
+            NAME NETWORK PEER_PROJECT PEER_NETWORK PEER_MTU IMPORT_CUSTOM_ROUTES EXPORT_CUSTOM_ROUTES STATE STATE_DETAILS
+            peering-1 network-1 my-project network-2 1500 True False ACTIVE Connected.
+            peering-2 network-1 my-project-2 network-3 1460 False False ACTIVE Connected.
+            peering-3 network-1 my-project-3 network-3  True True INACTIVE Waiting for peer network to connect.
+            """),
+        normalize_space=True)
 
   def testTableOutputNetworkFilterNone(self):
     self.client.networks.List.Expect(
         self.messages.ComputeNetworksListRequest(
             pageToken=None,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         response=self.messages.NetworkList(
-            items=test_resources.NETWORK_PEERINGS_V1,))
+            items=MakePeeringsForTest(self.api_version),))
 
     self.Run('compute networks peerings list --network no-network')
 
@@ -160,60 +167,6 @@ class PeeringsListBetaTest(PeeringsListTest):
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
-
-  def testTableOutput(self):
-    self.client.networks.List.Expect(
-        self.messages.ComputeNetworksListRequest(
-            pageToken=None,
-            project=self.Project(),
-        ),
-        response=self.messages.NetworkList(
-            items=MakePeeringsForTest(self.api_version),))
-
-    self.Run('compute networks peerings list')
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK PEER_PROJECT PEER_NETWORK IMPORT_CUSTOM_ROUTES EXPORT_CUSTOM_ROUTES STATE STATE_DETAILS
-            peering-1 network-1 my-project network-2 True False ACTIVE Connected.
-            peering-2 network-1 my-project-2 network-3 False False ACTIVE Connected.
-            peering-3 network-1 my-project-3 network-3 True True INACTIVE Waiting for peer network to connect.
-            my-peering-1 network-2 my-project network-1 False True ACTIVE Connected.
-            """),
-        normalize_space=True)
-
-  def testTableOutputNetworkFilter(self):
-    self.client.networks.List.Expect(
-        self.messages.ComputeNetworksListRequest(
-            pageToken=None,
-            project=self.Project(),
-        ),
-        response=self.messages.NetworkList(
-            items=MakePeeringsForTest(self.api_version),))
-
-    self.Run('compute networks peerings list --network network-1')
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK PEER_PROJECT PEER_NETWORK IMPORT_CUSTOM_ROUTES EXPORT_CUSTOM_ROUTES STATE STATE_DETAILS
-            peering-1 network-1 my-project network-2 True False ACTIVE Connected.
-            peering-2 network-1 my-project-2 network-3 False False ACTIVE Connected.
-            peering-3 network-1 my-project-3 network-3 True True INACTIVE Waiting for peer network to connect.
-            """),
-        normalize_space=True)
-
-  def testTableOutputNetworkFilterNone(self):
-    self.client.networks.List.Expect(
-        self.messages.ComputeNetworksListRequest(
-            pageToken=None,
-            project=self.Project(),
-        ),
-        response=self.messages.NetworkList(
-            items=MakePeeringsForTest(self.api_version),))
-
-    self.Run('compute networks peerings list --network no-network')
-
-    self.AssertOutputEquals('', normalize_space=True)
 
 
 class PeeringsListAlphaTest(PeeringsListBetaTest):

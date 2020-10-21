@@ -1,0 +1,39 @@
+NAME
+    gcloud beta domains registrations get-register-parameters - get register
+        parameters (including availability) of a specific domain
+
+SYNOPSIS
+    gcloud beta domains registrations get-register-parameters DOMAIN
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Get parameters needed to register a new domain, including price,
+    availability, supported privacy modes and notices.
+
+    In contrast to the search-domains command, this command returns up-to-date
+    domain name availability information.
+
+POSITIONAL ARGUMENTS
+     DOMAIN
+        Domain to get register parameters for.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To check if example.com is available for registration, run:
+
+        $ gcloud beta domains registrations get-register-parameters \
+            example.com
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha domains registrations get-register-parameters
+

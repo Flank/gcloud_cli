@@ -1,10 +1,9 @@
 title: List insights
-release_tracks: [ALPHA, BETA, GA]
+release_tracks: [BETA, GA]
 actions:
 - define_reference:
     reference: api-version
     track_values:
-      ALPHA: v1alpha2
       BETA: v1beta1
       GA: v1
 - execute_command:

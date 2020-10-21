@@ -316,7 +316,7 @@ errors:
   reason: Permission denied API reason.
 message: Your bad.>
 instance_name: <your-stuff>
-message: <User [user@gmail.com] does not have permission to access project [your-stuff] (or it may not exist): Your bad.>
+message: <User [user@gmail.com] does not have permission to access projects instance [your-stuff] (or it may not exist): Your bad.>
 resource_name: <projects>
 status_code: <403>
 status_description: <Permission denied API reason.>
@@ -349,7 +349,7 @@ errors:
   reason: Resource not found API reason.
 message: Your bad.>
 instance_name: <your-stuff>
-message: <Project [your-stuff] not found: Your bad.>
+message: <Projects instance [your-stuff] not found: Your bad.>
 resource_name: <projects>
 status_code: <404>
 status_description: <Resource not found API reason.>
@@ -382,7 +382,7 @@ errors:
   reason: Resource already exists API reason.
 message: Your bad.>
 instance_name: <your-stuff>
-message: <Resource in project [your-stuff] is the subject of a conflict: Your bad.>
+message: <Resource in projects [your-stuff] is the subject of a conflict: Your bad.>
 resource_name: <projects>
 status_code: <409>
 status_description: <Resource already exists API reason.>
@@ -513,7 +513,7 @@ Filter Sdk2
 
   def testCombinationsStaticRaiseHttpError(self):
     with self.AssertRaisesHttpExceptionMatches(
-        'User [None] does not have permission to access project [your-stuff] '
+        'User [None] does not have permission to access projects instance [your-stuff] '
         '(or it may not exist): '
         'Permission denied.'):
       self.cli.Execute([
@@ -527,7 +527,7 @@ Filter Sdk2
     self.AssertErrEquals("""\
 Filter Sdk1
 Filter Sdk2
-ERROR: (test.sdk2.combinations) User [None] does not have permission to access project [your-stuff] (or it may not exist): Permission denied.
+ERROR: (test.sdk2.combinations) User [None] does not have permission to access projects instance [your-stuff] (or it may not exist): Permission denied.
 """)
 
   def testCombinationsStaticRaiseHttpException(self):
@@ -566,7 +566,7 @@ Filter Sdk2
 
   def testCombinationsGeneratorRaiseHttpError(self):
     with self.AssertRaisesHttpExceptionMatches(
-        'User [None] does not have permission to access project [your-stuff] '
+        'User [None] does not have permission to access projects instance [your-stuff] '
         '(or it may not exist): '
         'Permission denied.'):
       self.cli.Execute([
@@ -582,7 +582,7 @@ Filter Sdk2
     self.AssertErrEquals("""\
 Filter Sdk1
 Filter Sdk2
-ERROR: (test.sdk2.combinations) User [None] does not have permission to access project [your-stuff] (or it may not exist): Permission denied.
+ERROR: (test.sdk2.combinations) User [None] does not have permission to access projects instance [your-stuff] (or it may not exist): Permission denied.
 """)
 
   def testCombinationsGeneratorRaiseHttpException(self):

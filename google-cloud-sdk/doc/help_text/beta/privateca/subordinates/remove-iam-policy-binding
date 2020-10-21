@@ -68,12 +68,10 @@ EXAMPLES
 
         $ gcloud beta privateca subordinates remove-iam-policy-binding \
             server-tls-1 \
-          --location 'us-west1' \
-          --member 'user:test-user@gmail.com' \
+          --location='us-west1' \
+          --member='user:test-user@gmail.com' \
           --role='roles/privateca.certificateManager'
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

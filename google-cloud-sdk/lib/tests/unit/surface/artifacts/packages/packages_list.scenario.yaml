@@ -15,7 +15,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -28,7 +28,7 @@ actions:
               locationId: us
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo/packages?alt=json
           method: GET
           headers: {}
           body: null
@@ -48,7 +48,7 @@ actions:
               createTime: '2019-04-10T22:08:45.773883Z'
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages?alt=json&pageToken=asdf
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo/packages?alt=json&pageToken=asdf
           method: GET
           headers: {}
           body: null

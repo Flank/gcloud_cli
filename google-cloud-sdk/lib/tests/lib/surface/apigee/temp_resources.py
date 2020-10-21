@@ -139,10 +139,9 @@ def _APIProxyArchive(name, revision, basepath, target_url):
         archive_file.close()
 
 
-# TODO(b/157082792): Use gcloud commands, not direct ResponseToApiRequest calls.
 # Commands to create and delete environments, API proxies, and revisions are not
-# yet part of the `gcloud apigee` command surface. If and when such commands are
-# added, these helper methods should be modified to use them.
+# yet part of the `gcloud apigee` command surface. Tests which require such
+# resources to exist must rely on helper methods like the ones below.
 
 
 def _IsTimestampStale(timestamp_str):

@@ -1,0 +1,110 @@
+
+.TH "GCLOUD_BETA_SERVICES_PEERED\-DNS\-DOMAINS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta services peered\-dns\-domains create \- create a peered DNS domain for a private service connection
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta services peered\-dns\-domains create\fR \fINAME\fR \fB\-\-dns\-suffix\fR=\fIDNS_SUFFIX\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command creates a peered DNS domain for a private service
+connection which sends requests for records in a given namespace originating in
+the service producer VPC network to the consumer VPC network to be resolved.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the peered DNS domain to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-dns\-suffix\fR=\fIDNS_SUFFIX\fR
+The DNS domain name suffix of the peered DNS domain.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The network in the consumer project peered with the service.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR; default="servicenetworking.googleapis.com"
+The name of the service to create a peered DNS domain for.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a peered DNS domain called \f5example\-com\fR which forwards DNS
+requests for the domain suffix \f5example.com.\fR for a private service
+connection between service \f5peering\-service\fR and the consumer network
+\f5my\-network\fR in the current project, run:
+
+.RS 2m
+$ gcloud beta services peered\-dns\-domains create example\-com \e
+    \-\-network=my\-network \e
+    \-\-service=peering\-service \-\-dns\-suffix=example.com.
+.RE
+
+To run the same command asynchronously (non\-blocking), run:
+
+.RS 2m
+$ gcloud beta services peered\-dns\-domains create example\-com \e
+    \-\-network=my\-network \e
+    \-\-service=peering\-service \-\-dns\-suffix=example.com. \e
+    \-\-async
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha services peered\-dns\-domains create
+.RE
+

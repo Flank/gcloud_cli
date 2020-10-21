@@ -19,15 +19,17 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class InstancesSetNameTest(test_base.BaseTest):
+class InstancesSetNameTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
 
   def _CreateSetNameRequest(self, name, current_name):
     return (self.compute.instances,
@@ -52,7 +54,7 @@ class InstancesSetNameTest(test_base.BaseTest):
     ])
 
     self.Run("""
-        alpha compute instances set-name instance-1
+          compute instances set-name instance-1
           --zone central2-a
           --new-name instance-2
         """)
@@ -70,7 +72,7 @@ class InstancesSetNameTest(test_base.BaseTest):
           [],
       ])
 
-      self.Run('alpha compute instances set-name instance-1')
+      self.Run('compute instances set-name instance-1')
 
   def testWithSameName(self):
     self.make_requests.side_effect = iter([
@@ -79,12 +81,20 @@ class InstancesSetNameTest(test_base.BaseTest):
     ])
 
     self.Run("""
-        alpha compute instances set-name instance-1
+          compute instances set-name instance-1
           --zone central2-a
           --new-name instance-1
         """)
 
     self.CheckRequests([self._CreateGetRequest(name='instance-1')])
+
+
+class InstancesSetNameTestAlpha(InstancesSetNameTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
 
 
 if __name__ == '__main__':

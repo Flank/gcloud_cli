@@ -215,6 +215,71 @@ class IosArgsTests(unit_base.IosMockClientTest):
         '[scenario-numbers]: Value must be greater than or equal to 1; received: 0',
         six.text_type(ex_ctx.exception))
 
+  def testPrepareArgs_DirsToPullValidInput(self):
+    args = self.NewTestArgs(
+        test='a',
+        directories_to_pull=[
+            'com.my.app:/Documents/outputdir',
+            '/private/var/mobile/Media/outputdir'
+        ])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    args_mgr.Prepare(args)
+
+  def testPrepareArgs_DirsToPullInvalidBundleIdInvalid(self):
+    args = self.NewTestArgs(
+        test='a', directories_to_pull=['b@d.bundle.!d:/Documents/outputdir'])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('Invalid value for [directories-to-pull]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_DirsToPullEmptyBundleIdInvalid(self):
+    args = self.NewTestArgs(
+        test='a', directories_to_pull=[':/Documents/outputdir'])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('Invalid value for [directories-to-pull]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_DirsToPullMissingBundleIdInvalid(self):
+    args = self.NewTestArgs(
+        test='a', directories_to_pull=['/Documents/outputdir'])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('Invalid value for [directories-to-pull]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_DirsToPullNotSharedFolderInvalid(self):
+    args = self.NewTestArgs(
+        test='a',
+        directories_to_pull=['/private/var/mobile/NotMedia/outputdir'])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('Invalid value for [directories-to-pull]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_DirsToPullAppFolderNotDocuments(self):
+    args = self.NewTestArgs(
+        test='a', directories_to_pull=['com.my.app:/NotDocuments/outputdir'])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('Invalid value for [directories-to-pull]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_DirsToPullEmptyInvalid(self):
+    args = self.NewTestArgs(
+        test='a', directories_to_pull=[''])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('Invalid value for [directories-to-pull]',
+                  six.text_type(ex_ctx.exception))
+
 
 def _IosArgManagerWithFakeCatalog():
   cat_mgr = catalog_manager.IosCatalogManager(fake_catalogs.FakeIosCatalog())

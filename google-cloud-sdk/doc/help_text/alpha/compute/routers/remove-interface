@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute routers remove-interface NAME
-        --interface-name=INTERFACE_NAME [--region=REGION]
+        (--interface-name=INTERFACE_NAME
+          | --interface-names=[INTERFACE_NAME,...]) [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,8 +17,13 @@ POSITIONAL ARGUMENTS
         Name of the router to update.
 
 REQUIRED FLAGS
-     --interface-name=INTERFACE_NAME
-        The name of the interface being removed.
+     Exactly one of these must be specified:
+
+       --interface-name=INTERFACE_NAME
+          The name of the interface being removed.
+
+       --interface-names=[INTERFACE_NAME,...]
+          The list of names for interfaces being removed.
 
 OPTIONAL FLAGS
      --region=REGION

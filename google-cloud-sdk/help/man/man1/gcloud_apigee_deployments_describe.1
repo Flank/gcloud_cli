@@ -1,0 +1,127 @@
+
+.TH "GCLOUD_APIGEE_DEPLOYMENTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud apigee deployments describe \- describe an Apigee API proxy deployment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud apigee deployments describe\fR [[\fIREVISION\fR]\ \fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describe an Apigee API proxy deployment.
+
+\f5gcloud apigee deployments describe\fR retrieves the status of a specific API
+proxy's deployment to a specific environment.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Revision resource \- API proxy revision and environment of the deployment to be
+described.
+
+.RE
+.sp
+To get a list of deployed proxies and their environments, run:
+
+.RS 2m
+$ gcloud apigee deployments list
+.RE
+
+REVISION can either be a positive revision number, or the special value
+\f5\fIauto\fR\fR, which will choose whichever revision of API is currently
+deployed in ENVIRONMENT, or return an error if more than one revision is
+deployed.
+
+
+If REVISION is unspecified, the default is \f5\fIauto\fR\fR.
+
+.RS 2m
+The arguments in this group can be used to specify the attributes of this resource.
+.RE
+
+
+.RS 2m
+.TP 2m
+[\fIREVISION\fR]
+ID of the revision or fully qualified identifier for the revision.
+
+.RS 2m
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+Deployed API proxy.
+
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+Environment in which the proxy was deployed.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Apigee Organization of the proxy and environment. If unspecified, the Cloud
+Platform project's associated organization will be used.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get the status of a deployment in the active Cloud Platform project, which
+deploys \f5\fImy\-proxy\fR\fR into the \f5\fIprod\fR\fR environment, run:
+
+.RS 2m
+$ gcloud apigee deployments describe \-\-api=my\-proxy \e
+  \-\-environment=prod
+.RE
+
+To get the status of that deployment as a JSON object, run:
+
+.RS 2m
+$ gcloud apigee deployments describe \-\-api=my\-proxy \e
+  \-\-environment=prod \-\-format=json
+.RE
+
+To get the status of a deployment in an organization called \f5\fImy\-org\fR\fR,
+which deploys version 3 of the proxy \f5\fImy\-proxy\fR\fR into the
+\f5\fItest\fR\fR environment, run:
+
+.RS 2m
+$ gcloud apigee deployments describe 3 \-\-organization=my\-org \e
+  \-\-environment=test \-\-api=my\-proxy
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha apigee deployments describe
+$ gcloud beta apigee deployments describe
+.RE
+

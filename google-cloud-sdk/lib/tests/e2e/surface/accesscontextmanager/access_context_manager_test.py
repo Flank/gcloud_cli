@@ -42,38 +42,74 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   # based on the operating system and release track.
   SHARDING_QUOTA_PROJECT = {
       OperatingSystem.LINUX: {
-          calliope_base.ReleaseTrack.GA: '888422664032',
-          calliope_base.ReleaseTrack.BETA: '334969862',
-          calliope_base.ReleaseTrack.ALPHA: '227997894940',
+          # cloudsdk01.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.GA:
+              '888422664032',
+          # cloudsdk03.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.BETA:
+              '334969862',
+          # cloudsdk05.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.ALPHA:
+              '227997894940',
       },
       OperatingSystem.WINDOWS: {
-          calliope_base.ReleaseTrack.GA: '502734576903',
-          calliope_base.ReleaseTrack.BETA: '937099147667',
-          calliope_base.ReleaseTrack.ALPHA: '686404499936',
+          # cloudsdk06.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.GA:
+              '502734576903',
+          # cloudsdk07.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.BETA:
+              '937099147667',
+          # cloudsdk08.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.ALPHA:
+              '686404499936',
       },
       OperatingSystem.MACOSX: {
-          calliope_base.ReleaseTrack.GA: '618624148297',
-          calliope_base.ReleaseTrack.BETA: '974650614028',
-          calliope_base.ReleaseTrack.ALPHA: '86178890000',
+          # cloudsdk09.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.GA:
+              '618624148297',
+          # cloudsdk10.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.BETA:
+              '974650614028',
+          # cloudsdk11.gen.atc-test.dev's billing project.
+          calliope_base.ReleaseTrack.ALPHA:
+              '86178890000',
       }
   }
   # A mapping of which organization to use for this instance of e2e test based
   # on the operating system and release track.
   SHARDING_ORG = {
       OperatingSystem.LINUX: {
-          calliope_base.ReleaseTrack.GA: '76738297746',
-          calliope_base.ReleaseTrack.BETA: '340595059913',
-          calliope_base.ReleaseTrack.ALPHA: '191131751739',
+          # cloudsdk01.gen.atc-test.dev
+          calliope_base.ReleaseTrack.GA:
+              '76738297746',
+          # cloudsdk03.gen.atc-test.dev
+          calliope_base.ReleaseTrack.BETA:
+              '340595059913',
+          # cloudsdk05.gen.atc-test.dev
+          calliope_base.ReleaseTrack.ALPHA:
+              '191131751739',
       },
       OperatingSystem.WINDOWS: {
-          calliope_base.ReleaseTrack.GA: '995906764022',
-          calliope_base.ReleaseTrack.BETA: '45731270610',
-          calliope_base.ReleaseTrack.ALPHA: '221222174612',
+          # cloudsdk06.gen.atc-test.dev
+          calliope_base.ReleaseTrack.GA:
+              '995906764022',
+          # cloudsdk07.gen.atc-test.dev
+          calliope_base.ReleaseTrack.BETA:
+              '45731270610',
+          # cloudsdk08.gen.atc-test.dev
+          calliope_base.ReleaseTrack.ALPHA:
+              '221222174612',
       },
       OperatingSystem.MACOSX: {
-          calliope_base.ReleaseTrack.GA: '507192639236',
-          calliope_base.ReleaseTrack.BETA: '880393349060',
-          calliope_base.ReleaseTrack.ALPHA: '62963706250',
+          # cloudsdk09.gen.atc-test.dev
+          calliope_base.ReleaseTrack.GA:
+              '507192639236',
+          # cloudsdk10.gen.atc-test.dev
+          calliope_base.ReleaseTrack.BETA:
+              '880393349060',
+          # cloudsdk11.gen.atc-test.dev
+          calliope_base.ReleaseTrack.ALPHA:
+              '62963706250',
       }
   }
 
@@ -121,6 +157,9 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
     self._policy_id = None
+    self.SetUpSharding()
+
+  def SetUpSharding(self):
     self._current_org = self.SHARDING_ORG.get(OperatingSystem.Current(),
                                               {}).get(self.track,
                                                       self.DEFAULT_ORG_ID)
@@ -307,52 +346,55 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   def testAccessContextManager(self):
     policy_id = self._GetTestPolicyId()
     with self._SetPolicyProperty(policy_id):
-      if self.track == calliope_base.ReleaseTrack.ALPHA or self.track == calliope_base.ReleaseTrack.BETA:
-        # TODO(b/150383794): Re-enable tests for ReplaceAccessLevels.
-        # pylint: disable=using-constant-test
-        if False:
-          # NOTE: Currently the replace levels includes a custom level.
-          # If replace levels goes to GA before custom levels, we will need to
-          # modify the replaceAll GA test to only reference basic levels.
-          with self._ReplaceLevels(policy_id) as (basic_level_id,
-                                                  custom_level_id):
-            basic_level = self._DescribeLevel(basic_level_id)
-            self.assertEqual(basic_level.title,
-                             'My Basic Level ' + basic_level_id)
-            custom_level = self._DescribeLevel(custom_level_id)
-            self.assertEqual(custom_level.title,
-                             'My Custom Level ' + custom_level_id)
-        # pylint: enable=using-constant-test
-      with self._CreateBasicLevel() as level_id:
-        level = self._DescribeLevel(level_id)
-        self.assertEqual(level.title, 'My Level ' + level_id)
-        self._UpdateBasicLevel(level_id, 'My Level Redux ' + level_id)
-        level = self._DescribeLevel(level_id)
-        self.assertEqual(level.title, 'My Level Redux ' + level_id)
-      with self._CreateCustomLevel() as level_id:
-        level = self._DescribeLevel(level_id)
-        self.assertEqual(level.title, 'My Level ' + level_id)
-        self._UpdateCustomLevel(level_id, 'My Level Redux ' + level_id)
-        level = self._DescribeLevel(level_id)
-        self.assertEqual(level.title, 'My Level Redux ' + level_id)
-      with self._CreatePerimeter() as perimeter_id:
-        perimeter = self._DescribePerimeter(perimeter_id)
-        self.assertEqual(perimeter.title, 'My Perimeter ' + perimeter_id)
-        self._UpdatePerimeter(perimeter_id,
-                              'My Perimeter Redux ' + perimeter_id)
-        perimeter = self._DescribePerimeter(perimeter_id)
-        self.assertEqual(perimeter.title, 'My Perimeter Redux ' + perimeter_id)
+      with self._SetBillingProject():
+        if self.track == calliope_base.ReleaseTrack.ALPHA or self.track == calliope_base.ReleaseTrack.BETA:
+          # TODO(b/150383794): Re-enable tests for ReplaceAccessLevels.
+          # pylint: disable=using-constant-test
+          if False:
+            # NOTE: Currently the replace levels includes a custom level.
+            # If replace levels goes to GA before custom levels, we will need to
+            # modify the replaceAll GA test to only reference basic levels.
+            with self._ReplaceLevels(policy_id) as (basic_level_id,
+                                                    custom_level_id):
+              basic_level = self._DescribeLevel(basic_level_id)
+              self.assertEqual(basic_level.title,
+                               'My Basic Level ' + basic_level_id)
+              custom_level = self._DescribeLevel(custom_level_id)
+              self.assertEqual(custom_level.title,
+                               'My Custom Level ' + custom_level_id)
+          # pylint: enable=using-constant-test
+        with self._CreateBasicLevel() as level_id:
+          level = self._DescribeLevel(level_id)
+          self.assertEqual(level.title, 'My Level ' + level_id)
+          self._UpdateBasicLevel(level_id, 'My Level Redux ' + level_id)
+          level = self._DescribeLevel(level_id)
+          self.assertEqual(level.title, 'My Level Redux ' + level_id)
+        with self._CreateCustomLevel() as level_id:
+          level = self._DescribeLevel(level_id)
+          self.assertEqual(level.title, 'My Level ' + level_id)
+          self._UpdateCustomLevel(level_id, 'My Level Redux ' + level_id)
+          level = self._DescribeLevel(level_id)
+          self.assertEqual(level.title, 'My Level Redux ' + level_id)
+        with self._CreatePerimeter() as perimeter_id:
+          perimeter = self._DescribePerimeter(perimeter_id)
+          self.assertEqual(perimeter.title, 'My Perimeter ' + perimeter_id)
+          self._UpdatePerimeter(perimeter_id,
+                                'My Perimeter Redux ' + perimeter_id)
+          perimeter = self._DescribePerimeter(perimeter_id)
+          self.assertEqual(perimeter.title,
+                           'My Perimeter Redux ' + perimeter_id)
 
   def testServicePerimeterDryRunCreateAndUpdate(self):
     perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
     try:
       with self._SetPolicyProperty(self._GetTestPolicyId()):
-        self._CreateDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        self._UpdateDryRunPerimeter(perimeter_id, 'bigtable.googleapis.com')
-        self._DescribeDryRunPerimeter(perimeter_id)
-        # This is the combined output of the two 'describe' calls.
-        self.AssertOutputEquals("""\
+        with self._SetBillingProject():
+          self._CreateDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          self._UpdateDryRunPerimeter(perimeter_id, 'bigtable.googleapis.com')
+          self._DescribeDryRunPerimeter(perimeter_id)
+          # This is the combined output of the two 'describe' calls.
+          self.AssertOutputEquals("""\
 name: {perimeter}
 title: My Perimeter {perimeter}
 type: PERIMETER_TYPE_REGULAR
@@ -384,20 +426,21 @@ vpcAccessibleServices:
     perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
     policy_id = self._GetTestPolicyId()
     with self._SetPolicyProperty(policy_id):
-      with self._CreateBasicLevel() as level_id:
-        try:
-          self.Run('access-context-manager perimeters create'
-                   '    --perimeter-type regular '
-                   '    --title "My Perimeter {perimeter}" '
-                   '    --restricted-services "storage.googleapis.com" '
-                   '    --access-levels "{level_id}" '
-                   '   {perimeter}'.format(
-                       level_id=level_id, perimeter=perimeter_id))
-          self._DescribeDryRunPerimeter(perimeter_id)
-          self._UpdateDryRunPerimeter(perimeter_id, 'bigtable.googleapis.com')
-          self._DescribeDryRunPerimeter(perimeter_id)
-          # This is the combined output of the two 'describe' calls.
-          self.AssertOutputEquals("""\
+      with self._SetBillingProject():
+        with self._CreateBasicLevel() as level_id:
+          try:
+            self.Run('access-context-manager perimeters create'
+                     '    --perimeter-type regular '
+                     '    --title "My Perimeter {perimeter}" '
+                     '    --restricted-services "storage.googleapis.com" '
+                     '    --access-levels "{level_id}" '
+                     '   {perimeter}'.format(
+                         level_id=level_id, perimeter=perimeter_id))
+            self._DescribeDryRunPerimeter(perimeter_id)
+            self._UpdateDryRunPerimeter(perimeter_id, 'bigtable.googleapis.com')
+            self._DescribeDryRunPerimeter(perimeter_id)
+            # This is the combined output of the two 'describe' calls.
+            self.AssertOutputEquals("""\
 This Service Perimeter does not have an explicit dry-run mode configuration. The enforcement config will be used as the dry-run mode configuration.
 name: {perimeter}
 title: My Perimeter {perimeter}
@@ -423,19 +466,20 @@ accessLevels:
 vpcAccessibleServices:
    NONE
 """.format(perimeter=perimeter_id, level_id=level_id, policy_id=policy_id))
-        finally:
-          self._DestroyPerimeter(perimeter_id)
+          finally:
+            self._DestroyPerimeter(perimeter_id)
 
   def testServicePerimeterDryRunCreateAndDelete(self):
     perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
     try:
       with self._SetPolicyProperty(self._GetTestPolicyId()):
-        self._CreateDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        self._DeleteDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        # This is the combined output of the two 'describe' calls.
-        self.AssertOutputEquals("""\
+        with self._SetBillingProject():
+          self._CreateDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          self._DeleteDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          # This is the combined output of the two 'describe' calls.
+          self.AssertOutputEquals("""\
 name: {perimeter}
 title: My Perimeter {perimeter}
 type: PERIMETER_TYPE_REGULAR
@@ -456,12 +500,13 @@ This Service Perimeter has been marked for deletion dry-run mode.
     perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
     try:
       with self._SetPolicyProperty(self._GetTestPolicyId()):
-        self._CreateDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        self._DropDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        # This is the combined output of the two 'describe' calls.
-        self.AssertOutputEquals("""\
+        with self._SetBillingProject():
+          self._CreateDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          self._DropDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          # This is the combined output of the two 'describe' calls.
+          self.AssertOutputEquals("""\
 name: {perimeter}
 title: My Perimeter {perimeter}
 type: PERIMETER_TYPE_REGULAR
@@ -482,12 +527,13 @@ This Service Perimeter has no dry-run or enforcement mode config.
     perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
     try:
       with self._SetPolicyProperty(self._GetTestPolicyId()):
-        self._CreateDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        self._EnforceDryRunPerimeter(perimeter_id)
-        self._DescribeDryRunPerimeter(perimeter_id)
-        # This is the combined output of the two 'describe' calls.
-        self.AssertOutputEquals("""\
+        with self._SetBillingProject():
+          self._CreateDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          self._EnforceDryRunPerimeter(perimeter_id)
+          self._DescribeDryRunPerimeter(perimeter_id)
+          # This is the combined output of the two 'describe' calls.
+          self.AssertOutputEquals("""\
 name: {perimeter}
 title: My Perimeter {perimeter}
 type: PERIMETER_TYPE_REGULAR
@@ -519,10 +565,11 @@ vpcAccessibleServices:
     perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
     try:
       with self._SetPolicyProperty(self._GetTestPolicyId()):
-        self._CreateDryRunPerimeter(perimeter_id)
-        self._EnforceAllDryRunPerimeters()
-        self._DescribeDryRunPerimeter(perimeter_id)
-        self.AssertOutputEquals("""\
+        with self._SetBillingProject():
+          self._CreateDryRunPerimeter(perimeter_id)
+          self._EnforceAllDryRunPerimeters()
+          self._DescribeDryRunPerimeter(perimeter_id)
+          self.AssertOutputEquals("""\
 This Service Perimeter does not have an explicit dry-run mode configuration. The enforcement config will be used as the dry-run mode configuration.
 name: {perimeter}
 title: My Perimeter {perimeter}
@@ -540,11 +587,12 @@ vpcAccessibleServices:
       self._DestroyPerimeter(perimeter_id)
 
 
-@test_case.Filters.skipAlways('Write quota exhaustion', 'b/152382402')
+@test_case.Filters.skipAlways('Timing out', 'b/152382402')
 class AccessContextManagerE2eTestsBeta(AccessContextManagerE2eTests):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.SetUpSharding()
 
 
 @test_case.Filters.skipAlways('Write quota exhaustion', 'b/152382402')

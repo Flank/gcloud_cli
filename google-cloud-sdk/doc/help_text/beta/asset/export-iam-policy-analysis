@@ -52,7 +52,10 @@ OPTIONAL FLAGS
 
        --analyze-service-account-impersonation
           If true, the response will include access analysis from identities to
-          resources via service account impersonation. Default is false.
+          resources via service account impersonation. This is a very expensive
+          operation, because many derived queries will be executed. We highly
+          recommend you use AnalyzeIamPolicyLongrunning rpc instead. Default is
+          false.
 
        --expand-groups
           If true, the identities section of the result will expand any Google

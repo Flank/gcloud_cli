@@ -27,7 +27,11 @@ GROUPS
     GROUP is one of the following:
 
      config-management
-        (ALPHA) Manage Config Management feature.
+        (ALPHA) Manage Config Management Feature.
+
+     features
+        (ALPHA) List enabled features for all your GKE and other Kubernetes
+        clusters registered with Hub.
 
      ingress
         (ALPHA) Manage MultiClusterIngress Feature.

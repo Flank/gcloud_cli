@@ -158,6 +158,21 @@ class Create(CreateBase):
     self._assertSSHCalled()
 
 
+# For cases where PreSetup should not set the TPU_NAME environment variable
+class CreateTpuOnly(CreateBase):
+
+  def testCreateSuccessTpuOnly(self):
+    self.ExpectTPUCreateCall(u'testinggcloud', u'v2-8', u'1.6', False)
+    self.zone = 'central2-a'
+    op_name = 'projects/fake-project/locations/central2-a/operations/fake-operation'
+    self.ExpectOperation(self.mock_tpu_client.projects_locations_operations,
+                         op_name, self.mock_tpu_client.projects_locations_nodes,
+                         op_name)
+    self.Run("""
+      compute tpus execution-groups create --name testinggcloud --tpu-only --zone central2-a --tf-version='1.6' --accelerator-type=v2-8
+    """)
+
+
 class CreateFailure(CreateBase):
 
   def SetUp(self):
@@ -185,7 +200,7 @@ class CreateFailure(CreateBase):
       compute tpus execution-groups create --name testinggcloud --zone central2-a \
       --tf-version='1.6' --machine-type=n1-standard-1
     """)
-    expected_responses = ('GCE VM with name:{} already exists, try a different '
+    expected_responses = ('VM with name:{} already exists, try a different '
                           'name. TPU Node:testinggcloud creation is underway '
                           ' and will need to be deleted.\n').format(name)
     self.AssertErrEquals(expected_responses, normalize_space=True)
@@ -200,7 +215,7 @@ class CreateFailure(CreateBase):
       --tf-version='1.6' --machine-type=n1-standard-1
     """)
     expected_responses = (
-        'GCE VM with name:{} already exists, try a different name.\n'.format(
+        'VM with name:{} already exists, try a different name.\n'.format(
             name)
         )
     self.AssertErrEquals(expected_responses, normalize_space=True)
@@ -233,10 +248,10 @@ class CreateDryRun(base.TpuUnitTestBase):
     expected_responses = (
         'Creating TPU with Name:testinggcloud, Accelerator '
         'type:v3-8, TF version:1.6, Zone:central2-a, Network:default\n'
-        'Creating GCE VM with Name:testinggcloud, Zone:central2-a, Machine '
+        'Creating VM with Name:testinggcloud, Zone:central2-a, Machine '
         'Type:n1-standard-1, Disk Size(GB):100, Preemptible:False, '
         'Network:default\n'
-        'SSH to GCE VM:testinggcloud\n')
+        'SSH to VM:testinggcloud\n')
 
     self.AssertErrEquals(expected_responses, normalize_space=True)
 
@@ -245,9 +260,19 @@ class CreateDryRun(base.TpuUnitTestBase):
       compute tpus execution-groups create --name testinggcloud --dry-run --vm-only --zone central2-a --accelerator-type v3-8 --tf-version='1.6' --machine-type=n1-standard-1 --disk-size='100GB'
     """)
     expected_responses = (
-        'Creating GCE VM with Name:testinggcloud, Zone:central2-a, Machine '
+        'Creating VM with Name:testinggcloud, Zone:central2-a, Machine '
         'Type:n1-standard-1, Disk Size(GB):100, Preemptible:False, '
         'Network:default\n'
-        'SSH to GCE VM:testinggcloud\n')
+        'SSH to VM:testinggcloud\n')
+
+    self.AssertErrEquals(expected_responses, normalize_space=True)
+
+  def testCreateDryRunTpuOnly(self):
+    self.Run("""
+      compute tpus execution-groups create --name testinggcloud --dry-run --tpu-only --zone central2-a --accelerator-type v3-8 --tf-version='1.6' --machine-type=n1-standard-1 --disk-size='100GB'
+    """)
+    expected_responses = (
+        'Creating TPU with Name:testinggcloud, Accelerator type:v3-8, '
+        'TF version:1.6, Zone:central2-a, Network:default\n')
 
     self.AssertErrEquals(expected_responses, normalize_space=True)

@@ -192,6 +192,17 @@ actions:
             - privateca.certificates.create
     - api_call:
         expect_request:
+          uri: https://privateca.googleapis.com/v1beta1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/foo/locations/us-east1/certificateAuthorities/prod-root
+            state: ENABLED
+    - api_call:
+        expect_request:
           uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json&projection=full
           method: GET
           body: null
@@ -428,7 +439,7 @@ actions:
                 includeCaCertUrl: true
                 includeCrlAccessUrl: true
               type: SUBORDINATE
-              lifetime: 315569261s
+              lifetime: 94670778s
         return_response:
           headers:
             cache-control: private
@@ -486,7 +497,7 @@ actions:
             text:
               matches: .*projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-ca-id$$/certificates/subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}.*
             json:
-              lifetime: 315569261s
+              lifetime: 94670778s
         return_response:
           headers:
             status: '200'
@@ -518,7 +529,6 @@ actions:
               cdfxf+99tenQXw24EifjaEbGAT7zu23MRJAMpt7lacPgdcKtZNLXlzcS/RGenjMN
               YhSedspfcIJw/STP
               -----END CERTIFICATE-----
-            lifetime: P30D
             pemCertificateChain:
             - |
               -----BEGIN CERTIFICATE-----

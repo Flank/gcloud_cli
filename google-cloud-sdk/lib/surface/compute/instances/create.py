@@ -182,7 +182,7 @@ def _CommonArgs(parser,
 class Create(base.CreateCommand):
   """Create Compute Engine virtual machine instances."""
 
-  _support_regional = False
+  _support_regional = True
   _support_kms = True
   _support_nvdimm = False
   _support_public_dns = False
@@ -192,7 +192,6 @@ class Create(base.CreateCommand):
   _support_location_hint = False
   _support_source_snapshot_csek = False
   _support_image_csek = False
-  _support_confidential_compute = False
   _support_post_key_revocation_action_type = False
   _support_rsa_encrypted = False
   _deprecate_maintenance_policy = False
@@ -208,7 +207,8 @@ class Create(base.CreateCommand):
         parser,
         enable_kms=cls._support_kms,
         support_multi_writer=False,
-        support_replica_zones=cls._support_replica_zones)
+        support_replica_zones=cls._support_replica_zones,
+        enable_regional=cls._support_regional)
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -216,6 +216,7 @@ class Create(base.CreateCommand):
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
     instances_flags.AddPrivateIpv6GoogleAccessArg(parser,
                                                   utils.COMPUTE_GA_API_VERSION)
+    instances_flags.AddConfidentialComputeArgs(parser)
 
   def Collection(self):
     return 'compute.instances'
@@ -268,7 +269,6 @@ class Create(base.CreateCommand):
         support_public_dns=self._support_public_dns)
 
     confidential_vm = (
-        self._support_confidential_compute and
         args.IsSpecified('confidential_compute') and args.confidential_compute)
 
     create_boot_disk = not (
@@ -281,10 +281,9 @@ class Create(base.CreateCommand):
     shielded_instance_config = create_utils.BuildShieldedInstanceConfigMessage(
         messages=compute_client.messages, args=args)
 
-    if self._support_confidential_compute:
-      confidential_instance_config = (
-          create_utils.BuildConfidentialInstanceConfigMessage(
-              messages=compute_client.messages, args=args))
+    confidential_instance_config = (
+        create_utils.BuildConfidentialInstanceConfigMessage(
+            messages=compute_client.messages, args=args))
 
     csek_keys = csek_utils.CsekKeyStore.FromArgs(args,
                                                  self._support_rsa_encrypted)
@@ -386,7 +385,7 @@ class Create(base.CreateCommand):
       if shielded_instance_config:
         instance.shieldedInstanceConfig = shielded_instance_config
 
-      if self._support_confidential_compute and confidential_instance_config:
+      if confidential_instance_config:
         instance.confidentialInstanceConfig = confidential_instance_config
 
       if self._support_erase_vss and \
@@ -516,7 +515,6 @@ class CreateBeta(Create):
   _support_location_hint = False
   _support_source_snapshot_csek = False
   _support_image_csek = False
-  _support_confidential_compute = True
   _support_post_key_revocation_action_type = False
   _support_rsa_encrypted = True
   _deprecate_maintenance_policy = False
@@ -576,7 +574,6 @@ class CreateAlpha(CreateBeta):
   _support_location_hint = True
   _support_source_snapshot_csek = True
   _support_image_csek = True
-  _support_confidential_compute = True
   _support_post_key_revocation_action_type = True
   _support_rsa_encrypted = True
   _deprecate_maintenance_policy = True
@@ -613,7 +610,7 @@ class CreateAlpha(CreateBeta):
     instances_flags.AddPostKeyRevocationActionTypeArgs(parser)
     instances_flags.AddPrivateIpv6GoogleAccessArg(
         parser, utils.COMPUTE_ALPHA_API_VERSION)
-    instances_flags.AddMaintenanceFreezeDuration(parser)
+    instances_flags.AddStableFleetArgs(parser)
     instances_flags.AddNestedVirtualizationArgs(parser)
 
 

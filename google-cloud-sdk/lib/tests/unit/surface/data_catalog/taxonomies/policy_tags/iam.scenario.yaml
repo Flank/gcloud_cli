@@ -1,5 +1,5 @@
 title: Data Catalog entry group IAM tests.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -57,6 +57,7 @@ actions:
     track_values:
       BETA: v1beta1
       ALPHA: v1beta1
+      GA: v1beta1
 - execute_command:
     command: data-catalog taxonomies policy-tags get-iam-policy 1601166323019705232
       --taxonomy=6748589401169165287 --location=us

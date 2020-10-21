@@ -11,7 +11,7 @@ gcloud compute networks update \- update a Compute Engine network
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-mtu\fR=\fIMTU\fR] [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,6 +38,13 @@ Name of the network to operate on.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-mtu\fR=\fIMTU\fR
+Maximum transmission unit (MTU) is the size of the largest IP packet that can be
+transmitted on this network. Default value is 1460 bytes, and the maximum is
+1500 bytes. The MTU advertised via DHCP to all instances attached to this
+network.
 
 .TP 2m
 

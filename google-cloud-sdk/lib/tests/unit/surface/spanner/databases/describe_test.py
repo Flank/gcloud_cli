@@ -38,6 +38,11 @@ class DatabasesDescribeTest(base.SpannerTestBase):
     self.client.projects_instances_databases.Get.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesGetRequest(
             name=self.db_ref.RelativeName()),
-        response=self.msgs.Database(name='reallymydb'))
+        response=self.msgs.Database(
+            name='reallymydb',
+            state=self.msgs.Database.StateValueValuesEnum.READY,
+            createTime='2020-01-02T03:04:05.678901Z'))
     self.Run('spanner databases describe mydb --instance myins')
-    self.AssertOutputContains('reallymydb')
+    self.AssertOutputContains('name: reallymydb')
+    self.AssertOutputContains('state: READY')
+    self.AssertOutputContains('createTime: \'2020-01-02T03:04:05.678901Z\'')

@@ -16,6 +16,10 @@ $schema: "http://json-schema.org/draft-06/schema#"
 
 definitions:
 
+  release_tracks:
+    type: string
+    enum: [ALPHA, BETA, GA]
+
   #############################################################################
   # Assertion Primitives                                                      #
   #############################################################################
@@ -441,6 +445,8 @@ definitions:
       # The full command line you want to run (excluding 'gcloud' and the
       # release track). (ex 'iot registries describe my-registry')
       command: {type: string}
+      # If set, use this release track instead of the release track.
+      track: {$ref: "#/definitions/release_tracks"}
       # If set, only retry a maximum of this number of times.
       retries: {type: integer}
       # The total number of seconds this is allowed to wait before timing out.
@@ -487,6 +493,9 @@ definitions:
       # The full command line you want to run (excluding 'gcloud' and the
       # release track). (ex 'iot registries describe my-registry')
       command: {type: string}
+
+      # If set, use this release track instead of the release track.
+      track: {$ref: "#/definitions/release_tracks"}
 
       # The reference of the generated resource id that this command is the
       # cleanup step for.
@@ -666,7 +675,7 @@ properties:
 
   release_tracks:
     type: array
-    items: {enum: [ALPHA, BETA, GA]}
+    items: {$ref: "#/definitions/release_tracks"}
 
   actions:
     type: array

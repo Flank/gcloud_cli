@@ -51,12 +51,13 @@ EXAMPLES
     'my-workload-identity-pool-provider':
 
         $ gcloud alpha iam workload-identity-pools providers delete \
-            my-workload-identity-pool-provider --location global
+            my-workload-identity-pool-provider --location=global
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access allowlist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta iam workload-identity-pools providers delete
 

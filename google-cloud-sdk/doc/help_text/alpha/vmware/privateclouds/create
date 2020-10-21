@@ -10,7 +10,9 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a VMware Engine private cloud.
+    (ALPHA) Create a VMware Engine private cloud. Private cloud creation is
+    considered finished when the private cloud is in READY state. Check the
+    progress of a private cloud using gcloud alpha vmware privateclouds list.
 
 POSITIONAL ARGUMENTS
      Privatecloud resource - privatecloud. The arguments in this group can be
@@ -27,23 +29,23 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --location=LOCATION
-          Location of the privatecloud or cluster.
+          Region of the private cloud or cluster.
 
 REQUIRED FLAGS
      --management-ip-range=MANAGEMENT_IP_RANGE
-        ip addresses range available to the privatecloud for management access,
-        in address/mask format, e.g. 10.0.1.0/29
+        IP address range available to the private cloud for management access,
+        in address/mask format. For example, --management-ip-range=10.0.1.0/29.
 
      --vpc-network=VPC_NETWORK
-        Name of the virtual network for this privatecloud
+        Name of the virtual network for this private cloud
 
      --workload-ip-range=WORKLOAD_IP_RANGE
-        ip addresses range available to the privatecloud in address/mask
-        format, e.g. 10.0.1.0/29
+        IP address range available to the private cloud in address/mask format.
+        For example, --workload-ip-range=10.0.1.0/29.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
-        Text describing the privatecloud
+        Text describing the private cloud
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

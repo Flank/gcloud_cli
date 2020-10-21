@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha kuberun core revisions - create and manage Knative revisions
+        on Kubernetes clusters
+
+SYNOPSIS
+    gcloud alpha kuberun core revisions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This set of commands can be used deploy or update a Knative
+    revision.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Deletes a Knative revision.
+
+     describe
+        (ALPHA) Describes a Knative revision.
+
+     list
+        (ALPHA) Lists revisions in a Knative cluster.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

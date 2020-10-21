@@ -24,11 +24,20 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     create
+        Create a new group.
+
      delete
         Delete an existing group.
 
      describe
         Describe an existing group.
+
+     search
+        Searches for Groups matching a specified query.
+
+     update
+        Update a group.
 
 NOTES
     These variants are also available:

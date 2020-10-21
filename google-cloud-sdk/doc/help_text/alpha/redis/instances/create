@@ -5,10 +5,11 @@ SYNOPSIS
     gcloud alpha redis instances create (INSTANCE : --region=REGION)
         [--alternative-zone=ALTERNATIVE_ZONE] [--async]
         [--connect-mode=CONNECT_MODE] [--display-name=DISPLAY_NAME]
-        [--labels=[KEY=VALUE,...]] [--network=NETWORK; default="default"]
-        [--redis-config=KEY=VALUE] [--redis-version=VERSION]
-        [--reserved-ip-range=RESERVED_IP_RANGE] [--size=SIZE; default=1]
-        [--tier=TIER; default="basic"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--enable-auth] [--labels=[KEY=VALUE,...]]
+        [--network=NETWORK; default="default"] [--redis-config=KEY=VALUE]
+        [--redis-version=VERSION] [--reserved-ip-range=RESERVED_IP_RANGE]
+        [--size=SIZE; default=1] [--tier=TIER; default="basic"] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new Redis instance.
@@ -52,6 +53,9 @@ FLAGS
 
      --display-name=DISPLAY_NAME
         A human-readable name for the instance.
+
+     --enable-auth
+        Enables Redis AUTH for the instance. If omitted AUTH is disabled.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

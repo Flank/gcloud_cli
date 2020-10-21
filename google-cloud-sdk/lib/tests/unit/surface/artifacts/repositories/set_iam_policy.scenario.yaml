@@ -47,7 +47,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -60,7 +60,7 @@ actions:
               locationId: us
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us/repositories/my-repo:setIamPolicy?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us/repositories/my-repo:setIamPolicy?alt=json
           method: POST
           body:
             json:

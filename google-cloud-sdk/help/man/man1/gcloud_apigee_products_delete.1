@@ -1,0 +1,92 @@
+
+.TH "GCLOUD_APIGEE_PRODUCTS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud apigee products delete \- delete an Apigee API product
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud apigee products delete\fR (\fIPRODUCT\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Delete an Apigee API product.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+API product resource \- API product to be deleted. To get a list of available
+API products, run:
+
+$ gcloud apigee products list
+
+The arguments in this group can be used to specify the attributes of this
+resource. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIPRODUCT\fR
+ID of the API product or fully qualified identifier for the API product. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Apigee organization containing the API product. If unspecified, the Cloud
+Platform project's associated organization will be used.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an API product called \f5\fIproduct\-name\fR\fR from the active Cloud
+Platform project, run:
+
+.RS 2m
+$ gcloud apigee products delete product\-name
+.RE
+
+To delete an API product called \f5\fIother\-product\fR\fR from an Apigee
+organization called \f5\fIorg\-name\fR\fR, run:
+
+.RS 2m
+$ gcloud apigee products delete other\-product \-\-organization=org\-name
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha apigee products delete
+$ gcloud beta apigee products delete
+.RE
+

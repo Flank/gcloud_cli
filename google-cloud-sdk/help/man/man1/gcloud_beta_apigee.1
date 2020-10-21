@@ -1,0 +1,112 @@
+
+.TH "GCLOUD_BETA_APIGEE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta apigee \- manage Apigee resources
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta apigee\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Manage Apigee resources.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBapis\fR
+\fB(BETA)\fR Manage Apigee API proxies.
+
+.TP 2m
+\fBapplications\fR
+\fB(BETA)\fR Manage third\-party applications which call Apigee API proxies.
+
+.TP 2m
+\fBdeployments\fR
+\fB(BETA)\fR Manage deployments of Apigee API proxies in runtime environments.
+
+.TP 2m
+\fBdevelopers\fR
+\fB(BETA)\fR Manage Apigee developers.
+
+.TP 2m
+\fBenvironments\fR
+\fB(BETA)\fR Manage Apigee environments.
+
+.TP 2m
+\fBorganizations\fR
+\fB(BETA)\fR Manage Apigee organizations.
+
+.TP 2m
+\fBproducts\fR
+\fB(BETA)\fR Manage Apigee API products.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To list API proxies in the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud beta apigee apis list
+.RE
+
+To deploy an API proxy named \f5\fIhello\-world\fR\fR to the \f5\fItest\fR\fR
+environment, run:
+
+.RS 2m
+$ gcloud beta apigee apis deploy \-\-environment=test \-\-api=hello\-world
+.RE
+
+To get the status of that deployment, run:
+
+.RS 2m
+$ gcloud beta apigee deployments describe \-\-environment=test \e
+    \-\-api=hello\-world
+.RE
+
+To undeploy that API proxy, run:
+
+.RS 2m
+$ gcloud beta apigee apis undeploy \-\-environment=test \e
+    \-\-api=hello\-world
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud apigee
+$ gcloud alpha apigee
+.RE
+

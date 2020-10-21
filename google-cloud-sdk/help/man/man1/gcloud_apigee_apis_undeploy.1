@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_APIGEE_APIS_UNDEPLOY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud apigee apis undeploy \- undeploy an Apigee API proxy from an environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud apigee apis undeploy\fR [[\fIREVISION\fR]\ \fB\-\-api\fR=\fIAPI\fR\ \fB\-\-environment\fR=\fIENVIRONMENT\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Undeploy an Apigee API proxy from an environment.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Revision resource \- API proxy revision to be undeployed and environment from
+which it should be removed. Revisions can either be a positive revision number,
+or the special value \f5\fIauto\fR\fR, which will undeploy whatever revision is
+currently deployed. If revision is unspecified, the default is \f5\fIauto\fR\fR.
+The arguments in this group can be used to specify the attributes of this
+resource.
+
+
+.RS 2m
+.TP 2m
+[\fIREVISION\fR]
+ID of the revision or fully qualified identifier for the revision.
+
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+API proxy to be undeployed. Must currently be deployed. To get a list of
+available deployed proxies, run \f5gcloud apigee deployments list
+\-\-environment=ENV\fR.
+
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+Environment from which to undeploy the API proxy. To get a list of available
+environments, run \f5gcloud apigee environments list\fR.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Apigee organization of the proxy and environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To undeploy an API proxy called \f5\fImy\-api\fR\fR from the \f5\fItest\fR\fR
+environment of the active Cloud Platform project, run:
+
+.RS 2m
+$ gcloud apigee apis undeploy \-\-environment=test \-\-api=my\-api
+.RE
+
+To undeploy revision 3 of an \f5my\-api\fR from the \f5test\fR environment of
+the organization named \f5\fItest\-org\fR\fR, run:
+
+.RS 2m
+$ gcloud apigee apis undeploy 3 \-\-organization=test\-org \e
+    \-\-environment=test \-\-api=my\-api
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha apigee apis undeploy
+$ gcloud beta apigee apis undeploy
+.RE
+

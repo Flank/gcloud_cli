@@ -24,7 +24,7 @@ summary:
 - execute:
   - label: List dashboards with an invalid project
   - command: monitoring dashboards list --project=nonexistent-project-id
-  - error: '1: Project [nonexistent-project-id] not found: Requested entity was not
+  - error: '1: Projects instance [nonexistent-project-id] not found: Requested entity was not
       found.'
 actions:
 - execute_command:
@@ -111,5 +111,5 @@ actions:
             }
     - expect_exit:
         code: 1
-        message: 'Project [nonexistent-project-id] not found: Requested entity was
+        message: 'Projects instance [nonexistent-project-id] not found: Requested entity was
           not found.'

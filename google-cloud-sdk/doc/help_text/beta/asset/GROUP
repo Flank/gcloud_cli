@@ -28,7 +28,7 @@ COMMANDS
     COMMAND is one of the following:
 
      analyze-iam-policy
-        (BETA) Analyzes accessible IAM policies that match a request.
+        (BETA) Analyzes IAM policies that match a request.
 
      export
         (BETA) Export the cloud assets to Google Cloud Storage.

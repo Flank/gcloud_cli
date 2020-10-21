@@ -223,6 +223,7 @@ class TriggerTestBeta(DeployE2ETestBaseBeta):
         self.Run('functions call {}'.format(function_name))
         self.AssertOutputContains('Hello World!')
 
+  @test_case.Filters.skip('failed on loading user code', 'b/170461055')
   def testPubSubTrigger(self):
     """Test PubSub Example."""
     with self._DeployFunction(
@@ -239,6 +240,7 @@ class TriggerTestBeta(DeployE2ETestBaseBeta):
       self.assertTrue(call_result)
       self.assertTrue(call_result.executionId)
 
+  @test_case.Filters.skip('failed on loading user code', 'b/170461055')
   def testStorageTrigger(self):
     with self._DeployFunction(
         source=self.function_path,

@@ -8,7 +8,7 @@ summary:
       done: true
       name: projects/fake-project/locations/us/operations/13166c87-a9c0-4b5f-8ccf-c5343a93eb2b
       response:
-        '@type': type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository
+        '@type': type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository
         format: MAVEN
         name: projects/fake-project/locations/us/repositories/test-repo1
 actions:
@@ -17,7 +17,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -30,7 +30,7 @@ actions:
               locationId: us
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/operations/13166c87-a9c0-4b5f-8ccf-c5343a93eb2b?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/operations/13166c87-a9c0-4b5f-8ccf-c5343a93eb2b?alt=json
           method: GET
           headers: {}
           body: null
@@ -42,7 +42,7 @@ actions:
              "name": "projects/fake-project/locations/us/operations/13166c87-a9c0-4b5f-8ccf-c5343a93eb2b",
              "done": true,
              "response": {
-              "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+              "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
               "format": "MAVEN",
               "name": "projects/fake-project/locations/us/repositories/test-repo1"
               }
@@ -51,7 +51,7 @@ actions:
         done: true
         name: projects/fake-project/locations/us/operations/13166c87-a9c0-4b5f-8ccf-c5343a93eb2b
         response:
-          '@type': type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository
+          '@type': type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository
           format: MAVEN
           name: projects/fake-project/locations/us/repositories/test-repo1
     - expect_exit:

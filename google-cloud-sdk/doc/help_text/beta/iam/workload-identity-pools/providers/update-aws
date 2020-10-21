@@ -176,13 +176,13 @@ EXAMPLES
             --display-name='My workload pool provider' \
             --description='My workload pool provider description' \
             --disabled \
-            --atribute-mapping='google.subject=assertion.arn' \
+            --attribute-mapping='google.subject=assertion.arn' \
             --attribute-condition='true' \
-            --account-id=1234567890 \
-            --sts-uri=https://sts.amazonaws.com
+            --account-id=1234567890
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha iam workload-identity-pools providers update-aws
 

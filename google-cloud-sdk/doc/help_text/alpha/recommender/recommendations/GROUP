@@ -23,10 +23,10 @@ COMMANDS
         (ALPHA) Describe a recommendation for a Cloud project.
 
      list
-        (ALPHA) Lists recommendations for a Cloud project.
+        (ALPHA) List operations for a recommendation.
 
      mark-active
-        (ALPHA) Mark a recommendation's state as ACTIVE.
+        (ALPHA) Mark Active operations for a recommendation.
 
      mark-claimed
         (ALPHA) Mark a recommendation's state as CLAIMED.

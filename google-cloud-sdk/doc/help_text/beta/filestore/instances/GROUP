@@ -32,7 +32,7 @@ COMMANDS
         (BETA) List Cloud Filestore instances.
 
      restore
-        (BETA) Restore a Cloud Filestore instance to a backup.
+        (BETA) Restore a Cloud Filestore instance from a backup.
 
      update
         (BETA) Update a Cloud Filestore instance.

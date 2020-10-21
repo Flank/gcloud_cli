@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha admin-service-cluster instances create
-        (NAME : --location=LOCATION) [--async] [--git-branch=GIT_BRANCH]
-        [--git-policy-dir=GIT_POLICY_DIR] [--git-secret-type=GIT_SECRET_TYPE]
-        [--git-sync-repo=GIT_SYNC_REPO]
+        (NAME : --location=LOCATION) --bundles=[BUNDLE,...] [--async]
+        [--git-branch=GIT_BRANCH] [--git-policy-dir=GIT_POLICY_DIR]
+        [--git-secret-type=GIT_SECRET_TYPE] [--git-sync-repo=GIT_SYNC_REPO]
         [--master-ipv4-cidr-block=MASTER_IPV4_CIDR_BLOCK]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -32,7 +32,12 @@ POSITIONAL ARGUMENTS
           The name of the Admin Service Cluster instance location. Currently,
           only us-central1 is supported.
 
-FLAGS
+REQUIRED FLAGS
+     --bundles=[BUNDLE,...]
+        Bundles that should be enabled. Exactly one bundle must be enabled.
+        BUNDLE must be one of: Anthos, Yakima.
+
+OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.

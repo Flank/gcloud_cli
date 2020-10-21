@@ -104,27 +104,6 @@ class IamCompletersTest(completer_test_base.CompleterBase):
         [],
         completer.Complete('x', self.parameter_info))
 
-  def testFoldersIamRolesCompleter(self):
-    completer = self.Completer(
-        completers.FoldersIamRolesCompleter,
-        args={'id': completer_test_data.FolderUri('my_a_folder')},
-        command_resources=_COMMAND_RESOURCES)
-    self._CommonAssertions(completer)
-
-  def testOrganizationsIamRolesCompleter(self):
-    completer = self.Completer(
-        completers.OrganizationsIamRolesCompleter,
-        args={'id': completer_test_data.OrganizationUri('007')},
-        command_resources=_COMMAND_RESOURCES)
-    self._CommonAssertions(completer)
-
-  def testProjectsIamRolesCompleter(self):
-    completer = self.Completer(
-        completers.ProjectsIamRolesCompleter,
-        args={'id': completer_test_data.PROJECT_URIS[0]},
-        command_resources=_COMMAND_RESOURCES)
-    self._CommonAssertions(completer)
-
 
 if __name__ == '__main__':
   test_case.main()

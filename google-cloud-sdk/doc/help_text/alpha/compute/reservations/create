@@ -7,6 +7,7 @@ SYNOPSIS
         (--machine-type=MACHINE_TYPE --vm-count=VM_COUNT
           : --accelerator=[count=COUNT],[type=TYPE]
           --local-ssd=[interface=INTERFACE],[size=SIZE]
+          --maintenance-freeze-duration=MAINTENANCE_FREEZE_DURATION
           --min-cpu-platform=MIN_CPU_PLATFORM --require-specific-reservation)
         [--description=DESCRIPTION] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
@@ -56,6 +57,11 @@ REQUIRED FLAGS
           more guest operating systems. NVME may provide higher performance.
        size
           The size of the local SSD in base-2 GB.
+       --maintenance-freeze-duration=MAINTENANCE_FREEZE_DURATION
+          Specifies the amount of hours after instance creation where the
+          instance won't be scheduled for maintenance, e.g. 4h, 2d6h. See $
+          gcloud topic datetimes for information on duration formats.
+
        --min-cpu-platform=MIN_CPU_PLATFORM
           Optional minimum CPU platform of the reservation to create.
 

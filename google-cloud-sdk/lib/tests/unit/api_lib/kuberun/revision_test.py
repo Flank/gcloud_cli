@@ -153,16 +153,6 @@ class RevisionTest(test_case.TestCase):
             }
         }).creation_timestamp, "2019-05-20T18:26:35.210Z")
 
-  def testLastModifier(self):
-    self.assertEqual(
-        revision.Revision({
-            "metadata": {
-                "annotations": {
-                    "serving.knative.dev/lastModifier": "foo@example.com"
-                }
-            }
-        }).last_modifier, "foo@example.com")
-
   def testServiceName(self):
     self.assertEqual(
         revision.Revision({
@@ -179,7 +169,7 @@ class RevisionTest(test_case.TestCase):
             "status": {
                 "conditions": [{
                     "type": "Active",
-                    "status": True
+                    "status": "True"
                 }]
             }
         }).active, True)
@@ -190,7 +180,7 @@ class RevisionTest(test_case.TestCase):
             "status": {
                 "conditions": [{
                     "type": "Ready",
-                    "status": False
+                    "status": "False"
                 }]
             }
         }).ReadySymbolAndColor(), ("!", "yellow"))

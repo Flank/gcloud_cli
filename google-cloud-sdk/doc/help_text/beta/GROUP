@@ -137,6 +137,12 @@ GROUPS
      anthos
         (BETA) Anthos command Group.
 
+     api-gateway
+        (BETA) Manage Cloud API Gateway resources.
+
+     apigee
+        (BETA) Manage Apigee resources.
+
      app
         (BETA) Manage your App Engine deployments.
 
@@ -213,6 +219,9 @@ GROUPS
      error-reporting
         (BETA) Manage Stackdriver Error Reporting.
 
+     eventarc
+        (BETA) Manage Eventarc resources.
+
      events
         (BETA) Manage your Cloud Run for Anthos Events resources.
 
@@ -278,6 +287,9 @@ GROUPS
 
      policy-troubleshoot
         (BETA) Troubleshoot Google Cloud Platform policies.
+
+     privateca
+        (BETA) Manage private Certificate Authorities on Google Cloud.
 
      projects
         (BETA) Create and manage project access policies.

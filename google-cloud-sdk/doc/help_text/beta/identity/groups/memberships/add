@@ -4,8 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud beta identity groups memberships add --group-email=GROUP_EMAIL
-        --member-email=MEMBER_EMAIL --organization=ORGANIZATION
-        [--expiration=EXPIRATION] [--roles=[ROLES,...]] [GCLOUD_WIDE_FLAG ...]
+        --member-email=MEMBER_EMAIL [--expiration=EXPIRATION]
+        [--organization=ORGANIZATION] [--roles=[ROLES,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create a new membership in an existing group.
@@ -17,18 +18,18 @@ REQUIRED FLAGS
      --member-email=MEMBER_EMAIL
         The email address of the group or user being added to a group.
 
-     --organization=ORGANIZATION
-        The organization of the group the new membership is being added to.
-
 OPTIONAL FLAGS
      --expiration=EXPIRATION
         Optional time of expiration for the membership. This is given as a
         duration from now, for example '30d', '6m', '3y' for 30 days, 6 months,
         or 3 years respectively.
 
+     --organization=ORGANIZATION
+        The organization ID of the group the new membership is being added to.
+
      --roles=[ROLES,...]
-        A comma-separated list of roles for the membership within the Group. If
-        not specified, MEMBER will be used as a default value.
+        A comma-separated list of roles for a member within the Group. If not
+        specified, MEMBER will be used as a default value.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -47,12 +48,12 @@ EXAMPLES
 
         $ gcloud beta identity groups memberships add \
             --group-email="eng-discuss@foo.com"  \
-            --organization="5149234212"  \
             --member-email="user@foo.com"
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud identity groups memberships add
         $ gcloud alpha identity groups memberships add
 

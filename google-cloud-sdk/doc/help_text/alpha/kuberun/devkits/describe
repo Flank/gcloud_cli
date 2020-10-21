@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha kuberun devkits describe - describe a Development Kit
+
+SYNOPSIS
+    gcloud alpha kuberun devkits describe DEVKIT [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe a Development Kit.
+
+POSITIONAL ARGUMENTS
+     DEVKIT
+        The Development Kit to show details for.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To show all the data about a Development Kit, run:
+
+        $ gcloud alpha kuberun devkits describe
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

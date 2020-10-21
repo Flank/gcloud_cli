@@ -24,7 +24,7 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --location=LOCATION
-          Location of the privatecloud or cluster.
+          Region of the private cloud or cluster.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -45,7 +45,7 @@ EXAMPLES
 
         $ gcloud alpha vmware privateclouds delete my-privatecloud
 
-    In the first example, the project and location are taken from gcloud
+    In the second example, the project and location are taken from gcloud
     properties core/project and vmware/location.
 
 NOTES

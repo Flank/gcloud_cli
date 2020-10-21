@@ -17,7 +17,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -33,7 +33,7 @@ actions:
           my-repo, package @cba/my-pkg..*
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/@cba%252Fmy-pkg/versions?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo/packages/@cba%252Fmy-pkg/versions?alt=json
           method: GET
           headers: {}
           body: null
@@ -57,7 +57,7 @@ actions:
               createTime: '2019-04-10T22:08:46.246729Z'
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/@cba%252Fmy-pkg/versions?alt=json&pageToken=asdf
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo/packages/@cba%252Fmy-pkg/versions?alt=json&pageToken=asdf
           method: GET
           headers: {}
           body: null

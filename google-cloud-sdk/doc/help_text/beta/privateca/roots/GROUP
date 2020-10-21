@@ -55,7 +55,5 @@ COMMANDS
         (BETA) Update an existing root certificate authority.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

@@ -322,7 +322,15 @@ class Cluster(_messages.Message):
       zones#available) in which the cluster resides.
     locations: The list of Google Compute Engine
       [zones](https://cloud.google.com/compute/docs/zones#available) in which
-      the cluster's nodes should be located.
+      the cluster's nodes should be located. This field provides a default
+      value if [NodePool.Locations](https://cloud.google.com/kubernetes-engine
+      /docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.F
+      IELDS.locations) are not specified during node pool creation. Warning:
+      changing cluster locations will update the
+      [NodePool.Locations](https://cloud.google.com/kubernetes-engine/docs/ref
+      erence/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.loc
+      ations) of all node pools and will result in nodes being added and/or
+      removed.
     loggingService: The logging service the cluster should use to write logs.
       Currently available options: * `logging.googleapis.com/kubernetes` - The
       Cloud Logging service with a Kubernetes-native resource model *
@@ -560,10 +568,10 @@ class ClusterUpdate(_messages.Message):
       visibility.
     desiredLocations: The desired list of Google Compute Engine
       [zones](https://cloud.google.com/compute/docs/zones#available) in which
-      the cluster's nodes should be located. Changing the locations a cluster
-      is in will result in nodes being either created or removed from the
-      cluster, depending on whether locations are being added or removed. This
-      list must always include the cluster's primary zone.
+      the cluster's nodes should be located. This list must always include the
+      cluster's primary zone. Warning: changing cluster locations will update
+      the locations of all node pools and will result in nodes being added
+      and/or removed.
     desiredLoggingService: The logging service the cluster should use to write
       logs. Currently available options: * `logging.googleapis.com/kubernetes`
       - The Cloud Logging service with a Kubernetes-native resource model *
@@ -1828,12 +1836,12 @@ class NodeConfig(_messages.Message):
       ensure-gke-docker" - "gci-metrics-enabled" - "gci-update-strategy" -
       "instance-template" - "kube-env" - "startup-script" - "user-data" -
       "disable-address-manager" - "windows-startup-script-ps1" - "common-psm1"
-      - "k8s-node-setup-psm1" - "install-ssh-psm1" - "user-profile-psm1" -
-      "serial-port-logging-enable" Values are free-form strings, and only have
-      meaning as interpreted by the image running in the instance. The only
-      restriction placed on them is that each value's size must be less than
-      or equal to 32 KB. The total size of all keys and values must be less
-      than 512 KB.
+      - "k8s-node-setup-psm1" - "install-ssh-psm1" - "user-profile-psm1" The
+      following keys are reserved for Windows nodes: - "serial-port-logging-
+      enable" Values are free-form strings, and only have meaning as
+      interpreted by the image running in the instance. The only restriction
+      placed on them is that each value's size must be less than or equal to
+      32 KB. The total size of all keys and values must be less than 512 KB.
 
   Fields:
     accelerators: A list of hardware accelerators to be attached to each node.
@@ -1878,12 +1886,12 @@ class NodeConfig(_messages.Message):
       ensure-gke-docker" - "gci-metrics-enabled" - "gci-update-strategy" -
       "instance-template" - "kube-env" - "startup-script" - "user-data" -
       "disable-address-manager" - "windows-startup-script-ps1" - "common-psm1"
-      - "k8s-node-setup-psm1" - "install-ssh-psm1" - "user-profile-psm1" -
-      "serial-port-logging-enable" Values are free-form strings, and only have
-      meaning as interpreted by the image running in the instance. The only
-      restriction placed on them is that each value's size must be less than
-      or equal to 32 KB. The total size of all keys and values must be less
-      than 512 KB.
+      - "k8s-node-setup-psm1" - "install-ssh-psm1" - "user-profile-psm1" The
+      following keys are reserved for Windows nodes: - "serial-port-logging-
+      enable" Values are free-form strings, and only have meaning as
+      interpreted by the image running in the instance. The only restriction
+      placed on them is that each value's size must be less than or equal to
+      32 KB. The total size of all keys and values must be less than 512 KB.
     minCpuPlatform: Minimum CPU platform to be used by this instance. The
       instance may be scheduled on the specified or newer CPU platform.
       Applicable values are the friendly names of CPU platforms, such as
@@ -1974,11 +1982,12 @@ class NodeConfig(_messages.Message):
     "gci-metrics-enabled" - "gci-update-strategy" - "instance-template" -
     "kube-env" - "startup-script" - "user-data" - "disable-address-manager" -
     "windows-startup-script-ps1" - "common-psm1" - "k8s-node-setup-psm1" -
-    "install-ssh-psm1" - "user-profile-psm1" - "serial-port-logging-enable"
-    Values are free-form strings, and only have meaning as interpreted by the
-    image running in the instance. The only restriction placed on them is that
-    each value's size must be less than or equal to 32 KB. The total size of
-    all keys and values must be less than 512 KB.
+    "install-ssh-psm1" - "user-profile-psm1" The following keys are reserved
+    for Windows nodes: - "serial-port-logging-enable" Values are free-form
+    strings, and only have meaning as interpreted by the image running in the
+    instance. The only restriction placed on them is that each value's size
+    must be less than or equal to 32 KB. The total size of all keys and values
+    must be less than 512 KB.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -2071,7 +2080,12 @@ class NodePool(_messages.Message):
       pool.
     locations: The list of Google Compute Engine
       [zones](https://cloud.google.com/compute/docs/zones#available) in which
-      the NodePool's nodes should be located.
+      the NodePool's nodes should be located. If this value is unspecified
+      during node pool creation, the
+      [Cluster.Locations](https://cloud.google.com/kubernetes-engine/docs/refe
+      rence/rest/v1/projects.locations.clusters#Cluster.FIELDS.locations)
+      value will be used, instead. Warning: changing node pool locations will
+      result in nodes being added and/or removed.
     management: NodeManagement configuration for this NodePool.
     maxPodsConstraint: The constraint on the maximum number of pods that can
       be run simultaneously on a node in the node pool.

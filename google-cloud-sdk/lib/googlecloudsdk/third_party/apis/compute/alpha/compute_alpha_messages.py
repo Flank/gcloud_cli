@@ -156,6 +156,7 @@ class AcceleratorTypeAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -181,22 +182,23 @@ class AcceleratorTypeAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -284,6 +286,7 @@ class AcceleratorTypeList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -309,22 +312,23 @@ class AcceleratorTypeList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -405,6 +409,7 @@ class AcceleratorTypesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -430,22 +435,23 @@ class AcceleratorTypesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -547,9 +553,11 @@ class AccessConfig(_messages.Message):
     ONE_TO_ONE_NAT.
 
     Values:
+      DIRECT_IPV6: <no description>
       ONE_TO_ONE_NAT: <no description>
     """
-    ONE_TO_ONE_NAT = 0
+    DIRECT_IPV6 = 0
+    ONE_TO_ONE_NAT = 1
 
   externalIpv6 = _messages.StringField(1)
   externalIpv6PrefixLength = _messages.IntegerField(2, variant=_messages.Variant.INT32)
@@ -910,6 +918,7 @@ class AddressAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -935,22 +944,23 @@ class AddressAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -1038,6 +1048,7 @@ class AddressList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -1063,22 +1074,23 @@ class AddressList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -1158,6 +1170,7 @@ class AddressesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -1183,22 +1196,23 @@ class AddressesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -2058,6 +2072,7 @@ class AutoscalerAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -2083,22 +2098,23 @@ class AutoscalerAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -2186,6 +2202,7 @@ class AutoscalerList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -2211,22 +2228,23 @@ class AutoscalerList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -2465,6 +2483,7 @@ class AutoscalersScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -2490,22 +2509,23 @@ class AutoscalersScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -3066,6 +3086,8 @@ class BackendBucket(_messages.Message):
       proxied responses.
     description: An optional textual description of the resource; provided by
       the client when the resource is created.
+    edgeSecurityPolicy: [Output Only] The resource URL for the edge security
+      policy associated with this backend bucket.
     enableCdn: If true, enable Cloud CDN for this BackendBucket.
     id: [Output Only] Unique identifier for the resource; defined by the
       server.
@@ -3087,12 +3109,13 @@ class BackendBucket(_messages.Message):
   creationTimestamp = _messages.StringField(3)
   customResponseHeaders = _messages.StringField(4, repeated=True)
   description = _messages.StringField(5)
-  enableCdn = _messages.BooleanField(6)
-  id = _messages.IntegerField(7, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(8, default='compute#backendBucket')
-  name = _messages.StringField(9)
-  selfLink = _messages.StringField(10)
-  selfLinkWithId = _messages.StringField(11)
+  edgeSecurityPolicy = _messages.StringField(6)
+  enableCdn = _messages.BooleanField(7)
+  id = _messages.IntegerField(8, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(9, default='compute#backendBucket')
+  name = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  selfLinkWithId = _messages.StringField(12)
 
 
 class BackendBucketCdnPolicy(_messages.Message):
@@ -3155,12 +3178,18 @@ class BackendBucketCdnPolicy(_messages.Message):
     negativeCaching: Negative caching allows per-status code TTLs to be set,
       in order to apply fine-grained caching for common errors or redirects.
       This can reduce the load on your origin and improve end-user experience
-      by reducing response latency. By default, Cloud CDN will apply the
-      following default TTLs to these status codes: HTTP 300 (Multiple
-      Choice), 301, 308 (Permanent Redirects): 10m HTTP 404 (Not Found), 410
-      (Gone), 451 (Unavailable For Legal Reasons): 120s HTTP 405 (Method Not
-      Found), 421 (Misdirected Request), 501 (Not Implemented): 60s These
-      defaults can be overridden in negative_caching_policy
+      by reducing response latency. When the cache mode is set to
+      CACHE_ALL_STATIC or USE_ORIGIN_HEADERS, negative caching applies to
+      responses with the specified response code that lack any Cache-Control,
+      Expires, or Pragma: no-cache directives. When the cache mode is set to
+      FORCE_CACHE_ALL, negative caching applies to all responses with the
+      specified response code, and override any caching headers. By default,
+      Cloud CDN will apply the following default TTLs to these status codes:
+      HTTP 300 (Multiple Choice), 301, 308 (Permanent Redirects): 10m HTTP 404
+      (Not Found), 410 (Gone), 451 (Unavailable For Legal Reasons): 120s HTTP
+      405 (Method Not Found), 421 (Misdirected Request), 501 (Not
+      Implemented): 60s. These defaults can be overridden in
+      negative_caching_policy.
     negativeCachingPolicy: Sets a cache TTL for the specified HTTP status
       code. negative_caching must be enabled to configure
       negative_caching_policy. Omitting the policy and leaving
@@ -3251,10 +3280,10 @@ class BackendBucketCdnPolicyNegativeCachingPolicy(_messages.Message):
     code: The HTTP status code to define a TTL against. Only HTTP status codes
       300, 301, 308, 404, 405, 410, 421, 451 and 501 are can be specified as
       values, and you cannot specify a status code more than once.
-    ttl: The TTL (in seconds) to cache responses with the corresponding status
-      code for. The maximum allowed value is 1800s (30 minutes), noting that
-      infrequently accessed objects may be evicted from the cache before the
-      defined TTL.
+    ttl: The TTL (in seconds) for which to cache responses with the
+      corresponding status code. The maximum allowed value is 1800s (30
+      minutes), noting that infrequently accessed objects may be evicted from
+      the cache before the defined TTL.
   """
 
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -3315,6 +3344,7 @@ class BackendBucketList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -3340,22 +3370,23 @@ class BackendBucketList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -3498,6 +3529,8 @@ class BackendService(_messages.Message):
       proxied responses.
     description: An optional description of this resource. Provide this
       property when you create the resource.
+    edgeSecurityPolicy: [Output Only] The resource URL for the edge security
+      policy associated with this backend service.
     enableCDN: If true, enables Cloud CDN for the backend service. Only
       applicable if the loadBalancingScheme is EXTERNAL and the protocol is
       HTTP or HTTPS.
@@ -3637,16 +3670,18 @@ class BackendService(_messages.Message):
 
     Values:
       EXTERNAL: <no description>
+      EXTERNAL_MANAGED: <no description>
       INTERNAL: <no description>
       INTERNAL_MANAGED: <no description>
       INTERNAL_SELF_MANAGED: <no description>
       INVALID_LOAD_BALANCING_SCHEME: <no description>
     """
     EXTERNAL = 0
-    INTERNAL = 1
-    INTERNAL_MANAGED = 2
-    INTERNAL_SELF_MANAGED = 3
-    INVALID_LOAD_BALANCING_SCHEME = 4
+    EXTERNAL_MANAGED = 1
+    INTERNAL = 2
+    INTERNAL_MANAGED = 3
+    INTERNAL_SELF_MANAGED = 4
+    INVALID_LOAD_BALANCING_SCHEME = 5
 
   class LocalityLbPolicyValueValuesEnum(_messages.Enum):
     r"""The load balancing algorithm used within the scope of the locality.
@@ -3760,30 +3795,31 @@ class BackendService(_messages.Message):
   customRequestHeaders = _messages.StringField(8, repeated=True)
   customResponseHeaders = _messages.StringField(9, repeated=True)
   description = _messages.StringField(10)
-  enableCDN = _messages.BooleanField(11)
-  failoverPolicy = _messages.MessageField('BackendServiceFailoverPolicy', 12)
-  fingerprint = _messages.BytesField(13)
-  healthChecks = _messages.StringField(14, repeated=True)
-  iap = _messages.MessageField('BackendServiceIAP', 15)
-  id = _messages.IntegerField(16, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(17, default='compute#backendService')
-  loadBalancingScheme = _messages.EnumField('LoadBalancingSchemeValueValuesEnum', 18)
-  localityLbPolicy = _messages.EnumField('LocalityLbPolicyValueValuesEnum', 19)
-  logConfig = _messages.MessageField('BackendServiceLogConfig', 20)
-  name = _messages.StringField(21)
-  network = _messages.StringField(22)
-  outlierDetection = _messages.MessageField('OutlierDetection', 23)
-  port = _messages.IntegerField(24, variant=_messages.Variant.INT32)
-  portName = _messages.StringField(25)
-  protocol = _messages.EnumField('ProtocolValueValuesEnum', 26)
-  region = _messages.StringField(27)
-  securityPolicy = _messages.StringField(28)
-  securitySettings = _messages.MessageField('SecuritySettings', 29)
-  selfLink = _messages.StringField(30)
-  selfLinkWithId = _messages.StringField(31)
-  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 32)
-  subsetting = _messages.MessageField('Subsetting', 33)
-  timeoutSec = _messages.IntegerField(34, variant=_messages.Variant.INT32)
+  edgeSecurityPolicy = _messages.StringField(11)
+  enableCDN = _messages.BooleanField(12)
+  failoverPolicy = _messages.MessageField('BackendServiceFailoverPolicy', 13)
+  fingerprint = _messages.BytesField(14)
+  healthChecks = _messages.StringField(15, repeated=True)
+  iap = _messages.MessageField('BackendServiceIAP', 16)
+  id = _messages.IntegerField(17, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(18, default='compute#backendService')
+  loadBalancingScheme = _messages.EnumField('LoadBalancingSchemeValueValuesEnum', 19)
+  localityLbPolicy = _messages.EnumField('LocalityLbPolicyValueValuesEnum', 20)
+  logConfig = _messages.MessageField('BackendServiceLogConfig', 21)
+  name = _messages.StringField(22)
+  network = _messages.StringField(23)
+  outlierDetection = _messages.MessageField('OutlierDetection', 24)
+  port = _messages.IntegerField(25, variant=_messages.Variant.INT32)
+  portName = _messages.StringField(26)
+  protocol = _messages.EnumField('ProtocolValueValuesEnum', 27)
+  region = _messages.StringField(28)
+  securityPolicy = _messages.StringField(29)
+  securitySettings = _messages.MessageField('SecuritySettings', 30)
+  selfLink = _messages.StringField(31)
+  selfLinkWithId = _messages.StringField(32)
+  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 33)
+  subsetting = _messages.MessageField('Subsetting', 34)
+  timeoutSec = _messages.IntegerField(35, variant=_messages.Variant.INT32)
 
 
 class BackendServiceAggregatedList(_messages.Message):
@@ -3867,6 +3903,7 @@ class BackendServiceAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -3892,22 +3929,23 @@ class BackendServiceAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -4001,12 +4039,18 @@ class BackendServiceCdnPolicy(_messages.Message):
     negativeCaching: Negative caching allows per-status code TTLs to be set,
       in order to apply fine-grained caching for common errors or redirects.
       This can reduce the load on your origin and improve end-user experience
-      by reducing response latency. By default, Cloud CDN will apply the
-      following default TTLs to these status codes: HTTP 300 (Multiple
-      Choice), 301, 308 (Permanent Redirects): 10m HTTP 404 (Not Found), 410
-      (Gone), 451 (Unavailable For Legal Reasons): 120s HTTP 405 (Method Not
-      Found), 421 (Misdirected Request), 501 (Not Implemented): 60s These
-      defaults can be overridden in negative_caching_policy
+      by reducing response latency. When the cache mode is set to
+      CACHE_ALL_STATIC or USE_ORIGIN_HEADERS, negative caching applies to
+      responses with the specified response code that lack any Cache-Control,
+      Expires, or Pragma: no-cache directives. When the cache mode is set to
+      FORCE_CACHE_ALL, negative caching applies to all responses with the
+      specified response code, and override any caching headers. By default,
+      Cloud CDN will apply the following default TTLs to these status codes:
+      HTTP 300 (Multiple Choice), 301, 308 (Permanent Redirects): 10m HTTP 404
+      (Not Found), 410 (Gone), 451 (Unavailable For Legal Reasons): 120s HTTP
+      405 (Method Not Found), 421 (Misdirected Request), 501 (Not
+      Implemented): 60s. These defaults can be overridden in
+      negative_caching_policy.
     negativeCachingPolicy: Sets a cache TTL for the specified HTTP status
       code. negative_caching must be enabled to configure
       negative_caching_policy. Omitting the policy and leaving
@@ -4098,10 +4142,10 @@ class BackendServiceCdnPolicyNegativeCachingPolicy(_messages.Message):
     code: The HTTP status code to define a TTL against. Only HTTP status codes
       300, 301, 308, 404, 405, 410, 421, 451 and 501 are can be specified as
       values, and you cannot specify a status code more than once.
-    ttl: The TTL (in seconds) to cache responses with the corresponding status
-      code for. The maximum allowed value is 1800s (30 minutes), noting that
-      infrequently accessed objects may be evicted from the cache before the
-      defined TTL.
+    ttl: The TTL (in seconds) for which to cache responses with the
+      corresponding status code. The maximum allowed value is 1800s (30
+      minutes), noting that infrequently accessed objects may be evicted from
+      the cache before the defined TTL.
   """
 
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -4282,6 +4326,7 @@ class BackendServiceList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -4307,22 +4352,23 @@ class BackendServiceList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -4430,6 +4476,7 @@ class BackendServicesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -4455,22 +4502,23 @@ class BackendServicesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -4825,6 +4873,17 @@ class BulkInsertInstanceResource(_messages.Message):
     minCount: The minimum number of instances to create. If no min_count is
       specified then count is used as the default value. If min_count
       instances cannot be created, then no instances will be created.
+    namePattern: Instance name pattern. Name pattern includes a parameter to
+      specify the auto-incrementing portion of the name, in a form of
+      consecutive hash (#) chars, each of them corresponding to one digit of
+      an instance name. For example: name_pattern = inst-####-prod will
+      generate names starting with inst-0001-prod, inst-0002-prod, up to
+      required count. If there exist instances matching the name pattern in
+      the same project and zone, the initial instance number will be equal to
+      the maximum existing instance number + 1 (e.g. if there exists an
+      instance with name inst-0030-prod, then the generated names will start
+      with inst-0031-prod). The name pattern placeholder #...# can contain up
+      to 18 characters.
     predefinedNames: List of predefined names. The number of names provided
       must be equal to count.
     sourceInstanceTemplate: Specifies the instance template from which to
@@ -4843,8 +4902,9 @@ class BulkInsertInstanceResource(_messages.Message):
   instanceProperties = _messages.MessageField('InstanceProperties', 3)
   locationPolicy = _messages.MessageField('LocationPolicy', 4)
   minCount = _messages.IntegerField(5)
-  predefinedNames = _messages.StringField(6, repeated=True)
-  sourceInstanceTemplate = _messages.StringField(7)
+  namePattern = _messages.StringField(6)
+  predefinedNames = _messages.StringField(7, repeated=True)
+  sourceInstanceTemplate = _messages.StringField(8)
 
 
 class CacheInvalidationRule(_messages.Message):
@@ -5298,6 +5358,7 @@ class CommitmentAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -5323,22 +5384,23 @@ class CommitmentAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -5426,6 +5488,7 @@ class CommitmentList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -5451,22 +5514,23 @@ class CommitmentList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -5546,6 +5610,7 @@ class CommitmentsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -5571,22 +5636,23 @@ class CommitmentsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -6411,6 +6477,33 @@ class ComputeBackendBucketsPatchRequest(_messages.Message):
   requestId = _messages.StringField(4)
 
 
+class ComputeBackendBucketsSetEdgeSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeBackendBucketsSetEdgeSecurityPolicyRequest object.
+
+  Fields:
+    backendBucket: Name of the BackendService resource to which the security
+      policy should be set. The name should conform to RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicyReference: A SecurityPolicyReference resource to be passed
+      as the request body.
+  """
+
+  backendBucket = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  securityPolicyReference = _messages.MessageField('SecurityPolicyReference', 4)
+
+
 class ComputeBackendBucketsSetIamPolicyRequest(_messages.Message):
   r"""A ComputeBackendBucketsSetIamPolicyRequest object.
 
@@ -6728,6 +6821,33 @@ class ComputeBackendServicesPatchRequest(_messages.Message):
   backendServiceResource = _messages.MessageField('BackendService', 2)
   project = _messages.StringField(3, required=True)
   requestId = _messages.StringField(4)
+
+
+class ComputeBackendServicesSetEdgeSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeBackendServicesSetEdgeSecurityPolicyRequest object.
+
+  Fields:
+    backendService: Name of the BackendService resource to which the edge
+      security policy should be set. The name should conform to RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicyReference: A SecurityPolicyReference resource to be passed
+      as the request body.
+  """
+
+  backendService = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  securityPolicyReference = _messages.MessageField('SecurityPolicyReference', 4)
 
 
 class ComputeBackendServicesSetSecurityPolicyRequest(_messages.Message):
@@ -18987,6 +19107,34 @@ class ComputeRegionInstantSnapshotsDeleteRequest(_messages.Message):
   requestId = _messages.StringField(4)
 
 
+class ComputeRegionInstantSnapshotsExportRequest(_messages.Message):
+  r"""A ComputeRegionInstantSnapshotsExportRequest object.
+
+  Fields:
+    instantSnapshot: Name of the instant snapshot to export.
+    instantSnapshotExportParams: A InstantSnapshotExportParams resource to be
+      passed as the request body.
+    project: Project ID for this request.
+    region: The name of the zone for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  instantSnapshot = _messages.StringField(1, required=True)
+  instantSnapshotExportParams = _messages.MessageField('InstantSnapshotExportParams', 2)
+  project = _messages.StringField(3, required=True)
+  region = _messages.StringField(4, required=True)
+  requestId = _messages.StringField(5)
+
+
 class ComputeRegionInstantSnapshotsGetIamPolicyRequest(_messages.Message):
   r"""A ComputeRegionInstantSnapshotsGetIamPolicyRequest object.
 
@@ -25460,6 +25608,34 @@ class ComputeZoneInstantSnapshotsDeleteRequest(_messages.Message):
   zone = _messages.StringField(4, required=True)
 
 
+class ComputeZoneInstantSnapshotsExportRequest(_messages.Message):
+  r"""A ComputeZoneInstantSnapshotsExportRequest object.
+
+  Fields:
+    instantSnapshot: Name of the instant snapshot to export.
+    instantSnapshotExportParams: A InstantSnapshotExportParams resource to be
+      passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  instantSnapshot = _messages.StringField(1, required=True)
+  instantSnapshotExportParams = _messages.MessageField('InstantSnapshotExportParams', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
 class ComputeZoneInstantSnapshotsGetIamPolicyRequest(_messages.Message):
   r"""A ComputeZoneInstantSnapshotsGetIamPolicyRequest object.
 
@@ -26476,6 +26652,7 @@ class DiskAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -26501,22 +26678,23 @@ class DiskAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -26680,6 +26858,7 @@ class DiskList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -26705,22 +26884,23 @@ class DiskList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -26907,6 +27087,7 @@ class DiskTypeAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -26932,22 +27113,23 @@ class DiskTypeAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -27035,6 +27217,7 @@ class DiskTypeList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -27060,22 +27243,23 @@ class DiskTypeList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -27155,6 +27339,7 @@ class DiskTypesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -27180,22 +27365,23 @@ class DiskTypesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -27302,6 +27488,7 @@ class DisksScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -27327,22 +27514,23 @@ class DisksScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -27552,6 +27740,7 @@ class ExchangedPeeringRoutesList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -27577,22 +27766,23 @@ class ExchangedPeeringRoutesList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -27838,6 +28028,7 @@ class ExternalVpnGatewayList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -27863,22 +28054,23 @@ class ExternalVpnGatewayList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -28182,6 +28374,7 @@ class FirewallList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -28207,22 +28400,23 @@ class FirewallList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -28416,6 +28610,7 @@ class FirewallPolicyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -28441,22 +28636,23 @@ class FirewallPolicyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -28685,7 +28881,9 @@ class ForwardingRule(_messages.Message):
       information, refer to [IP address specifications](/load-
       balancing/docs/forwarding-rule-concepts#ip_address_specifications).
       Must be set to `0.0.0.0` when the target is targetGrpcProxy that has
-      validateForProxyless field set to true.
+      validateForProxyless field set to true.  For Private Service Connect
+      forwarding rules that forward traffic to Google APIs, IP address must be
+      provided.
     IPProtocol: The IP protocol to which this rule applies. For protocol
       forwarding, valid options are TCP, UDP, ESP, AH, SCTP or ICMP.  For
       Internal TCP/UDP Load Balancing, the load balancing scheme is INTERNAL,
@@ -28780,7 +28978,9 @@ class ForwardingRule(_messages.Message):
     network: This field is not used for external load balancing.  For internal
       load balancing, this field identifies the network that the load balanced
       IP should belong to for this Forwarding Rule. If this field is not
-      specified, the default network will be used.
+      specified, the default network will be used.  For Private Service
+      Connect forwarding rules that forward traffic to Google APIs, a network
+      must be provided.
     networkTier: This signifies the networking tier used for configuring this
       load balancer and can only take the following values: PREMIUM, STANDARD.
       For regional ForwardingRule, the valid values are PREMIUM and STANDARD.
@@ -28846,7 +29046,15 @@ class ForwardingRule(_messages.Message):
       global load balancing resource. The forwarded traffic must be of a type
       appropriate to the target object. For more information, see the "Target"
       column in [Port specifications](/load-balancing/docs/forwarding-rule-
-      concepts#ip_address_specifications).
+      concepts#ip_address_specifications).  For Private Service Connect
+      forwarding rules that forward traffic to Google APIs, provide the name
+      of a supported Google API bundle. Currently, the supported Google API
+      bundles include:    - vpc-sc - GCP APIs that support VPC Service
+      Controls. For more information about which APIs support VPC Service
+      Controls, refer to VPC-SC supported products and limitations.   - all-
+      apis - All GCP APIs. For more information about which APIs are supported
+      with this bundle, refer to Private Google Access-specific domains and
+      VIPs.
   """
 
   class IPProtocolValueValuesEnum(_messages.Enum):
@@ -28904,16 +29112,18 @@ class ForwardingRule(_messages.Message):
 
     Values:
       EXTERNAL: <no description>
+      EXTERNAL_MANAGED: <no description>
       INTERNAL: <no description>
       INTERNAL_MANAGED: <no description>
       INTERNAL_SELF_MANAGED: <no description>
       INVALID: <no description>
     """
     EXTERNAL = 0
-    INTERNAL = 1
-    INTERNAL_MANAGED = 2
-    INTERNAL_SELF_MANAGED = 3
-    INVALID = 4
+    EXTERNAL_MANAGED = 1
+    INTERNAL = 2
+    INTERNAL_MANAGED = 3
+    INTERNAL_SELF_MANAGED = 4
+    INVALID = 5
 
   class NetworkTierValueValuesEnum(_messages.Enum):
     r"""This signifies the networking tier used for configuring this load
@@ -29071,6 +29281,7 @@ class ForwardingRuleAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -29096,22 +29307,23 @@ class ForwardingRuleAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -29198,6 +29410,7 @@ class ForwardingRuleList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -29223,22 +29436,23 @@ class ForwardingRuleList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -29343,6 +29557,7 @@ class ForwardingRulesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -29368,22 +29583,23 @@ class ForwardingRulesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -30096,6 +30312,7 @@ class HealthCheckList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -30121,22 +30338,23 @@ class HealthCheckList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -30397,6 +30615,7 @@ class HealthCheckServicesList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -30422,22 +30641,23 @@ class HealthCheckServicesList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -30550,6 +30770,7 @@ class HealthChecksAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -30575,22 +30796,23 @@ class HealthChecksAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -30671,6 +30893,7 @@ class HealthChecksScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -30696,22 +30919,23 @@ class HealthChecksScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -31147,6 +31371,7 @@ class HttpHealthCheckList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -31172,22 +31397,23 @@ class HttpHealthCheckList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -31667,6 +31893,7 @@ class HttpsHealthCheckList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -31692,22 +31919,23 @@ class HttpsHealthCheckList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -32028,6 +32256,7 @@ class ImageList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -32053,22 +32282,23 @@ class ImageList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -32279,6 +32509,7 @@ class InPlaceSnapshotList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -32304,22 +32535,23 @@ class InPlaceSnapshotList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -32744,6 +32976,7 @@ class InstanceAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -32769,22 +33002,23 @@ class InstanceAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -32966,6 +33200,7 @@ class InstanceGroupAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -32991,22 +33226,23 @@ class InstanceGroupAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -33094,6 +33330,7 @@ class InstanceGroupList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -33119,22 +33356,23 @@ class InstanceGroupList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -33426,6 +33664,7 @@ class InstanceGroupManagerAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -33451,22 +33690,23 @@ class InstanceGroupManagerAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -33585,6 +33825,7 @@ class InstanceGroupManagerList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -33610,22 +33851,23 @@ class InstanceGroupManagerList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -34167,6 +34409,7 @@ class InstanceGroupManagersListPerInstanceConfigsResp(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -34192,22 +34435,23 @@ class InstanceGroupManagersListPerInstanceConfigsResp(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -34337,6 +34581,7 @@ class InstanceGroupManagersScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -34362,22 +34607,23 @@ class InstanceGroupManagersScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -34524,6 +34770,7 @@ class InstanceGroupsListInstances(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -34549,22 +34796,23 @@ class InstanceGroupsListInstances(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -34685,6 +34933,7 @@ class InstanceGroupsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -34710,22 +34959,23 @@ class InstanceGroupsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -34826,6 +35076,7 @@ class InstanceList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -34851,22 +35102,23 @@ class InstanceList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -34953,6 +35205,7 @@ class InstanceListReferrers(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -34978,22 +35231,23 @@ class InstanceListReferrers(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -35376,6 +35630,7 @@ class InstanceTemplateList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -35401,22 +35656,23 @@ class InstanceTemplateList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -35605,6 +35861,7 @@ class InstancesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -35630,22 +35887,23 @@ class InstancesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -35918,6 +36176,47 @@ class InstantSnapshot(_messages.Message):
   zone = _messages.StringField(16)
 
 
+class InstantSnapshotExportParams(_messages.Message):
+  r"""A InstantSnapshotExportParams object.
+
+  Enums:
+    OutputTypeValueValuesEnum: The format of the output file.
+
+  Fields:
+    baseInstantSnapshot: An optional base instant snapshot that this resource
+      is compared against. If not specified, all blocks of this resource are
+      exported. The base instant snapshot and this resource must be created
+      from the same disk. The base instant snapshot must be created earlier in
+      time than this resource.
+    bucketName: The name of an existing bucket in Cloud Storage where the
+      changed blocks will be stored. The Google Service Account must have read
+      and write access to this bucket. The bucket has to be in the same region
+      as this resource.
+    encryptionKey: Encryption key used to encrypt the instant snapshot.
+    objectName: Name of the output Bigstore object storing the changed blocks.
+      Object name must be less than 1024 bytes in length.
+    outputType: The format of the output file.
+  """
+
+  class OutputTypeValueValuesEnum(_messages.Enum):
+    r"""The format of the output file.
+
+    Values:
+      INVALID: <no description>
+      METADATA_AND_DATA: <no description>
+      METADATA_ONLY: <no description>
+    """
+    INVALID = 0
+    METADATA_AND_DATA = 1
+    METADATA_ONLY = 2
+
+  baseInstantSnapshot = _messages.StringField(1)
+  bucketName = _messages.StringField(2)
+  encryptionKey = _messages.MessageField('CustomerEncryptionKey', 3)
+  objectName = _messages.StringField(4)
+  outputType = _messages.EnumField('OutputTypeValueValuesEnum', 5)
+
+
 class InstantSnapshotList(_messages.Message):
   r"""Contains a list of InstantSnapshot resources.
 
@@ -35972,6 +36271,7 @@ class InstantSnapshotList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -35997,22 +36297,23 @@ class InstantSnapshotList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -36796,6 +37097,7 @@ class InterconnectAttachmentAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -36821,22 +37123,23 @@ class InterconnectAttachmentAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -36926,6 +37229,7 @@ class InterconnectAttachmentList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -36951,22 +37255,23 @@ class InterconnectAttachmentList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -37082,6 +37387,7 @@ class InterconnectAttachmentsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -37107,22 +37413,23 @@ class InterconnectAttachmentsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -37370,6 +37677,7 @@ class InterconnectList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -37395,22 +37703,23 @@ class InterconnectList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -37613,6 +37922,7 @@ class InterconnectLocationList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -37638,22 +37948,23 @@ class InterconnectLocationList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -37954,6 +38265,7 @@ class IpAddressesList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -37979,22 +38291,23 @@ class IpAddressesList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -38081,6 +38394,7 @@ class IpOwnerList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -38106,22 +38420,23 @@ class IpOwnerList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -38395,6 +38710,7 @@ class LicensesListResponse(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -38420,22 +38736,23 @@ class LicensesListResponse(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -38484,8 +38801,7 @@ class LocalDisk(_messages.Message):
 
 class LocationPolicy(_messages.Message):
   r"""Configuration for location policy among multiple possible locations
-  (e.g. preferences for zone selection among zones in a single region). Note
-  that this message has a copy in logs/proto/bigcluster/bulk_apis.proto.
+  (e.g. preferences for zone selection among zones in a single region).
 
   Messages:
     LocationsValue: Location configurations mapped by location name. Currently
@@ -38812,6 +39128,7 @@ class MachineImageList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -38837,22 +39154,23 @@ class MachineImageList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -39034,6 +39352,7 @@ class MachineTypeAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -39059,22 +39378,23 @@ class MachineTypeAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -39162,6 +39482,7 @@ class MachineTypeList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -39187,22 +39508,23 @@ class MachineTypeList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -39283,6 +39605,7 @@ class MachineTypesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -39308,22 +39631,23 @@ class MachineTypesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -40146,6 +40470,7 @@ class NetworkEndpointGroupAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -40171,22 +40496,23 @@ class NetworkEndpointGroupAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -40374,6 +40700,7 @@ class NetworkEndpointGroupList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -40399,22 +40726,23 @@ class NetworkEndpointGroupList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -40567,6 +40895,7 @@ class NetworkEndpointGroupsListNetworkEndpoints(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -40592,22 +40921,23 @@ class NetworkEndpointGroupsListNetworkEndpoints(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -40687,6 +41017,7 @@ class NetworkEndpointGroupsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -40712,22 +41043,23 @@ class NetworkEndpointGroupsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -40792,6 +41124,10 @@ class NetworkInterface(_messages.Message):
       with error 412 conditionNotMet.
     internalIpv6PrefixLength: [Output Only] The prefix length of the primary
       internal IPv6 range.
+    ipv6AccessConfigs: An array of IPv6 access configurations for this
+      interface. Currently, only one IPv6 access config, DIRECT_IPV6, is
+      supported. If there is no ipv6AccessConfig specified, then this instance
+      will have no external IPv6 Internet access.
     ipv6Address: [Output Only] An IPv6 internal network address for this
       network interface.
     kind: [Output Only] Type of the resource. Always compute#networkInterface
@@ -40862,15 +41198,16 @@ class NetworkInterface(_messages.Message):
   aliasIpRanges = _messages.MessageField('AliasIpRange', 2, repeated=True)
   fingerprint = _messages.BytesField(3)
   internalIpv6PrefixLength = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  ipv6Address = _messages.StringField(5)
-  kind = _messages.StringField(6, default='compute#networkInterface')
-  name = _messages.StringField(7)
-  network = _messages.StringField(8)
-  networkIP = _messages.StringField(9)
-  nicType = _messages.EnumField('NicTypeValueValuesEnum', 10)
-  queueCount = _messages.IntegerField(11, variant=_messages.Variant.INT32)
-  stackType = _messages.EnumField('StackTypeValueValuesEnum', 12)
-  subnetwork = _messages.StringField(13)
+  ipv6AccessConfigs = _messages.MessageField('AccessConfig', 5, repeated=True)
+  ipv6Address = _messages.StringField(6)
+  kind = _messages.StringField(7, default='compute#networkInterface')
+  name = _messages.StringField(8)
+  network = _messages.StringField(9)
+  networkIP = _messages.StringField(10)
+  nicType = _messages.EnumField('NicTypeValueValuesEnum', 11)
+  queueCount = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  stackType = _messages.EnumField('StackTypeValueValuesEnum', 13)
+  subnetwork = _messages.StringField(14)
 
 
 class NetworkList(_messages.Message):
@@ -40928,6 +41265,7 @@ class NetworkList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -40953,22 +41291,23 @@ class NetworkList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -41380,6 +41719,7 @@ class NodeGroupAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -41405,22 +41745,23 @@ class NodeGroupAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -41543,6 +41884,7 @@ class NodeGroupList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -41568,22 +41910,23 @@ class NodeGroupList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -41768,6 +42111,7 @@ class NodeGroupsListNodes(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -41793,22 +42137,23 @@ class NodeGroupsListNodes(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -41888,6 +42233,7 @@ class NodeGroupsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -41913,22 +42259,23 @@ class NodeGroupsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -42181,6 +42528,7 @@ class NodeTemplateAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -42206,22 +42554,23 @@ class NodeTemplateAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -42309,6 +42658,7 @@ class NodeTemplateList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -42334,22 +42684,23 @@ class NodeTemplateList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -42444,6 +42795,7 @@ class NodeTemplatesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -42469,22 +42821,23 @@ class NodeTemplatesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -42643,6 +42996,7 @@ class NodeTypeAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -42668,22 +43022,23 @@ class NodeTypeAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -42771,6 +43126,7 @@ class NodeTypeList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -42796,22 +43152,23 @@ class NodeTypeList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -42891,6 +43248,7 @@ class NodeTypesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -42916,22 +43274,23 @@ class NodeTypesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -43084,6 +43443,7 @@ class NotificationEndpointList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -43109,22 +43469,23 @@ class NotificationEndpointList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -43309,6 +43670,7 @@ class Operation(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -43334,22 +43696,23 @@ class Operation(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -43481,6 +43844,7 @@ class OperationAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -43506,22 +43870,23 @@ class OperationAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -43609,6 +43974,7 @@ class OperationList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -43634,22 +44000,23 @@ class OperationList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -43729,6 +44096,7 @@ class OperationsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -43754,22 +44122,23 @@ class OperationsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -44105,6 +44474,7 @@ class PacketMirroringAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -44130,22 +44500,23 @@ class PacketMirroringAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -44286,6 +44657,7 @@ class PacketMirroringList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -44311,22 +44683,23 @@ class PacketMirroringList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -44467,6 +44840,7 @@ class PacketMirroringsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -44492,22 +44866,23 @@ class PacketMirroringsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -45334,6 +45709,7 @@ class PublicAdvertisedPrefixList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -45359,22 +45735,23 @@ class PublicAdvertisedPrefixList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -45585,6 +45962,7 @@ class PublicDelegatedPrefixAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -45610,22 +45988,23 @@ class PublicDelegatedPrefixAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -45713,6 +46092,7 @@ class PublicDelegatedPrefixList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -45738,22 +46118,23 @@ class PublicDelegatedPrefixList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -45875,6 +46256,7 @@ class PublicDelegatedPrefixesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -45900,22 +46282,23 @@ class PublicDelegatedPrefixesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -46348,6 +46731,7 @@ class RegionAutoscalerList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -46373,22 +46757,23 @@ class RegionAutoscalerList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -46486,6 +46871,7 @@ class RegionDiskTypeList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -46511,22 +46897,23 @@ class RegionDiskTypeList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -46643,6 +47030,7 @@ class RegionInstanceGroupList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -46668,22 +47056,23 @@ class RegionInstanceGroupList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -46782,6 +47171,7 @@ class RegionInstanceGroupManagerList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -46807,22 +47197,23 @@ class RegionInstanceGroupManagerList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -47087,6 +47478,7 @@ class RegionInstanceGroupManagersListInstanceConfigsResp(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -47112,22 +47504,23 @@ class RegionInstanceGroupManagersListInstanceConfigsResp(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -47275,6 +47668,7 @@ class RegionInstanceGroupsListInstances(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -47300,22 +47694,23 @@ class RegionInstanceGroupsListInstances(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -47449,6 +47844,7 @@ class RegionList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -47474,22 +47870,23 @@ class RegionList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -47816,6 +48213,7 @@ class ReservationAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -47841,22 +48239,23 @@ class ReservationAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -47944,6 +48343,7 @@ class ReservationList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -47969,22 +48369,23 @@ class ReservationList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -48075,6 +48476,7 @@ class ReservationsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -48100,22 +48502,23 @@ class ReservationsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -48243,6 +48646,7 @@ class ResourcePoliciesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -48268,22 +48672,23 @@ class ResourcePoliciesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -48325,7 +48730,7 @@ class ResourcePolicy(_messages.Message):
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: A string attribute.
-    groupPlacementPolicy: Resource policy for instacnes for placement
+    groupPlacementPolicy: Resource policy for instances for placement
       configuration.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
@@ -48463,6 +48868,7 @@ class ResourcePolicyAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -48488,22 +48894,23 @@ class ResourcePolicyAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -48734,6 +49141,7 @@ class ResourcePolicyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -48759,22 +49167,23 @@ class ResourcePolicyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -49067,11 +49476,11 @@ class Route(_messages.Message):
       You can only specify the internet gateway using a full or partial valid
       URL:  projects/project/global/gateways/default-internet-gateway
     nextHopIlb: The URL to a forwarding rule of type
-      loadBalancingScheme=INTERNAL that should handle matching packets. You
-      can only specify the forwarding rule as a partial or full URL. For
-      example, the following are all valid URLs:   - https://www.googleapis.co
-      m/compute/v1/projects/project/regions/region/forwardingRules/forwardingR
-      ule  - regions/region/forwardingRules/forwardingRule
+      loadBalancingScheme=INTERNAL that should handle matching packets or the
+      IP address of the forwarding Rule. For example, the following are all
+      valid URLs:   - 10.128.0.56  - https://www.googleapis.com/compute/v1/pro
+      jects/project/regions/region/forwardingRules/forwardingRule  -
+      regions/region/forwardingRules/forwardingRule
     nextHopInstance: The URL to an instance that should handle matching
       packets. You can specify this as a full or partial URL. For example: htt
       ps://www.googleapis.com/compute/v1/projects/project/zones/zone/instances
@@ -49136,6 +49545,7 @@ class Route(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -49161,22 +49571,23 @@ class Route(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -49276,6 +49687,7 @@ class RouteList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -49301,22 +49713,23 @@ class RouteList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -49497,6 +49910,7 @@ class RouterAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -49522,22 +49936,23 @@ class RouterAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -49703,10 +50118,11 @@ class RouterBgpPeer(_messages.Message):
       use a different value.
     peerIpAddress: IP address of the BGP interface outside Google Cloud
       Platform. Only IPv4 is supported.
-    routerApplianceInstance: URI of the VM instance that is used as third
-      party router appliances such as Next Gen Firewalls, Virtual Routers, SD-
-      WAN. The VM instance must live in zones contained in the same region as
-      this Cloud Router. The VM instance is the peer side of the BGP session.
+    routerApplianceInstance: URI of the VM instance that is used as third-
+      party router appliances such as Next Gen Firewalls, Virtual Routers, or
+      Router Appliances. The VM instance must be located in zones contained in
+      the same region as this Cloud Router. The VM instance is the peer side
+      of the BGP session.
   """
 
   class AdvertiseModeValueValuesEnum(_messages.Enum):
@@ -49945,25 +50361,26 @@ class RouterInterface(_messages.Message):
       means the first character must be a lowercase letter, and all following
       characters must be a dash, lowercase letter, or digit, except the last
       character, which cannot be a dash.
-    privateIpAddress: The regional private internal IP address that will be
-      used to establish BGP session to a VM instance, which is used as third
-      party router appliances such as Next Gen Firewalls, Virtual Routers, SD-
-      WAN.
+    privateIpAddress: The regional private internal IP address that is used to
+      establish BGP sessions to a VM instance acting as a third-party Router
+      Appliance, such as a Next Gen Firewall, a Virtual Router, or an SD-WAN
+      VM.
     redundantInterface: Name of the interface that will be redundant with the
       current interface you are creating. The redundantInterface must belong
       to the same Cloud Router as the interface here. To establish the BGP
-      session to SD-WAN VM, you must create two BGP peers, and the two BGP
-      peers need to be attached to two separate interfaces that are redundant
+      session to a Router Appliance VM, you must create two BGP peers. The two
+      BGP peers must be attached to two separate interfaces that are redundant
       with each other. The redundant_interface must be 1-63 characters long,
       and comply with RFC1035. Specifically, the redundant_interface must be
       1-63 characters long and match the regular expression
       `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a
       lowercase letter, and all following characters must be a dash, lowercase
       letter, or digit, except the last character, which cannot be a dash.
-    subnetwork: The URL of the subnetwork resource this interface belongs to,
-      it must be in the same region as the router. When you establish a BGP
-      session to a VM instance using this interface, the VM instance must
-      belong to the same subnetwork as the subnetwork specified here.
+    subnetwork: The URL of the subnetwork resource that this interface belongs
+      to, which must be in the same region as the Cloud Router. When you
+      establish a BGP session to a VM instance using this interface, the VM
+      instance must belong to the same subnetwork as the subnetwork specified
+      here.
   """
 
   class ManagementTypeValueValuesEnum(_messages.Enum):
@@ -50046,6 +50463,7 @@ class RouterList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -50071,22 +50489,23 @@ class RouterList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -50553,6 +50972,7 @@ class RoutersScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -50578,22 +50998,23 @@ class RoutersScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -50892,10 +51313,12 @@ class ScalingScheduleStatus(_messages.Message):
       ACTIVE: <no description>
       DISABLED: <no description>
       OBSOLETE: <no description>
+      READY: <no description>
     """
     ACTIVE = 0
     DISABLED = 1
     OBSOLETE = 2
+    READY = 3
 
   lastStartTime = _messages.StringField(1)
   nextStartTime = _messages.StringField(2)
@@ -51143,10 +51566,12 @@ class SecurityPolicy(_messages.Message):
 
     Values:
       CLOUD_ARMOR: <no description>
+      CLOUD_ARMOR_EDGE: <no description>
       FIREWALL: <no description>
     """
     CLOUD_ARMOR = 0
-    FIREWALL = 1
+    CLOUD_ARMOR_EDGE = 1
+    FIREWALL = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -51274,6 +51699,7 @@ class SecurityPolicyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -51299,22 +51725,23 @@ class SecurityPolicyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -51897,6 +52324,7 @@ class ServiceAttachmentList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -51922,22 +52350,23 @@ class ServiceAttachmentList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -52337,6 +52766,7 @@ class SnapshotList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -52362,22 +52792,23 @@ class SnapshotList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -52702,6 +53133,7 @@ class SslCertificateAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -52727,22 +53159,23 @@ class SslCertificateAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -52829,6 +53262,7 @@ class SslCertificateList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -52854,22 +53288,23 @@ class SslCertificateList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -53055,6 +53490,7 @@ class SslCertificatesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -53080,22 +53516,23 @@ class SslCertificatesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -53178,6 +53615,7 @@ class SslPoliciesList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -53203,22 +53641,23 @@ class SslPoliciesList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -53387,6 +53826,7 @@ class SslPolicy(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -53412,22 +53852,23 @@ class SslPolicy(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -54037,6 +54478,7 @@ class SubnetworkAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -54062,22 +54504,23 @@ class SubnetworkAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -54165,6 +54608,7 @@ class SubnetworkList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -54190,22 +54634,23 @@ class SubnetworkList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -54401,6 +54846,7 @@ class SubnetworksScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -54426,22 +54872,23 @@ class SubnetworksScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -54715,6 +55162,7 @@ class TargetGrpcProxyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -54740,22 +55188,23 @@ class TargetGrpcProxyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -54835,6 +55284,7 @@ class TargetHttpProxiesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -54860,22 +55310,23 @@ class TargetHttpProxiesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -54952,9 +55403,15 @@ class TargetHttpProxy(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
-    proxyBind: This field only applies when the loadBalancingScheme is
-      INTERNAL_SELF_MANAGED. When set to true the Envoy binds on the IP
-      address specified by the forwarding rule. Default is false.
+    proxyBind: This field only applies when the forwarding rule that
+      references this target proxy has a loadBalancingScheme set to
+      INTERNAL_SELF_MANAGED.  When this field is set to true, Envoy proxies
+      set up inbound traffic interception and bind to the IP address and port
+      specified in the forwarding rule. This is generally useful when using
+      Traffic Director to configure Envoy as a gateway or middle proxy (in
+      other words, not a sidecar proxy). The Envoy proxy listens for inbound
+      requests and handles requests when it receives them.  The default is
+      false.
     region: [Output Only] URL of the region where the regional Target HTTP
       Proxy resides. This field is not applicable to global Target HTTP
       Proxies.
@@ -55061,6 +55518,7 @@ class TargetHttpProxyAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -55086,22 +55544,23 @@ class TargetHttpProxyAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -55189,6 +55648,7 @@ class TargetHttpProxyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -55214,22 +55674,23 @@ class TargetHttpProxyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -55309,6 +55770,7 @@ class TargetHttpsProxiesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -55334,22 +55796,23 @@ class TargetHttpsProxiesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -55490,9 +55953,15 @@ class TargetHttpsProxy(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
-    proxyBind: This field only applies when the loadBalancingScheme is
-      INTERNAL_SELF_MANAGED. When set to true the Envoy binds on the IP
-      address specified by the forwarding rule. Default is false.
+    proxyBind: This field only applies when the forwarding rule that
+      references this target proxy has a loadBalancingScheme set to
+      INTERNAL_SELF_MANAGED.  When this field is set to true, Envoy proxies
+      set up inbound traffic interception and bind to the IP address and port
+      specified in the forwarding rule. This is generally useful when using
+      Traffic Director to configure Envoy as a gateway or middle proxy (in
+      other words, not a sidecar proxy). The Envoy proxy listens for inbound
+      requests and handles requests when it receives them.  The default is
+      false.
     quicOverride: Specifies the QUIC override policy for this TargetHttpsProxy
       resource. This setting determines whether the load balancer attempts to
       negotiate QUIC with clients. You can specify NONE, ENABLE, or DISABLE.
@@ -55649,6 +56118,7 @@ class TargetHttpsProxyAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -55674,22 +56144,23 @@ class TargetHttpsProxyAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -55777,6 +56248,7 @@ class TargetHttpsProxyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -55802,22 +56274,23 @@ class TargetHttpsProxyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -55999,6 +56472,7 @@ class TargetInstanceAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -56024,22 +56498,23 @@ class TargetInstanceAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -56126,6 +56601,7 @@ class TargetInstanceList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -56151,22 +56627,23 @@ class TargetInstanceList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -56246,6 +56723,7 @@ class TargetInstancesScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -56271,22 +56749,23 @@ class TargetInstancesScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -56331,17 +56810,18 @@ class TargetPool(_messages.Message):
       instance remains healthy.
 
   Fields:
-    backupPool: This field is applicable only when the containing target pool
-      is serving a forwarding rule as the primary pool, and its failoverRatio
-      field is properly set to a value between [0, 1].  backupPool and
-      failoverRatio together define the fallback behavior of the primary
-      target pool: if the ratio of the healthy instances in the primary pool
-      is at or below failoverRatio, traffic arriving at the load-balanced IP
-      will be directed to the backup pool.  In case where failoverRatio and
-      backupPool are not set, or all the instances in the backup pool are
-      unhealthy, the traffic will be directed back to the primary pool in the
-      "force" mode, where traffic will be spread to the healthy instances with
-      the best effort, or to all instances when no instance is healthy.
+    backupPool: The server-defined URL for the resource. This field is
+      applicable only when the containing target pool is serving a forwarding
+      rule as the primary pool, and its failoverRatio field is properly set to
+      a value between [0, 1].  backupPool and failoverRatio together define
+      the fallback behavior of the primary target pool: if the ratio of the
+      healthy instances in the primary pool is at or below failoverRatio,
+      traffic arriving at the load-balanced IP will be directed to the backup
+      pool.  In case where failoverRatio and backupPool are not set, or all
+      the instances in the backup pool are unhealthy, the traffic will be
+      directed back to the primary pool in the "force" mode, where traffic
+      will be spread to the healthy instances with the best effort, or to all
+      instances when no instance is healthy.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional description of this resource. Provide this
@@ -56514,6 +56994,7 @@ class TargetPoolAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -56539,22 +57020,23 @@ class TargetPoolAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -56656,6 +57138,7 @@ class TargetPoolList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -56681,22 +57164,23 @@ class TargetPoolList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -56825,6 +57309,7 @@ class TargetPoolsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -56850,22 +57335,23 @@ class TargetPoolsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -57084,6 +57570,7 @@ class TargetSslProxyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -57109,22 +57596,23 @@ class TargetSslProxyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -57302,6 +57790,7 @@ class TargetTcpProxyList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -57327,22 +57816,23 @@ class TargetTcpProxyList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -57570,6 +58060,7 @@ class TargetVpnGatewayAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -57595,22 +58086,23 @@ class TargetVpnGatewayAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -57698,6 +58190,7 @@ class TargetVpnGatewayList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -57723,22 +58216,23 @@ class TargetVpnGatewayList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -57819,6 +58313,7 @@ class TargetVpnGatewaysScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -57844,22 +58339,23 @@ class TargetVpnGatewaysScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -58237,6 +58733,7 @@ class UrlMapList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -58262,22 +58759,23 @@ class UrlMapList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -58443,6 +58941,7 @@ class UrlMapsAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -58468,22 +58967,23 @@ class UrlMapsAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -58564,6 +59064,7 @@ class UrlMapsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -58589,22 +59090,23 @@ class UrlMapsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -58759,6 +59261,7 @@ class UsableSubnetworksAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -58784,22 +59287,23 @@ class UsableSubnetworksAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -58985,6 +59489,7 @@ class VmEndpointNatMappingsList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -59010,22 +59515,23 @@ class VmEndpointNatMappingsList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -59224,6 +59730,7 @@ class VpnGatewayAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -59249,22 +59756,23 @@ class VpnGatewayAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -59352,6 +59860,7 @@ class VpnGatewayList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -59377,22 +59886,23 @@ class VpnGatewayList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -59597,6 +60107,7 @@ class VpnGatewaysScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -59622,22 +60133,23 @@ class VpnGatewaysScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -59973,6 +60485,7 @@ class VpnTunnelAggregatedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -59998,22 +60511,23 @@ class VpnTunnelAggregatedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -60101,6 +60615,7 @@ class VpnTunnelList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -60126,22 +60641,23 @@ class VpnTunnelList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -60221,6 +60737,7 @@ class VpnTunnelsScopedList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -60246,22 +60763,23 @@ class VpnTunnelsScopedList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -60409,6 +60927,7 @@ class XpnHostList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -60434,22 +60953,23 @@ class XpnHostList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.
@@ -60614,6 +61134,7 @@ class ZoneList(_messages.Message):
         EXTERNAL_API_WARNING: <no description>
         FIELD_VALUE_OVERRIDEN: <no description>
         INJECTED_KERNELS_DEPRECATED: <no description>
+        LARGE_DEPLOYMENT_WARNING: <no description>
         MISSING_TYPE_DEPENDENCY: <no description>
         NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
         NEXT_HOP_CANNOT_IP_FORWARD: <no description>
@@ -60639,22 +61160,23 @@ class ZoneList(_messages.Message):
       EXTERNAL_API_WARNING = 5
       FIELD_VALUE_OVERRIDEN = 6
       INJECTED_KERNELS_DEPRECATED = 7
-      MISSING_TYPE_DEPENDENCY = 8
-      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
-      NEXT_HOP_CANNOT_IP_FORWARD = 10
-      NEXT_HOP_INSTANCE_NOT_FOUND = 11
-      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
-      NEXT_HOP_NOT_RUNNING = 13
-      NOT_CRITICAL_ERROR = 14
-      NO_RESULTS_ON_PAGE = 15
-      PARTIAL_SUCCESS = 16
-      REQUIRED_TOS_AGREEMENT = 17
-      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 18
-      RESOURCE_NOT_DELETED = 19
-      SCHEMA_VALIDATION_IGNORED = 20
-      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 21
-      UNDECLARED_PROPERTIES = 22
-      UNREACHABLE = 23
+      LARGE_DEPLOYMENT_WARNING = 8
+      MISSING_TYPE_DEPENDENCY = 9
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 10
+      NEXT_HOP_CANNOT_IP_FORWARD = 11
+      NEXT_HOP_INSTANCE_NOT_FOUND = 12
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 13
+      NEXT_HOP_NOT_RUNNING = 14
+      NOT_CRITICAL_ERROR = 15
+      NO_RESULTS_ON_PAGE = 16
+      PARTIAL_SUCCESS = 17
+      REQUIRED_TOS_AGREEMENT = 18
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 19
+      RESOURCE_NOT_DELETED = 20
+      SCHEMA_VALIDATION_IGNORED = 21
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 22
+      UNDECLARED_PROPERTIES = 23
+      UNREACHABLE = 24
 
     class DataValueListEntry(_messages.Message):
       r"""A DataValueListEntry object.

@@ -37,13 +37,14 @@ EXAMPLES
     your project within location LOCATION:
 
         $ gcloud alpha data-catalog taxonomies import \
-            --taxonomies="/tmp/taxonomies.json" --location="LOCATION"
+            "/tmp/taxonomies.json" --location="LOCATION"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access allowlist. This variant is also available:
+    access allowlist. These variants are also available:
 
+        $ gcloud data-catalog taxonomies import
         $ gcloud beta data-catalog taxonomies import
 

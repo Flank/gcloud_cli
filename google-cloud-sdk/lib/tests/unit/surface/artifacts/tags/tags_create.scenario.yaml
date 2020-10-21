@@ -14,7 +14,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -27,7 +27,7 @@ actions:
               locationId: us-east1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags?alt=json&tagId=my-tag
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags?alt=json&tagId=my-tag
           method: POST
           headers: {}
           body:

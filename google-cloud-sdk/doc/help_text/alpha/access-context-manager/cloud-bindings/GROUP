@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha access-context-manager cloud-bindings - manage Access Context
+        Manager cloud access bindings
+
+SYNOPSIS
+    gcloud alpha access-context-manager cloud-bindings COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) An access binding assigns an access level to a group, then the
+    policy will be forced when a user in the group access cloud console or API.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new cloud access binding.
+
+     delete
+        (ALPHA) Delete a cloud access binding.
+
+     describe
+        (ALPHA) Show details about a cloud access binding.
+
+     list
+        (ALPHA) List cloud access bindings under an organization.
+
+     update
+        (ALPHA) Update an existing cloud access binding.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist.
+

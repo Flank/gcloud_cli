@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta identity groups search \- search groups
+gcloud beta identity groups search \- searches for Groups matching a specified query
 
 
 
@@ -17,7 +17,7 @@ gcloud beta identity groups search \- search groups
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Search groups.
+\fB(BETA)\fR Searches for Groups matching a specified query.
 
 
 
@@ -26,12 +26,29 @@ gcloud beta identity groups search \- search groups
 .RS 2m
 .TP 2m
 \fB\-\-labels\fR=\fILABELS\fR
-Labels of the group resource. Example of labels "\-\-labels
-cloudidentity.googleapis.com/groups.discussion_forum"
+One or more label entries that apply to the Group. Currently supported labels
+contain a key with an empty value.
+
+Google Groups are the default type of group and have a label with a key of
+\'cloudidentity.googleapis.com/groups.discussion_forum' and an empty value.
+
+Existing Google Groups can have an additional label with a key of
+\'cloudidentity.googleapis.com/groups.security' and an empty value added to
+them. \fBThis is an immutable change and the security label cannot be removed
+once added.\fR
+
+Dynamic groups have a label with a key of
+\'cloudidentity.googleapis.com/groups.dynamic'.
+
+Identity\-mapped groups for Cloud Search have a label with a key of
+\'system/groups/external' and an empty value.
+
+Examples: {"cloudidentity.googleapis.com/groups.discussion_forum": ""} or
+{"system/groups/external": ""}.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
-The organization the Group being searched.
+The organization ID for the groups being searched.
 
 
 .RE
@@ -42,26 +59,34 @@ The organization the Group being searched.
 .RS 2m
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
-The default page size is 200 (max 1000) for the BASIC view, and 50 (max 500) for
-the FULL view.
+The maximum number of results to return.
+
+Note that the number of results returned may be less than this value even if
+there are more available results. To fetch all results, clients must continue
+calling this method repeatedly until the response no longer contains a
+nextPageToken.
+
+If unspecified, defaults to 200 'basic' view and to 50 for 'full' view.
+
+Must not be greater than 1000 for 'basic' view or 500 for 'full' view.
 
 .TP 2m
 \fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR
-The next_page_token value returned from a previous search request, if any.
+The nextPageToken value returned from a previous search request, if any.
 
 .TP 2m
 \fB\-\-view\fR=\fIVIEW\fR; default="basic"
-There are two possible views, 'basic' and 'full', default is 'basic'. \fIVIEW\fR
-must be one of:
+The level of detail to be returned. There are two possible views: 'basic' and
+\'full'. If unspecified, default to 'basic'. \fIVIEW\fR must be one of:
 
 .RS 2m
 .TP 2m
 \fBbasic\fR
-Response only basic information of the groups.
+Default. Only basic group information is returned.
 
 .TP 2m
 \fBfull\fR
-Response includes all the fields of the groups.
+All group information is returned.
 
 .RE
 .sp
@@ -104,10 +129,11 @@ $ gcloud beta identity groups search \-\-organization="5149234212"  \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud identity groups search
 $ gcloud alpha identity groups search
 .RE
 

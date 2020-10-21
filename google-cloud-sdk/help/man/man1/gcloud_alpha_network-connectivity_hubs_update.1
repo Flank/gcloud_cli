@@ -11,7 +11,7 @@ gcloud alpha network\-connectivity hubs update \- update a hub
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha network\-connectivity hubs update\fR \fIHUB\fR \fB\-\-description\fR=\fIDESCRIPTION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha network\-connectivity hubs update\fR \fIHUB\fR \fB\-\-description\fR=\fIDESCRIPTION\fR [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,17 @@ New description of the hub.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+List of label KEY=VALUE pairs to add.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
@@ -78,7 +89,7 @@ new description of my\-hub'.
 
 .RS 2m
 $ gcloud alpha network\-connectivity hubs update my\-hub \e
-    \-\-description "The new description of my\-hub".
+    \-\-description="The new description of my\-hub".
 .RE
 
 

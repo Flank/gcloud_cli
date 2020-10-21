@@ -44,13 +44,27 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
     self.source_uri = 'gs://31dd/source-vm.ova'
     self.https_source_disk = ('https://storage.googleapis.com/'
                               '31dd/source-vm.ova')
-    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
-        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
     self.os = 'ubuntu-1604'
     self.tags = ['gce-daisy', 'gce-ovf-import']
     self.zone = 'us-west1-c'
+    self.builder = ''
     properties.VALUES.compute.zone.Set(self.zone)
+
+  def PrepareMocks(self,
+                   step,
+                   async_flag=False,
+                   permissions=None,
+                   timeout='7200s',
+                   log_location=None,
+                   zone='us-west1-c'):
+    self.PrepareDaisyMocks(
+        step,
+        async_flag=async_flag,
+        permissions=permissions,
+        timeout=timeout,
+        log_location=log_location)
+    self.prepareArtifactRegistryMocks(
+        expected_builder_location=daisy_utils.GetRegionFromZone(zone))
 
   def PrepareZonalMocksForValidZone(self, zone):
     # The empty list is for the response of _CheckForExistingInstance, i.e.
@@ -89,6 +103,9 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
 
     self.make_requests.side_effect = make_requests_mock
 
+  def prepareArtifactRegistryMocks(self, expected_builder_location=''):
+    pass
+
   def GetOVFImportStep(self, instance_names=None):
     return self.GetOVFImportStepForArgs([
         '-instance-names={0}'.format(instance_names or self.instance_name),
@@ -117,18 +134,17 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
   def GetOVFImportStepForArgs(self, args):
     return self.cloudbuild_v1_messages.BuildStep(
         args=args,
-        name=self.ovf_builder,
+        name=self.GetBuilder(),
     )
 
-  def PrepareMocks(self,
-                   step,
-                   async_flag=False,
-                   permissions=None,
-                   timeout='7200s',
-                   log_location=None):
-    self.PrepareDaisyMocks(
-        step, async_flag=async_flag, permissions=permissions, timeout=timeout,
-        log_location=log_location)
+  def GetBuilder(self,
+                 zone='',
+                 tag=daisy_utils._DEFAULT_BUILDER_VERSION):
+    if self.builder:
+      return self.builder
+    return daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+        docker_image_tag=tag)
 
   def testCommonCase(self):
     self.PrepareMocks(self.GetOVFImportStep())
@@ -243,14 +259,15 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
     self.doZoneFlagTest()
 
   def testOVFImportUsesZoneConfigProperty(self):
-    properties.VALUES.compute.zone.Set('us-west1-c')
-    self.doZoneFlagTest(add_zone_cli_arg=False)
+    properties.VALUES.compute.zone.Set('europe-north1-b')
+    self.doZoneFlagTest(add_zone_cli_arg=False, zone='europe-north1-b')
 
   def doZoneFlagTest(self,
                      add_zone_cli_arg=True,
                      zone='us-central1-b',
                      is_valid_zone=True):
 
+    self.builder = self.GetBuilder(zone=zone)
     flags = '{0} --source-uri {1} --os {2}'
     zone_arg = properties.VALUES.compute.zone.Get()
     if add_zone_cli_arg:
@@ -273,7 +290,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
     # Setting up mocks
     if is_valid_zone:
       self.PrepareZonalMocksForValidZone(zone)
-      self.PrepareMocks(ovf_import_step_with_zone)
+      self.PrepareMocks(ovf_import_step_with_zone, zone=zone)
     else:
       # No standard mocks are needed for invalid zone as the logic terminates
       # before any of the mocks are called.
@@ -688,14 +705,9 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
                """.format(self.instance_name, 'not-a-gcs-path', self.os))
 
   def testDockerImageTag(self):
-    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
-        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
     self.testCommonCase()
 
-    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
-        docker_image_tag='latest')
+    self.builder = self.GetBuilder(tag='latest')
     self.PrepareMocks(self.GetOVFImportStep())
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2}
@@ -766,6 +778,51 @@ class InstanceImportTestBeta(InstanceImportTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    super(InstanceImportTestBeta, self).SetUp()
+    self.builder = ''
+
+  def prepareArtifactRegistryMocks(self, expected_builder_location=''):
+    if not expected_builder_location:
+      expected_builder_location = daisy_utils.GetRegionFromZone(self.zone)
+    full_builder_location = 'projects/compute-image-tools/locations/{}'.format(
+        expected_builder_location)
+    repo_name = '{}/repositories/wrappers'.format(full_builder_location)
+    package_name = '{}/packages/gce_ovf_import'.format(repo_name)
+
+    msgs = self.mocked_artifacts_v1beta2_messages
+    self.mocked_artifacts_v1beta2.projects_locations.List.Expect(
+        msgs.ArtifactregistryProjectsLocationsListRequest(
+            name='projects/compute-image-tools'),
+        response=msgs.ListLocationsResponse(locations=[
+            msgs.Location(
+                name=full_builder_location,
+                locationId=expected_builder_location)
+        ]))
+    self.mocked_artifacts_v1beta2.projects_locations_repositories.Get.Expect(
+        msgs.ArtifactregistryProjectsLocationsRepositoriesGetRequest(
+            name=repo_name),
+        response=msgs.Repository(
+            name=repo_name,
+            format=msgs.Repository.FormatValueValuesEnum.DOCKER))
+    self.mocked_artifacts_v1beta2.projects_locations_repositories_packages.Get.Expect(
+        msgs.ArtifactregistryProjectsLocationsRepositoriesPackagesGetRequest(
+            name=package_name),
+        response=msgs.Package(name=package_name))
+
+  def GetBuilder(self,
+                 zone='',
+                 tag=daisy_utils._DEFAULT_BUILDER_VERSION):
+    if self.builder:
+      return self.builder
+    if not zone:
+      zone = self.zone
+    builder_region = daisy_utils.GetRegionFromZone(zone).lower()
+    return daisy_utils._REGIONALIZED_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+        region=builder_region,
+        docker_image_tag=tag)
 
 
 class InstanceImportTestAlpha(InstanceImportTestBeta):

@@ -173,8 +173,8 @@ EXAMPLES
     --device flag more than once:
 
         $ gcloud firebase test ios run --test=XCTEST_ZIP \
-            --device=model=iphone7
-        --device=model=ipadmini4,version=11.2 --device=model=iphonese
+            --device=model=iphone7 --device=model=ipadmini4,version=11.2 \
+            --device=model=iphonese
 
     To run your XCTest using a specific version of Xcode, say 9.4.1, run:
 

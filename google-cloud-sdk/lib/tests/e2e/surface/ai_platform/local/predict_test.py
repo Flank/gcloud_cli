@@ -103,6 +103,7 @@ class TensorflowPredictTest(base.MlGaPlatformTestBase):
       self.assertSetEqual(set(prediction.keys()), expected_keys)
 
 
+@test_case.Filters.skip('pip cannot install sklearn', 'b/170861154')
 # If this test is skipped, we have very little effective coverage of this code
 # path and it should be treated as a high-priority issue.
 @sdk_test_base.Filters.RunOnlyInBundle

@@ -150,7 +150,7 @@ class DnsChangesCreateRequest(_messages.Message):
       identifier specified by the client. Must be unique for operation
       resources in the Operations collection.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     project: Identifies the project addressed by this request.
   """
 
@@ -170,7 +170,7 @@ class DnsChangesGetRequest(_messages.Message):
       identifier specified by the client. Must be unique for operation
       resources in the Operations collection.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     project: Identifies the project addressed by this request.
   """
 
@@ -189,7 +189,7 @@ class DnsChangesListRequest(_messages.Message):
 
   Fields:
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     maxResults: Optional. Maximum number of results to be returned. If
       unspecified, the server will decide how many results to return.
     pageToken: Optional. A tag returned by a previous list request that was
@@ -227,7 +227,7 @@ class DnsDnsKeysGetRequest(_messages.Message):
       type will be computed and displayed.
     dnsKeyId: The identifier of the requested DnsKey.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     project: Identifies the project addressed by this request.
   """
 
@@ -246,7 +246,7 @@ class DnsDnsKeysListRequest(_messages.Message):
       and display for key signing keys. If omitted, the recommended digest
       type will be computed and displayed.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     maxResults: Optional. Maximum number of results to be returned. If
       unspecified, the server will decide how many results to return.
     pageToken: Optional. A tag returned by a previous list request that was
@@ -543,7 +543,7 @@ class DnsManagedZonesDeleteRequest(_messages.Message):
       identifier specified by the client. Must be unique for operation
       resources in the Operations collection.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     project: Identifies the project addressed by this request.
   """
 
@@ -564,7 +564,7 @@ class DnsManagedZonesGetRequest(_messages.Message):
       identifier specified by the client. Must be unique for operation
       resources in the Operations collection.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     project: Identifies the project addressed by this request.
   """
 
@@ -599,7 +599,7 @@ class DnsManagedZonesPatchRequest(_messages.Message):
       identifier specified by the client. Must be unique for operation
       resources in the Operations collection.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     managedZoneResource: A ManagedZone resource to be passed as the request
       body.
     project: Identifies the project addressed by this request.
@@ -619,7 +619,7 @@ class DnsManagedZonesUpdateRequest(_messages.Message):
       identifier specified by the client. Must be unique for operation
       resources in the Operations collection.
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     managedZoneResource: A ManagedZone resource to be passed as the request
       body.
     project: Identifies the project addressed by this request.
@@ -754,7 +754,7 @@ class DnsResourceRecordSetsListRequest(_messages.Message):
 
   Fields:
     managedZone: Identifies the managed zone addressed by this request. Can be
-      the managed zone name or id.
+      the managed zone name or ID.
     maxResults: Optional. Maximum number of results to be returned. If
       unspecified, the server will decide how many results to return.
     name: Restricts the list to return only records with this fully qualified
@@ -1045,12 +1045,31 @@ class ManagedZonePrivateVisibilityConfig(_messages.Message):
   r"""A ManagedZonePrivateVisibilityConfig object.
 
   Fields:
+    gkeClusters: The list of Google Kubernetes Engine clusters that can see
+      this zone.
     kind: A string attribute.
     networks: The list of VPC networks that can see this zone.
   """
 
-  kind = _messages.StringField(1, default='dns#managedZonePrivateVisibilityConfig')
-  networks = _messages.MessageField('ManagedZonePrivateVisibilityConfigNetwork', 2, repeated=True)
+  gkeClusters = _messages.MessageField('ManagedZonePrivateVisibilityConfigGKECluster', 1, repeated=True)
+  kind = _messages.StringField(2, default='dns#managedZonePrivateVisibilityConfig')
+  networks = _messages.MessageField('ManagedZonePrivateVisibilityConfigNetwork', 3, repeated=True)
+
+
+class ManagedZonePrivateVisibilityConfigGKECluster(_messages.Message):
+  r"""A ManagedZonePrivateVisibilityConfigGKECluster object.
+
+  Fields:
+    gkeClusterName: The resource name of the cluster to retrieve. This should
+      be specified in the format like: projects/*/locations/*/clusters/*. This
+      is referenced from GKE projects.locations.clusters.get API:
+      https://cloud.google.com/kubernetes-
+      engine/docs/reference/rest/v1/projects.locations.clusters/get
+    kind: A string attribute.
+  """
+
+  gkeClusterName = _messages.StringField(1)
+  kind = _messages.StringField(2, default='dns#managedZonePrivateVisibilityConfigGKECluster')
 
 
 class ManagedZonePrivateVisibilityConfigNetwork(_messages.Message):
@@ -1478,12 +1497,102 @@ class Quota(_messages.Message):
   whitelistedKeySpecs = _messages.MessageField('DnsKeySpec', 15, repeated=True)
 
 
+class RRSetRoutingPolicy(_messages.Message):
+  r"""A RRSetRoutingPolicy represents ResourceRecordSet data that will be
+  returned dynamically with the response varying based on configured
+  properties such as geolocation or by weighted random selection.
+
+  Fields:
+    geoPolicy: A RRSetRoutingPolicyGeoPolicy attribute.
+    kind: A string attribute.
+    wrrPolicy: A RRSetRoutingPolicyWrrPolicy attribute.
+  """
+
+  geoPolicy = _messages.MessageField('RRSetRoutingPolicyGeoPolicy', 1)
+  kind = _messages.StringField(2, default='dns#rRSetRoutingPolicy')
+  wrrPolicy = _messages.MessageField('RRSetRoutingPolicyWrrPolicy', 3)
+
+
+class RRSetRoutingPolicyGeoPolicy(_messages.Message):
+  r"""A RRSetRoutingPolicyGeoPolicy object.
+
+  Fields:
+    failovers: If the health check for the primary target for a geo location
+      returns an unhealthy status, the failover target is returned instead.
+      This failover configuration is not mandatory. If a failover is not
+      provided, the primary target won't be healthchecked - we'll return the
+      primarily configured rrdata irrespective of whether it is healthy or
+      not.
+    items: The primary geo routing configuration. If there are multiple items
+      with the same location, an error is returned instead.
+    kind: A string attribute.
+  """
+
+  failovers = _messages.MessageField('RRSetRoutingPolicyGeoPolicyGeoPolicyItem', 1, repeated=True)
+  items = _messages.MessageField('RRSetRoutingPolicyGeoPolicyGeoPolicyItem', 2, repeated=True)
+  kind = _messages.StringField(3, default='dns#rRSetRoutingPolicyGeoPolicy')
+
+
+class RRSetRoutingPolicyGeoPolicyGeoPolicyItem(_messages.Message):
+  r"""A RRSetRoutingPolicyGeoPolicyGeoPolicyItem object.
+
+  Fields:
+    kind: A string attribute.
+    location: The geo-location granularity is a GCP region. This location
+      string should correspond to a GCP region. e.g "us-east1", "southamerica-
+      east1", "asia-east1", etc.
+    rrdatas: A string attribute.
+    signatureRrdatas: DNSSEC generated signatures for the above geo_rrdata.
+  """
+
+  kind = _messages.StringField(1, default='dns#rRSetRoutingPolicyGeoPolicyGeoPolicyItem')
+  location = _messages.StringField(2)
+  rrdatas = _messages.StringField(3, repeated=True)
+  signatureRrdatas = _messages.StringField(4, repeated=True)
+
+
+class RRSetRoutingPolicyWrrPolicy(_messages.Message):
+  r"""A RRSetRoutingPolicyWrrPolicy object.
+
+  Fields:
+    items: A RRSetRoutingPolicyWrrPolicyWrrPolicyItem attribute.
+    kind: A string attribute.
+  """
+
+  items = _messages.MessageField('RRSetRoutingPolicyWrrPolicyWrrPolicyItem', 1, repeated=True)
+  kind = _messages.StringField(2, default='dns#rRSetRoutingPolicyWrrPolicy')
+
+
+class RRSetRoutingPolicyWrrPolicyWrrPolicyItem(_messages.Message):
+  r"""A RRSetRoutingPolicyWrrPolicyWrrPolicyItem object.
+
+  Fields:
+    kind: A string attribute.
+    rrdatas: A string attribute.
+    signatureRrdatas: DNSSEC generated signatures for the above wrr_rrdata.
+    weight: The weight corresponding to this subset of rrdata. When multiple
+      WeightedRoundRobinPolicyItems are configured, the probability of
+      returning an rrset is proportional to its weight relative to the sum of
+      weights configured for all items. This weight should be a decimal in the
+      range [0,1].
+  """
+
+  kind = _messages.StringField(1, default='dns#rRSetRoutingPolicyWrrPolicyWrrPolicyItem')
+  rrdatas = _messages.StringField(2, repeated=True)
+  signatureRrdatas = _messages.StringField(3, repeated=True)
+  weight = _messages.FloatField(4)
+
+
 class ResourceRecordSet(_messages.Message):
   r"""A unit of data that will be returned by the DNS servers.
 
   Fields:
     kind: A string attribute.
     name: For example, www.example.com.
+    routingPolicy: Configures dynamic query responses based on geo location of
+      querying user or a weighted round robin based routing policy. A
+      ResourceRecordSet should only have either rrdata (static) or
+      routing_policy(dynamic). An error is returned otherwise.
     rrdatas: As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1)
       -- see examples.
     signatureRrdatas: As defined in RFC 4034 (section 3.2).
@@ -1495,10 +1604,11 @@ class ResourceRecordSet(_messages.Message):
 
   kind = _messages.StringField(1, default='dns#resourceRecordSet')
   name = _messages.StringField(2)
-  rrdatas = _messages.StringField(3, repeated=True)
-  signatureRrdatas = _messages.StringField(4, repeated=True)
-  ttl = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  type = _messages.StringField(6)
+  routingPolicy = _messages.MessageField('RRSetRoutingPolicy', 3)
+  rrdatas = _messages.StringField(4, repeated=True)
+  signatureRrdatas = _messages.StringField(5, repeated=True)
+  ttl = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  type = _messages.StringField(7)
 
 
 class ResourceRecordSetsListResponse(_messages.Message):

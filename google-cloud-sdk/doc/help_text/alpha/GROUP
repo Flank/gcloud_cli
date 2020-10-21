@@ -140,6 +140,9 @@ GROUPS
      anthos
         (ALPHA) Anthos command Group.
 
+     api-gateway
+        (ALPHA) Manage Cloud API Gateway resources.
+
      apigee
         (ALPHA) Manage Apigee resources.
 
@@ -358,7 +361,7 @@ GROUPS
         (ALPHA) Manage Stackdriver Trace.
 
      vmware
-        (ALPHA) Manage Cloud VMware resources.
+        (ALPHA) Manage Google Cloud VMware Engine resources.
 
      web-security-scanner
         (ALPHA) Manage Cloud Web Security Scanner resources.

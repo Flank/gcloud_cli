@@ -25,6 +25,7 @@ from googlecloudsdk.api_lib.privateca import locations
 from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 
 
 class LocationsApiTest(sdk_test_base.WithFakeAuth):
@@ -37,7 +38,7 @@ class LocationsApiTest(sdk_test_base.WithFakeAuth):
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
 
-  def testGetLocationsReturnsLocationIds(self):
+  def testGetLocationsReturnsLiveLocationIds(self):
     properties.VALUES.core.project.Set('p1')
     self.client.projects_locations.List.Expect(
         request=self.messages.PrivatecaProjectsLocationsListRequest(
@@ -50,6 +51,16 @@ class LocationsApiTest(sdk_test_base.WithFakeAuth):
 
     result = locations.GetSupportedLocations()
     self.assertCountEqual(['us-west1', 'europe-west1'], result)
+
+  def testGetLocationsReturnsFallbackListOnApiFailure(self):
+    properties.VALUES.core.project.Set('p1')
+    self.client.projects_locations.List.Expect(
+        request=self.messages.PrivatecaProjectsLocationsListRequest(
+            name='projects/p1'),
+        exception=http_error.MakeHttpError(code=500))
+
+    result = locations.GetSupportedLocations()
+    self.assertCountEqual(locations._FallbackLocations, result)
 
 
 if __name__ == '__main__':

@@ -24,7 +24,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.storage import api_factory
-from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.command_lib.storage.tasks import task
 from googlecloudsdk.core.util import files
 
@@ -51,11 +50,10 @@ class FileDownloadTask(task.Task):
     with files.BinaryFileWriter(
         self._destination_resource.storage_url.object_name,
         create_path=True) as download_stream:
-      provider = cloud_api.ProviderPrefix(
-          self._source_resource.storage_url.scheme)
+      provider = self._source_resource.storage_url.scheme
       bucket_name = self._source_resource.storage_url.bucket_name
       object_name = self._source_resource.storage_url.object_name
 
-      # TODO(b/162264437): Support all of DownloadObject's parameters.
-      api_factory.get_api(provider).DownloadObject(bucket_name, object_name,
-                                                   download_stream)
+      # TODO(b/162264437): Support all of download_object's parameters.
+      api_factory.get_api(provider).download_object(bucket_name, object_name,
+                                                    download_stream)

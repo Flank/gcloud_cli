@@ -96,7 +96,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -109,7 +109,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -123,7 +123,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22
           method: GET
           headers: {}
           body: null
@@ -142,7 +142,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -170,7 +170,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -183,7 +183,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -197,7 +197,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22
           method: GET
           headers: {}
           body: null
@@ -216,7 +216,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -241,7 +241,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -254,7 +254,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -268,7 +268,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
           method: GET
           headers: {}
           body: null
@@ -282,7 +282,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3A41291ad0fa5346bcf96d03704f434610ea3079f2c682e776274446f42bb27d02%22
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3A41291ad0fa5346bcf96d03704f434610ea3079f2c682e776274446f42bb27d02%22
           method: GET
           headers: {}
           body: null
@@ -306,7 +306,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -317,7 +317,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:41291ad0fa5346bcf96d03704f434610ea3079f2c682e776274446f42bb27d02?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:41291ad0fa5346bcf96d03704f434610ea3079f2c682e776274446f42bb27d02?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -344,7 +344,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -357,7 +357,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -371,7 +371,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
           method: GET
           headers: {}
           body: null
@@ -385,7 +385,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3A41291ad0fa5346bcf96d03704f434610ea3079f2c682e776274446f42bb27d02%22
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3A41291ad0fa5346bcf96d03704f434610ea3079f2c682e776274446f42bb27d02%22
           method: GET
           headers: {}
           body: null
@@ -409,7 +409,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -422,7 +422,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -442,7 +442,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -470,7 +470,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -483,7 +483,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -497,7 +497,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22
           method: GET
           headers: {}
           body: null
@@ -513,7 +513,7 @@ actions:
               version: projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22&pageToken=asdf
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags?alt=json&filter=version%3D%22projects%2Ffake-project%2Flocations%2Fus-west1%2Frepositories%2Fdocker-repo%2Fpackages%2Fubuntu%2Fversions%2Fsha256%3Aabcxyz%22&pageToken=asdf
           method: GET
           headers: {}
           body: null
@@ -539,7 +539,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -549,7 +549,7 @@ actions:
           body: null
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-other-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-other-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -559,7 +559,7 @@ actions:
           body: null
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-last-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/tags/my-last-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -570,7 +570,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-west1/repositories/docker-repo/packages/ubuntu/versions/sha256:abcxyz?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -597,7 +597,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -610,7 +610,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
           method: GET
           headers: {}
           body: null

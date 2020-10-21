@@ -125,10 +125,9 @@ Create an ACTIVE my\-finding attached to example\-project under organization
 
 .RS 2m
 $ gcloud scc findings create my\-finding \-\-organization=123456 \e
-    \-\-source=5678 \-\-state ACTIVE \e
-    \-\-resource\-name \e
-    '//cloudresourcemanager.googleapis.com/v1/projects/example\-proje\e
-ct'
+    \-\-source=5678 \-\-state=ACTIVE \e
+    \-\-resource\-name='//cloudresourcemanager.googleapis.com/v1/projec\e
+ts/example\-project'
 .RE
 
 Create an ACTIVE my\-finding with category: XSS_SCRIPTING under organization
@@ -136,7 +135,7 @@ Create an ACTIVE my\-finding with category: XSS_SCRIPTING under organization
 
 .RS 2m
 $ gcloud scc findings create my\-finding \-\-organization=123456 \e
-    \-\-source=5678 \-\-state ACTIVE \-\-category 'XSS_SCRIPTING'
+    \-\-source=5678 \-\-state=ACTIVE \-\-category='XSS_SCRIPTING'
 .RE
 
 

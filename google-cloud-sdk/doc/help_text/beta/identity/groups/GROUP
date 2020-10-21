@@ -37,7 +37,7 @@ COMMANDS
         (BETA) Retrieve a list of users in a customer account using CEL query.
 
      search
-        (BETA) Search groups.
+        (BETA) Searches for Groups matching a specified query.
 
      update
         (BETA) Update a group.

@@ -24,10 +24,10 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --location=LOCATION
-          Location of the privatecloud or cluster.
+          Region of the private cloud or cluster.
 
        --privatecloud=PRIVATECLOUD
-          VMware privatecloud.
+          VMware Engine private cloud.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

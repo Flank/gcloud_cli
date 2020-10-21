@@ -26,6 +26,15 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+_TEST_CONFIG_YAML = """\
+workerPoolSpecs:
+  machineSpec:
+    machineType: n1-highmem-2
+  replicaCount: 1
+  containerSpec:
+    imageUri: gcr.io/ucaip-test/ucaip-training-test
+"""
+
 
 class CreateCustomJobUnitTestAlpha(cli_test_base.CliTestBase,
                                    sdk_test_base.WithFakeAuth):
@@ -42,6 +51,8 @@ class CreateCustomJobUnitTestAlpha(cli_test_base.CliTestBase,
             'aiplatform', 'v1beta1', no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+    self.yaml_file = self.Touch(
+        self.temp_path, name='config.yaml', contents=_TEST_CONFIG_YAML)
 
   def RunCommand(self, *command):
     return self.Run([self.version, 'ai', 'custom-jobs'] + list(command))
@@ -86,6 +97,25 @@ class CreateCustomJobUnitTestAlpha(cli_test_base.CliTestBase,
     self.AssertErrContains(
         'Your job is still active. You may view the status of your job with the command'
     )
+    self.AssertErrContains('gcloud alpha ai custom-jobs describe 1')
+    self.assertEqual(response, expected_response)
+
+  def testCreateValidCustomJobWithConfig(self):
+    expected_request = self._buildCreateCustomJobRequest()
+    expected_response = self.messages.GoogleCloudAiplatformV1beta1CustomJob(
+        name='projects/508879632478/locations/us-central1/customJobs/1',
+        jobSpec=expected_request.googleCloudAiplatformV1beta1CustomJob.jobSpec)
+    self.mock_client.projects_locations_customJobs.Create.Expect(
+        expected_request, response=expected_response)
+
+    response = self.RunCommand('create', '--region={}'.format(self.region),
+                               '--display-name=CreateCustomJobUnitTest',
+                               '--config={}'.format(self.yaml_file))
+
+    self.AssertErrContains(
+        'Using endpoint [https://us-central1-aiplatform.googleapis.com/')
+    self.AssertErrContains('Your job is still active. You may view the status '
+                           'of your job with the command')
     self.AssertErrContains('gcloud alpha ai custom-jobs describe 1')
     self.assertEqual(response, expected_response)
 

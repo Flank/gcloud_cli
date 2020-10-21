@@ -97,7 +97,6 @@ class MlJobsTests(e2e_base.WithServiceAuth, parameterized.TestCase):
         'prediction', job_id,
         ('  --model={model_id} '
          '  --version={version_id} '
-         '  --runtime-version=2.1 '
          '  --data-format TEXT '
          '  --input-paths gs://cloud-ml-data/mnist/predict_sample.tensor.json '
          '  --output-path {bucket_url}/{job_id} '

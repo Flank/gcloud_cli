@@ -43,10 +43,11 @@ EXAMPLES
     'my-workload-identity-pool':
 
         $ gcloud beta iam workload-identity-pools undelete \
-            my-workload-identity-pool --location global
+            my-workload-identity-pool --location=global
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha iam workload-identity-pools undelete
 

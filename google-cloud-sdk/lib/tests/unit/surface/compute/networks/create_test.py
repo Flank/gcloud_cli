@@ -200,20 +200,6 @@ $ gcloud compute firewall-rules create <FIREWALL_NAME> --network my-network \
             """),
         normalize_space=True)
 
-
-class NetworksCreateBetaTest(NetworksCreateTest):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-
-class NetworksCreateAlphaTest(NetworksCreateBetaTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testCreateWithMtu(self):
     expected = self.messages.Network(
         name='my-network', autoCreateSubnetworks=True, mtu=1500)
@@ -228,6 +214,20 @@ class NetworksCreateAlphaTest(NetworksCreateBetaTest):
                        self.messages.ComputeNetworksInsertRequest(
                            project='my-project', network=expected))
     self.CheckRequests([expected_insert])
+
+
+class NetworksCreateBetaTest(NetworksCreateTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class NetworksCreateAlphaTest(NetworksCreateBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

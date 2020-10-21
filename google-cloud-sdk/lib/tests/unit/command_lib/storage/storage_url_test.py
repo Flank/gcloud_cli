@@ -56,31 +56,36 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
           'testcase_name': '_object_without_version',
           'url_str': 'gs://bucket/obj/a/b/c',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='gs', bucket='bucket', obj='obj/a/b/c', gen=None)
+              scheme=storage_url.ProviderPrefix.GCS, bucket='bucket',
+              obj='obj/a/b/c', gen=None)
       },
       {
           'testcase_name': '_object_with_version',
           'url_str': 'gs://bucket/obj/a/b/c#1234',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='gs', bucket='bucket', obj='obj/a/b/c', gen='1234')
+              scheme=storage_url.ProviderPrefix.GCS, bucket='bucket',
+              obj='obj/a/b/c', gen='1234')
       },
       {
           'testcase_name': '_bucketurl',
           'url_str': 'gs://bucket/',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='gs', bucket='bucket', obj=None, gen=None)
+              scheme=storage_url.ProviderPrefix.GCS, bucket='bucket', obj=None,
+              gen=None)
       },
       {
           'testcase_name': '_s3provider',
           'url_str': 's3://bucket/obj/a/b/c',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='s3', bucket='bucket', obj='obj/a/b/c', gen=None)
+              scheme=storage_url.ProviderPrefix.S3, bucket='bucket',
+              obj='obj/a/b/c', gen=None)
       },
       {
           'testcase_name': '_providerurl',
           'url_str': 'gs://',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='gs', bucket=None, obj=None, gen=None)
+              scheme=storage_url.ProviderPrefix.GCS, bucket=None, obj=None,
+              gen=None)
       }
   ])
   def test_url_from_string(self, url_str, expected_url_obj):
@@ -111,22 +116,24 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
   @parameterized.named_parameters([
       {
           'testcase_name': '_provider',
-          'cloudurl_args': ('gs',),
+          'cloudurl_args': (storage_url.ProviderPrefix.GCS,),
           'expected': 'gs://'
       },
       {
           'testcase_name': '_bucketurl',
-          'cloudurl_args': ('gs', 'bucket'),
+          'cloudurl_args': (storage_url.ProviderPrefix.GCS, 'bucket'),
           'expected': 'gs://bucket'
       },
       {
           'testcase_name': '_objecturl',
-          'cloudurl_args': ('gs', 'bucket', 'obj/a/b'),
+          'cloudurl_args': (storage_url.ProviderPrefix.GCS, 'bucket',
+                            'obj/a/b'),
           'expected': 'gs://bucket/obj/a/b'
       },
       {
           'testcase_name': '_objecturl_with_version',
-          'cloudurl_args': ('gs', 'bucket', 'obj/a/b', '1212'),
+          'cloudurl_args': (storage_url.ProviderPrefix.GCS, 'bucket', 'obj/a/b',
+                            '1212'),
           'expected': 'gs://bucket/obj/a/b#1212'
       },
   ])
@@ -137,12 +144,14 @@ class CloudStorageUrlTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
   @parameterized.named_parameters([
       {
           'testcase_name': '_objecturl',
-          'cloudurl_args': ('gs', 'bucket', 'obj/a/b'),
+          'cloudurl_args': (storage_url.ProviderPrefix.GCS, 'bucket',
+                            'obj/a/b'),
           'expected': 'gs://bucket/obj/a/b'
       },
       {
           'testcase_name': '_objecturl_with_version',
-          'cloudurl_args': ('gs', 'bucket', 'obj/a/b', '1212'),
+          'cloudurl_args': (storage_url.ProviderPrefix.GCS, 'bucket', 'obj/a/b',
+                            '1212'),
           'expected': 'gs://bucket/obj/a/b'
       },
   ])
@@ -165,13 +174,15 @@ class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
           'testcase_name': '_file_path',
           'url_str': '/random/path.txt',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='file', bucket=None, obj='/random/path.txt', gen=None)
+              scheme=storage_url.ProviderPrefix.FILE, bucket=None,
+              obj='/random/path.txt', gen=None)
       },
       {
           'testcase_name': '_with_file_scheme',
           'url_str': 'file:///random/a.txt',
           'expected_url_obj': ExpectedStorageUrl(
-              scheme='file', bucket=None, obj='/random/a.txt', gen=None)
+              scheme=storage_url.ProviderPrefix.FILE, bucket=None,
+              obj='/random/a.txt', gen=None)
       }
   ])
   def test_file_url_from_string(self, url_str, expected_url_obj):
@@ -182,7 +193,7 @@ class FileStorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertEqual(file_url_object.generation, expected_url_obj.gen)
     self.assertEqual(
         file_url_object.url_string,
-        '%s://%s' % (file_url_object.scheme, file_url_object.object_name))
+        '%s://%s' % (file_url_object.scheme.value, file_url_object.object_name))
 
   def test_file_url_exists(self):
     self.assertTrue(self.local_file_url.exists())
@@ -255,7 +266,8 @@ class StorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
 
   def test_equality(self):
     url1 = storage_url.CloudUrl.from_url_string('gs://bucket/obj.txt#1234')
-    url2 = storage_url.CloudUrl('gs', 'bucket', 'obj.txt', '1234')
+    url2 = storage_url.CloudUrl(
+        storage_url.ProviderPrefix.GCS, 'bucket', 'obj.txt', '1234')
     self.assertEqual(url1, url2)
 
   def test_not_equal_with_different_type(self):
@@ -269,5 +281,6 @@ class StorageUrlTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertNotEqual(url1, url2)
 
   def test_hash(self):
-    url = storage_url.CloudUrl('gs', 'bucket', 'obj.txt', '1234')
+    url = storage_url.CloudUrl(
+        storage_url.ProviderPrefix.GCS, 'bucket', 'obj.txt', '1234')
     self.assertEqual(hash(url), hash('gs://bucket/obj.txt#1234'))

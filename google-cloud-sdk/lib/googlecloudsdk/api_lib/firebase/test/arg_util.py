@@ -544,6 +544,39 @@ def AddIosBetaArgs(parser):
       help='List of up to 100 additional IPAs to install, in addition to '
       'the one being directly tested. The path may be in the local filesystem '
       'or in Google Cloud Storage using gs:// notation.')
+  parser.add_argument(
+      '--other-files',
+      type=arg_parsers.ArgDict(min_length=1),
+      metavar='DEVICE_PATH=FILE_PATH',
+      help="""\
+      A list of device-path=file-path pairs that specify the paths of the test
+      device and the files you want pushed to the device prior to testing.\n
+      Device paths should either be under the Media shared folder (e.g. prefixed
+      with /private/var/mobile/Media) or within the documents directory of the
+      filesystem of an app under test (e.g. /Documents). Device paths to app
+      filesystems should be prefixed by the bundle ID and a colon. Source file
+      paths may be in the local filesystem or in Google Cloud Storage
+      (gs://...).\n
+      Examples:\n
+      ```
+      --other-files com.my.app:/Documents/file.txt=local/file.txt,/private/var/mobile/Media/file.jpg=gs://bucket/file.jpg
+      ```
+      """)
+  parser.add_argument(
+      '--directories-to-pull',
+      type=arg_parsers.ArgList(),
+      metavar='DIR_TO_PULL',
+      help="""\
+      A list of paths that will be copied from the device\'s storage to
+      the designated results bucket after the test is complete. These must be
+      absolute paths under `/private/var/mobile/Media` or `/Documents` of the
+      app under test. If the path is under an app\'s `/Documents`, it must be
+      prefixed with the app\'s bundle id and a colon.\n
+      Example:\n
+      ```
+      --directories-to-pull=com.my.app:/Documents/output,/private/var/mobile/Media/output
+      ```
+      """)
 
   # The following args are specific to iOS game-loop tests.
 

@@ -25,7 +25,8 @@ COMMANDS
         Set the setting for an IAP resource.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iap settings
         $ gcloud beta iap settings
 

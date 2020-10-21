@@ -64,10 +64,17 @@ FLAGS
          type
             Type of agent to manage.
 
-            Required. Allowed values: logging and metrics. Use logging for the
-            Logging Agent (https://cloud.google.com/logging/docs/agent). Use
-            metrics for the Monitoring Agent
-            (https://cloud.google.com/monitoring/agent).
+            Required. Allowed values: logging, metrics and ops-agent. Use
+            logging for the Logging Agent
+            (https://cloud.google.com/logging/docs/agent). Use metrics for the
+            Monitoring Agent (https://cloud.google.com/monitoring/agent). Use
+            ops-agent for the Ops Agent
+            (https://cloud.google.com/stackdriver/docs/solutions/ops-agent).
+            The Ops Agent has both a logging module and a metrics module
+            already. So other types of agents are not allowed when there is an
+            agent with type ops-agent. See
+            https://cloud.google.com/stackdriver/docs/solutions/ops-agent#which_agent
+            for which agent to use.
 
          version
             Version of the agent to install.
@@ -365,7 +372,7 @@ EXAMPLES
         $ gcloud alpha compute instances ops-agents policies update \
             ops-agents-labels-policy --clear-instances \
             --group-labels="env=prod,product=myapp;env=staging,product=myapp\
-        " --etag f59741c8-bb5e-4ee6-bf6f-c4ebeb6b06e0
+        " --etag=f59741c8-bb5e-4ee6-bf6f-c4ebeb6b06e0
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

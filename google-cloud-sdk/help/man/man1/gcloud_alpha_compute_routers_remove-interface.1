@@ -11,7 +11,7 @@ gcloud alpha compute routers remove\-interface \- remove an interface from a Com
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers remove\-interface\fR \fINAME\fR \fB\-\-interface\-name\fR=\fIINTERFACE_NAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers remove\-interface\fR \fINAME\fR (\fB\-\-interface\-name\fR=\fIINTERFACE_NAME\fR\ |\ \fB\-\-interface\-names\fR=[\fIINTERFACE_NAME\fR,...]) [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,10 +37,20 @@ Name of the router to update.
 
 .RS 2m
 .TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-interface\-name\fR=\fIINTERFACE_NAME\fR
 The name of the interface being removed.
 
+.TP 2m
+\fB\-\-interface\-names\fR=[\fIINTERFACE_NAME\fR,...]
+The list of names for interfaces being removed.
 
+
+.RE
 .RE
 .sp
 

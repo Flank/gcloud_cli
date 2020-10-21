@@ -174,6 +174,38 @@ class CreateTestAlpha(CreateTestBeta):
                              zone='fake-zone',
                          ))],)
 
+  def testCreateWithFleet(self):
+    self.make_requests.side_effect = iter([[]])
+    reservation = self.messages.Reservation(
+        name='alloc',
+        zone='fake-zone',
+        specificReservationRequired=True,
+        specificReservation=self.messages.AllocationSpecificSKUReservation(
+            count=1,
+            instanceProperties=self.messages
+            .AllocationSpecificSKUAllocationReservedInstanceProperties(
+                machineType='n1-standard-1',
+                minCpuPlatform='Intel Haswell',
+                maintenanceFreezeDurationHours=168,
+                maintenanceInterval=self.messages
+                .AllocationSpecificSKUAllocationReservedInstanceProperties
+                .MaintenanceIntervalValueValuesEnum.PERIODIC
+            )))
+
+    self.Run('compute reservations create alloc --zone=fake-zone '
+             '--require-specific-reservation '
+             '--vm-count=1 '
+             '--machine-type=n1-standard-1 '
+             '--min-cpu-platform="Intel Haswell" '
+             '--maintenance-freeze-duration=168h '
+             '--maintenance-interval=periodic')
+
+    self.CheckRequests([(self.compute.reservations, 'Insert',
+                         self.messages.ComputeReservationsInsertRequest(
+                             reservation=reservation,
+                             project='my-project',
+                             zone='fake-zone',
+                         ))],)
 
 if __name__ == '__main__':
   test_case.main()

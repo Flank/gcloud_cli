@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.kuberun import domainmapping
 from googlecloudsdk.api_lib.kuberun import revision
+from googlecloudsdk.api_lib.kuberun import service
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.kuberun import kuberuncli
 from googlecloudsdk.command_lib.util.anthos import binary_operations as bin_ops
@@ -69,6 +70,7 @@ class KubeRunUnitTestBase(sdk_test_base.WithFakeAuth,
                                               'refresh')
     self.mock_bin_exec = self.StartObjectPatch(bin_ops.BinaryBackedOperation,
                                                '_Execute')
+    self.addTypeEqualityFunc(service.Service, self.props_compare)
     self.addTypeEqualityFunc(revision.Revision, self.props_compare)
     self.addTypeEqualityFunc(domainmapping.DomainMapping, self.props_compare)
 

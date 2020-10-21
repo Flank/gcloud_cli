@@ -868,9 +868,10 @@ class KeyVersionSpec(_messages.Message):
       key for a for a simplified experience. All managed keys will be have
       their ProtectionLevel as `HSM`.
     cloudKmsKeyVersion: Required. The resource name for an existing Cloud KMS
-      CryptoKeyVersion in the format`projects/*/locations/*/keyRings/*/cryptoK
-      eys/*/cryptoKeyVersions/*`. This option enables full flexibility in the
-      key's capabilities and properties.
+      CryptoKeyVersion in the format
+      `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
+      This option enables full flexibility in the key's capabilities and
+      properties.
   """
 
   class AlgorithmValueValuesEnum(_messages.Enum):
@@ -886,6 +887,12 @@ class KeyVersionSpec(_messages.Message):
         RSA_SIGN_PSS_3072_SHA256
       RSA_PSS_4096_SHA256: maps to
         CryptoKeyVersionAlgorithm.RSA_SIGN_PSS_4096_SHA256
+      RSA_PKCS1_2048_SHA256: maps to
+        CryptoKeyVersionAlgorithm.RSA_SIGN_PKCS1_2048_SHA256
+      RSA_PKCS1_3072_SHA256: maps to
+        CryptoKeyVersionAlgorithm.RSA_SIGN_PKCS1_3072_SHA256
+      RSA_PKCS1_4096_SHA256: maps to
+        CryptoKeyVersionAlgorithm.RSA_SIGN_PKCS1_4096_SHA256
       EC_P256_SHA256: maps to CryptoKeyVersionAlgorithm.EC_SIGN_P256_SHA256
       EC_P384_SHA384: maps to CryptoKeyVersionAlgorithm.EC_SIGN_P384_SHA384
     """
@@ -893,8 +900,11 @@ class KeyVersionSpec(_messages.Message):
     RSA_PSS_2048_SHA256 = 1
     RSA_PSS_3072_SHA256 = 2
     RSA_PSS_4096_SHA256 = 3
-    EC_P256_SHA256 = 4
-    EC_P384_SHA384 = 5
+    RSA_PKCS1_2048_SHA256 = 4
+    RSA_PKCS1_3072_SHA256 = 5
+    RSA_PKCS1_4096_SHA256 = 6
+    EC_P256_SHA256 = 7
+    EC_P384_SHA384 = 8
 
   algorithm = _messages.EnumField('AlgorithmValueValuesEnum', 1)
   cloudKmsKeyVersion = _messages.StringField(2)
@@ -1515,8 +1525,13 @@ class PrivatecaProjectsLocationsCertificateAuthoritiesCertificatesListRequest(_m
 
   Fields:
     filter: Optional. Only include resources that match the filter in the
-      response.
-    orderBy: Optional. Specify how the results should be sorted.
+      response. For details on supported filters and syntax, see [Certificates
+      Filtering documentation](https://cloud.google.com/certificate-authority-
+      service/docs/sorting-filtering-certificates#filtering_support).
+    orderBy: Optional. Specify how the results should be sorted. For details
+      on supported fields and syntax, see [Certificates Sorting
+      documentation](https://cloud.google.com/certificate-authority-
+      service/docs/sorting-filtering-certificates#sorting_support).
     pageSize: Optional. Limit on the number of Certificates to include in the
       response. Further Certificates can subsequently be obtained by including
       the ListCertificatesResponse.next_page_token in a subsequent request. If
@@ -1871,58 +1886,6 @@ class PrivatecaProjectsLocationsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
-class PrivatecaProjectsLocationsReusableConfigsCreateRequest(_messages.Message):
-  r"""A PrivatecaProjectsLocationsReusableConfigsCreateRequest object.
-
-  Fields:
-    parent: Required. The resource name of the location associated with the
-      ReusableConfig, in the format `projects/*/locations/*`.
-    requestId: Optional. An ID to identify requests. Specify a unique request
-      ID so that if you must retry your request, the server will know to
-      ignore the request if it has already been completed. The server will
-      guarantee that for at least 60 minutes since the first request. For
-      example, consider a situation where you make an initial request and t he
-      request times out. If you make the request again with the same request
-      ID, the server can check if original operation with the same request ID
-      was received, and if so, will ignore the second request. This prevents
-      clients from accidentally creating duplicate commitments. The request ID
-      must be a valid UUID with the exception that zero UUID is not supported
-      (00000000-0000-0000-0000-000000000000).
-    reusableConfig: A ReusableConfig resource to be passed as the request
-      body.
-    reusableConfigId: Required. It must be unique within a location and match
-      the regular expression `[a-zA-Z0-9_-]{1,63}`
-  """
-
-  parent = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  reusableConfig = _messages.MessageField('ReusableConfig', 3)
-  reusableConfigId = _messages.StringField(4)
-
-
-class PrivatecaProjectsLocationsReusableConfigsDeleteRequest(_messages.Message):
-  r"""A PrivatecaProjectsLocationsReusableConfigsDeleteRequest object.
-
-  Fields:
-    name: Required. The resource name for this ReusableConfig in the format
-      `projects/*/locations/*/reusableConfigs/*`.
-    requestId: Optional. An ID to identify requests. Specify a unique request
-      ID so that if you must retry your request, the server will know to
-      ignore the request if it has already been completed. The server will
-      guarantee that for at least 60 minutes since the first request. For
-      example, consider a situation where you make an initial request and t he
-      request times out. If you make the request again with the same request
-      ID, the server can check if original operation with the same request ID
-      was received, and if so, will ignore the second request. This prevents
-      clients from accidentally creating duplicate commitments. The request ID
-      must be a valid UUID with the exception that zero UUID is not supported
-      (00000000-0000-0000-0000-000000000000).
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-
-
 class PrivatecaProjectsLocationsReusableConfigsGetIamPolicyRequest(_messages.Message):
   r"""A PrivatecaProjectsLocationsReusableConfigsGetIamPolicyRequest object.
 
@@ -1979,34 +1942,6 @@ class PrivatecaProjectsLocationsReusableConfigsListRequest(_messages.Message):
   parent = _messages.StringField(5, required=True)
 
 
-class PrivatecaProjectsLocationsReusableConfigsPatchRequest(_messages.Message):
-  r"""A PrivatecaProjectsLocationsReusableConfigsPatchRequest object.
-
-  Fields:
-    name: Output only. The resource path for this ReusableConfig in the format
-      `projects/*/locations/*/reusableConfigs/*`.
-    requestId: Optional. An ID to identify requests. Specify a unique request
-      ID so that if you must retry your request, the server will know to
-      ignore the request if it has already been completed. The server will
-      guarantee that for at least 60 minutes since the first request. For
-      example, consider a situation where you make an initial request and t he
-      request times out. If you make the request again with the same request
-      ID, the server can check if original operation with the same request ID
-      was received, and if so, will ignore the second request. This prevents
-      clients from accidentally creating duplicate commitments. The request ID
-      must be a valid UUID with the exception that zero UUID is not supported
-      (00000000-0000-0000-0000-000000000000).
-    reusableConfig: A ReusableConfig resource to be passed as the request
-      body.
-    updateMask: Required. A list of fields to be updated in this request.
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  reusableConfig = _messages.MessageField('ReusableConfig', 3)
-  updateMask = _messages.StringField(4)
-
-
 class PrivatecaProjectsLocationsReusableConfigsSetIamPolicyRequest(_messages.Message):
   r"""A PrivatecaProjectsLocationsReusableConfigsSetIamPolicyRequest object.
 
@@ -2045,8 +1980,12 @@ class PublicKey(_messages.Message):
     TypeValueValuesEnum: Required. The type of public key.
 
   Fields:
-    key: Required. A public key. Padding and encoding varies by 'KeyType' and
-      is described along with the KeyType values.
+    key: Required. A public key. When this is specified in a request, the
+      padding and encoding can be any of the options described by the
+      respective 'KeyType' value. When this is generated by the service, it
+      will always be an RFC 5280
+      [SubjectPublicKeyInfo](https://tools.ietf.org/html/rfc5280#section-4.1)
+      structure containing an algorithm identifier and a key.
     type: Required. The type of public key.
   """
 
@@ -2055,9 +1994,12 @@ class PublicKey(_messages.Message):
 
     Values:
       KEY_TYPE_UNSPECIFIED: Default unspecified value.
-      PEM_RSA_KEY: A PEM-encoded PKCS#1/RFC 3447 RSAPrivateKey structure.
+      PEM_RSA_KEY: A PEM-encoded PKCS#1/RFC 3447 RSAPrivateKey structure, or
+        an RFC 5280 [SubjectPublicKeyInfo](https://tools.ietf.org/html/rfc5280
+        #section-4.1) structure containing the former.
       PEM_EC_KEY: A PEM-encoded compressed NIST P-256/secp256r1/prime256v1 or
-        P-384 key.
+        P-384 key, or an RFC 5280 [SubjectPublicKeyInfo](https://tools.ietf.or
+        g/html/rfc5280#section-4.1) structure containing the former.
     """
     KEY_TYPE_UNSPECIFIED = 0
     PEM_RSA_KEY = 1

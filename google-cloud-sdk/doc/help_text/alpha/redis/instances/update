@@ -3,9 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha redis instances update (INSTANCE : --region=REGION) [--async]
-        [--display-name=DISPLAY_NAME] [--remove-redis-config=[KEY,...]]
-        [--size=SIZE] [--update-labels=[KEY=VALUE,...]]
-        [--update-redis-config=KEY=VALUE]
+        [--display-name=DISPLAY_NAME] [--enable-auth]
+        [--remove-redis-config=[KEY,...]] [--size=SIZE]
+        [--update-labels=[KEY=VALUE,...]] [--update-redis-config=KEY=VALUE]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -42,6 +42,9 @@ FLAGS
 
      --display-name=DISPLAY_NAME
         A human-readable name for the instance.
+
+     --enable-auth
+        Enables Redis AUTH for the instance.
 
      --remove-redis-config=[KEY,...]
         A list of Redis config parameters to remove. Removing a non-existent

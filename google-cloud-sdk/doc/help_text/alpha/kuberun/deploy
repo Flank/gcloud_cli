@@ -1,0 +1,29 @@
+NAME
+    gcloud alpha kuberun deploy - deploy KubeRun application
+
+SYNOPSIS
+    gcloud alpha kuberun deploy [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Deploy KubeRun application.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To deploy KubeRun application, run:
+
+        $ gcloud alpha kuberun deploy
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access allowlist.
+

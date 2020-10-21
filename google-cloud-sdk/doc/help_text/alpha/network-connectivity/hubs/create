@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha network-connectivity hubs create HUB [--async]
-        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--labels=KEY=VALUE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new hub with the given name.
@@ -26,6 +26,9 @@ FLAGS
 
      --description=DESCRIPTION
         Description of the hub.
+
+     --labels=KEY=VALUE
+        List of label KEY=VALUE pairs to add.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

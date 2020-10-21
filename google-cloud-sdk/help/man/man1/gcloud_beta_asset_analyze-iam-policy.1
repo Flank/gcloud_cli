@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta asset analyze\-iam\-policy \- analyzes accessible IAM policies that match a request
+gcloud beta asset analyze\-iam\-policy \- analyzes IAM policies that match a request
 
 
 
@@ -17,7 +17,7 @@ gcloud beta asset analyze\-iam\-policy \- analyzes accessible IAM policies that 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Analyzes accessible IAM policies that match a request.
+\fB(BETA)\fR Analyzes IAM policies that match a request.
 
 
 
@@ -81,7 +81,7 @@ The analysis options.
 If true, the response will include access analysis from identities to resources
 via service account impersonation. This is a very expensive operation, because
 many derived queries will be executed. We highly recommend you use
-ExportIamPolicyAnalysis rpc instead. Default is false.
+AnalyzeIamPolicyLongrunning rpc instead. Default is false.
 
 .TP 2m
 \fB\-\-execution\-timeout\fR=\fIEXECUTION_TIMEOUT\fR

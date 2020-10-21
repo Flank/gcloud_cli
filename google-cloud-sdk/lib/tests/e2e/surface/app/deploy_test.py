@@ -52,11 +52,14 @@ class DeployConfigTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
       why=('App deploy is flaky but eventually consistent.'),
       max_retrials=5,
       sleep_ms=500)
-  def _deployConfig(self, filename):
+  def _deployConfig(self, filename, cli_args=None):
+    if not cli_args:
+      cli_args = ['--verbosity=debug', 'app', 'deploy']
     config_path = os.path.join(self.test_config_dir, filename)
+    cli_args.append(config_path)
     self.ExecuteScript(
         'gcloud',
-        ['--verbosity=debug', 'app', 'deploy', config_path],
+        cli_args,
         timeout=DeployConfigTests.TIMEOUT)
 
   def testDeployCron(self):
@@ -64,6 +67,12 @@ class DeployConfigTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
 
   def testDeployQueue(self):
     self._deployConfig('queue.yaml')
+
+  def testDeplpoyQueueCloudTasksApis(self):
+    self._deployConfig(
+        'queue.yaml',
+        cli_args=[
+            'beta', 'app', 'deploy', '--use-ct-apis'])
 
   def testDeployDispatch(self):
     self._deployConfig('dispatch.yaml')

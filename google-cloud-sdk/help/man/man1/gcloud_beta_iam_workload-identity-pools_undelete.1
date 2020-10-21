@@ -1,0 +1,91 @@
+
+.TH "GCLOUD_BETA_IAM_WORKLOAD\-IDENTITY\-POOLS_UNDELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iam workload\-identity\-pools undelete \- undelete a WorkloadIdentityPool
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iam workload\-identity\-pools undelete\fR (\fIWORKLOAD_IDENTITY_POOL\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Undelete a WorkloadIdentityPool.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+WorkloadIdentityPool resource \- The WorkloadIdentityPool to undelete. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[workload_identity_pool] on the command line with a fully specified name; set
+the property [core/project]; provide the argument [\-\-project] on the command
+line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIWORKLOAD_IDENTITY_POOL\fR
+ID of the WorkloadIdentityPool or fully qualified identifier for the
+WorkloadIdentityPool. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location name.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBiam/v1beta\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iam/
+
+
+
+.SH "EXAMPLES"
+
+The following command undeletes the WorkloadIdentityPool with the ID
+\'my\-workload\-identity\-pool':
+
+.RS 2m
+$ gcloud beta iam workload\-identity\-pools undelete \e
+    my\-workload\-identity\-pool \-\-location=global
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha iam workload\-identity\-pools undelete
+.RE
+

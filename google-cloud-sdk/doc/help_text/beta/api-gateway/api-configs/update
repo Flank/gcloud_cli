@@ -81,13 +81,14 @@ EXAMPLES
     To update the display name of an API config, run:
 
         $ gcloud beta api-gateway api-configs update my-config \
-            --api my-api --display-name="New Display Name"
+            --api=my-api --display-name="New Display Name"
 
     NOTE: Only the display name and labels attributes are mutable on an API
     config.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha api-gateway api-configs update
 

@@ -9,8 +9,11 @@ SYNOPSIS
         [--backup-location=BACKUP_LOCATION]
         [--backup-start-time=BACKUP_START_TIME] [--collation=COLLATION]
         [--cpu=CPU] [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
-        [--database-version=DATABASE_VERSION] [--enable-bin-log]
-        [--enable-point-in-time-recovery]
+        [--database-version=DATABASE_VERSION]
+        [--deny-maintenance-period-end-date=DENY_MAINTENANCE_PERIOD_END_DATE]
+        [--deny-maintenance-period-start-date=DENY_MAINTENANCE_PERIOD_START_DATE]
+        [--deny-maintenance-period-time=DENY_MAINTENANCE_PERIOD_TIME]
+        [--enable-bin-log] [--enable-point-in-time-recovery]
         [--failover-replica-name=FAILOVER_REPLICA_NAME]
         [--labels=[KEY=VALUE,...]]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
@@ -112,6 +115,16 @@ FLAGS
         The database engine type and version. If left unspecified, the API
         defaults will be used. See the list of database versions at
         https://cloud.google.com/sql/docs/mysql/admin-api/v1beta4/instances#databaseVersion
+
+     --deny-maintenance-period-end-date=DENY_MAINTENANCE_PERIOD_END_DATE
+        Date when the deny maintenance period ends, that is ``2021-01-10".
+
+     --deny-maintenance-period-start-date=DENY_MAINTENANCE_PERIOD_START_DATE
+        Date when the deny maintenance period begins, that is ``2020-11-01".
+
+     --deny-maintenance-period-time=DENY_MAINTENANCE_PERIOD_TIME
+        Time when the deny maintenance period starts or ends, that is
+        ``05:00:00".
 
      --enable-bin-log
         Allows for data recovery from a specific point in time, down to a

@@ -22,6 +22,7 @@ from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib import redis
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -91,17 +92,25 @@ class InstancesUnitTestBase(UnitTestBase):
   def MakeDefaultInstance(self, name=None):
     network_ref = resources.REGISTRY.Create(
         'compute.networks', project=self.Project(), network='default')
-    return self.messages.Instance(
+
+    redis_instance = self.messages.Instance(
         name=name,
         authorizedNetwork=network_ref.RelativeName(),
         memorySizeGb=1,
         tier=self.messages.Instance.TierValueValuesEnum('BASIC'))
 
+    if (self.track == calliope_base.ReleaseTrack.ALPHA or
+        self.track == calliope_base.ReleaseTrack.BETA):
+      redis_instance.authEnabled = False
+
+    return redis_instance
+
   def MakeAllOptionsInstance(self,
                              name=None,
                              redis_version='REDIS_3_2',
                              connect_mode='DIRECT_PEERING',
-                             transit_encryption_mode=None):
+                             transit_encryption_mode=None,
+                             auth_enabled=None):
     network_ref = resources.REGISTRY.Create(
         'compute.networks', project=self.Project(), network='my-network')
     redis_configs = {
@@ -149,6 +158,10 @@ class InstancesUnitTestBase(UnitTestBase):
     if transit_encryption_mode == 'SERVER_AUTHENTICATION':
       redis_instance.transitEncryptionMode = self.messages.Instance.TransitEncryptionModeValueValuesEnum(
           'SERVER_AUTHENTICATION')
+
+    if auth_enabled is not None:
+      redis_instance.authEnabled = auth_enabled
+
     return redis_instance
 
 

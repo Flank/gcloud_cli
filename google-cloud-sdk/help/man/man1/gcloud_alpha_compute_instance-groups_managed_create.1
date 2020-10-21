@@ -132,31 +132,34 @@ default.
 .sp
 .TP 2m
 \fB\-\-target\-distribution\-shape\fR=\fISHAPE\fR
-Specify distribution policy target shape.
+Specifies how a regional managed instance group distributes its instances across
+zones within the region.
 
-Target shape may be specified for regional managed instance group only. By
-default it is set to EVEN.
-
-The following target shapes are available:
+.RS 2m
+The following target shape are available:
+.RE
 
 .RS 2m
 .IP "\(em" 2m
-EVEN \- The managed instance group creates the same number of managed instances
-in each zone without consideration for resource availability.
-
+\f5\fIEVEN\fR\fR ‒ The group schedules VM instance creation and deletion in a
+way that maintains an even number of managed instances across the selected
+zones. Recommended for highly available serving workloads.
 .IP "\(em" 2m
-ANY \- The managed instance group creates managed instances in zones that have
-available resources \- such as specialized hardware \- and will not attempt to
-converge to even distribution. All VMs might end up in a single zone.
-
+\f5\fIBALANCED\fR\fR ‒ The group prioritizes acquisition of resources \-
+scheduling VMs in zones where resources are available \- while distributing VMs
+as evenly as possible across selected zones to minimize the impact of
+zone\-level failure. Recommended for highly available serving or batch workloads
+that do not require autoscaling.
 .IP "\(em" 2m
-BALANCED \- The managed instance group creates managed instances in zones as
-evenly as possible given availability of resources in each zone, such as
-availability of specialized hardware.
+\f5\fIANY\fR\fR ‒ The group picks zones for creating VM instances to fulfill the
+requested number of VMs within present capacity constraints. Recommended for
+batch workloads that do not require high availability.
 
 .RE
 .RE
 .sp
+If not specified, the default shape is \f5\fIEVEN\fR\fR.
+
 \fISHAPE\fR must be one of: \fBEVEN\fR, \fBANY\fR, \fBBALANCED\fR.
 
 .RS 2m

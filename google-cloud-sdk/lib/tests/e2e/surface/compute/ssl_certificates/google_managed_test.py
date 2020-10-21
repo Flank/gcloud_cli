@@ -70,9 +70,10 @@ class GoogleManagedSslCertificateTest(
           cert.type)
 
       self.assertEqual(domains, cert.managed.domains)
-      self.assertEqual(
-          self.managed.StatusValueValuesEnum.PROVISIONING,
-          cert.managed.status)
+      self.assertIn(
+          cert.managed.status,
+          [self.managed.StatusValueValuesEnum.PROVISIONING,
+           self.managed.StatusValueValuesEnum.PROVISIONING_FAILED])
 
     # test create
     result = self.Run('compute ssl-certificates create {0} --domains {1}'

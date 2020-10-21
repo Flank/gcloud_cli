@@ -34,15 +34,15 @@ def patch(unit_test_function):
   @mock_cloud_api.patch
   def my_api_test(self, mock_client):
     # Set return values for successive calls to API client function.
-    mock_client.GetBucket.side_effect = ['bucket1_data,', 'bucket2_data', ...]
+    mock_client.get_bucket.side_effect = ['bucket1_data,', 'bucket2_data', ...]
 
     # Test logic.
     ...
 
     # Make sure successive calls to API client function had correct arguments.
     # The mock.call objects can be used to represent args and kwargs together.
-    mock_client.GetBucket.assert_has_calls([mock.call('bucket1', extra=True),
-                                            mock.call('bucket2'), ...])
+    mock_client.get_bucket.assert_has_calls([mock.call('bucket1', extra=True),
+                                             mock.call('bucket2'), ...])
 
   Args:
     unit_test_function (function): Unit test to decorate.

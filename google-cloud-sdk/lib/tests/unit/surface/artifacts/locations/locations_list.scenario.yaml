@@ -22,7 +22,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -46,7 +46,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json&pageSize=1
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json&pageSize=1
           method: GET
           headers: {}
           body: null
@@ -60,7 +60,7 @@ actions:
               locationId: asia-east2
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json&pageSize=1&pageToken=asdf
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json&pageSize=1&pageToken=asdf
           method: GET
           headers: {}
           body: null

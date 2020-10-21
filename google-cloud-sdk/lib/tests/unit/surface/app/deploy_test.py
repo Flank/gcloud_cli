@@ -2186,5 +2186,26 @@ class BetaDeploy(DeployWithFlexBase):
                             {'app_id': self.Project()})
     self.AssertPostDeployHints(dispatch=True)
 
+  def testDeploy_CronYaml(self):
+    """Test deployment and hinting for cron.yaml when using use-ct-apis flag."""
+    self.WriteConfig(self.CRON_DATA)
+    self.ExpectGetApplicationRequest(self.Project())
+    structured_output = self.Run('app deploy {0} --use-ct-apis'.format(
+        self.FullPath(self.CRON_DATA[0])))
+
+    self.assertEqual(structured_output, {
+        'configs': ['cron'],
+        'versions': []
+    })
+    self.AssertConfigDeployed(cron=True)
+    self.AssertPostDeployHints(cron=True, cron_with_tasks=True)
+
+  def testDeploy_QueueYamlWithInvalidPath(self):
+    invalid_path = os.path.abspath(os.path.join('dummy', 'path', 'queue.yaml'))
+    with self.assertRaisesRegex(
+        app_exceptions.FileNotFoundError, 'does not exist'):
+      self.Run(r'app deploy {} --use-ct-apis'.format(invalid_path))
+
+
 if __name__ == '__main__':
   test_case.main()

@@ -54,11 +54,11 @@ EXAMPLES
     Describe source with display name 'Security Scanner':
 
         $ gcloud scc sources describe 123456 \
-            --source-display-name "Security Scanner"
+            --source-display-name="Security Scanner"
 
     Describe source with source id '5678':
 
-        $ gcloud scc sources describe 123456 --source 5678
+        $ gcloud scc sources describe 123456 --source=5678
 
 NOTES
     These variants are also available:

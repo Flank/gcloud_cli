@@ -1,5 +1,5 @@
 title: pubsub lite-topics list scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # Set all required flags for list command.

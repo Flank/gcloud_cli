@@ -176,15 +176,15 @@ EXAMPLES
             --display-name='My workload pool provider' \
             --description='My workload pool provider description' \
             --disabled \
-            --atribute-mapping='google.subject=assertion.arn' \
+            --attribute-mapping='google.subject=assertion.arn' \
             --attribute-condition='true' \
-            --account-id=1234567890 \
-            --sts-uri=https://sts.amazonaws.com
+            --account-id=1234567890
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access allowlist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta iam workload-identity-pools providers update-aws
 

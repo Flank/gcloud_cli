@@ -31,6 +31,9 @@ GROUPS
      oauth-clients
         (ALPHA) Manage IAP OAuth clients.
 
+     settings
+        (ALPHA) Manage IAP settings.
+
      web
         (ALPHA) Manage IAP web policies.
 

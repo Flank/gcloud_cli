@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.command_lib.storage import name_expansion
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import wildcard_iterator
+from googlecloudsdk.command_lib.storage.resources import resource_reference
 from googlecloudsdk.command_lib.storage.tasks.cp import copy_task_iterator
 from googlecloudsdk.command_lib.storage.tasks.cp import file_download_task
 from googlecloudsdk.command_lib.storage.tasks.cp import file_upload_task
@@ -295,7 +295,8 @@ class CopyTaskIteratorTest(parameterized.TestCase):
           'sources': [_get_name_expansion_result('gs://src/obj1')],
           'destination_string': 'gs://dest/obj1',
           'expected_dest_resources': [
-              test_resources.get_object_resource('gs', 'dest', 'obj1'),
+              test_resources.get_object_resource(
+                  storage_url.ProviderPrefix.GCS, 'dest', 'obj1'),
           ],
           'task_type': intra_cloud_copy_task.IntraCloudCopyTask
       },

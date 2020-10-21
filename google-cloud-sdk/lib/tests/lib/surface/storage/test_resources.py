@@ -18,8 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
+from googlecloudsdk.command_lib.storage.resources import resource_reference
 
 
 def get_bucket_resource(scheme, name):
@@ -81,7 +81,7 @@ def from_url_string(url_string):
   if parsed_url.is_object() and not url_string.endswith(
       storage_url.CloudUrl.CLOUD_URL_DELIM):
     return get_object_resource(parsed_url.scheme, parsed_url.bucket_name,
-                               parsed_url.object_name)
+                               parsed_url.object_name, parsed_url.generation)
   # See docstring.
   if parsed_url.is_object() and url_string.endswith(
       storage_url.CloudUrl.CLOUD_URL_DELIM):

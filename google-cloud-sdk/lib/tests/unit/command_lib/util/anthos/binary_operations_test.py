@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+import sys
 
 from googlecloudsdk.command_lib.util.anthos import binary_operations
 from googlecloudsdk.core import config
@@ -26,6 +27,7 @@ from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core.updater import local_state
 from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -138,6 +140,11 @@ class StreamingBinaryOperation(
     return ['-a', arg1_val, '-b', six.text_type(arg2_val)]
 
 
+@test_case.Filters.skipIf(
+    (not encoding.GetEncodedValue(os.environ, 'KOKORO_JOB_NAME')
+     and sys.version_info.major == 2),
+    'Broken pipe flake', 'b/168728547'
+)
 @test_case.Filters.DoNotRunInDebPackage('Given test binaries are grte which do '
                                         'not work on non google machines')
 @test_case.Filters.DoNotRunInRpmPackage('Given test binaries are grte which do '
@@ -287,6 +294,11 @@ class BinaryOperationsTests(parameterized.TestCase,
       operation(string_val='foo', int_val=1, execution_dir='NOT_REAL')
 
 
+@test_case.Filters.skipIf(
+    (not encoding.GetEncodedValue(os.environ, 'KOKORO_JOB_NAME')
+     and sys.version_info.major == 2),
+    'Broken pipe flake', 'b/168728547'
+)
 @test_case.Filters.DoNotRunInDebPackage('packaging does not contain test_data')
 @test_case.Filters.DoNotRunInRpmPackage('packaging does not contain test_data')
 class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
@@ -455,6 +467,11 @@ class StreamingBinaryOperationsTests(sdk_test_base.WithLogCapture,
     self.AssertErrContains('Parameter -a required.')
 
 
+@test_case.Filters.skipIf(
+    (not encoding.GetEncodedValue(os.environ, 'KOKORO_JOB_NAME')
+     and sys.version_info.major == 2),
+    'Broken pipe flake', 'b/168728547'
+)
 @test_case.Filters.DoNotRunInDebPackage('packaging does not contain test_data')
 @test_case.Filters.DoNotRunInRpmPackage('packaging does not contain test_data')
 class StructuredOutputTests(sdk_test_base.WithLogCapture,
@@ -601,6 +618,11 @@ class StructuredOutputTests(sdk_test_base.WithLogCapture,
       binary_operations.ProcessStructuredErr(result)
 
 
+@test_case.Filters.skipIf(
+    (not encoding.GetEncodedValue(os.environ, 'KOKORO_JOB_NAME')
+     and sys.version_info.major == 2),
+    'Broken pipe flake', 'b/168728547'
+)
 @test_case.Filters.DoNotRunInDebPackage('packaging does not contain test_data')
 @test_case.Filters.DoNotRunInRpmPackage('packaging does not contain test_data')
 class StreamingStructuredOutputTests(sdk_test_base.WithLogCapture,
@@ -786,7 +808,6 @@ class StreamingStructuredOutputTests(sdk_test_base.WithLogCapture,
         execution_dir='.')
     self.AssertErrContains('Expected structured message, logging as raw text')
     self.assertEqual(expected_result, actual_result)
-
 
 if __name__ == '__main__':
   test_case.main()

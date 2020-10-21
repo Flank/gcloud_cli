@@ -11,7 +11,7 @@ gcloud beta emulators spanner start \- start a local Cloud Spanner emulator
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta emulators spanner start\fR [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fB\-\-rest\-port\fR=\fIREST_PORT\fR] [\fB\-\-use\-docker\fR=\fIUSE_DOCKER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta emulators spanner start\fR [\fB\-\-enable\-fault\-injection\fR=\fIENABLE_FAULT_INJECTION\fR] [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fB\-\-rest\-port\fR=\fIREST_PORT\fR] [\fB\-\-use\-docker\fR=\fIUSE_DOCKER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,6 +24,11 @@ gcloud beta emulators spanner start \- start a local Cloud Spanner emulator
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-enable\-fault\-injection\fR=\fIENABLE_FAULT_INJECTION\fR
+If true, the emulator will randomly inject faults into transactions. This
+facilitates application abort\-retry testing.
+
 .TP 2m
 \fB\-\-host\-port\fR=\fIHOST_PORT\fR
 The host:port to which the emulator should be bound. The default value is

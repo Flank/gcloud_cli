@@ -43,13 +43,10 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
     self.source_uri = 'gs://31dd/source-vm.ova'
     self.https_source_disk = ('https://storage.googleapis.com/'
                               '31dd/source-vm.ova')
-    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
-        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
+    self.ovf_builder = ''
     self.os = 'ubuntu-1604'
     self.tags = ['gce-daisy', 'gce-ovf-machine-image-import']
     self.zone = 'us-west1-c'
-    properties.VALUES.compute.zone.Set(self.zone)
 
   def PrepareZonalMocksForValidZone(self, zone):
     self.make_requests.side_effect = iter([
@@ -73,8 +70,13 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
       del requests, errors_to_collect, progress_tracker, followup_overrides, no_followup, http, errors, batch_url, log_result, timeout, always_return_operation
       # For the call to daisy_utils.ValidateZone
       raise exceptions.ToolException('')
-
     self.make_requests.side_effect = make_requests_mock
+
+  def prepareArtifactRegistryMocks(self,
+                                   expect_source_file_bucket_check=True,
+                                   expected_builder_location='',
+                                   regionalized=True):
+    pass
 
   def GetOVFImportStep(self, machine_image_name=None):
     return self.GetOVFImportStepForArgs([
@@ -83,11 +85,10 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
-        '-zone={0}'.format(self.zone),
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
-    ],)
+    ])
 
   def GetOVFNetworkStep(self, network_args):
     return self.GetOVFImportStepForArgs([
@@ -96,27 +97,44 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format(self.source_uri),
     ] + network_args + [
         '-os={0}'.format(self.os),
-        '-zone={0}'.format(self.zone),
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
     ])
 
-  def GetOVFImportStepForArgs(self, args):
+  def GetOVFImportStepForArgs(self, args, zone=''):
     return self.cloudbuild_v1_messages.BuildStep(
         args=args,
-        name=self.ovf_builder,
+        name=self.GetBuilder(zone=zone, region='my-region'),
     )
+
+  def GetBuilder(self,
+                 zone='',
+                 region='',
+                 tag=daisy_utils._DEFAULT_BUILDER_VERSION):
+    if self.ovf_builder:
+      return self.ovf_builder
+    return daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+        docker_image_tag=tag)
 
   def PrepareMocks(self,
                    step,
                    async_flag=False,
                    permissions=None,
                    timeout='7200s',
-                   log_location=None):
+                   log_location=None,
+                   zone=''):
     self.PrepareDaisyMocks(
-        step, async_flag=async_flag, permissions=permissions, timeout=timeout,
+        step,
+        async_flag=async_flag,
+        permissions=permissions,
+        timeout=timeout,
         log_location=log_location)
+    self.prepareArtifactRegistryMocks(
+        expect_source_file_bucket_check=False if zone else True,
+        expected_builder_location=daisy_utils
+        .GetRegionFromZone(zone) if zone else '')
 
   def testCommonCase(self):
     self.PrepareMocks(self.GetOVFImportStep())
@@ -175,7 +193,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
-        '-zone={0}'.format(self.zone),
         '-timeout=59s',  # OVF import timeout 2% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -191,7 +208,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
-        '-zone={0}'.format(self.zone),
         '-timeout=21300s',  # OVF import timeout 5min sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -232,7 +248,8 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
 
   def testOVFImportUsesZoneConfigProperty(self):
     properties.VALUES.compute.zone.Set('us-west1-c')
-    self.doZoneFlagTest(add_zone_cli_arg=False)
+    self.doZoneFlagTest(add_zone_cli_arg=False, zone='us-west1-c')
+    properties.VALUES.compute.zone.Set('')
 
   def doZoneFlagTest(self,
                      add_zone_cli_arg=True,
@@ -256,12 +273,12 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
-    ])
+    ], zone=zone)
 
     # Setting up mocks
     if is_valid_zone:
       self.PrepareZonalMocksForValidZone(zone)
-      self.PrepareMocks(ovf_import_step_with_zone)
+      self.PrepareMocks(ovf_import_step_with_zone, zone=zone)
     else:
       # No standard mocks are needed for invalid zone as the logic terminates
       # before any of the mocks are called.
@@ -294,7 +311,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-no-guest-environment',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -312,7 +328,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-can-ip-forward',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -329,7 +344,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-description=a_desc',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -346,7 +360,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-labels=lk1=lv1,lk2=lv2',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -363,7 +376,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-machine-type=n2-standard-4',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -380,7 +392,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-machine-type=custom-2-5120',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -398,7 +409,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-machine-type=n1-custom-2-5120-ext',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -502,7 +512,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-no-restart-on-failure',
             '-os={0}'.format(self.os),
-            '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
             '-release-track={0}'.format(self.track.id.lower()),
             '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -520,7 +529,6 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
         '-tags={0}'.format(tags),
-        '-zone={0}'.format(self.zone),
         '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -532,34 +540,33 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
                           tags))
 
   def testSourceFileBucketOnlyGCSPath(self):
-    self.doTestSourceFileBucketOnly('gs://bucket-name')
+    self.doTestSourceFileBucketOnly('gs://31dd')
 
   def testSourceFileBucketOnlyWithTrailingSlashGCSPath(self):
-    self.doTestSourceFileBucketOnly('gs://bucket-name/')
+    self.doTestSourceFileBucketOnly('gs://31dd/')
 
   def testSourceFileBucketOnlyHttpsGcsPath(self):
     self.doTestSourceFileBucketOnly(
-        'https://www.googleapis.com/storage/v1/b/bucket-name')
+        'https://www.googleapis.com/storage/v1/b/31dd')
 
   def testSourceFileBucketOnlyWithTrailingSlashHttpsGcsPath(self):
     self.doTestSourceFileBucketOnly(
-        'https://www.googleapis.com/storage/v1/b/bucket-name/')
+        'https://www.googleapis.com/storage/v1/b/31dd/')
 
   def testSourceFileBucketOnlyHttpGcsPath(self):
     self.doTestSourceFileBucketOnly(
-        'http://www.googleapis.com/storage/v1/b/bucket-name')
+        'http://www.googleapis.com/storage/v1/b/31dd')
 
   def testSourceFileBucketOnlyWithTrailingSlashHttpGcsPath(self):
     self.doTestSourceFileBucketOnly(
-        'http://www.googleapis.com/storage/v1/b/bucket-name/')
+        'http://www.googleapis.com/storage/v1/b/31dd/')
 
   def doTestSourceFileBucketOnly(self, bucket_path):
     ovf_import_step = self.GetOVFImportStepForArgs([
         '-machine-image-name={0}'.format(self.machine_image_name),
         '-client-id=gcloud',
-        '-ovf-gcs-path={0}'.format('gs://bucket-name/'),
+        '-ovf-gcs-path={0}'.format('gs://31dd/'),
         '-os={0}'.format(self.os),
-        '-zone={0}'.format(self.zone),
         '-timeout=6984s',  # OVF import timeout 3% sooner than Argo.
         '-release-track={0}'.format(self.track.id.lower()),
         '-client-version={0}'.format(config.CLOUD_SDK_VERSION),
@@ -579,14 +586,9 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
                """.format(self.machine_image_name, 'not-a-gcs-path', self.os))
 
   def testDockerImageTag(self):
-    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
-        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
     self.testCommonCase()
 
-    self.ovf_builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
-        docker_image_tag='latest')
+    self.ovf_builder = self.GetBuilder(tag='latest', region='my-region')
     self.PrepareMocks(self.GetOVFImportStep())
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2}
@@ -629,6 +631,74 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
                {0} --source-uri {1} --os {2} --log-location {3}
                """.format(self.machine_image_name, self.source_uri, self.os,
                           log_location))
+
+
+class MachineImageImportTestAlpha(MachineImageImportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    super(MachineImageImportTestAlpha, self).SetUp()
+    self.ovf_builder = ''
+
+  def prepareArtifactRegistryMocks(self,
+                                   expect_source_file_bucket_check=True,
+                                   expected_builder_location='',
+                                   regionalized=True):
+    region = self.GetScratchBucketRegion().lower(
+    ) if not expected_builder_location else expected_builder_location
+    if expect_source_file_bucket_check:
+      self.mocked_storage_v1.buckets.Get.Expect(
+          self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
+          response=self.storage_v1_messages.Bucket(
+              name='31dd', storageClass='REGIONAL', location=region),
+      )
+    if regionalized:
+      location = 'projects/compute-image-tools/locations/{}'.format(region)
+      repo_name = '{}/repositories/wrappers'.format(location)
+      package_name = '{}/packages/gce_ovf_import'.format(repo_name)
+
+      msgs = self.mocked_artifacts_v1beta2_messages
+      self.mocked_artifacts_v1beta2.projects_locations.List.Expect(
+          msgs.ArtifactregistryProjectsLocationsListRequest(
+              name='projects/compute-image-tools'),
+          response=msgs.ListLocationsResponse(
+              locations=[msgs.Location(name=location, locationId=region)]))
+
+      self.mocked_artifacts_v1beta2.projects_locations_repositories.Get.Expect(
+          msgs.ArtifactregistryProjectsLocationsRepositoriesGetRequest(
+              name=repo_name),
+          response=msgs.Repository(
+              name=repo_name,
+              format=msgs.Repository.FormatValueValuesEnum.DOCKER))
+
+      self.mocked_artifacts_v1beta2.projects_locations_repositories_packages.Get.Expect(
+          msgs.ArtifactregistryProjectsLocationsRepositoriesPackagesGetRequest(
+              name=package_name),
+          response=msgs.Package(name=package_name))
+
+  def GetBuilder(self,
+                 zone='',
+                 region='',
+                 tag=daisy_utils._DEFAULT_BUILDER_VERSION):
+    if self.ovf_builder:
+      return self.ovf_builder
+    builder_region = ''
+    if zone:
+      builder_region = daisy_utils.GetRegionFromZone(zone).lower()
+    elif region:
+      builder_region = region.lower()
+
+    if builder_region:
+      return daisy_utils._REGIONALIZED_BUILDER_DOCKER_PATTERN.format(
+          executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+          region=builder_region,
+          docker_image_tag=tag)
+    else:
+      return daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+          executable=daisy_utils._OVF_IMPORT_BUILDER_EXECUTABLE,
+          docker_image_tag=tag)
 
 
 if __name__ == '__main__':

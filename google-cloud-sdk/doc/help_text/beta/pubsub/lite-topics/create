@@ -74,8 +74,9 @@ EXAMPLES
             --message-retention-period=2w
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud pubsub lite-topics create
         $ gcloud alpha pubsub lite-topics create
 

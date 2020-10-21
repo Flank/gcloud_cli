@@ -15,13 +15,13 @@
 """Command to list available Kuberun Development Kits."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 from __future__ import unicode_literals
 
+import json
+
+from googlecloudsdk.api_lib.kuberun import devkit
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.kuberun import flags
 from googlecloudsdk.command_lib.kuberun import kuberun_command
-from googlecloudsdk.core import log
 
 _DETAILED_HELP = {
     'EXAMPLES':
@@ -38,27 +38,22 @@ class List(kuberun_command.KubeRunCommandWithOutput, base.ListCommand):
   """Lists available Development Kits."""
 
   detailed_help = _DETAILED_HELP
+  flags = []
 
-  # TODO(b/169182315): remove this method
-  @staticmethod
-  def AddTemporaryArgs(parser):
-    flags.AddNamespaceFlag(parser)
-
-  @staticmethod
-  def Args(parser):
+  @classmethod
+  def Args(cls, parser):
+    super(List, cls).Args(parser)
+    base.ListCommand._Flags(parser)
     base.URI_FLAG.RemoveFromParser(parser)
-    List.AddTemporaryArgs(parser)
-
-  def BuildKubeRunArgs(self, args):
-    return []
+    columns = ['id', 'name', 'description', 'version']
+    parser.display_info.AddFormat('table({})'.format(','.join(columns)))
 
   def Command(self):
     return ['devkits', 'list']
 
   def FormatOutput(self, out, args):
-    # TODO(b/169186627): handle this as JSON
-    return out
-
-  # TODO(b/169186627): remove this workaround
-  def Display(self, args, output):
-    log.out.write(output)
+    if out:
+      json_list = json.loads(out)
+      return [devkit.DevKit.FromJSON(x) for x in json_list]
+    else:
+      return []

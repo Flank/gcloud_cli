@@ -1,5 +1,5 @@
 title: pubsub lite-topics create scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 # Disabiling trailing spaces rule since the linter sees an extra space in string below that is
 # required for tests to pass
 # yamllint disable rule:trailing-spaces

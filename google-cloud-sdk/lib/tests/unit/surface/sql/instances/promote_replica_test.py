@@ -30,7 +30,18 @@ from tests.lib.surface.sql import base
 class _BaseInstancesPromoteReplicaTest(object):
   # pylint:disable=g-tzinfo-datetime
 
-  def _ExpectPromoteReplica(self):
+  def _ExpectInstanceLookup(self, database_version=None):
+    database_version = (
+        database_version or
+        self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum.MYSQL_5_7)
+    self.mocked_client.instances.Get.Expect(
+        self.messages.SqlInstancesGetRequest(
+            instance='replica-1',
+            project=self.Project(),
+        ), self.messages.DatabaseInstance(databaseVersion=database_version))
+
+  def _ExpectPromoteReplica(self, database_version=None):
+    self._ExpectInstanceLookup(database_version)
     self.mocked_client.instances.PromoteReplica.Expect(
         self.messages.SqlInstancesPromoteReplicaRequest(
             instance='replica-1',
@@ -120,11 +131,30 @@ class _BaseInstancesPromoteReplicaTest(object):
             user='170350250316@developer.gserviceaccount.com',
         ))
 
-  def testSimplePromote(self):
-    self._ExpectPromoteReplica()
+  def testSimplePromoteMysql(self):
+    self._ExpectPromoteReplica(database_version=self.messages.DatabaseInstance
+                               .DatabaseVersionValueValuesEnum.MYSQL_5_7)
     self.WriteInput('y')
 
     self.Run('sql instances promote-replica replica-1')
+    # It should link to the db-specific guidance for promote replica.
+    self.AssertErrContains(
+        'Learn more:\nhttps://cloud.google.com/sql/docs/mysql/replication/manage-replicas#promote-replica'
+    )
+    self.AssertErrContains(
+        'Promoted [https://sqladmin.googleapis.com/sql/v1beta4/'
+        'projects/{0}/instances/replica-1].'.format(self.Project()))
+
+  def testSimplePromotePostgres(self):
+    self._ExpectPromoteReplica(database_version=self.messages.DatabaseInstance
+                               .DatabaseVersionValueValuesEnum.POSTGRES_12)
+    self.WriteInput('y')
+
+    self.Run('sql instances promote-replica replica-1')
+    # It should link to the db-specific guidance for promote replica.
+    self.AssertErrContains(
+        'Learn more:\nhttps://cloud.google.com/sql/docs/postgres/replication/manage-replicas#promote-replica'
+    )
     self.AssertErrContains(
         'Promoted [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/replica-1].'.format(self.Project()))
@@ -139,6 +169,7 @@ class _BaseInstancesPromoteReplicaTest(object):
         'projects/{0}/instances/replica-1].'.format(self.Project()))
 
   def testPromoteNoConfirmCancels(self):
+    self._ExpectInstanceLookup()
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql instances promote-replica replica-1')

@@ -3,9 +3,9 @@ NAME
         session with Cloud Shell
 
 SYNOPSIS
-    gcloud beta cloud-shell ssh [--authorize-session] [--boosted]
-        [--command=COMMAND] [--dry-run] [--force-key-file-overwrite]
-        [--ssh-flag=SSH_FLAG] [--ssh-key-file] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta cloud-shell ssh [--authorize-session] [--command=COMMAND]
+        [--dry-run] [--force-key-file-overwrite] [--ssh-flag=SSH_FLAG]
+        [--ssh-key-file] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta cloud-shell ssh lets you remotely log in to Cloud Shell.
@@ -18,11 +18,6 @@ FLAGS
         on behalf of the user. When this completes, the session will be
         authorized to run various Google Cloud command-line tools without
         requiring the user to manually authenticate.
-
-     --boosted
-        If provided, starts Cloud Shell in boost mode. If there is alread a
-        running Cloud Shell session that is not boosted, this will restart the
-        session.
 
      --command=COMMAND
         A command to run in Cloud Shell.

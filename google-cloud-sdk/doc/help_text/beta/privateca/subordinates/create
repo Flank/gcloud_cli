@@ -12,10 +12,10 @@ SYNOPSIS
         [--issuance-policy=ISSUANCE_POLICY] [--labels=[KEY=VALUE,...]]
         [--no-publish-ca-cert] [--no-publish-crl] [--subject=[SUBJECT,...]]
         [--tier=TIER; default="enterprise"] [--uri-san=[URI_SAN,...]]
-        [--validity=VALIDITY; default="P10Y"]
+        [--validity=VALIDITY; default="P3Y"]
         [--from-ca=FROM_CA : --from-ca-location=FROM_CA_LOCATION
           --from-ca-project=FROM_CA_PROJECT]
-        [--key-algorithm=KEY_ALGORITHM; default="rsa-pss-4096-sha256"
+        [--key-algorithm=KEY_ALGORITHM; default="rsa-pkcs1-2048-sha256"
           | [--kms-key-version=KMS_KEY_VERSION : --kms-key=KMS_KEY
           --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]]
@@ -123,6 +123,8 @@ OPTIONAL FLAGS
         Note that the same bucket may be used for the CA cert if
         --publish-ca-cert is set.
 
+        CRL publication is not supported for CAs in the DevOps tier.
+
         Enabled by default, use --no-publish-crl to disable.
 
      --subject=[SUBJECT,...]
@@ -136,34 +138,35 @@ OPTIONAL FLAGS
      --uri-san=[URI_SAN,...]
         One or more comma-separated URI Subject Alternative Names.
 
-     --validity=VALIDITY; default="P10Y"
-        The validity of this CA, as an ISO8601 duration. Defaults to 10 years.
+     --validity=VALIDITY; default="P3Y"
+        The validity of this CA, as an ISO8601 duration. Defaults to 3 years.
 
-     Certificate Authority source resource - The name of the CA source for this
-     CA. The arguments in this group can be used to specify the attributes of
-     this resource.
+     Source CA resource - An existing CA from which to copy configuration
+     values for the new CA. You can still override any of those values by
+     explicitly providing the appropriate flags. The arguments in this group
+     can be used to specify the attributes of this resource.
 
        --from-ca=FROM_CA
-          ID of the Certificate Authority source or fully qualified identifier
-          for the Certificate Authority source. This flag must be specified if
-          any of the other arguments in this group are specified.
+          ID of the source CA or fully qualified identifier for the source CA.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
 
        --from-ca-location=FROM_CA_LOCATION
-          The location of the Certificate Authority source. Alternatively, you
-          can set the property [privateca/location].
+          The location of the source CA. Alternatively, you can set the
+          property [privateca/location].
 
        --from-ca-project=FROM_CA_PROJECT
-          Project ID of the Google Cloud Platform project for the Certificate
-          Authority source.
+          Project ID of the Google Cloud Platform project for the source CA.
 
      The key configuration used for the CA certificate. Defaults to a managed
      key if not specified. At most one of these may be specified:
 
-       --key-algorithm=KEY_ALGORITHM; default="rsa-pss-4096-sha256"
+       --key-algorithm=KEY_ALGORITHM; default="rsa-pkcs1-2048-sha256"
           The crypto algorithm to use for creating a managed KMS key for the
-          Certificate Authority. KEY_ALGORITHM must be one of: ec-p256-sha256,
-          ec-p384-sha384, rsa-pss-2048-sha256, rsa-pss-3078-sha256,
-          rsa-pss-4096-sha256.
+          Certificate Authority. The default is rsa-pkcs1-2048-sha256.
+          KEY_ALGORITHM must be one of: ec-p256-sha256, ec-p384-sha384,
+          rsa-pkcs1-2048-sha256, rsa-pkcs1-3072-sha256, rsa-pkcs1-4096-sha256,
+          rsa-pss-2048-sha256, rsa-pss-3078-sha256, rsa-pss-4096-sha256.
 
        Key version resource - The KMS key version backing this CA. The
        arguments in this group can be used to specify the attributes of this
@@ -237,32 +240,27 @@ EXAMPLES
     CA:
 
         $ gcloud beta privateca subordinates create server-tls-1 \
-          --subject "CN=Joonix TLS CA" \
-          --issuer prod-root --issuer-location us-west1 \
-          --kms-crypto-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
+          --subject="CN=Joonix TLS CA" \
+          --issuer=prod-root --issuer-location=us-west1 \
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
 
     To create a subordinate CA named 'server-tls-1' whose issuer is located
     elsewhere:
 
         $ gcloud beta privateca subordinates create server-tls-1 \
-          --subject "CN=Joonix TLS CA" \
+          --subject="CN=Joonix TLS CA" \
           --create-csr \
-          --csr-output-file "./csr.pem" \
-          --kms-crypto-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
+          --csr-output-file="./csr.pem" \
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
 
     To create a subordinate CA named 'server-tls-1' chaining up to a root CA
     named 'prod-root'based on an existing CA:
 
         $ gcloud beta privateca subordinates create server-tls-1 \
-          --issuer prod-root --issuer-location us-west1 \
-          --from-ca source-ca --from-ca-location us-central1 \
-          --kms-crypto-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
+          --issuer=prod-root --issuer-location=us-west1 \
+          --from-ca=source-ca --from-ca-location=us-central1 \
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

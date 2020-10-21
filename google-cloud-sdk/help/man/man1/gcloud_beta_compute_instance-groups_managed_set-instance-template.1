@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute instance\-groups managed set\-instance\-template \- set instance template for managed instance group
+gcloud beta compute instance\-groups managed set\-instance\-template \- set the instance template for a managed instance group
 
 
 
@@ -18,12 +18,26 @@ gcloud beta compute instance\-groups managed set\-instance\-template \- set inst
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute instance\-groups managed
-set\-instance\-template\fR updates the instance template for an existing managed
+set\-instance\-template\fR sets the instance template for an existing managed
 instance group.
 
-The new template won't apply to existing instances in the group unless they are
-recreated using the recreate\-instances command. But the new template does apply
-to all new instances added to the managed instance group.
+The new template applies to all new instances added to the managed instance
+group.
+
+To apply the new template to existing instances in the group, use one of the
+following methods:
+
+.RS 2m
+.IP "\(bu" 2m
+Update instances using the \f5update\-instances\fR command.
+.IP "\(bu" 2m
+Recreate instances using the \f5recreate\-instances\fR command.
+.IP "\(bu" 2m
+Use the \f5rolling\-action start\-update\fR command.
+.IP "\(bu" 2m
+Use the API to set the group's \f5updatePolicy.type\fR to \f5PROACTIVE\fR.
+.RE
+.sp
 
 
 

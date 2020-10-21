@@ -81,7 +81,7 @@ COMMANDS
         (BETA) Set autoscaling parameters of a managed instance group.
 
      set-instance-template
-        (BETA) Set instance template for managed instance group.
+        (BETA) Set the instance template for a managed instance group.
 
      set-named-ports
         (BETA) Sets the list of named ports for an instance group.

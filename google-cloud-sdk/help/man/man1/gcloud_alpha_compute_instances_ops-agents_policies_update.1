@@ -80,10 +80,16 @@ allowed values of the key are as follows.
 \fBtype\fR
 Type of agent to manage.
 
-\fBRequired\fR. Allowed values: \f5\fIlogging\fR\fR and \f5\fImetrics\fR\fR. Use
-\f5\fIlogging\fR\fR for the Logging Agent
+\fBRequired\fR. Allowed values: \f5\fIlogging\fR\fR, \f5\fImetrics\fR\fR and
+\f5\fIops\-agent\fR\fR. Use \f5\fIlogging\fR\fR for the Logging Agent
 (https://cloud.google.com/logging/docs/agent). Use \f5\fImetrics\fR\fR for the
-Monitoring Agent (https://cloud.google.com/monitoring/agent).
+Monitoring Agent (https://cloud.google.com/monitoring/agent). Use
+\f5\fIops\-agent\fR\fR for the Ops Agent
+(https://cloud.google.com/stackdriver/docs/solutions/ops\-agent). The Ops Agent
+has both a logging module and a metrics module already. So other types of agents
+are not allowed when there is an agent with type \f5\fIops\-agent\fR\fR. See
+https://cloud.google.com/stackdriver/docs/solutions/ops\-agent#which_agent for
+which agent to use.
 
 .TP 2m
 \fBversion\fR
@@ -448,7 +454,7 @@ etag (retrieved by an earlier command) is
 $ gcloud alpha compute instances ops\-agents policies update \e
     ops\-agents\-labels\-policy \-\-clear\-instances \e
     \-\-group\-labels="env=prod,product=myapp;env=staging,product=myapp\e
-" \-\-etag f59741c8\-bb5e\-4ee6\-bf6f\-c4ebeb6b06e0
+" \-\-etag=f59741c8\-bb5e\-4ee6\-bf6f\-c4ebeb6b06e0
 .RE
 
 

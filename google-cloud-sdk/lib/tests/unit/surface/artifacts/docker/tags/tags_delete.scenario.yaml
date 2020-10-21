@@ -25,7 +25,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -38,7 +38,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -55,7 +55,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags/my-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -72,7 +72,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -85,7 +85,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -102,7 +102,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fmy-image/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fmy-image/tags/my-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -119,7 +119,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -132,7 +132,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
           method: GET
           headers: {}
           body: null

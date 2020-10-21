@@ -24,6 +24,7 @@ from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.privateca import base as privateca_base
 from googlecloudsdk.api_lib.privateca import locations
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.privateca import create_utils
 from googlecloudsdk.core import properties
 from surface.privateca.roots import create as roots_create
@@ -215,6 +216,27 @@ class ParseCAResourceArgsTestMixin(object):
       'GetSupportedLocations',
       autospec=True,
       return_value=['us-west1', 'us-east1', 'europe-west1'])
+  def testUnderSpecifiedKmsKeyVersionRaisesException(self, _):
+    properties.VALUES.privateca.location.Set(None)
+    args = self.parser.parse_args([
+        'new-ca',
+        '--location=us-west1',
+        '--kms-key-version=1',
+    ] + self.other_args)
+
+    expected_error = """googlecloudsdk.calliope.concepts.handlers.ParseError: Error parsing [kms_key_version].
+The [key version] resource is not properly specified.
+Failed to find attribute [kms-keyring]. The attribute can be set in the following ways:
+- provide the argument [--kms-keyring] on the command line
+"""
+    with self.assertRaises(handlers.ParseError, msg=expected_error):
+      create_utils._ParseCAResourceArgs(args)
+
+  @mock.patch.object(
+      locations,
+      'GetSupportedLocations',
+      autospec=True,
+      return_value=['us-west1', 'us-east1', 'europe-west1'])
   def testSupportsMissingKmsKeyVersion(self, _):
     args = self.parser.parse_args([
         'new-ca',
@@ -272,6 +294,27 @@ class ParseCAResourceArgsTestMixin(object):
     _, ca_source_ref, _ = create_utils._ParseCAResourceArgs(args)
     self.assertEqual(ca_source_ref.locationsId, 'europe-west1')
     self.assertEqual(ca_source_ref.certificateAuthoritiesId, 'source-root')
+
+  @mock.patch.object(
+      locations,
+      'GetSupportedLocations',
+      autospec=True,
+      return_value=['us-west1', 'us-east1', 'europe-west1'])
+  def testUnderSpecifiedSourceRaisesException(self, _):
+    properties.VALUES.privateca.location.Set(None)
+    args = self.parser.parse_args([
+        'new-ca',
+        '--location=us-west1',
+        '--from-ca=source',
+    ] + self.other_args)
+
+    expected_error = """The [source CA] resource is not properly specified.
+Failed to find attribute [location]. The attribute can be set in the following ways:
+- provide the argument [--from-ca-location] on the command line
+- set the property [privateca/location]"
+"""
+    with self.assertRaises(handlers.ParseError, msg=expected_error):
+      create_utils._ParseCAResourceArgs(args)
 
 
 class SourceCAOverridesTestMixin(object):
@@ -451,6 +494,27 @@ class ParseSubordinateCAResourceArgsTest(ParseCAResourceArgsTestMixin,
     _, _, issuer_ref = create_utils._ParseCAResourceArgs(args)
     self.assertEqual(issuer_ref.locationsId, 'europe-west1')
     self.assertEqual(issuer_ref.certificateAuthoritiesId, 'my-root')
+
+  @mock.patch.object(
+      locations,
+      'GetSupportedLocations',
+      autospec=True,
+      return_value=['us-west1', 'us-east1', 'europe-west1'])
+  def testUnderSpecifiedIssuerFails(self, location_mock):
+    properties.VALUES.privateca.location.Set(None)
+    args = self.parser.parse_args([
+        'new-ca',
+        '--location=us-west1',
+        '--issuer=my-root',
+    ])
+
+    expected_error = """The [Issuer] resource is not properly specified.
+Failed to find attribute [location]. The attribute can be set in the following ways:
+- provide the argument [--issuer-location] on the command line
+- set the property [privateca/location]"
+"""
+    with self.assertRaises(handlers.ParseError, msg=expected_error):
+      create_utils._ParseCAResourceArgs(args)
 
 
 class SourceCAOverridesRootsTest(SourceCAOverridesTestMixin,

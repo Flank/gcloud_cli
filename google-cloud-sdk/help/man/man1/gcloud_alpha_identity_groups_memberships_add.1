@@ -11,7 +11,7 @@ gcloud alpha identity groups memberships add \- create a new membership in an ex
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha identity groups memberships add\fR \fB\-\-group\-email\fR=\fIGROUP_EMAIL\fR \fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-expiration\fR=\fIEXPIRATION\fR] [\fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha identity groups memberships add\fR \fB\-\-group\-email\fR=\fIGROUP_EMAIL\fR \fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR [\fB\-\-expiration\fR=\fIEXPIRATION\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -32,10 +32,6 @@ The email address of the group the new membership is being added to.
 \fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR
 The email address of the group or user being added to a group.
 
-.TP 2m
-\fB\-\-organization\fR=\fIORGANIZATION\fR
-The organization of the group the new membership is being added to.
-
 
 .RE
 .sp
@@ -50,8 +46,12 @@ now, for example '30d', '6m', '3y' for 30 days, 6 months, or 3 years
 respectively.
 
 .TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization ID of the group the new membership is being added to.
+
+.TP 2m
 \fB\-\-roles\fR=[\fIROLES\fR,...]
-A comma\-separated list of roles for the membership within the Group. If not
+A comma\-separated list of roles for a member within the Group. If not
 specified, MEMBER will be used as a default value.
 
 
@@ -83,7 +83,6 @@ To create a new membership in a group:
 .RS 2m
 $ gcloud alpha identity groups memberships add \e
     \-\-group\-email="eng\-discuss@foo.com"  \e
-    \-\-organization="5149234212"  \e
     \-\-member\-email="user@foo.com"
 .RE
 
@@ -94,9 +93,10 @@ $ gcloud alpha identity groups memberships add \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-allowlist. This variant is also available:
+allowlist. These variants are also available:
 
 .RS 2m
+$ gcloud identity groups memberships add
 $ gcloud beta identity groups memberships add
 .RE
 

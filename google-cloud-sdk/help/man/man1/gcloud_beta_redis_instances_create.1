@@ -11,7 +11,7 @@ gcloud beta redis instances create \- create a Memorystore Redis instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-connect\-mode\fR=\fICONNECT_MODE\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-redis\-version\fR=\fIVERSION\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-connect\-mode\fR=\fICONNECT_MODE\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-enable\-auth\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-redis\-version\fR=\fIVERSION\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -84,6 +84,10 @@ Network connection mode used by instances. \fICONNECT_MODE\fR must be one of:
 .TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 A human\-readable name for the instance.
+
+.TP 2m
+\fB\-\-enable\-auth\fR
+Enables Redis AUTH for the instance. If omitted AUTH is disabled.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]

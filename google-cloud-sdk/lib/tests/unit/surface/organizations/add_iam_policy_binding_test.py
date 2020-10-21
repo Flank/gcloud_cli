@@ -72,13 +72,13 @@ class OrganizationsAddIamPolicyBindingGA(testbase.OrganizationsUnitTestBase):
       self):
     self.SetupGetIamPolicyFailure(self.HTTP_404_ERR)
     with self.AssertRaisesHttpExceptionMatches(
-        'Organization [BAD_ID] not found: Resource not found.'):
+        'Organizations instance [BAD_ID] not found: Resource not found.'):
       self.DoRequest()
 
   def testAddIamPolicyBindingOrganization_raisesOrganizationsAccessError(self):
     self.SetupGetIamPolicyFailure(self.HTTP_403_ERR)
     with self.AssertRaisesHttpExceptionMatches(
-        'User [{}] does not have permission to access organization [SECRET_ID] '
+        'User [{}] does not have permission to access organizations instance [SECRET_ID] '
         '(or it may not exist): Permission denied.'.format(
             self.FakeAuthAccount())):
       self.DoRequest()

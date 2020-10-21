@@ -1,5 +1,5 @@
 title: Data Catalog describe taxonomy scenario test.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -14,6 +14,7 @@ actions:
     track_values:
       BETA: v1beta1
       ALPHA: v1beta1
+      GA: v1beta1
 - execute_command:
     command: data-catalog taxonomies describe 674858940116916528754321 --location=us
     events:

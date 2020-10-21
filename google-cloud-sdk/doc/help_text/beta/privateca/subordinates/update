@@ -67,6 +67,8 @@ FLAGS
         Note that the same bucket may be used for the CA cert if
         --publish-ca-cert is set.
 
+        CRL publication is not supported for CAs in the DevOps tier.
+
         Enabled by default, use --no-publish-crl to disable.
 
      --update-labels=[KEY=VALUE,...]
@@ -110,17 +112,15 @@ EXAMPLES
     To update labels on a subordinate CA:
 
         $ gcloud beta privateca subordinates update server-tls-1 \
-          --location us-west1 \
-          --update-labels foo=bar
+          --location=us-west1 \
+          --update-labels=foo=bar
 
     To disable publishing CRLs for a subordinate CA:
 
         $ gcloud beta privateca subordinates update server-tls-1 \
-          --location us-west1 \
+          --location=us-west1 \
           --no-publish-crl
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

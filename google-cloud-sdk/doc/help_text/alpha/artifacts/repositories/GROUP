@@ -41,6 +41,9 @@ COMMANDS
      set-iam-policy
         (ALPHA) Set the IAM policy for an Artifact Registry repository.
 
+     update
+        (ALPHA) Update an Artifact Registry repository.
+
 EXAMPLES
     To create a repository with the name my-repo, run:
 

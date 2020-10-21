@@ -144,7 +144,7 @@ class OVFimportTestBase(daisy_test_base.DaisyBaseTest):
 
     # Called once for each missed service account role.
     self._ExpectAddIamPolicyBinding(5)
-
+    self.prepareArtifactRegistryMocks()
     self._ExpectCloudBuild(self.GetOVFImportStep())
 
     self._RunAndAssertSuccess("""

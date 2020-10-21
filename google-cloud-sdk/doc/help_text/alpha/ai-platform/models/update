@@ -16,7 +16,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --description=DESCRIPTION
-        The description of the model.
+        Description of the model.
 
      --region=REGION
         Google Cloud region of the regional endpoint to use for this command.

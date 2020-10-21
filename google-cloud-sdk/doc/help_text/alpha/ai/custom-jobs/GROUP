@@ -30,6 +30,9 @@ COMMANDS
      list
         (ALPHA) Lists the existing custom jobs.
 
+     stream-logs
+        (ALPHA) Show stream logs from a running AI Platform custom job.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

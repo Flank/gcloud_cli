@@ -11,7 +11,7 @@ gcloud beta run deploy \- deploy a container to Cloud Run
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] \fB\-\-image\fR=\fIIMAGE\fR [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] \fB\-\-image\fR=\fIIMAGE\fR [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-no\-traffic\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -82,7 +82,14 @@ unset this field, provide the special value \f5default\fR.
 
 .TP 2m
 \fB\-\-cpu\fR=\fICPU\fR
-Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+Set a CPU limit in Kubernetes cpu units.
+
+Cloud Run (fully managed) supports values 1, 2 and 4. For Cloud Run (fully
+managed), 4 cpus also requires a minimum 2Gi \f5\-\-memory\fR value. Examples 2,
+2.0, 2000m
+
+Cloud Run for Anthos and Knative\-compatible Kubernetes clusters support
+fractional values. Examples .5, 500m, 2
 
 .TP 2m
 \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR
@@ -92,6 +99,11 @@ to unset the limit and use the platform default.
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
 Set a memory limit. Ex: 1Gi, 512Mi.
+
+.TP 2m
+\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR
+The minimum number of container instances of the Service to run or 'default' to
+remove any minimum.
 
 .TP 2m
 \fB\-\-platform\fR=\fIPLATFORM\fR
@@ -261,11 +273,6 @@ Visible only within the cluster.
 
 
 .TP 2m
-\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR
-The minimum number of container instances of the Service to run or 'default' to
-remove any minimum.
-
-.TP 2m
 \fB\-\-[no\-]use\-http2\fR
 Whether to use HTTP/2 for connections to the service. Use \fB\-\-use\-http2\fR
 to enable and \fB\-\-no\-use\-http2\fR to disable.
@@ -377,6 +384,24 @@ for a service named 'helloworld', would lead to a revision named
 .TP 2m
 \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR
 Set a VPC connector for this Service.
+
+.TP 2m
+\fB\-\-vpc\-egress\fR=\fIVPC_EGRESS\fR
+The outbound traffic to send through the VPC connector for this Service. This
+Service must have a VPC connector to set VPC egress. \fIVPC_EGRESS\fR must be
+one of:
+
+.RS 2m
+.TP 2m
+\fBall\fR
+Sends all outbound traffic through the VPC connector.
+.TP 2m
+\fBprivate\-ranges\-only\fR
+Default option. Sends outbound traffic to private IP addresses defined by
+RFC1918 through the VPC connector.
+.RE
+.sp
+
 
 .TP 2m
 

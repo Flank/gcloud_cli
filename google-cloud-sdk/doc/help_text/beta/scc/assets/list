@@ -92,26 +92,24 @@ EXAMPLES
     2019-01-01T01:00:00 GMT time.
 
         $ gcloud beta scc assets list 123456 \
-            --read-time "2019-01-01T01:00:00Z"
+            --read-time="2019-01-01T01:00:00Z"
 
     Only list category and resource_name for all assets under organization
     (123456):
 
         $ gcloud beta scc assets list 123456 \
-            --field-mask "category,resource_name"
+            --field-mask="category,resource_name"
 
     List all compute instances under organization (123456):
 
         $ gcloud beta scc assets list 123456 \
-            --filter \
-            "security_center_properties.resource_type=\"google.compute.Insta\
-        nce\""
+            --filter="security_center_properties.resource_type=\"google.comp\
+        ute.Instance\""
 
     List all firewall rules that have open HTTP Ports:
 
         $ gcloud beta scc assets list 123456 \
-            --filter \
-            "security_center_properties.resource_type =\
+            --filter="security_center_properties.resource_type =\
          \"google.compute.Firewall\" AND resource_properties.name \
             =\"default-allow-http\""
 
@@ -119,8 +117,7 @@ EXAMPLES
     numeric identifier).
 
         $ gcloud beta scc assets list 123456 \
-            --filter \
-            "security_center_properties.resource_parent =\
+            --filter="security_center_properties.resource_parent =\
          \"//cloudresourcemanager.googleapis.com/projects/5678\" OR \
             security_center_properties.resource_parent = "\78910\""
 
@@ -128,8 +125,7 @@ EXAMPLES
     usage of : which enforces partial matching.
 
         $ gcloud beta scc assets list 123456 \
-            --filter \
-            "security_center_properties.resource_type =\
+            --filter="security_center_properties.resource_type =\
          \"google.cloud.resourcemanager.Project\" AND \
             security_center_properties.resource_owners : \
             \"user:someone@domain.com\""
@@ -137,7 +133,7 @@ EXAMPLES
     List assets and add a state_change property that indicates if the asset was
     added, removed, or remained present during the past 24 hours period:
 
-        $ gcloud beta scc assets list 123456 --compare-duration 86400s
+        $ gcloud beta scc assets list 123456 --compare-duration=86400s
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -32,6 +32,9 @@ GOOD_LOGGING_AGENT_RULE = agent_policy.OpsAgentPolicy.AgentRule(
 GOOD_METRICS_AGENT_RULE = agent_policy.OpsAgentPolicy.AgentRule(
     agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS, 'latest',
     agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, False)
+GOOD_OPS_AGENT_RULE = agent_policy.OpsAgentPolicy.AgentRule(
+    agent_policy.OpsAgentPolicy.AgentRule.Type.OPS_AGENT, '1.*.*',
+    agent_policy.OpsAgentPolicy.AgentRule.PackageState.INSTALLED, True)
 GOOD_OS_TYPE = agent_policy.OpsAgentPolicy.Assignment.OsType(
     agent_policy.OpsAgentPolicy.Assignment.OsType.OsShortName.CENTOS, '8')
 GOOD_ASSIGNMENT = agent_policy.OpsAgentPolicy.Assignment(
@@ -89,6 +92,31 @@ class _ValidateAgentTypesUniquenessTest(subtests.Base):
       self.Run(
           None, agent_rules, exception=_WrapOneError(
               validator.AgentTypesUniquenessError(duplicate_type)))
+
+
+class _ValidateAgentTypesConflict(subtests.Base):
+
+  def RunSubTest(self, agent_rules, **kwargs):
+    policy = copy.deepcopy(GOOD_POLICY)
+    policy.agent_rules = agent_rules
+    return validator.ValidateOpsAgentsPolicy(policy)
+
+  def testValid(self):
+    for agent_rules in [
+        [GOOD_LOGGING_AGENT_RULE],
+        [GOOD_METRICS_AGENT_RULE],
+        [GOOD_OPS_AGENT_RULE],
+        [GOOD_LOGGING_AGENT_RULE, GOOD_METRICS_AGENT_RULE],
+    ]:
+      self.Run(None, agent_rules)
+
+  def testInvalid(self):
+    for agent_rules in [[GOOD_OPS_AGENT_RULE, GOOD_LOGGING_AGENT_RULE],
+                        [GOOD_OPS_AGENT_RULE, GOOD_METRICS_AGENT_RULE],]:
+      self.Run(
+          None,
+          agent_rules,
+          exception=_WrapOneError(validator.AgentTypesConflictError()))
 
 
 class _ValidateAgentTest(subtests.Base):

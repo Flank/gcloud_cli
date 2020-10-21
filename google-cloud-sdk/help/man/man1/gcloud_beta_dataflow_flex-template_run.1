@@ -11,7 +11,7 @@ gcloud beta dataflow flex\-template run \- runs a job from the specified path
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataflow flex\-template run\fR \fIJOB_NAME\fR \fB\-\-template\-file\-gcs\-location\fR=\fITEMPLATE_FILE_GCS_LOCATION\fR [\fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataflow flex\-template run\fR \fIJOB_NAME\fR \fB\-\-template\-file\-gcs\-location\fR=\fITEMPLATE_FILE_GCS_LOCATION\fR [\fB\-\-additional\-experiments\fR=[\fIADDITIONAL_EXPERIMENTS\fR,...]] [\fB\-\-additional\-user\-labels\fR=[\fIADDITIONAL_USER_LABELS\fR,...]] [\fB\-\-dataflow\-kms\-key\fR=\fIDATAFLOW_KMS_KEY\fR] [\fB\-\-disable\-public\-ips\fR] [\fB\-\-enable\-streaming\-engine\fR] [\fB\-\-max\-workers\fR=\fIMAX_WORKERS\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-staging\-location\fR=\fISTAGING_LOCATION\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-worker\-region\fR=\fIWORKER_REGION\fR\ |\ \fB\-\-worker\-zone\fR=\fIWORKER_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,7 +26,7 @@ gcloud beta dataflow flex\-template run \- runs a job from the specified path
 .RS 2m
 .TP 2m
 \fIJOB_NAME\fR
-The unique name to assign to the job.
+Unique name to assign to the job.
 
 
 .RE
@@ -37,7 +37,7 @@ The unique name to assign to the job.
 .RS 2m
 .TP 2m
 \fB\-\-template\-file\-gcs\-location\fR=\fITEMPLATE_FILE_GCS_LOCATION\fR
-The Google Cloud Storage location of the flex template to run. (Must be a URL
+Google Cloud Storage location of the flex template to run. (Must be a URL
 beginning with 'gs://'.)
 
 
@@ -48,19 +48,80 @@ beginning with 'gs://'.)
 
 .RS 2m
 .TP 2m
+\fB\-\-additional\-experiments\fR=[\fIADDITIONAL_EXPERIMENTS\fR,...]
+Additional experiments to pass to the job.
+
+.TP 2m
+\fB\-\-additional\-user\-labels\fR=[\fIADDITIONAL_USER_LABELS\fR,...]
+Additional user labels to pass to the job.
+
+.TP 2m
+\fB\-\-dataflow\-kms\-key\fR=\fIDATAFLOW_KMS_KEY\fR
+Cloud KMS key to protect the job resources.
+
+.TP 2m
+\fB\-\-disable\-public\-ips\fR
+Cloud Dataflow workers must not use public IP addresses. Overrides the default
+\fBdataflow/disable_public_ips\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-enable\-streaming\-engine\fR
+Enabling Streaming Engine for the streaming job. Overrides the default
+\fBdataflow/enable_streaming_engine\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-max\-workers\fR=\fIMAX_WORKERS\fR
+Maximum number of workers to run.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Compute Engine network for launching instances to run your pipeline.
+
+.TP 2m
+\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR
+Initial number of workers to use.
+
+.TP 2m
 \fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]
-The parameters to pass to the job.All pipeline options should be passed via
-parameters flag. Use right casing format according to the sdk. Example:
-\-\-parameters=maxNumWorkers=5 for java sdk 1.X and
-\-\-parameters=max_num_workers=5 for python sdk. For all the parameter options
-please refer
-https://cloud.google.com/dataflow/docs/guides/specifying\-exec\-params#setting\-other\-cloud\-dataflow\-pipeline\-options
+Parameters to pass to the job.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION_ID\fR
-The region ID of the job's regional endpoint. Defaults to 'us\-central1'.
+Region ID of the job's regional endpoint. Defaults to 'us\-central1'.
+
+.TP 2m
+\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR
+Service account to run the workers as.
+
+.TP 2m
+\fB\-\-staging\-location\fR=\fISTAGING_LOCATION\fR
+Google Cloud Storage location to stage temporary files. (Must be a URL beginning
+with 'gs://'.)
+
+.TP 2m
+\fB\-\-subnetwork\fR=\fISUBNETWORK\fR
+Compute Engine subnetwork for launching instances to run your pipeline.
+
+.TP 2m
+\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR
+Type of machine to use for workers. Defaults to server\-specified.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-worker\-region\fR=\fIWORKER_REGION\fR
+Region to run the workers in.
+
+.TP 2m
+\fB\-\-worker\-zone\fR=\fIWORKER_ZONE\fR
+Zone to run the workers in.
 
 
+.RE
 .RE
 .sp
 
@@ -83,8 +144,8 @@ To run a job from the flex template, run:
 $ gcloud beta dataflow flex\-template run my\-job \e
     \-\-template\-file\-gcs\-location=gs://flex\-template\-path \e
     \-\-region=europe\-west1 \e
-    \-\-parameters=input="gs://input",output="gs://output\-path",\e
-max_num_workers=5
+    \-\-parameters=input="gs://input",output="gs://output\-path" \e
+    \-\-max\-workers=5
 .RE
 
 

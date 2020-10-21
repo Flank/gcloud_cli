@@ -18,8 +18,103 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.kuberun import revision
+import json
 
+from googlecloudsdk.api_lib.kuberun import devkit
+from googlecloudsdk.api_lib.kuberun import revision
+from googlecloudsdk.api_lib.kuberun import service
+
+SERVICE_STRING = """{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "annotations": {
+      "client.knative.dev/user-image": "gcr.io/cloudrun/hello",
+      "run.googleapis.com/client-name": "gcloud"
+    },
+    "creationTimestamp": "2020-09-18T21:56:33Z",
+    "generation": 1,
+    "name": "hello",
+    "namespace": "default",
+    "resourceVersion": "2102",
+    "selfLink": "/apis/serving.knative.dev/v1/namespaces/default/services/hello",
+    "uid": "addfda59-46ec-44f1-8869-2e7cb06215d1"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "client.knative.dev/user-image": "gcr.io/cloudrun/hello",
+          "run.googleapis.com/client-name": "gcloud"
+        },
+        "name": "hello-00001-loq"
+      },
+      "spec": {
+        "containerConcurrency": 0,
+        "containers": [
+          {
+            "image": "gcr.io/cloudrun/hello",
+            "name": "user-container",
+            "readinessProbe": {
+              "successThreshold": 1,
+              "tcpSocket": {
+                "port": 0
+              }
+            },
+            "resources": {}
+          }
+        ],
+        "timeoutSeconds": 300
+      }
+    },
+    "traffic": [
+      {
+         "revisionName": "hello-00001-loq",
+         "percent": 100,
+         "tag": "tag1",
+         "url": "hello-00001-loq.service.example.com",
+         "latestRevision": false
+       }
+    ]
+  },
+  "status": {
+    "address": {
+      "url": "http://hello.default.svc.cluster.local"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2020-09-18T21:56:44Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2020-09-18T21:56:44Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2020-09-18T21:56:44Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "hello-00001-loq",
+    "latestReadyRevisionName": "hello-00001-loq",
+    "observedGeneration": 1,
+    "traffic": [
+      {
+         "revisionName": "hello-00001-loq",
+         "percent": 100,
+         "tag": "tag1",
+         "url": "hello-00001-loq.service.example.com",
+         "latestRevision": false
+       }
+    ],
+    "url": "http://hello.default.example.com"
+  }
+}"""
+
+SERVICE = service.Service(json.loads(SERVICE_STRING))
 
 REVISION_STRING = """{
         "metadata": {
@@ -62,45 +157,7 @@ REVISION_STRING = """{
         }
     }"""
 
-REVISION = revision.Revision({
-    "metadata": {
-        "namespace": "default",
-        "name": "hello-dxtvy-1",
-        "annotations": {
-            "client.knative.dev/user-image":
-                "gcr.io/knative-samples/helloworld-go"
-        },
-        "labels": {
-            "labelKey": "labelValue"
-        }
-    },
-    "spec": {
-        "metadata": {
-            "annotations": {
-                "autoscaling.knative.dev/minScale": "1",
-                "autoscaling.knative.dev/maxScale": "5"
-            }
-        },
-        "containers": [{
-            "name": "user-container",
-            "image": "gcr.io/knative-samples/helloworld-go",
-            "resources": {
-                "limits": {
-                    "cpu": "1000m",
-                    "memory": "1.5G"
-                }
-            }
-        }],
-        "serviceAccountName": "hello-sa",
-        "containerConcurrency": 5,
-        "timeoutSeconds": 300
-    },
-    "status": {
-        "conditions": [{
-            "type": "Ready",
-            "status": "true"
-        }]
-    }})
+REVISION = revision.Revision(json.loads(REVISION_STRING))
 
 DOMAIN_MAPPING_STRING = """
 {
@@ -162,3 +219,23 @@ DOMAIN_MAPPING_STRING = """
    }
 }
 """
+
+
+DEVKITS_LIST_JSON = """
+[
+  {
+    "id": "test-devkit",
+    "name": "Unit Test Development Kit",
+    "description": "A Fake Development Kit for Unit Testing",
+    "version": "v0.1.0"
+  }
+]
+"""
+
+DEVKITS_LIST = [
+    devkit.DevKit(
+        id_='test-devkit',
+        name='Unit Test Development Kit',
+        description='A Fake Development Kit for Unit Testing',
+        version='v0.1.0')
+]

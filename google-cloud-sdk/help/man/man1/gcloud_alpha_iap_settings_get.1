@@ -1,0 +1,145 @@
+
+.TH "GCLOUD_ALPHA_IAP_SETTINGS_GET" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha iap settings get \- get the setting for an IAP resource
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha iap settings get\fR [\fB\-\-folder\fR=\fIFOLDER\fR\ \fB\-\-organization\fR=\fIORGANIZATION\fR\ \fB\-\-project\fR=\fIPROJECT\fR\ \fB\-\-resource\-type\fR=\fIRESOURCE_TYPE\fR\ \fB\-\-service\fR=\fISERVICE\fR\ \fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Get the setting for an IAP resource.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER\fR
+Folder ID.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Organization ID.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT\fR
+Project ID.
+
+.TP 2m
+\fB\-\-resource\-type\fR=\fIRESOURCE_TYPE\fR
+Resource type of the IAP resource. \fIRESOURCE_TYPE\fR must be one of:
+\fBapp\-engine\fR, \fBiap_web\fR, \fBcompute\fR, \fBorganization\fR,
+\fBfolder\fR.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+Service name. Required when resource type is ``app\-engine, optional when
+resource type is ``compute.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+Version name. Optional when resource type is ``app\-engine.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get the IAP setting for the resources within an organization, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-organization=ORGANIZATION_ID
+.RE
+
+To get the IAP setting for the resources within a folder, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-folder=FOLDER_ID
+.RE
+
+To get the IAP setting for the resources within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID
+.RE
+
+To get the IAP setting for web type resources within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID \e
+    \-\-resource\-type=iap_web
+.RE
+
+To get the IAP setting for all app engine services within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID \e
+    \-\-resource\-type=app\-engine
+.RE
+
+To get the IAP setting for an app engine service within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID \e
+    \-\-resource\-type=app\-engine \-\-service=SERVICE_ID
+.RE
+
+To get the IAP setting for an app engine service version within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID \e
+    \-\-resource\-type=app\-engine \-\-service=SERVICE_ID
+    \-\-version=VERSION_ID
+.RE
+
+To get the IAP setting for all backend services within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID \e
+    \-\-resource\-type=compute
+.RE
+
+To get the IAP setting for a backend service within a project, run:
+
+.RS 2m
+$ gcloud alpha iap settings get \-\-project=PROJECT_ID \e
+    \-\-resource\-type=compute \-\-service=SERVICE_ID
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. These variants are also available:
+
+.RS 2m
+$ gcloud iap settings get
+$ gcloud beta iap settings get
+.RE
+

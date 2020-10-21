@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
@@ -69,17 +68,8 @@ class ClusterStartUnitTestBeta(unit_base.DataprocUnitTestBase,
     expected = self.MakeCompletedOperation()
     self.WriteInput('y\n')
     result = self.RunDataproc('clusters start ' + self.CLUSTER_NAME)
-    self.AssertErrContains("Cluster 'test-cluster' is starting.")
-    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertErrContains("Waiting for cluster 'test-cluster' to start.")
     self.AssertMessagesEqual(expected, result)
-
-  def testStartClusterDecline(self):
-    self.WriteInput('n\n')
-    with self.AssertRaisesExceptionMatches(console_io.OperationCancelledError,
-                                           'Starting cluster aborted by user.'):
-      self.RunDataproc('clusters start ' + self.CLUSTER_NAME)
-      self.AssertErrContains("Cluster 'test-cluster' is starting.")
-      self.AssertErrContains('PROMPT_CONTINUE')
 
   def testStartClusterOperationFailure(self):
     self.ExpectStartCalls(error=self.MakeRpcError())
@@ -123,8 +113,7 @@ class ClusterStartUnitTestBeta(unit_base.DataprocUnitTestBase,
     expected = self.MakeCompletedOperation()
     self.WriteInput('y\n')
     result = self.RunDataproc('clusters start {}'.format(self.CLUSTER_NAME))
-    self.AssertErrContains("Cluster 'test-cluster' is starting.")
-    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertErrContains("Waiting for cluster 'test-cluster' to start.")
     self.AssertMessagesEqual(expected, result)
 
   def testStartClusterWithoutRegion(self):

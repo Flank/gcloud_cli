@@ -45,7 +45,7 @@ EXAMPLES
     To delete the certificate map entry with name simple-entry, run:
 
         $ gcloud alpha certificate-manager maps entries delete \
-            simple-entry --map simple-map
+            simple-entry --map=simple-map
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

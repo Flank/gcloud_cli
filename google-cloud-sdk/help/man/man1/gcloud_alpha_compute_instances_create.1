@@ -11,7 +11,7 @@ gcloud alpha compute instances create \- create Compute Engine virtual machine i
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-confidential\-compute\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-[no\-]enable\-nested\-virtualization\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-post\-key\-revocation\-action\-type\fR=\fIPOLICY\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-source\-machine\-image\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-confidential\-compute\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-[no\-]enable\-nested\-virtualization\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-freeze\-duration\fR=\fIMAINTENANCE_FREEZE_DURATION\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-post\-key\-revocation\-action\-type\fR=\fIPOLICY\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-source\-machine\-image\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -102,9 +102,9 @@ destination or source IP addresses.
 
 .TP 2m
 \fB\-\-confidential\-compute\fR
-The instance will boot with confidential compute enabled. Confidential Compute
-is based on Secure Encrypted Virtualization (SEV), an AMD virtualization feature
-for running confidential instances.
+The instance will boot with Confidential Computing enabled. Confidential
+Computing is based on Secure Encrypted Virtualization (SEV), an AMD
+virtualization feature for running confidential instances.
 
 .TP 2m
 \fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
@@ -279,7 +279,8 @@ https://cloud.google.com/compute/docs/disks/scheduled\-snapshots
 \fBsource\-snapshot\-csek\-required\fR
 The CSK protected source disk snapshot that will be used to create the disk.
 This can be provided as a full URL to the snapshot or just the snapshot name.
-For example, the following are valid values:
+Must be specified with \f5source\-snapshot\-csek\-key\-file\fR. The following
+are valid values:
 
 .RS 2m
 .IP "\(bu" 2m
@@ -290,18 +291,12 @@ https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapsh
 snapshot
 
 .RE
-.RE
-.RE
 .sp
-Must be specified with \f5source\-snapshot\-csek\-key\-file\fR.
-
-.RS 2m
 .TP 2m
 \fBsource\-snapshot\-csek\-key\-file
 Path to a Customer\-Supplied Encryption Key (CSEK) key file for the source
 snapshot. Must be specified with \f5source\-snapshot\-csek\-required\fR.
 
-.RS 2m
 .TP 2m
 \fRimage\-csek\-required\fB
 Specifies the name of the CSK protected image that the disk will be initialized
@@ -332,7 +327,6 @@ specified replica zone and the zone of the newly created instance.
 .sp
 .TP 2m
 \fR\-\-csek\-key\-file\fB=\fIFILE\fR
-
 Path to a Customer\-Supplied Encryption Key (CSEK) key file, mapping Google
 Compute Engine resources to user managed keys to be used when creating,
 mounting, or snapshotting disks.
@@ -343,17 +337,14 @@ more details.
 
 .TP 2m
 \fR\-\-deletion\-protection\fB
-
 Enables deletion protection for the instance.
 
 .TP 2m
 \fR\-\-description\fB=\fIDESCRIPTION\fR
-
 Specifies a textual description of the instances.
 
 .TP 2m
 \fR\-\-disk\fB=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]
-
 Attaches persistent disks to the instances. The disks specified must already
 exist.
 
@@ -401,26 +392,22 @@ region as the instance. The default value for this is \f5\fIzonal\fR\fR.
 .sp
 .TP 2m
 \fR\-\-enable\-display\-device\fB
-
 Enable a display device on VM instances. Disabled by default.
 
 .TP 2m
 \fR\-\-[no\-]enable\-nested\-virtualization\fB
-
 If set to true, enables nested virtualization for the instance. Use
 \fR\-\-enable\-nested\-virtualization\fB to enable and
 \fR\-\-no\-enable\-nested\-virtualization\fB to disable.
 
 .TP 2m
 \fR\-\-erase\-windows\-vss\-signature\fB
-
 Specifies whether the disk restored from source snapshots or source machine
 image should erase Windows specific VSS signature. See
 https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#\-\-guest\-flush
 
 .TP 2m
 \fR\-\-hostname\fB=\fIHOSTNAME\fR
-
 Specify the hostname of the instance to be created. The specified hostname must
 be RFC1035 compliant. If hostname is not specified, the default hostname is
 [INSTANCE_NAME].c.[PROJECT_ID].internal when using the global DNS, and
@@ -428,7 +415,6 @@ be RFC1035 compliant. If hostname is not specified, the default hostname is
 
 .TP 2m
 \fR\-\-labels\fB=[\fIKEY\fR=\fIVALUE\fR,...]
-
 List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
@@ -438,7 +424,6 @@ numbers.
 
 .TP 2m
 \fR\-\-local\-nvdimm\fB=[\fIsize\fR=\fISIZE\fR]
-
 Attaches a local NVDIMM to the instances.
 
 .RS 2m
@@ -454,7 +439,6 @@ and the default is 3 TB.
 .sp
 .TP 2m
 \fR\-\-local\-ssd\fB=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
-
 Attaches a local SSD to the instances.
 
 This flag is currently in BETA and may change without notice.
@@ -484,14 +468,18 @@ of 375 GB and the default is 375 GB. For Alpha API only.
 .sp
 .TP 2m
 \fR\-\-machine\-type\fB=\fIMACHINE_TYPE\fR
-
 Specifies the machine type used for the instances. To get a list of available
 machine types, run 'gcloud compute machine\-types list'. If unspecified, the
 default type is n1\-standard\-1.
 
 .TP 2m
-\fR\-\-metadata\fB=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+\fR\-\-maintenance\-freeze\-duration\fB=\fIMAINTENANCE_FREEZE_DURATION\fR
+Specifies the amount of hours after instance creation where the instance won't
+be scheduled for maintenance, e.g. \f54h\fR, \f52d6h\fR. See $ gcloud topic
+datetimes for information on duration formats.
 
+.TP 2m
+\fR\-\-metadata\fB=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 Metadata to be made available to the guest operating system running on the
 instances. Each metadata entry is a key/value pair separated by an equals sign.
 Each metadata key must be unique and have a max of 128 bytes in length. Each
@@ -520,14 +508,12 @@ from a publicly\-accessible location on the web.
 .sp
 .TP 2m
 \fR\-\-metadata\-from\-file\fB=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]
-
 Same as \f5\fI\-\-metadata\fR\fR except that the value for the entry will be
 read from a local file. This is useful for values that are too large such as
 \f5\fIstartup\-script\fR\fR contents.
 
 .TP 2m
 \fR\-\-min\-cpu\-platform\fB=\fIPLATFORM\fR
-
 When specified, the VM will be scheduled on host with specified CPU architecture
 or a newer one. To list available CPU platforms in given zone, run:
 
@@ -545,20 +531,17 @@ https://cloud.google.com/compute/docs/instances/specify\-min\-cpu\-platform
 
 .TP 2m
 \fR\-\-min\-node\-cpu\fB=\fIMIN_NODE_CPU\fR
-
 Minimum number of virtual CPUs this instance will consume when running on a
 sole\-tenant node.
 
 .TP 2m
 \fR\-\-network\fB=\fINETWORK\fR
-
 Specifies the network that the instances will be part of. If \-\-subnet is also
 specified subnet must be a subnetwork of network specified by \-\-network. If
 neither is specified, this defaults to the "default" network.
 
 .TP 2m
 \fR\-\-network\-interface\fB=[\fIPROPERTY\fR=\fIVALUE\fR,...]
-
 Adds a network interface to the instance. Mutually exclusive with any of these
 flags: \fR\-\-address\fB, \fR\-\-network\fB, \fR\-\-network\-tier\fB,
 \fR\-\-subnet\fB, \fR\-\-private\-network\-ip\fB. This flag can be repeated to
@@ -624,14 +607,12 @@ specified netmask and allocate it to this network interface.
 .sp
 .TP 2m
 \fR\-\-network\-tier\fB=\fINETWORK_TIER\fR
-
 Specifies the network tier that will be used to configure the instance.
 \f5\fINETWORK_TIER\fR\fR must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The
 default value is \f5PREMIUM\fR.
 
 .TP 2m
 \fR\-\-post\-key\-revocation\-action\-type\fB=\fIPOLICY\fR
-
 The instance will be shut down when the KMS key of one of its disk is revoked,
 if set to \f5SHUTDOWN\fR.
 
@@ -641,7 +622,6 @@ Default setting is \f5NOOP\fR.
 
 .TP 2m
 \fR\-\-preemptible\fB
-
 If provided, instances will be preemptible and time\-limited. Instances may be
 preempted to free up resources for standard VM instances, and will only be able
 to run for a limited amount of time. Preemptible instances can not be restarted
@@ -649,7 +629,6 @@ and will not migrate.
 
 .TP 2m
 \fR\-\-private\-ipv6\-google\-access\-type\fB=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
-
 The private IPv6 Google access type for the VM.
 \fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of:
 \fRenable\-bidirectional\-access\fB, \fRenable\-outbound\-vm\-access\fB,
@@ -657,13 +636,11 @@ The private IPv6 Google access type for the VM.
 
 .TP 2m
 \fR\-\-private\-network\-ip\fB=\fIPRIVATE_NETWORK_IP\fR
-
 Specifies the RFC1918 IP to assign to the instance. The IP should be in the
 subnet or legacy network IP range.
 
 .TP 2m
 \fR\-\-require\-csek\-key\-create\fB
-
 Refuse to create resources not protected by a user managed key in the key file
 when \-\-csek\-key\-file is given. This behavior is enabled by default to
 prevent incorrect gcloud invocations from accidentally creating resources with
@@ -676,20 +653,17 @@ to disable.
 
 .TP 2m
 \fR\-\-resource\-policies\fB=[\fIRESOURCE_POLICY\fR,...]
-
 A list of resource policy names to be added to the instance. The policies must
 exist in the same region as the instance.
 
 .TP 2m
 \fR\-\-restart\-on\-failure\fB
-
 The instances will be restarted if they are terminated by Compute Engine. This
 does not affect terminations performed by the user. Enabled by default, use
 \fR\-\-no\-restart\-on\-failure\fB to disable.
 
 .TP 2m
 \fR\-\-shielded\-integrity\-monitoring\fB
-
 Enables monitoring and attestation of the boot integrity of the instance. The
 attestation is performed against the integrity policy baseline. This baseline is
 initially derived from the implicitly trusted boot image when the instance is
@@ -701,14 +675,12 @@ https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm.
 
 .TP 2m
 \fR\-\-shielded\-secure\-boot\fB
-
 The instance boots with secure boot enabled. On Shielded VMs, Secure Boot is not
 enabled by default. For information about how to modify Shielded VM options, see
 https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm.
 
 .TP 2m
 \fR\-\-shielded\-vtpm\fB
-
 The instance boots with the TPM (Trusted Platform Module) enabled. A TPM is a
 hardware module that can be used for different security operations such as
 remote attestation, encryption, and sealing of keys. On Shielded VMs, vTPM is
@@ -717,7 +689,6 @@ https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm.
 
 .TP 2m
 \fR\-\-source\-instance\-template\fB=\fISOURCE_INSTANCE_TEMPLATE\fR
-
 The name of the instance template that the instance will be created from.
 
 Users can also override machine type and labels. Values of other flags will be
@@ -725,12 +696,10 @@ ignored and \f5\-\-source\-instance\-template\fR will be used instead.
 
 .TP 2m
 \fR\-\-source\-machine\-image\fB=\fISOURCE_MACHINE_IMAGE\fR
-
 The name of the machine image that the instance will be created from.
 
 .TP 2m
 \fR\-\-source\-machine\-image\-csek\-key\-file\fB=\fIFILE\fR
-
 Path to a Customer\-Supplied Encryption Key (CSEK) key file, mapping resources
 to user managed keys which were used to encrypt the source machine\-image. See
 https://cloud.google.com/compute/docs/disks/customer\-supplied\-encryption for
@@ -738,13 +707,11 @@ more details.
 
 .TP 2m
 \fR\-\-subnet\fB=\fISUBNET\fR
-
 Specifies the subnet that the instances will be part of. If \-\-network is also
 specified subnet must be a subnetwork of network specified by \-\-network.
 
 .TP 2m
 \fR\-\-tags\fB=\fITAG\fR,[\fITAG\fR,...]
-
 Specifies a list of tags to apply to the instance. These tags allow network
 firewall rules and routes to be applied to specified VM instances. See \fRgcloud
 compute firewall\-rules create\fB(1) for more details.
@@ -767,7 +734,6 @@ $ gcloud compute instances list \-\-filter='tags:tag1'
 
 .TP 2m
 \fR\-\-zone\fB=\fIZONE\fR
-
 Zone of the instances to create. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
@@ -798,7 +764,6 @@ Alternatively, the zone can be stored in the environment variable
 
 At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fR\-\-address\fB=\fIADDRESS\fR
@@ -812,10 +777,12 @@ If provided, the instances are not assigned external IP addresses. To pull
 container images, you must configure private Google access if using Container
 Registry or configure Cloud NAT for instances to access container images
 directly. For more information, see:
-.IP "\(em" 2m
+.RS 2m
+.IP "\(bu" 2m
 https://cloud.google.com/vpc/docs/configure\-private\-google\-access
-.IP "\(em" 2m
+.IP "\(bu" 2m
 https://cloud.google.com/nat/docs/using\-nat
+.RE
 .RE
 .RE
 .sp
@@ -826,7 +793,6 @@ https://cloud.google.com/nat/docs/using\-nat
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
 used to protect the disk. The arguments in this group can be used to specify the
 attributes of this resource.
-
 
 .RS 2m
 .TP 2m
@@ -851,7 +817,6 @@ The Cloud project for the key.
 .TP 2m
 
 Custom machine type extensions.
-
 
 .RS 2m
 .TP 2m
@@ -883,18 +848,19 @@ including exposing a more accurate NUMA topology to the guest OS. The default is
 .sp
 .TP 2m
 \fR\-\-image\-project\fB=\fIIMAGE_PROJECT\fR
-
 The Google Cloud project against which all image and image family references
 will be resolved. It is best practice to define image\-project. A full list of
 available projects can be generated by running \f5gcloud projects list\fR.
-.IP "\(bu" 2m
+.RS 2m
+.IP "\(em" 2m
 If specifying one of our public images, image\-project must be provided.
-.IP "\(bu" 2m
+.IP "\(em" 2m
 If there are several of the same image\-family value in multiple projects,
 image\-project must be specified to clarify the image to be used.
-.IP "\(bu" 2m
+.IP "\(em" 2m
 If not specified and either image or image\-family is provided, the current
 default project is used.
+.RE
 .RE
 .sp
 
@@ -902,7 +868,6 @@ default project is used.
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -934,11 +899,13 @@ The name of the source disk snapshot that the instance boot disk will be created
 from. You can provide this as a full URL to the snapshot or just the snapshot
 name. For example, the following are valid values:
 
-.IP "\(em" 2m
+.RS 2m
+.IP "\(bu" 2m
 
 https://compute.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
-.IP "\(em" 2m
+.IP "\(bu" 2m
 snapshot
+.RE
 .RE
 .RE
 .sp
@@ -947,7 +914,6 @@ snapshot
 .TP 2m
 
 Maintenance Behavior. At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -994,7 +960,6 @@ The instances should be terminated.
 
 Sole Tenancy. At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fR\-\-node\fB=\fINODE\fR
@@ -1032,7 +997,6 @@ The name of the node group to schedule this instance on.
 
 At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fR\-\-public\-dns\fB
@@ -1047,7 +1011,6 @@ If provided, the instance will not be assigned a public DNS name.
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -1064,7 +1027,6 @@ Mutually exclusive with public\-ptr\-domain.
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -1084,7 +1046,6 @@ of the instance.
 
 Specifies the reservation for the instance.
 
-
 .RS 2m
 .TP 2m
 \fR\-\-reservation\fB=\fIRESERVATION\fR
@@ -1101,7 +1062,6 @@ of: \fRany\fB, \fRnone\fB, \fRspecific\fB.
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -1175,7 +1135,6 @@ Create instance without scopes
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m

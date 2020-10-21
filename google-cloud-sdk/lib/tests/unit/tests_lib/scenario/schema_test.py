@@ -237,7 +237,8 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
   def testExecuteCommandUntil(self):
     stdout_values = ['first', 'second', 'done']
     stderr_values = ['firsterr', 'seconderr', 'doneerr']
-    def _Run(command):
+    def _Run(command, track=None):
+      del track
       self.assertEqual('foo bar FAKE0', command)
       sys.stdout.write(stdout_values.pop(0))
       sys.stderr.write(stderr_values.pop(0))
@@ -260,6 +261,22 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
     self.assertEqual([], stdout_values)
     self.assertEqual([], stderr_values)
 
+  def testExecuteCommandUntilWithTrack(self):
+    def _Run(command, track=None):
+      self.assertEqual('foo bar FAKE0', command)
+      self.assertEqual('ALPHA', track)
+
+    context = self._MakeContext(
+        _Run, execution_mode=session.ExecutionMode.REMOTE)
+    context.resource_ref_resolver.AddGeneratedResourceId('instance0', 'FAKE0')
+    a = schema.ExecuteCommandUntilAction.FromData({
+        'execute_command_until': {
+            'command': 'foo bar $$instance0$$',
+            'track': 'ALPHA',
+        }
+    })
+    a.Execute(context)
+
   def testExecute(self):
     """Basic tests of all functionality in the command execution action.
 
@@ -268,7 +285,8 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
     happens, a command is called, updates are triggered, and the scenario is
     updated.
     """
-    def _Run(command):
+    def _Run(command, track=None):
+      del track
       # Check that references get resolved for execution.
       sys.stdout.write(command)
       self.assertEqual('some command FAKE0 --flag=FAKE1 FAKE2', command)
@@ -289,7 +307,7 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
             {'expect_exit': {'code': 1}},
         ]
     }}
-    a = schema.CommandExecutionAction.FromData(data)
+    a = schema.ExecuteCommandAction.FromData(data)
 
     a.Execute(context)
 
@@ -311,6 +329,33 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
     # Check that the file is rewritten.
     self.rewrite_mock.assert_called_once()
 
+  def testExecuteWithTrack(self):
+    """Basic tests of all functionality in the command execution action.
+
+    This doesn't test a lot of details because the events themselves are heavily
+    tested separately. We want to make sure that the resource ref substitution
+    happens, a command is called, updates are triggered, and the scenario is
+    updated.
+    """
+    def _Run(command, track=None):
+      # Check that references get resolved for execution.
+      self.assertEqual('some command FAKE0 --flag=FAKE1 FAKE2', command)
+      self.assertEqual('ALPHA', track)
+
+    context = self._MakeContext(_Run)
+    context.resource_ref_resolver.AddGeneratedResourceId('instance0', 'FAKE0')
+    context.resource_ref_resolver.AddGeneratedResourceId('instance1', 'FAKE1')
+    context.resource_ref_resolver.AddGeneratedResourceId('instance2', 'FAKE2')
+
+    data = {'execute_command': {
+        'command': 'some command $$instance0$$ --flag=$$instance1$$ '
+                   '$$instance2$$',
+        'track': 'ALPHA',
+    }}
+    a = schema.ExecuteCommandAction.FromData(data)
+
+    a.Execute(context)
+
   def testValidationOnlyLocal(self):
     """Validation only commands are not run in LOCAL mode."""
     run_mock = mock.MagicMock()
@@ -321,14 +366,14 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
         'validation_only': True,
         'events': [{'expect_exit': {'code': 0}},]
     }}
-    a = schema.CommandExecutionAction.FromData(data)
+    a = schema.ExecuteCommandAction.FromData(data)
     a.Execute(context)
     run_mock.assert_not_called()
 
   def testValidateRemoteAPICallsLocal(self):
     """In LOCAL mode validate_remote_api_calls set to False has no effect."""
-    def _Run(command):
-      del command
+    def _Run(command, track=None):
+      del command, track
       http.Http().request(
           'https://example.com', method='GET', body='{"body": "foo"}',
           headers={'foo': 'bar'})
@@ -341,7 +386,7 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
         'validate_remote_api_calls': False,
         'events': [{'expect_exit': {'code': 0}},]
     }}
-    a = schema.CommandExecutionAction.FromData(data)
+    a = schema.ExecuteCommandAction.FromData(data)
     with self.assertRaises(session.PauseError):
       # A pause error indicates that the session is validating the API request,
       # added it to the scenario, but doesn't have response data for it yet.
@@ -353,8 +398,8 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
   ])
   def testAPICallValidationRemote(self, settings):
     """In REMOTE mode, don't validate api calls for either of these settings."""
-    def _Run(command):
-      del command
+    def _Run(command, track=None):
+      del command, track
       http.Http().request('https://example.com', method='GET')
 
     context = self._MakeContext(
@@ -369,7 +414,7 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
     }}
     data['execute_command'].update(settings)
 
-    a = schema.CommandExecutionAction.FromData(data)
+    a = schema.ExecuteCommandAction.FromData(data)
     # No errors are raised because we don't validate api calls.
     a.Execute(context)
     # Real call is made.

@@ -11,7 +11,7 @@ gcloud alpha compute routers add\-bgp\-peer \- add a BGP peer to a Compute Engin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers add\-bgp\-peer\fR \fINAME\fR \fB\-\-interface\fR=\fIINTERFACE\fR \fB\-\-peer\-asn\fR=\fIPEER_ASN\fR \fB\-\-peer\-name\fR=\fIPEER_NAME\fR [\fB\-\-advertised\-route\-priority\fR=\fIADVERTISED_ROUTE_PRIORITY\fR] [\fB\-\-advertisement\-mode\fR=\fIMODE\fR] [\fB\-\-async\fR] [\fB\-\-peer\-ip\-address\fR=\fIPEER_IP_ADDRESS\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]] [\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers add\-bgp\-peer\fR \fINAME\fR \fB\-\-interface\fR=\fIINTERFACE\fR \fB\-\-peer\-asn\fR=\fIPEER_ASN\fR \fB\-\-peer\-name\fR=\fIPEER_NAME\fR [\fB\-\-advertised\-route\-priority\fR=\fIADVERTISED_ROUTE_PRIORITY\fR] [\fB\-\-advertisement\-mode\fR=\fIMODE\fR] [\fB\-\-async\fR] [\fB\-\-instance\fR=\fIINSTANCE\fR] [\fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR] [\fB\-\-peer\-ip\-address\fR=\fIPEER_IP_ADDRESS\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]] [\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -81,6 +81,39 @@ Default (Google\-managed) BGP advertisements.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Router appliance instance of the BGP peer being added.
+
+.TP 2m
+\fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR
+Zone of the instance to operate on. If not specified, the user may be prompted
+to select a zone. \f5gcloud\fR will attempt to identify the zone by searching
+for resources in the user's project. If the zone cannot be determined, the user
+will then be prompted with all Google Cloud Platform zones.
+
+To avoid prompting when this flag is omitted, the user can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
 .TP 2m
 \fB\-\-peer\-ip\-address\fR=\fIPEER_IP_ADDRESS\fR

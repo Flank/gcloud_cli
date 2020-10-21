@@ -1,0 +1,171 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_SUBORDINATES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca subordinates update \- update an existing subordinate certificate authority
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca subordinates update\fR (\fICERTIFICATE_AUTHORITY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-issuance\-policy\fR=\fIISSUANCE_POLICY\fR] [\fB\-\-pem\-chain\fR=\fIPEM_CHAIN\fR] [\fB\-\-no\-publish\-ca\-cert\fR] [\fB\-\-no\-publish\-crl\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+CERTIFICATE AUTHORITY resource \- The certificate authority to update. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[CERTIFICATE_AUTHORITY] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE_AUTHORITY\fR
+ID of the CERTIFICATE_AUTHORITY or fully qualified identifier for the
+CERTIFICATE_AUTHORITY. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the CERTIFICATE_AUTHORITY. Alternatively, you can set the
+property [privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-issuance\-policy\fR=\fIISSUANCE_POLICY\fR
+A YAML file describing this Certificate Authority's issuance policy.
+
+.TP 2m
+\fB\-\-pem\-chain\fR=\fIPEM_CHAIN\fR
+A file containing a list of PEM\-encoded certificates that represent the issuing
+chain of this CA.
+
+.TP 2m
+\fB\-\-publish\-ca\-cert\fR
+If this is enabled, the following will happen: 1) The CA certificate will be
+written to a known location within the CA distribution point. 2) The AIA
+extension in all issued certificates will point to the CA cert URL in that
+distribution point.
+
+If this gets disabled, the AIA extension will not be written to any future
+certificates issued by this CA. However, an existing bucket will not be deleted,
+and the CA certificate will not be removed from that bucket.
+
+Note that the same bucket may be used for the CRLs if \-\-publish\-crl is set.
+
+Enabled by default, use \fB\-\-no\-publish\-ca\-cert\fR to disable.
+
+.TP 2m
+\fB\-\-publish\-crl\fR
+If this gets enabled, the following will happen: 1) CRLs will be written to a
+known location within the CA distribution point. 2) The CDP extension in all
+future issued certificates will point to the CRL URL in that distribution point.
+
+If this gets disabled, the CDP extension will not be written to any future
+certificates issued by this CA, and new CRLs will not be published to that
+bucket (which affects existing certs). However, an existing bucket will not be
+deleted, and any existing CRLs will not be removed from that bucket.
+
+Note that the same bucket may be used for the CA cert if \-\-publish\-ca\-cert
+is set.
+
+CRL publication is not supported for CAs in the DevOps tier.
+
+Enabled by default, use \fB\-\-no\-publish\-crl\fR to disable.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud beta privateca subordinates update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud beta privateca subordinates update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update labels on a subordinate CA:
+
+.RS 2m
+$ gcloud beta privateca subordinates update server\-tls\-1 \e
+  \-\-location=us\-west1 \e
+  \-\-update\-labels=foo=bar
+.RE
+
+To disable publishing CRLs for a subordinate CA:
+
+.RS 2m
+$ gcloud beta privateca subordinates update server\-tls\-1 \e
+  \-\-location=us\-west1 \e
+  \-\-no\-publish\-crl
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

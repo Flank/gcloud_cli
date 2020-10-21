@@ -224,9 +224,8 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
     properties.VALUES.core.account.Set('user@gmail.com')
     exc = exceptions.HttpException(err)
     self.assertEqual(
-        'User [user@gmail.com] does not have permission to access project '
-        '[your-stuff] (or it may not exist): Your bad.',
-        exc.payload.message)
+        'User [user@gmail.com] does not have permission to access projects instance '
+        '[your-stuff] (or it may not exist): Your bad.', exc.payload.message)
     self.assertEqual('mock', exc.payload.api_name)
     self.assertEqual('v1', exc.payload.api_version)
 
@@ -236,9 +235,8 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
         url='https://mock.googleapis.com/v1/projects/your-stuff',
         message='Your bad.')
     exc = exceptions.HttpException(err)
-    self.assertEqual(
-        'Project [your-stuff] not found: Your bad.',
-        str(exc))
+    self.assertEqual('Projects instance [your-stuff] not found: Your bad.',
+                     str(exc))
     self.assertEqual('mock', exc.payload.api_name)
     self.assertEqual('v1', exc.payload.api_version)
 
@@ -249,9 +247,8 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
         message='Your bad.')
     exc = exceptions.HttpException(err)
     self.assertEqual(
-        ('Resource in project [your-stuff] is the subject of a conflict: '
-         'Your bad.'),
-        exc.payload.message)
+        ('Resource in projects [your-stuff] is the subject of a conflict: '
+         'Your bad.'), exc.payload.message)
     self.assertEqual('mock', exc.payload.api_name)
     self.assertEqual('v1', exc.payload.api_version)
 
@@ -381,14 +378,13 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
         url=('https://cloudresourcemanager.googleapis.com/v1beta1/projects/'
              'error-reporting-gcloud-e2e-does-not-exist?alt=json'))
     exc = exceptions.HttpException(err)
-    self.assertEqual(
-        ('Project [error-reporting-gcloud-e2e-does-not-exist] not found: '
-         'Resource not found.'),
-        exc.message)
+    self.assertEqual((
+        'Projects instance [error-reporting-gcloud-e2e-does-not-exist] not found: '
+        'Resource not found.'), exc.message)
     self.assertEqual('cloudresourcemanager', exc.payload.api_name)
     self.assertEqual('v1beta1', exc.payload.api_version)
     self.assertEqual('projects', exc.payload.resource_name)
-    self.assertEqual('project', exc.payload.resource_item)
+    self.assertEqual('projects instance', exc.payload.resource_item)
     self.assertEqual(
         'error-reporting-gcloud-e2e-does-not-exist', exc.payload.instance_name)
 
@@ -399,11 +395,12 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
              'ID?someParam=true&other=false'))
     exc = exceptions.HttpException(err)
     self.assertEqual(
-        'Organization [ID] not found: Resource not found.', exc.message)
+        'Organizations instance [ID] not found: Resource not found.',
+        exc.message)
     self.assertEqual('cloudresourcemanager', exc.payload.api_name)
     self.assertEqual('v1beta1', exc.payload.api_version)
     self.assertEqual('organizations', exc.payload.resource_name)
-    self.assertEqual('organization', exc.payload.resource_item)
+    self.assertEqual('organizations instance', exc.payload.resource_item)
     self.assertEqual('ID', exc.payload.instance_name)
 
   def testHttpExceptionErrorFormatAttributes(self):

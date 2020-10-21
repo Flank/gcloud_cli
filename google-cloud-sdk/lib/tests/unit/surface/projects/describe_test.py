@@ -92,7 +92,7 @@ projectNumber: '925276746377'
     with self.assertRaises(exceptions.HttpException):
       self.RunProjects('describe', 'BAD_ID')
     self.AssertErrContains(
-        'does not have permission to access project [BAD_ID]')
+        'does not have permission to access projects instance [BAD_ID]')
 
 
 # DO NOT REMOVE THIS TEST.

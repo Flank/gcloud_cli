@@ -20,6 +20,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     cloud-bindings
+        (ALPHA) Manage Access Context Manager cloud access bindings.
+
      levels
         (ALPHA) Manage Access Context Manager levels.
 

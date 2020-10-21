@@ -29,8 +29,8 @@ POSITIONAL ARGUMENTS
 FLAGS
      --security-marks=[SECURITY_MARKS,...]
         SecurityMarks resource to be passed as the request body. It's a
-        key=value pair separated by comma (,). For example: --security-marks
-        "key1=val1,key2=val2".
+        key=value pair separated by comma (,). For example:
+        --security-marks="key1=val1,key2=val2".
 
      --start-time=START_TIME
         Time at which the updated SecurityMarks take effect. For example
@@ -38,10 +38,10 @@ FLAGS
 
      --update-mask=UPDATE_MASK
         Use update-mask if you want to selectively update marks represented by
-        --security-marks flag. For example: --update-mask
-        "marks.key1,marks.key2". If you want to override all the marks for the
-        given asset either skip the update-mask flag or provide an empty value
-        (--update-mask '') for it.
+        --security-marks flag. For example:
+        --update-mask="marks.key1,marks.key2". If you want to override all the
+        marks for the given asset either skip the update-mask flag or provide
+        an empty value (--update-mask '') for it.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -62,18 +62,18 @@ EXAMPLES
     asset will not change.
 
         $ gcloud beta scc assets update-marks 5678 --organization=123456 \
-            --security-marks "key1=val1.1" --update-mask "marks.key1"
+            --security-marks="key1=val1.1" --update-mask="marks.key1"
 
     Update value of security mark (key1) and delete other marks on asset 5678
     under organization 123456:
 
         $ gcloud beta scc assets update-marks 5678 --organization=123456 \
-            --security-marks "key1=updatedVal"
+            --security-marks="key1=updatedVal"
 
     Delete all security marks on asset 5678 under organization 123456:
 
         $ gcloud beta scc assets update-marks 5678 --organization=123456 \
-            --security-marks ""
+            --security-marks=""
 
 NOTES
     This command is currently in BETA and may change without notice. These

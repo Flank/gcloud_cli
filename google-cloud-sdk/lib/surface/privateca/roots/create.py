@@ -36,6 +36,7 @@ from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import log
 
 
+# pylint: disable=line-too-long
 class Create(base.CreateCommand):
   r"""Create a new root certificate authority.
 
@@ -44,39 +45,31 @@ class Create(base.CreateCommand):
   To create a root CA that supports one layer of subordinates:
 
       $ {command} prod-root \
-        --kms-key-version \
-        "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-        \
-        --subject "CN=Joonix Production Root CA" \
-        --max-chain-length 1
+        --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+        --subject="CN=Joonix Production Root CA" \
+        --max-chain-length=1
 
   To create a root CA and restrict what it can issue:
 
       $ {command} prod-root \
-        --kms-key-version \
-        "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-        \
-        --subject "CN=Joonix Production Root CA" \
-        --issuance-policy policy.yaml
+        --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+        --subject="CN=Joonix Production Root CA" \
+        --issuance-policy=policy.yaml
 
   To create a root CA that doesn't publicly publish CA certificate and CRLs:
 
       $ {command} root-2 \
-        --kms-key-version \
-        "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-        \
-        --subject "CN=Joonix Production Root CA" \
-        --issuance-policy policy.yaml \
+        --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+        --subject="CN=Joonix Production Root CA" \
+        --issuance-policy=policy.yaml \
         --no-publish-ca-cert \
         --no-publish-crl
 
   To create a root CA that is based on an existing CA:
 
       $ {command} prod-root \
-        --kms-key-version \
-        "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-        \
-        --from-ca source-root --from-ca-location us-central1
+        --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+        --from-ca=source-root --from-ca-location=us-central1
   """
 
   def __init__(self, *args, **kwargs):
@@ -136,7 +129,7 @@ class Create(base.CreateCommand):
     flags.AddSubjectFlags(parser, subject_required=False)
     flags.AddPublishCaCertFlag(parser, use_update_help_text=False)
     flags.AddPublishCrlFlag(parser, use_update_help_text=False)
-    flags.AddKeyAlgorithmFlag(key_spec_group)
+    flags.AddKeyAlgorithmFlag(key_spec_group, default='rsa-pkcs1-4096-sha256')
     flags.AddInlineReusableConfigFlags(reusable_config_group, is_ca=True)
     flags.AddValidityFlag(
         parser,

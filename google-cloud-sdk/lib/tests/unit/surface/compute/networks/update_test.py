@@ -123,6 +123,26 @@ class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
           """)
     self.AssertErrContains('Aborted by user.')
 
+  def testUpdateMtu_success(self):
+    expected = self.messages.Network()
+
+    expected.mtu = 1500
+    self.mock_client.networks.Patch.Expect(
+        self.messages.ComputeNetworksPatchRequest(
+            project='fake-project',
+            network='my-network',
+            networkResource=expected), self.messages.Operation(name='myop'))
+
+    self.WriteInput('y\n')
+    self.Run("""compute networks update my-network --mtu 1500""")
+
+  def testUpdateMtu_no(self):
+    self.WriteInput('n\n')
+
+    with self.assertRaises(console_io.OperationCancelledError):
+      self.Run("""compute networks update my-network --mtu 1500""")
+    self.AssertErrContains('Aborted by user.')
+
 
 class UpdateTestBeta(UpdateTest):
 
@@ -150,18 +170,6 @@ class UpdateTestAlpha(UpdateTestBeta):
             'compute', 'alpha', no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
-
-  def testUpdateMtu(self):
-    expected = self.messages.Network()
-
-    expected.mtu = 1500
-    self.mock_client.networks.Patch.Expect(
-        self.messages.ComputeNetworksPatchRequest(
-            project='fake-project',
-            network='my-network',
-            networkResource=expected), self.messages.Operation(name='myop'))
-
-    self.Run("""compute networks update my-network --mtu 1500""")
 
 
 if __name__ == '__main__':

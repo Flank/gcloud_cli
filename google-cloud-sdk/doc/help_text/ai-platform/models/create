@@ -16,7 +16,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --description=DESCRIPTION
-        The description of the model.
+        Description of the model.
 
      --enable-logging
         If set, enables StackDriver Logging for online prediction. These logs

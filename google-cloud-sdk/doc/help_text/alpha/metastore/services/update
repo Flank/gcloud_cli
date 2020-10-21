@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha metastore services update (SERVICE : --location=LOCATION)
-        [--async] [--port=PORT] [--update-labels=[KEY=VALUE,...]]
+        [--async] [--data-catalog-sync] [--port=PORT]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]]
         [--kerberos_principal=KERBEROS_PRINCIPAL
           --keytab=KEYTAB --krb5-config=KRB5_CONFIG]
@@ -45,6 +46,10 @@ FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --data-catalog-sync
+        A boolean flag to determine whether Dataproc Metastore metadata sync to
+        Data Catalog should be enabled.
 
      --port=PORT
         The TCP port on which the Metastore service will listen.

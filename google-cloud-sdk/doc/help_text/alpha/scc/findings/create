@@ -86,17 +86,16 @@ EXAMPLES
     123456 and source 5678:
 
         $ gcloud alpha scc findings create my-finding \
-            --organization=123456 --source=5678 --state ACTIVE \
-            --resource-name \
-            '//cloudresourcemanager.googleapis.com/v1/projects/example-proje\
-        ct'
+            --organization=123456 --source=5678 --state=ACTIVE \
+            --resource-name='//cloudresourcemanager.googleapis.com/v1/projec\
+        ts/example-project'
 
     Create an ACTIVE my-finding with category: XSS_SCRIPTING under organization
     123456 and source 5678:
 
         $ gcloud alpha scc findings create my-finding \
-            --organization=123456 --source=5678 --state ACTIVE \
-            --category 'XSS_SCRIPTING'
+            --organization=123456 --source=5678 --state=ACTIVE \
+            --category='XSS_SCRIPTING'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

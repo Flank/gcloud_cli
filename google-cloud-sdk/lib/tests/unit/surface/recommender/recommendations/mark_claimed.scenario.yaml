@@ -1,5 +1,5 @@
 title: Mark a recommendation as CLAIMED
-release_tracks: [ALPHA, BETA, GA]
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -68,7 +68,6 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
-      ALPHA: v1alpha2
       BETA: v1beta1
       GA: v1
 - execute_command:

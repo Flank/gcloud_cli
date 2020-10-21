@@ -42,17 +42,15 @@ EXAMPLES
     To get metadata for the root CA 'prod-root' in location 'us-west1':
 
         $ gcloud beta privateca roots describe server-tls-1 \
-          --location us
+          --location=us
 
     To download the PEM-encoded CA certificate for the 'prod-root' CA in
     location 'us-west1' to a file called 'prod-root.crt':
 
         $ gcloud beta privateca roots describe prod-root \
-          --location us-west1 \
-          --format "value(pem_cert)" > ./prod-root.crt
+          --location=us-west1 \
+          --format="value(pem_cert)" > ./prod-root.crt
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

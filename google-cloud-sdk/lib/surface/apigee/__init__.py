@@ -21,7 +21,9 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA,
+                    base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Apigee(base.Group):
   """Manage Apigee resources.
 
@@ -52,3 +54,8 @@ class Apigee(base.Group):
             $ {command} apis undeploy --environment=test --api=hello-world
           """
   }
+
+  def Filter(self, context, args):
+    """Runs before any commands in this group."""
+    del context, args
+    base.OptInRequests()  # For b/168048261 migration.

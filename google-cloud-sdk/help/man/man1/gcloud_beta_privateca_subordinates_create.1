@@ -1,0 +1,346 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_SUBORDINATES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca subordinates create \- create a new subordinate certificate authority
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca subordinates create\fR (\fICERTIFICATE_AUTHORITY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-create\-csr\fR\ \fB\-\-csr\-output\-file\fR=\fICSR_OUTPUT_FILE\fR\ |\ [\fB\-\-issuer\fR=\fIISSUER\fR\ :\ \fB\-\-issuer\-location\fR=\fIISSUER_LOCATION\fR]) [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-dns\-san\fR=[\fIDNS_SAN\fR,...]] [\fB\-\-email\-san\fR=[\fIEMAIL_SAN\fR,...]] [\fB\-\-ip\-san\fR=[\fIIP_SAN\fR,...]] [\fB\-\-issuance\-policy\fR=\fIISSUANCE_POLICY\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-no\-publish\-ca\-cert\fR] [\fB\-\-no\-publish\-crl\fR] [\fB\-\-subject\fR=[\fISUBJECT\fR,...]] [\fB\-\-tier\fR=\fITIER\fR;\ default="enterprise"] [\fB\-\-uri\-san\fR=[\fIURI_SAN\fR,...]] [\fB\-\-validity\fR=\fIVALIDITY\fR;\ default="P3Y"] [\fB\-\-from\-ca\fR=\fIFROM_CA\fR\ :\ \fB\-\-from\-ca\-location\fR=\fIFROM_CA_LOCATION\fR\ \fB\-\-from\-ca\-project\fR=\fIFROM_CA_PROJECT\fR] [\fB\-\-key\-algorithm\fR=\fIKEY_ALGORITHM\fR;\ default="rsa\-pkcs1\-2048\-sha256"\ |\ [\fB\-\-kms\-key\-version\fR=\fIKMS_KEY_VERSION\fR\ :\ \fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR]] [[\fB\-\-reusable\-config\fR=\fIREUSABLE_CONFIG\fR\ :\ \fB\-\-extended\-key\-usages\fR=[\fIEXTENDED_KEY_USAGES\fR,...]\ \fB\-\-key\-usages\fR=[\fIKEY_USAGES\fR,...]\ \fB\-\-max\-chain\-length\fR=\fIMAX_CHAIN_LENGTH\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Certificate Authority resource \- The name of the subordinate CA to create. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[CERTIFICATE_AUTHORITY] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE_AUTHORITY\fR
+ID of the Certificate Authority or fully qualified identifier for the
+Certificate Authority. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the Certificate Authority. Alternatively, you can set the
+property [privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+The issuer configuration used for this CA certificate. Exactly one of these must
+be specified:
+
+.RS 2m
+.TP 2m
+
+If the issuing CA is not hosted on Private CA, you must provide these settings:
+
+.RS 2m
+.TP 2m
+\fB\-\-create\-csr\fR
+Indicates that a CSR should be generated which can be signed by the issuing CA.
+This must be set if \-\-issuer is not provided. This flag must be specified if
+any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-csr\-output\-file\fR=\fICSR_OUTPUT_FILE\fR
+The path where the resulting PEM\-encoded CSR file should be written. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.RE
+.sp
+.TP 2m
+
+Issuer resource \- The issuing certificate authority to use, if it is on Private
+CA. The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[\-\-issuer] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-issuer\fR=\fIISSUER\fR
+ID of the Issuer or fully qualified identifier for the Issuer. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-issuer\-location\fR=\fIISSUER_LOCATION\fR
+The location of the Issuer. Alternatively, you can set the property
+[privateca/location].
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-bucket\fR=\fIBUCKET\fR
+The name of an existing storage bucket to use for storing the CA certificate and
+CRLs. If omitted, a new bucket will be created and managed by the service on
+your behalf.
+
+.TP 2m
+\fB\-\-dns\-san\fR=[\fIDNS_SAN\fR,...]
+One or more comma\-separated DNS Subject Alternative Names.
+
+.TP 2m
+\fB\-\-email\-san\fR=[\fIEMAIL_SAN\fR,...]
+One or more comma\-separated email Subject Alternative Names.
+
+.TP 2m
+\fB\-\-ip\-san\fR=[\fIIP_SAN\fR,...]
+One or more comma\-separated IP Subject Alternative Names.
+
+.TP 2m
+\fB\-\-issuance\-policy\fR=\fIISSUANCE_POLICY\fR
+A YAML file describing this Certificate Authority's issuance policy.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-publish\-ca\-cert\fR
+If this is enabled, the following will happen: 1) The CA certificate will be
+written to a known location within the CA distribution point. 2) The AIA
+extension in all issued certificates will point to the CA cert URL in that
+distribition point.
+
+Note that the same bucket may be used for the CRLs if \-\-publish\-crl is set.
+
+Enabled by default, use \fB\-\-no\-publish\-ca\-cert\fR to disable.
+
+.TP 2m
+\fB\-\-publish\-crl\fR
+If this gets enabled, the following will happen: 1) CRLs will be written to a
+known location within the CA distribution point. 2) The CDP extension in all
+future issued certificates will point to the CRL URL in that distribution point.
+
+Note that the same bucket may be used for the CA cert if \-\-publish\-ca\-cert
+is set.
+
+CRL publication is not supported for CAs in the DevOps tier.
+
+Enabled by default, use \fB\-\-no\-publish\-crl\fR to disable.
+
+.TP 2m
+\fB\-\-subject\fR=[\fISUBJECT\fR,...]
+X.501 name of the certificate subject. Example:\-\-subject
+"C=US,ST=California,L=Mountain View,O=Google LLC,CN=google.com"
+
+.TP 2m
+\fB\-\-tier\fR=\fITIER\fR; default="enterprise"
+The tier for the Certificate Authority. \fITIER\fR must be one of: \fBdevops\fR,
+\fBenterprise\fR.
+
+.TP 2m
+\fB\-\-uri\-san\fR=[\fIURI_SAN\fR,...]
+One or more comma\-separated URI Subject Alternative Names.
+
+.TP 2m
+\fB\-\-validity\fR=\fIVALIDITY\fR; default="P3Y"
+The validity of this CA, as an ISO8601 duration. Defaults to 3 years.
+
+.TP 2m
+
+Source CA resource \- An existing CA from which to copy configuration values for
+the new CA. You can still override any of those values by explicitly providing
+the appropriate flags. The arguments in this group can be used to specify the
+attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-from\-ca\fR=\fIFROM_CA\fR
+ID of the source CA or fully qualified identifier for the source CA. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-from\-ca\-location\fR=\fIFROM_CA_LOCATION\fR
+The location of the source CA. Alternatively, you can set the property
+[privateca/location].
+
+.TP 2m
+\fB\-\-from\-ca\-project\fR=\fIFROM_CA_PROJECT\fR
+Project ID of the Google Cloud Platform project for the source CA.
+
+.RE
+.sp
+.TP 2m
+
+The key configuration used for the CA certificate. Defaults to a managed key if
+not specified. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-key\-algorithm\fR=\fIKEY_ALGORITHM\fR; default="rsa\-pkcs1\-2048\-sha256"
+The crypto algorithm to use for creating a managed KMS key for the Certificate
+Authority. The default is \fBrsa\-pkcs1\-2048\-sha256\fR. \fIKEY_ALGORITHM\fR
+must be one of: \fBec\-p256\-sha256\fR, \fBec\-p384\-sha384\fR,
+\fBrsa\-pkcs1\-2048\-sha256\fR, \fBrsa\-pkcs1\-3072\-sha256\fR,
+\fBrsa\-pkcs1\-4096\-sha256\fR, \fBrsa\-pss\-2048\-sha256\fR,
+\fBrsa\-pss\-3078\-sha256\fR, \fBrsa\-pss\-4096\-sha256\fR.
+
+.TP 2m
+
+Key version resource \- The KMS key version backing this CA. The arguments in
+this group can be used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-kms\-key\-version\fR=\fIKMS_KEY_VERSION\fR
+ID of the key version or fully qualified identifier for the key version. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-kms\-key\fR=\fIKMS_KEY\fR
+The KMS key of the key version.
+
+.TP 2m
+\fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR
+The KMS keyring of the key version.
+
+.TP 2m
+\fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR
+The location of the key version. Alternatively, you can provide the argument
+[location] on the command line, or set the property [privateca/location].
+
+.TP 2m
+\fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR
+The project containing the key version. Alternatively, you can provide the
+argument [project] on the command line, or set the property [core/project].
+
+.RE
+.RE
+.sp
+.TP 2m
+
+The X.509 configuration used for the CA certificate. At most one of these may be
+specified:
+
+.RS 2m
+.TP 2m
+
+Reusable config resource \- The Reusable Config containing X.509 values for this
+CA. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-reusable\-config] on the command line with
+a fully specified name; project will default to privateca\-data. To set the
+[location] attribute: provide the argument [\-\-reusable\-config] on the command
+line with a fully specified name; location will default to the same location as
+the CA.
+
+.RS 2m
+.TP 2m
+\fB\-\-reusable\-config\fR=\fIREUSABLE_CONFIG\fR
+ID of the reusable config or fully qualified identifier for the reusable config.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-extended\-key\-usages\fR=[\fIEXTENDED_KEY_USAGES\fR,...]
+The list of extended key usages for this CA. This can only be provided if
+\f5\-\-reusable\-config\fR is not provided. \fIEXTENDED_KEY_USAGES\fR must be
+one of: \fBserver_auth\fR, \fBclient_auth\fR, \fBcode_signing\fR,
+\fBemail_protection\fR, \fBtime_stamping\fR, \fBocsp_signing\fR.
+
+.TP 2m
+\fB\-\-key\-usages\fR=[\fIKEY_USAGES\fR,...]
+The list of key usages for this CA. This can only be provided if
+\f5\-\-reusable\-config\fR is not provided. \fIKEY_USAGES\fR must be one of:
+\fBdigital_signature\fR, \fBcontent_commitment\fR, \fBkey_encipherment\fR,
+\fBdata_encipherment\fR, \fBkey_agreement\fR, \fBcert_sign\fR, \fBcrl_sign\fR,
+\fBencipher_only\fR, \fBdecipher_only\fR.
+
+.TP 2m
+\fB\-\-max\-chain\-length\fR=\fIMAX_CHAIN_LENGTH\fR
+Maximum depth of subordinate CAs allowed under this CA for a CA certificate.
+This can only be provided if \f5\-\-reusable\-config\fR is not provided.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a subordinate CA named 'server\-tls\-1' whose issuer is on Private CA:
+
+.RS 2m
+$ gcloud beta privateca subordinates create server\-tls\-1 \e
+  \-\-subject="CN=Joonix TLS CA" \e
+  \-\-issuer=prod\-root \-\-issuer\-location=us\-west1 \e
+  \-\-kms\-key\-version="projects/joonix\-pki/locations/us\-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
+.RE
+
+To create a subordinate CA named 'server\-tls\-1' whose issuer is located
+elsewhere:
+
+.RS 2m
+$ gcloud beta privateca subordinates create server\-tls\-1 \e
+  \-\-subject="CN=Joonix TLS CA" \e
+  \-\-create\-csr \e
+  \-\-csr\-output\-file="./csr.pem" \e
+  \-\-kms\-key\-version="projects/joonix\-pki/locations/us\-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
+.RE
+
+To create a subordinate CA named 'server\-tls\-1' chaining up to a root CA named
+\'prod\-root'based on an existing CA:
+
+.RS 2m
+$ gcloud beta privateca subordinates create server\-tls\-1 \e
+  \-\-issuer=prod\-root \-\-issuer\-location=us\-west1 \e
+  \-\-from\-ca=source\-ca \-\-from\-ca\-location=us\-central1 \e
+  \-\-kms\-key\-version="projects/joonix\-pki/locations/us\-west1/keyRings/kr1/cryptoKeys/key2/cryptoKeyVersions/1"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

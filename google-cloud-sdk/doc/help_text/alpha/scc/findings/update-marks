@@ -36,8 +36,8 @@ POSITIONAL ARGUMENTS
 FLAGS
      --security-marks=[SECURITY_MARKS,...]
         SecurityMarks resource to be passed as the request body. It's a
-        key=value pair separated by comma (,). For example: --security-marks
-        "key1=val1,key2=val2".
+        key=value pair separated by comma (,). For example:
+        --security-marks="key1=val1,key2=val2".
 
      --start-time=START_TIME
         Time at which the updated SecurityMarks take effect. For example:
@@ -45,10 +45,10 @@ FLAGS
 
      --update-mask=UPDATE_MASK
         Use update-mask if you want to selectively update marks represented by
-        --security-marks flag. For example: --update-mask
-        "marks.key1,marks.key2". If you want to override all the marks for the
-        given finding either skip the update-mask flag or provide an empty
-        value (--update-mask '') for it.
+        --security-marks flag. For example:
+        --update-mask="marks.key1,marks.key2". If you want to override all the
+        marks for the given finding either skip the update-mask flag or provide
+        an empty value (--update-mask '') for it.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -68,20 +68,20 @@ EXAMPLES
     that other security marks on my-finding are untouched:
 
         $ gcloud alpha scc findings update-marks my-finding \
-            --organization=123456 --source=5678 --security-marks "key1=v1" \
-            --update-mask "marks.markKey1"
+            --organization=123456 --source=5678 --security-marks="key1=v1" \
+            --update-mask="marks.markKey1"
 
     Update all security marks on my-finding, under organization 123456 and
     source 5678:
 
         $ gcloud alpha scc findings update-marks my-finding \
             --organization=123456 --source=5678 \
-            --security-marks "key1=v1,key2=v2"
+            --security-marks="key1=v1,key2=v2"
 
     Delete all security marks on my-finding:
 
         $ gcloud alpha scc findings update-marks my-finding \
-            --organization=123456 --source=5678 --security-marks ""
+            --organization=123456 --source=5678 --security-marks=""
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

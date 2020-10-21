@@ -120,7 +120,8 @@ class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
     self.mock_http = self.StartPatch(
-        'googlecloudsdk.core.credentials.http.Http', autospec=True)
+        'googlecloudsdk.core.credentials.transports.GetApitoolsTransport',
+        autospec=True)
 
     api_cache = ApitoolsClientCache(core_apis.GetClientInstance)
     for api_version in core_apis.GetVersions('compute'):

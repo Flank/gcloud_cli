@@ -20,6 +20,8 @@ from __future__ import unicode_literals
 
 import enum
 
+from googlecloudsdk.command_lib.storage import storage_url
+
 
 class DownloadStrategy(enum.Enum):
   """Enum class for specifying download strategy."""
@@ -34,13 +36,7 @@ class FieldsScope(enum.Enum):
   SHORT = 3
 
 
-class ProviderPrefix(enum.Enum):
-  """Prefix strings for cloud storage provider URLs."""
-  GCS = 'gs'
-  S3 = 's3'
-
-
-DEFAULT_PROVIDER = ProviderPrefix.GCS
+DEFAULT_PROVIDER = storage_url.ProviderPrefix.GCS
 NUM_ITEMS_PER_LIST_PAGE = 1000
 
 
@@ -55,28 +51,6 @@ class RequestConfig(object):
     self.predefined_acl_string = predefined_acl_string
 
 
-# TODO (b/168332070): Move to a private function for gcs_api.
-def ValidateObjectMetadata(metadata):
-  """Ensures metadata supplies the needed fields for copy and insert.
-
-  Args:
-    metadata (apitools.messages.Object | None): Apitools Object metadata to
-        validate.
-
-  Raises:
-    ValueError: Metadata is invalid.
-  """
-  if not metadata:
-    raise ValueError(
-        'No object metadata supplied for object.')
-  if not metadata.name:
-    raise ValueError(
-        'Object metadata supplied for object had no object name.')
-  if not metadata.bucket:
-    raise ValueError(
-        'Object metadata supplied for object had no bucket name.')
-
-
 class CloudApi(object):
   """Abstract base class for interacting with cloud storage providers.
 
@@ -86,11 +60,12 @@ class CloudApi(object):
   a separate instance of the Cloud API should be instantiated per-thread.
   """
 
-  def CreateBucket(self, metadata, fields_scope=None):
+  def create_bucket(self, bucket_resource, fields_scope=None):
     """Creates a new bucket with the specified metadata.
 
     Args:
-      metadata (apitools.messages.Bucket): Object defining new bucket metadata.
+      bucket_resource (resource_reference.BucketResource):
+          Resource containing metadata for new bucket.
       fields_scope (FieldsScope): Determines the fields and projection
           parameters of API call.
 
@@ -101,13 +76,11 @@ class CloudApi(object):
       ValueError: Invalid fields_scope.
 
     Returns:
-      apitools.messages.Bucket object describing new bucket metadata.
+      resource_reference.BucketResource representing new bucket.
     """
-    raise NotImplementedError('CreateBucket must be overridden.')
+    raise NotImplementedError('create_bucket must be overridden.')
 
-  def DeleteBucket(self,
-                   bucket_name,
-                   request_config=None):
+  def delete_bucket(self, bucket_name, request_config=None):
     """Deletes a bucket.
 
     Args:
@@ -120,9 +93,9 @@ class CloudApi(object):
       NotImplementedError: This function was not implemented by a class using
           this interface.
     """
-    raise NotImplementedError('DeleteBucket must be overridden.')
+    raise NotImplementedError('delete_bucket must be overridden.')
 
-  def GetBucket(self, bucket_name, fields_scope=None):
+  def get_bucket(self, bucket_name, fields_scope=None):
     """Gets Bucket metadata.
 
     Args:
@@ -139,9 +112,9 @@ class CloudApi(object):
           this interface.
       ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('GetBucket must be overridden.')
+    raise NotImplementedError('get_bucket must be overridden.')
 
-  def ListBuckets(self, fields_scope=None):
+  def list_buckets(self, fields_scope=None):
     """Lists bucket metadata for the given project.
 
     Args:
@@ -156,14 +129,14 @@ class CloudApi(object):
           this interface.
       ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('ListBuckets must be overridden.')
+    raise NotImplementedError('list_buckets must be overridden.')
 
-  def ListObjects(self,
-                  bucket_name,
-                  prefix=None,
-                  delimiter=None,
-                  all_versions=None,
-                  fields_scope=None):
+  def list_objects(self,
+                   bucket_name,
+                   prefix=None,
+                   delimiter=None,
+                   all_versions=None,
+                   fields_scope=None):
     """Lists objects (with metadata) and prefixes in a bucket.
 
     Args:
@@ -182,13 +155,13 @@ class CloudApi(object):
           this interface.
       ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('ListObjects must be overridden.')
+    raise NotImplementedError('list_objects must be overridden.')
 
-  def DeleteObject(self,
-                   bucket_name,
-                   object_name,
-                   generation=None,
-                   request_config=None):
+  def delete_object(self,
+                    bucket_name,
+                    object_name,
+                    generation=None,
+                    request_config=None):
     """Deletes an object.
 
     Args:
@@ -204,13 +177,13 @@ class CloudApi(object):
       NotImplementedError: This function was not implemented by a class using
           this interface.
     """
-    raise NotImplementedError('DeleteObject must be overridden.')
+    raise NotImplementedError('delete_object must be overridden.')
 
-  def GetObjectMetadata(self,
-                        bucket_name,
-                        object_name,
-                        generation=None,
-                        fields_scope=None):
+  def get_object_metadata(self,
+                          bucket_name,
+                          object_name,
+                          generation=None,
+                          fields_scope=None):
     """Gets object metadata.
 
     If decryption is supported by the implementing class, this function will
@@ -234,22 +207,23 @@ class CloudApi(object):
           this interface.
       ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('GetObjectMetadata must be overridden.')
+    raise NotImplementedError('get_object_metadata must be overridden.')
 
-  def PatchObjectMetadata(self,
-                          bucket_name,
-                          object_name,
-                          metadata,
-                          fields_scope=None,
-                          generation=None,
-                          request_config=None):
+  def patch_object_metadata(self,
+                            bucket_name,
+                            object_name,
+                            object_resource,
+                            fields_scope=None,
+                            generation=None,
+                            request_config=None):
     """Updates object metadata with patch semantics.
 
     Args:
       bucket_name (str): Bucket containing the object.
       object_name (str): Object name.
-      metadata (apitools.messages.Object): Object defining metadata to be
-          updated.
+      object_resource (resource_reference.ObjectResource): Contains
+          metadata that will be used to update cloud object. May have
+          different name than object_name argument.
       fields_scope (FieldsScope): Determines the fields and projection
           parameters of API call.
       generation (string): Generation (or version) of the object to update.
@@ -265,24 +239,21 @@ class CloudApi(object):
           this interface.
       ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('PatchObjectMetadata must be overridden.')
+    raise NotImplementedError('patch_object_metadata must be overridden.')
 
-  def CopyObject(self,
-                 source_object_metadata,
-                 destination_object_metadata,
-                 source_object_generation=None,
-                 progress_callback=None,
-                 request_config=None):
+  def copy_object(self,
+                  source_resource,
+                  destination_resource,
+                  progress_callback=None,
+                  request_config=None):
     """Copies an object within the cloud of one provider.
 
     Args:
-      source_object_metadata (apitools.messages.Object): Object metadata for
-          source object. Must include bucket name, object name, and etag.
-      destination_object_metadata (apitools.messages.Object): Object metadata
-          for new object. Must include bucket and object name.
-      source_object_generation (string): Generation of the source object to
-          copy. Separate from source_object_metadata because Apitools wants
-          an int generation, but we need to support strings for AWS.
+      source_resource (resource_reference.ObjectResource): Resource for
+          source object. Must have been confirmed to exist in the cloud.
+      destination_resource (resource_reference.ObjectResource|UnknownResource):
+          Resource for destination object. Existence doesn't have to be
+          confirmed.
       progress_callback (function): Optional callback function for progress
           notifications. Receives calls with arguments (bytes_transferred,
           total_size).
@@ -297,22 +268,22 @@ class CloudApi(object):
       NotImplementedError: This function was not implemented by a class using
           this interface.
     """
-    raise NotImplementedError('CopyObject must be overridden')
+    raise NotImplementedError('copy_object must be overridden')
 
-  def DownloadObject(self,
-                     bucket_name,
-                     object_name,
-                     download_stream,
-                     compressed_encoding=False,
-                     decryption_wrapper=None,
-                     digesters=None,
-                     download_strategy=DownloadStrategy.ONE_SHOT,
-                     generation=None,
-                     object_size=None,
-                     progress_callback=None,
-                     serialization_data=None,
-                     start_byte=0,
-                     end_byte=None):
+  def download_object(self,
+                      bucket_name,
+                      object_name,
+                      download_stream,
+                      compressed_encoding=False,
+                      decryption_wrapper=None,
+                      digesters=None,
+                      download_strategy=DownloadStrategy.ONE_SHOT,
+                      generation=None,
+                      object_size=None,
+                      progress_callback=None,
+                      serialization_data=None,
+                      start_byte=0,
+                      end_byte=None):
     """Gets object data.
 
     Args:
@@ -353,19 +324,19 @@ class CloudApi(object):
       NotImplementedError: This function was not implemented by a class using
           this interface.
     """
-    raise NotImplementedError('UploadObject must be overridden.')
+    raise NotImplementedError('download_object must be overridden.')
 
-  def UploadObject(self,
-                   upload_stream,
-                   object_metadata,
-                   progress_callback=None,
-                   request_config=None):
+  def upload_object(self,
+                    upload_stream,
+                    upload_resource,
+                    progress_callback=None,
+                    request_config=None):
     """Uploads object data and metadata.
 
     Args:
       upload_stream (stream): Seekable stream of object data.
-      object_metadata (apitools.messages.Object): Object containing the correct
-          metadata to upload. Exact class depends on API being used.
+      upload_resource (resource_reference.FileObjectResource): Resource
+          containing the correct metadata to upload.
       progress_callback (function): Callback function for progress
           notifications. Receives calls with arguments (bytes_transferred,
           total_size).
@@ -380,4 +351,4 @@ class CloudApi(object):
       NotImplementedError: This function was not implemented by a class using
           this interface.
     """
-    raise NotImplementedError('UploadObject must be overridden.')
+    raise NotImplementedError('upload_object must be overridden.')

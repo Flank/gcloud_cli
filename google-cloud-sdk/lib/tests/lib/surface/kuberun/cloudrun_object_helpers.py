@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.run import traffic as run_traffic
 from googlecloudsdk.api_lib.util import apis
@@ -240,6 +241,14 @@ def TrafficTargets(targets, msg_module):
   return run_traffic.TrafficTargets(msg_module, targets)
 
 
+def Revision(msg_module, metadata=None, spec=None, status=None):
+  rev_msg = run_v1_messages.Revision()
+  rev_msg.metadata = metadata
+  rev_msg.spec = spec
+  rev_msg.status = status
+  return revision.Revision(rev_msg, msg_module)
+
+
 def ServiceSpec(template=None, traffic=None):
   spec = run_v1_messages.ServiceSpec()
   spec.template = template
@@ -259,7 +268,7 @@ def ServiceStatus(address=None,
   addr = run_v1_messages.Addressable()
   addr.url = address
   spec.address = addr
-  spec.conditions = conditions
+  spec.conditions = conditions or []
   spec.latestCreatedRevisionName = latest_created
   spec.latestReadyRevisionName = latest_ready
   spec.observedGeneration = gen

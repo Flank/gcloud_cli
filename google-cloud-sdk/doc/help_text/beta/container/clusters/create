@@ -240,12 +240,21 @@ FLAGS
      --disable-default-snat
         Disable default source NAT rules applied in cluster nodes.
 
-        By default, network traffic sending from Pods to outside of VPC will
-        get masqueraded by the node external IP. When this flag is set, no
-        default sNAT will be enforced on the cluster. The flag must be set if
-        the cluster uses privately used public IPs.
+        By default, cluster nodes perform source network address translation
+        (SNAT) for packets sent from Pod IP address sources to destination IP
+        addresses that are not in the non-masquerade CIDRs list. For more
+        details about SNAT and IP masquerading, see:
+        https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent#how_ipmasq_works
+        SNAT changes the packet's source IP address to the node's internal IP
+        address.
 
-        Must be used in conjunction with --enable-ip-alias and
+        When this flag is set, GKE does not perform SNAT for packets sent to
+        any destination. You must set this flag if the cluster uses privately
+        reused public IPs.
+
+        The --disable-default-snat flag is only applicable to private GKE
+        clusters, which are inherently VPC-native. Thus, --disable-default-snat
+        requires that you also set --enable-ip-alias and
         --enable-private-nodes.
 
      --disk-size=DISK_SIZE

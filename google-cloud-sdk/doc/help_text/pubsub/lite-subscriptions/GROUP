@@ -1,0 +1,41 @@
+NAME
+    gcloud pubsub lite-subscriptions - manage Pub/Sub Lite subscriptions
+
+SYNOPSIS
+    gcloud pubsub lite-subscriptions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Pub/Sub Lite subscriptions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Pub/Sub Lite subscription.
+
+     delete
+        Delete a Pub/Sub Lite subscription.
+
+     describe
+        Describe a Pub/Sub Lite subscription.
+
+     list
+        List Pub/Sub Lite subscriptions.
+
+     update
+        Update a Pub/Sub Lite subscription.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub lite-subscriptions
+        $ gcloud beta pubsub lite-subscriptions
+

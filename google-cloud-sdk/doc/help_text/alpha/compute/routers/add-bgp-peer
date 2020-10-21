@@ -6,9 +6,9 @@ SYNOPSIS
     gcloud alpha compute routers add-bgp-peer NAME --interface=INTERFACE
         --peer-asn=PEER_ASN --peer-name=PEER_NAME
         [--advertised-route-priority=ADVERTISED_ROUTE_PRIORITY]
-        [--advertisement-mode=MODE] [--async]
-        [--peer-ip-address=PEER_IP_ADDRESS] [--region=REGION]
-        [--set-advertisement-groups=[GROUP,...]]
+        [--advertisement-mode=MODE] [--async] [--instance=INSTANCE]
+        [--instance-zone=INSTANCE_ZONE] [--peer-ip-address=PEER_IP_ADDRESS]
+        [--region=REGION] [--set-advertisement-groups=[GROUP,...]]
         [--set-advertisement-ranges=[CIDR_RANGE=DESC,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -49,6 +49,32 @@ OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --instance=INSTANCE
+        Router appliance instance of the BGP peer being added.
+
+     --instance-zone=INSTANCE_ZONE
+        Zone of the instance to operate on. If not specified, the user may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in the user's project. If the zone cannot be
+        determined, the user will then be prompted with all Google Cloud
+        Platform zones.
+
+        To avoid prompting when this flag is omitted, the user can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
 
      --peer-ip-address=PEER_IP_ADDRESS
         The link-local address of the peer router. Must be a link-local IPv4

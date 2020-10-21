@@ -36,6 +36,9 @@ GROUPS
      service-accounts
         (BETA) Create and manipulate service accounts.
 
+     workload-identity-pools
+        (BETA) Manage IAM WorkloadIdentityPools.
+
 COMMANDS
     COMMAND is one of the following:
 

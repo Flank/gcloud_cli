@@ -51,31 +51,31 @@ EXAMPLES
     filter):
 
         $ gcloud scc notifications update my-config --organization=123456 \
-            --description "New description" \
-            --pubsub_topic "projects/22222/topics/newtopic"
+            --description="New description" \
+            --pubsub-topic="projects/22222/topics/newtopic"
 
         $ gcloud scc notifications update \
             organizations/123456/notificationConfigs/my-config \
-            --description "New description" \
-            --pubsub_topic "projects/22222/topics/newtopic"
+            --description="New description" \
+            --pubsub-topic="projects/22222/topics/newtopic"
 
     Update my-config's description
 
         $ gcloud scc notifications update my-config --organization=123456 \
-            --description "New description"
+            --description="New description"
 
         $ gcloud scc notifications update \
             organizations/123456/notificationConfigs/my-config \
-            --description "New description"
+            --description="New description"
 
     Update my-config's pubsub-topic
 
         $ gcloud scc notifications update my-config --organization=123456 \
-            --pubsub_topic "projects/22222/topics/newtopic"
+            --pubsub-topic="projects/22222/topics/newtopic"
 
         $ gcloud scc notifications update \
             organizations/123456/notificationConfigs/my-config \
-            --pubsub_topic "projects/22222/topics/newtopic"
+            --pubsub-topic="projects/22222/topics/newtopic"
 
     Update my-config's filter
 

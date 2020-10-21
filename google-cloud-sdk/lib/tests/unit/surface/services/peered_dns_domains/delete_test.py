@@ -33,7 +33,7 @@ class DeletePeeredDnsDomainTest(unit_test_base.SNUnitTestBase):
   ZONE_NAME = 'googleapis-com'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   @mock.patch.object(projects_api, 'Get', autospec=True)
   def testDeletePeeredDnsDomain_Success(self, mock_get):

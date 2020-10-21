@@ -66,6 +66,8 @@ If this gets enabled, the following will happen:
 2) The CDP extension in all future issued certificates will point to the CRL URL in that distribution point.
 
 Note that the same bucket may be used for the CA cert if --publish-ca-cert is set.
+
+CRL publication is not supported for CAs in the DevOps tier.
 """
 
 PUBLISH_CRL_UPDATE_HELP = """
@@ -79,6 +81,8 @@ However, an existing bucket will not be deleted, and any existing CRLs will not 
 from that bucket.
 
 Note that the same bucket may be used for the CA cert if --publish-ca-cert is set.
+
+CRL publication is not supported for CAs in the DevOps tier.
 """
 
 _VALID_KEY_USAGES = [
@@ -450,9 +454,21 @@ def SanFlagsAreSpecified(args):
 
 def ParseIssuingOptions(args):
   """Parses the IssuingOptions proto message from the args."""
-  return privateca_base.GetMessagesModule().IssuingOptions(
-      includeCaCertUrl=args.publish_ca_cert,
-      includeCrlAccessUrl=args.publish_crl)
+  messages = privateca_base.GetMessagesModule()
+  publish_ca_cert = args.publish_ca_cert
+  publish_crl = args.publish_crl
+
+  tier = ParseTierFlag(args)
+  if tier == messages.CertificateAuthority.TierValueValuesEnum.DEVOPS:
+    if args.IsSpecified('publish_crl') and publish_crl:
+      raise exceptions.InvalidArgumentException(
+          '--publish-crl',
+          'CRL publication is not supported in the DevOps tier.')
+    # It's not explicitly set to True, so change the default to False here.
+    publish_crl = False
+
+  return messages.IssuingOptions(
+      includeCaCertUrl=publish_ca_cert, includeCrlAccessUrl=publish_crl)
 
 
 def ParseIssuancePolicy(args):
@@ -463,7 +479,9 @@ def ParseIssuancePolicy(args):
     return messages_util.DictToMessageWithErrorCheck(
         args.issuance_policy,
         privateca_base.GetMessagesModule().CertificateAuthorityPolicy)
-  except messages_util.DecodeError:
+  # TODO(b/77547931): Catch `AttributeError` until upstream library takes the
+  # fix.
+  except (messages_util.DecodeError, AttributeError):
     raise exceptions.InvalidArgumentException(
         '--issuance-policy', 'Unrecognized field in the Issuance Policy.')
 
@@ -531,13 +549,15 @@ _KEY_ALGORITHM_MAPPING = {
     'RSA_PSS_2048_SHA256': 'rsa-pss-2048-sha256',
     'RSA_PSS_3072_SHA256': 'rsa-pss-3078-sha256',
     'RSA_PSS_4096_SHA256': 'rsa-pss-4096-sha256',
+    'RSA_PKCS1_2048_SHA256': 'rsa-pkcs1-2048-sha256',
+    'RSA_PKCS1_3072_SHA256': 'rsa-pkcs1-3072-sha256',
+    'RSA_PKCS1_4096_SHA256': 'rsa-pkcs1-4096-sha256',
     'EC_P256_SHA256': 'ec-p256-sha256',
     'EC_P384_SHA384': 'ec-p384-sha384',
 }
 
 _KEY_ALGORITHM_MAPPER = arg_utils.ChoiceEnumMapper(
     arg_name='--key-algorithm',
-    default='rsa-pss-4096-sha256',
     help_str='The crypto algorithm to use for creating a managed KMS key for '
     'the Certificate Authority.',
     message_enum=privateca_base.GetMessagesModule().KeyVersionSpec
@@ -579,8 +599,9 @@ def ParseTierFlag(args):
   return _TIER_MAPPER.GetEnumForChoice(args.tier)
 
 
-def AddKeyAlgorithmFlag(parser_group):
+def AddKeyAlgorithmFlag(parser_group, default='rsa-pkcs1-4096-sha256'):
   _KEY_ALGORITHM_MAPPER.choice_arg.AddToParser(parser_group)
+  _KEY_ALGORITHM_MAPPER.choice_arg.SetDefault(parser_group, default)
 
 
 def ParseKeySpec(args):

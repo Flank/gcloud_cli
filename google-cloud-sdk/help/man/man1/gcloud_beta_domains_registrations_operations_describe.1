@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_BETA_DOMAINS_REGISTRATIONS_OPERATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta domains registrations operations describe \- show details about a Cloud Domains operation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta domains registrations operations describe\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Print information about a Cloud Domains operation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Operation resource \- The operation to describe. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[operation] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project]. To
+set the [location] attribute: provide the argument [operation] on the command
+line with a fully specified name; location is always global. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of the operation or fully qualified identifier for the operation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an operation \f5\fIoperation\-id\fR\fR, run:
+
+.RS 2m
+$ gcloud beta domains registrations operations describe operation\-id
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha domains registrations operations describe
+.RE
+

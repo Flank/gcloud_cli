@@ -582,6 +582,19 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
     InstanceGroupManagersUpdateZonalTestBeta.SetUp(self)
     self.SelectApi('alpha')
 
+  def testUpdateSetDistributionTargetShapeForZonalScope_throws(self):
+    self._setInitialIgm()
+
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        'Flag --target-distribution-shape may be specified for regional '
+        'managed instance groups only.'):
+      self.Run("""
+          compute instance-groups managed update group-1
+            --zone us-central2-a
+            --target-distribution-shape ANY
+          """)
+
 
 class InstanceGroupManagersUpdateRegionalTestGA(
     InstanceGroupManagersUpdateZonalTestGA):
@@ -634,13 +647,16 @@ class InstanceGroupManagersUpdateRegionalTestGA(
   def _getPatchRequestStub(self,
                            stateful_policy=None,
                            update_policy=None,
-                           autohealing_policies=None):
+                           autohealing_policies=None,
+                           distribution_policy=None):
     igm_resource = self.messages.InstanceGroupManager(
         updatePolicy=update_policy)
     if stateful_policy is not None:
       igm_resource.statefulPolicy = stateful_policy
     if autohealing_policies is not None:
       igm_resource.autoHealingPolicies = autohealing_policies
+    if distribution_policy is not None:
+      igm_resource.distributionPolicy = distribution_policy
     return self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
         instanceGroupManager=self.igm_name,
         instanceGroupManagerResource=igm_resource,
@@ -653,7 +669,8 @@ class InstanceGroupManagersUpdateRegionalTestGA(
                                 health_check=None,
                                 initial_delay=None,
                                 clear_autohealing=False,
-                                with_empty_stateful_policy=False):
+                                with_empty_stateful_policy=False,
+                                distribution_policy=None):
     autohealing_policies = None
     if clear_autohealing or \
         health_check is not None or initial_delay is not None:
@@ -678,7 +695,8 @@ class InstanceGroupManagersUpdateRegionalTestGA(
                          self._getPatchRequestStub(
                              stateful_policy=stateful_policy,
                              update_policy=update_policy,
-                             autohealing_policies=autohealing_policies))])
+                             autohealing_policies=autohealing_policies,
+                             distribution_policy=distribution_policy))])
 
   def _setInitialIgm(self):
     igm = self.messages.InstanceGroupManager(
@@ -843,6 +861,25 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
   def SetUp(self):
     InstanceGroupManagersUpdateRegionalTestBeta.SetUp(self)
     self.SelectApi('alpha')
+
+  def _createDistributionPolicy(self, target_shape):
+    distribution_policy = self.messages.DistributionPolicy()
+    distribution_policy.targetShape = target_shape
+    return distribution_policy
+
+  def testUpdateSetDistributionTargetShape(self):
+    self._setInitialIgm()
+
+    self.Run("""
+        compute instance-groups managed update group-1
+          --{} {}
+          --target-distribution-shape ANY
+        """.format(*self.scope_params))
+
+    self._checkGetAndPatchRequests(
+        distribution_policy=self._createDistributionPolicy(
+            target_shape=self.messages.DistributionPolicy
+            .TargetShapeValueValuesEnum.ANY))
 
 
 if __name__ == '__main__':

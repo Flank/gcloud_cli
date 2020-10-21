@@ -70,6 +70,7 @@ class ScenarioContext(object):
     full_spec_path: str, The absolute path to the file that the spec was loaded
       from.
     spec_data: The parsed spec data.
+    track: calliope_base.ReleaseTrack, Release track to run the test in.
     execution_mode: session.ExecutionMode, The mode the tests are running in.
     update_modes: [updates.Mode], The list of enabled update modes for this
       scenario run.
@@ -138,7 +139,7 @@ class Scenario(object):
       elif 'execute_binary' in a:
         yield ExecuteBinaryAction.FromData(a)
       elif 'execute_command' in a:
-        yield CommandExecutionAction.FromData(a)
+        yield ExecuteCommandAction.FromData(a)
       else:
         # This will never happen if schema passes validation.
         raise ValueError('Unknown action type: {}'.format(a))
@@ -313,6 +314,7 @@ class ExecuteCommandUntilAction(Action):
     command_execution_data = data.get('execute_command_until')
     return cls(
         command_execution_data['command'],
+        command_execution_data.get('track'),
         command_execution_data.get('retries'),
         command_execution_data.get('timeout', 120),
         command_execution_data.get('exit_code'),
@@ -324,6 +326,7 @@ class ExecuteCommandUntilAction(Action):
 
   def __init__(self,
                command,
+               track,
                retries,
                timeout,
                exit_code,
@@ -333,6 +336,7 @@ class ExecuteCommandUntilAction(Action):
                wait_ceiling):
     super(ExecuteCommandUntilAction, self).__init__()
     self._command = command
+    self._track = calliope_base.ReleaseTrack.FromId(track) if track else None
     self._retries = retries
     self._timeout = timeout
     self._exit_code = exit_code
@@ -366,7 +370,7 @@ class ExecuteCommandUntilAction(Action):
     def _Run():
       """Executes the command for the retrier."""
       try:
-        scenario_context.command_executor(command)
+        scenario_context.command_executor(command, track=self._track)
         exit_code = 0
       except Exception as e:  # pylint: disable=broad-except
         if isinstance(e, (KeyboardInterrupt, SystemExit)):
@@ -453,7 +457,7 @@ class ExecuteBinaryAction(Action):
         scenario_context.RewriteScenario()
 
 
-class CommandExecutionAction(Action):
+class ExecuteCommandAction(Action):
   """Action that runs a command and validates assertions about its execution."""
 
   @classmethod
@@ -462,6 +466,7 @@ class CommandExecutionAction(Action):
     command_execution_data = data.get('execute_command')
     return cls(
         command_execution_data['command'],
+        command_execution_data.get('track'),
         command_execution_data.get('cleanup_for'),
         command_execution_data.get('validation_only'),
         command_execution_data.get('validate_remote_api_calls', True),
@@ -469,10 +474,11 @@ class CommandExecutionAction(Action):
         command_execution_data,
     )
 
-  def __init__(self, command, cleanup_for, validation_only,
+  def __init__(self, command, track, cleanup_for, validation_only,
                validate_remote_api_calls, label, original_event_data):
-    super(CommandExecutionAction, self).__init__()
+    super(ExecuteCommandAction, self).__init__()
     self.command = command
+    self.track = calliope_base.ReleaseTrack.FromId(track) if track else None
     self.cleanup_for = cleanup_for
     self.validation_only = validation_only
     self.validate_remote_api_calls = validate_remote_api_calls
@@ -529,7 +535,11 @@ class CommandExecutionAction(Action):
         raise ValueError('Unknown event type: {}'.format(e))
 
   def Summary(self):
-    steps = [{'command': self.command}]
+    if self.track:
+      command = [self.track.prefix, self.command]
+    else:
+      command = [self.command]
+    steps = [{'command': ' '.join(command)}]
     if self.label:
       steps.insert(0, {'label': self.label})
     for e in self._LoadEvents(None):
@@ -569,7 +579,8 @@ class CommandExecutionAction(Action):
             action_location=action_location, debug=scenario_context.debug) as s:
           session_obj = s
           scenario_context.command_executor(
-              scenario_context.resource_ref_resolver.Resolve(self.command))
+              scenario_context.resource_ref_resolver.Resolve(self.command),
+              track=self.track)
     finally:
       if session_obj:
         if update_modes:

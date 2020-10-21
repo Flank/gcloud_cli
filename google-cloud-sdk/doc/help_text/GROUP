@@ -143,6 +143,9 @@ GROUPS
      anthos
         Anthos command Group.
 
+     apigee
+        Manage Apigee resources.
+
      app
         Manage your App Engine deployments.
 

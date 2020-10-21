@@ -11,7 +11,7 @@ gcloud beta redis instances update \- update Memorystore Redis instances
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta redis instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-remove\-redis\-config\fR=[\fIKEY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-update\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta redis instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-enable\-auth\fR] [\fB\-\-remove\-redis\-config\fR=[\fIKEY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-update\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,6 +72,10 @@ Return immediately, without waiting for the operation in progress to complete.
 .TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 A human\-readable name for the instance.
+
+.TP 2m
+\fB\-\-enable\-auth\fR
+Enables Redis AUTH for the instance.
 
 .TP 2m
 \fB\-\-remove\-redis\-config\fR=[\fIKEY\fR,...]

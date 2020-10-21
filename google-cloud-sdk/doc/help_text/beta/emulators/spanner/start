@@ -2,14 +2,19 @@ NAME
     gcloud beta emulators spanner start - start a local Cloud Spanner emulator
 
 SYNOPSIS
-    gcloud beta emulators spanner start [--host-port=HOST_PORT]
-        [--rest-port=REST_PORT] [--use-docker=USE_DOCKER]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta emulators spanner start
+        [--enable-fault-injection=ENABLE_FAULT_INJECTION]
+        [--host-port=HOST_PORT] [--rest-port=REST_PORT]
+        [--use-docker=USE_DOCKER] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) This command starts a local Cloud Spanner emulator.
 
 FLAGS
+     --enable-fault-injection=ENABLE_FAULT_INJECTION
+        If true, the emulator will randomly inject faults into transactions.
+        This facilitates application abort-retry testing.
+
      --host-port=HOST_PORT
         The host:port to which the emulator should be bound. The default value
         is localhost:9010. Note that this port serves gRPC requests. To

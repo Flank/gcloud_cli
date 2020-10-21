@@ -83,12 +83,12 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     self.compute_v1_messages = core_apis.GetMessagesModule(
         'compute', 'v1')
 
-    self.mocked_artifacts_v1beta1 = client_mocker.Client(
-        core_apis.GetClientClass('artifactregistry', 'v1beta1'))
-    self.mocked_artifacts_v1beta1.Mock()
-    self.addCleanup(self.mocked_artifacts_v1beta1.Unmock)
-    self.mocked_artifacts_v1beta1_messages = core_apis.GetMessagesModule(
-        'artifactregistry', 'v1beta1')
+    self.mocked_artifacts_v1beta2 = client_mocker.Client(
+        core_apis.GetClientClass('artifactregistry', 'v1beta2'))
+    self.mocked_artifacts_v1beta2.Mock()
+    self.addCleanup(self.mocked_artifacts_v1beta2.Unmock)
+    self.mocked_artifacts_v1beta2_messages = core_apis.GetMessagesModule(
+        'artifactregistry', 'v1beta2')
 
     make_requests_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.MakeRequests',
@@ -370,11 +370,13 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
 
   def PrepareDaisyMocksWithRegionalBucket(
       self, daisy_step, timeout='7200s', log_location=None, permissions=None,
-      async_flag=False, is_import=True, match_source_file_region=True):
+      async_flag=False, is_import=True, match_source_file_region=True,
+      scratch_bucket_location=''):
     self.PrepareDaisyMocks(daisy_step, timeout, log_location, permissions,
                            async_flag, is_import)
     self.PrepareDaisyBucketMocksWithRegion(
-        match_source_file_region=match_source_file_region)
+        match_source_file_region=match_source_file_region,
+        scratch_bucket_location=scratch_bucket_location)
 
   def PrepareDaisyMocksWithDefaultBucket(
       self,
@@ -388,20 +390,25 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
                            async_flag, is_import)
     self.PrepareDaisyBucketMocksWithoutRegion()
 
-  def PrepareDaisyBucketMocksWithRegion(self, match_source_file_region=True):
+  def PrepareDaisyBucketMocksWithRegion(self,
+                                        match_source_file_region=True,
+                                        scratch_bucket_location=''):
     if match_source_file_region:
       self.mocked_storage_v1.buckets.Get.Expect(
           self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
           response=self.storage_v1_messages.Bucket(
               name='31dd',
               storageClass='REGIONAL',
-              location=self.GetScratchBucketRegion()
+              location='MY-REGION'
           ),
       )
 
-    daisy_bucket_name = self.GetScratchBucketNameWithRegion()
+    daisy_bucket_name = self.GetScratchBucketNameWithRegion(
+        scratch_bucket_location=scratch_bucket_location)
     daisy_bucket = self.storage_v1_messages.Bucket(
-        id=daisy_bucket_name, location=self.GetScratchBucketRegion())
+        id=daisy_bucket_name,
+        location=self.GetScratchBucketRegion(
+            scratch_bucket_location=scratch_bucket_location))
     self.mocked_storage_v1.buckets.Get.Expect(
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket=daisy_bucket_name),
@@ -456,23 +463,27 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     return self.cloudbuild_v1_messages.BuildStep(args=args, name=self.builder)
 
   @staticmethod
-  def GetScratchBucketNameWithRegion():
-    return ('my-project-daisy-bkt-' +
-            DaisyBaseTest.GetScratchBucketRegion().lower())
+  def GetScratchBucketNameWithRegion(scratch_bucket_location=''):
+    return (
+        'my-project-daisy-bkt-' +
+        DaisyBaseTest.GetScratchBucketRegion(scratch_bucket_location).lower())
 
   @staticmethod
   def GetScratchBucketNameWithoutRegion():
     return 'my-project-daisy-bkt'
 
   @staticmethod
-  def GetScratchBucketName(regionalized):
+  def GetScratchBucketName(regionalized, scratch_bucket_location=''):
     if regionalized:
-      return DaisyBaseTest.GetScratchBucketNameWithRegion()
+      return DaisyBaseTest.GetScratchBucketNameWithRegion(
+          scratch_bucket_location)
     else:
       return DaisyBaseTest.GetScratchBucketNameWithoutRegion()
 
   @staticmethod
-  def GetScratchBucketRegion():
+  def GetScratchBucketRegion(scratch_bucket_location=''):
+    if scratch_bucket_location:
+      return scratch_bucket_location
     return 'MY-REGION'
 
   @staticmethod

@@ -74,20 +74,23 @@ class NameExpansionTest(cloud_storage_util.WithGCSCalls,
   @mock_cloud_api.patch
   def test_invalid_url(self, client):
     """Test that invalid URL raises InvalidUrlError."""
-    client.ListObjects.return_value = []
+    client.list_objects.return_value = []
 
     with self.assertRaisesRegex(errors.InvalidUrlError,
                                 r'gs://bucket/bad1\* matched no objects'):
       list(name_expansion.NameExpansionIterator([
           'gs://bucket/bad1*', 'gs://bucket/bad2*']))
 
-    client.ListObjects.assert_called_once_with(
-        all_versions=False, bucket_name='bucket', delimiter='/',
-        fields_scope=cloud_api.FieldsScope.NO_ACL, prefix='bad1')
+    client.list_objects.assert_called_once_with(
+        all_versions=False,
+        bucket_name='bucket',
+        delimiter='/',
+        fields_scope=cloud_api.FieldsScope.NO_ACL,
+        prefix='bad1')
 
   @mock_cloud_api.patch
   def test_expansion_without_recursion(self, client):
-    client.ListObjects.side_effect = [
+    client.list_objects.side_effect = [
         # Response for 'gs://a_bucket1/dir*' expansion.
         self.objects_with_dir_prefix,
         # Response for 'gs://a_bucket1/foo'.
@@ -109,11 +112,12 @@ class NameExpansionTest(cloud_storage_util.WithGCSCalls,
     ]
 
     self.assertEqual(name_expansion_results, expected_name_expansion_results)
-    self.assertEqual(client.ListObjects.mock_calls, expected_list_objects_calls)
+    self.assertEqual(client.list_objects.mock_calls,
+                     expected_list_objects_calls)
 
   @mock_cloud_api.patch
   def test_expansion_with_recursion(self, client):
-    client.ListObjects.side_effect = [
+    client.list_objects.side_effect = [
         # Response for 'gs://bucket/dir*' expansion.
         self.objects_with_dir_prefix,
         # Response for 'gs://bucket/dir1/**' expansion.
@@ -139,7 +143,7 @@ class NameExpansionTest(cloud_storage_util.WithGCSCalls,
     for resource in self.dir2_objects:
       expected_nam_expansion_results.append(name_expansion.NameExpansionResult(
           resource, self.dir2.storage_url))
-   # Result for gs://bucket/dir*. The dirobj.txt object.
+  # Result for gs://bucket/dir*. The dirobj.txt object.
     expected_nam_expansion_results.append(name_expansion.NameExpansionResult(
         self.dirobj, self.dirobj.storage_url))
     # Result for gs://bucket/foo*.
@@ -160,7 +164,8 @@ class NameExpansionTest(cloud_storage_util.WithGCSCalls,
                   fields_scope=cloud_api.FieldsScope.NO_ACL, prefix='foo/')
     ]
     self.assertEqual(name_expansion_results, expected_nam_expansion_results)
-    self.assertEqual(client.ListObjects.mock_calls, expected_list_objects_calls)
+    self.assertEqual(client.list_objects.mock_calls,
+                     expected_list_objects_calls)
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')

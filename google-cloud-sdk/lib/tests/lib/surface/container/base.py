@@ -274,7 +274,8 @@ class TestBase(cli_test_base.CliTestBase):
     c = self.messages.Cluster(
         name=kwargs.get('name', self.CLUSTER_NAME),
         currentNodeCount=kwargs.get('currentNodeCount'),
-        initialNodeCount=kwargs.get('initialNodeCount'),
+        initialNodeCount=kwargs.get('clusterNodeCount',
+                                    kwargs.get('initialNodeCount')),
         locations=kwargs.get('locations', []),
         endpoint=kwargs.get('endpoint'),
         status=kwargs.get('status'),
@@ -308,6 +309,7 @@ class TestBase(cli_test_base.CliTestBase):
         shieldedNodes=kwargs.get('shieldedNodes'),
         releaseChannel=kwargs.get('releaseChannel'),
     )
+
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
     if (kwargs.get('issueClientCertificate') is not None or
@@ -343,6 +345,10 @@ class TestBase(cli_test_base.CliTestBase):
       c.databaseEncryption = self.messages.DatabaseEncryption(
           keyName=kwargs.get('databaseEncryptionKey'),
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
+
+    if kwargs.get('autogke'):
+      c.autogke = self.messages.AutoGKE(enabled=True)
+
     return c
 
   def _MakeClusterWithAutoscaling(self, **kwargs):
@@ -387,7 +393,8 @@ class TestBase(cli_test_base.CliTestBase):
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
         autoscaling=kwargs.get('autoscaling'),
         management=(kwargs.get('management') if 'management' in kwargs else
-                    self._MakeDefaultNodeManagement()),
+                    self._MakeDefaultNodeManagement(
+                        autogke=kwargs.get('autogke'))),
         maxPodsConstraint=kwargs.get('maxPodsConstraint'),
         upgradeSettings=kwargs.get('upgradeSettings'),
     )
@@ -395,7 +402,9 @@ class TestBase(cli_test_base.CliTestBase):
   # Creates a default node management adaptive to release tracks.
   # Autorepair default value is True for default image config.
   # Autoupgrade default value is True.
-  def _MakeDefaultNodeManagement(self, auto_repair=True):
+  def _MakeDefaultNodeManagement(self, auto_repair=True, autogke=False):
+    if autogke:
+      return self.messages.NodeManagement(autoRepair=False)
     return self.messages.NodeManagement(
         autoRepair=auto_repair, autoUpgrade=True)
 
@@ -1020,11 +1029,20 @@ class GATestBase(TestBase):
         response=response)
 
   def ExpectGetServerConfig(self, location, exception=None):
+    rapid = self.messages.ReleaseChannelConfig.ChannelValueValuesEnum.RAPID
+    reg = self.messages.ReleaseChannelConfig.ChannelValueValuesEnum.REGULAR
+    stable = self.messages.ReleaseChannelConfig.ChannelValueValuesEnum.STABLE
     if exception:
       response = None
     else:
       response = self.messages.ServerConfig(
-          defaultClusterVersion='1.2.3', validMasterVersions=['1.3.2'])
+          defaultClusterVersion='1.2.3',
+          validMasterVersions=['1.3.2'],
+          channels=[
+              self.messages.ReleaseChannelConfig(channel=rapid),
+              self.messages.ReleaseChannelConfig(channel=reg),
+              self.messages.ReleaseChannelConfig(channel=stable),
+          ])
     self.mocked_client.projects_locations.GetServerConfig.Expect(
         self.messages.ContainerProjectsLocationsGetServerConfigRequest(
             name=api_adapter.ProjectLocation(self.PROJECT_ID, location)),
@@ -1094,6 +1112,16 @@ class BetaTestBase(GATestBase):
       cluster.clusterTelemetry = kwargs.get('clusterTelemetry')
     cluster.notificationConfig = kwargs.get('notificationConfig')
     cluster.confidentialNodes = kwargs.get('confidentialNodes')
+
+    if kwargs.get('autogke'):
+      config = self.messages.PrivateClusterConfig()
+      config.enablePrivateNodes = True
+      cluster.privateClusterConfig = config
+
+      policy = self.messages.IPAllocationPolicy()
+      policy.useIpAliases = True
+      policy.createSubnetwork = False
+      cluster.ipAllocationPolicy = policy
 
     return cluster
 

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 - release_tracks: [ALPHA, BETA]
-  hidden: true
 
   help_text:
     brief: List WorkloadIdentityPools.
@@ -21,7 +20,7 @@
       The following command lists all WorkloadIdentityPools in the default project, including
       soft-deleted pools:
 
-        $ {command} --location global --show-deleted
+        $ {command} --location=global --show-deleted
 
   request:
     collection: iam.projects.locations.workloadIdentityPools

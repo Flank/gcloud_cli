@@ -37,8 +37,11 @@ class DatabasesListTest(base.SpannerTestBase):
             parent=self.ins_ref.RelativeName(), pageSize=100),
         response=self.msgs.ListDatabasesResponse(databases=[
             self.msgs.Database(name='db1'),
-            self.msgs.Database(name='db2')
+            self.msgs.Database(
+                name='db2', state=self.msgs.Database.StateValueValuesEnum.READY)
         ]))
     self.Run('spanner databases list --instance myins')
-    self.AssertOutputContains('db1')
-    self.AssertOutputContains('db2')
+    self.AssertOutputEquals(
+        'NAME  STATE\n'
+        'db1\n'
+        'db2   READY', normalize_space=r'\s')

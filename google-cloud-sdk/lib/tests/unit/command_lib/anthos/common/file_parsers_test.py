@@ -23,6 +23,7 @@ import copy
 
 from googlecloudsdk.command_lib.anthos.common import file_parsers
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import files
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 
@@ -298,27 +299,33 @@ class YamlConfigFileTest(sdk_test_base.SdkBase, parameterized.TestCase):
                                        'testdata')
     self.config_path = self.Resource(self.test_file_dir,
                                      'auth-config-multiple-v2alpha1.yaml')
+    self.config_contents = files.ReadFileContents(self.config_path)
+
     self.config_path_2 = self.Resource(self.test_file_dir,
                                        'auth-config-v2alpha1.yaml')
+    self.config_contents_2 = files.ReadFileContents(self.config_path_2)
 
   def testFindMatchingItem(self):
-    config_file = file_parsers.YamlConfigFile(self.config_path,
-                                              file_parsers.LoginConfigObject)
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
     found_config = config_file.FindMatchingItem(
         file_parsers.LoginConfigObject.CLUSTER_NAME_KEY, 'testcluster-2')[0]
     self.assertEqual(found_config.GetPreferredAuth(), 'ldap2')
 
   def testFindMatchingItemData(self):
-    config_file = file_parsers.YamlConfigFile(self.config_path,
-                                              file_parsers.LoginConfigObject)
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
     found_clusters = config_file.FindMatchingItemData(
         file_parsers.LoginConfigObject.CLUSTER_NAME_KEY)
     self.assertCountEqual(found_clusters,
                           ['testcluster-1', 'testcluster-2', 'testcluster-3'])
 
   def testSetMatchingItem(self):
-    config_file = file_parsers.YamlConfigFile(self.config_path,
-                                              file_parsers.LoginConfigObject)
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
     config_file.SetMatchingItemData(
         file_parsers.LoginConfigObject.CLUSTER_NAME_KEY, 'testcluster-2',
         file_parsers.LoginConfigObject.CLUSTER_NAME_KEY, 'updated_cluster',
@@ -328,12 +335,13 @@ class YamlConfigFileTest(sdk_test_base.SdkBase, parameterized.TestCase):
 
   def testSetMatchingItemWithPersist(self):
     # copy config to a temp directory
-    config_file = file_parsers.YamlConfigFile(self.config_path,
-                                              file_parsers.LoginConfigObject)
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
     temp_config_path = self.Touch(self.temp_path, name='temp_config.yaml',
                                   contents=config_file.yaml)
     new_config_file = file_parsers.YamlConfigFile(
-        temp_config_path, file_parsers.LoginConfigObject)
+        item_type=file_parsers.LoginConfigObject, file_path=temp_config_path)
     # mutate copied config and confirm temp file is changed on disk
     new_config_file.SetMatchingItemData(
         file_parsers.LoginConfigObject.CLUSTER_NAME_KEY, 'testcluster-2',
@@ -341,23 +349,74 @@ class YamlConfigFileTest(sdk_test_base.SdkBase, parameterized.TestCase):
     self.AssertFileContains('updated_cluster', temp_config_path)
 
   def testPathNotFound(self):
+    # No file_contents provided.
     with self.assertRaises(file_parsers.YamlConfigFileError):
-      file_parsers.YamlConfigFile('NOT_FOUND', file_parsers.YamlConfigObject)
+      file_parsers.YamlConfigFile(item_type=file_parsers.YamlConfigObject,
+                                  file_path='NOT_FOUND')
 
   def testEq(self):
-    config_file = file_parsers.YamlConfigFile(self.config_path,
-                                              file_parsers.LoginConfigObject)
-    config_file_2 = file_parsers.YamlConfigFile(self.config_path_2,
-                                                file_parsers.LoginConfigObject)
-    config_file3 = file_parsers.YamlConfigFile(self.config_path,
-                                               file_parsers.LoginConfigObject)
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
+    config_file_2 = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path_2)
+    config_file3 = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
     self.assertNotEqual(config_file, config_file_2)
     self.assertEqual(config_file, config_file3)
 
   def testItemType(self):
-    config_file = file_parsers.YamlConfigFile(self.config_path,
-                                              file_parsers.LoginConfigObject)
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
     self.assertEqual(config_file.item_type, file_parsers.LoginConfigObject)
+
+  # No source file nor contents provided should throw exception.
+  def testNoContentsNorFileProvided(self):
+    with self.assertRaises(file_parsers.YamlConfigFileError):
+      file_parsers.YamlConfigFile(item_type=file_parsers.LoginConfigObject)
+
+  # Providing URL with no file_contents should throw exception.
+  def testURLWithNoContents(self):
+    with self.assertRaises(file_parsers.YamlConfigFileError):
+      file_parsers.YamlConfigFile(item_type=file_parsers.LoginConfigObject,
+                                  file_path='http://www.example.com')
+
+  # Trying to write to disk with no file path specified should throw exception.
+  def testWriteToDiskNoFilePath(self):
+    with self.assertRaises(file_parsers.YamlConfigFileError):
+      login_config = file_parsers.YamlConfigFile(
+          item_type=file_parsers.LoginConfigObject,
+          file_contents=self.config_contents)
+      login_config.WriteToDisk()
+
+  # Test equality in loading from file_path and from file_contents.
+  def testEqLoadFromContents(self):
+    # Read from file 1.
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path)
+    # Read from file 2.
+    config_file_2 = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_path=self.config_path_2)
+    # Load from pre-read contents of file 1.
+    config_file3 = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_contents=self.config_contents)
+    self.assertNotEqual(config_file3, config_file_2)
+    self.assertEqual(config_file3, config_file)
+
+  # Test file_contents property is stored.
+  def testFileContentsProperty(self):
+    # Read from file 1.
+    config_file = file_parsers.YamlConfigFile(
+        item_type=file_parsers.LoginConfigObject,
+        file_contents=self.config_contents,
+        file_path=self.config_path)
+    self.assertEqual(self.config_contents, config_file.file_contents)
 
 
 if __name__ == '__main__':

@@ -250,7 +250,21 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                              location=None,
                              gcs_location=None,
                              parameters=None,
-                             job_name=None):
+                             job_name=None,
+                             service_account_email=None,
+                             max_workers=None,
+                             num_workers=None,
+                             worker_machine_type=None,
+                             staging_location=None,
+                             network=None,
+                             subnetwork=None,
+                             kms_key_name=None,
+                             disable_public_ips=False,
+                             worker_region=None,
+                             worker_zone=None,
+                             enable_streaming_engine=False,
+                             additional_experiments=None,
+                             additional_user_labels=None):
     run_job_req_body = MESSAGE_MODULE.LaunchFlexTemplateRequest
     run_job_req_class = (
         MESSAGE_MODULE.DataflowProjectsLocationsFlexTemplatesLaunchRequest)
@@ -271,9 +285,43 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
     if params_list:
       additional_properties = params_value(additionalProperties=params_list)
 
+    user_labels = None
+    user_labels_list = []
+    labels_value = MESSAGE_MODULE.FlexTemplateRuntimeEnvironment.AdditionalUserLabelsValue
+    if additional_user_labels:
+      for (k, v) in additional_user_labels:
+        user_labels_list.append(
+            labels_value.AdditionalProperty(
+                key=six.text_type(k), value=six.text_type(v)))
+    if user_labels_list:
+      user_labels = labels_value(additionalProperties=user_labels_list)
+
+    experiments = []
+    if additional_experiments:
+      experiments = additional_experiments
+
+    ip_configuration_enum = MESSAGE_MODULE.FlexTemplateRuntimeEnvironment.IpConfigurationValueValuesEnum
+    ip_private = ip_configuration_enum.WORKER_IP_PRIVATE
+    ip_configuration = ip_private if disable_public_ips else None
+
     param_body = run_job_req_params(
         jobName=job_name,
         containerSpecGcsPath=gcs_location,
+        environment=MESSAGE_MODULE.FlexTemplateRuntimeEnvironment(
+            serviceAccountEmail=service_account_email,
+            maxWorkers=max_workers,
+            numWorkers=num_workers,
+            network=network,
+            subnetwork=subnetwork,
+            machineType=worker_machine_type,
+            kmsKeyName=kms_key_name,
+            tempLocation=staging_location,
+            ipConfiguration=ip_configuration,
+            workerRegion=worker_region,
+            workerZone=worker_zone,
+            enableStreamingEngine=enable_streaming_engine,
+            additionalExperiments=experiments,
+            additionalUserLabels=user_labels),
         parameters=additional_properties)
     body = run_job_req_body(launchParameter=param_body)
 

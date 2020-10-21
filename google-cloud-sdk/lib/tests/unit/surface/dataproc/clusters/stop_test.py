@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
@@ -67,22 +66,9 @@ class ClusterStopUnitTestBeta(unit_base.DataprocUnitTestBase,
   def testStopCluster(self):
     self.ExpectStopCalls()
     expected = self.MakeCompletedOperation()
-    self.WriteInput('y\n')
     result = self.RunDataproc('clusters stop ' + self.CLUSTER_NAME)
-    self.AssertErrContains(
-        "Cluster 'test-cluster' is stopping.")
-    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertErrContains("Waiting for cluster 'test-cluster' to stop.")
     self.AssertMessagesEqual(expected, result)
-
-  def testStopClusterDecline(self):
-    self.WriteInput('n\n')
-    with self.AssertRaisesExceptionMatches(
-        console_io.OperationCancelledError,
-        'Stopping cluster aborted by user.'):
-      self.RunDataproc('clusters stop ' + self.CLUSTER_NAME)
-      self.AssertErrContains(
-          "Cluster 'test-cluster' is stopping.")
-      self.AssertErrContains('PROMPT_CONTINUE')
 
   def testStopClusterOperationFailure(self):
     self.ExpectStopCalls(error=self.MakeRpcError())
@@ -112,7 +98,6 @@ class ClusterStopUnitTestBeta(unit_base.DataprocUnitTestBase,
     operation = self.MakeOperation()
     self.ExpectStopCluster(
         response=operation)
-    self.WriteInput('y\n')
     self.ExpectGetOperation(
         operation=operation,
         exception=self.MakeHttpError(403))
@@ -124,10 +109,8 @@ class ClusterStopUnitTestBeta(unit_base.DataprocUnitTestBase,
     properties.VALUES.dataproc.region.Set('us-central1')
     self.ExpectStopCalls(region='us-central1')
     expected = self.MakeCompletedOperation()
-    self.WriteInput('y\n')
     result = self.RunDataproc('clusters stop {}'.format(self.CLUSTER_NAME))
-    self.AssertErrContains("Cluster 'test-cluster' is stopping.")
-    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertErrContains("Waiting for cluster 'test-cluster' to stop.")
     self.AssertMessagesEqual(expected, result)
 
   def testStopClusterWithoutRegion(self):

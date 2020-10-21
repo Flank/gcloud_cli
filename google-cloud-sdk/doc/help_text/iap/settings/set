@@ -133,7 +133,8 @@ EXAMPLES
             --resource-type=compute --service=SERVICE_ID
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iap settings set
         $ gcloud beta iap settings set
 

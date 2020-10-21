@@ -46,17 +46,15 @@ EXAMPLES
     To get metadata for the 'frontend-server-tls' certificate:
 
         $ gcloud beta privateca certificates describe frontend-server-tls \
-          --issuer server-tls-1 --issuer-location us-west1
+          --issuer=server-tls-1 --issuer-location=us-west1
 
     To download the PEM-encoded certificate for the 'frontend-server-tls'
     certificate to a file called 'frontend-server-tls.crt':
 
         $ gcloud beta privateca certificates describe frontend-server-tls \
-          --issuer server-tls-1 --issuer-location us-west1 \
-          --format "value(pem_cert)" > ./frontend-server-tls.crt
+          --issuer=server-tls-1 --issuer-location=us-west1 \
+          --format="value(pem_cert)" > ./frontend-server-tls.crt
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

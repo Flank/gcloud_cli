@@ -23,6 +23,7 @@ import re
 from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
 from googlecloudsdk.api_lib.util import waiter
+from googlecloudsdk.command_lib.artifacts import containeranalysis_util as ca_util
 from googlecloudsdk.command_lib.artifacts import requests as ar_requests
 from googlecloudsdk.command_lib.artifacts import util as ar_util
 from googlecloudsdk.core import log
@@ -31,7 +32,6 @@ from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 
 ARTIFACTREGISTRY_API_NAME = "artifactregistry"
-ARTIFACTREGISTRY_API_VERSION = "v1beta1"
 
 _INVALID_IMAGE_PATH_ERROR = """Invalid Docker string.
 
@@ -93,6 +93,8 @@ DOCKER_IMG_BY_DIGEST_REGEX = (
 
 DOCKER_IMG_REGEX = r"^.*-docker.pkg.dev\/[^\/]+\/[^\/]+\/(?P<img>.*)"
 
+_VERSION_COLLECTION_NAME = "artifactregistry.projects.locations.repositories.packages.versions"
+
 
 def _GetDefaultResources():
   """Gets default config values for project, location, and repository."""
@@ -131,7 +133,7 @@ def _ParseInput(input_str):
   return DockerRepo(project_id, location, matches.group("repo"))
 
 
-def _ParseDockerImagePath(img_path):
+def ParseDockerImagePath(img_path):
   """Validates and parses an image path into a DockerImage or a DockerRepo."""
   if not img_path:
     return _GetDefaultResources()
@@ -276,10 +278,12 @@ def _GetDockerVersions(docker_img,
 
   img_list = []
   for ver in ver_list:
+    v = resources.REGISTRY.Parse(
+        ver.name, collection=_VERSION_COLLECTION_NAME).Name()
     img_list.append({
         "package": docker_img.GetDockerString(),
         "tags": ", ".join([tag.name.split("/")[-1] for tag in ver.relatedTags]),
-        "version": ver.name,
+        "version": v,
         "createTime": ver.createTime,
         "updateTime": ver.updateTime
     })
@@ -315,6 +319,37 @@ def _ValidateDockerRepo(repo_name):
         "only be used on Docker repositories.".format(repo.format))
 
 
+def _ValidateAndGetDockerVersion(version_or_tag):
+  """Validates a version_or_tag and returns the validated DockerVersion object.
+
+  Args:
+    version_or_tag: a docker version or a docker tag.
+
+  Returns:
+    a DockerVersion object.
+
+  Raises:
+    ar_exceptions.InvalidInputValueError if version_or_tag is not valid.
+  """
+  try:
+    if isinstance(version_or_tag, DockerVersion):
+      # We have all the information about the docker digest.
+      # Call the API to make sure it exists.
+      ar_requests.GetVersion(ar_requests.GetClient(), ar_requests.GetMessages(),
+                             version_or_tag.GetVersionName())
+      return version_or_tag
+    elif isinstance(version_or_tag, DockerTag):
+      digest = ar_requests.GetVersionFromTag(ar_requests.GetClient(),
+                                             ar_requests.GetMessages(),
+                                             version_or_tag.GetTagName())
+      docker_version = DockerVersion(version_or_tag.image, digest)
+      return docker_version
+    else:
+      raise ar_exceptions.InvalidInputValueError(_INVALID_DOCKER_IMAGE_ERROR)
+  except api_exceptions.HttpNotFoundError:
+    raise ar_exceptions.InvalidInputValueError(_DOCKER_IMAGE_NOT_FOUND)
+
+
 class DockerRepo(object):
   """Holder for a Docker repository.
 
@@ -344,6 +379,10 @@ class DockerRepo(object):
   def repo(self):
     return self._repo
 
+  def GetDockerString(self):
+    return "{}-docker.pkg.dev/{}/{}".format(self.location, self.project,
+                                            self.repo)
+
   def GetRepositoryName(self):
     return "projects/{}/locations/{}/repositories/{}".format(
         self.project, self.location, self.repo)
@@ -356,6 +395,7 @@ class DockerImage(object):
   LOCATION-docker.pkg.dev/PROJECT-ID/REPOSITORY-ID/IMAGE_PATH
 
   Properties:
+    project: str, The name of cloud project.
     docker_repo: DockerRepo, The Docker repository.
     pkg: str, The name of the package.
   """
@@ -363,6 +403,10 @@ class DockerImage(object):
   def __init__(self, docker_repo, pkg_id):
     self._docker_repo = docker_repo
     self._pkg = pkg_id
+
+  @property
+  def project(self):
+    return self._docker_repo.project
 
   @property
   def docker_repo(self):
@@ -426,6 +470,7 @@ class DockerVersion(object):
   Properties:
     image: DockerImage, The DockerImage containing the tag.
     digest: str, The name of the Docker digest.
+    project: str, the project this image belongs to.
   """
 
   def __init__(self, docker_img, digest):
@@ -440,6 +485,10 @@ class DockerVersion(object):
   def digest(self):
     return self._digest
 
+  @property
+  def project(self):
+    return self._image.docker_repo.project
+
   def GetVersionName(self):
     return "{}/versions/{}".format(self.image.GetPackageName(), self.digest)
 
@@ -450,9 +499,8 @@ class DockerVersion(object):
     return "{}@{}".format(self.image.GetDockerString(), self.digest)
 
 
-def GetDockerImages(args):
+def GetDockerImages(resource, args):
   """Gets Docker images."""
-  resource = _ParseDockerImagePath(args.IMAGE_PATH)
   if isinstance(resource, DockerRepo):
     _ValidateDockerRepo(resource.GetRepositoryName())
     log.status.Print(
@@ -499,39 +547,10 @@ def DescribeDockerImage(args):
   """
   image, version_or_tag = _ParseDockerImage(args.IMAGE, _INVALID_IMAGE_ERROR)
   _ValidateDockerRepo(image.docker_repo.GetRepositoryName())
+  docker_version = _ValidateAndGetDockerVersion(version_or_tag)
 
   result = {}
-  result["image_summary"] = _GetDockerDigest(version_or_tag)
-  return result
-
-
-def _GetDockerDigest(version_or_tag):
-  """Retrieves the docker digest information.
-
-  Args:
-    version_or_tag: an object of DockerVersion or DockerTag
-
-  Returns:
-    A dictionary of information about the given docker image.
-  """
-  docker_version = version_or_tag
-  try:
-    if isinstance(version_or_tag, DockerVersion):
-      # We have all the information about the docker digest.
-      # Call the API to make sure it exists.
-      ar_requests.GetVersion(ar_requests.GetClient(), ar_requests.GetMessages(),
-                             version_or_tag.GetVersionName())
-    elif isinstance(version_or_tag, DockerTag):
-      digest = ar_requests.GetVersionFromTag(
-          ar_requests.GetClient(),
-          ar_requests.GetMessages(),
-          version_or_tag.GetTagName())
-      docker_version = DockerVersion(version_or_tag.image, digest)
-    else:
-      raise ar_exceptions.InvalidInputValueError(_INVALID_DOCKER_IMAGE_ERROR)
-  except api_exceptions.HttpNotFoundError:
-    raise ar_exceptions.InvalidInputValueError(_DOCKER_IMAGE_NOT_FOUND)
-  return {
+  result["image_summary"] = {
       "digest":
           docker_version.digest,
       "fully_qualified_digest":
@@ -541,6 +560,10 @@ def _GetDockerDigest(version_or_tag):
       "repository":
           docker_version.image.docker_repo.repo,
   }
+
+  metadata = ca_util.GetContainerAnalysisMetadata(docker_version, args)
+  result.update(metadata.ImagesDescribeView())
+  return result
 
 
 def DeleteDockerImage(args):
@@ -672,7 +695,7 @@ def DeleteDockerTag(args):
 
 def ListDockerTags(args):
   """Lists Docker tags."""
-  resource = _ParseDockerImagePath(args.IMAGE_PATH)
+  resource = ParseDockerImagePath(args.IMAGE_PATH)
 
   client = ar_requests.GetClient()
   messages = ar_requests.GetMessages()

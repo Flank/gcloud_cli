@@ -200,7 +200,7 @@ class _SessionTestsBase(sdk_test_base.WithOutputCapture,
     data = {
         'execute_command': {
             'command': '', 'events': list(scenario_events)}}
-    return schema.CommandExecutionAction.FromData(data)
+    return schema.ExecuteCommandAction.FromData(data)
 
   @contextlib.contextmanager
   def Execute(self, ce, execution_mode=session.ExecutionMode.LOCAL,
@@ -1213,7 +1213,7 @@ class SessionUpdateTests(_SessionTestsBase):
 
   def testAddEvents(self):
     data = {'execute_command': {'command': '', 'events': []}}
-    ce = schema.CommandExecutionAction.FromData(data)
+    ce = schema.ExecuteCommandAction.FromData(data)
     with self.Execute(ce, update_modes=[updates.Mode.RESULT,
                                         updates.Mode.UX,
                                         updates.Mode.API_REQUESTS]) as s:
@@ -1231,7 +1231,7 @@ class SessionUpdateTests(_SessionTestsBase):
     data = {'execute_command': {'command': '', 'events': [
         {'expect_stdout': 'foo'},
         {'expect_stderr': 'bar'}]}}
-    ce = schema.CommandExecutionAction.FromData(data)
+    ce = schema.ExecuteCommandAction.FromData(data)
     with self.Execute(ce, update_modes=[updates.Mode.RESULT,
                                         updates.Mode.UX,
                                         updates.Mode.API_REQUESTS]) as s:
@@ -1246,7 +1246,7 @@ class SessionUpdateTests(_SessionTestsBase):
         {'expect_prompt_continue': {'message': 'foo', 'user_input': 'y'}},
         {'expect_stdout': 'foo'},
         {'expect_stderr': 'bar'}]}}
-    ce = schema.CommandExecutionAction.FromData(data)
+    ce = schema.ExecuteCommandAction.FromData(data)
     with self.Execute(ce, update_modes=[updates.Mode.RESULT,
                                         updates.Mode.UX,
                                         updates.Mode.API_REQUESTS]) as s:
@@ -1273,7 +1273,7 @@ class SessionUpdateTests(_SessionTestsBase):
    - 'expect_stdout': 'foo'
     """
     data = yaml.load(data_string, round_trip=True, version=yaml.VERSION_1_2)
-    ce = schema.CommandExecutionAction.FromData(data)
+    ce = schema.ExecuteCommandAction.FromData(data)
     with self.Execute(ce, update_modes=[updates.Mode.RESULT,
                                         updates.Mode.UX,
                                         updates.Mode.API_REQUESTS]) as s:

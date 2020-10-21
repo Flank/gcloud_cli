@@ -1,0 +1,141 @@
+
+.TH "GCLOUD_ALPHA_API\-GATEWAY_API\-CONFIGS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha api\-gateway api\-configs create \- add a new config to an API
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha api\-gateway api\-configs create\fR (\fIAPI_CONFIG\fR\ :\ \fB\-\-api\fR=\fIAPI\fR) (\fB\-\-grpc\-files\fR=[\fIFILE\fR,...]\ |\ \fB\-\-openapi\-spec\fR=[\fIFILE\fR,...]) [\fB\-\-async\fR] [\fB\-\-backend\-auth\-service\-account\fR=\fIBACKEND_AUTH_SERVICE_ACCOUNT\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Add a new config to an API.
+
+NOTE: If the specified API does not exist it will be created.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Api config resource \- Name for API Config which will be created. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [api_config] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. To set the [location]
+attribute: provide the argument [api_config] on the command line with a fully
+specified name; Location for API and API Configs. Defaults to global. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fIAPI_CONFIG\fR
+ID of the api\-config or fully qualified identifier for the api\-config. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+API ID.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Configuration files for the API. Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-grpc\-files\fR=[\fIFILE\fR,...]
+Files describing the GRPC service. Google Service Configuration files in JSON or
+YAML formats as well as Proto descriptors should be listed.
+
+.TP 2m
+\fB\-\-openapi\-spec\fR=[\fIFILE\fR,...]
+The OpenAPI v2 specifications containing service configuration information, and
+API specification for the gateway.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-backend\-auth\-service\-account\fR=\fIBACKEND_AUTH_SERVICE_ACCOUNT\fR
+Service account which will be used to sign tokens for backends with
+authentication configured.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Human readable name which can optionally be supplied.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an API config for the API 'my\-api' with an OpenAPI spec, run:
+
+.RS 2m
+$ gcloud alpha api\-gateway api\-configs create my\-config \e
+    \-\-api=my\-api \-\-openapi\-spec=path/to/openapi_spec.yaml
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta api\-gateway api\-configs create
+.RE
+

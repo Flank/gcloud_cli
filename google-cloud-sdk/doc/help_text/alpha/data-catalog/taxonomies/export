@@ -49,7 +49,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access allowlist. This variant is also available:
+    access allowlist. These variants are also available:
 
+        $ gcloud data-catalog taxonomies export
         $ gcloud beta data-catalog taxonomies export
 

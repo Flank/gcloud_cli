@@ -40,7 +40,7 @@ EXAMPLES
     To describe WEB_SECURITY_SCANNER settings of project id="12345", run:
 
         $ gcloud alpha scc settings services describe-explicit \
-            --project=12345 --service WEB_SECURITY_SCANNER
+            --project=12345 --service=WEB_SECURITY_SCANNER
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

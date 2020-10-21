@@ -129,9 +129,9 @@ $ gcloud dataflow flex\-template build gs://template\-file\-gcs\-path \e
 .RS 2m
 $ gcloud dataflow flex\-template build gs://template\-file\-gcs\-path  \e
                \-\-image\-gcr\-path=gcr://path\-tos\-tore\-image          \e
-       \-\-jar path/to/pipeline.jar \-\-jar path/to/dependency.jar     \e
-            \-\-env FLEX_TEMPLATE_JAVA_MAIN_CLASS=classpath          \e
-       \-\-flex\-template\-base\-image JAVA11             \e
+       \-\-jar=path/to/pipeline.jar \-\-jar=path/to/dependency.jar     \e
+            \-\-env=FLEX_TEMPLATE_JAVA_MAIN_CLASS=classpath          \e
+       \-\-flex\-template\-base\-image=JAVA11             \e
     \-\-metadata\-file=/local/path/to/metadata.json \-\-sdk\-language=JAVA
 .RE
 

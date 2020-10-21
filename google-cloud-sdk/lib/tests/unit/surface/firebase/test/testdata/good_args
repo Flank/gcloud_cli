@@ -65,6 +65,11 @@ directories-to-pull.list:
 directories-to-pull.string:
   directories-to-pull: "/singleStringPath"
 
+directories-to-pull-ios.good:
+  directories-to-pull:
+    - /private/var/mobile/Media/my_output
+    - com.my.app:/Documents/my_other_output
+
 environment-variables.good:
   environment-variables:
     e1: value1
@@ -120,6 +125,11 @@ other-files.good:
   other-files:
     /sdcard/dir1/file.txt: local/dir/file1.txt
     '/sdcard/dir2/file.txt': 'gs://bucket/file2.txt'
+
+other-files-ios.good:
+  other-files:
+    /private/var/mobile/Media/myfile.txt: local/dir/file1.txt
+    'com.google:/Documents/myfile2.txt': 'gs://bucket/file2.txt'
 
 client-details.good:
   client-details:

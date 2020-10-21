@@ -11,7 +11,7 @@ gcloud alpha firebase test ios run \- invoke a test in Firebase Test Lab for iOS
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-xcode\-version\fR=\fIXCODE_VERSION\fR] [\fB\-\-xctestrun\-file\fR=\fIXCTESTRUN_FILE\fR] [\fB\-\-additional\-ipas\fR=\fIIPA\fR,[\fIIPA\fR,...]] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-async\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-special\-entitlements\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-xcode\-version\fR=\fIXCODE_VERSION\fR] [\fB\-\-xctestrun\-file\fR=\fIXCTESTRUN_FILE\fR] [\fB\-\-additional\-ipas\fR=\fIIPA\fR,[\fIIPA\fR,...]] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-async\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-other\-files\fR=\fIDEVICE_PATH\fR=\fIFILE_PATH\fR,[...]] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-special\-entitlements\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -169,6 +169,20 @@ Example:
 .RE
 
 .TP 2m
+\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]
+A list of paths that will be copied from the device's storage to the designated
+results bucket after the test is complete. These must be absolute paths under
+\f5/private/var/mobile/Media\fR or \f5/Documents\fR of the app under test. If
+the path is under an app's \f5/Documents\fR, it must be prefixed with the app's
+bundle id and a colon.
+
+Example:
+
+.RS 2m
+\-\-directories\-to\-pull=com.my.app:/Documents/output,/private/var/mobile/Media/output
+.RE
+
+.TP 2m
 \fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR
 Specifies the number of times a test execution should be reattempted if one or
 more of its test cases fail for any reason. An execution that initially fails
@@ -176,6 +190,23 @@ but succeeds on any reattempt is reported as FLAKY.
 
 The maximum number of reruns allowed is 10. (Default: 0, which implies no
 reruns.) All additional attempts are executed in parallel.
+
+.TP 2m
+\fB\-\-other\-files\fR=\fIDEVICE_PATH\fR=\fIFILE_PATH\fR,[...]
+A list of device\-path=file\-path pairs that specify the paths of the test
+device and the files you want pushed to the device prior to testing.
+
+Device paths should either be under the Media shared folder (e.g. prefixed with
+/private/var/mobile/Media) or within the documents directory of the filesystem
+of an app under test (e.g. /Documents). Device paths to app filesystems should
+be prefixed by the bundle ID and a colon. Source file paths may be in the local
+filesystem or in Google Cloud Storage (gs://...).
+
+Examples:
+
+.RS 2m
+\-\-other\-files com.my.app:/Documents/file.txt=local/file.txt,/private/var/mobile/Media/file.jpg=gs://bucket/file.jpg
+.RE
 
 .TP 2m
 \fB\-\-record\-video\fR
@@ -294,8 +325,8 @@ To run your tests against multiple iOS devices simultaneously, specify the
 
 .RS 2m
 $ gcloud alpha firebase test ios run \-\-test=XCTEST_ZIP \e
-    \-\-device=model=iphone7
-\-\-device=model=ipadmini4,version=11.2 \-\-device=model=iphonese
+    \-\-device=model=iphone7 \-\-device=model=ipadmini4,version=11.2 \e
+    \-\-device=model=iphonese
 .RE
 
 To run your XCTest using a specific version of Xcode, say 9.4.1, run:
@@ -317,6 +348,16 @@ To run an iOS game loop with specific scenario(s), use the
 .RS 2m
 $ gcloud alpha firebase test ios run \-\-type=game\-loop \e
     \-\-app=app.ipa \-\-scenario\-numbers=1,2,3
+.RE
+
+To run a test that pushes a local file onto the device before testing, use the
+\fB\-\-other\-files\fR flag:
+
+.RS 2m
+$ gcloud alpha firebase test ios run \-\-type=game\-loop \e
+    \-\-app=app.ipa \-\-scenario\-numbers=1 \e
+    \-\-other\-files=/private/var/mobile/Media/file.txt=/path/to/\e
+file.txt
 .RE
 
 All test arguments for a given test may alternatively be stored in an argument

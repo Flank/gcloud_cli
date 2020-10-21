@@ -30,8 +30,8 @@ from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
 from tests.lib import test_case
 
-import httplib2
 import mock
+import requests
 
 
 class ConcordUtilTest(cli_test_base.CliTestBase):
@@ -47,9 +47,10 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
       elif isinstance(survey_question, question.FreeTextQuestion):
         survey_question.AnswerQuestion('Love Cloud SDK!')
 
-    self.mock_client = mock.create_autospec(httplib2.Http)
+    self.mock_client = mock.create_autospec(requests.Session)
     self.StartPatch(
-        'googlecloudsdk.core.http.Http', return_value=self.mock_client)
+        'googlecloudsdk.core.requests.GetSession',
+        return_value=self.mock_client)
 
     self.StartObjectPatch(
         metrics, 'GetTimeMillis', autospec=True, return_value=100)
@@ -78,7 +79,7 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
     self.StartPatch('time.time', return_value=200)
 
   def testLogSurveyAnswers_Success(self):
-    self.mock_client.request.return_value = ({'status': '200'}, '')
+    self.mock_client.request.return_value = mock.PropertyMock(status_code=200)
     concord_util.LogSurveyAnswers(self.survey_instances)
     expected_headers = {'user-agent': 'cloudsdk'}
     expected_hats_response = {
@@ -132,16 +133,16 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
     }, sort_keys=True)
 
     self.mock_client.request.assert_called_once_with(
+        'POST',
         'https://play.googleapis.com/log',
-        method='POST',
-        body=expected_body,
+        data=expected_body,
         headers=expected_headers)
     with survey_check.PromptRecord() as pr:
       self.assertEqual(pr.last_answer_survey_time, 200)
     self.AssertErrEquals('Your response is submitted.\n')
 
   def testLongSurveyAnswersTest_Failed(self):
-    self.mock_client.request.return_value = ({'status': '400'}, '')
+    self.mock_client.request.return_value = mock.PropertyMock(status_code=400)
     with self.AssertRaisesExceptionMatches(
         concord_util.SurveyNotRecordedError,
         'We cannot record your feedback at this time, please try again later.'):

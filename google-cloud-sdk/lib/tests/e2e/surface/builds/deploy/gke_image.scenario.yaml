@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: Likely GCR related
-    bug: b/163030401
 title: Execute a deployment to a GKE cluster
 release_tracks: [ALPHA]
 summary:

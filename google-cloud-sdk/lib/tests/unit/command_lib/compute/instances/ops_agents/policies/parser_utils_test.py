@@ -31,13 +31,14 @@ class ArgEnumAgainstAgentTypeTest(subtests.Base):
         field_name='type',
         allowed_values=[
             agent_policy.OpsAgentPolicy.AgentRule.Type.LOGGING,
-            agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS
+            agent_policy.OpsAgentPolicy.AgentRule.Type.METRICS,
+            agent_policy.OpsAgentPolicy.AgentRule.Type.OPS_AGENT,
         ],
         **kwargs)(
             value)
 
   def testParser(self):
-    for arg_value in {'logging', 'metrics'}:
+    for arg_value in {'logging', 'metrics', 'ops-agent'}:
       self.Run(arg_value, arg_value)
 
   def testParserException(self):
@@ -47,7 +48,7 @@ class ArgEnumAgainstAgentTypeTest(subtests.Base):
           arg_value,
           exception=arg_parsers.ArgumentTypeError((
               'Invalid value [{}] from field [type], expected one of '
-              '[logging, metrics].'
+              '[logging, metrics, ops-agent].'
           ).format(arg_value)))
 
 

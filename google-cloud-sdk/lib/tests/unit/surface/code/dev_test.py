@@ -21,6 +21,7 @@ import subprocess
 from googlecloudsdk.command_lib.code import kubernetes
 from googlecloudsdk.command_lib.code import run_subprocess
 from googlecloudsdk.command_lib.code import skaffold
+from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files as file_utils
@@ -52,8 +53,6 @@ class DevTest(test_case.TestCase):
     self.find_executable_on_path = self.StartObjectPatch(
         file_utils, 'FindExecutableOnPath', return_value=True)
     self.mock_run = self.StartObjectPatch(run_subprocess, 'Run')
-    self.ensure_installed = self.StartObjectPatch(update_manager.UpdateManager,
-                                                  'EnsureInstalledAndRestart')
 
   def testSelectMinikube(self):
     args = self.parser.parse_args(['--minikube-profile=fake-profile'] +
@@ -64,7 +63,6 @@ class DevTest(test_case.TestCase):
       cmd.Run(args)
 
     mock_minikube.assert_called()
-    self.assertIn('minikube', self.ensure_installed.call_args[0][0])
 
   def testSelectMinikubeDefaultOnWindows(self):
     args = self.parser.parse_args(self.COMMON_ARGS)
@@ -99,7 +97,6 @@ class DevTest(test_case.TestCase):
       cmd.Run(args)
 
     mock_kind.assert_called()
-    self.assertIn('kind', self.ensure_installed.call_args[0][0])
 
   def testSelectMinikubeDefaultOnLinux(self):
     args = self.parser.parse_args(self.COMMON_ARGS)
@@ -140,3 +137,66 @@ class DevTest(test_case.TestCase):
         returncode=1, cmd='')
     with self.assertRaises(dev.RuntimeMissingDependencyError):
       cmd.Run(args)
+
+
+class EnsureComponentsInstalled(test_case.TestCase):
+
+  def SetUp(self):
+    self.parser = util.ArgumentParser()
+    dev.Dev.Args(self.parser)
+
+    self.StartObjectPatch(config, 'Paths').return_value.sdk_root = '/'
+
+  def testNoFlags(self):
+    args = self.parser.parse_args([])
+
+    with mock.patch.object(update_manager.UpdateManager,
+                           'EnsureInstalledAndRestart') as ensure_installed:
+      dev._EnsureComponentsInstalled(args)
+
+    ensure_installed.assert_called_with(['skaffold', 'minikube'])
+
+  def testKind(self):
+    args = self.parser.parse_args(['--kind-cluster=abc'])
+
+    with mock.patch.object(update_manager.UpdateManager,
+                           'EnsureInstalledAndRestart') as ensure_installed:
+      dev._EnsureComponentsInstalled(args)
+
+    ensure_installed.assert_called_with(['skaffold', 'kind'])
+
+  def testExternal(self):
+    args = self.parser.parse_args(['--kube-context=abc'])
+
+    with mock.patch.object(update_manager.UpdateManager,
+                           'EnsureInstalledAndRestart') as ensure_installed:
+      dev._EnsureComponentsInstalled(args)
+
+    ensure_installed.assert_called_with(['skaffold'])
+
+  def testMinikube(self):
+    args = self.parser.parse_args(['--minikube-profile=abc'])
+
+    with mock.patch.object(update_manager.UpdateManager,
+                           'EnsureInstalledAndRestart') as ensure_installed:
+      dev._EnsureComponentsInstalled(args)
+
+    ensure_installed.assert_called_with(['skaffold', 'minikube'])
+
+
+class EnsureComponentsInstalledSkip(test_case.TestCase):
+
+  def SetUp(self):
+    self.parser = util.ArgumentParser()
+    dev.Dev.Args(self.parser)
+
+    self.StartObjectPatch(config, 'Paths').return_value.sdk_root = None
+
+  def testNoFlags(self):
+    args = self.parser.parse_args([])
+
+    with mock.patch.object(update_manager.UpdateManager,
+                           'EnsureInstalledAndRestart') as ensure_installed:
+      dev._EnsureComponentsInstalled(args)
+
+    ensure_installed.assert_not_called()

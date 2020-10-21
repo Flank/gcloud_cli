@@ -48,7 +48,7 @@ summary:
         You are about to delete a membership.
     - input: y
   - error: '1: Invalid value for [--group-email, --member-email]: There is no such
-      membership associated with the specified arguments:eng-discuss@foo.com, invalid-user@foo.com'
+      membership associated with the specified arguments: eng-discuss@foo.com, invalid-user@foo.com'
 - execute:
   - label: Delete membership, and abort the delete.
   - command: |
@@ -209,7 +209,7 @@ actions:
     - expect_exit:
         code: 1
         message: 'Invalid value for [--group-email, --member-email]: There is no such
-          membership associated with the specified arguments:eng-discuss@foo.com,
+          membership associated with the specified arguments: eng-discuss@foo.com,
           invalid-user@foo.com'
 - execute_command:
     label: Delete membership, and abort the delete.

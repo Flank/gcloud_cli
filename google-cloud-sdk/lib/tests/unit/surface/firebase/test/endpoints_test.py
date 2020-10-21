@@ -57,6 +57,11 @@ class EndpointTests(unit_base.TestMockClientTest):
     properties.VALUES.api_endpoint_overrides.toolresults.Set(TEST_RESULTS)
     endpoints.ValidateTestServiceEndpoints()
 
+  def testLocalEndpointCompatibleWithTestEndpoint(self):
+    properties.VALUES.api_endpoint_overrides.testing.Set('https://localhost/')
+    properties.VALUES.api_endpoint_overrides.toolresults.Set(TEST_RESULTS)
+    endpoints.ValidateTestServiceEndpoints()
+
   def testProdEndpointIsIncompatibleWithTestEndpoint(self):
     properties.VALUES.api_endpoint_overrides.testing.Set(PROD_TESTING)
     properties.VALUES.api_endpoint_overrides.toolresults.Set(TEST_RESULTS)

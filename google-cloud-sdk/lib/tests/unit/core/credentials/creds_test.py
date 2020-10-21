@@ -27,6 +27,8 @@ from googlecloudsdk.core import config
 from googlecloudsdk.core import http
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import creds
+from googlecloudsdk.core.credentials import devshell
+from googlecloudsdk.core.credentials import google_auth_credentials
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -36,8 +38,10 @@ from tests.lib.core.credentials import credentials_test_base
 import httplib2
 import mock
 from oauth2client import client
+from oauth2client.contrib import gce
 from six.moves import http_client as httplib
 import sqlite3
+from google.auth import compute_engine as google_auth_gce
 from google.auth import crypt as google_auth_crypt
 from google.oauth2 import service_account as google_auth_service_account
 
@@ -759,6 +763,10 @@ class ADCTestsGoogleAuth(cli_test_base.CliTestBase,
     self.AssertErrContains('Cannot find a project')
 
 
+class UnKnownCredentials(object):
+  pass
+
+
 class UtilsTests(sdk_test_base.SdkBase, parameterized.TestCase):
 
   @parameterized.parameters((True, {}, 'fake_token_host'), (True, {
@@ -771,6 +779,41 @@ class UtilsTests(sdk_test_base.SdkBase, parameterized.TestCase):
     if explicitly_set:
       properties.VALUES.auth.token_host.Set('fake_token_host')
     self.assertEqual(expected_value, creds.GetEffectiveTokenUri(cred_json))
+
+  @parameterized.parameters(
+      (google_auth_credentials.UserCredWithReauth('access_token',
+                                                  'refresh_token'), True, True),
+      (google_auth_credentials.UserCredWithReauth(
+          'access_token', 'refresh_token'), False, True),
+      (google_auth_gce.Credentials(), True, True),
+      (google_auth_gce.Credentials(), False, False),
+      (UnKnownCredentials(), True, False),
+      (UnKnownCredentials(), False, False),
+  )
+  def testIsUserAccountCredentialsGoogleAuth(self, credentials, is_devshell,
+                                             expected_result):
+    self.StartObjectPatch(
+        devshell, 'IsDevshellEnvironment', return_value=is_devshell)
+    self.assertEqual(
+        creds.IsUserAccountCredentials(credentials), expected_result)
+
+  @parameterized.parameters(
+      (client.OAuth2Credentials('token', 'client_id', 'client_secret',
+                                'refresh_token', None, None, None), True, True),
+      (client.OAuth2Credentials('token', 'client_id', 'client_secret',
+                                'refresh_token', None, None,
+                                None), False, True),
+      (gce.AppAssertionCredentials(), True, True),
+      (gce.AppAssertionCredentials(), False, False),
+      (UnKnownCredentials(), True, False),
+      (UnKnownCredentials(), False, False),
+  )
+  def testIsUserAccountCredentialsOauth2client(self, credentials, is_devshell,
+                                               expected_result):
+    self.StartObjectPatch(
+        devshell, 'IsDevshellEnvironment', return_value=is_devshell)
+    self.assertEqual(
+        creds.IsUserAccountCredentials(credentials), expected_result)
 
 
 if __name__ == '__main__':

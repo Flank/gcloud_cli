@@ -1,5 +1,5 @@
 title: cloud domains configure contacts|dns test scenario with invalid YAML file
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 filters:
   DoNotRunOnPy2:
     reason: Error messages are different on Py2 and Py3. They print type, so its not
@@ -35,6 +35,11 @@ summary:
   - error: "1: Failed to load YAML from [notFound.yaml]: Unable to read file [notFound.yaml]:\
       \ [Errno 2] No such file or directory: 'notFound.yaml'"
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - write_file:
     path: dnsSettingsIncorrectType.yaml
     contents: |
@@ -60,7 +65,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          uri: https://domains.googleapis.com/$$api-version$$/projects/fake-project/locations/global/registrations/example.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -91,7 +96,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          uri: https://domains.googleapis.com/$$api-version$$/projects/fake-project/locations/global/registrations/example.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -121,7 +126,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          uri: https://domains.googleapis.com/$$api-version$$/projects/fake-project/locations/global/registrations/example.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -150,7 +155,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          uri: https://domains.googleapis.com/$$api-version$$/projects/fake-project/locations/global/registrations/example.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -178,7 +183,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://domains.googleapis.com/v1alpha2/projects/fake-project/locations/global/registrations/example.com?alt=json
+          uri: https://domains.googleapis.com/$$api-version$$/projects/fake-project/locations/global/registrations/example.com?alt=json
           method: GET
           headers: {}
           body: null

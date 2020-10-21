@@ -27,11 +27,10 @@ from tests.lib.surface.compute import utils
 class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.replica_zone = 'us-central1-a'
-    self.url = 'https://www.googleapis.com/compute/alpha/projects'
 
   def testInstanceCreationWithCreateDisk(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.GetInstanceName()
     self.Run(
         'compute instances create {0} '
@@ -51,6 +50,8 @@ class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
     self.AssertNewOutputContains('description: testDescription')
 
   def testInstanceCreationWithCreationOfRegionalBootDisk(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.url = 'https://www.googleapis.com/compute/alpha/projects'
     self.GetInstanceName()
 
     # Create a disk
@@ -87,6 +88,25 @@ class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
         '- {0}/{1}/zones/{2}'.format(self.url, self.Project(),
                                      self.replica_zone),
         '- {0}/{1}/zones/{2}'.format(self.url, self.Project(), self.zone)
+    ])
+
+  def testInstanceCreationWithRegionalDiskAsBoot(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.url = 'https://www.googleapis.com/compute/v1/projects'
+    self.GetInstanceName()
+    self.Run('compute disks create {0}-5 --replica-zones={1},{2}'.format(
+        self.instance_name, self.zone, self.replica_zone))
+    self.Run('compute instances create {0} --disk=boot=yes,name={0}-5,'
+             'scope=regional --zone={1}'.format(self.instance_name,
+                                                self.zone))
+    self.Run('compute instances describe {0} --zone {1}'.format(
+        self.instance_name, self.zone))
+    # This ensures that the one disk we attached as boot is indeed the boot disk
+    self.AssertNewOutputNotContains('boot: false', reset=False)
+    self.AssertNewOutputContainsAll([
+        'boot: true',
+        'source: {0}/{1}/regions/us-central1/disks/{2}-5'
+        .format(self.url, self.Project(), self.instance_name)
     ])
 
 

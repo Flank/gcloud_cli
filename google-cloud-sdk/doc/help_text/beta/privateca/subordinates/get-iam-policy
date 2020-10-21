@@ -73,10 +73,8 @@ EXAMPLES
     'us-west1', run:
 
         $ gcloud beta privateca subordinates get-iam-policy server-tls-1 \
-            --location us-west1
+            --location=us-west1
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

@@ -11,7 +11,7 @@ gcloud alpha compute reservations create \- create a Compute Engine reservation
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute reservations create\fR \fIRESERVATION\fR (\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR\ :\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-reservation\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute reservations create\fR \fIRESERVATION\fR (\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR\ :\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-maintenance\-freeze\-duration\fR=\fIMAINTENANCE_FREEZE_DURATION\fR\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-reservation\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -78,6 +78,12 @@ operating systems. NVME may provide higher performance.
 .TP 2m
 \fBsize\fR
 The size of the local SSD in base\-2 GB.
+.TP 2m
+\fB\-\-maintenance\-freeze\-duration\fR=\fIMAINTENANCE_FREEZE_DURATION\fR
+Specifies the amount of hours after instance creation where the instance won't
+be scheduled for maintenance, e.g. \f54h\fR, \f52d6h\fR. See $ gcloud topic
+datetimes for information on duration formats.
+
 .TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
 Optional minimum CPU platform of the reservation to create.

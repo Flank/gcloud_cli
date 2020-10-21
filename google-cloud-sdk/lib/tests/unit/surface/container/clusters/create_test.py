@@ -4052,6 +4052,27 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  def testCreateAuto(self):
+    cluster_kwargs = {
+        'autogke': True,
+        'upgradeSettings': None,
+        'initialNodeCount': 1,
+        'clusterNodeCount': None,
+    }
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE +
+                                          ' create-auto {0}'.format(
+                                              self.CLUSTER_NAME)))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
@@ -5042,6 +5063,39 @@ linuxConfig:
           '--release-channel={channel}'.format(
               name=self.CLUSTER_NAME, channel=channel_name))
     self.AssertErrContains('Invalid choice')
+
+  def testWorkloadIdentityCertificates(self):
+    workload_pool = '{}.svc.id.goog'.format(self.PROJECT_ID)
+    workload_ca = '//privateca.googleapis.com/projects/{}/locations/us-moon1/certificateAuthorities/moon-prod'.format(
+        self.PROJECT_ID)
+
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters({})
+    expected_cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
+        workloadPool=workload_pool, issuingCertificateAuthority=workload_ca)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        '{base} create {name} --workload-pool={workload_pool} --workload-identity-certificate-authority={workload_ca}'
+        .format(
+            base=self.clusters_command_base.format(self.ZONE),
+            name=self.CLUSTER_NAME,
+            workload_pool=workload_pool,
+            workload_ca=workload_ca))
+    self.AssertOutputContains('RUNNING')
+
+  def testWorkloadIdentityCertificatesErrorBadCA(self):
+    workload_pool = '{}.svc.id.goog'.format(self.PROJECT_ID)
+    workload_ca = '//not/a/valid/format'
+
+    with self.AssertRaisesArgumentErrorRegexp('Must be of the form'):
+      self.Run(
+          '{base} create {name} --workload-pool={workload_pool} --workload-identity-certificate-authority={workload_ca}'
+          .format(
+              base=self.clusters_command_base.format(self.ZONE),
+              name=self.CLUSTER_NAME,
+              workload_pool=workload_pool,
+              workload_ca=workload_ca))
 
 
 if __name__ == '__main__':

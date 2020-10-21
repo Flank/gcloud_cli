@@ -36,31 +36,12 @@ class FirestoreUtilTests(sdk_test_base.WithFakeAuth):
   def Project(self):
     return 'fake-project'
 
-  def testGetFirestoreEmulatorRoot(self):
-    self._DoTestGetFirestoreEmulatorRoot('cloud-firestore-emulator')
-
-  def _DoTestGetFirestoreEmulatorRoot(self, firestore_dir):
-    cloud_sdk_mock = self.StartObjectPatch(util, 'GetCloudSDKRoot')
-    cloud_sdk_mock.return_value = 'pathtocloudsdk'
-
-    os_isdir_mock = self.StartObjectPatch(os.path, 'isdir')
-    os_isdir_mock.return_value = True
-
-    expected = os.path.join(cloud_sdk_mock.return_value, 'platform',
-                            firestore_dir)
-    self.assertEqual(expected, firestore_util.GetFirestoreEmulatorRoot())
-
-    os_isdir_mock.return_value = False
-    with self.assertRaises(firestore_util.NoFirestoreEmulatorError):
-      firestore_util.GetFirestoreEmulatorRoot()
-
   @test_case.Filters.DoNotRunOnWindows
   def testArgsForFirestoreEmulatorOnNonWindows(self):
     self._DoTestArgsForFirestoreEmulatorOnNonWindows('cloud_firestore_emulator')
 
   def _DoTestArgsForFirestoreEmulatorOnNonWindows(self, firestore_exec):
-    firestore_root_mock = self.StartObjectPatch(firestore_util,
-                                                'GetFirestoreEmulatorRoot')
+    firestore_root_mock = self.StartObjectPatch(util, 'GetEmulatorRoot')
     firestore_root_mock.return_value = 'pathtofirestoreroot'
 
     firestore_executable = os.path.join(firestore_root_mock.return_value,
@@ -74,8 +55,7 @@ class FirestoreUtilTests(sdk_test_base.WithFakeAuth):
     self._DoTestArgsForFirestoreEmulatorWindows('cloud_firestore_emulator.cmd')
 
   def _DoTestArgsForFirestoreEmulatorWindows(self, firestore_exec):
-    firestore_root_mock = self.StartObjectPatch(firestore_util,
-                                                'GetFirestoreEmulatorRoot')
+    firestore_root_mock = self.StartObjectPatch(util, 'GetEmulatorRoot')
     firestore_root_mock.return_value = 'pathtofirestoreroot'
 
     firestore_executable = os.path.join(firestore_root_mock.return_value,
@@ -88,8 +68,7 @@ class FirestoreUtilTests(sdk_test_base.WithFakeAuth):
     self._DoTestStartFirestoreEmulator()
 
   def _DoTestStartFirestoreEmulator(self):
-    firestore_root_mock = self.StartObjectPatch(firestore_util,
-                                                'GetFirestoreEmulatorRoot')
+    firestore_root_mock = self.StartObjectPatch(util, 'GetEmulatorRoot')
     firestore_root_mock.return_value = 'pathtofirestoreroot'
     exec_mock = self.StartObjectPatch(util, 'Exec')
 

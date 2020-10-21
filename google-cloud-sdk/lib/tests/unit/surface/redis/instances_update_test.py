@@ -82,9 +82,10 @@ class UpdateTest(InstancesUpdateUnitTestBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
+    self.auth_enabled = None
 
   def testUpdate(self):
-    self._SetUpExpectations()
+    self._SetUpExpectations(auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {instance_id} --region {region_id}'
@@ -99,7 +100,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
     self.AssertErrContains('Do you want to proceed with update?')
 
   def testUpdate_UsingRegionProperty(self):
-    self._SetUpExpectations()
+    self._SetUpExpectations(auth_enabled=self.auth_enabled)
 
     properties.VALUES.redis.region.Set(self.region_id)
     actual_instance = self.Run(
@@ -109,7 +110,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
     self.assertEqual(actual_instance, self.expected_instance)
 
   def testUpdate_UsingRelativeInstanceName(self):
-    self._SetUpExpectations()
+    self._SetUpExpectations(auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {name} {update_options}'.format(
@@ -124,7 +125,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
           instance_id=self.instance_id))
 
   def testUpdate_Async(self):
-    self._SetUpExpectations(is_async=True)
+    self._SetUpExpectations(is_async=True, auth_enabled=self.auth_enabled)
 
     self.Run('redis instances update {instance_id} --region {region_id} --async'
              ' {update_options}'.format(
@@ -143,7 +144,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
       self.Run('redis instances update {} --region {}'.format(
           self.instance_id, self.region_id))
 
-  def _SetUpExpectations(self, is_async=False):
+  def _SetUpExpectations(self, is_async=False, auth_enabled=None):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     update_options = (
@@ -166,6 +167,9 @@ class UpdateTest(InstancesUpdateUnitTestBase):
     })
     expected_instance.labels = self.Labels({'a': '3', 'b': '4', 'c': '5'})
 
+    if auth_enabled is not None:
+      expected_instance.authEnabled = auth_enabled
+
     self.WriteInput('y\n')
     self.ExpectUpdate(
         instance_to_update,
@@ -186,6 +190,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
       (None,
        'Scaling a redis instance may result in data loss, and the instance '
        'will be briefly unavailable during scaling.'))
+
   def testUpdate_SizePrompts(self, tier, prompt_message):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
@@ -197,6 +202,10 @@ class UpdateTest(InstancesUpdateUnitTestBase):
         name=self.instance_relative_name,
         tier=instance_to_update.tier,
         memorySizeGb=6)
+
+    if (self.track == calliope_base.ReleaseTrack.BETA or
+        self.track == calliope_base.ReleaseTrack.ALPHA):
+      expected_instance.authEnabled = False
 
     self.ExpectUpdate(instance_to_update, expected_instance,
                       expected_update_mask)
@@ -219,6 +228,10 @@ class UpdateTest(InstancesUpdateUnitTestBase):
     expected_instance = self.messages.Instance(
         name=self.instance_relative_name, displayName='new-display-name')
     expected_instance.displayName = 'new-display-name'
+
+    if (self.track == calliope_base.ReleaseTrack.BETA or
+        self.track == calliope_base.ReleaseTrack.ALPHA):
+      expected_instance.authEnabled = False
 
     self.ExpectUpdate(instance_to_update, expected_instance,
                       expected_update_mask)
@@ -248,6 +261,65 @@ class UpdateTestBeta(UpdateTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'v1beta1'
+    self.auth_enabled = False
+
+  def testUpdate_enableAuth(self):
+    instance_to_update = self.messages.Instance(
+        name=self.instance_relative_name)
+    expected_update_mask = 'auth_enabled'
+    expected_instance = self.messages.Instance(
+        name=self.instance_relative_name, authEnabled=True)
+
+    self.ExpectUpdate(instance_to_update, expected_instance,
+                      expected_update_mask)
+
+    actual_instance = self.Run(
+        'redis instances update {instance_id} --region {region_id} '
+        '--enable-auth'.format(
+            instance_id=self.instance_id, region_id=self.region_id))
+
+    self.AssertErrContains('AUTH credentials are not confidential when ' +
+                           'transmitted or intended to protect against ' +
+                           'malicious actors.')
+    self.AssertErrContains('Do you want to proceed?')
+
+    self.assertEqual(actual_instance, expected_instance)
+
+  def testUpdate_enableAuthPromptCancel(self):
+    instance_to_update = self.messages.Instance(
+        name=self.instance_relative_name)
+    self.instances_service.Get.Expect(
+        request=self.messages.RedisProjectsLocationsInstancesGetRequest(
+            name=instance_to_update.name),
+        response=instance_to_update)
+
+    self.WriteInput('n\n')
+    with self.assertRaises(console_io.OperationCancelledError):
+      self.Run('redis instances update {instance_id} --region {region_id} '
+               '--enable-auth'.format(
+                   instance_id=self.instance_id, region_id=self.region_id))
+
+    self.AssertErrContains('AUTH credentials are not confidential when ' +
+                           'transmitted or intended to protect against ' +
+                           'malicious actors.')
+    self.AssertErrContains('Do you want to proceed?')
+
+  def testUpdate_disableAuth(self):
+    instance_to_update = self.messages.Instance(
+        name=self.instance_relative_name, authEnabled=True)
+    expected_update_mask = 'auth_enabled'
+    expected_instance = self.messages.Instance(
+        name=self.instance_relative_name, authEnabled=False)
+
+    self.ExpectUpdate(instance_to_update, expected_instance,
+                      expected_update_mask)
+
+    actual_instance = self.Run(
+        'redis instances update {instance_id} --region {region_id} '
+        '--no-enable-auth'.format(
+            instance_id=self.instance_id, region_id=self.region_id))
+
+    self.assertEqual(actual_instance, expected_instance)
 
 
 class UpdateTestAlpha(UpdateTestBeta):
@@ -255,12 +327,14 @@ class UpdateTestAlpha(UpdateTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'v1alpha1'
+    self.auth_enabled = False
 
 
 class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
+    self.auth_enabled = None
 
   def testRemoveRedisConfig(self):
     original_redis_configs = {
@@ -272,7 +346,8 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
         'activedefrag': 'yes',
         'maxmemory-policy': 'noeviction'
     }
-    self._SetUpExpectations(original_redis_configs, new_redis_configs)
+    self._SetUpExpectations(original_redis_configs, new_redis_configs,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {}'
@@ -285,7 +360,8 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
     original_redis_configs = {'maxmemory-policy': 'noeviction'}
     # Removing a non-existent Redis config should silently have no effect.
     new_redis_configs = {'maxmemory-policy': 'noeviction'}
-    self._SetUpExpectations(original_redis_configs, new_redis_configs)
+    self._SetUpExpectations(original_redis_configs, new_redis_configs,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {}'
@@ -305,7 +381,8 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
         'maxmemory-policy': 'noeviction',
         'notify-keyspace-events': 'kx'
     }
-    self._SetUpExpectations(original_redis_configs, new_redis_configs)
+    self._SetUpExpectations(original_redis_configs, new_redis_configs,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {}'
@@ -323,7 +400,8 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
         'notify-keyspace-events': 'El'
     }
     new_redis_configs = {}
-    self._SetUpExpectations(original_redis_configs, new_redis_configs)
+    self._SetUpExpectations(original_redis_configs, new_redis_configs,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {}'
@@ -337,13 +415,17 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
                          original_redis_configs,
                          new_redis_configs,
                          expected_update_mask='redis_configs',
-                         is_async=False):
+                         is_async=False,
+                         auth_enabled=None):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     instance_to_update.redisConfigs = self.RedisConfigs(new_redis_configs)
 
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
     expected_instance.redisConfigs = self.RedisConfigs(new_redis_configs)
+
+    if auth_enabled is not None:
+      expected_instance.authEnabled = auth_enabled
 
     self.ExpectUpdate(
         instance_to_update,
@@ -359,6 +441,7 @@ class RemoveRedisConfigsTestBeta(RemoveRedisConfigsTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'v1beta1'
+    self.auth_enabled = False
 
 
 class RemoveRedisConfigsTestAlpha(RemoveRedisConfigsTestBeta):
@@ -366,17 +449,20 @@ class RemoveRedisConfigsTestAlpha(RemoveRedisConfigsTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'v1alpha1'
+    self.auth_enabled = False
 
 
 class LabelsTest(InstancesUpdateUnitTestBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
+    self.auth_enabled = None
 
   def testUpdateNonExistentLabel(self):
     original_labels = {'b': '2'}
     new_labels = {'a': '3', 'b': '2'}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(original_labels, new_labels,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {} --update-labels a=3'.format(
@@ -387,7 +473,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
   def testRemoveLabel(self):
     original_labels = {'a': '1', 'b': '2'}
     new_labels = {'b': '2'}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(original_labels, new_labels,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run('redis instances update {} --region {}'
                                ' --remove-labels a'.format(
@@ -400,7 +487,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
     # Removing a non-existent label should silently have no effect.
     new_labels = {'b': '2'}
     self._SetUpExpectations(
-        original_labels, new_labels, expected_update_mask='labels')
+        original_labels, new_labels, expected_update_mask='labels',
+        auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run('redis instances update {} --region {}'
                                ' --remove-labels a'.format(
@@ -411,7 +499,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
   def testRemoveAndUpdateLabel(self):
     original_labels = {'a': '1', 'b': '2'}
     new_labels = {'b': '4', 'c': '5'}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(original_labels, new_labels,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run('redis instances update {} --region {}'
                                ' --remove-labels a'
@@ -423,7 +512,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
   def testRemoveAllLabels(self):
     original_labels = {'a': '1', 'b': '2'}
     new_labels = {}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(original_labels, new_labels,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {} --remove-labels a,b'.format(
@@ -434,7 +524,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
   def testClearLabels(self):
     original_labels = {'a': '1', 'b': '2'}
     new_labels = {}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(original_labels, new_labels,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {} --clear-labels'.format(
@@ -445,7 +536,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
   def testClearAndUpdateLabels(self):
     original_labels = {'a': '1', 'b': '2'}
     new_labels = {'a': '3', 'b': '4', 'c': '5'}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(original_labels, new_labels,
+                            auth_enabled=self.auth_enabled)
 
     actual_instance = self.Run(
         'redis instances update {} --region {} --clear-labels'
@@ -457,13 +549,17 @@ class LabelsTest(InstancesUpdateUnitTestBase):
                          original_labels,
                          new_labels,
                          is_async=False,
-                         expected_update_mask='labels'):
+                         expected_update_mask='labels',
+                         auth_enabled=None):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     instance_to_update.labels = self.Labels(original_labels)
 
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
     expected_instance.labels = self.Labels(new_labels)
+
+    if auth_enabled is not None:
+      expected_instance.authEnabled = auth_enabled
 
     self.ExpectUpdate(
         instance_to_update,
@@ -479,6 +575,7 @@ class LabelsTestBeta(LabelsTest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'v1beta1'
+    self.auth_enabled = False
 
 
 class LabelsTestAlpha(LabelsTestBeta):
@@ -486,6 +583,7 @@ class LabelsTestAlpha(LabelsTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'v1alpha1'
+    self.auth_enabled = False
 
 
 if __name__ == '__main__':

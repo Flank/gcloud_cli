@@ -32,7 +32,7 @@ SPANNER_EMULATOR_COMPONENT_ID = 'cloud-spanner-emulator'
 SPANNER_EMULATOR_TITLE = 'Google Cloud Spanner Emulator'
 SPANNER_EMULATOR_EXECUTABLE_DIR = 'cloud_spanner_emulator'
 SPANNER_EMULATOR_EXECUTABLE_FILE = 'gateway_main'
-SPANNER_EMULATOR_DOCKER_IMAGE = 'gcr.io/cloud-spanner-emulator/emulator:1.0.0'
+SPANNER_EMULATOR_DOCKER_IMAGE = 'gcr.io/cloud-spanner-emulator/emulator:1.1.1'
 SPANNER_EMULATOR_DEFAULT_GRPC_PORT = 9010
 SPANNER_EMULATOR_DEFAULT_REST_PORT = 9020
 
@@ -56,25 +56,33 @@ def _BuildStartArgsForDocker(args):
     raise ValueError('When using docker, hostname specified via --host-port '
                      'must be an IPV4 or IPV6 address, found ' + host_ip)
 
-  return execution_utils.ArgsForExecutableTool(
-      'docker', 'run', '-p',
-      '{}:{}:{}'.format(host_ip, args.host_port.port,
-                        SPANNER_EMULATOR_DEFAULT_GRPC_PORT), '-p',
-      '{}:{}:{}'.format(host_ip, args.rest_port,
-                        SPANNER_EMULATOR_DEFAULT_REST_PORT),
-      SPANNER_EMULATOR_DOCKER_IMAGE)
+  if args.enable_fault_injection:
+    return execution_utils.ArgsForExecutableTool(
+        'docker', 'run', '-p',
+        '{}:{}:{}'.format(host_ip, args.host_port.port,
+                          SPANNER_EMULATOR_DEFAULT_GRPC_PORT), '-p',
+        '{}:{}:{}'.format(host_ip, args.rest_port,
+                          SPANNER_EMULATOR_DEFAULT_REST_PORT),
+        SPANNER_EMULATOR_DOCKER_IMAGE, './gateway_main', '--hostname',
+        '0.0.0.0', '--enable_fault_injection')
+  else:
+    return execution_utils.ArgsForExecutableTool(
+        'docker', 'run', '-p',
+        '{}:{}:{}'.format(host_ip, args.host_port.port,
+                          SPANNER_EMULATOR_DEFAULT_GRPC_PORT), '-p',
+        '{}:{}:{}'.format(host_ip, args.rest_port,
+                          SPANNER_EMULATOR_DEFAULT_REST_PORT),
+        SPANNER_EMULATOR_DOCKER_IMAGE)
 
 
 def _BuildStartArgsForNativeExecutable(args):
   spanner_executable = os.path.join(util.GetCloudSDKRoot(), 'bin',
                                     SPANNER_EMULATOR_EXECUTABLE_DIR,
                                     SPANNER_EMULATOR_EXECUTABLE_FILE)
-  return execution_utils.ArgsForExecutableTool(spanner_executable, '--hostname',
-                                               args.host_port.host,
-                                               '--grpc_port',
-                                               args.host_port.port,
-                                               '--http_port',
-                                               six.text_type(args.rest_port))
+  return execution_utils.ArgsForExecutableTool(
+      spanner_executable, '--hostname', args.host_port.host, '--grpc_port',
+      args.host_port.port, '--http_port', six.text_type(args.rest_port),
+      ('--enable_fault_injection' if args.enable_fault_injection else ''))
 
 
 def _BuildStartArgs(args):

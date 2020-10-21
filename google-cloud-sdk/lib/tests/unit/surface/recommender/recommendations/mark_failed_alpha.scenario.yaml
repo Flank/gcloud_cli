@@ -1,0 +1,729 @@
+title: Mark a recommendation as FAILED
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: recommender recommendations mark-failed my-recommendation --project=my-project --location=my-location --recommender=my-recommender --etag=my-etag
+  - stdout: |
+      content:
+        contentFormat: CANONICAL_V1
+        justification:
+          accessObservationEndTime: '2019-02-04T16:00:00-08:00'
+          accessObservationStartTime: '2018-12-06T16:00:00-08:00'
+          currentTotalPermissionsCount: '1777'
+          policyLastUpdateTime: '2018-08-13T13:06:24-07:00'
+          recommendedTotalPermissionsCount: '2'
+          sampledUsedPermissions:
+          - resourcemanager.projects.get
+          summary: Replace the current role with a smaller role to cover the 1 permissions
+            used since 2018-12-06.
+          usedPermissionsCount: '1'
+        operationGroups:
+        - operations:
+          - action: add
+            path: /iamPolicy/bindings/*/members/-
+            pathFilter:
+              /iamPolicy/bindings/*/condition/expression: ''
+              /iamPolicy/bindings/*/role: roles/cloudkms.cryptoKeyDecrypter
+            resource: //cloudresourcemanager.googleapis.com/projects/my-project
+            resourceType: cloudresourcemanager.googleapis.com/Project
+            value: user:user@google.com
+          - action: remove
+            path: /iamPolicy/bindings/*/members/*
+            pathFilter:
+              /iamPolicy/bindings/*/condition/expression: ''
+              /iamPolicy/bindings/*/members/*: user:user@google.com
+              /iamPolicy/bindings/*/role: roles/owner
+            resource: //cloudresourcemanager.googleapis.com/projects/my-project
+            resourceType: cloudresourcemanager.googleapis.com/Project
+        resourceChanges:
+          iamPolicyChangeNewRole:
+            changeSpec:
+              policyChange:
+                bindingChanges:
+                - action: ADD
+                  bindingTuple:
+                    member: user:user@google.com
+                    role: roles/cloudkms.cryptoKeyDecrypter
+                - action: REMOVE
+                  bindingTuple:
+                    member: user:user@google.com
+                    role: roles/owner
+            id: iamPolicyChangeNewRole
+            resourceChangeType: UPDATE
+            resourceName: //cloudresourcemanager.googleapis.com/projects/my-project
+            resourceType: google.cloud.resourcemanager.Project
+      description: Replace the current role with a smaller role to cover the 1 permissions
+        used since 2018-12-06.
+      etag: my-etag
+      lastModifiedUser: user@google.com
+      lastRefreshTime: '2019-02-06T06:42:31Z'
+      name: projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation
+      primaryImpact:
+        category: SECURITY
+      stateInfo:
+        state: FAILED
+      userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
+      GA: v1
+- execute_command:
+    command: recommender recommendations mark-failed my-recommendation --project=my-project --location=my-location --recommender=my-recommender --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markFailed?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "description": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+              "userLastUpdateTime": "2019-03-14T22:57:56.781035Z",
+              "primaryImpact": {
+                "category": "SECURITY"
+              },
+              "lastModifiedUser": "user@google.com",
+              "content": {
+                "justification": {
+                  "accessObservationEndTime": "2019-02-04T16:00:00-08:00",
+                  "accessObservationStartTime": "2018-12-06T16:00:00-08:00",
+                  "currentTotalPermissionsCount": "1777",
+                  "policyLastUpdateTime": "2018-08-13T13:06:24-07:00",
+                  "recommendedTotalPermissionsCount": "2",
+                  "sampledUsedPermissions": [
+                    "resourcemanager.projects.get"
+                  ],
+                  "summary": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+                  "usedPermissionsCount": "1"
+                },
+                "resourceChanges": {
+                  "iamPolicyChangeNewRole": {
+                    "resourceType": "google.cloud.resourcemanager.Project",
+                    "resourceName": "//cloudresourcemanager.googleapis.com/projects/my-project",
+                    "resourceChangeType": "UPDATE",
+                    "changeSpec": {
+                      "policyChange": {
+                        "bindingChanges": [
+                          {
+                            "action": "ADD",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/cloudkms.cryptoKeyDecrypter"
+                            }
+                          },
+                          {
+                            "action": "REMOVE",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/owner"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "id": "iamPolicyChangeNewRole"
+                  }
+                },
+                "contentFormat": "CANONICAL_V1",
+                "operationGroups": [
+                  {
+                    "operations": [
+                      {
+                        "action": "add",
+                        "resourceType": "cloudresourcemanager.googleapis.com/Project",
+                        "resource": "//cloudresourcemanager.googleapis.com/projects/my-project",
+                        "path": "/iamPolicy/bindings/*/members/-",
+                        "value": "user:user@google.com",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/role": "roles/cloudkms.cryptoKeyDecrypter",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      },
+                      {
+                        "action": "remove",
+                        "resourceType": "cloudresourcemanager.googleapis.com/Project",
+                        "resource": "//cloudresourcemanager.googleapis.com/projects/my-project",
+                        "path": "/iamPolicy/bindings/*/members/*",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/members/*": "user:user@google.com",
+                          "/iamPolicy/bindings/*/role": "roles/owner",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "stateInfo": {
+                "state": "FAILED"
+              },
+              "etag": "my-etag",
+              "lastRefreshTime": "2019-02-06T06:42:31Z"
+            }
+    - expect_stdout: |
+        content:
+          contentFormat: CANONICAL_V1
+          justification:
+            accessObservationEndTime: '2019-02-04T16:00:00-08:00'
+            accessObservationStartTime: '2018-12-06T16:00:00-08:00'
+            currentTotalPermissionsCount: '1777'
+            policyLastUpdateTime: '2018-08-13T13:06:24-07:00'
+            recommendedTotalPermissionsCount: '2'
+            sampledUsedPermissions:
+            - resourcemanager.projects.get
+            summary: Replace the current role with a smaller role to cover the 1 permissions
+              used since 2018-12-06.
+            usedPermissionsCount: '1'
+          operationGroups:
+          - operations:
+            - action: add
+              path: /iamPolicy/bindings/*/members/-
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/role: roles/cloudkms.cryptoKeyDecrypter
+              resource: //cloudresourcemanager.googleapis.com/projects/my-project
+              resourceType: cloudresourcemanager.googleapis.com/Project
+              value: user:user@google.com
+            - action: remove
+              path: /iamPolicy/bindings/*/members/*
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/members/*: user:user@google.com
+                /iamPolicy/bindings/*/role: roles/owner
+              resource: //cloudresourcemanager.googleapis.com/projects/my-project
+              resourceType: cloudresourcemanager.googleapis.com/Project
+          resourceChanges:
+            iamPolicyChangeNewRole:
+              changeSpec:
+                policyChange:
+                  bindingChanges:
+                  - action: ADD
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/cloudkms.cryptoKeyDecrypter
+                  - action: REMOVE
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/owner
+              id: iamPolicyChangeNewRole
+              resourceChangeType: UPDATE
+              resourceName: //cloudresourcemanager.googleapis.com/projects/my-project
+              resourceType: google.cloud.resourcemanager.Project
+        description: Replace the current role with a smaller role to cover the 1 permissions
+          used since 2018-12-06.
+        etag: my-etag
+        lastModifiedUser: user@google.com
+        lastRefreshTime: '2019-02-06T06:42:31Z'
+        name: projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation
+        primaryImpact:
+          category: SECURITY
+        stateInfo:
+          state: FAILED
+        userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: recommender recommendations mark-failed my-recommendation --billing-account=my-billing-account --location=my-location --recommender=my-recommender --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/billingAccounts/my-billing-account/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markFailed?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/my-billing-account/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "billingAccounts/my-billing-account/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "description": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+              "userLastUpdateTime": "2019-03-14T22:57:56.781035Z",
+              "primaryImpact": {
+                "category": "SECURITY"
+              },
+              "lastModifiedUser": "user@google.com",
+              "content": {
+                "justification": {
+                  "accessObservationEndTime": "2019-02-04T16:00:00-08:00",
+                  "accessObservationStartTime": "2018-12-06T16:00:00-08:00",
+                  "currentTotalPermissionsCount": "1777",
+                  "policyLastUpdateTime": "2018-08-13T13:06:24-07:00",
+                  "recommendedTotalPermissionsCount": "2",
+                  "sampledUsedPermissions": [
+                    "resourcemanager.billingAccounts.get"
+                  ],
+                  "summary": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+                  "usedPermissionsCount": "1"
+                },
+                "resourceChanges": {
+                  "iamPolicyChangeNewRole": {
+                    "resourceType": "google.cloud.resourcemanager.BillingAccount",
+                    "resourceName": "//cloudresourcemanager.googleapis.com/billingAccounts/my-billing-account",
+                    "resourceChangeType": "UPDATE",
+                    "changeSpec": {
+                      "policyChange": {
+                        "bindingChanges": [
+                          {
+                            "action": "ADD",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/cloudkms.cryptoKeyDecrypter"
+                            }
+                          },
+                          {
+                            "action": "REMOVE",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/owner"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "id": "iamPolicyChangeNewRole"
+                  }
+                },
+                "contentFormat": "CANONICAL_V1",
+                "operationGroups": [
+                  {
+                    "operations": [
+                      {
+                        "action": "add",
+                        "resourceType": "cloudresourcemanager.googleapis.com/BillingAccount",
+                        "resource": "//cloudresourcemanager.googleapis.com/billingAccounts/my-billing-account",
+                        "path": "/iamPolicy/bindings/*/members/-",
+                        "value": "user:user@google.com",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/role": "roles/cloudkms.cryptoKeyDecrypter",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      },
+                      {
+                        "action": "remove",
+                        "resourceType": "cloudresourcemanager.googleapis.com/BillingAccount",
+                        "resource": "//cloudresourcemanager.googleapis.com/billingAccounts/my-billing-account",
+                        "path": "/iamPolicy/bindings/*/members/*",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/members/*": "user:user@google.com",
+                          "/iamPolicy/bindings/*/role": "roles/owner",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "stateInfo": {
+                "state": "FAILED"
+              },
+              "etag": "my-etag",
+              "lastRefreshTime": "2019-02-06T06:42:31Z"
+            }
+    - expect_stdout: |
+        content:
+          contentFormat: CANONICAL_V1
+          justification:
+            accessObservationEndTime: '2019-02-04T16:00:00-08:00'
+            accessObservationStartTime: '2018-12-06T16:00:00-08:00'
+            currentTotalPermissionsCount: '1777'
+            policyLastUpdateTime: '2018-08-13T13:06:24-07:00'
+            recommendedTotalPermissionsCount: '2'
+            sampledUsedPermissions:
+            - resourcemanager.billingAccounts.get
+            summary: Replace the current role with a smaller role to cover the 1 permissions
+              used since 2018-12-06.
+            usedPermissionsCount: '1'
+          operationGroups:
+          - operations:
+            - action: add
+              path: /iamPolicy/bindings/*/members/-
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/role: roles/cloudkms.cryptoKeyDecrypter
+              resource: //cloudresourcemanager.googleapis.com/billingAccounts/my-billing-account
+              resourceType: cloudresourcemanager.googleapis.com/BillingAccount
+              value: user:user@google.com
+            - action: remove
+              path: /iamPolicy/bindings/*/members/*
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/members/*: user:user@google.com
+                /iamPolicy/bindings/*/role: roles/owner
+              resource: //cloudresourcemanager.googleapis.com/billingAccounts/my-billing-account
+              resourceType: cloudresourcemanager.googleapis.com/BillingAccount
+          resourceChanges:
+            iamPolicyChangeNewRole:
+              changeSpec:
+                policyChange:
+                  bindingChanges:
+                  - action: ADD
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/cloudkms.cryptoKeyDecrypter
+                  - action: REMOVE
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/owner
+              id: iamPolicyChangeNewRole
+              resourceChangeType: UPDATE
+              resourceName: //cloudresourcemanager.googleapis.com/billingAccounts/my-billing-account
+              resourceType: google.cloud.resourcemanager.BillingAccount
+        description: Replace the current role with a smaller role to cover the 1 permissions
+          used since 2018-12-06.
+        etag: my-etag
+        lastModifiedUser: user@google.com
+        lastRefreshTime: '2019-02-06T06:42:31Z'
+        name: billingAccounts/my-billing-account/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation
+        primaryImpact:
+          category: SECURITY
+        stateInfo:
+          state: FAILED
+        userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: recommender recommendations mark-failed my-recommendation --folder=my-folder --location=my-location --recommender=my-recommender --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/folders/my-folder/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markFailed?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "folders/my-folder/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "folders/my-folder/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "description": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+              "userLastUpdateTime": "2019-03-14T22:57:56.781035Z",
+              "primaryImpact": {
+                "category": "SECURITY"
+              },
+              "lastModifiedUser": "user@google.com",
+              "content": {
+                "justification": {
+                  "accessObservationEndTime": "2019-02-04T16:00:00-08:00",
+                  "accessObservationStartTime": "2018-12-06T16:00:00-08:00",
+                  "currentTotalPermissionsCount": "1777",
+                  "policyLastUpdateTime": "2018-08-13T13:06:24-07:00",
+                  "recommendedTotalPermissionsCount": "2",
+                  "sampledUsedPermissions": [
+                    "resourcemanager.folders.get"
+                  ],
+                  "summary": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+                  "usedPermissionsCount": "1"
+                },
+                "resourceChanges": {
+                  "iamPolicyChangeNewRole": {
+                    "resourceType": "google.cloud.resourcemanager.Folder",
+                    "resourceName": "//cloudresourcemanager.googleapis.com/folders/my-folder",
+                    "resourceChangeType": "UPDATE",
+                    "changeSpec": {
+                      "policyChange": {
+                        "bindingChanges": [
+                          {
+                            "action": "ADD",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/cloudkms.cryptoKeyDecrypter"
+                            }
+                          },
+                          {
+                            "action": "REMOVE",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/owner"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "id": "iamPolicyChangeNewRole"
+                  }
+                },
+                "contentFormat": "CANONICAL_V1",
+                "operationGroups": [
+                  {
+                    "operations": [
+                      {
+                        "action": "add",
+                        "resourceType": "cloudresourcemanager.googleapis.com/Folder",
+                        "resource": "//cloudresourcemanager.googleapis.com/folders/my-folder",
+                        "path": "/iamPolicy/bindings/*/members/-",
+                        "value": "user:user@google.com",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/role": "roles/cloudkms.cryptoKeyDecrypter",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      },
+                      {
+                        "action": "remove",
+                        "resourceType": "cloudresourcemanager.googleapis.com/Folder",
+                        "resource": "//cloudresourcemanager.googleapis.com/folders/my-folder",
+                        "path": "/iamPolicy/bindings/*/members/*",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/members/*": "user:user@google.com",
+                          "/iamPolicy/bindings/*/role": "roles/owner",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "stateInfo": {
+                "state": "FAILED"
+              },
+              "etag": "my-etag",
+              "lastRefreshTime": "2019-02-06T06:42:31Z"
+            }
+    - expect_stdout: |
+        content:
+          contentFormat: CANONICAL_V1
+          justification:
+            accessObservationEndTime: '2019-02-04T16:00:00-08:00'
+            accessObservationStartTime: '2018-12-06T16:00:00-08:00'
+            currentTotalPermissionsCount: '1777'
+            policyLastUpdateTime: '2018-08-13T13:06:24-07:00'
+            recommendedTotalPermissionsCount: '2'
+            sampledUsedPermissions:
+            - resourcemanager.folders.get
+            summary: Replace the current role with a smaller role to cover the 1 permissions
+              used since 2018-12-06.
+            usedPermissionsCount: '1'
+          operationGroups:
+          - operations:
+            - action: add
+              path: /iamPolicy/bindings/*/members/-
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/role: roles/cloudkms.cryptoKeyDecrypter
+              resource: //cloudresourcemanager.googleapis.com/folders/my-folder
+              resourceType: cloudresourcemanager.googleapis.com/Folder
+              value: user:user@google.com
+            - action: remove
+              path: /iamPolicy/bindings/*/members/*
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/members/*: user:user@google.com
+                /iamPolicy/bindings/*/role: roles/owner
+              resource: //cloudresourcemanager.googleapis.com/folders/my-folder
+              resourceType: cloudresourcemanager.googleapis.com/Folder
+          resourceChanges:
+            iamPolicyChangeNewRole:
+              changeSpec:
+                policyChange:
+                  bindingChanges:
+                  - action: ADD
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/cloudkms.cryptoKeyDecrypter
+                  - action: REMOVE
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/owner
+              id: iamPolicyChangeNewRole
+              resourceChangeType: UPDATE
+              resourceName: //cloudresourcemanager.googleapis.com/folders/my-folder
+              resourceType: google.cloud.resourcemanager.Folder
+        description: Replace the current role with a smaller role to cover the 1 permissions
+          used since 2018-12-06.
+        etag: my-etag
+        lastModifiedUser: user@google.com
+        lastRefreshTime: '2019-02-06T06:42:31Z'
+        name: folders/my-folder/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation
+        primaryImpact:
+          category: SECURITY
+        stateInfo:
+          state: FAILED
+        userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: recommender recommendations mark-failed my-recommendation --organization=my-organization --location=my-location --recommender=my-recommender --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/organizations/my-organization/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markFailed?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "organizations/my-organization/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/my-organization/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation",
+              "description": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+              "userLastUpdateTime": "2019-03-14T22:57:56.781035Z",
+              "primaryImpact": {
+                "category": "SECURITY"
+              },
+              "lastModifiedUser": "user@google.com",
+              "content": {
+                "justification": {
+                  "accessObservationEndTime": "2019-02-04T16:00:00-08:00",
+                  "accessObservationStartTime": "2018-12-06T16:00:00-08:00",
+                  "currentTotalPermissionsCount": "1777",
+                  "policyLastUpdateTime": "2018-08-13T13:06:24-07:00",
+                  "recommendedTotalPermissionsCount": "2",
+                  "sampledUsedPermissions": [
+                    "resourcemanager.organizations.get"
+                  ],
+                  "summary": "Replace the current role with a smaller role to cover the 1 permissions used since 2018-12-06.",
+                  "usedPermissionsCount": "1"
+                },
+                "resourceChanges": {
+                  "iamPolicyChangeNewRole": {
+                    "resourceType": "google.cloud.resourcemanager.Organization",
+                    "resourceName": "//cloudresourcemanager.googleapis.com/organizations/my-organization",
+                    "resourceChangeType": "UPDATE",
+                    "changeSpec": {
+                      "policyChange": {
+                        "bindingChanges": [
+                          {
+                            "action": "ADD",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/cloudkms.cryptoKeyDecrypter"
+                            }
+                          },
+                          {
+                            "action": "REMOVE",
+                            "bindingTuple": {
+                              "member": "user:user@google.com",
+                              "role": "roles/owner"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "id": "iamPolicyChangeNewRole"
+                  }
+                },
+                "contentFormat": "CANONICAL_V1",
+                "operationGroups": [
+                  {
+                    "operations": [
+                      {
+                        "action": "add",
+                        "resourceType": "cloudresourcemanager.googleapis.com/Organization",
+                        "resource": "//cloudresourcemanager.googleapis.com/organizations/my-organization",
+                        "path": "/iamPolicy/bindings/*/members/-",
+                        "value": "user:user@google.com",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/role": "roles/cloudkms.cryptoKeyDecrypter",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      },
+                      {
+                        "action": "remove",
+                        "resourceType": "cloudresourcemanager.googleapis.com/Organization",
+                        "resource": "//cloudresourcemanager.googleapis.com/organizations/my-organization",
+                        "path": "/iamPolicy/bindings/*/members/*",
+                        "pathFilter": {
+                          "/iamPolicy/bindings/*/members/*": "user:user@google.com",
+                          "/iamPolicy/bindings/*/role": "roles/owner",
+                          "/iamPolicy/bindings/*/condition/expression": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "stateInfo": {
+                "state": "FAILED"
+              },
+              "etag": "my-etag",
+              "lastRefreshTime": "2019-02-06T06:42:31Z"
+            }
+    - expect_stdout: |
+        content:
+          contentFormat: CANONICAL_V1
+          justification:
+            accessObservationEndTime: '2019-02-04T16:00:00-08:00'
+            accessObservationStartTime: '2018-12-06T16:00:00-08:00'
+            currentTotalPermissionsCount: '1777'
+            policyLastUpdateTime: '2018-08-13T13:06:24-07:00'
+            recommendedTotalPermissionsCount: '2'
+            sampledUsedPermissions:
+            - resourcemanager.organizations.get
+            summary: Replace the current role with a smaller role to cover the 1 permissions
+              used since 2018-12-06.
+            usedPermissionsCount: '1'
+          operationGroups:
+          - operations:
+            - action: add
+              path: /iamPolicy/bindings/*/members/-
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/role: roles/cloudkms.cryptoKeyDecrypter
+              resource: //cloudresourcemanager.googleapis.com/organizations/my-organization
+              resourceType: cloudresourcemanager.googleapis.com/Organization
+              value: user:user@google.com
+            - action: remove
+              path: /iamPolicy/bindings/*/members/*
+              pathFilter:
+                /iamPolicy/bindings/*/condition/expression: ''
+                /iamPolicy/bindings/*/members/*: user:user@google.com
+                /iamPolicy/bindings/*/role: roles/owner
+              resource: //cloudresourcemanager.googleapis.com/organizations/my-organization
+              resourceType: cloudresourcemanager.googleapis.com/Organization
+          resourceChanges:
+            iamPolicyChangeNewRole:
+              changeSpec:
+                policyChange:
+                  bindingChanges:
+                  - action: ADD
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/cloudkms.cryptoKeyDecrypter
+                  - action: REMOVE
+                    bindingTuple:
+                      member: user:user@google.com
+                      role: roles/owner
+              id: iamPolicyChangeNewRole
+              resourceChangeType: UPDATE
+              resourceName: //cloudresourcemanager.googleapis.com/organizations/my-organization
+              resourceType: google.cloud.resourcemanager.Organization
+        description: Replace the current role with a smaller role to cover the 1 permissions
+          used since 2018-12-06.
+        etag: my-etag
+        lastModifiedUser: user@google.com
+        lastRefreshTime: '2019-02-06T06:42:31Z'
+        name: organizations/my-organization/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation
+        primaryImpact:
+          category: SECURITY
+        stateInfo:
+          state: FAILED
+        userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
+    - expect_exit:
+        code: 0

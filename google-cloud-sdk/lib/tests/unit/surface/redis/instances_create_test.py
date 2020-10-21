@@ -23,6 +23,7 @@ import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.concepts import handlers as concepts_handler
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 
@@ -31,6 +32,7 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
+    self.auth_enabled = None
 
   def testCreate_NoOptions(self):
     instance_to_create = self.MakeDefaultInstance()
@@ -43,7 +45,8 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
     self.assertEqual(actual_instance, expected_instance)
 
   def testCreate_AllOptions32(self):
-    instance_to_create = self.MakeAllOptionsInstance()
+    instance_to_create = self.MakeAllOptionsInstance(
+        auth_enabled=self.auth_enabled)
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
@@ -64,7 +67,8 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
     self.assertEqual(actual_instance, expected_instance)
 
   def testCreate_AllOptions40(self):
-    instance_to_create = self.MakeAllOptionsInstance(redis_version='REDIS_4_0')
+    instance_to_create = self.MakeAllOptionsInstance(
+        redis_version='REDIS_4_0', auth_enabled=self.auth_enabled)
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
@@ -86,7 +90,8 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
     self.assertEqual(actual_instance, expected_instance)
 
   def testCreate_AllOptions50(self):
-    instance_to_create = self.MakeAllOptionsInstance(redis_version='REDIS_5_0')
+    instance_to_create = self.MakeAllOptionsInstance(
+        redis_version='REDIS_5_0', auth_enabled=self.auth_enabled)
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
@@ -110,7 +115,8 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
 
   def testCreate_AllOptionsPrivateServiceAccess(self):
     instance_to_create = self.MakeAllOptionsInstance(
-        redis_version='REDIS_4_0', connect_mode='PRIVATE_SERVICE_ACCESS')
+        redis_version='REDIS_4_0', connect_mode='PRIVATE_SERVICE_ACCESS',
+        auth_enabled=self.auth_enabled)
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
@@ -206,7 +212,8 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
 
   def testCreate_FullNetworkName(self):
     instance_to_create = self.MakeAllOptionsInstance(
-        redis_version='REDIS_4_0', connect_mode='PRIVATE_SERVICE_ACCESS')
+        redis_version='REDIS_4_0', connect_mode='PRIVATE_SERVICE_ACCESS',
+        auth_enabled=self.auth_enabled)
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
@@ -234,6 +241,60 @@ class CreateTestBeta(CreateTestGA):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'v1beta1'
+    self.auth_enabled = False
+
+  def testCreate_AuthEnabled(self):
+    instance_to_create = self.MakeAllOptionsInstance(
+        redis_version='REDIS_4_0', auth_enabled=True)
+    expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
+                                           self.instance_relative_name)
+
+    actual_instance = self.Run(
+        'redis instances create {} --region {}'
+        ' --alternative-zone zone2'
+        ' --display-name my-display-name'
+        ' --labels a=1,b=2'
+        ' --network my-network'
+        ' --redis-config maxmemory-policy=allkeys-lfu,notify-keyspace-events=El'
+        ',activedefrag=yes,lfu-log-factor=2,lfu-decay-time=10'
+        ' --redis-version redis_4_0'
+        ' --reserved-ip-range 10.0.0.0/29'
+        ' --size 4'
+        ' --tier standard'
+        ' --connect-mode direct_peering'
+        ' --zone zone1'
+        ' --enable-auth'.format(self.instance_id, self.region_id))
+
+    self.AssertErrContains('AUTH credentials are not confidential when ' +
+                           'transmitted or intended to protect against ' +
+                           'malicious actors.')
+    self.AssertErrContains('Do you want to proceed?')
+
+    self.assertEqual(actual_instance, expected_instance)
+
+  def testCreate_AuthEnabledPromptCancel(self):
+    self.WriteInput('n\n')
+    with self.assertRaises(console_io.OperationCancelledError):
+      self.Run(
+          'redis instances create {} --region {}'
+          ' --alternative-zone zone2'
+          ' --display-name my-display-name'
+          ' --labels a=1,b=2'
+          ' --network my-network'
+          ' --redis-config maxmemory-policy=allkeys-lfu,notify-keyspace-events=El'
+          ',activedefrag=yes,lfu-log-factor=2,lfu-decay-time=10'
+          ' --redis-version redis_4_0'
+          ' --reserved-ip-range 10.0.0.0/29'
+          ' --size 4'
+          ' --tier standard'
+          ' --connect-mode direct_peering'
+          ' --zone zone1'
+          ' --enable-auth'.format(self.instance_id, self.region_id))
+
+    self.AssertErrContains('AUTH credentials are not confidential when ' +
+                           'transmitted or intended to protect against ' +
+                           'malicious actors.')
+    self.AssertErrContains('Do you want to proceed?')
 
 
 class CreateTestAlpha(CreateTestBeta):
@@ -241,12 +302,14 @@ class CreateTestAlpha(CreateTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'v1alpha1'
+    self.auth_enabled = False
 
   def testCreate_TransitEncryptionMode(self):
     instance_to_create = self.MakeAllOptionsInstance(
         redis_version='REDIS_4_0',
         connect_mode='PRIVATE_SERVICE_ACCESS',
-        transit_encryption_mode='SERVER_AUTHENTICATION')
+        transit_encryption_mode='SERVER_AUTHENTICATION',
+        auth_enabled=self.auth_enabled)
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 

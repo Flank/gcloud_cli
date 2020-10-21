@@ -19,6 +19,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import enum
+import os.path
 import uuid
 
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
@@ -33,12 +35,12 @@ from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import messages_util
 from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.run import resource_args
+from googlecloudsdk.command_lib.run import resource_change_validators
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.command_lib.run import stages
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import progress_tracker
 
 
@@ -68,6 +70,11 @@ def GetAllowUnauth(args, operations, service_ref, service_exists):
     if not service_exists and not allow_unauth:
       allow_unauth = None
   return allow_unauth
+
+
+class BuildType(enum.Enum):
+  DOCKERFILE = 'Dockerfile'
+  BUILDPACKS = 'Buildpacks'
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -149,32 +156,36 @@ class Deploy(base.Command):
   def Run(self, args):
     """Deploy a container to Cloud Run."""
     service_ref = flags.GetService(args)
-    build_op_ref = None
     messages = None
-    build_log_url = None
+    build_type = None
+    build_config = None
+    image = None
     include_build = flags.FlagIsExplicitlySet(args, 'source')
-    # Build an image from source if source specified.
+    operation_message = 'Deploying container'
+    # Build an image from source if source specified
     if include_build:
       # Create a tag for the image creation
-      if (not args.IsSpecified('image') and not args.IsSpecified('config') and
-          not args.IsSpecified('pack')):
+      if not args.IsSpecified('image'):
         args.image = 'gcr.io/{projectID}/cloud-run-source-deploy/{service}:{tag}'.format(
             projectID=properties.VALUES.core.project.Get(required=True),
             service=service_ref.servicesId,
             tag=uuid.uuid4().hex)
-
+      # Use GCP Buildpacks if Dockerfile doesn't exist
+      docker_file = args.source + '/Dockerfile'
+      if os.path.exists(docker_file):
+        build_type = BuildType.DOCKERFILE
+      else:
+        args.pack = [{'image': args.image}]
+        build_type = BuildType.BUILDPACKS
+      operation_message = 'Building using {build_type} and deploying container'.format(
+          build_type=build_type.value)
       messages = cloudbuild_util.GetMessagesModule()
+      image = None if args.pack else args.image
       build_config = submit_util.CreateBuildConfigAlpha(
-          args.image, args.no_cache, messages, args.substitutions, args.config,
+          image, args.no_cache, messages, args.substitutions, None,
           args.IsSpecified('source'), False, args.source,
           args.gcs_source_staging_dir, args.ignore_file, args.gcs_log_dir,
           args.machine_type, args.disk_size, args.worker_pool, args.pack)
-
-      build, build_op = submit_util.Build(messages, True, build_config, True)
-      build_op_ref = resources.REGISTRY.ParseRelativeName(
-          build_op.name, 'cloudbuild.operations')
-      build_log_url = build.logUrl
-      args.image = build.images[0]
     elif not args.IsSpecified('image'):
       raise c_exceptions.RequiredArgumentException(
           '--image', 'Requires a container image to deploy (e.g. '
@@ -189,9 +200,11 @@ class Deploy(base.Command):
     with serverless_operations.Connect(conn_context) as operations:
       service = operations.GetService(service_ref)
       allow_unauth = GetAllowUnauth(args, operations, service_ref, service)
+      resource_change_validators.ValidateClearVpcConnector(service, args)
 
       pretty_print.Info(
-          messages_util.GetStartDeployMessage(conn_context, service_ref))
+          messages_util.GetStartDeployMessage(conn_context, service_ref,
+                                              operation_message))
       has_latest = (
           service is None or
           traffic.LATEST_REVISION_KEY in service.spec_traffic)
@@ -199,9 +212,11 @@ class Deploy(base.Command):
           include_iam_policy_set=allow_unauth is not None,
           include_route=has_latest,
           include_build=include_build)
-      header = 'Deploying'
+      header = None
       if include_build:
-        header += ' and building'
+        header = 'Building and deploying'
+      else:
+        header = 'Deploying'
       if service is None:
         header += ' new service'
       header += '...'
@@ -217,8 +232,8 @@ class Deploy(base.Command):
             asyn=args.async_,
             allow_unauthenticated=allow_unauth,
             prefetch=service,
-            build_op_ref=build_op_ref,
-            build_log_url=build_log_url)
+            build_config=build_config,
+            build_messages=messages)
 
       if args.async_:
         pretty_print.Success('Service [{{bold}}{serv}{{reset}}] is deploying '
@@ -236,7 +251,19 @@ class BetaDeploy(Deploy):
 
   @staticmethod
   def Args(parser):
-    Deploy.Args(parser)
+    Deploy.CommonArgs(parser)
+    flags.AddImageArg(parser)
+
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddEgressSettingsFlag(managed_group)
+
+    # Flags only supported on GKE and Knative
+    cluster_group = flags.GetClusterArgGroup(parser)
+    flags.AddEndpointVisibilityEnum(cluster_group)
+
+    # Flags not specific to any platform
+    flags.AddMinInstancesFlag(parser)
     flags.AddDeployTagFlag(parser)
 
 

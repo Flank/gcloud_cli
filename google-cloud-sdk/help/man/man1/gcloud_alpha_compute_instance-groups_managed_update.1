@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed update \- update a Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-target\-distribution\-shape\fR=\fISHAPE\fR] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -112,6 +112,35 @@ default.
 
 .RE
 .sp
+.TP 2m
+\fB\-\-target\-distribution\-shape\fR=\fISHAPE\fR
+Specifies how a regional managed instance group distributes its instances across
+zones within the region.
+
+The following target shape are available:
+
+.RS 2m
+.IP "\(em" 2m
+\f5\fIEVEN\fR\fR ‒ The group schedules VM instance creation and deletion in a
+way that maintains an even number of managed instances across the selected
+zones. Recommended for highly available serving workloads.
+.IP "\(em" 2m
+\f5\fIBALANCED\fR\fR ‒ The group prioritizes acquisition of resources \-
+scheduling VMs in zones where resources are available \- while distributing VMs
+as evenly as possible across selected zones to minimize the impact of
+zone\-level failure. Recommended for highly available serving or batch workloads
+that do not require autoscaling.
+.IP "\(em" 2m
+\f5\fIANY\fR\fR ‒ The group picks zones for creating VM instances to fulfill the
+requested number of VMs within present capacity constraints. Recommended for
+batch workloads that do not require high availability.
+
+.RE
+.RE
+.sp
+\fISHAPE\fR must be one of: \fBEVEN\fR, \fBANY\fR, \fBBALANCED\fR.
+
+.RS 2m
 .TP 2m
 
 At most one of these may be specified:

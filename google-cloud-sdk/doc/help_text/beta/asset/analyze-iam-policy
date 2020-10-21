@@ -1,6 +1,6 @@
 NAME
-    gcloud beta asset analyze-iam-policy - analyzes accessible IAM policies
-        that match a request
+    gcloud beta asset analyze-iam-policy - analyzes IAM policies that match a
+        request
 
 SYNOPSIS
     gcloud beta asset analyze-iam-policy
@@ -15,7 +15,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Analyzes accessible IAM policies that match a request.
+    (BETA) Analyzes IAM policies that match a request.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
@@ -47,7 +47,7 @@ OPTIONAL FLAGS
           If true, the response will include access analysis from identities to
           resources via service account impersonation. This is a very expensive
           operation, because many derived queries will be executed. We highly
-          recommend you use ExportIamPolicyAnalysis rpc instead. Default is
+          recommend you use AnalyzeIamPolicyLongrunning rpc instead. Default is
           false.
 
        --execution-timeout=EXECUTION_TIMEOUT

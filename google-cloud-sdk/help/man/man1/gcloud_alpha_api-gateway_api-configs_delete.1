@@ -1,0 +1,97 @@
+
+.TH "GCLOUD_ALPHA_API\-GATEWAY_API\-CONFIGS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha api\-gateway api\-configs delete \- deletes a config from an API
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha api\-gateway api\-configs delete\fR (\fIAPI_CONFIG\fR\ :\ \fB\-\-api\fR=\fIAPI\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Deletes a config from an API.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Api config resource \- Name for API Config which will be deleted. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [api_config] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. To set the [location]
+attribute: provide the argument [api_config] on the command line with a fully
+specified name; Location for API and API Configs. Defaults to global. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fIAPI_CONFIG\fR
+ID of the api\-config or fully qualified identifier for the api\-config. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+API ID.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an API Config 'my\-config' in 'my\-api', run:
+
+.RS 2m
+$ gcloud alpha api\-gateway api\-configs delete my\-config \-\-api=my\-api
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta api\-gateway api\-configs delete
+.RE
+

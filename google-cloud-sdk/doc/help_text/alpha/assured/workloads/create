@@ -80,7 +80,7 @@ EXAMPLES
             --billing-account=billingAccounts/456 \
             --next-rotation-time=2020-12-30T10:15:00.00Z \
             --rotation-period=172800s \
-            --labels LabelKey1=LabelValue1,LabelKey2=LabelValue2
+            --labels=LabelKey1=LabelValue1,LabelKey2=LabelValue2
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

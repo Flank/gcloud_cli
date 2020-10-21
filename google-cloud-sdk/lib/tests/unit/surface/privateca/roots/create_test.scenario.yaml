@@ -299,6 +299,9 @@ actions:
             json:
               tier: DEVOPS
               keySpec.algorithm: EC_P384_SHA384
+              issuingOptions:
+                includeCaCertUrl: true
+                includeCrlAccessUrl: false
         return_response:
           headers:
             status: '200'
@@ -944,7 +947,7 @@ actions:
           body:
             json:
               tier: ENTERPRISE
-              keySpec.algorithm: RSA_PSS_4096_SHA256
+              keySpec.algorithm: RSA_PKCS1_4096_SHA256
         return_response:
           headers:
             status: '200'

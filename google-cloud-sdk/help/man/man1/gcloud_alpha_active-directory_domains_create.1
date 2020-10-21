@@ -11,7 +11,7 @@ gcloud alpha active\-directory domains create \- create a Managed Microsoft AD d
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha active\-directory domains create\fR \fIDOMAIN\fR \fB\-\-region\fR=[\fIREGION\fR,...] \fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR [\fB\-\-admin\-name\fR=\fIADMIN_NAME\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-networks\fR=[\fIAUTHORIZED_NETWORKS\fR,...]] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha active\-directory domains create\fR \fIDOMAIN\fR \fB\-\-region\fR=[\fIREGION\fR,...] \fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR [\fB\-\-admin\-name\fR=\fIADMIN_NAME\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-networks\fR=[\fIAUTHORIZED_NETWORKS\fR,...]] [\fB\-\-enable\-audit\-logs\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -95,6 +95,10 @@ Names of the Google Compute Engine networks to which the domain will be
 connected.
 
 .TP 2m
+\fB\-\-enable\-audit\-logs\fR
+Whether Active Directory data audit logs are enabled for the domain.
+
+.TP 2m
 \fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
 List of label KEY=VALUE pairs to add.
 
@@ -115,8 +119,9 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBmanagedidentities/v1\fR API. The full documentation for
-this API can be found at: https://cloud.google.com/managed\-microsoft\-ad/
+This command uses the \fBmanagedidentities/v1alpha1\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/managed\-microsoft\-ad/
 
 
 

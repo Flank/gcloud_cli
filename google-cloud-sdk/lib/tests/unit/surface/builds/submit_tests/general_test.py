@@ -583,6 +583,50 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
     with self.assertRaises(c_exceptions.InvalidArgumentException):
       self._Run(['builds', 'submit', 'gs://bucket/object.zip', '--tag='])
 
+  def testCreateSuccessCloudLogging(self):
+    b_out = self.cloudbuild_v1_messages.Build(
+        createTime='2016-03-31T19:12:32.838111Z',
+        id='123-456-789',
+        projectId='my-project',
+        source=None,
+        images=[
+            'gcr.io/my-project/image',
+        ],
+        status=self._statuses.SUCCESS,
+        options=self.cloudbuild_v1_messages.BuildOptions(
+            logging=self.cloudbuild_v1_messages.BuildOptions
+            .LoggingValueValuesEnum.CLOUD_LOGGING_ONLY))
+    b_in = self.cloudbuild_v1_messages.Build(
+        source=None,
+        images=[
+            'gcr.io/my-project/image',
+        ],
+        steps=test_base.DOCKER_BUILD_STEPS,
+    )
+    self.ExpectMessagesForSimpleBuild(b_in, b_out, gcs=False)
+    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
+            id='123-456-789',
+            projectId='my-project',
+        ),
+        response=b_out)
+
+    self._Run(
+        ['builds', 'submit', '--no-source', '--tag=gcr.io/my-project/image'])
+
+    self.AssertErrContains(
+        """\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+Logs are available in the Cloud Console.
+""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - - - SUCCESS
+""",
+        normalize_space=True)
+
 
 class GeneralSubmitTestBeta(GeneralSubmitTest):
 

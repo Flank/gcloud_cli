@@ -42,7 +42,7 @@ EXAMPLES
     To create a Cloud Spanner instance, run:
 
         $ gcloud beta spanner instances create my-instance-id \
-            --config=regional-us-east1
+            --config=regional-us-east1 \
             --description=my-instance-display-name --nodes=3
 
 NOTES

@@ -59,7 +59,8 @@ EXAMPLES
         $ gcloud beta api-gateway operations list --location=us-central1
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha api-gateway operations list
 

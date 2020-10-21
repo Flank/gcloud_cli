@@ -94,5 +94,5 @@ actions:
               status: PERMISSION_DENIED
     - expect_exit:
         code: 1
-        message: 'User [fake_account] does not have permission to access labelKey
+        message: 'User [fake_account] does not have permission to access labelKeys instance
           [123] (or it may not exist): The caller does not have permission'

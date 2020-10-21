@@ -38,25 +38,8 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
   def Project(self):
     return 'fake-project'
 
-  def testGetGCDRoot(self):
-    self._DoTestGetGCDRoot('cloud-datastore-emulator')
-
-  def _DoTestGetGCDRoot(self, gcd_dir):
-    cloud_sdk_mock = self.StartObjectPatch(util, 'GetCloudSDKRoot')
-    cloud_sdk_mock.return_value = 'pathtocloudsdk'
-
-    os_isdir_mock = self.StartObjectPatch(os.path, 'isdir')
-    os_isdir_mock.return_value = True
-
-    expected = os.path.join(cloud_sdk_mock.return_value, 'platform', gcd_dir)
-    self.assertEqual(expected, datastore_util.GetGCDRoot())
-
-    os_isdir_mock.return_value = False
-    with self.assertRaises(datastore_util.NoGCDError):
-      datastore_util.GetGCDRoot()
-
   def testArgsForGCDEmulator(self):
-    gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
+    gcd_root_mock = self.StartObjectPatch(util, 'GetEmulatorRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
 
     emulator_executable = 'cloud_datastore_emulator'
@@ -74,7 +57,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     self._DoTestPrepareGCDDataDir()
 
   def _DoTestPrepareGCDDataDir(self):
-    gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
+    gcd_root_mock = self.StartObjectPatch(util, 'GetEmulatorRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
     exec_mock = self.StartObjectPatch(util, 'Exec')
     process = mock.Mock()
@@ -121,7 +104,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     self._DoTestStartGCDEmulator()
 
   def _DoTestStartGCDEmulator(self):
-    gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
+    gcd_root_mock = self.StartObjectPatch(util, 'GetEmulatorRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
     exec_mock = self.StartObjectPatch(util, 'Exec')
 

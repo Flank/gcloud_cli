@@ -11,7 +11,7 @@ gcloud beta sql instances patch \- updates the settings of a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql instances patch\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-diff\fR] [\fB\-\-[no\-]enable\-bin\-log\fR] [\fB\-\-[no\-]enable\-database\-replication\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-any\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-[no\-]require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]\ |\ \fB\-\-clear\-gae\-apps\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]\ |\ \fB\-\-clear\-authorized\-networks\fR] [\fB\-\-clear\-database\-flags\fR\ |\ \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-no\-backup\fR\ |\ \fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR\ \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql instances patch\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-deny\-maintenance\-period\-end\-date\fR=\fIDENY_MAINTENANCE_PERIOD_END_DATE\fR] [\fB\-\-deny\-maintenance\-period\-start\-date\fR=\fIDENY_MAINTENANCE_PERIOD_START_DATE\fR] [\fB\-\-deny\-maintenance\-period\-time\fR=\fIDENY_MAINTENANCE_PERIOD_TIME\fR] [\fB\-\-diff\fR] [\fB\-\-[no\-]enable\-bin\-log\fR] [\fB\-\-[no\-]enable\-database\-replication\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-any\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR] [\fB\-\-remove\-deny\-maintenance\-period\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-[no\-]require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]\ |\ \fB\-\-clear\-gae\-apps\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]\ |\ \fB\-\-clear\-authorized\-networks\fR] [\fB\-\-clear\-database\-flags\fR\ |\ \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-no\-backup\fR\ |\ \fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR\ \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -77,6 +77,18 @@ Provides no failover capability. This is the default.
 Whole number value indicating how many cores are desired in the machine. Both
 \-\-cpu and \-\-memory must be specified if a custom machine type is desired,
 and the \-\-tier flag must be omitted.
+
+.TP 2m
+\fB\-\-deny\-maintenance\-period\-end\-date\fR=\fIDENY_MAINTENANCE_PERIOD_END_DATE\fR
+Date when the deny maintenance period ends, that is ``2021\-01\-10".
+
+.TP 2m
+\fB\-\-deny\-maintenance\-period\-start\-date\fR=\fIDENY_MAINTENANCE_PERIOD_START_DATE\fR
+Date when the deny maintenance period begins, that is ``2020\-11\-01".
+
+.TP 2m
+\fB\-\-deny\-maintenance\-period\-time\fR=\fIDENY_MAINTENANCE_PERIOD_TIME\fR
+Time when the deny maintenance period starts or ends, that is ``05:00:00".
 
 .TP 2m
 \fB\-\-diff\fR
@@ -159,6 +171,10 @@ form:\f5\-\-network\fR=\f5projects/testproject/global/networks/testsharednetwork
 \fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR, \fB\-p\fR \fIPRICING_PLAN\fR
 First Generation instances only. The pricing plan for this instance.
 \fIPRICING_PLAN\fR must be one of: \fBPER_USE\fR, \fBPACKAGE\fR.
+
+.TP 2m
+\fB\-\-remove\-deny\-maintenance\-period\fR
+Removes the user\-specified deny maintenance period.
 
 .TP 2m
 \fB\-\-replication\fR=\fIREPLICATION\fR

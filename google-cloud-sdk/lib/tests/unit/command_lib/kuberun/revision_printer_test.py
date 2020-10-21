@@ -20,7 +20,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.kuberun import revision
-from googlecloudsdk.api_lib.run import revision as runrevision
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.kuberun import revision_printer
 from googlecloudsdk.command_lib.run import revision_printer as run_rev_printer
@@ -77,12 +76,8 @@ class RevisionPrinterTest(resource_printer_test_base.Base):
     status = runhelpers.RevisionStatus(
         [runhelpers.Condition(condition_type="Ready", status="True")])
 
-    # TODO(b/168741059) create revision.Revision in runhelpers
-    rev_msg = run_v1_messages.Revision()
-    rev_msg.metadata = meta
-    rev_msg.spec = spec
-    rev_msg.status = status
-    run_rev = runrevision.Revision(rev_msg, runhelpers.TestMessagesModule())
+    run_rev = runhelpers.Revision(runhelpers.TestMessagesModule(), meta, spec,
+                                  status)
 
     run_printer = run_rev_printer.RevisionPrinter()
     run_printer.AddRecord(run_rev)
@@ -169,3 +164,36 @@ class RevisionPrinterTest(resource_printer_test_base.Base):
     self._printer.Finish()
 
     self.AssertOutputEquals(run_out)
+
+  def testWithBasicRevision(self):
+    rev = revision.Revision({
+        "metadata": {
+            "namespace": "default",
+            "name": "hello-dxtvy-1",
+        },
+        "spec": {
+            "metadata": {
+            },
+            "containers": [{
+                "name": "user-container",
+                "image": "gcr.io/knative-samples/helloworld-go",
+                "resources": {},
+            }],
+            "serviceAccountName": "hello-sa",
+        },
+        "status": {
+            "conditions": [{
+                "type": "Ready",
+                "status": "true",
+            }]
+        }
+    })
+    printer = revision_printer.RevisionPrinter()
+    printer.Transform(rev)
+    self.assertIsNone(printer.GetMinInstances(rev))
+    self.assertIsNone(printer.GetMaxInstances(rev))
+    self.assertIsNone(printer.GetTimeout(rev))
+    self.assertEqual(printer.GetUserEnvironmentVariables(rev), [])
+    self.assertEqual(printer.GetSecrets(rev), [])
+    self.assertEqual(printer.GetConfigMaps(rev), [])
+

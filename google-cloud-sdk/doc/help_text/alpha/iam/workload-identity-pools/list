@@ -66,13 +66,14 @@ EXAMPLES
     The following command lists all WorkloadIdentityPools in the default
     project, including soft-deleted pools:
 
-        $ gcloud alpha iam workload-identity-pools list --location global \
+        $ gcloud alpha iam workload-identity-pools list --location=global \
             --show-deleted
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access allowlist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta iam workload-identity-pools list
 

@@ -1,20 +1,20 @@
 title: surface unit tests for 'gcloud compute networks peerings list'
-release_tracks: [BETA, ALPHA]
+release_tracks: [GA, BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       compute networks peerings list
   - stdout: |
-      NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
-      peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
-      peer-2  network-2  fake-project  network-1     False                 True                  ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+      NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  PEER_MTU  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+      peer-1  network-1  fake-project  network-2     1500      True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+      peer-2  network-2  fake-project  network-1     1460      False                 True                  ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
 - execute:
   - command: |
       compute networks peerings list --network network-1
   - stdout: |
-      NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
-      peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+      NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  PEER_MTU  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+      peer-1  network-1  fake-project  network-2     1500      True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
 - execute:
   - command: |
       compute networks peerings list --network network-does-not-exist
@@ -58,6 +58,7 @@ actions:
                 network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                peerMtu: 1500
                 autoCreateRoutes: true
                 exportCustomRoutes: false
                 importCustomRoutes: true
@@ -77,6 +78,7 @@ actions:
                 network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                peerMtu: 1460
                 autoCreateRoutes: true
                 exportCustomRoutes: true
                 importCustomRoutes: false
@@ -84,9 +86,9 @@ actions:
               routingConfig:
                 routingMode: REGIONAL
     - expect_stdout: |
-        NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
-        peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
-        peer-2  network-2  fake-project  network-1     False                 True                  ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+        NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  PEER_MTU  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+        peer-1  network-1  fake-project  network-2     1500      True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+        peer-2  network-2  fake-project  network-1     1460      False                 True                  ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
     - expect_exit:
         code: 0
 - execute_command:
@@ -122,6 +124,7 @@ actions:
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
                 exportCustomRoutes: false
+                peerMtu: 1500
                 importCustomRoutes: true
                 exchangeSubnetRoutes: true
               routingConfig:
@@ -140,14 +143,15 @@ actions:
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
+                peerMtu: 1460
                 exportCustomRoutes: true
                 importCustomRoutes: false
                 exchangeSubnetRoutes: true
               routingConfig:
                 routingMode: REGIONAL
     - expect_stdout: |
-        NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
-        peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+        NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  PEER_MTU  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+        peer-1  network-1  fake-project  network-2     1500      True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
     - expect_exit:
         code: 0
 - execute_command:

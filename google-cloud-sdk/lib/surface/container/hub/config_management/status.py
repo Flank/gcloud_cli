@@ -67,23 +67,49 @@ class ConfigmanagementFeatureState(object):
     self.last_synced_token = NA
     self.last_synced = NA
     self.sync_branch = NA
+    self.policy_controller_state = NA
 
   def update_sync_state(self, fs):
     """update config_sync state for the membership that has nomos installed.
 
     Args:
-      fs: ConfigmanagementFeatureState
+      fs: ConfigManagementFeatureState
     """
     if not (fs.configSyncState and fs.configSyncState.syncState):
       self.config_sync = 'SYNC_STATE_UNSPECIFIED'
     else:
       self.config_sync = fs.configSyncState.syncState.code
-      # (b/153566864) limit the last_synced_token to 7 or 8 characters.
       if fs.configSyncState.syncState.syncToken:
         self.last_synced_token = fs.configSyncState.syncState.syncToken[:7]
       self.last_synced = fs.configSyncState.syncState.lastSyncTime
       if has_config_sync_git(fs):
         self.sync_branch = fs.membershipConfig.configSync.git.syncBranch
+
+  def update_policy_controller_state(self, fs):
+    """update poicy controller state for the membership that has nomos installed.
+
+    Args:
+      fs: ConfigmanagementFeatureState
+    """
+    if not (fs.policyControllerState and
+            fs.policyControllerState.deploymentState):
+      self.policy_controller_state = NA
+      return
+    pc_deployment_state = fs.policyControllerState.deploymentState
+    expected_deploys = {
+        'GatekeeperControllerManager':
+            pc_deployment_state.gatekeeperControllerManagerState
+    }
+    if fs.membershipConfig and fs.membershipConfig.version and fs.membershipConfig.version > '1.4.1':
+      expected_deploys['GatekeeperAudit'] = pc_deployment_state.gatekeeperAudit
+    for deployment_name, deployment_state in expected_deploys.items():
+      if not deployment_state:
+        continue
+      elif deployment_state.name != 'INSTALLED':
+        self.policy_controller_state = '{} {}'.format(
+            deployment_name, deployment_state)
+        return
+      self.policy_controller_state = deployment_state.name
 
 
 class Status(base.ListCommand):
@@ -106,7 +132,8 @@ class Status(base.ListCommand):
             config_sync:label=Status,
             last_synced_token:label="Last_Synced_Token",
             sync_branch:label="Sync_Branch",
-            last_synced:label="Last_Synced_Time"
+            last_synced:label="Last_Synced_Time",
+            policy_controller_state:label="Policy_Controller"
       )' , acm_errors:format=list)
     """)
 
@@ -166,6 +193,7 @@ class Status(base.ListCommand):
             if has_config_sync_error(fs):
               append_error(name, fs.configSyncState.syncState.errors,
                            acm_errors)
+            cluster.update_policy_controller_state(fs)
       acm_status.append(cluster)
     return {'acm_errors': acm_errors, 'acm_status': acm_status}
 

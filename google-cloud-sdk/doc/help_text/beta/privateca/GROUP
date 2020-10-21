@@ -1,11 +1,12 @@
 NAME
-    gcloud beta privateca - manage private PKI on Google cloud
+    gcloud beta privateca - manage private Certificate Authorities on Google
+        Cloud
 
 SYNOPSIS
     gcloud beta privateca GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) The gcloud privateca command group lets you create and manage
+    (BETA) The privateca command group lets you create and manage private
     certificate authorities and certificates.
 
 GCLOUD WIDE FLAGS
@@ -35,7 +36,5 @@ GROUPS
         (BETA) Manage subordinate certificate authorities.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

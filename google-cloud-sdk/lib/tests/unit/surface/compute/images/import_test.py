@@ -99,16 +99,19 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
         name=self.GetBuilder())
 
   def GetDaisyImportTranslateStep(self):
-    return self.GetNetworkStepForImport(include_zone=False)
+    return self.GetNetworkStepForImport(zone='')
 
-  def GetNetworkStepForImport(self, network=None, subnet=None,
-                              include_zone=True, from_image=False,
-                              include_storage_location=False,
-                              family=None, description=None,
-                              sysprep_windows=False, daisy_bucket_name=None):
-
+  def GetNetworkStepForImport(self,
+                              network=None,
+                              subnet=None,
+                              zone='my-region-c',
+                              from_image=False,
+                              storage_location='',
+                              family=None,
+                              description=None,
+                              sysprep_windows=False,
+                              daisy_bucket_name=None):
     import_vars = []
-
     if from_image:
       daisy_utils.AppendArg(import_vars, 'source_image', self.source_image)
     else:
@@ -118,17 +121,16 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
               regionalized=True, daisy_bucket_name=daisy_bucket_name))
 
     daisy_utils.AppendArg(import_vars, 'os', 'ubuntu-1604')
-
-    if include_zone:
-      daisy_utils.AppendArg(import_vars, 'zone', 'my-region-c')
-
-    if include_storage_location:
-      daisy_utils.AppendArg(import_vars, 'storage_location', 'my-region')
+    if zone:
+      daisy_utils.AppendArg(import_vars, 'zone', zone)
+    if storage_location:
+      daisy_utils.AppendArg(import_vars, 'storage_location', storage_location)
 
     daisy_utils.AppendArg(
         import_vars, 'scratch_bucket_gcs_path', 'gs://{0}/'.format(
-            daisy_bucket_name or self.GetScratchBucketName(
-                not from_image or include_storage_location)))
+            daisy_bucket_name or
+            self.GetScratchBucketName(not from_image or storage_location,
+                                      storage_location if from_image else '')))
 
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
@@ -151,12 +153,13 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
     daisy_utils.AppendArg(import_vars, 'client_version',
                           config.CLOUD_SDK_VERSION)
+    region = ''
+    if storage_location and from_image:
+      region = storage_location
+    elif not from_image:
+      region = 'my-region'
     return self.cloudbuild_v1_messages.BuildStep(
-        args=import_vars,
-        name=self.GetBuilder(
-            zone='my-region-c' if include_zone else '',
-            region='my-region'
-            if include_storage_location or not from_image else ''))
+        args=import_vars, name=self.GetBuilder(zone=zone, region=region))
 
   def AddStorageRewriteMock(self, daisy_bucket_name=None):
     destination_bucket = daisy_bucket_name or self.GetScratchBucketNameWithRegion(
@@ -320,7 +323,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
   def testDescription(self):
     self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetNetworkStepForImport(include_zone=False,
+        self.GetNetworkStepForImport(zone='',
                                      description='custom ubuntu image'))
     self.AddStorageRewriteMock()
     self.prepareArtifactRegistryMocks()
@@ -337,7 +340,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
   def testFamily(self):
     self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetNetworkStepForImport(include_zone=False, family='ubuntu'))
+        self.GetNetworkStepForImport(zone='', family='ubuntu'))
     self.AddStorageRewriteMock()
     self.prepareArtifactRegistryMocks()
 
@@ -983,24 +986,29 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
                            cmd,
                            regionalized=True,
                            from_image=False,
-                           zone_included=False):
+                           zone_included=False,
+                           scratch_bucket_location='',
+                           wrapper_location=''):
     if regionalized:
       self.PrepareDaisyMocksWithRegionalBucket(
-          daisy_step, match_source_file_region=not from_image)
+          daisy_step,
+          match_source_file_region=not from_image,
+          scratch_bucket_location=scratch_bucket_location)
       if not from_image:
         self.AddStorageRewriteMock()
     else:
       self.PrepareDaisyMocksWithDefaultBucket(daisy_step)
     self.prepareArtifactRegistryMocks(
         source_file_bucket_check=not from_image and not zone_included,
-        regionalized=regionalized or zone_included)
+        regionalized=regionalized or zone_included,
+        location=wrapper_location)
     self.Run(cmd)
     self.AssertOutputContains('[import-image] output', normalize_space=True)
 
   def testNetworkFlag(self):
     self.doNetworkTestSuccess(
         self.GetNetworkStepForImport(
-            network=self.network, include_zone=False), """
+            network=self.network, zone=''), """
         compute images import {0} --source-file {1} --os ubuntu-1604
         --network {2}
         """.format(self.image_name, self.source_disk, self.network))
@@ -1017,7 +1025,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
   def testSubnetFlagZoneAndRegionNotSpecified(self):
     self.doNetworkTestSuccess(
-        self.GetNetworkStepForImport(subnet=self.subnet, include_zone=False),
+        self.GetNetworkStepForImport(subnet=self.subnet, zone=''),
         """
              compute images import {0} --source-file {1} --os ubuntu-1604
              --subnet {2}
@@ -1038,7 +1046,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     properties.VALUES.compute.region.Set('my-region')
     self.doNetworkTestSuccess(
         self.GetNetworkStepForImport(
-            network=self.network, subnet=self.subnet, include_zone=False),
+            network=self.network, subnet=self.subnet, zone=''),
         """
         compute images import {0} --source-file {1} --os ubuntu-1604
         --network {2} --subnet {3}
@@ -1048,7 +1056,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
   def testNetworkFlagFromImage(self):
     self.doNetworkTestSuccess(
         self.GetNetworkStepForImport(
-            network=self.network, include_zone=False, from_image=True),
+            network=self.network, zone='', from_image=True),
         """
         compute images import {0} --source-image {1} --os ubuntu-1604
         --network {2}
@@ -1059,17 +1067,18 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
   def testSubnetFlagFromImage(self):
     self.doNetworkTestSuccess(
         self.GetNetworkStepForImport(
-            network=self.network, subnet=self.subnet,
-            include_zone=True, from_image=True),
+            network=self.network, subnet=self.subnet, from_image=True),
         """
         compute images import {0} --source-image {1} --os ubuntu-1604
         --network {2} --subnet {3} --zone my-region-c
-        """.format(
-            self.image_name, self.source_image, self.network, self.subnet),
-        regionalized=False, from_image=True, zone_included=True)
+        """.format(self.image_name, self.source_image, self.network,
+                   self.subnet),
+        regionalized=False,
+        from_image=True,
+        zone_included=True)
 
   def testScratchBucketCreatedInSourceRegion(self):
-    import_step = self.GetNetworkStepForImport(include_zone=False)
+    import_step = self.GetNetworkStepForImport(zone='')
 
     self.PrepareDaisyMocks(
         import_step, timeout='7200s', log_location=None, permissions=None,
@@ -1187,7 +1196,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     self.prepareArtifactRegistryMocks()
 
     import_step = self.GetNetworkStepForImport(
-        include_zone=False, daisy_bucket_name=daisy_bucket_name)
+        zone='', daisy_bucket_name=daisy_bucket_name)
     self.PrepareDaisyMocks(
         import_step, timeout='7200s', log_location=None, permissions=None,
         async_flag=False, is_import=True)
@@ -1275,27 +1284,42 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
                  --source-file gs://bucket --os ubuntu-1604
                  """.format(self.image_name))
 
-  def testStorageLocationFlagFromGCSFile(self):
+  def testStorageLocationFlagFromGCSFileZoneSpecified(self):
     self.doNetworkTestSuccess(
         self.GetNetworkStepForImport(
-            include_zone=True, include_storage_location=True),
+            storage_location='storage-region', zone='zone-region-c'),
         """
         compute images import {0} --source-file {1} --os ubuntu-1604
-        --zone my-region-c --storage-location my-region
+        --zone zone-region-c --storage-location storage-region
         """.format(self.image_name, self.source_disk),
-        zone_included=True)
+        zone_included=True,
+        wrapper_location='zone-region')
+
+  def testStorageLocationFlagFromGCSFileZoneNotSpecified(self):
+    self.doNetworkTestSuccess(
+        self.GetNetworkStepForImport(
+            storage_location='storage-region', zone=''),
+        """
+        compute images import {0} --source-file {1} --os ubuntu-1604
+        --storage-location storage-region
+        """.format(self.image_name, self.source_disk),
+        zone_included=False,
+        wrapper_location='my-region')
 
   def testStorageLocationFlagFromImage(self):
     self.doNetworkTestSuccess(
         self.GetNetworkStepForImport(
-            network=self.network, include_zone=True, from_image=True,
-            include_storage_location=True),
+            network=self.network,
+            from_image=True,
+            storage_location='storage-region'),
         """
         compute images import {0} --source-image {1} --os ubuntu-1604
-        --network {2} --storage-location my-region --zone my-region-c
-        """.format(
-            self.image_name, self.source_image, self.network),
-        regionalized=True, from_image=True, zone_included=True)
+        --network {2} --storage-location storage-region --zone my-region-c
+        """.format(self.image_name, self.source_image, self.network),
+        regionalized=True,
+        from_image=True,
+        zone_included=True,
+        scratch_bucket_location='storage-region')
 
 
 class ImageImportTestBeta(ImageImportTest):
@@ -1323,21 +1347,21 @@ class ImageImportTestBeta(ImageImportTest):
       repo_name = '{}/repositories/wrappers'.format(location)
       package_name = '{}/packages/gce_vm_image_import'.format(repo_name)
 
-      msgs = self.mocked_artifacts_v1beta1_messages
-      self.mocked_artifacts_v1beta1.projects_locations.List.Expect(
+      msgs = self.mocked_artifacts_v1beta2_messages
+      self.mocked_artifacts_v1beta2.projects_locations.List.Expect(
           msgs.ArtifactregistryProjectsLocationsListRequest(
               name='projects/compute-image-tools'),
           response=msgs.ListLocationsResponse(
               locations=[msgs.Location(name=location, locationId=region)]))
 
-      self.mocked_artifacts_v1beta1.projects_locations_repositories.Get.Expect(
+      self.mocked_artifacts_v1beta2.projects_locations_repositories.Get.Expect(
           msgs.ArtifactregistryProjectsLocationsRepositoriesGetRequest(
               name=repo_name),
           response=msgs.Repository(
               name=repo_name,
               format=msgs.Repository.FormatValueValuesEnum.DOCKER))
 
-      self.mocked_artifacts_v1beta1.projects_locations_repositories_packages.Get.Expect(
+      self.mocked_artifacts_v1beta2.projects_locations_repositories_packages.Get.Expect(
           msgs.ArtifactregistryProjectsLocationsRepositoriesPackagesGetRequest(
               name=package_name),
           response=msgs.Package(name=package_name))
@@ -1350,10 +1374,11 @@ class ImageImportTestBeta(ImageImportTest):
       return self.builder
 
     builder_region = ''
-    if region:
-      builder_region = region.lower()
-    elif zone:
+
+    if zone:
       builder_region = daisy_utils.GetRegionFromZone(zone).lower()
+    elif region:
+      builder_region = region.lower()
 
     if builder_region:
       return daisy_utils._REGIONALIZED_BUILDER_DOCKER_PATTERN.format(

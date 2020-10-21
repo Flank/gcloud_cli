@@ -43,17 +43,15 @@ EXAMPLES
     'us-west1':
 
         $ gcloud beta privateca subordinates describe server-tls-1 \
-          --location us-west1
+          --location=us-west1
 
     To download the PEM-encoded CA certificate for the 'server-tls-1' CA in
     location 'us-west1' to a file called 'server-tls-1.crt':
 
         $ gcloud beta privateca subordinates describe server-tls-1 \
-          --location us-west1 \
-          --format "value(pem_cert)" > ./server-tls-1.crt
+          --location=us-west1 \
+          --format="value(pem_cert)" > ./server-tls-1.crt
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

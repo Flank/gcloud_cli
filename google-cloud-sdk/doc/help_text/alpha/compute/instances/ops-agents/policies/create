@@ -45,10 +45,17 @@ REQUIRED FLAGS
          type
             Type of agent to manage.
 
-            Required. Allowed values: logging and metrics. Use logging for the
-            Logging Agent (https://cloud.google.com/logging/docs/agent). Use
-            metrics for the Monitoring Agent
-            (https://cloud.google.com/monitoring/agent).
+            Required. Allowed values: logging, metrics and ops-agent. Use
+            logging for the Logging Agent
+            (https://cloud.google.com/logging/docs/agent). Use metrics for the
+            Monitoring Agent (https://cloud.google.com/monitoring/agent). Use
+            ops-agent for the Ops Agent
+            (https://cloud.google.com/stackdriver/docs/solutions/ops-agent).
+            The Ops Agent has both a logging module and a metrics module
+            already. So other types of agents are not allowed when there is an
+            agent with type ops-agent. See
+            https://cloud.google.com/stackdriver/docs/solutions/ops-agent#which_agent
+            for which agent to use.
 
          version
             Version of the agent to install.
@@ -299,6 +306,19 @@ EXAMPLES
             ops-agents-prod-policy \
             --agent-rules="type=logging,version=1.*.*;type=metrics,version=6\
         .*.*" --description="A prod policy." \
+            --os-types=short-name=centos,version=7 --zones=us-central1-a \
+            --group-labels="env=prod,product=myapp;env=staging,product=myapp\
+        "
+
+    To create a policy named ops-agents-prod-policy that targets all CentOS 7
+    VMs in zone us-central1-a with either env=prod,product=myapp or
+    env=staging,product=myapp labels and makes sure the ops-agent version is
+    pinned to specific major versions for staging and production, run:
+
+        $ gcloud alpha compute instances ops-agents policies create \
+            ops-agents-prod-policy \
+            --agent-rules="type=ops-agent,version=1.*.*" \
+            --description="A prod policy." \
             --os-types=short-name=centos,version=7 --zones=us-central1-a \
             --group-labels="env=prod,product=myapp;env=staging,product=myapp\
         "

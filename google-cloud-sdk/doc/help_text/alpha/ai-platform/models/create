@@ -17,7 +17,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --description=DESCRIPTION
-        The description of the model.
+        Description of the model.
 
      --enable-console-logging
         If set, enables StackDriver Logging of stderr and stdout streams for

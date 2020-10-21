@@ -30,7 +30,7 @@ class MlOnlinePredictionTests(e2e_base.WithServiceAuth):
   """e2e tests for ai-platform online prediction."""
 
   MODEL_ID = 'do_not_delete_model'
-  VERSION_ID = 'do_not_delete_version_savedmodel'
+  VERSION_ID = 'do_not_delete_version'
 
   def testOnlinePrediction(self, module_name):
     r"""Tests online prediction.
@@ -42,10 +42,12 @@ class MlOnlinePredictionTests(e2e_base.WithServiceAuth):
     $ gcloud config set project $PROJECT
     $ gcloud ml-engine models create do_not_delete_model --regions=us-central1
     $ MODEL_DIR="${CLOUDSDK_TEST_DIR}/e2e/surface/ml_engine/testdata/savedmodel"
+    $ RUNTIME_VER="latest-available-tensorflow-version-placeholder"
     $ gcloud ml-engine versions create do_not_delete_version \
         --model do_not_delete_model \
         --origin "${MODEL_DIR}" \
         --staging-bucket gs://${PROJECT}-ml
+        --runtime-version "$RUNTIME_VER"
 
     Args:
       module_name : The surface command to run. One of "ai-platform" or it's

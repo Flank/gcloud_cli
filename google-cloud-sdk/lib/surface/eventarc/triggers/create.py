@@ -18,9 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import encoding
 from googlecloudsdk.api_lib.eventarc import triggers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.eventarc import flags
+from googlecloudsdk.command_lib.eventarc import types
 from googlecloudsdk.core import log
 
 _DETAILED_HELP = {
@@ -60,12 +62,21 @@ class Create(base.CreateCommand):
                               service_account_ref, args.destination_run_service,
                               args.destination_run_path,
                               args.destination_run_region)
+    self._event_type = args.matching_criteria['type']
     if args.async_:
       return operation
-    return client.WaitFor(operation)
+    response = client.WaitFor(operation)
+    trigger_dict = encoding.MessageToPyValue(response)
+    if types.IsPubsubType(self._event_type):
+      log.status.Print('Created Pub/Sub topic [{}].'.format(
+          trigger_dict['transport']['pubsub']['topic']))
+      log.status.Print(
+          'Publish to this topic to receive events in Cloud Run service [{}].'
+          .format(args.destination_run_service))
+    return response
 
   def Epilog(self, resources_were_displayed):
-    if resources_were_displayed:
+    if resources_were_displayed and types.IsAuditLogType(self._event_type):
       log.warning(
-          'It may take up to {} minutes for the trigger to start functioning.'
-          .format(triggers.MAX_READY_LATENCY_MINUTES))
+          'It may take up to {} minutes for the new trigger to become active.'
+          .format(triggers.MAX_ACTIVE_DELAY_MINUTES))

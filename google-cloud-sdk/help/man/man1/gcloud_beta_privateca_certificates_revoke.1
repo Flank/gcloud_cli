@@ -1,0 +1,133 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_CERTIFICATES_REVOKE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca certificates revoke \- revoke a certificate
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca certificates revoke\fR (\fB\-\-certificate\fR=\fICERTIFICATE\fR\ :\ \fB\-\-serial\-number\fR=\fISERIAL_NUMBER\fR) [\fB\-\-reason\fR=\fIREASON\fR;\ default="unspecified"] [\fB\-\-issuer\fR=\fIISSUER\fR\ :\ \fB\-\-issuer\-location\fR=\fIISSUER_LOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Revokes the given certificate for the given reason.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+The certificate identifier. Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Certificate resource \- The certificate to revoke. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[\-\-certificate] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project]. To
+set the [issuer\-location] attribute: provide the argument [\-\-certificate] on
+the command line with a fully specified name; set the property
+[privateca/location]. To set the [issuer] attribute: provide the argument
+[\-\-certificate] on the command line with a fully specified name.
+
+.RS 2m
+.TP 2m
+\fB\-\-certificate\fR=\fICERTIFICATE\fR
+ID of the certificate or fully qualified identifier for the certificate.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-serial\-number\fR=\fISERIAL_NUMBER\fR
+The serial number of the certificate.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-reason\fR=\fIREASON\fR; default="unspecified"
+Revocation reason to include in the CRL. \fIREASON\fR must be one of:
+\fBaffiliation\-changed\fR, \fBattribute\-authority\-compromise\fR,
+\fBcertificate\-authority\-compromise\fR, \fBcertificate\-hold\fR,
+\fBcessation\-of\-operation\fR, \fBkey\-compromise\fR,
+\fBprivilege\-withdrawn\fR, \fBunspecified\fR, \fBsuperseded\fR.
+
+.TP 2m
+
+Issuing CA resource \- The issuing certificate authority of the certificate to
+revoke. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[\-\-issuer] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-issuer\fR=\fIISSUER\fR
+ID of the Issuing CA or fully qualified identifier for the Issuing CA. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-issuer\-location\fR=\fIISSUER_LOCATION\fR
+The location of the Issuing CA. Alternatively, you can set the property
+[privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To revoke the 'frontend\-server\-tls' certificate due to key compromise:
+
+.RS 2m
+$ gcloud beta privateca certificates revoke \e
+  \-\-certificate=frontend\-server\-tls \e
+  \-\-issuer=server\-tls\-1 \-\-issuer\-location=us\-west1 \e
+  \-\-reason=key_compromise
+.RE
+
+To revoke the a certificate with the serial number
+\'7dc1d9186372de2e1f4824abb1c4c9e5e43cbb40' due to a newer one being issued:
+
+.RS 2m
+$ gcloud beta privateca certificates revoke \e
+  \-\-serial\-number=7dc1d9186372de2e1f4824abb1c4c9e5e43cbb40 \e
+  \-\-issuer=server\-tls\-1 \-\-issuer\-location=us\-west1 \e
+  \-\-reason=superseded
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

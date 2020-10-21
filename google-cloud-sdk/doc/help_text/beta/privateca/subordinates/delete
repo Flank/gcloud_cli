@@ -53,21 +53,19 @@ EXAMPLES
     To schedule a subordinate CA for deletion:
 
         $ gcloud beta privateca subordinates delete server-tls-1 \
-            --location 'us-west1'
+            --location='us-west1'
 
     To schedule a subordinate CA for deletion while skipping the confirmation
     input:
 
         $ gcloud beta privateca subordinates delete server-tls-1 \
-            --location 'us-west1' --quiet
+            --location='us-west1' --quiet
 
     To un-do the scheduled deletion for a subordinate CA:
 
         $ gcloud beta privateca subordinates restore server-tls-1 \
-            --location 'us-west1'
+            --location='us-west1'
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

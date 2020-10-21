@@ -51,8 +51,10 @@ from tests.lib import exec_utils
 from tests.lib import test_case
 
 from oauth2client import client
+from oauth2client import transport
 from oauth2client.contrib import gce
 import six
+from google.auth import _helpers as google_auth_helpers
 from google.auth.compute_engine import credentials as gce_google_auth
 from google.oauth2 import credentials
 
@@ -580,6 +582,108 @@ class WithTempCWD(SdkBase):
   def ExitDir(self):
     """Changes the CWD back to whatever the test runner started as."""
     os.chdir(self.__cwd)
+
+
+# TODO(b/170388540) Remove this class after it is not needed.
+class UnifiedCredentials(object):
+  """A mock credential which behaves like a google-auth or oauth2client cred."""
+
+  def __init__(self,
+               access_token,
+               client_id,
+               client_secret,
+               refresh_token,
+               token_expiry,
+               token_uri,
+               user_agent,
+               revoke_uri=None,
+               id_token=None,
+               token_response=None,
+               scopes=None,
+               token_info_uri=None,
+               rapt_token=None):
+    self.access_token, self.token = access_token, access_token
+    self.client_id, self._client_id = client_id, client_id
+    self.client_secret, self._client_secret = client_secret, client_secret
+    self.refresh_token, self._refresh_token = refresh_token, refresh_token
+    self.token_expiry, self.expiry = token_expiry, token_expiry
+    self.token_uri, self._token_uri = token_uri, token_uri
+    self.user_agent = user_agent
+    self.revoke_uri = revoke_uri
+    self.id_token, self._id_token = id_token, id_token
+    self.token_response = token_response
+    self.scopes, self._scopes = scopes, scopes
+    self.token_info_uri = token_info_uri
+    self.rapt_token, self._rapt_token = rapt_token, rapt_token
+
+  def refresh(self, http):  # pylint: disable=invalid-name
+    del http
+    pass
+
+  @property
+  def expired(self):
+    return False
+
+  @property
+  def valid(self):
+    return True
+
+  def apply(self, headers, token=None):  # pylint: disable=invalid-name
+    headers['Authorization'] = 'Bearer {}'.format(
+        google_auth_helpers.from_bytes(token or self.token))
+
+  def before_request(self, request, method, url, headers):  # pylint: disable=invalid-name
+    del request, method, url
+    self.apply(headers)
+
+  def authorize(self, http):  # pylint: disable=invalid-name
+    transport.wrap_http_for_auth(self, http)
+    return http
+
+
+# TODO(b/170388540) Remove this class and use WithFakeAuth for scenario tests.
+class WithFakeAuthScenarioTests(SdkBase):
+  """A base class that mocks out auth credentials for scenario tests.
+
+  It supports the interface of both oauth2client credentials and
+  google-auth credentials. Since we are migrating from oauth2client to
+  google-auth, and from httplib2 to requests, some scenario tests are running
+  with oauth2client+httplib2 mode and some are running with google-auth+requests
+  mode. This class is necessary to handle these two cases.
+  """
+
+  def SetUp(self):
+
+    def Connect(destpair):
+      raise RuntimeError(
+          'This test tries to access network at {}'.format(destpair))
+
+    self.socket_connect_mock = self.StartObjectPatch(
+        socket.socket, 'connect', side_effect=Connect)
+    properties.VALUES.core.account.Set(self.FakeAuthAccount())
+    self._load_mock = self.StartObjectPatch(c_store, 'Load')
+    self._load_mock.return_value = UnifiedCredentials('access_token',
+                                                      'client_id',
+                                                      'client_secret',
+                                                      'refresh_token',
+                                                      self.FakeAuthExpiryTime(),
+                                                      'token_uri', 'user_agent')
+
+  def FakeAuthAccount(self):
+    """Override this method to change the account that is used for credentials.
+
+    Returns:
+      str, The account name to use for the credentials object.
+    """
+    return 'fake_account'
+
+  def FakeAuthExpiryTime(self):
+    """Override the expiry time of the fake access_token used for credentials.
+
+    Returns:
+      datetime.datetime, The expiry time of the access token.
+    """
+    return datetime.datetime.utcnow() + datetime.timedelta(hours=1)
 
 
 class WithFakeAuth(SdkBase):

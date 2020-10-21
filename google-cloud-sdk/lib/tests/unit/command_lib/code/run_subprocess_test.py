@@ -169,9 +169,9 @@ class StreamOutputJsonTest(test_case.TestCase):
         run_subprocess.StreamOutputJson(
             cmd=[
                 'bash', '-c',
-                'sleep .1; echo {}; sleep .1; echo {}; sleep .1; echo {}'
+                'sleep .4; echo {}; sleep .4; echo {}; sleep .4; echo {}'
             ],
-            event_timeout_sec=0.2))
+            event_timeout_sec=0.9))
     # (Assert no exception.)
 
   def testExitNonZero(self):

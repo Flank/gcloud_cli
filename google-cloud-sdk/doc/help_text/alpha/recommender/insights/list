@@ -1,31 +1,54 @@
 NAME
-    gcloud alpha recommender insights list - list insights for a Cloud project
+    gcloud alpha recommender insights list - list insights for a cloud entity
 
 SYNOPSIS
-    gcloud alpha recommender insights list
-        (--insight-type=INSIGHT_TYPE : --location=LOCATION)
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha recommender insights list --insight-type=INSIGHT_TYPE
+        (--billing-account=BILLING_ACCOUNT | --folder=FOLDER_ID
+          | --organization=ORGANIZATION_ID | --project=PROJECT_ID)
+        [--location=LOCATION] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List insights for a Cloud project.
+    (ALPHA) This command will list all insights for a give cloud entity,
+    location and insight type. Currently the following cloud_entity_types are
+    supported, project, billing_account, folder and organization.
 
 REQUIRED FLAGS
-     Insight type resource - The insight types to list. The arguments in this
-     group can be used to specify the attributes of this resource. (NOTE) Some
-     attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: provide the argument
-     [--insight-type] on the command line with a fully specified name; provide
-     the argument [--project] on the command line; set the property
-     [core/project]. This must be specified.
+     --insight-type=INSIGHT_TYPE
+        Insight type to list insights for
 
-       --insight-type=INSIGHT_TYPE
-          ID of the insight-type or fully qualified identifier for the
-          insight-type. This flag must be specified if any of the other
-          arguments in this group are specified.
+     Resource that is associated with cloud entity type. Currently four
+     mutually exclusive flags are supported, --project, --billing-account,
+     --folder, --organization. Exactly one of these must be specified:
 
-       --location=LOCATION
-          The location ID.
+       --billing-account=BILLING_ACCOUNT
+          The Google Cloud Platform Billing Account ID to use for this
+          invocation.
+
+       --folder=FOLDER_ID
+          Folder ID to use for this invocation.
+
+       --organization=ORGANIZATION_ID
+          The Google Cloud Platform Organization ID to use for this invocation.
+
+       --project=PROJECT_ID
+          The Google Cloud Platform Project Number to use for this invocation.
+
+          The Google Cloud Platform project ID to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
+
+FLAGS
+     --location=LOCATION
+        Location
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -53,6 +76,9 @@ LIST COMMAND FLAGS
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
 
+     --uri
+        Print a list of resource URIs instead of the default output.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -61,12 +87,8 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
-API REFERENCE
-    This command uses the recommender/v1alpha2 API. The full documentation for
-    this API can be found at: https://cloud.google.com/recommender/docs/
-
 EXAMPLES
-    To list insights:
+    To list all insights for a billing account:
 
         $ gcloud alpha recommender insights list --project=project-name \
             --location=global --insight-type=google.compute.firewall.Insight

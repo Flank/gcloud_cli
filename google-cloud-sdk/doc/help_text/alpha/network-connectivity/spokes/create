@@ -5,9 +5,9 @@ SYNOPSIS
     gcloud alpha network-connectivity spokes create (SPOKE : --region=REGION)
         --hub=HUB
         (--interconnect-attachment=[INTERCONNECT_ATTACHMENT,...]
-          | --router-appliance-instance=[ROUTER_APPLIANCE_INSTANCE,...]
+          | --router-appliance=ROUTER_APPLIANCE
           | --vpn-tunnel=[VPN_TUNNEL,...]) [--async]
-        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--labels=KEY=VALUE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new spoke with the given name.
@@ -38,8 +38,14 @@ REQUIRED FLAGS
        --interconnect-attachment=[INTERCONNECT_ATTACHMENT,...]
           Interconnect attachment that this spoke links to.
 
-       --router-appliance-instance=[ROUTER_APPLIANCE_INSTANCE,...]
-          Router appliance instance that this spoke links to.
+       --router-appliance=ROUTER_APPLIANCE
+          Router appliance instance(s)and that this spoke links to.
+
+          For example, use --router-appliance=instance=ins_1,ip=10.10.0.1 to
+          add a single router-appliance instance, or
+          --router-appliance=instance=ins_1,ip=10.10.0.1
+          --router-appliance=instance=ins_2,ip=10.10.0.1 ... to add multiple
+          instances.
 
        --vpn-tunnel=[VPN_TUNNEL,...]
           VPN tunnel that this spoke links to.
@@ -51,6 +57,9 @@ OPTIONAL FLAGS
 
      --description=DESCRIPTION
         Description of the spoke to be created.
+
+     --labels=KEY=VALUE
+        List of label KEY=VALUE pairs to add.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

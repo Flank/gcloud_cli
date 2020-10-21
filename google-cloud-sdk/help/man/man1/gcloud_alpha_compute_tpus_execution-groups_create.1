@@ -11,7 +11,7 @@ gcloud alpha compute tpus execution\-groups create \- create Google Compute TPUs
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute tpus execution\-groups create\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="250GB"] [\fB\-\-dry\-run\fR] [\fB\-\-forward\-ports\fR] [\fB\-\-gce\-image\fR=\fIGCE_IMAGE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-1"] [\fB\-\-name\fR=\fINAME\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-preemptible\fR] [\fB\-\-preemptible\-vm\fR] [\fB\-\-tf\-version\fR=\fITF_VERSION\fR] [\fB\-\-use\-dl\-images\fR] [\fB\-\-vm\-only\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute tpus execution\-groups create\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="250GB"] [\fB\-\-dry\-run\fR] [\fB\-\-forward\-ports\fR] [\fB\-\-gce\-image\fR=\fIGCE_IMAGE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-1"] [\fB\-\-name\fR=\fINAME\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-preemptible\fR] [\fB\-\-preemptible\-vm\fR] [\fB\-\-tf\-version\fR=\fITF_VERSION\fR] [\fB\-\-tpu\-only\fR] [\fB\-\-use\-dl\-images\fR] [\fB\-\-vm\-only\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -84,6 +84,12 @@ terminate the instance at any time.
 \fB\-\-tf\-version\fR=\fITF_VERSION\fR
 Set the version of TensorFlow to use when creating the Compute Engine VM and the
 Cloud TPU. (It defaults to auto\-selecting the latest stable release.)
+
+.TP 2m
+\fB\-\-tpu\-only\fR
+Do not allocate a VM, only allocate a TPU. To be used after the command has been
+run with a \-\-vm\-only flag and the user is ready to run on a TPU. Ensure that
+the name matches the name passed in when creating with the \-\-vm\-only flag.
 
 .TP 2m
 \fB\-\-use\-dl\-images\fR

@@ -492,6 +492,42 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     duration = flags.ParseValidityFlag(args)
     self.assertEqual(duration, '315569261s')
 
+  def testParseIssuingOptionsDefaultsAllToTrueForEnterpriseTier(self):
+    flags.AddPublishCaCertFlag(self.parser)
+    flags.AddPublishCrlFlag(self.parser)
+    flags.AddTierFlag(self.parser)
+    args = self.parser.parse_args(['--tier=enterprise'])
+    issuing_options = flags.ParseIssuingOptions(args)
+    self.assertTrue(issuing_options.includeCaCertUrl)
+    self.assertTrue(issuing_options.includeCrlAccessUrl)
+
+  def testParseIssuingOptionsDefaultsPublishCrlToFalseForDevOpsTier(self):
+    flags.AddPublishCaCertFlag(self.parser)
+    flags.AddPublishCrlFlag(self.parser)
+    flags.AddTierFlag(self.parser)
+    args = self.parser.parse_args(['--tier=devops'])
+    issuing_options = flags.ParseIssuingOptions(args)
+    self.assertTrue(issuing_options.includeCaCertUrl)
+    self.assertFalse(issuing_options.includeCrlAccessUrl)
+
+  def testParseIssuingOptionsAcceptsExplicitPublishCrlForEnterpriseTier(self):
+    flags.AddPublishCaCertFlag(self.parser)
+    flags.AddPublishCrlFlag(self.parser)
+    flags.AddTierFlag(self.parser)
+    args = self.parser.parse_args(['--tier=enterprise', '--publish-crl'])
+    issuing_options = flags.ParseIssuingOptions(args)
+    self.assertTrue(issuing_options.includeCaCertUrl)
+    self.assertTrue(issuing_options.includeCrlAccessUrl)
+
+  def testParseIssuingOptionsRejectsExplicitPublishCrlForDevOpsTier(self):
+    flags.AddPublishCaCertFlag(self.parser)
+    flags.AddPublishCrlFlag(self.parser)
+    flags.AddTierFlag(self.parser)
+    args = self.parser.parse_args(['--tier=devops', '--publish-crl'])
+    with self.assertRaisesRegex(exceptions.InvalidArgumentException,
+                                '--publish-crl.*DevOps.*'):
+      flags.ParseIssuingOptions(args)
+
   def testParseIssuancePolicy(self):
     flags.AddCertificateAuthorityIssuancePolicyFlag(self.parser)
     policy_issuance_path = self.Resource('tests', 'unit', 'surface',
@@ -540,13 +576,13 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         resource_args.CreateKmsKeyVersionResourceSpec(),
         'KMS key version.'
     ).AddToParser(self.parser)
-    flags.AddKeyAlgorithmFlag(self.parser)
+    flags.AddKeyAlgorithmFlag(self.parser, default='rsa-pkcs1-3072-sha256')
     args = self.parser.parse_args([])
     key_spec = flags.ParseKeySpec(args)
     self.assertIsNone(key_spec.cloudKmsKeyVersion)
     self.assertEqual(key_spec.algorithm,
                      self.messages.KeyVersionSpec
-                     .AlgorithmValueValuesEnum.RSA_PSS_4096_SHA256)
+                     .AlgorithmValueValuesEnum.RSA_PKCS1_3072_SHA256)
 
 
 if __name__ == '__main__':

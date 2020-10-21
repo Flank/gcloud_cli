@@ -95,14 +95,14 @@ This flag accepts "\-" for stdin.
 .RS 2m
 .TP 2m
 \fB\-\-framework\fR=\fIFRAMEWORK\fR
-The ML framework used to train this version of the model. If not specified,
-defaults to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
+ML framework used to train this version of the model. If not specified, defaults
+to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
 \fBtensorflow\fR, \fBxgboost\fR.
 
 .TP 2m
 \fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
-The name of the signature defined in the SavedModel to use for this job.
-Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+Name of the signature defined in the SavedModel to use for this job. Defaults to
+DEFAULT_SERVING_SIGNATURE_DEF_KEY in
 https://www.tensorflow.org/api_docs/python/tf/compat/v1/saved_model/signature_constants,
 which is "serving_default". Only applies to TensorFlow models.
 

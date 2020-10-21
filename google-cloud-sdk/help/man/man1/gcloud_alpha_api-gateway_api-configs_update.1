@@ -1,0 +1,146 @@
+
+.TH "GCLOUD_ALPHA_API\-GATEWAY_API\-CONFIGS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha api\-gateway api\-configs update \- update an API Gateway API config
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha api\-gateway api\-configs update\fR (\fIAPI_CONFIG\fR\ :\ \fB\-\-api\fR=\fIAPI\fR) [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update an API Gateway API config.
+
+NOTE: Only the name and labels may be updated on an API config.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Api config resource \- Name for API Config which will be updated. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [api_config] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. To set the [location]
+attribute: provide the argument [api_config] on the command line with a fully
+specified name; Location for API and API Configs. Defaults to global. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fIAPI_CONFIG\fR
+ID of the api\-config or fully qualified identifier for the api\-config. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-api\fR=\fIAPI\fR
+API ID.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Human readable name which can optionally be supplied.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha api\-gateway api\-configs update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha api\-gateway api\-configs update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the display name of an API config, run:
+
+.RS 2m
+$ gcloud alpha api\-gateway api\-configs update my\-config \e
+    \-\-api=my\-api \-\-display\-name="New Display Name"
+.RE
+
+NOTE: Only the display name and labels attributes are mutable on an API config.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+allowlist. This variant is also available:
+
+.RS 2m
+$ gcloud beta api\-gateway api\-configs update
+.RE
+

@@ -66,19 +66,6 @@ summary:
   - stderr: |
       Created repository [my-repo].
 - execute:
-  - command: artifacts repositories create my-repo --project=my-project --repository-format=apt
-      --location=us-east1  --description="My apt repo"
-  - stderr: |+
-      Note: APT package support is in Alpha.
-
-  - stderr: |
-      Create request issued for: [my-repo]
-  - progress_tracker:
-    - message: Waiting for operation [$$operation$$] to complete
-    - status: SUCCESS
-  - stderr: |
-      Created repository [my-repo].
-- execute:
   - command: artifacts repositories create repo-with-labels --project=my-project --repository-format=docker
       --location=us-east1  --description="Testing labels" --labels=label1=value1,label2=value2
   - stderr: |
@@ -95,7 +82,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -112,7 +99,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
           method: POST
           headers: {}
           body:
@@ -128,7 +115,7 @@ actions:
               "done": false,
               "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
               "response": {
-                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
                 "name": "projects/my-project/locations/us-east1/repositories/my-repo",
                 "format": "MAVEN",
                 "description": "My test repo"
@@ -145,7 +132,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -162,7 +149,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
           method: POST
           headers: {}
           body:
@@ -178,7 +165,7 @@ actions:
               "done": false,
               "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
               "response": {
-                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
                 "name": "projects/my-project/locations/us-east1/repositories/my-repo",
                 "format": "MAVEN",
                 "description": "My test repo"
@@ -191,7 +178,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
           method: GET
           body: null
         return_response:
@@ -218,7 +205,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -232,7 +219,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
           method: POST
           headers: {}
           body:
@@ -248,7 +235,7 @@ actions:
               "done": false,
               "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
               "response": {
-                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
                 "name": "projects/my-project/locations/us-east1/repositories/my-repo",
                 "format": "DOCKER",
                 "description": "My cmek repo",
@@ -262,7 +249,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
           method: GET
           body: null
         return_response:
@@ -350,7 +337,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -364,7 +351,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
           method: POST
           headers: {}
           body:
@@ -380,7 +367,7 @@ actions:
               "done": false,
               "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
               "response": {
-                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
                 "name": "projects/my-project/locations/us-east1/repositories/my-repo",
                 "format": "DOCKER",
                 "description": "My cmek repo with service account already set up",
@@ -394,7 +381,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
           method: GET
           body: null
         return_response:
@@ -458,7 +445,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -475,7 +462,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
           method: POST
           headers: {}
           body:
@@ -491,7 +478,7 @@ actions:
               "done": false,
               "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
               "response": {
-                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
                 "name": "projects/my-project/locations/us-east1/repositories/my-repo",
                 "format": "APT",
                 "description": "My test repo"
@@ -504,7 +491,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
           method: GET
           body: null
         return_response:
@@ -531,7 +518,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -545,7 +532,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=repo-with-labels
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=repo-with-labels
           method: POST
           headers: {}
           body:
@@ -564,7 +551,7 @@ actions:
               "done": false,
               "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
               "response": {
-                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta2.Repository",
                 "name": "projects/my-project/locations/us-east1/repositories/repo-with-labels",
                 "format": "DOCKER",
                 "description": "Testing labels"
@@ -577,7 +564,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/repo-with-labels?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-east1/repositories/repo-with-labels?alt=json
           method: GET
           headers: {}
           body: null

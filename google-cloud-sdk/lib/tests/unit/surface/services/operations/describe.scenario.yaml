@@ -17,7 +17,7 @@ summary:
   - command: |
       services operations describe operations/abc.1233333333
   - error: |-
-      1: User [fake_account] does not have permission to access operation [abc.1233333333] (or it may not exist): The caller does not have permission
+      1: User [fake_account] does not have permission to access operations instance [abc.1233333333] (or it may not exist): The caller does not have permission
       - '@type': type.googleapis.com/google.rpc.DebugInfo
         detail: '[ORIGINAL ERROR] generic::permission_denied: Operation not found or permission
           denied.'
@@ -69,7 +69,7 @@ actions:
     - expect_exit:
         code: 1
         message: |-
-          User [fake_account] does not have permission to access operation [abc.1233333333] (or it may not exist): The caller does not have permission
+          User [fake_account] does not have permission to access operations instance [abc.1233333333] (or it may not exist): The caller does not have permission
           - '@type': type.googleapis.com/google.rpc.DebugInfo
             detail: '[ORIGINAL ERROR] generic::permission_denied: Operation not found or permission
               denied.'

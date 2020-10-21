@@ -1,6 +1,6 @@
 NAME
     gcloud alpha filestore instances restore - restore a Cloud Filestore
-        instance to a snapshot or backup
+        instance from a snapshot or backup
 
 SYNOPSIS
     gcloud alpha filestore instances restore (INSTANCE : --zone=ZONE)
@@ -12,7 +12,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Restore an existing Cloud Filestore instance to an existing
+    (ALPHA) Restore an existing Cloud Filestore instance from an existing
     snapshot or backup.
 
 POSITIONAL ARGUMENTS
@@ -34,7 +34,7 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --file-share=FILE_SHARE
-        File share destination of the restored snapshot.
+        File share to restore from the snapshot or backup.
 
      Exactly one of these must be specified:
 

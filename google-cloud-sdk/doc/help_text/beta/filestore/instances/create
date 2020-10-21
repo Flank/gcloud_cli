@@ -37,9 +37,9 @@ REQUIRED FLAGS
         capacity is required.
 
          capacity
-            The desired size of the volume in GB or TB units. If no size unit
-            is specified, GB is assumed. Acceptable instance sizes for each
-            tier are as follows:
+            The desired capacity of the volume in GB or TB units. If no
+            capacity unit is specified, GB is assumed. Acceptable instance
+            capacities for each tier are as follows:
             + BASIC_HDD: 1TB-63.9TB in 1GB increments or its multiples.
             + BASIC_SSD: 2.5TB-63.9TB in 1GB increments or its multiples.
             + HIGH_SCALE_SSD: 60TB-320TB in 10TB increments or its multiples.

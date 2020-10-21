@@ -431,7 +431,7 @@ actions:
                 includeCaCertUrl: true
                 includeCrlAccessUrl: true
               type: SUBORDINATE
-              lifetime: 315569261s
+              lifetime: 94670778s
         return_response:
           headers:
             cache-control: private

@@ -43,10 +43,8 @@ EXAMPLES
     'server-tls-1.csr':
 
         $ gcloud beta privateca subordinates get-csr server-tls-1 \
-            --location us > server-tls-1.csr
+            --location=us > server-tls-1.csr
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

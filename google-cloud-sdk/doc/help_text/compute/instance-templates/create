@@ -7,7 +7,8 @@ SYNOPSIS
         [--accelerator=[count=COUNT],[type=TYPE]] [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
-        [--can-ip-forward] [--configure-disk=[PROPERTY=VALUE,...]]
+        [--can-ip-forward] [--confidential-compute]
+        [--configure-disk=[PROPERTY=VALUE,...]]
         [--create-disk=[PROPERTY=VALUE,...]] [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],
           [boot=BOOT],[device-name=DEVICE-NAME],[mode=MODE],[name=NAME]]
@@ -96,6 +97,12 @@ FLAGS
      --can-ip-forward
         If provided, allows the instances to send and receive packets with
         non-matching destination or source IP addresses.
+
+     --confidential-compute
+        The instance will boot with Confidential Computing enabled.
+        Confidential Computing is based on Secure Encrypted Virtualization
+        (SEV), an AMD virtualization feature for running confidential
+        instances.
 
      --configure-disk=[PROPERTY=VALUE,...]
         This option has effect only when used with --source-instance. It allows

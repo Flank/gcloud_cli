@@ -65,7 +65,7 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To list all certificate map entries in the certificate map, run:
 
-        $ gcloud alpha certificate-manager maps entries list --map simple-map
+        $ gcloud alpha certificate-manager maps entries list --map=simple-map
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

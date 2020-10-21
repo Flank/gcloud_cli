@@ -495,8 +495,12 @@ def AddMemoryFlag(parser):
 def AddCpuFlag(parser):
   parser.add_argument(
       '--cpu',
-      help='Set a CPU limit in Kubernetes cpu units. '
-      'Ex: .5, 500m, 2.')
+      help='Set a CPU limit in Kubernetes cpu units.\n\n'
+      'Cloud Run (fully managed) supports values 1, 2 and 4.'
+      '  For Cloud Run (fully managed), 4 cpus also requires a minimum 2Gi'
+      '  `--memory` value.  Examples 2, 2.0, 2000m\n\n'
+      'Cloud Run for Anthos and Knative-compatible Kubernetes clusters support'
+      '  fractional values.  Examples .5, 500m, 2')
 
 
 def _ConcurrencyValue(value):
@@ -593,10 +597,11 @@ def AddEgressSettingsFlag(parser):
       ' for this Service. This Service must have a VPC connector to set'
       ' VPC egress.',
       choices={
-          'private-ranges-only':
+          revision.EGRESS_SETTINGS_PRIVATE_RANGES_ONLY:
               'Default option. Sends outbound traffic to private IP addresses '
               'defined by RFC1918 through the VPC connector.',
-          'all': 'Sends all outbound traffic through the VPC connector.'
+          revision.EGRESS_SETTINGS_ALL:
+              'Sends all outbound traffic through the VPC connector.'
       })
 
 
@@ -1080,12 +1085,13 @@ def GetConfigurationChanges(args):
     changes.append(config_changes.RevisionNameChanges(args.revision_suffix))
   if 'vpc_connector' in args and args.vpc_connector:
     changes.append(config_changes.VpcConnectorChange(args.vpc_connector))
-  if 'clear_vpc_connector' in args and args.clear_vpc_connector:
-    changes.append(config_changes.ClearVpcConnectorChange())
   if FlagIsExplicitlySet(args, 'vpc_egress'):
     changes.append(
         config_changes.SetTemplateAnnotationChange(
             revision.EGRESS_SETTINGS_ANNOTATION, args.vpc_egress))
+  if 'clear_vpc_connector' in args and args.clear_vpc_connector:
+    # MUST be after 'vpc_egress' change.
+    changes.append(config_changes.ClearVpcConnectorChange())
   if 'connectivity' in args and args.connectivity:
     if args.connectivity == 'internal':
       changes.append(config_changes.EndpointVisibilityChange(True))
@@ -1359,18 +1365,20 @@ def VerifyOnePlatformFlags(args, release_track, product):
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_KUBERNETES]))
 
   if (FlagIsExplicitlySet(args, 'min_instances') and
-      release_track != base.ReleaseTrack.ALPHA):
+      release_track == base.ReleaseTrack.GA):
     raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--min-instances',
-            platform=PLATFORM_KUBERNETES,
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_KUBERNETES]))
+        'The `--min-instances` flag is not supported in the GA release track '
+        'on the fully managed version of Cloud Run. Use `gcloud beta` to set'
+        ' `--min-instances` on Cloud Run (fully managed). Alternatively, '
+        'specify `--platform kubernetes` or run `gcloud config set run/platform'
+        ' kubernetes` to work with Cloud Run for Anthos deployed on VMware.')
 
   if (FlagIsExplicitlySet(args, 'timeout') and
       release_track == base.ReleaseTrack.GA):
     if args.timeout > _FIFTEEN_MINUTES:
       raise serverless_exceptions.ConfigurationError(
-          'Timeout duration must be less than 15m.')
+          'Timeout duration must be less than 15m. Timeouts above 15m are in '
+          'Beta. Use "gcloud beta run ..." to set timeouts above 15m.')
 
   if FlagIsExplicitlySet(args, 'trigger_filters'):
     raise serverless_exceptions.ConfigurationError(

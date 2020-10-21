@@ -38,7 +38,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo:getIamPolicy?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo:getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -65,7 +65,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -78,7 +78,7 @@ actions:
               locationId: us
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo:setIamPolicy?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo:setIamPolicy?alt=json
           method: POST
           body:
             json:
@@ -123,7 +123,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo:getIamPolicy?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo:getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -150,7 +150,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -163,7 +163,7 @@ actions:
               locationId: us
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo:setIamPolicy?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us/repositories/my-repo:setIamPolicy?alt=json
           method: POST
           body:
             json:

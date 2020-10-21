@@ -288,7 +288,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1beta1/projects/foo/locations/europe-west1/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=100
+          uri: https://privateca.googleapis.com/v1beta1/projects/foo/locations/europe-west1/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=1
           method: GET
           body: null
         return_response:

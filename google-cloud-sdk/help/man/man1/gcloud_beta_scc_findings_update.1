@@ -85,14 +85,15 @@ State is one of: [ACTIVE, INACTIVE]. \fISTATE\fR must be one of: \fBactive\fR,
 Optional: If left unspecified (default), an update\-mask is automatically
 created using the flags specified in the command and only those values are
 updated. For example: \-\-external\-uri='<some\-uri>'
-\-\-event\-time='<some\-time>' would automatically generate \-\-update\-mask
-\'external_uri,event_time'. Note that as a result, only external\-uri and
-event\-time are updated for the given finding and everything else remains
-untouched. If you want to delete attributes/properties (that are not being
-changed in the update command) use an empty update\-mask (''). That will delete
-all the mutable properties/attributes that aren't specified as flags in the
-update command. In the above example it would delete source\-properties. State
-can be toggled from ACTIVE to INACTIVE and vice\-versa but it cannot be deleted.
+\-\-event\-time='<some\-time>' would automatically generate
+\-\-update\-mask='external_uri,event_time'. Note that as a result, only
+external\-uri and event\-time are updated for the given finding and everything
+else remains untouched. If you want to delete attributes/properties (that are
+not being changed in the update command) use an empty update\-mask (''). That
+will delete all the mutable properties/attributes that aren't specified as flags
+in the update command. In the above example it would delete source\-properties.
+State can be toggled from ACTIVE to INACTIVE and vice\-versa but it cannot be
+deleted.
 
 
 .RE
@@ -123,7 +124,7 @@ Update my\-finding's state from ACTIVE to INACTIVE:
 
 .RS 2m
 $ gcloud beta scc findings update my\-finding \-\-organization=123456 \e
-    \-\-source=5678 \-\-state INACTIVE
+    \-\-source=5678 \-\-state=INACTIVE
 .RE
 
 Override all source properties on my\-finding:
@@ -131,7 +132,7 @@ Override all source properties on my\-finding:
 .RS 2m
 $ gcloud beta scc findings update my\-finding \-\-organization=123456 \e
     \-\-source=5678 \e
-    \-\-source\-properties "propKey1=propVal1,propKey2=propVal2"
+    \-\-source\-properties="propKey1=propVal1,propKey2=propVal2"
 .RE
 
 Selectively update a specific source property on my\-finding:
@@ -139,8 +140,8 @@ Selectively update a specific source property on my\-finding:
 .RS 2m
 $ gcloud beta scc findings update my\-finding \-\-organization=123456 \e
     \-\-source=5678 \e
-    \-\-source\-properties "propKey1=propVal1,propKey2=propVal2" \e
-    \-\-update\-mask "source_properties.propKey1"
+    \-\-source\-properties="propKey1=propVal1,propKey2=propVal2" \e
+    \-\-update\-mask="source_properties.propKey1"
 .RE
 
 

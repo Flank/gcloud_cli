@@ -3,7 +3,7 @@ NAME
         private service connections
 
 SYNOPSIS
-    gcloud beta services peered-dns-domains [GCLOUD_WIDE_FLAG ...]
+    gcloud beta services peered-dns-domains COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Peered DNS domains for various private service connections.
@@ -15,6 +15,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a peered DNS domain for a private service connection.
+
+     delete
+        (BETA) Delete a peered DNS domain for a private service connection.
+
+     list
+        (BETA) List the peered DNS domains for a private service connection.
 
 NOTES
     This command is currently in BETA and may change without notice. These

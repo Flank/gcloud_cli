@@ -50,11 +50,14 @@ class LsTestAlpha(cli_test_base.CliTestBase):
     self.stdout_seek_position = 0
 
   def test_ls_filesystem_error(self):
-    with self.assertRaises(ValueError):
+    with self.assertRaisesRegex(
+        errors.InvalidUrlError,
+        'Ls only works for cloud URLs. Error for: file://hi.png'):
       self.Run('storage ls file://hi.png')
 
   def test_ls_cloud_provider_error(self):
-    with self.assertRaises(errors.InvalidUrlError):
+    with self.assertRaisesRegex(
+        errors.InvalidUrlError, 'Unrecognized scheme "ninjacloud"'):
       self.Run('storage ls ninjacloud://hi.png')
 
 

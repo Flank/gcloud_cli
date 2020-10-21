@@ -11,7 +11,7 @@ gcloud alpha compute instant\-snapshots create \- create Compute Engine instant 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instant\-snapshots create\fR \fIINSTANT_SNAPSHOT_NAME\fR [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ :\ \fB\-\-source\-disk\-region\fR=\fISOURCE_DISK_REGION\fR\ |\ \fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instant\-snapshots create\fR \fIINSTANT_SNAPSHOT_NAME\fR \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -35,6 +35,17 @@ Name of the instant snapshot to create.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+
+Source disk options
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR
+Source disk used to create the instant snapshot.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
@@ -104,80 +115,7 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
-.RE
-.sp
-.TP 2m
 
-Source disk options
-
-.RS 2m
-.TP 2m
-\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR
-Source disk used to create the instant snapshot. This flag must be specified if
-any of the other arguments in this group are specified.
-
-.TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-source\-disk\-region\fR=\fISOURCE_DISK_REGION\fR
-Region of the source disk to operate on. If not specified, you may be prompted
-to select a region.
-
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/region\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/region REGION
-.RE
-
-A list of regions can be fetched by running:
-
-.RS 2m
-$ gcloud compute regions list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/region
-.RE
-
-Alternatively, the region can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
-
-.TP 2m
-\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR
-Zone of the source disk to operate on. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
-zone.
-
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/zone ZONE
-.RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
-
-
-.RE
 .RE
 .RE
 .sp

@@ -29,6 +29,8 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
+from oauthlib.oauth2.rfc6749 import errors as rfc6749_errors
+from requests import exceptions as requests_exceptions
 import six
 
 
@@ -212,6 +214,36 @@ class GoogleAuthFlowTest(cli_test_base.CliTestBase):
     run_console_mock.assert_called()
     run_local_server_mock.assert_called()
     self.AssertErrContains('Defaulting to URL copy/paste mode.')
+
+  def testOauth2FlowErrorHandler_ConnectionError(self):
+    run_console_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                             'run_console')
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    run_console_mock.side_effect = requests_exceptions.ConnectionError('error')
+    with self.AssertRaisesExceptionMatches(flow.AuthRequestFailedError,
+                                           'Could not reach the login server.'):
+      flow.RunGoogleAuthFlow(google_auth_flow, launch_browser=False)
+
+  def testOauth2FlowErrorHandler_AccessDeniedError(self):
+    run_console_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                             'run_console')
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    run_console_mock.side_effect = rfc6749_errors.AccessDeniedError('error')
+    with self.AssertRaisesExceptionMatches(flow.AuthRequestRejectedError,
+                                           'error'):
+      flow.RunGoogleAuthFlow(google_auth_flow, launch_browser=False)
+
+  def testOauth2FlowErrorHandler_ValueError(self):
+    run_console_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                             'run_console')
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    run_console_mock.side_effect = ValueError('error')
+    with self.AssertRaisesExceptionMatches(flow.AuthRequestFailedError,
+                                           'error'):
+      flow.RunGoogleAuthFlow(google_auth_flow, launch_browser=False)
 
 
 class LocalSeverCreationTest(cli_test_base.CliTestBase):

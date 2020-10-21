@@ -92,7 +92,9 @@ The analysis options.
 .TP 2m
 \fB\-\-analyze\-service\-account\-impersonation\fR
 If true, the response will include access analysis from identities to resources
-via service account impersonation. Default is false.
+via service account impersonation. This is a very expensive operation, because
+many derived queries will be executed. We highly recommend you use
+AnalyzeIamPolicyLongrunning rpc instead. Default is false.
 
 .TP 2m
 \fB\-\-expand\-groups\fR

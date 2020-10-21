@@ -25,7 +25,7 @@ from googlecloudsdk.command_lib.domains import util
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class GetRegisterParameters(base.DescribeCommand):
   """Get register parameters (including availability) of a specific domain.
 
@@ -52,7 +52,8 @@ class GetRegisterParameters(base.DescribeCommand):
 
   def Run(self, args):
     """Run the get register parameters command."""
-    client = registrations.RegistrationsClient()
+    api_version = registrations.GetApiVersionFromArgs(args)
+    client = registrations.RegistrationsClient(api_version)
 
     location_ref = args.CONCEPTS.location.Parse()
 

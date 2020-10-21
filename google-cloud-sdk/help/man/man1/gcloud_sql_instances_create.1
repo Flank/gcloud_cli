@@ -11,7 +11,7 @@ gcloud sql instances create \- creates a new Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-collation\fR=\fICOLLATION\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-disk\-encryption\-key\fR=\fIDISK_ENCRYPTION_KEY\fR\ :\ \fB\-\-disk\-encryption\-key\-keyring\fR=\fIDISK_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-disk\-encryption\-key\-location\fR=\fIDISK_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-disk\-encryption\-key\-project\fR=\fIDISK_ENCRYPTION_KEY_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-collation\fR=\fICOLLATION\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-deny\-maintenance\-period\-end\-date\fR=\fIDENY_MAINTENANCE_PERIOD_END_DATE\fR] [\fB\-\-deny\-maintenance\-period\-start\-date\fR=\fIDENY_MAINTENANCE_PERIOD_START_DATE\fR] [\fB\-\-deny\-maintenance\-period\-time\fR=\fIDENY_MAINTENANCE_PERIOD_TIME\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-enable\-point\-in\-time\-recovery\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-disk\-encryption\-key\fR=\fIDISK_ENCRYPTION_KEY\fR\ :\ \fB\-\-disk\-encryption\-key\-keyring\fR=\fIDISK_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-disk\-encryption\-key\-location\fR=\fIDISK_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-disk\-encryption\-key\-project\fR=\fIDISK_ENCRYPTION_KEY_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -120,6 +120,18 @@ be used. \fIDATABASE_VERSION\fR must be one of: \fBMYSQL_5_6\fR,
 \fBPOSTGRES_11\fR, \fBPOSTGRES_12\fR, \fBSQLSERVER_2017_EXPRESS\fR,
 \fBSQLSERVER_2017_WEB\fR, \fBSQLSERVER_2017_STANDARD\fR,
 \fBSQLSERVER_2017_ENTERPRISE\fR.
+
+.TP 2m
+\fB\-\-deny\-maintenance\-period\-end\-date\fR=\fIDENY_MAINTENANCE_PERIOD_END_DATE\fR
+Date when the deny maintenance period ends, that is ``2021\-01\-10".
+
+.TP 2m
+\fB\-\-deny\-maintenance\-period\-start\-date\fR=\fIDENY_MAINTENANCE_PERIOD_START_DATE\fR
+Date when the deny maintenance period begins, that is ``2020\-11\-01".
+
+.TP 2m
+\fB\-\-deny\-maintenance\-period\-time\fR=\fIDENY_MAINTENANCE_PERIOD_TIME\fR
+Time when the deny maintenance period starts or ends, that is ``05:00:00".
 
 .TP 2m
 \fB\-\-enable\-bin\-log\fR

@@ -37,8 +37,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 API REFERENCE
-    This command uses the managedidentities/v1 API. The full documentation for
-    this API can be found at: https://cloud.google.com/managed-microsoft-ad/
+    This command uses the managedidentities/v1alpha1 API. The full
+    documentation for this API can be found at:
+    https://cloud.google.com/managed-microsoft-ad/
 
 EXAMPLES
     The following command prints metadata for an AD domain with the name

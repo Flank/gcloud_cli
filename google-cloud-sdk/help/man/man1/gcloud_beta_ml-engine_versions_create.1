@@ -63,9 +63,10 @@ The type of the accelerator. Choices are 'nvidia\-tesla\-a100',
 
 .TP 2m
 \fBcount\fR
-The number of accelerators to attach to each machine running the job. This is
-usually 1; scaling parameters are configured using \f5manualScaling\fR or
-\f5autoScaling\fR flags.
+The number of accelerators to attach to each machine running the job. If not
+specified, the default value is 1. Your model must be specially designed to
+accommodate more than 1 accelerator per machine. To configure how many replicas
+your model has, set the \f5manualScaling\fR or \f5autoScaling\fR parameters.
 
 .RE
 .sp
@@ -107,7 +108,7 @@ arguments, the command\-line arguments override the configuration file.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-The description of the version.
+Description of the version.
 
 .TP 2m
 \fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR
@@ -121,8 +122,8 @@ sampled\-shapley: Use Sampled Shapley. xrai: Use XRAI.
 
 .TP 2m
 \fB\-\-framework\fR=\fIFRAMEWORK\fR
-The ML framework used to train this version of the model. If not specified,
-defaults to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
+ML framework used to train this version of the model. If not specified, defaults
+to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
 \fBtensorflow\fR, \fBxgboost\fR.
 
 .TP 2m
@@ -275,8 +276,8 @@ Python packages to use.
 
 .TP 2m
 \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR
-The fully\-qualified name of the custom prediction class in the package provided
-for custom prediction.
+Fully\-qualified name of the custom prediction class in the package provided for
+custom prediction.
 
 For example, \f5\-\-prediction\-class=my_package.SequenceModel\fR.
 

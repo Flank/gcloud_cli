@@ -1,5 +1,5 @@
 title: pubsub lite-subscriptions update scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # Do not specify any update fields to update. Expect an error.

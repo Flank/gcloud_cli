@@ -136,6 +136,9 @@ COMMANDS
      set-machine-type
         (BETA) Set machine type for Compute Engine virtual machines.
 
+     set-name
+        (BETA) Set the name of a Compute Engine virtual machine.
+
      set-scheduling
         (BETA) Set scheduling options for Compute Engine virtual machines.
 

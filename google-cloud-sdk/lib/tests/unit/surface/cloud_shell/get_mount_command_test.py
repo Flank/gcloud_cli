@@ -50,31 +50,5 @@ class GetMountCommandTest(cli_test_base.CliTestBase,
         return_value=util.ConnectionInfo(
             ssh_env=None, user=user, host=host, port=port, key=key))
 
-  @test_case.Filters.DoNotRunOnWindows
-  def testNotWindows(self):
-    self.mockConnection(
-        user="my-user", host="my-host", port=123, key="/key/path")
-    self.Run("alpha cloud-shell get-mount-command myMountDir")
-    self.AssertOutputContains(
-        "sshfs my-user@my-host: myMountDir -p 123 -oIdentityFile=/key/path "
-        "-oStrictHostKeyChecking=no"
-    )
-
-  @test_case.Filters.RunOnlyOnWindows
-  def testWindows(self):
-    with self.assertRaises(util.UnsupportedPlatform):
-      self.Run("alpha cloud-shell get-mount-command myMountDir")
-
-  def mockConnection(self,
-                     user="some-user",
-                     host="some-host",
-                     port=6000,
-                     key=None):
-    self.StartPatch(
-        "googlecloudsdk.command_lib.cloud_shell.util.PrepareEnvironment",
-        return_value=util.ConnectionInfo(
-            ssh_env=None, user=user, host=host, port=port, key=key))
-
-
 if __name__ == "__main__":
   test_case.main()

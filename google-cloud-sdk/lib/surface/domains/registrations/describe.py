@@ -24,7 +24,7 @@ from googlecloudsdk.command_lib.domains import resource_args
 from googlecloudsdk.command_lib.domains import util
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Describe an existing Cloud Domains registration.
 
@@ -42,6 +42,7 @@ class Describe(base.DescribeCommand):
     resource_args.AddRegistrationResourceArg(parser, 'to describe')
 
   def Run(self, args):
-    client = registrations.RegistrationsClient()
+    api_version = registrations.GetApiVersionFromArgs(args)
+    client = registrations.RegistrationsClient(api_version)
     args.registration = util.NormalizeResourceName(args.registration)
     return client.Get(args.CONCEPTS.registration.Parse())

@@ -472,6 +472,11 @@ Specifies that Cloud Dataflow workers must not use public IP addresses.
 
 
 .TP 2m
+\fBenable_streaming_engine\fR
+Specifies that enabling Streaming Engine for the job.
+
+
+.TP 2m
 \fBprint_only\fR
 Prints the container spec to stdout. Does not save in Google Cloud Storage.
 
@@ -513,6 +518,20 @@ Engine zones inside the region.
 \fBglob_imports\fR
 Enable import path globbing. Uses glob patterns to match multiple imports in a
 config file.
+
+
+.RE
+.sp
+.TP 2m
+\fIeventarc\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+The default location to use when working with Eventarc resources. This should be
+either \f5\fIglobal\fR\fR or one of the supported regions. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value, if set.
 
 
 .RE

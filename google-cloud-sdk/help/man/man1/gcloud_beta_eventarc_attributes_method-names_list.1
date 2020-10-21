@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_BETA_EVENTARC_ATTRIBUTES_METHOD\-NAMES_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta eventarc attributes method\-names list \- list values for the methodName CloudEvents attribute
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta eventarc attributes method\-names list\fR \fB\-\-service\-name\fR=\fISERVICE_NAME\fR \fB\-\-type\fR=\fITYPE\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR List values for the methodName CloudEvents attribute.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-service\-name\fR=\fISERVICE_NAME\fR
+The value of the serviceName CloudEvents attribute.
+
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR
+The event type.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list methodName values for event type
+\f5\fIgoogle.cloud.audit.log.v1.written\fR\fR and serviceName
+\f5\fIstorage.googleapis.com\fR\fR, run:
+
+.RS 2m
+$ gcloud beta eventarc attributes method\-names list \e
+     \-\-type=google.cloud.audit.log.v1.written \e
+     \-\-service\-name=storage.googleapis.com
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

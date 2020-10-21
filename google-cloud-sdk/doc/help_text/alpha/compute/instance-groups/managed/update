@@ -7,6 +7,7 @@ SYNOPSIS
         [--instance-redistribution-type=TYPE]
         [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
         [--stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]]
+        [--target-distribution-shape=SHAPE]
         [--clear-autohealing
           | --initial-delay=INITIAL_DELAY --health-check=HEALTH_CHECK
           | --http-health-check=HTTP_HEALTH_CHECK
@@ -85,6 +86,27 @@ FLAGS
             given instance is permanently deleted from the instance group; for
             example when the group is resized down). If omitted, never is used
             as the default.
+
+     --target-distribution-shape=SHAPE
+        Specifies how a regional managed instance group distributes its
+        instances across zones within the region.
+
+        The following target shape are available:
+
+        * EVEN ‒ The group schedules VM instance creation and deletion in a
+          way that maintains an even number of managed instances across the
+          selected zones. Recommended for highly available serving workloads.
+        * BALANCED ‒ The group prioritizes acquisition of resources -
+          scheduling VMs in zones where resources are available - while
+          distributing VMs as evenly as possible across selected zones to
+          minimize the impact of zone-level failure. Recommended for highly
+          available serving or batch workloads that do not require autoscaling.
+        * ANY ‒ The group picks zones for creating VM instances to fulfill
+          the requested number of VMs within present capacity constraints.
+          Recommended for batch workloads that do not require high
+          availability.
+
+    SHAPE must be one of: EVEN, ANY, BALANCED.
 
      At most one of these may be specified:
 

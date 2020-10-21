@@ -32,16 +32,6 @@ class ServiceTest(test_case.TestCase):
             }
         }).url, "https://service.example.com")
 
-  def testLastModifier(self):
-    self.assertEqual(
-        service.Service({
-            "metadata": {
-                "annotations": {
-                    "serving.knative.dev/lastModifier": "foo@example.com"
-                }
-            }
-        }).last_modifier, "foo@example.com")
-
   def testSpecTraffic(self):
     spec_traffic = service.Service({
         "spec": {
@@ -104,7 +94,7 @@ class ServiceTest(test_case.TestCase):
                 "latestReadyRevisionName": "rev2",
                 "conditions": [{
                     "type": "Ready",
-                    "status": False
+                    "status": "False"
                 }]
             }
         }).ReadySymbolAndColor(), ("!", "yellow"))

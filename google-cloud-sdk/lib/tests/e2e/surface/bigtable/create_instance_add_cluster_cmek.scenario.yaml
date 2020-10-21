@@ -1,19 +1,10 @@
-filters:
-  skipAlways:
-    reason: failing to create an instance
-    bug: b/163307210
-# TODO(b/153734534): After CMEK is enabled in prod infra bt, update this to point to prod anviltop.
 title: Test
 release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: config set api_endpoint_overrides/bigtableadmin https://test-bigtableadmin.sandbox.googleapis.com/
-  - stderr: |
-      Updated property [api_endpoint_overrides/bigtableadmin].
-- execute:
   - command: bigtable instances create $$auto-clean$$ --display-name="Test Instance Auto Cleanup"
-      --cluster-config id=$$test-cluster-us$$,zone=us-east1-c,kms-key=$$kms-key$$
+      --cluster-config id=$$test-cluster-1$$,zone=us-east1-b,kms-key=$$kms-key$$
   - progress_tracker:
     - message: Creating bigtable instance $$auto-clean$$
     - status: SUCCESS
@@ -25,29 +16,29 @@ summary:
       state: READY
       type: PRODUCTION
 - execute:
-  - command: bigtable clusters describe $$test-cluster-us$$ --instance $$auto-clean$$
+  - command: bigtable clusters describe $$test-cluster-1$$ --instance $$auto-clean$$
+  - stdout: |
+      defaultStorageType: SSD
+      encryptionConfig:
+        kmsKeyName: $$kms-key$$
+      location: projects/cloud-sdk-integration-testing/locations/us-east1-b
+      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-1$$
+      serveNodes: 1
+      state: READY
+- execute:
+  - command: bigtable clusters create $$test-cluster-2$$ --instance $$auto-clean$$
+      --num-nodes 1 --zone us-east1-c --kms-key=$$kms-key$$
+  - progress_tracker:
+    - message: Creating bigtable cluster $$test-cluster-2$$
+    - status: SUCCESS
+- execute:
+  - command: bigtable clusters describe $$test-cluster-2$$ --instance $$auto-clean$$
   - stdout: |
       defaultStorageType: SSD
       encryptionConfig:
         kmsKeyName: $$kms-key$$
       location: projects/cloud-sdk-integration-testing/locations/us-east1-c
-      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-us$$
-      serveNodes: 1
-      state: READY
-- execute:
-  - command: bigtable clusters create $$test-cluster-asia$$ --instance $$auto-clean$$
-      --num-nodes 1 --zone asia-east1-c --kms-key=$$kms-key$$
-  - progress_tracker:
-    - message: Creating bigtable cluster $$test-cluster-asia$$
-    - status: SUCCESS
-- execute:
-  - command: bigtable clusters describe $$test-cluster-asia$$ --instance $$auto-clean$$
-  - stdout: |
-      defaultStorageType: SSD
-      encryptionConfig:
-        kmsKeyName: $$kms-key$$
-      location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
-      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$
+      name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-2$$
       serveNodes: 1
       state: READY
 - execute:
@@ -64,27 +55,20 @@ actions:
     reference: auto-clean
     prefix: auto-clean
 - generate_resource_id:
-    reference: test-cluster-us
+    reference: test-cluster-1
     prefix: cluster
     requires_cleanup: false
 - generate_resource_id:
-    reference: test-cluster-asia
+    reference: test-cluster-2
     prefix: cluster
     requires_cleanup: false
 - execute_command:
-    command: config set api_endpoint_overrides/bigtableadmin https://test-bigtableadmin.sandbox.googleapis.com/
-    events:
-    - expect_stderr: |
-        Updated property [api_endpoint_overrides/bigtableadmin].
-    - expect_exit:
-        code: 0
-- execute_command:
     command: bigtable instances create $$auto-clean$$ --display-name="Test Instance Auto Cleanup"
-      --cluster-config id=$$test-cluster-us$$,zone=us-east1-c,kms-key=$$kms-key$$
+      --cluster-config id=$$test-cluster-1$$,zone=us-east1-b,kms-key=$$kms-key$$
     events:
     - api_call:
         expect_request:
-          uri: https://test-bigtableadmin.sandbox.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances?alt=json
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances?alt=json
           method: POST
           headers: {}
           body:
@@ -101,7 +85,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/locations/us-east1-c/operations/2916271117460969673
+            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/locations/us-east1-b/operations/2916271117460969673
             metadata:
               '@type': type.googleapis.com/google.bigtable.admin.v2.CreateInstanceMetadata
               originalRequest:
@@ -112,7 +96,7 @@ actions:
                   type: PRODUCTION
                 clusters:
                   cluster-20200508-155236-sh5g:
-                    location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+                    location: projects/cloud-sdk-integration-testing/locations/us-east1-b
                     serveNodes: 1
                     defaultStorageType: SSD
               requestTime: '2020-05-08T15:52:37.083738871Z'
@@ -124,7 +108,7 @@ actions:
             json: {}
     - api_call:
         expect_request:
-          uri: https://test-bigtableadmin.sandbox.googleapis.com/v2/$$operation$$?alt=json
+          uri: https://bigtableadmin.googleapis.com/v2/$$operation$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -135,7 +119,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/locations/us-east1-c/operations/2916271117460969673
+            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/locations/us-east1-b/operations/2916271117460969673
             metadata:
               '@type': type.googleapis.com/google.bigtable.admin.v2.CreateInstanceMetadata
               originalRequest:
@@ -146,7 +130,7 @@ actions:
                   type: PRODUCTION
                 clusters:
                   cluster-20200508-155236-sh5g:
-                    location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+                    location: projects/cloud-sdk-integration-testing/locations/us-east1-b
                     serveNodes: 1
                     defaultStorageType: SSD
               requestTime: '2020-05-08T15:52:37.083738871Z'
@@ -164,7 +148,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://test-bigtableadmin.sandbox.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$?alt=json
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -193,26 +177,26 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: bigtable clusters describe $$test-cluster-us$$ --instance $$auto-clean$$
+    command: bigtable clusters describe $$test-cluster-1$$ --instance $$auto-clean$$
     validation_only: true
     events:
     - expect_stdout: |
         defaultStorageType: SSD
         encryptionConfig:
           kmsKeyName: $$kms-key$$
-        location: projects/cloud-sdk-integration-testing/locations/us-east1-c
-        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-us$$
+        location: projects/cloud-sdk-integration-testing/locations/us-east1-b
+        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-1$$
         serveNodes: 1
         state: READY
     - expect_exit:
         code: 0
 - execute_command:
-    command: bigtable clusters create $$test-cluster-asia$$ --instance $$auto-clean$$
-      --num-nodes 1 --zone asia-east1-c --kms-key=$$kms-key$$
+    command: bigtable clusters create $$test-cluster-2$$ --instance $$auto-clean$$
+      --num-nodes 1 --zone us-east1-c --kms-key=$$kms-key$$
     events:
     - api_call:
         expect_request:
-          uri: https://test-bigtableadmin.sandbox.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters?alt=json&clusterId=$$test-cluster-asia$$
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters?alt=json&clusterId=$$test-cluster-2$$
           method: POST
           headers: {}
           body:
@@ -220,7 +204,7 @@ actions:
               defaultStorageType: STORAGE_TYPE_UNSPECIFIED
               encryptionConfig:
                 kmsKeyName: $$kms-key$$
-              location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+              location: projects/cloud-sdk-integration-testing/locations/us-east1-c
               serveNodes: 1
         return_response:
           headers:
@@ -229,14 +213,14 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/clusters/cluster-20200508-155236-y32y/locations/asia-east1-c/operations/4013532649853729622
+            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/clusters/cluster-20200508-155236-y32y/locations/us-east1-c/operations/4013532649853729622
             metadata:
               '@type': type.googleapis.com/google.bigtable.admin.v2.CreateClusterMetadata
               originalRequest:
                 parent: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$
-                clusterId: $$test-cluster-asia$$
+                clusterId: $$test-cluster-2$$
                 cluster:
-                  location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+                  location: projects/cloud-sdk-integration-testing/locations/us-east1-c
                   serveNodes: 1
                   defaultStorageType: SSD
                   encryptionConfig:
@@ -250,7 +234,7 @@ actions:
             json: {}
     - api_call:
         expect_request:
-          uri: https://test-bigtableadmin.sandbox.googleapis.com/v2/$$operation$$?alt=json
+          uri: https://bigtableadmin.googleapis.com/v2/$$operation$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -261,14 +245,14 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/clusters/cluster-20200508-155236-y32y/locations/asia-east1-c/operations/4013532649853729622
+            name: operations/projects/cloud-sdk-integration-testing/instances/auto-clean-20200508-155236-chvn/clusters/cluster-20200508-155236-y32y/locations/us-east1-c/operations/4013532649853729622
             metadata:
               '@type': type.googleapis.com/google.bigtable.admin.v2.CreateClusterMetadata
               originalRequest:
                 parent: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$
-                clusterId: $$test-cluster-asia$$
+                clusterId: $$test-cluster-2$$
                 cluster:
-                  location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+                  location: projects/cloud-sdk-integration-testing/locations/us-east1-c
                   serveNodes: 1
                   defaultStorageType: SSD
                   encryptionConfig:
@@ -278,8 +262,8 @@ actions:
             done: true
             response:
               '@type': type.googleapis.com/google.bigtable.admin.v2.Cluster
-              name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$
-              location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+              name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-2$$
+              location: projects/cloud-sdk-integration-testing/locations/us-east1-c
               state: READY
               serveNodes: 1
               defaultStorageType: SSD
@@ -287,11 +271,11 @@ actions:
                 kmsKeyName: $$kms-key$$
         repeatable: true
     - expect_progress_tracker:
-        message: Creating bigtable cluster $$test-cluster-asia$$
+        message: Creating bigtable cluster $$test-cluster-2$$
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://test-bigtableadmin.sandbox.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$?alt=json
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-2$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -302,8 +286,8 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$
-            location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
+            name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-2$$
+            location: projects/cloud-sdk-integration-testing/locations/us-east1-c
             state: READY
             serveNodes: 1
             defaultStorageType: SSD
@@ -312,15 +296,15 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: bigtable clusters describe $$test-cluster-asia$$ --instance $$auto-clean$$
+    command: bigtable clusters describe $$test-cluster-2$$ --instance $$auto-clean$$
     validation_only: true
     events:
     - expect_stdout: |
         defaultStorageType: SSD
         encryptionConfig:
           kmsKeyName: $$kms-key$$
-        location: projects/cloud-sdk-integration-testing/locations/asia-east1-c
-        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-asia$$
+        location: projects/cloud-sdk-integration-testing/locations/us-east1-c
+        name: projects/cloud-sdk-integration-testing/instances/$$auto-clean$$/clusters/$$test-cluster-2$$
         serveNodes: 1
         state: READY
     - expect_exit:

@@ -64,12 +64,13 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
   def testGetIamPolicyFolder_raisesFolderNotFoundError(self):
     self.SetupGetIamPolicyFailure(testbase.HTTP_404_ERR)
     self.AssertRaisesHttpExceptionMatches(
-        'Folder [BAD_ID] not found: Resource not found.', self.DoRequest)
+        'Folders instance [BAD_ID] not found: Resource not found.',
+        self.DoRequest)
 
   def testGetIamPolicyFolder_raisesFolderAccessError(self):
     self.SetupGetIamPolicyFailure(testbase.HTTP_403_ERR)
     self.AssertRaisesHttpExceptionMatches(
-        'User [{}] does not have permission to access folder [SECRET_ID] '
+        'User [{}] does not have permission to access folders instance [SECRET_ID] '
         '(or it may not exist): Permission denied.'.format(
             self.FakeAuthAccount()), self.DoRequest)
 

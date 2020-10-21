@@ -168,31 +168,31 @@ https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
 Group findings under organization 123456 across all sources by their category:
 
 .RS 2m
-$ gcloud alpha scc findings group 123456 \-\-group\-by "category"
+$ gcloud alpha scc findings group 123456 \-\-group\-by="category"
 .RE
 
 Group findings under organization 123456 and source 5678, by their category:
 
 .RS 2m
-$ gcloud alpha scc findings group 123456 \-\-source 5678 \e
-    \-\-group\-by "category"
+$ gcloud alpha scc findings group 123456 \-\-source=5678 \e
+    \-\-group\-by="category"
 .RE
 
 Group ACTIVE findings under organization 123456 and source 5678, by their
 category:
 
 .RS 2m
-$ gcloud alpha scc findings group 123456 \-\-source 5678 \e
-    \-\-group\-by "category" \-\-filter "state=\e"ACTIVE\e""
+$ gcloud alpha scc findings group 123456 \-\-source=5678 \e
+    \-\-group\-by="category" \-\-filter="state=\e"ACTIVE\e""
 .RE
 
 Group ACTIVE findings under organization 123456 and source 5678, on
 2019\-01\-01T01:00:00 GMT, by their category:
 
 .RS 2m
-$ gcloud alpha scc findings group 123456 \-\-source 5678 \e
-    \-\-group\-by "category" \e
-    \-\-filter "state=\e"ACTIVE\e"" \-\-read\-time "2019\-01\-01T01:00:00Z"
+$ gcloud alpha scc findings group 123456 \-\-source=5678 \e
+    \-\-group\-by="category" \e
+    \-\-filter="state=\e"ACTIVE\e"" \-\-read\-time="2019\-01\-01T01:00:00Z"
 .RE
 
 Group findings under organization 123456 and source 5678 into following 3
@@ -200,8 +200,8 @@ state_changes (ADDED/CHANGED/UNCHANGED) based on the activity during past 24
 hours:
 
 .RS 2m
-$ gcloud alpha scc findings group 123456 \-\-source 5678 \e
-    \-\-group\-by "state_change" \-\-compare\-duration 86400s
+$ gcloud alpha scc findings group 123456 \-\-source=5678 \e
+    \-\-group\-by="state_change" \-\-compare\-duration=86400s
 .RE
 
 

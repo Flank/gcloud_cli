@@ -226,7 +226,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
                  'my-project_cloudbuild?alt=json')))
 
     with self.AssertRaisesHttpExceptionMatches(
-        'Bucket [my-project_cloudbuild] is the subject of a conflict: '
+        'Buckets instance [my-project_cloudbuild] is the subject of a conflict: '
         'Resource already exists.'):
       self._Run([
           'builds', 'submit', '/bucket/object.zip',

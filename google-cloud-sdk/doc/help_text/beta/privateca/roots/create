@@ -12,7 +12,7 @@ SYNOPSIS
         [--uri-san=[URI_SAN,...]] [--validity=VALIDITY; default="P10Y"]
         [--from-ca=FROM_CA : --from-ca-location=FROM_CA_LOCATION
           --from-ca-project=FROM_CA_PROJECT]
-        [--key-algorithm=KEY_ALGORITHM; default="rsa-pss-4096-sha256"
+        [--key-algorithm=KEY_ALGORITHM; default="rsa-pkcs1-4096-sha256"
           | [--kms-key-version=KMS_KEY_VERSION : --kms-key=KMS_KEY
           --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]]
@@ -85,6 +85,8 @@ FLAGS
         Note that the same bucket may be used for the CA cert if
         --publish-ca-cert is set.
 
+        CRL publication is not supported for CAs in the DevOps tier.
+
         Enabled by default, use --no-publish-crl to disable.
 
      --subject=[SUBJECT,...]
@@ -121,11 +123,12 @@ FLAGS
      The key configuration used for the CA certificate. Defaults to a managed
      key if not specified. At most one of these may be specified:
 
-       --key-algorithm=KEY_ALGORITHM; default="rsa-pss-4096-sha256"
+       --key-algorithm=KEY_ALGORITHM; default="rsa-pkcs1-4096-sha256"
           The crypto algorithm to use for creating a managed KMS key for the
-          Certificate Authority. KEY_ALGORITHM must be one of: ec-p256-sha256,
-          ec-p384-sha384, rsa-pss-2048-sha256, rsa-pss-3078-sha256,
-          rsa-pss-4096-sha256.
+          Certificate Authority. The default is rsa-pkcs1-4096-sha256.
+          KEY_ALGORITHM must be one of: ec-p256-sha256, ec-p384-sha384,
+          rsa-pkcs1-2048-sha256, rsa-pkcs1-3072-sha256, rsa-pkcs1-4096-sha256,
+          rsa-pss-2048-sha256, rsa-pss-3078-sha256, rsa-pss-4096-sha256.
 
        Key version resource - An existing KMS key version to back this CA. The
        arguments in this group can be used to specify the attributes of this
@@ -198,42 +201,32 @@ EXAMPLES
     To create a root CA that supports one layer of subordinates:
 
         $ gcloud beta privateca roots create prod-root \
-          --kms-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-          \
-          --subject "CN=Joonix Production Root CA" \
-          --max-chain-length 1
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --subject="CN=Joonix Production Root CA" \
+          --max-chain-length=1
 
     To create a root CA and restrict what it can issue:
 
         $ gcloud beta privateca roots create prod-root \
-          --kms-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-          \
-          --subject "CN=Joonix Production Root CA" \
-          --issuance-policy policy.yaml
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --subject="CN=Joonix Production Root CA" \
+          --issuance-policy=policy.yaml
 
     To create a root CA that doesn't publicly publish CA certificate and CRLs:
 
         $ gcloud beta privateca roots create root-2 \
-          --kms-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-          \
-          --subject "CN=Joonix Production Root CA" \
-          --issuance-policy policy.yaml \
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --subject="CN=Joonix Production Root CA" \
+          --issuance-policy=policy.yaml \
           --no-publish-ca-cert \
           --no-publish-crl
 
     To create a root CA that is based on an existing CA:
 
         $ gcloud beta privateca roots create prod-root \
-          --kms-key-version \
-          "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1"
-          \
-          --from-ca source-root --from-ca-location us-central1
+          --kms-key-version="projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --from-ca=source-root --from-ca-location=us-central1
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

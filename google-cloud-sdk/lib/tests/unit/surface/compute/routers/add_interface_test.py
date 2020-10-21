@@ -28,6 +28,11 @@ from tests.lib.surface.compute import test_base
 
 class AddInterfaceTest(test_base.BaseTest):
 
+  def SetUp(self):
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
   def GetRouter(self):
     return self.messages.Router(
         name='my-router',
@@ -44,12 +49,14 @@ class AddInterfaceTest(test_base.BaseTest):
                 name='my-if', linkedVpnTunnel='', ipRange='10.0.0.1/24')
         ],
         region='us-central1',
-        network=('https://compute.googleapis.com/compute/v1/projects/my-project/'
+        network=('https://compute.googleapis.com/compute/' + self.api_version +
+                 '/projects/my-project/'
                  'global/networks/default'),
     )
 
   def ComposeLinkedVpnTunnel(self):
-    return ('https://compute.googleapis.com/compute/v1/projects/'
+    return ('https://compute.googleapis.com/compute/' + self.api_version +
+            '/projects/'
             'my-project/regions/us-central1/vpnTunnels/my-vpn')
 
   def testSimple(self):
@@ -248,6 +255,113 @@ class AddInterfaceWithAttachmentAlphaTest(AddInterfaceWithAttachmentTest):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
+
+  def testWithLinkedAttachmentAndVpn(self):
+    orig = self.GetRouter()
+    expected = copy.deepcopy(orig)
+
+    expected.interfaces.append(
+        self.messages.RouterInterface(
+            name='a-if',
+            linkedInterconnectAttachment=self.
+            composeLinkedInterconnectAttachment()))
+
+    self.make_requests.side_effect = iter([[orig]])
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --interconnect-attachment --interconnect-attachment-region: '
+        'Exactly one of '
+        '(--interconnect-attachment --interconnect-attachment-region | '
+        '--subnetwork --subnetwork-region | '
+        '--vpn-tunnel --vpn-tunnel-region) must be specified.'):
+      self.Run("""
+          compute routers add-interface my-router
+          --interconnect-attachment my-attachment
+          --vpn-tunnel my-vpn
+          --interface-name a-if --region us-central1
+          """)
+
+
+class AddInterfaceWithRouterApplianceAlpha(AddInterfaceTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def ComposeLinkedSubnetwork(self):
+    return ('https://compute.googleapis.com/compute/' + self.api_version +
+            '/projects/'
+            'my-project/regions/us-central1/subnetworks/my-subnetwork')
+
+  def testInterfaceWithLinkedSubnetwork(self):
+    orig = self.GetRouter()
+    expected = copy.deepcopy(orig)
+
+    expected.interfaces.append(
+        self.messages.RouterInterface(
+            name='a-if',
+            subnetwork=self.ComposeLinkedSubnetwork(),
+            privateIpAddress='10.10.0.0',
+            redundantInterface='a-if-redun'))
+
+    self.make_requests.side_effect = [[orig], []]
+
+    self.Run("""
+        compute routers add-interface my-router --subnetwork=my-subnetwork
+        --ip-address 10.10.0.0 --redundant-interface a-if-redun
+        --interface-name a-if --region us-central1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.routers, 'Get', self.messages.ComputeRoutersGetRequest(
+            router='my-router', region='us-central1', project='my-project'))],
+        [(self.compute.routers, 'Patch',
+          self.messages.ComputeRoutersPatchRequest(
+              router='my-router',
+              routerResource=expected,
+              region='us-central1',
+              project='my-project'))],
+    )
+
+  def testWithLinkedVpnAndSubnetwork(self):
+    orig = self.GetRouter()
+    expected = copy.deepcopy(orig)
+
+    expected.interfaces.append(
+        self.messages.RouterInterface(
+            name='a-if', subnetwork=self.ComposeLinkedSubnetwork()))
+
+    self.make_requests.side_effect = iter([[orig]])
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --subnetwork --subnetwork-region: '
+        'Exactly one of '
+        '(--interconnect-attachment --interconnect-attachment-region | '
+        '--subnetwork --subnetwork-region | '
+        '--vpn-tunnel --vpn-tunnel-region) must be specified.'):
+      self.Run("""
+          compute routers add-interface my-router
+          --subnetwork my-subnetwork
+          --vpn-tunnel my-vpn
+          --interface-name a-if --region us-central1
+          """)
+
+  def testSubnetworkInterfaceCannotSpecifyMaskLengh(self):
+    orig = self.GetRouter()
+    expected = copy.deepcopy(orig)
+
+    expected.interfaces.append(
+        self.messages.RouterInterface(
+            name='a-if', subnetwork=self.ComposeLinkedSubnetwork()))
+
+    self.make_requests.side_effect = iter([[orig]])
+    with self.assertRaises(parser_errors.ArgumentException):
+      self.Run("""
+          compute routers add-interface my-router
+          --subnetwork my-subnetwork
+          --ip-address 10.10.0.1
+          --mask-length 30
+          --interface-name a-if --region us-central1
+          """)
 
 
 if __name__ == '__main__':

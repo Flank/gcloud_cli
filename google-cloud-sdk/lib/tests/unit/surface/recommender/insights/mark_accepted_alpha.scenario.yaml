@@ -1,0 +1,227 @@
+title: Mark an insight as ACCEPTED
+release_tracks: [ALPHA]
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+- execute_command:
+    command: recommender insights mark-accepted my-insight --project=my-project --location=my-location
+      --insight-type=my-insight-type --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/my-project/locations/my-location/insightTypes/my-insight-type/insights/my-insight:markAccepted?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "projects/my-project/locations/my-location/insightTypes/my-insight-type/insights/my-insight",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "category": "SECURITY",
+              "content": {
+                "shadowingFirewalls": [
+                  "//compute.googleapis.com/projects/cloud-test/global/firewalls/deny-to-vm2"
+                ]
+              },
+              "description": "Test insight for my-project.",
+              "etag": "my-etag",
+              "insightSubtype": "SHADOWED_RULE",
+              "lastRefreshTime": "2019-09-04T17:33:46Z",
+              "name": "projects/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight",
+              "observationPeriod": "0s",
+              "stateInfo": {
+                "state": "ACCEPTED"
+              },
+              "targetResources": [
+                "//compute.googleapis.com/projects/cloud-test/global/firewalls/deny-to-vm2-shadowed"
+              ]
+            }
+    - expect_stdout: |
+        category: SECURITY
+        content:
+          shadowingFirewalls:
+          - //compute.googleapis.com/projects/cloud-test/global/firewalls/deny-to-vm2
+        description: Test insight for my-project.
+        etag: my-etag
+        insightSubtype: SHADOWED_RULE
+        lastRefreshTime: '2019-09-04T17:33:46Z'
+        name: projects/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight
+        observationPeriod: 0s
+        stateInfo:
+          state: ACCEPTED
+        targetResources:
+        - //compute.googleapis.com/projects/cloud-test/global/firewalls/deny-to-vm2-shadowed
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: recommender insights mark-accepted my-insight --billing-account=my-billing-account --location=my-location
+      --insight-type=my-insight-type --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/billingAccounts/my-billing-account/locations/my-location/insightTypes/my-insight-type/insights/my-insight:markAccepted?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "billingAccounts/my-billing-account/locations/my-location/insightTypes/my-insight-type/insights/my-insight",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "category": "SECURITY",
+              "content": {
+                "shadowingFirewalls": [
+                  "//compute.googleapis.com/billingAccounts/cloud-test/global/firewalls/deny-to-vm2"
+                ]
+              },
+              "description": "Test insight for my-billing-account.",
+              "etag": "my-etag",
+              "insightSubtype": "SHADOWED_RULE",
+              "lastRefreshTime": "2019-09-04T17:33:46Z",
+              "name": "billingAccounts/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight",
+              "observationPeriod": "0s",
+              "stateInfo": {
+                "state": "ACCEPTED"
+              },
+              "targetResources": [
+                "//compute.googleapis.com/billingAccounts/cloud-test/global/firewalls/deny-to-vm2-shadowed"
+              ]
+            }
+    - expect_stdout: |
+        category: SECURITY
+        content:
+          shadowingFirewalls:
+          - //compute.googleapis.com/billingAccounts/cloud-test/global/firewalls/deny-to-vm2
+        description: Test insight for my-billing-account.
+        etag: my-etag
+        insightSubtype: SHADOWED_RULE
+        lastRefreshTime: '2019-09-04T17:33:46Z'
+        name: billingAccounts/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight
+        observationPeriod: 0s
+        stateInfo:
+          state: ACCEPTED
+        targetResources:
+        - //compute.googleapis.com/billingAccounts/cloud-test/global/firewalls/deny-to-vm2-shadowed
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: recommender insights mark-accepted my-insight --folder=my-folder --location=my-location
+      --insight-type=my-insight-type --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/folders/my-folder/locations/my-location/insightTypes/my-insight-type/insights/my-insight:markAccepted?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "folders/my-folder/locations/my-location/insightTypes/my-insight-type/insights/my-insight",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "category": "SECURITY",
+              "content": {
+                "shadowingFirewalls": [
+                  "//compute.googleapis.com/folders/cloud-test/global/firewalls/deny-to-vm2"
+                ]
+              },
+              "description": "Test insight for my-folder.",
+              "etag": "my-etag",
+              "insightSubtype": "SHADOWED_RULE",
+              "lastRefreshTime": "2019-09-04T17:33:46Z",
+              "name": "folders/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight",
+              "observationPeriod": "0s",
+              "stateInfo": {
+                "state": "ACCEPTED"
+              },
+              "targetResources": [
+                "//compute.googleapis.com/folders/cloud-test/global/firewalls/deny-to-vm2-shadowed"
+              ]
+            }
+    - expect_stdout: |
+        category: SECURITY
+        content:
+          shadowingFirewalls:
+          - //compute.googleapis.com/folders/cloud-test/global/firewalls/deny-to-vm2
+        description: Test insight for my-folder.
+        etag: my-etag
+        insightSubtype: SHADOWED_RULE
+        lastRefreshTime: '2019-09-04T17:33:46Z'
+        name: folders/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight
+        observationPeriod: 0s
+        stateInfo:
+          state: ACCEPTED
+        targetResources:
+        - //compute.googleapis.com/folders/cloud-test/global/firewalls/deny-to-vm2-shadowed
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: recommender insights mark-accepted my-insight --organization=my-organization --location=my-location
+      --insight-type=my-insight-type --etag=my-etag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/$$api-version$$/organizations/my-organization/locations/my-location/insightTypes/my-insight-type/insights/my-insight:markAccepted?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "name": "organizations/my-organization/locations/my-location/insightTypes/my-insight-type/insights/my-insight",
+              "etag": "my-etag"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "category": "SECURITY",
+              "content": {
+                "shadowingFirewalls": [
+                  "//compute.googleapis.com/organizations/cloud-test/global/firewalls/deny-to-vm2"
+                ]
+              },
+              "description": "Test insight for my-organization.",
+              "etag": "my-etag",
+              "insightSubtype": "SHADOWED_RULE",
+              "lastRefreshTime": "2019-09-04T17:33:46Z",
+              "name": "organizations/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight",
+              "observationPeriod": "0s",
+              "stateInfo": {
+                "state": "ACCEPTED"
+              },
+              "targetResources": [
+                "//compute.googleapis.com/organizations/cloud-test/global/firewalls/deny-to-vm2-shadowed"
+              ]
+            }
+    - expect_stdout: |
+        category: SECURITY
+        content:
+          shadowingFirewalls:
+          - //compute.googleapis.com/organizations/cloud-test/global/firewalls/deny-to-vm2
+        description: Test insight for my-organization.
+        etag: my-etag
+        insightSubtype: SHADOWED_RULE
+        lastRefreshTime: '2019-09-04T17:33:46Z'
+        name: organizations/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight
+        observationPeriod: 0s
+        stateInfo:
+          state: ACCEPTED
+        targetResources:
+        - //compute.googleapis.com/organizations/cloud-test/global/firewalls/deny-to-vm2-shadowed
+    - expect_exit:
+        code: 0

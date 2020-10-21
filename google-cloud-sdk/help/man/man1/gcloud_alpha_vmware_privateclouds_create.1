@@ -17,7 +17,9 @@ gcloud alpha vmware privateclouds create \- create a VMware Engine private cloud
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a VMware Engine private cloud.
+\fB(ALPHA)\fR Create a VMware Engine private cloud. Private cloud creation is
+considered finished when the private cloud is in READY state. Check the progress
+of a private cloud using \f5gcloud alpha vmware privateclouds list\fR.
 
 
 
@@ -42,7 +44,7 @@ specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Location of the privatecloud or cluster.
+Region of the private cloud or cluster.
 
 
 .RE
@@ -54,17 +56,17 @@ Location of the privatecloud or cluster.
 .RS 2m
 .TP 2m
 \fB\-\-management\-ip\-range\fR=\fIMANAGEMENT_IP_RANGE\fR
-ip addresses range available to the privatecloud for management access, in
-address/mask format, e.g. 10.0.1.0/29
+IP address range available to the private cloud for management access, in
+address/mask format. For example, \f5\-\-management\-ip\-range=10.0.1.0/29\fR.
 
 .TP 2m
 \fB\-\-vpc\-network\fR=\fIVPC_NETWORK\fR
-Name of the virtual network for this privatecloud
+Name of the virtual network for this private cloud
 
 .TP 2m
 \fB\-\-workload\-ip\-range\fR=\fIWORKLOAD_IP_RANGE\fR
-ip addresses range available to the privatecloud in address/mask format, e.g.
-10.0.1.0/29
+IP address range available to the private cloud in address/mask format. For
+example, \f5\-\-workload\-ip\-range=10.0.1.0/29\fR.
 
 
 .RE
@@ -75,7 +77,7 @@ ip addresses range available to the privatecloud in address/mask format, e.g.
 .RS 2m
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-Text describing the privatecloud
+Text describing the private cloud
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]

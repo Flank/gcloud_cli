@@ -25,7 +25,7 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --model=MODEL
-          The model for the version.
+          Model for the version.
 
 FLAGS
      --config=YAML_FILE
@@ -57,7 +57,7 @@ FLAGS
         configuration file.
 
      --description=DESCRIPTION
-        The description of the version.
+        Description of the version.
 
      --region=REGION
         Google Cloud region of the regional endpoint to use for this command.

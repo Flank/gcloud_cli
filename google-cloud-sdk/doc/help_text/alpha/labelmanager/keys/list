@@ -56,7 +56,8 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To list all the LabelKeys under 'organizations/123', run:
 
-        $ gcloud alpha labelmanager keys list 'organizations/123'
+        $ gcloud alpha labelmanager keys list \
+        --label_parent='organizations/123'
 
 NOTES
     This command is an internal implementation detail and may change or

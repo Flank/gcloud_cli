@@ -69,7 +69,15 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
             'branch': 'my-branch',
             'buildNumber': '1234',
         },
-        test_special_entitlements=True)
+        test_special_entitlements=True,
+        other_files={
+            '/private/var/mobile/Media/myfile.txt': 'gs://sea/file1.txt',
+            'com.google:/Documents/myfile2.txt': 'r/file2.txt'
+        },
+        directories_to_pull=[
+            '/private/var/mobile/Media/outputdir',
+            'com.my.app:/Documents/outputdir'
+        ])
 
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('request-id-123')
@@ -100,6 +108,34 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     self.assertEqual(test.testsZip.gcsPath, 'gs://kfc/2018-02-24/ios-test.zip')
     self.assertEqual(test.xctestrun.gcsPath, 'gs://kfc/2018-02-24/myxctestrun')
     self.assertEqual(test.testSpecialEntitlements, True)
+
+    setup = spec.iosTestSetup
+    self.assertEqual(len(setup.pushFiles), 2)
+    self.assertIn(
+        TESTING_V1_MESSAGES.IosDeviceFile(
+            devicePath='/private/var/mobile/Media/myfile.txt',
+            bundleId=None,
+            content=TESTING_V1_MESSAGES.FileReference(
+                gcsPath='gs://kfc/2018-02-24/private/var/mobile/Media/myfile.txt'
+            )), setup.pushFiles)
+    self.assertIn(
+        TESTING_V1_MESSAGES.IosDeviceFile(
+            devicePath='/Documents/myfile2.txt',
+            bundleId='com.google',
+            content=TESTING_V1_MESSAGES.FileReference(
+                gcsPath='gs://kfc/2018-02-24/Documents/myfile2.txt')),
+        setup.pushFiles)
+    self.assertEqual(len(setup.pullDirectories), 2)
+    self.assertIn(
+        TESTING_V1_MESSAGES.IosDeviceFile(
+            devicePath='/private/var/mobile/Media/outputdir',
+            bundleId=None,
+            content=None), setup.pullDirectories)
+    self.assertIn(
+        TESTING_V1_MESSAGES.IosDeviceFile(
+            devicePath='/Documents/outputdir',
+            bundleId='com.my.app',
+            content=None), setup.pullDirectories)
 
     client_details = matrix.clientInfo.clientInfoDetails
     client_detail1 = TESTING_V1_MESSAGES.ClientInfoDetail(

@@ -6,10 +6,11 @@ summary:
 - execute:
   - command: |
       eventarc triggers list --location us-central1
-  - stdout: |
-      NAME                   DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  RECENTLY_MODIFIED
-      fake-auditlog-trigger  fake-service1                                  False
-      fake-pubsub-trigger    fake-service2            /fake/path            True
+  - stdout: |-
+      NAME                   TYPE                                           DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  ACTIVE
+      fake-auditlog-trigger  google.cloud.audit.log.v1.written              fake-service1                                  By ..:10:00
+      fake-pubsub-trigger    google.cloud.pubsub.topic.v1.messagePublished  fake-service2            /fake/path            Yes
+      $
 - execute:
   - command: |
       eventarc triggers list
@@ -22,10 +23,11 @@ summary:
 - execute:
   - command: |
       eventarc triggers list
-  - stdout: |
-      NAME                   DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  RECENTLY_MODIFIED
-      fake-auditlog-trigger  fake-service1                                  False
-      fake-pubsub-trigger    fake-service2            /fake/path            True
+  - stdout: |-
+      NAME                   TYPE                                           DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  ACTIVE
+      fake-auditlog-trigger  google.cloud.audit.log.v1.written              fake-service1                                  By ..:10:00
+      fake-pubsub-trigger    google.cloud.pubsub.topic.v1.messagePublished  fake-service2            /fake/path            Yes
+      $
 
 actions:
 - execute_command:
@@ -55,7 +57,7 @@ actions:
               - attribute: methodName
                 value: storage.buckets.create
               name: projects/fake-project/locations/us-central1/triggers/fake-auditlog-trigger
-              updateTime: '2000-01-01T00:00:00Z'
+              updateTime: '3000-01-01T00:00:00Z'
             - destination:
                 cloudRunService:
                   service: fake-service2
@@ -65,11 +67,12 @@ actions:
               - attribute: type
                 value: google.cloud.pubsub.topic.v1.messagePublished
               name: projects/fake-project/locations/us-central1/triggers/fake-pubsub-trigger
-              updateTime: '3000-01-01T00:00:00Z'
-    - expect_stdout: |
-        NAME                   DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  RECENTLY_MODIFIED
-        fake-auditlog-trigger  fake-service1                                  False
-        fake-pubsub-trigger    fake-service2            /fake/path            True
+              updateTime: '2000-01-01T00:00:00Z'
+    - expect_stdout:
+        matches: |
+          NAME                   TYPE                                           DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  ACTIVE
+          fake-auditlog-trigger  google.cloud.audit.log.v1.written              fake-service1                                  By ..:10:00
+          fake-pubsub-trigger    google.cloud.pubsub.topic.v1.messagePublished  fake-service2            /fake/path            Yes
     - expect_exit:
         code: 0
 
@@ -116,7 +119,7 @@ actions:
               - attribute: methodName
                 value: storage.buckets.create
               name: projects/fake-project/locations/us-central1/triggers/fake-auditlog-trigger
-              updateTime: '2000-01-01T00:00:00Z'
+              updateTime: '3000-01-01T00:00:00Z'
             - destination:
                 cloudRunService:
                   service: fake-service2
@@ -126,10 +129,11 @@ actions:
               - attribute: type
                 value: google.cloud.pubsub.topic.v1.messagePublished
               name: projects/fake-project/locations/us-central1/triggers/fake-pubsub-trigger
-              updateTime: '3000-01-01T00:00:00Z'
-    - expect_stdout: |
-        NAME                   DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  RECENTLY_MODIFIED
-        fake-auditlog-trigger  fake-service1                                  False
-        fake-pubsub-trigger    fake-service2            /fake/path            True
+              updateTime: '2000-01-01T00:00:00Z'
+    - expect_stdout:
+        matches: |
+          NAME                   TYPE                                           DESTINATION_RUN_SERVICE  DESTINATION_RUN_PATH  ACTIVE
+          fake-auditlog-trigger  google.cloud.audit.log.v1.written              fake-service1                                  By ..:10:00
+          fake-pubsub-trigger    google.cloud.pubsub.topic.v1.messagePublished  fake-service2            /fake/path            Yes
     - expect_exit:
         code: 0

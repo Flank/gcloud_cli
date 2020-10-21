@@ -1,0 +1,240 @@
+
+.TH "GCLOUD_BETA_DOMAINS_REGISTRATIONS_CONFIGURE_CONTACTS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta domains registrations configure contacts \- configure contact settings of a Cloud Domains registration
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta domains registrations configure contacts\fR \fIREGISTRATION\fR [\fB\-\-contact\-data\-from\-file\fR=\fICONTACT_DATA_FILE_NAME\fR] [\fB\-\-contact\-privacy\fR=\fICONTACT_PRIVACY\fR] [\fB\-\-validate\-only\fR] [\fB\-\-async\fR] [\fB\-\-notices\fR=[\fINOTICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Configure registration's contact settings: email, phone number,
+postal address and also contact privacy.
+
+In some cases such changes have to be confirmed through an email sent to the
+registrant before they take effect. In order to resend the email, execute this
+command again.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Registration resource \- The domain registration to configure contact settings
+for. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [registration] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. To set the [location] attribute: provide the argument
+[registration] on the command line with a fully specified name; location is
+always global. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREGISTRATION\fR
+ID of the registration or fully qualified identifier for the registration.
+
+
+.RE
+.RE
+.sp
+
+.SH "COMMONLY USED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-contact\-data\-from\-file\fR=\fICONTACT_DATA_FILE_NAME\fR
+A YAML file containing the contact data for the domain's three contacts:
+registrant, admin, and technical.
+
+The file can either specify a single set of contact data with label
+\'allContacts', or three separate sets of contact data with labels
+\'adminContact' and 'technicalContact'.
+
+If 'registrantContact', 'adminContact' or 'technicalContact' labels are used
+then only the specified contacts are updated.
+
+Each contact data must contain values for all required fields: email,
+phoneNumber and postalAddress in google.type.PostalAddress format.
+
+For more guidance on how to specify postalAddress, please see:
+https://support.google.com/business/answer/6397478
+
+Examples of file contents:
+
+.RS 2m
+allContacts:
+  email: 'example@example.com'
+  phoneNumber: '+1.8005550123'
+  postalAddress:
+    regionCode: 'US'
+    postalCode: '94043'
+    administrativeArea: 'CA'
+    locality: 'Mountain View'
+    addressLines: ['1600 Amphitheatre Pkwy']
+    recipients: ['Jane Doe']
+.RE
+
+.RS 2m
+adminContact:
+  email: 'admin@example.com'
+  phoneNumber: '+1.8005550123'
+  postalAddress:
+    regionCode: 'US'
+    postalCode: '94043'
+    administrativeArea: 'CA'
+    locality: 'Mountain View'
+    addressLines: ['1600 Amphitheatre Pkwy']
+    recipients: ['Admin Jane Doe']
+.RE
+
+.RS 2m
+registrantContact:
+  email: 'registrant@example.com'
+  phoneNumber: '+1.8005550123'
+  postalAddress:
+    regionCode: 'US'
+    postalCode: '94043'
+    administrativeArea: 'CA'
+    locality: 'Mountain View'
+    addressLines: ['1600 Amphitheatre Pkwy']
+    recipients: ['Registrant Jane Doe']
+adminContact:
+  email: 'admin@example.com'
+  phoneNumber: '+1.8005550123'
+  postalAddress:
+    regionCode: 'US'
+    postalCode: '94043'
+    administrativeArea: 'CA'
+    locality: 'Mountain View'
+    addressLines: ['1600 Amphitheatre Pkwy']
+    recipients: ['Admin Jane Doe']
+technicalContact:
+  email: 'technical@example.com'
+  phoneNumber: '+1.8005550123'
+  postalAddress:
+    regionCode: 'US'
+    postalCode: '94043'
+    administrativeArea: 'CA'
+    locality: 'Mountain View'
+    addressLines: ['1600 Amphitheatre Pkwy']
+    recipients: ['Technic Jane Doe']
+.RE
+
+.TP 2m
+\fB\-\-contact\-privacy\fR=\fICONTACT_PRIVACY\fR
+The contact privacy mode to use. Supported privacy modes depend on the domain.
+\fICONTACT_PRIVACY\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBprivate\-contact\-data\fR
+Your contact info won't be available to the public. To help protect your info
+and prevent spam, a third party provides alternate (proxy) contact info for your
+domain in the public directory at no extra cost. They will forward received
+messages to you.
+.TP 2m
+\fBpublic\-contact\-data\fR
+All the data from contact config is publicly available. To set this value, you
+must also pass the \-\-notices flag with value
+public\-contact\-data\-acknowledgement or agree to the notice interactively.
+.TP 2m
+\fBredacted\-contact\-data\fR
+Limited personal information will be available to the public. The actual
+information redacted depends on the domain. For more information see
+https://support.google.com/domains/answer/3251242.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-validate\-only\fR
+Don't actually configure contact settings of the registration. Only validate
+arguments.
+
+
+.RE
+.sp
+
+.SH "OTHER FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-notices\fR=[\fINOTICE\fR,...]
+Notices about special properties of contacts. \fINOTICE\fR must be (currently
+only one value is supported):
+
+.RS 2m
+.TP 2m
+\fBpublic\-contact\-data\-acknowledgement\fR
+By sending this notice you acknowledge that using public\-contact\-data contact
+privacy makes all the data from contact config publicly available.
+.RE
+.sp
+
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To start an interactive flow to configure contact settings for
+\f5\fIexample.com\fR\fR, run:
+
+.RS 2m
+$ gcloud beta domains registrations configure contacts example.com
+.RE
+
+To enable contact privacy for \f5\fIexample.com\fR\fR, run:
+
+.RS 2m
+$ gcloud beta domains registrations configure contacts example.com \e
+    \-\-contact\-privacy=private\-contact\-data
+.RE
+
+To change contact data for \f5\fIexample.com\fR\fR according to information from
+a YAML file \f5\fIcontacts.yaml\fR\fR, run:
+
+.RS 2m
+$ gcloud beta domains registrations configure contacts example.com \e
+    \-\-contact\-data\-from\-file=contacts.yaml
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha domains registrations configure contacts
+.RE
+

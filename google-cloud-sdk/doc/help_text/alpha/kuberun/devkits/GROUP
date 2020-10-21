@@ -20,6 +20,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     describe
+        (ALPHA) Describe a Development Kit.
+
      list
         (ALPHA) Lists available Development Kits.
 

@@ -278,6 +278,9 @@ AVAILABLE PROPERTIES
             Specifies that Cloud Dataflow workers must not use public IP
             addresses.
 
+         enable_streaming_engine
+            Specifies that enabling Streaming Engine for the job.
+
          print_only
             Prints the container spec to stdout. Does not save in Google Cloud
             Storage.
@@ -300,6 +303,13 @@ AVAILABLE PROPERTIES
          glob_imports
             Enable import path globbing. Uses glob patterns to match multiple
             imports in a config file.
+
+     eventarc
+         location
+            The default location to use when working with Eventarc resources.
+            This should be either global or one of the supported regions. When
+            a --location flag is required but not provided, the command will
+            fall back to this value, if set.
 
      filestore
          location

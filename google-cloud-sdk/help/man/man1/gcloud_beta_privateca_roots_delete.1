@@ -1,0 +1,106 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_ROOTS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca roots delete \- schedule a root certificate authority for deletion
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca roots delete\fR (\fICERTIFICATE_AUTHORITY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Schedule a root certificate authority for deletion in 30 days.
+
+Note that any user\-managed KMS keys or Google Cloud Storage buckets will not be
+affected by this operation. You will need to delete the user\- managed resources
+separately once the CA is deleted. Any Google\-managed resources will be cleaned
+up.
+
+The CA specified in this command MUST:
+
+.RS 2m
+1) be disabled.
+2) have no un\-revoked or un\-expired certificates. Use the revoke command
+   to revoke any active certificates.
+.RE
+
+You can use the restore command to halt this process.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+CERTIFICATE AUTHORITY resource \- The certificate authority to schedule deletion
+for. The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[CERTIFICATE_AUTHORITY] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE_AUTHORITY\fR
+ID of the CERTIFICATE_AUTHORITY or fully qualified identifier for the
+CERTIFICATE_AUTHORITY. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the CERTIFICATE_AUTHORITY. Alternatively, you can set the
+property [privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To schedule a root CA for deletion:
+
+.RS 2m
+$ gcloud beta privateca roots delete prod\-root \-\-location='us\-west1'
+.RE
+
+To schedule a root CA for deletion while skipping the confirmation input:
+
+.RS 2m
+$ gcloud beta privateca roots delete prod\-root \e
+    \-\-location='us\-west1' \-\-quiet
+.RE
+
+To un\-do the scheduled deletion for a root CA:
+
+.RS 2m
+$ gcloud beta privateca roots restore prod\-root \-\-location='us\-west1'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

@@ -81,7 +81,7 @@ COMMANDS
         (ALPHA) Set autoscaling parameters of a managed instance group.
 
      set-instance-template
-        (ALPHA) Set instance template for managed instance group.
+        (ALPHA) Set the instance template for a managed instance group.
 
      set-named-ports
         (ALPHA) Sets the list of named ports for an instance group.

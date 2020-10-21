@@ -77,7 +77,7 @@ Expression that defines what fields and order to use for sorting. String value
 should follow SQL syntax: comma separated list of fields. For example:
 "name,resource_properties.a_property". The default sorting order is ascending.
 To specify descending order for a field, a suffix " desc" should be appended to
-the field name. For example: \-\-order\-by "name
+the field name. For example: \-\-order\-by="name
 desc,source_properties.a_property" will order by name in descending order while
 source_properties.a_property in ascending order.
 
@@ -162,14 +162,14 @@ https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
 List all ACTIVE findings under organization 123456 across all sources:
 
 .RS 2m
-$ gcloud alpha scc findings list 123456 \-\-filter "state=\e"ACTIVE\e""
+$ gcloud alpha scc findings list 123456 \-\-filter="state=\e"ACTIVE\e""
 .RE
 
 List all ACTIVE findings under organization 123456 and source 5678:
 
 .RS 2m
-$ gcloud alpha scc findings list 123456 \-\-source 5678 \e
-    \-\-filter "state=\e"ACTIVE\e""
+$ gcloud alpha scc findings list 123456 \-\-source=5678 \e
+    \-\-filter="state=\e"ACTIVE\e""
 .RE
 
 Only list category and resource_name of all ACTIVE findings under organization
@@ -185,24 +185,23 @@ List all ACTIVE findings of XSS category/type, under organization 123456 and
 source 5678:
 
 .RS 2m
-$ gcloud alpha scc findings list 123456 \-\-source 5678 \e
-    \-\-filter "state=\e"ACTIVE\e" AND category=\e"XSS\e""
+$ gcloud alpha scc findings list 123456 \-\-source=5678 \e
+    \-\-filter="state=\e"ACTIVE\e" AND category=\e"XSS\e""
 .RE
 
 List all findings attached to a particular resource under organization 123456:
 
 .RS 2m
 $ gcloud alpha scc findings list 123456 \e
-    \-\-filter \e
-    "resource_name=\e"//container.googleapis.com/projects/pid/zones/\e
-zone\-id/clusters/cluster\-id\e""
+    \-\-filter="resource_name=\e"//container.googleapis.com/projects/\e
+pid/zones/zone\-id/clusters/cluster\-id\e""
 .RE
 
 List all ACTIVE findings that took place on 2019\-01\-01T01:00:00 GMT time,
 under organization 123456:
 
 .RS 2m
-$ gcloud alpha scc findings list 123456 \-\-filter "state=\e"ACTIVE\e" \e
+$ gcloud alpha scc findings list 123456 \-\-filter="state=\e"ACTIVE\e" \e
     AND event_time > 1546304400000"
 .RE
 
@@ -211,7 +210,7 @@ organization 123456:
 
 .RS 2m
 $ gcloud alpha scc findings list 123456 \e
-    \-\-filter "state=\e"ACTIVE\e"" \-\-read\-time "2019\-01\-01T01:00:00Z"
+    \-\-filter="state=\e"ACTIVE\e"" \-\-read\-time="2019\-01\-01T01:00:00Z"
 .RE
 
 

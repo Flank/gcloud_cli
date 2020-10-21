@@ -52,7 +52,7 @@ organizations/123, the id is 123.
 .TP 2m
 \fB\-\-security\-marks\fR=[\fISECURITY_MARKS\fR,...]
 SecurityMarks resource to be passed as the request body. It's a key=value pair
-separated by comma (,). For example: \-\-security\-marks "key1=val1,key2=val2".
+separated by comma (,). For example: \-\-security\-marks="key1=val1,key2=val2".
 
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
@@ -62,7 +62,7 @@ Time at which the updated SecurityMarks take effect. For example
 .TP 2m
 \fB\-\-update\-mask\fR=\fIUPDATE_MASK\fR
 Use update\-mask if you want to selectively update marks represented by
-\-\-security\-marks flag. For example: \-\-update\-mask "marks.key1,marks.key2".
+\-\-security\-marks flag. For example: \-\-update\-mask="marks.key1,marks.key2".
 If you want to override all the marks for the given asset either skip the
 update\-mask flag or provide an empty value (\-\-update\-mask '') for it.
 
@@ -97,7 +97,7 @@ not change.
 
 .RS 2m
 $ gcloud beta scc assets update\-marks 5678 \-\-organization=123456 \e
-    \-\-security\-marks "key1=val1.1" \-\-update\-mask "marks.key1"
+    \-\-security\-marks="key1=val1.1" \-\-update\-mask="marks.key1"
 .RE
 
 Update value of security mark (key1) and delete other marks on asset 5678 under
@@ -105,14 +105,14 @@ organization 123456:
 
 .RS 2m
 $ gcloud beta scc assets update\-marks 5678 \-\-organization=123456 \e
-    \-\-security\-marks "key1=updatedVal"
+    \-\-security\-marks="key1=updatedVal"
 .RE
 
 Delete all security marks on asset 5678 under organization 123456:
 
 .RS 2m
 $ gcloud beta scc assets update\-marks 5678 \-\-organization=123456 \e
-    \-\-security\-marks ""
+    \-\-security\-marks=""
 .RE
 
 

@@ -32,7 +32,7 @@ COMMANDS
         (ALPHA) List Cloud Filestore instances.
 
      restore
-        (ALPHA) Restore a Cloud Filestore instance to a snapshot or backup.
+        (ALPHA) Restore a Cloud Filestore instance from a snapshot or backup.
 
      update
         (ALPHA) Update a Cloud Filestore instance in the current project.

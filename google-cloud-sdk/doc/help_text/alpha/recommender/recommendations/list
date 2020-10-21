@@ -1,32 +1,56 @@
 NAME
-    gcloud alpha recommender recommendations list - lists recommendations for a
-        Cloud project
+    gcloud alpha recommender recommendations list - list operations for a
+        recommendation
 
 SYNOPSIS
-    gcloud alpha recommender recommendations list
-        (--recommender=RECOMMENDER : --location=LOCATION) [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+    gcloud alpha recommender recommendations list --recommender=RECOMMENDER
+        (--billing-account=BILLING_ACCOUNT | --folder=FOLDER_ID
+          | --organization=ORGANIZATION_ID | --project=PROJECT_ID)
+        [--location=LOCATION] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Lists recommendations for a Cloud project.
+    (ALPHA) This command will list all recommendations for a give
+    cloud_entity_id, location and recommender. Currently the following
+    cloud_entity_types are supported, project, billing_account, folder and
+    organization.
 
 REQUIRED FLAGS
-     Recommender resource - The Cloud Recommender to list recommendations for.
-     The arguments in this group can be used to specify the attributes of this
-     resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the
-     argument [--recommender] on the command line with a fully specified name;
-     provide the argument [--project] on the command line; set the property
-     [core/project]. This must be specified.
+     --recommender=RECOMMENDER
+        Recommender to list recommendations for
 
-       --recommender=RECOMMENDER
-          ID of the recommender or fully qualified identifier for the
-          recommender. This flag must be specified if any of the other
-          arguments in this group are specified.
+     Resource that is associated with cloud entity type. Currently four
+     mutually exclusive flags are supported, --project, --billing-account,
+     --folder, --organization. Exactly one of these must be specified:
 
-       --location=LOCATION
-          The location ID.
+       --billing-account=BILLING_ACCOUNT
+          The Google Cloud Platform Billing Account ID to use for this
+          invocation.
+
+       --folder=FOLDER_ID
+          Folder ID to use for this invocation.
+
+       --organization=ORGANIZATION_ID
+          The Google Cloud Platform Organization ID to use for this invocation.
+
+       --project=PROJECT_ID
+          The Google Cloud Platform Project Number to use for this invocation.
+
+          The Google Cloud Platform project ID to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
+
+FLAGS
+     --location=LOCATION
+        Location
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -65,14 +89,8 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
-API REFERENCE
-    This command uses the recommender/v1alpha2 API. The full documentation for
-    this API can be found at: https://cloud.google.com/recommender/docs/
-
 EXAMPLES
-    To list recommendations:
-
-        $ gcloud alpha recommender recommendations list \
+    Lists recommendations for a Cloud project.        $ gcloud alpha recommender recommendations list \
             --project=project-name --location=global \
             --recommender=google.compute.instance.MachineTypeRecommender
 

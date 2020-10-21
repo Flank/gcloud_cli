@@ -11,7 +11,7 @@ gcloud alpha cloud\-shell scp \- copies files between Cloud Shell and the local 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha cloud\-shell scp\fR (\fIcloudshell\fR|\fIlocalhost\fR):\fISRC\fR [(\fIcloudshell\fR|\fIlocalhost\fR):\fISRC\fR\ ...] (\fIcloudshell\fR|\fIlocalhost\fR):\fIDEST\fR [\fB\-\-boosted\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha cloud\-shell scp\fR (\fIcloudshell\fR|\fIlocalhost\fR):\fISRC\fR [(\fIcloudshell\fR|\fIlocalhost\fR):\fISRC\fR\ ...] (\fIcloudshell\fR|\fIlocalhost\fR):\fIDEST\fR [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,11 +64,6 @@ Specifies a destination for the source files.
 .SH "FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-boosted\fR
-If provided, starts Cloud Shell in boost mode. If there is alread a running
-Cloud Shell session that is not boosted, this will restart the session.
-
 .TP 2m
 \fB\-\-dry\-run\fR
 If provided, prints the command that would be run to standard out instead of

@@ -124,25 +124,6 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
     self.expectGetEnvironment()
     util.PrepareEnvironment(self.makeArgs())
 
-  def testKeyNotRunningNeedsBoost(self):
-    # Given an environment that has a key but isn't running
-    self.expectGetEnvironment(
-        response=self.makeEnvironment(
-            has_key=True,
-            running=False,
-        ))
-    self.expectUpdateEnvironment()
-
-    # Expect that we start the environment, but don't create a key
-    self.expectStartEnvironment(
-        response=self.messages.Operation(name='some-op'))
-    self.expectGetOperation(name='some-op')
-    self.expectGetEnvironment()
-
-    args = self.makeArgs()
-    args.boosted = True
-    util.PrepareEnvironment(args)
-
   def testKeyNotRunningNeedsAuthorizedSession(self):
     # Given an environment that has a key but isn't running
     self.expectGetEnvironment(
@@ -217,19 +198,6 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
     self.client.UsersEnvironmentsService.Get.Expect(
         self.messages.CloudshellUsersEnvironmentsGetRequest(
             name='users/me/environments/default'),
-        response=response)
-
-  def expectUpdateEnvironment(self, response=None):
-    if response is None:
-      response = self.messages.Environment()
-    boosted_environment = self.messages.Environment(
-        size=self.messages.Environment.SizeValueValuesEnum.BOOSTED)
-
-    self.client.UsersEnvironmentsService.Patch.Expect(
-        self.messages.CloudshellUsersEnvironmentsPatchRequest(
-            name='users/me/environments/default',
-            updateMask='size',
-            environment=boosted_environment),
         response=response)
 
   def expectCreatePublicKey(self):

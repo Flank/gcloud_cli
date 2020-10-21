@@ -11,138 +11,218 @@ summary:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       SYNCED
-      acm_status[0].last_synced:       2020-03-23 11:12:31 -0700 PDT
-      acm_status[0].last_synced_token: 2945500
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       master
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-03-23 11:12:31 -0700 PDT
+      acm_status[0].last_synced_token:       2945500
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             master
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       CODE_UNSPECIFIED
-      acm_status[0].last_synced:       NA
-      acm_status[0].last_synced_token: NA
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             CODE_UNSPECIFIED
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       FAILED
-      acm_status[0].last_synced:       NA
-      acm_status[0].last_synced_token: NA
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             FAILED
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       OPERATOR_STATE_UNSPECIFIED
-      acm_status[0].last_synced:       NA
-      acm_status[0].last_synced_token: NA
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             OPERATOR_STATE_UNSPECIFIED
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       SYNC_STATE_UNSPECIFIED
-      acm_status[0].last_synced:       NA
-      acm_status[0].last_synced_token: NA
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNC_STATE_UNSPECIFIED
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors[0].cluster:           golden-cluster
-      acm_errors[0].error:             missing git-creds Secret
-      acm_errors[1].cluster:           golden-cluster
-      acm_errors[1].error:             KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory
-      acm_status[0].config_sync:       ERROR
-      acm_status[0].last_synced:       2020-05-19T08:06:12Z
-      acm_status[0].last_synced_token: 308bc3c
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       Master
+      acm_errors[0].cluster:                 golden-cluster
+      acm_errors[0].error:                   missing git-creds Secret
+      acm_errors[1].cluster:                 golden-cluster
+      acm_errors[1].error:                   KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory
+      acm_status[0].config_sync:             ERROR
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308bc3c
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             Master
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors[0].cluster:           golden-cluster
-      acm_errors[0].error:             (operatorState.error) missing git-creds Secret
-      acm_errors[1].cluster:           golden-cluster
-      acm_errors[1].error:             (syncState.error)missing git-creds Secret
-      acm_status[0].config_sync:       ERROR
-      acm_status[0].last_synced_token: NA
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       Master
+      acm_errors[0].cluster:                 golden-cluster
+      acm_errors[0].error:                   (operatorState.error) missing git-creds Secret
+      acm_errors[1].cluster:                 golden-cluster
+      acm_errors[1].error:                   (syncState.error)missing git-creds Secret
+      acm_status[0].config_sync:             ERROR
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             Master
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors[0].cluster:           golden-cluster
-      acm_errors[0].error:             "KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory\nCheck git-sync logs for more info: kubectl logs -n $$feature$$-system  -l app=git-importer -c git-sync\n\nFor more information, see https://cloud.google.com/anthos-$$feature$$/docs/reference/errors#knv2004"
-      acm_status[0].config_sync:       ERROR
-      acm_status[0].last_synced:       2020-05-19T08:06:12Z
-      acm_status[0].last_synced_token: 308bc3c
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       Master
+      acm_errors[0].cluster:                 golden-cluster
+      acm_errors[0].error:                   "KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory\nCheck git-sync logs for more info: kubectl logs -n $$feature$$-system  -l app=git-importer -c git-sync\n\nFor more information, see https://cloud.google.com/anthos-$$feature$$/docs/reference/errors#knv2004"
+      acm_status[0].config_sync:             ERROR
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308bc3c
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             Master
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       SYNCED
-      acm_status[0].last_synced:       2020-05-19T08:06:12Z
-      acm_status[0].last_synced_token: 308b
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       SYNCED
-      acm_status[0].last_synced:       2020-05-19T08:06:12Z
-      acm_status[0].last_synced_token: 308b
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
-      acm_status[1].config_sync:       NA
-      acm_status[1].last_synced:       NA
-      acm_status[1].last_synced_token: NA
-      acm_status[1].name:              silver-cluster
-      acm_status[1].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: INSTALLED
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       NA
-      acm_status[0].last_synced:       NA
-      acm_status[0].last_synced_token: NA
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
-      acm_status[1].config_sync:       NA
-      acm_status[1].last_synced:       NA
-      acm_status[1].last_synced_token: NA
-      acm_status[1].name:              silver-cluster
-      acm_status[1].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNC_STATE_UNSPECIFIED
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 - execute:
   - command: |
       container hub $$feature$$ status --format text
   - stdout: |
-      acm_errors:                      []
-      acm_status[0].config_sync:       SYNCED
-      acm_status[0].last_synced:       2020-05-19T08:06:12Z
-      acm_status[0].last_synced_token: 308b
-      acm_status[0].name:              golden-cluster
-      acm_status[0].sync_branch:       NA
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
+- execute:
+  - command: |
+      container hub $$feature$$ status --format text
+  - stdout: |
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: INSTALLED
+      acm_status[0].sync_branch:             NA
+- execute:
+  - command: |
+      container hub $$feature$$ status --format text
+  - stdout: |
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: GatekeeperAudit NOT_INSTALLED
+      acm_status[0].sync_branch:             NA
+- execute:
+  - command: |
+      container hub $$feature$$ status --format text
+  - stdout: |
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNC_STATE_UNSPECIFIED
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: INSTALLED
+      acm_status[0].sync_branch:             NA
+- execute:
+  - command: |
+      container hub $$feature$$ status --format text
+  - stdout: |
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
+      acm_status[1].config_sync:             NA
+      acm_status[1].last_synced:             NA
+      acm_status[1].last_synced_token:       NA
+      acm_status[1].name:                    silver-cluster
+      acm_status[1].policy_controller_state: NA
+      acm_status[1].sync_branch:             NA
+- execute:
+  - command: |
+      container hub $$feature$$ status --format text
+  - stdout: |
+      acm_errors:                            []
+      acm_status[0].config_sync:             NA
+      acm_status[0].last_synced:             NA
+      acm_status[0].last_synced_token:       NA
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
+      acm_status[1].config_sync:             NA
+      acm_status[1].last_synced:             NA
+      acm_status[1].last_synced_token:       NA
+      acm_status[1].name:                    silver-cluster
+      acm_status[1].policy_controller_state: NA
+      acm_status[1].sync_branch:             NA
+- execute:
+  - command: |
+      container hub $$feature$$ status --format text
+  - stdout: |
+      acm_errors:                            []
+      acm_status[0].config_sync:             SYNCED
+      acm_status[0].last_synced:             2020-05-19T08:06:12Z
+      acm_status[0].last_synced_token:       308b
+      acm_status[0].name:                    golden-cluster
+      acm_status[0].policy_controller_state: NA
+      acm_status[0].sync_branch:             NA
 actions:
 - define_reference:
     reference: feature
@@ -247,15 +327,15 @@ actions:
                           syncBranch: master
                           syncRepo: git@github.com:/csp-$$feature$$.git
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       SYNCED
-        acm_status[0].last_synced:       2020-03-23 11:12:31 -0700 PDT
-        acm_status[0].last_synced_token: 2945500
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       master
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-03-23 11:12:31 -0700 PDT
+        acm_status[0].last_synced_token:       2945500
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             master
     - expect_exit:
         code: 0
-
 - execute_command:
     command: |
       container hub $$feature$$ status --format text
@@ -309,12 +389,14 @@ actions:
                           syncBranch: master
                           syncRepo: git@github.com:/csp-$$feature$$.git
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       CODE_UNSPECIFIED
-        acm_status[0].last_synced:       NA
-        acm_status[0].last_synced_token: NA
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             CODE_UNSPECIFIED
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
+
     - expect_exit:
         code: 0
 - execute_command:
@@ -371,13 +453,15 @@ actions:
                         git:
                           syncBranch: master
                           syncRepo: git@github.com:/csp-$$feature$$.git
+
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       FAILED
-        acm_status[0].last_synced:       NA
-        acm_status[0].last_synced_token: NA
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             FAILED
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
     - expect_exit:
         code: 0
 - execute_command:
@@ -435,12 +519,13 @@ actions:
                           syncBranch: master
                           syncRepo: git@github.com:/csp-$$feature$$.git
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       OPERATOR_STATE_UNSPECIFIED
-        acm_status[0].last_synced:       NA
-        acm_status[0].last_synced_token: NA
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             OPERATOR_STATE_UNSPECIFIED
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
     - expect_exit:
         code: 0
 - execute_command:
@@ -501,12 +586,13 @@ actions:
                           syncRepo: git@github.com:/csp-$$feature$$.git
 
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       SYNC_STATE_UNSPECIFIED
-        acm_status[0].last_synced:       NA
-        acm_status[0].last_synced_token: NA
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNC_STATE_UNSPECIFIED
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
     - expect_exit:
         code: 0
 - execute_command:
@@ -586,15 +672,16 @@ actions:
                       - errorMessage: missing git-creds Secret
                       version: 20200409021017-op
     - expect_stdout: |
-        acm_errors[0].cluster:           golden-cluster
-        acm_errors[0].error:             missing git-creds Secret
-        acm_errors[1].cluster:           golden-cluster
-        acm_errors[1].error:             KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory
-        acm_status[0].config_sync:       ERROR
-        acm_status[0].last_synced:       2020-05-19T08:06:12Z
-        acm_status[0].last_synced_token: 308bc3c
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       Master
+        acm_errors[0].cluster:                 golden-cluster
+        acm_errors[0].error:                   missing git-creds Secret
+        acm_errors[1].cluster:                 golden-cluster
+        acm_errors[1].error:                   KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory
+        acm_status[0].config_sync:             ERROR
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308bc3c
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             Master
     - expect_exit:
         code: 0
 - execute_command:
@@ -669,14 +756,15 @@ actions:
               lifecycleState: ENABLED
             updateTime: '2020-06-05T03:05:32.372931482Z'
     - expect_stdout: |
-        acm_errors[0].cluster:           golden-cluster
-        acm_errors[0].error:             (operatorState.error) missing git-creds Secret
-        acm_errors[1].cluster:           golden-cluster
-        acm_errors[1].error:             (syncState.error)missing git-creds Secret
-        acm_status[0].config_sync:       ERROR
-        acm_status[0].last_synced_token: NA
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       Master
+        acm_errors[0].cluster:                 golden-cluster
+        acm_errors[0].error:                   (operatorState.error) missing git-creds Secret
+        acm_errors[1].cluster:                 golden-cluster
+        acm_errors[1].error:                   (syncState.error)missing git-creds Secret
+        acm_status[0].config_sync:             ERROR
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             Master
     - expect_exit:
         code: 0
 - execute_command:
@@ -758,13 +846,15 @@ actions:
                       version: 20200409021017-op
 
     - expect_stdout: |
-        acm_errors[0].cluster:           golden-cluster
-        acm_errors[0].error:             "KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory\nCheck git-sync logs for more info: kubectl logs -n $$feature$$-system  -l app=git-importer -c git-sync\n\nFor more information, see https://cloud.google.com/anthos-$$feature$$/docs/reference/errors#knv2004"
-        acm_status[0].config_sync:       ERROR
-        acm_status[0].last_synced:       2020-05-19T08:06:12Z
-        acm_status[0].last_synced_token: 308bc3c
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       Master
+        acm_errors[0].cluster:                 golden-cluster
+        acm_errors[0].error:                   "KNV2004: unable to sync repo: lstat /repo/rev: no such file or directory\nCheck git-sync logs for more info: kubectl logs -n $$feature$$-system  -l app=git-importer -c git-sync\n\nFor more information, see https://cloud.google.com/anthos-$$feature$$/docs/reference/errors#knv2004"
+        acm_status[0].config_sync:             ERROR
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308bc3c
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             Master
+
     - expect_exit:
         code: 0
 - execute_command:
@@ -827,14 +917,439 @@ actions:
                       version: 20200409021017-op
 
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       SYNCED
-        acm_status[0].last_synced:       2020-05-19T08:06:12Z
-        acm_status[0].last_synced_token: 308b
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
     - expect_exit:
         code: 0
+
+- execute_command:
+    command: |
+      container hub $$feature$$ status --format text
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/$$project$$/locations/global/memberships?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          body: |
+            {
+              "resources": [
+                {
+                  "name": "projects/mynomos/locations/global/memberships/golden-cluster",
+                  "description": "golden-cluster",
+                  "endpoint": {
+                    "gkeCluster": {
+                      "resourceLink": "//container.googleapis.com/projects/mynomos/locations/us-west2-c/clusters/golden-cluster"
+                    }
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            configmanagementFeatureSpec: {}
+            createTime: '2020-03-25T21:45:15.740170039Z'
+            featureState:
+              lifecycleState: ENABLED
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+                  configmanagementFeatureState:
+                    policyControllerState:
+                      deploymentState:
+                        gatekeeperAudit: INSTALLED
+                        gatekeeperControllerManagerState: INSTALLED
+                    configSyncState:
+                      syncState:
+                        code: SYNCED
+                        importToken: 308b
+                        lastSync: 2020-05-19 01:06:12 -0700 PDT
+                        lastSyncTime: '2020-05-19T08:06:12Z'
+                        sourceToken: 308b
+                        syncToken: 308b
+                    operatorState:
+                      deploymentState: INSTALLED
+                      version: 20200409021017-op
+
+    - expect_stdout: |
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: INSTALLED
+        acm_status[0].sync_branch:             NA
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      container hub $$feature$$ status --format text
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/$$project$$/locations/global/memberships?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          body: |
+            {
+              "resources": [
+                {
+                  "name": "projects/mynomos/locations/global/memberships/golden-cluster",
+                  "description": "golden-cluster",
+                  "endpoint": {
+                    "gkeCluster": {
+                      "resourceLink": "//container.googleapis.com/projects/mynomos/locations/us-west2-c/clusters/golden-cluster"
+                    }
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/global/features/$$feature_api$$
+            configmanagementFeatureSpec: {}
+            createTime: '2020-03-25T21:45:15.740170039Z'
+            featureState:
+              lifecycleState: ENABLED
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+                  configmanagementFeatureState:
+                    policyControllerState:
+                      version:
+                        version: anthos1.4.2
+                    operatorState:
+                      deploymentState: INSTALLED
+                      version: 20200409021017-op
+
+        repeatable: true
+    - expect_stdout: |
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNC_STATE_UNSPECIFIED
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      container hub $$feature$$ status --format text
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/$$project$$/locations/global/memberships?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          body: |
+            {
+              "resources": [
+                {
+                  "name": "projects/mynomos/locations/global/memberships/golden-cluster",
+                  "description": "golden-cluster",
+                  "endpoint": {
+                    "gkeCluster": {
+                      "resourceLink": "//container.googleapis.com/projects/mynomos/locations/us-west2-c/clusters/golden-cluster"
+                    }
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '549'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/global/features/$$feature_api$$
+            configmanagementFeatureSpec: {}
+            createTime: '2020-03-25T21:45:15.740170039Z'
+            featureState:
+              lifecycleState: ENABLED
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+                  configmanagementFeatureState:
+                    policyControllerState:
+                      deploymentState:
+                        gatekeeperAudit: INSTALLED
+                    configSyncState:
+                      syncState:
+                        code: SYNCED
+                        importToken: 308b
+                        lastSync: 2020-05-19 01:06:12 -0700 PDT
+                        lastSyncTime: '2020-05-19T08:06:12Z'
+                        sourceToken: 308b
+                        syncToken: 308b
+                    operatorState:
+                      deploymentState: INSTALLED
+                      version: 20200409021017-op
+        repeatable: true
+    - expect_stdout: |
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      container hub $$feature$$ status --format text
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/$$project$$/locations/global/memberships?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          body: |
+            {
+              "resources": [
+                {
+                  "name": "projects/mynomos/locations/global/memberships/golden-cluster",
+                  "description": "golden-cluster",
+                  "endpoint": {
+                    "gkeCluster": {
+                      "resourceLink": "//container.googleapis.com/projects/mynomos/locations/us-west2-c/clusters/golden-cluster"
+                    }
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '549'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/global/features/$$feature_api$$
+            configmanagementFeatureSpec: {}
+            createTime: '2020-03-25T21:45:15.740170039Z'
+            featureState:
+              lifecycleState: ENABLED
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+                  configmanagementFeatureState:
+                    policyControllerState:
+                      deploymentState:
+                        gatekeeperAudit: NOT_INSTALLED
+                        gatekeeperControllerManagerState: INSTALLED
+                    configSyncState:
+                      syncState:
+                        code: SYNCED
+                        importToken: 308b
+                        lastSync: 2020-05-19 01:06:12 -0700 PDT
+                        lastSyncTime: '2020-05-19T08:06:12Z'
+                        sourceToken: 308b
+                        syncToken: 308b
+                    operatorState:
+                      deploymentState: INSTALLED
+                      version: 20200409021017-op
+        repeatable: true
+    - expect_stdout: |
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: INSTALLED
+        acm_status[0].sync_branch:             NA
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      container hub $$feature$$ status --format text
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/$$project$$/locations/global/memberships?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          body: |
+            {
+              "resources": [
+                {
+                  "name": "projects/mynomos/locations/global/memberships/golden-cluster",
+                  "description": "golden-cluster",
+                  "endpoint": {
+                    "gkeCluster": {
+                      "resourceLink": "//container.googleapis.com/projects/mynomos/locations/us-west2-c/clusters/golden-cluster"
+                    }
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '549'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/global/features/$$feature_api$$
+            configmanagementFeatureSpec: {}
+            createTime: '2020-03-25T21:45:15.740170039Z'
+            featureState:
+              lifecycleState: ENABLED
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+                  configmanagementFeatureState:
+                    membershipConfig:
+                      version: 1.4.2
+                    policyControllerState:
+                      deploymentState:
+                        gatekeeperAudit: NOT_INSTALLED
+                        gatekeeperControllerManagerState: INSTALLED
+                    configSyncState:
+                      syncState:
+                        code: SYNCED
+                        importToken: 308b
+                        lastSync: 2020-05-19 01:06:12 -0700 PDT
+                        lastSyncTime: '2020-05-19T08:06:12Z'
+                        sourceToken: 308b
+                        syncToken: 308b
+                    operatorState:
+                      deploymentState: INSTALLED
+                      version: 20200409021017-op
+        repeatable: true
+    - expect_stdout: |
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: GatekeeperAudit NOT_INSTALLED
+        acm_status[0].sync_branch:             NA
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      container hub $$feature$$ status --format text
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/$$project$$/locations/global/memberships?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          body: |
+            {
+              "resources": [
+                {
+                  "name": "projects/mynomos/locations/global/memberships/golden-cluster",
+                  "description": "golden-cluster",
+                  "endpoint": {
+                    "gkeCluster": {
+                      "resourceLink": "//container.googleapis.com/projects/mynomos/locations/us-west2-c/clusters/golden-cluster"
+                    }
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1alpha1/projects/$$project$$/locations/global/features/$$feature_api$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '549'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/global/features/$$feature_api$$
+            configmanagementFeatureSpec: {}
+            createTime: '2020-03-25T21:45:15.740170039Z'
+            featureState:
+              lifecycleState: ENABLED
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+                  configmanagementFeatureState:
+                    membershipConfig:
+                      configSync:
+                        git: {}
+                    policyControllerState:
+                      deploymentState:
+                        gatekeeperControllerManagerState: INSTALLED
+                    operatorState:
+                      deploymentState: INSTALLED
+                      version: 20200409021017-op
+        repeatable: true
+    - expect_stdout: |
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNC_STATE_UNSPECIFIED
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: INSTALLED
+        acm_status[0].sync_branch:             NA
+    - expect_exit:
+        code: 0
+
 - execute_command:
     command: |
       container hub $$feature$$ status --format text
@@ -904,17 +1419,19 @@ actions:
                       version: 20200409021017-op
 
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       SYNCED
-        acm_status[0].last_synced:       2020-05-19T08:06:12Z
-        acm_status[0].last_synced_token: 308b
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
-        acm_status[1].config_sync:       NA
-        acm_status[1].last_synced:       NA
-        acm_status[1].last_synced_token: NA
-        acm_status[1].name:              silver-cluster
-        acm_status[1].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
+        acm_status[1].config_sync:             NA
+        acm_status[1].last_synced:             NA
+        acm_status[1].last_synced_token:       NA
+        acm_status[1].name:                    silver-cluster
+        acm_status[1].policy_controller_state: NA
+        acm_status[1].sync_branch:             NA
     - expect_exit:
         code: 0
 
@@ -969,17 +1486,19 @@ actions:
 
 
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       NA
-        acm_status[0].last_synced:       NA
-        acm_status[0].last_synced_token: NA
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
-        acm_status[1].config_sync:       NA
-        acm_status[1].last_synced:       NA
-        acm_status[1].last_synced_token: NA
-        acm_status[1].name:              silver-cluster
-        acm_status[1].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             NA
+        acm_status[0].last_synced:             NA
+        acm_status[0].last_synced_token:       NA
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
+        acm_status[1].config_sync:             NA
+        acm_status[1].last_synced:             NA
+        acm_status[1].last_synced_token:       NA
+        acm_status[1].name:                    silver-cluster
+        acm_status[1].policy_controller_state: NA
+        acm_status[1].sync_branch:             NA
     - expect_exit:
         code: 0
 
@@ -1057,11 +1576,12 @@ actions:
                       deploymentState: INSTALLED
                       version: 20200409021017-op
     - expect_stdout: |
-        acm_errors:                      []
-        acm_status[0].config_sync:       SYNCED
-        acm_status[0].last_synced:       2020-05-19T08:06:12Z
-        acm_status[0].last_synced_token: 308b
-        acm_status[0].name:              golden-cluster
-        acm_status[0].sync_branch:       NA
+        acm_errors:                            []
+        acm_status[0].config_sync:             SYNCED
+        acm_status[0].last_synced:             2020-05-19T08:06:12Z
+        acm_status[0].last_synced_token:       308b
+        acm_status[0].name:                    golden-cluster
+        acm_status[0].policy_controller_state: NA
+        acm_status[0].sync_branch:             NA
     - expect_exit:
         code: 0

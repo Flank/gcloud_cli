@@ -107,33 +107,33 @@ EXAMPLES
     Group findings under organization 123456 across all sources by their
     category:
 
-        $ gcloud scc findings group 123456 --group-by "category"
+        $ gcloud scc findings group 123456 --group-by="category"
 
     Group findings under organization 123456 and source 5678, by their
     category:
 
-        $ gcloud scc findings group 123456 --source 5678 \
-            --group-by "category"
+        $ gcloud scc findings group 123456 --source=5678 \
+            --group-by="category"
 
     Group ACTIVE findings under organization 123456 and source 5678, by their
     category:
 
-        $ gcloud scc findings group 123456 --source 5678 \
-            --group-by "category" --filter "state=\"ACTIVE\""
+        $ gcloud scc findings group 123456 --source=5678 \
+            --group-by="category" --filter="state=\"ACTIVE\""
 
     Group ACTIVE findings under organization 123456 and source 5678, on
     2019-01-01T01:00:00 GMT, by their category:
 
-        $ gcloud scc findings group 123456 --source 5678 \
-            --group-by "category" \
-            --filter "state=\"ACTIVE\"" --read-time "2019-01-01T01:00:00Z"
+        $ gcloud scc findings group 123456 --source=5678 \
+            --group-by="category" \
+            --filter="state=\"ACTIVE\"" --read-time="2019-01-01T01:00:00Z"
 
     Group findings under organization 123456 and source 5678 into following 3
     state_changes (ADDED/CHANGED/UNCHANGED) based on the activity during past
     24 hours:
 
-        $ gcloud scc findings group 123456 --source 5678 \
-            --group-by "state_change" --compare-duration 86400s
+        $ gcloud scc findings group 123456 --source=5678 \
+            --group-by="state_change" --compare-duration=86400s
 
 NOTES
     These variants are also available:

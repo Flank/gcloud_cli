@@ -18,6 +18,12 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     lite-subscriptions
+        Manage Pub/Sub Lite subscriptions.
+
+     lite-topics
+        Manage Pub/Sub Lite topics.
+
      snapshots
         Manage Cloud Pub/Sub snapshots.
 

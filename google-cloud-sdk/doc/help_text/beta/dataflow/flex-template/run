@@ -4,7 +4,16 @@ NAME
 SYNOPSIS
     gcloud beta dataflow flex-template run JOB_NAME
         --template-file-gcs-location=TEMPLATE_FILE_GCS_LOCATION
+        [--additional-experiments=[ADDITIONAL_EXPERIMENTS,...]]
+        [--additional-user-labels=[ADDITIONAL_USER_LABELS,...]]
+        [--dataflow-kms-key=DATAFLOW_KMS_KEY] [--disable-public-ips]
+        [--enable-streaming-engine] [--max-workers=MAX_WORKERS]
+        [--network=NETWORK] [--num-workers=NUM_WORKERS]
         [--parameters=[PARAMETERS,...]] [--region=REGION_ID]
+        [--service-account-email=SERVICE_ACCOUNT_EMAIL]
+        [--staging-location=STAGING_LOCATION] [--subnetwork=SUBNETWORK]
+        [--worker-machine-type=WORKER_MACHINE_TYPE]
+        [--worker-region=WORKER_REGION | --worker-zone=WORKER_ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -12,25 +21,68 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      JOB_NAME
-        The unique name to assign to the job.
+        Unique name to assign to the job.
 
 REQUIRED FLAGS
      --template-file-gcs-location=TEMPLATE_FILE_GCS_LOCATION
-        The Google Cloud Storage location of the flex template to run. (Must be
-        a URL beginning with 'gs://'.)
+        Google Cloud Storage location of the flex template to run. (Must be a
+        URL beginning with 'gs://'.)
 
 OPTIONAL FLAGS
+     --additional-experiments=[ADDITIONAL_EXPERIMENTS,...]
+        Additional experiments to pass to the job.
+
+     --additional-user-labels=[ADDITIONAL_USER_LABELS,...]
+        Additional user labels to pass to the job.
+
+     --dataflow-kms-key=DATAFLOW_KMS_KEY
+        Cloud KMS key to protect the job resources.
+
+     --disable-public-ips
+        Cloud Dataflow workers must not use public IP addresses. Overrides the
+        default dataflow/disable_public_ips property value for this command
+        invocation.
+
+     --enable-streaming-engine
+        Enabling Streaming Engine for the streaming job. Overrides the default
+        dataflow/enable_streaming_engine property value for this command
+        invocation.
+
+     --max-workers=MAX_WORKERS
+        Maximum number of workers to run.
+
+     --network=NETWORK
+        Compute Engine network for launching instances to run your pipeline.
+
+     --num-workers=NUM_WORKERS
+        Initial number of workers to use.
+
      --parameters=[PARAMETERS,...]
-        The parameters to pass to the job.All pipeline options should be passed
-        via parameters flag. Use right casing format according to the sdk.
-        Example: --parameters=maxNumWorkers=5 for java sdk 1.X and
-        --parameters=max_num_workers=5 for python sdk. For all the parameter
-        options please refer
-        https://cloud.google.com/dataflow/docs/guides/specifying-exec-params#setting-other-cloud-dataflow-pipeline-options
+        Parameters to pass to the job.
 
      --region=REGION_ID
-        The region ID of the job's regional endpoint. Defaults to
-        'us-central1'.
+        Region ID of the job's regional endpoint. Defaults to 'us-central1'.
+
+     --service-account-email=SERVICE_ACCOUNT_EMAIL
+        Service account to run the workers as.
+
+     --staging-location=STAGING_LOCATION
+        Google Cloud Storage location to stage temporary files. (Must be a URL
+        beginning with 'gs://'.)
+
+     --subnetwork=SUBNETWORK
+        Compute Engine subnetwork for launching instances to run your pipeline.
+
+     --worker-machine-type=WORKER_MACHINE_TYPE
+        Type of machine to use for workers. Defaults to server-specified.
+
+     At most one of these may be specified:
+
+       --worker-region=WORKER_REGION
+          Region to run the workers in.
+
+       --worker-zone=WORKER_ZONE
+          Zone to run the workers in.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -46,8 +98,8 @@ EXAMPLES
         $ gcloud beta dataflow flex-template run my-job \
             --template-file-gcs-location=gs://flex-template-path \
             --region=europe-west1 \
-            --parameters=input="gs://input",output="gs://output-path",\
-        max_num_workers=5
+            --parameters=input="gs://input",output="gs://output-path" \
+            --max-workers=5
 
 NOTES
     This command is currently in BETA and may change without notice. This

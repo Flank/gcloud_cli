@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_BETA_APIGEE_PRODUCTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta apigee products describe \- describe an Apigee API product
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta apigee products describe\fR (\fIPRODUCT\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Describe an Apigee API product.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+API product resource \- API product to be described. To get a list of available
+API products, run:
+
+$ gcloud beta apigee products list
+
+The arguments in this group can be used to specify the attributes of this
+resource. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIPRODUCT\fR
+ID of the API product or fully qualified identifier for the API product. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Apigee organization containing the API product. If unspecified, the Cloud
+Platform project's associated organization will be used.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an API product called \f5\fIproduct\-name\fR\fR in the active Cloud
+Platform project, run:
+
+.RS 2m
+$ gcloud beta apigee products describe product\-name
+.RE
+
+To describe an API product called \f5\fIother\-product\fR\fR in an Apigee
+organization called \f5\fIorg\-name\fR\fR, run:
+
+.RS 2m
+$ gcloud beta apigee products describe other\-product \e
+  \-\-organization=org\-name
+.RE
+
+To describe an API product called \f5\fIproduct\-name\fR\fR as a JSON object,
+run:
+
+.RS 2m
+$ gcloud beta apigee products describe product\-name \-\-format=json
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud apigee products describe
+$ gcloud alpha apigee products describe
+.RE
+

@@ -20,13 +20,11 @@ from __future__ import unicode_literals
 
 import os
 
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
+from googlecloudsdk.command_lib.storage.resources import resource_reference
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.storage import test_resources
-
-import mock
 
 
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
@@ -52,7 +50,7 @@ class GetResourceFromUrlStringTest(sdk_test_base.SdkBase):
     self.assertEqual(test_resources.from_url_string(url_string), resource)
 
   def test_gets_object_resource(self):
-    url_string = 'gs://bucket/object'
+    url_string = 'gs://bucket/object#1'
     parsed_url = storage_url.storage_url_from_string(url_string)
     resource = resource_reference.ObjectResource(parsed_url)
     self.assertEqual(test_resources.from_url_string(url_string), resource)
@@ -63,14 +61,13 @@ class GetResourceFromUrlStringTest(sdk_test_base.SdkBase):
     resource = resource_reference.PrefixResource(parsed_url, 'prefix/')
     self.assertEqual(test_resources.from_url_string(url_string), resource)
 
-  @mock.patch.object(storage_url, 'storage_url_from_string')
-  def test_gets_unknown_resource(self, mock_storage_url_from_string):
-    parsed_url = storage_url.CloudUrl.from_url_string('gs://to/mutate')
-    parsed_url.scheme = parsed_url.bucket_name = None
+  def test_gets_unknown_resource(self):
+    # Create URL test_resources.from_url_string will categorize as unknown.
+    url_string = 'gs://'
+    parsed_url = storage_url.storage_url_from_string(url_string)
 
-    mock_storage_url_from_string.return_value = parsed_url
     resource = resource_reference.UnknownResource(parsed_url)
-    self.assertEqual(test_resources.from_url_string(None), resource)
+    self.assertEqual(test_resources.from_url_string(url_string), resource)
 
 if __name__ == '__main__':
   test_case.main()

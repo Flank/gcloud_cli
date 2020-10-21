@@ -11,7 +11,7 @@ gcloud compute networks create \- create a Compute Engine network
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks create\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR;\ default="regional"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-subnet\-mode\fR=\fIMODE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks create\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR;\ default="regional"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-mtu\fR=\fIMTU\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-subnet\-mode\fR=\fIMODE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -63,6 +63,13 @@ router's best learned BGP routes.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the network.
+
+.TP 2m
+\fB\-\-mtu\fR=\fIMTU\fR
+Maximum transmission unit (MTU) is the size of the largest IP packet that can be
+transmitted on this network. Default value is 1460 bytes, and the maximum is
+1500 bytes. The MTU advertised via DHCP to all instances attached to this
+network.
 
 .TP 2m
 \fB\-\-range\fR=\fIRANGE\fR

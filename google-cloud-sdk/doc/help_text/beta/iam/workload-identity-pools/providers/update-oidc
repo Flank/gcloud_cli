@@ -191,13 +191,14 @@ EXAMPLES
             --display-name='My workload pool provider' \
             --description='My workload pool provider description' \
             --disabled \
-            --atribute-mapping='google.subject=assertion.sub' \
+            --attribute-mapping='google.subject=assertion.sub' \
             --attribute-condition='true' \
             --issuer-uri=https://test-idp.com
             --allowed-audiences=https://test-audience-1.com,https://test-audience-2.com
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha iam workload-identity-pools providers update-oidc
 

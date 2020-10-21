@@ -2,42 +2,37 @@ NAME
     gcloud alpha kuberun devkits list - lists available Development Kits
 
 SYNOPSIS
-    gcloud alpha kuberun devkits list [--namespace=NAMESPACE]
-        [--cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
-          | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kuberun devkits list [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Lists available Development Kits.
 
-FLAGS
-     --namespace=NAMESPACE
-        Kubernetes namespace to operate in.
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
 
-     At most one of these may be specified:
+     --limit=LIMIT
+        Maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
 
-       --cluster=CLUSTER
-          ID of the cluster or fully qualified identifier for the cluster. If
-          specified, then --cluster-location is required. Cannot be specified
-          together with --context and --kubeconfig. This flag must be specified
-          if any of the other arguments in this group are specified.
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
 
-       --cluster-location=CLUSTER_LOCATION
-          Zone in which the cluster is located. If specified, then --cluster is
-          required. Cannot be specified together with --context and
-          --kubeconfig. This flag must be specified if any of the other
-          arguments in this group are specified.
-
-       --context=CONTEXT
-          Name of the context in your kubectl config file to use for
-          connecting. Cannot be specified together with --cluster and
-          --cluster-location.
-
-       --kubeconfig=KUBECONFIG
-          Absolute path to your kubectl config file. If not specified, the
-          colon- or semicolon-delimited list of paths specified by $KUBECONFIG
-          will be used. If $KUBECONFIG is unset, this defaults to
-          ~/.kube/config. Cannot be specified together with --cluster and
-          --cluster-location.
+     --sort-by=[FIELD,...]
+        Comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -28,16 +28,16 @@
         ]
       },
       "version": {
-        "build_number": 20200925192311,
-        "version_string": "2020.09.25"
+        "build_number": 20201016191216,
+        "version_string": "2020.10.16"
       }
     }
   ],
-  "revision": 20200925192311,
+  "revision": 20201016191216,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "312.0.0"
+  "version": "315.0.0"
 }

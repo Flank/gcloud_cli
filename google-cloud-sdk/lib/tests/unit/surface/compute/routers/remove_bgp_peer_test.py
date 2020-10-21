@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import copy
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_utils
 from tests.lib.surface.compute import test_base
@@ -59,6 +60,75 @@ class RemoveBgpPeerTest(test_base.BaseTest):
               region='us-central1',
               project='my-project'))],
     )
+
+
+class RemoveBgpPeerTestAlpha(RemoveBgpPeerTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testRemoveListOfBgpPeers(self):
+    orig = router_test_utils.CreateBaseRouterMessage(self.messages)
+    orig.bgpPeers.append(
+        self.messages.RouterBgpPeer(
+            name='my-peer-2', interfaceName='my-if-2', peerAsn=66000))
+    expected = copy.deepcopy(orig)
+
+    expected.bgpPeers.pop()
+    expected.bgpPeers.pop()
+
+    self.make_requests.side_effect = iter([
+        [orig],
+        []
+    ])
+
+    self.Run("""
+        compute routers remove-bgp-peer my-router
+        --peer-names my-peer,my-peer-2 --region us-central1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.routers,
+          'Get',
+          self.messages.ComputeRoutersGetRequest(
+              router='my-router',
+              region='us-central1',
+              project='my-project'))],
+        [(self.compute.routers,
+          'Patch',
+          self.messages.ComputeRoutersPatchRequest(
+              router='my-router',
+              routerResource=expected,
+              region='us-central1',
+              project='my-project'))],
+    )
+
+  def testUsingBothPeerNameAndPeerNameListError(self):
+    orig = router_test_utils.CreateBaseRouterMessage(self.messages)
+    orig.bgpPeers.append(
+        self.messages.RouterBgpPeer(
+            name='my-peer-2', interfaceName='my-if-2', peerAsn=66000))
+    expected = copy.deepcopy(orig)
+
+    expected.bgpPeers.pop()
+    expected.bgpPeers.pop()
+
+    self.make_requests.side_effect = iter([
+        [orig],
+        []
+    ])
+
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --peer-name: Exactly one of (--peer-name | '
+        '--peer-names) must be specified.'):
+      self.Run("""
+          compute routers remove-bgp-peer my-router
+          --peer-names my-peer,my-peer-2 --region us-central1
+          --peer-name my-peer
+          """)
+
 
 if __name__ == '__main__':
   test_case.main()

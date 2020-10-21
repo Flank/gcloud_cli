@@ -72,7 +72,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -85,7 +85,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -102,7 +102,7 @@ actions:
           docker-repo..*
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json
           method: GET
           headers: {}
           body: null
@@ -129,7 +129,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -142,7 +142,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -159,7 +159,7 @@ actions:
           docker-repo..*
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
           method: GET
           headers: {}
           body: null
@@ -172,7 +172,7 @@ actions:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json
           method: GET
           headers: {}
           body: null
@@ -187,7 +187,7 @@ actions:
               version: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:potato
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image/tags?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image/tags?alt=json
           method: GET
           headers: {}
           body: null
@@ -241,7 +241,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -254,7 +254,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -271,7 +271,7 @@ actions:
           docker-repo..*
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
           method: GET
           headers: {}
           body: null
@@ -284,7 +284,7 @@ actions:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json
           method: GET
           headers: {}
           body: null
@@ -299,7 +299,7 @@ actions:
               version: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:potato
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image/tags?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image/tags?alt=json
           method: GET
           headers: {}
           body: null
@@ -322,7 +322,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -335,7 +335,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -352,7 +352,7 @@ actions:
           docker-repo..*
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fmy-image/tags?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fmy-image/tags?alt=json
           method: GET
           headers: {}
           body: null
@@ -376,7 +376,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -389,7 +389,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -411,7 +411,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -424,7 +424,7 @@ actions:
               locationId: us-west1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
           method: GET
           headers: {}
           body: null
@@ -441,7 +441,7 @@ actions:
           docker-repo..*
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages?alt=json
           method: GET
           headers: {}
           body: null
@@ -454,7 +454,7 @@ actions:
             - name: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json&pageSize=1
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json&pageSize=1
           method: GET
           headers: {}
           body: null
@@ -468,7 +468,7 @@ actions:
               version: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:abcxyz
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json&pageSize=1&pageToken=asdf
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags?alt=json&pageSize=1&pageToken=asdf
           method: GET
           headers: {}
           body: null
@@ -481,7 +481,7 @@ actions:
               version: projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/versions/sha256:potato
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image/tags?alt=json&pageSize=1
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-other-image/tags?alt=json&pageSize=1
           method: GET
           headers: {}
           body: null

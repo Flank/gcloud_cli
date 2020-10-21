@@ -124,7 +124,7 @@ compute instance, service etc):
 
 .RS 2m
 $ gcloud alpha scc assets group 123456 \e
-    \-\-group\-by "security_center_properties.resource_type"
+    \-\-group\-by="security_center_properties.resource_type"
 .RE
 
 Group compute instances (assets) under organization 123456 by their respective
@@ -132,9 +132,9 @@ projects:
 
 .RS 2m
 $ gcloud alpha scc assets group 123456 \e
-    \-\-filter \e
-    "security_center_properties.resource_type=\e"google.compute.Insta\e
-nce\e"" \-\-group\-by "security_center_properties.resource_project"
+    \-\-filter="security_center_properties.resource_type=\e"google.comp\e
+ute.Instance\e""\e
+ \-\-group\-by="security_center_properties.resource_project"
 .RE
 
 Group assets that were updated on or after 2019\-01\-01T01:00:00 GMT by their
@@ -142,16 +142,16 @@ types.
 
 .RS 2m
 $ gcloud alpha scc assets group 123456 \e
-    \-\-filter "update_time >= 1546304400000" \e
-    \-\-group\-by "security_center_properties.resource_type"
+    \-\-filter="update_time >= 1546304400000" \e
+    \-\-group\-by="security_center_properties.resource_type"
 .RE
 
 Group assets into following 3 state_changes (ADDED/DELETED/ACTIVE) based on the
 activity during past 24 hours:
 
 .RS 2m
-$ gcloud alpha scc assets group 123456 \-\-compare\-duration 86400s \e
-    \-\-group\-by "state_change"
+$ gcloud alpha scc assets group 123456 \-\-compare\-duration=86400s \e
+    \-\-group\-by="state_change"
 .RE
 
 

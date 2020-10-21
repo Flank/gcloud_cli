@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta filestore instances restore \- restore a Cloud Filestore instance to a backup
+gcloud beta filestore instances restore \- restore a Cloud Filestore instance from a backup
 
 
 
@@ -17,7 +17,8 @@ gcloud beta filestore instances restore \- restore a Cloud Filestore instance to
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Restore an existing Cloud Filestore instance to an existing backup.
+\fB(BETA)\fR Restore an existing Cloud Filestore instance from an existing
+backup.
 
 
 
@@ -55,7 +56,7 @@ The zone of the Filestore instance.
 .RS 2m
 .TP 2m
 \fB\-\-file\-share\fR=\fIFILE_SHARE\fR
-File share destination of the restored snapshot.
+File share to restore from the backup.
 
 .TP 2m
 \fB\-\-source\-backup\fR=\fISOURCE_BACKUP\fR

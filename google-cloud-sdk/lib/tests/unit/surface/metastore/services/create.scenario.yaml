@@ -26,7 +26,7 @@ summary:
 - execute:
   - label: user specified flags
   - command: |
-      metastore services create test-gcloud2 --port=8080 --network=projects/metastore-dogfood-cp/global/networks/yanbinlyu1 --hive-metastore-configs-from-file=metastore.xml --kerberos-principal=metastore/fake-project@C.FAKE-PROJECT.INTERNAL --krb5-config=gs://kerberos-fake-project/krb5.conf --keytab=projects/fake-project/secrets/kerberos-test/versions/1 --hive-metastore-version=2.3.6 --labels=foo1=bar1
+      metastore services create test-gcloud2 --port=8080 --network=projects/metastore-dogfood-cp/global/networks/yanbinlyu1 --hive-metastore-configs-from-file=metastore.xml --kerberos-principal=metastore/fake-project@C.FAKE-PROJECT.INTERNAL --krb5-config=gs://kerberos-fake-project/krb5.conf --keytab=projects/fake-project/secrets/kerberos-test/versions/1 --hive-metastore-version=2.3.6 --labels=foo1=bar1 --no-data-catalog-sync
   - stderr: |
       Create request issued for: [test-gcloud2]
   - progress_tracker:
@@ -288,7 +288,7 @@ actions:
 - execute_command:
     label: user specified flags
     command: |
-      metastore services create test-gcloud2 --port=8080 --network=projects/metastore-dogfood-cp/global/networks/yanbinlyu1 --hive-metastore-configs-from-file=metastore.xml --kerberos-principal=metastore/fake-project@C.FAKE-PROJECT.INTERNAL --krb5-config=gs://kerberos-fake-project/krb5.conf --keytab=projects/fake-project/secrets/kerberos-test/versions/1 --hive-metastore-version=2.3.6 --labels=foo1=bar1
+      metastore services create test-gcloud2 --port=8080 --network=projects/metastore-dogfood-cp/global/networks/yanbinlyu1 --hive-metastore-configs-from-file=metastore.xml --kerberos-principal=metastore/fake-project@C.FAKE-PROJECT.INTERNAL --krb5-config=gs://kerberos-fake-project/krb5.conf --keytab=projects/fake-project/secrets/kerberos-test/versions/1 --hive-metastore-version=2.3.6 --labels=foo1=bar1 --no-data-catalog-sync
     events:
     - api_call:
         expect_request:
@@ -309,6 +309,9 @@ actions:
               network: projects/metastore-dogfood-cp/global/networks/yanbinlyu1
               port: 8080
               tier: ENTERPRISE
+              metadataIntegration:
+                dataCatalogConfig:
+                  disabled: true
               labels:
                 foo1: bar1
         return_response:
@@ -370,6 +373,11 @@ actions:
                     "principal": "metastore/fake-project@C.FAKE-PROJECT.INTERNAL"
                   }
                 },
+                "metadataIntegration": {
+                  "dataCatalogConfig" : {
+                    "disabled": true
+                  }
+                },
                 "network": "projects/metastore-dogfood-cp/global/networks/yanbinlyu1",
                 "endpointUri": "thrift://10.20.64.31:8080",
                 "port": 8080,
@@ -412,6 +420,11 @@ actions:
                   },
                   "krb5ConfigGcsUri": "gs://kerberos-fake-project/krb5.conf",
                   "principal": "metastore/fake-project@C.FAKE-PROJECT.INTERNAL"
+                }
+              },
+              "metadataIntegration": {
+                "dataCatalogConfig" : {
+                  "disabled": true
                 }
               },
               "network": "projects/metastore-dogfood-cp/global/networks/yanbinlyu1",

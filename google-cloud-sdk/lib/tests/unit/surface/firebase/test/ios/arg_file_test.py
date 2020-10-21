@@ -188,6 +188,47 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':additional-ipas.empty',
                                   self.ios_args_set)
 
+  # Tests for --other-files arg
+
+  def testOtherFiles_GoodInput(self):
+    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':other-files-ios.good',
+                                       self.ios_args_set)
+    self.assertEqual(
+        args['other_files'], {
+            '/private/var/mobile/Media/myfile.txt': 'local/dir/file1.txt',
+            'com.google:/Documents/myfile2.txt': 'gs://bucket/file2.txt'
+        })
+
+  def testOtherFiles_ListInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':other-files.list',
+                                  self.ios_args_set)
+
+  def testOtherFiles_StringInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':other-files.string',
+                                  self.ios_args_set)
+
+  def testOtherFiles_IntInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':other-files.int',
+                                  self.ios_args_set)
+
+  # Tests for --directories-to-pull arg
+
+  def testDirsToPull_GoodInput(self):
+    args = arg_file.GetArgsFromArgFile(
+        GOOD_ARGS + ':directories-to-pull-ios.good', self.ios_args_set)
+    self.assertEqual(args['directories_to_pull'], [
+        '/private/var/mobile/Media/my_output',
+        'com.my.app:/Documents/my_other_output'
+    ])
+
+  def testDirsToPull_DictInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':directories-to-pull-ios.dict',
+                                  self.ios_args_set)
+
   # Various int-list arg validation tests
 
   def testIntList_ValidNumber(self):

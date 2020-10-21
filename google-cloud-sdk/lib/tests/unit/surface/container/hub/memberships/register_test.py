@@ -252,6 +252,7 @@ class RegisterTest(base.MembershipsTestBase):
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
     self.mock_kubernetes_client.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     self.StartObjectPatch(
         kube_util, 'IsGKECluster', return_value=False)
 
@@ -417,6 +418,7 @@ class RegisterTest(base.MembershipsTestBase):
   def testCreateMembershipWithExternalID(self):
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     self.StartObjectPatch(
         kube_util, 'IsGKECluster', return_value=False)
     self.mockValidateExclusivitySucceed()
@@ -881,7 +883,7 @@ class RegisterTest(base.MembershipsTestBase):
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = '//container.googleapis.com/projects/project/locations/location/clusters/cluster'
-
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = 'https//container.googleapis.com/v1/projects/project/locations/location/clusters/cluster'
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -936,6 +938,7 @@ class RegisterTest(base.MembershipsTestBase):
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = '//container.googleapis.com/projects/project/regions/region/clusters/cluster'
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = 'https//container.googleapis.com/v1/projects/project/locations/location/clusters/cluster'
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -963,6 +966,7 @@ class RegisterTest(base.MembershipsTestBase):
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -989,6 +993,7 @@ class RegisterTest(base.MembershipsTestBase):
   def testCreateMembershipWithGKECluster(self):
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = 'fake-uid'
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = '//container.googleapis.com/projects/project/locations/location/clusters/cluster'
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = 'https//container.googleapis.com/v1/projects/project/locations/location/clusters/cluster'
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -1082,6 +1087,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
         {'issuer': TEST_ISSUER_URL})
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -1098,13 +1104,12 @@ class RegisterTestBeta(RegisterTest):
       ])
 
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.assert_called_once_with(
-        )  # The linter prefers a hanging paren due to above line length.
+        issuer_url=None
+    )  # The linter prefers a hanging paren due to above line length.
 
-    mock_create_membership.assert_called_once_with(
-        'fake-project', 'my-cluster', 'my-cluster',
-        None,
-        TEST_UID, self.track, TEST_ISSUER_URL
-    )
+    mock_create_membership.assert_called_once_with('fake-project', 'my-cluster',
+                                                   'my-cluster', None, TEST_UID,
+                                                   self.track, TEST_ISSUER_URL)
 
   def testCreateWIMembershipPublicIssuer(self):
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
@@ -1112,6 +1117,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
         {'issuer': TEST_ISSUER_URL})
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -1142,6 +1148,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
         {'issuer': TEST_ISSUER_URL})
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = '//container.googleapis.com/projects/project/locations/location/clusters/cluster'
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = 'https//container.googleapis.com/v1/projects/project/locations/location/clusters/cluster'
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -1175,6 +1182,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.side_effect = exceptions.Error(
         'Oops!')
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
     self.mockValidateExclusivitySucceed()
@@ -1183,18 +1191,19 @@ class RegisterTestBeta(RegisterTest):
 
     # This test is not concerned about exceptions thrown during the command,
     # only that the parameters downstream methods are called with valid args.
-    with self.assertRaisesRegex(exceptions.Error,
-                                'Please double check that it is possible to '
-                                'access the /.well-known/openid-configuration '
-                                'endpoint on the cluster: Oops!'):
+    with self.assertRaisesRegex(
+        exceptions.Error, 'Error getting the OpenID Provider Configuration'):
       self.RunCommand([
-          'my-cluster', '--kubeconfig=' + self.kubeconfig,
-          '--context=test-context', '--project=fake-project',
+          'my-cluster',
+          '--kubeconfig=' + self.kubeconfig,
+          '--context=test-context',
+          '--project=fake-project',
           '--enable-workload-identity',
       ])
 
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.assert_called_once_with(
-        )  # The linter prefers a hanging paren due to above line length.
+        issuer_url=None
+    )  # The linter prefers a hanging paren due to above line length.
 
     mock_create_membership.assert_not_called()
 
@@ -1203,6 +1212,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.side_effect = exceptions.Error(
         'Oops!')
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
@@ -1212,9 +1222,8 @@ class RegisterTestBeta(RegisterTest):
 
     # This test is not concerned about exceptions thrown during the command,
     # only that the parameters downstream methods are called with valid args.
-    with self.assertRaisesRegex(exceptions.Error,
-                                'Please double check that --public-issuer-url '
-                                'was set correctly: Oops!'):
+    with self.assertRaisesRegex(
+        exceptions.Error, 'Error getting the OpenID Provider Configuration'):
       self.RunCommand([
           'my-cluster', '--kubeconfig=' + self.kubeconfig,
           '--context=test-context', '--project=fake-project',
@@ -1232,6 +1241,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
         {})
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
@@ -1255,6 +1265,7 @@ class RegisterTestBeta(RegisterTest):
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.return_value = json.dumps(
         {'issuer': discovered_issuer})
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
     # Mock to create a new membership.
     mock_create_membership = self.MockOutCreateMembershipNotFound()
@@ -1410,6 +1421,7 @@ class RegisterTestAlpha(RegisterTestBeta):
         {'issuer': TEST_BUCKET_ISSUER_URL})
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDKeyset.return_value = json.dumps(
         {'keys': [{'alg': 'RSA256'}]})
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_uri = None
     self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
 
     mock_create_bucket = self.StartObjectPatch(
@@ -1432,7 +1444,8 @@ class RegisterTestAlpha(RegisterTestBeta):
       ])
 
     self.mock_kubernetes_client.__enter__.return_value.GetOpenIDConfiguration.assert_called_once_with(
-        )  # The linter prefers a hanging paren due to above line length.
+        issuer_url=None
+    )  # The linter prefers a hanging paren due to above line length.
 
     mock_create_bucket.assert_called_once_with(
         'fake-project', TEST_BUCKET_ISSUER_URL,

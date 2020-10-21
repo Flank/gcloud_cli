@@ -1,0 +1,37 @@
+NAME
+    gcloud beta domains registrations configure - configure Cloud Domains
+        registrations' management, DNS or contact settings
+
+SYNOPSIS
+    gcloud beta domains registrations configure COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Commands for configuring Cloud Domains registrations' management,
+    DNS or contact settings.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     contacts
+        (BETA) Configure contact settings of a Cloud Domains registration.
+
+     dns
+        (BETA) Configure DNS settings of a Cloud Domains registration.
+
+     management
+        (BETA) Configure management settings of a Cloud Domains registration.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha domains registrations configure
+

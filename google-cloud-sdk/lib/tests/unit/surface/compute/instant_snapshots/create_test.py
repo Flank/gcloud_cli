@@ -111,7 +111,7 @@ class ZoneInstantSnapshotsCreateTestAlpha(ZoneInstantSnapshotsCreateTestBeta):
       self.Run("""
           compute instant-snapshots create ips-with-labels
             --source-disk my-disk
-            --source-disk-zone us-central1-a
+            --zone us-central1-a
             --labels inv@lid-key=inv@l!d-value
           """)
 

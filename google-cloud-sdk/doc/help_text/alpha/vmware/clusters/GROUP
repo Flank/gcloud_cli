@@ -1,11 +1,12 @@
 NAME
-    gcloud alpha vmware clusters - manage clusters in VMware privateclouds
+    gcloud alpha vmware clusters - manage clusters in VMware Engine private
+        clouds
 
 SYNOPSIS
     gcloud alpha vmware clusters COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage clusters in VMware privateclouds.
+    (ALPHA) Manage clusters in VMware Engine private clouds.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

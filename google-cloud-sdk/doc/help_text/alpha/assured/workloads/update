@@ -62,8 +62,7 @@ EXAMPLES
         $ gcloud alpha assured workloads update \
             organizations/123/locations/us-central1/workloads/456 \
             --display-name=Test-Workload-2 \
-            --labels \
-            ExistingLabelKey1=ExistingLabelValue1,\
+            --labels=ExistingLabelKey1=ExistingLabelValue1,\
         NewLabelKey2=NewLabelValue2 --etag=789
 
 NOTES

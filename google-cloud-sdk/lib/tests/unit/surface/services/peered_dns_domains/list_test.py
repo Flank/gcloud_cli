@@ -38,7 +38,7 @@ class ListPeeredDnsDomainsTest(unit_test_base.SNUnitTestBase):
   """Unit tests for services peered-dns-domains list command."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   @mock.patch.object(projects_api, 'Get', autospec=True)
   def testListPeeredDnsDomains_Success(self, mock_get):

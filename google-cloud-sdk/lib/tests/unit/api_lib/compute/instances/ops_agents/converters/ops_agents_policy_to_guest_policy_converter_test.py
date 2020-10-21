@@ -117,7 +117,7 @@ def _CreateLoggingAgentRule(
 
 
 def _CreateOpsAgentRule(
-    agent_version='0.0.1',
+    agent_version='1.0.0',
     package_state=agent_policy.OpsAgentPolicy.AgentRule.PackageState
     .INSTALLED,
     enable_autoupgrade=True):
@@ -138,6 +138,16 @@ AGENT_RULE_RUN_SCRIPT = textwrap.dedent("""\
             sudo rm {repo_dir}/{repo_name}.repo || true; find {cache_dir} -name '*{repo_name}*' | xargs sudo rm -rf || true
             for i in {{1..5}}; do
               if (sudo {package_manager} remove -y {package_name} || true; sudo {package_manager} install -y '{package_name}{package_suffix}';{additional_install} sudo service {package_name} start); then
+                break
+              fi
+              sleep 1m
+            done""")
+
+OPS_AGENT_RULE_RUN_SCRIPT = textwrap.dedent("""\
+    #!/bin/bash -e
+            sudo rm {repo_dir}/{repo_name}.repo || true; find {cache_dir} -name '*{repo_name}*' | xargs sudo rm -rf || true
+            for i in {{1..5}}; do
+              if (sudo {package_manager} remove -y {package_name} || true; sudo {package_manager} install -y '{package_name}{package_suffix}';{additional_install} sudo systemctl start google-cloud-ops-agent.target); then
                 break
               fi
               sleep 1m
@@ -576,18 +586,18 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         UNIFIED_AGENT_YUM_GUEST_POLICY_YAML.format(
             ops_agent_enable_autoupgrade='true',
             ops_agent_package_state='installed',
-            ops_agent_version='0.0.1',
+            ops_agent_version='1.0.0',
             ops_agent_desired_state='UPDATED',
             ops_agent_repo_suffix='-all',
             etag=ETAG,
-            ops_agent_run_script=AGENT_RULE_RUN_SCRIPT.format(
+            ops_agent_run_script=OPS_AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/yum.repos.d',
                 repo_name='google-cloud-ops-agent',
                 additional_install='',
                 cache_dir='/var/cache/yum',
                 package_name='google-cloud-ops-agent',
                 package_manager='yum',
-                package_suffix='-0.0.1-1.el7')),
+                package_suffix='-1.0.0-1.el7')),
         self.messages.GuestPolicy)
     ops_agents_policy = _CreateOpsAgentPolicy(
         'centos', OPS_AGENT_RULE_POLICY_AGENT_RULES)
@@ -659,18 +669,18 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         UNIFIED_AGENT_ZYPPER_GUEST_POLICY_YAML.format(
             ops_agent_enable_autoupgrade='true',
             ops_agent_package_state='installed',
-            ops_agent_version='0.0.1',
+            ops_agent_version='1.0.0',
             ops_agent_desired_state='UPDATED',
             ops_agent_repo_suffix='-all',
             etag=ETAG,
-            ops_agent_run_script=AGENT_RULE_RUN_SCRIPT.format(
+            ops_agent_run_script=OPS_AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/zypp/repos.d',
                 repo_name='google-cloud-ops-agent',
                 additional_install='',
                 cache_dir='/var/cache/zypp',
                 package_name='google-cloud-ops-agent',
                 package_manager='zypper',
-                package_suffix='=0.0.1-1')),
+                package_suffix='=1.0.0-1')),
         self.messages.GuestPolicy)
     ops_agents_policy = _CreateOpsAgentPolicy(
         'sles', OPS_AGENT_RULE_POLICY_AGENT_RULES)
@@ -739,18 +749,18 @@ class OpsAgentPolicyToGuestPolicyTest(test_case.TestCase):
         UNIFIED_AGENT_APT_GUEST_POLICY_YAML.format(
             ops_agent_enable_autoupgrade='true',
             ops_agent_package_state='installed',
-            ops_agent_version='0.0.1',
+            ops_agent_version='1.0.0',
             ops_agent_desired_state='UPDATED',
             ops_agent_repo_suffix='-all',
             etag=ETAG,
-            ops_agent_run_script=AGENT_RULE_RUN_SCRIPT.format(
+            ops_agent_run_script=OPS_AGENT_RULE_RUN_SCRIPT.format(
                 repo_dir='/etc/apt/sources.list.d',
                 repo_name='google-cloud-ops-agent',
                 additional_install='',
                 cache_dir='/var/cache/apt',
                 package_name='google-cloud-ops-agent',
                 package_manager='apt-get',
-                package_suffix='=0.0.1-1*')),
+                package_suffix='=1.0.0-1*')),
         self.messages.GuestPolicy)
     ops_agents_policy = _CreateOpsAgentPolicy(
         'debian', OPS_AGENT_RULE_POLICY_AGENT_RULES)

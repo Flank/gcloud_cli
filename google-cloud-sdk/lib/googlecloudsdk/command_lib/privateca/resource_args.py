@@ -25,11 +25,13 @@ from googlecloudsdk.api_lib.privateca import locations
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.calliope.concepts import util
 from googlecloudsdk.command_lib.kms import resource_args as kms_args
 from googlecloudsdk.command_lib.privateca import exceptions as privateca_exceptions
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import properties
-
+import six
 
 # Flag fallthroughs that rely on properties.
 LOCATION_PROPERTY_FALLTHROUGH = deps.PropertyFallthrough(
@@ -60,10 +62,14 @@ def CertificateAttributeConfig(fallthroughs=None):
       name='certificate', fallthroughs=fallthroughs or [])
 
 
-def CertificateAuthorityAttributeConfig(arg_name='certificate_authority'):
+def CertificateAuthorityAttributeConfig(arg_name='certificate_authority',
+                                        fallthroughs=None):
+  fallthroughs = fallthroughs or []
   return concepts.ResourceParameterAttributeConfig(
       name=arg_name,
-      help_text='The issuing certificate authority of the {resource}.')
+      help_text='The issuing certificate authority of the {resource}.' +
+      _GetFallthroughsSummary(fallthroughs),
+      fallthroughs=fallthroughs)
 
 
 def LocationAttributeConfig(arg_name='location', fallthroughs=None):
@@ -149,13 +155,14 @@ def CreateReusableConfigResourceSpec(location_fallthroughs=None):
 def CreateCertificateAuthorityResourceSpec(
     display_name,
     certificate_authority_attribute='certificate_authority',
-    location_attribute='location'):
+    location_attribute='location',
+    ca_id_fallthroughs=None):
   return concepts.ResourceSpec(
       'privateca.projects.locations.certificateAuthorities',
       # This will be formatted and used as {resource} in the help text.
       resource_name=display_name,
       certificateAuthoritiesId=CertificateAuthorityAttributeConfig(
-          certificate_authority_attribute),
+          certificate_authority_attribute, fallthroughs=ca_id_fallthroughs),
       locationsId=LocationAttributeConfig(location_attribute),
       projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG)
 
@@ -235,3 +242,28 @@ def CheckExpectedCAType(expected_type, ca):
     raise privateca_exceptions.InvalidCertificateAuthorityTypeError(
         'Cannot perform roots command on Subordinate CA. Please use the `privateca subordinates` command group instead.'
     )
+
+
+def ValidateResourceIsCompleteIfSpecified(args, resource_arg_name):
+  """Raises a ParseError if the given resource_arg_name is partially specified."""
+  if not hasattr(args.CONCEPTS, resource_arg_name):
+    return
+
+  concept_info = args.CONCEPTS.ArgNameToConceptInfo(resource_arg_name)
+  associated_args = [
+      util.NamespaceFormat(arg)
+      for arg in concept_info.attribute_to_args_map.values()
+  ]
+
+  # If none of the relevant args are specified, we're good.
+  if not [arg for arg in associated_args if args.IsSpecified(arg)]:
+    return
+
+  try:
+    # Re-parse this concept, but treat it as required even if it originally
+    # wasn't. This will trigger a meaningful user error if it's underspecified.
+    concept_info.ClearCache()
+    concept_info.allow_empty = False
+    concept_info.Parse(args)
+  except concepts.InitializationError as e:
+    raise handlers.ParseError(resource_arg_name, six.text_type(e))

@@ -1,11 +1,12 @@
 NAME
-    gcloud alpha vmware privateclouds - manage privateclouds in Cloud VMware
+    gcloud alpha vmware privateclouds - manage private clouds in Google Cloud
+        VMware Engine
 
 SYNOPSIS
     gcloud alpha vmware privateclouds COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage privateclouds in Cloud VMware.
+    (ALPHA) Manage private clouds in Google Cloud VMware Engine.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

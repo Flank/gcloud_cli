@@ -846,6 +846,11 @@ class ValidationsTestBeta(ValidationsTestGA):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
+  def testVerifyOnePlatformFlagsMinInstance(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    args.min_instances = 3
+    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
+
   def testVerifyOnePlatformFlagsTimeout(self):
     parser = argparse.ArgumentParser()
     flags.AddTimeoutFlag(parser)
@@ -858,11 +863,6 @@ class ValidationsTestAlpha(ValidationsTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testVerifyOnePlatformFlagsMinInstance(self):
-    args = parser_extensions.Namespace(min_instances=None)
-    args.min_instances = 3
-    flags.VerifyOnePlatformFlags(args, self.track, flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsTimeout(self):
     parser = argparse.ArgumentParser()

@@ -29,7 +29,6 @@ from tests.lib import e2e_utils
 from tests.lib import test_case
 
 
-@test_case.Filters.skip('likely GCR related', 'b/163030401')
 class ImagesTest(e2e_base.WithServiceAuth):
 
   _CREATE_CMD = 'builds submit {0} -q --tag={1}'

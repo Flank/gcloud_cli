@@ -62,29 +62,44 @@ class SpannerStartTestBeta(cli_test_base.CliTestBase):
 
     self.StartObjectPatch(util, 'PrefixOutput', self.prefix_output_mock)
 
-  def _ExpectedDockerCommand(self, host, grpc_port, rest_port):
-    return [
-        'docker', 'run', '-p',
-        '{}:{}:9010'.format(host, grpc_port), '-p',
-        '{}:{}:9020'.format(host, rest_port),
-        spanner_util.SPANNER_EMULATOR_DOCKER_IMAGE
-    ]
+  def _ExpectedDockerCommand(self, host, grpc_port, rest_port,
+                             enable_fault_injection):
+    if enable_fault_injection:
+      return [
+          'docker', 'run', '-p', '{}:{}:9010'.format(host, grpc_port), '-p',
+          '{}:{}:9020'.format(host, rest_port),
+          spanner_util.SPANNER_EMULATOR_DOCKER_IMAGE, './gateway_main',
+          '--hostname', '0.0.0.0', '--enable_fault_injection'
+      ]
+    else:
+      return [
+          'docker', 'run', '-p', '{}:{}:9010'.format(host, grpc_port), '-p',
+          '{}:{}:9020'.format(host, rest_port),
+          spanner_util.SPANNER_EMULATOR_DOCKER_IMAGE
+      ]
 
-  def _ExpectedNativeCommand(self, host, grpc_port, rest_port):
+  def _ExpectedNativeCommand(self, host, grpc_port, rest_port,
+                             enable_fault_injection):
     return [
         os.path.join('pathtocloudsdk', 'bin', 'cloud_spanner_emulator',
-                     'gateway_main'), '--hostname', host, '--grpc_port',
-        grpc_port, '--http_port', rest_port
+                     'gateway_main'),
+        '--hostname',
+        host,
+        '--grpc_port',
+        grpc_port,
+        '--http_port',
+        rest_port,
+        ('--enable_fault_injection' if enable_fault_injection else ''),
     ]
 
   def testRun_WithNoArgs(self):
     self.Run('emulators spanner start')
     if _IsRunningOnLinux():
       self.exec_mock.assert_called_with(
-          self._ExpectedNativeCommand('localhost', '9010', '9020'))
+          self._ExpectedNativeCommand('localhost', '9010', '9020', False))
     else:
       self.exec_mock.assert_called_with(
-          self._ExpectedDockerCommand('127.0.0.1', '9010', '9020'))
+          self._ExpectedDockerCommand('127.0.0.1', '9010', '9020', False))
     self.prefix_output_mock.assert_called_with(
         'proc', spanner_util.SPANNER_EMULATOR_COMPONENT_ID)
 
@@ -93,15 +108,24 @@ class SpannerStartTestBeta(cli_test_base.CliTestBase):
         'emulators spanner start --host-port=1.2.3.4:1111 --rest-port 1234')
     if _IsRunningOnLinux():
       self.exec_mock.assert_called_with(
-          self._ExpectedNativeCommand('1.2.3.4', '1111', '1234'))
+          self._ExpectedNativeCommand('1.2.3.4', '1111', '1234', False))
     else:
       self.exec_mock.assert_called_with(
-          self._ExpectedDockerCommand('1.2.3.4', '1111', '1234'))
+          self._ExpectedDockerCommand('1.2.3.4', '1111', '1234', False))
 
   def testRun_WithUseDocker(self):
     self.Run('emulators spanner start --use-docker=true')
     self.exec_mock.assert_called_with(
-        self._ExpectedDockerCommand('127.0.0.1', '9010', '9020'))
+        self._ExpectedDockerCommand('127.0.0.1', '9010', '9020', False))
+
+  def testRun_WithEnableFaultInjection(self):
+    self.Run('emulators spanner start --enable-fault-injection=true')
+    if _IsRunningOnLinux():
+      self.exec_mock.assert_called_with(
+          self._ExpectedNativeCommand('localhost', '9010', '9020', True))
+    else:
+      self.exec_mock.assert_called_with(
+          self._ExpectedDockerCommand('127.0.0.1', '9010', '9020', True))
 
 
 class SpannerStartTestAlpha(SpannerStartTestBeta):

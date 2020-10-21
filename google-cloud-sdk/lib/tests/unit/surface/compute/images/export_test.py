@@ -57,11 +57,16 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         async_flag=async_flag,
         is_import=False)
 
+  def prepareArtifactRegistryMocks(self,
+                                   expect_destination_bucket_check=True,
+                                   expected_builder_location=''):
+    pass
+
   def GetNetworkStepForExport(
       self,
       network=None,
       subnet=None,
-      include_zone=True,
+      zone='my-region-c',
       include_empty_network=False,
       image_project='my-project',
       workflow='../workflows/export/image_export.wf.json',
@@ -75,8 +80,8 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     if network:
       daisy_utils.AppendArg(export_vars, 'network', network)
 
-    if include_zone:
-      daisy_utils.AppendArg(export_vars, 'zone', 'my-region-c')
+    if zone:
+      daisy_utils.AppendArg(export_vars, 'zone', zone)
 
     daisy_utils.AppendArg(
         export_vars, 'scratch_bucket_gcs_path',
@@ -95,11 +100,19 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
                           config.CLOUD_SDK_VERSION)
 
     return self.cloudbuild_v1_messages.BuildStep(
-        args=export_vars, name=self.builder)
+        args=export_vars, name=self.GetBuilder(zone='', region='my-region'))
+
+  def GetBuilder(self, zone='', region=''):
+    if self.builder:
+      return self.builder
+    return daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+        executable=daisy_utils._IMAGE_EXPORT_BUILDER_EXECUTABLE,
+        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
 
   def testCommonCase(self):
-    build_step = self.GetNetworkStepForExport(include_zone=False)
+    build_step = self.GetNetworkStepForExport(zone='')
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -112,10 +125,11 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
   def testExportFormat(self):
     build_step = self.GetNetworkStepForExport(
-        include_zone=False,
+        zone='',
         workflow='../workflows/export/image_export_ext.wf.json',
         image_format='vmdk')
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -127,15 +141,21 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testZoneFlag(self):
-    build_step = self.GetNetworkStepForExport()
+    zone = 'us-west2-c'
+    self.builder = self.GetBuilder(zone=zone)
+    build_step = self.GetNetworkStepForExport(zone=zone)
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks(
+        expected_builder_location='us-west2',
+        expect_destination_bucket_check=False)
 
     self.Run("""
              compute images export --image {0}
              --destination-uri {1} --zone={2}
-             """.format(self.image_name, self.destination_uri, 'my-region-c'))
+             """.format(self.image_name, self.destination_uri, zone))
 
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
         [image-export] output
         """, normalize_space=True)
 
@@ -150,6 +170,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     )
 
     self.PrepareDaisyBucketMocksWithRegion()
+    self.prepareArtifactRegistryMocks()
 
     with self.assertRaisesRegexp(console_io.UnattendedPromptError,
                                  'This prompt could not be answered because '
@@ -172,6 +193,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     )
 
     self.PrepareDaisyBucketMocksWithRegion()
+    self.prepareArtifactRegistryMocks()
 
     with self.assertRaisesRegexp(console_io.UnattendedPromptError,
                                  ('This prompt could not be answered because '
@@ -184,9 +206,10 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     self.AssertErrContains('compute.googleapis.com')
 
   def testImageProject(self):
-    build_step = self.GetNetworkStepForExport(include_zone=False,
+    build_step = self.GetNetworkStepForExport(zone='',
                                               image_project='debian-cloud')
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -199,8 +222,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
   def testNetworkFlag(self):
     build_step = self.GetNetworkStepForExport(
-        network=self.network, include_zone=False)
+        network=self.network, zone='')
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -226,17 +250,23 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
                """.format(self.image_name))
 
   def testSubnetFlag(self):
+    zone = 'us-west2-c'
+    self.builder = self.GetBuilder(zone=zone)
     build_step = self.GetNetworkStepForExport(
-        network=self.network, subnet=self.subnet)
+        network=self.network, subnet=self.subnet, zone=zone)
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks(
+        expect_destination_bucket_check=False,
+        expected_builder_location='us-west2')
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
-             --network {2} --subnet {3} --zone my-region-c
+             --network {2} --subnet {3} --zone {4}
              """.format(self.image_name, self.destination_uri, self.network,
-                        self.subnet))
+                        self.subnet, zone))
 
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
         [image-export] output
         """, normalize_space=True)
 
@@ -244,6 +274,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     build_step = self.GetNetworkStepForExport(
         network='', include_empty_network=True, subnet=self.subnet)
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks(expect_destination_bucket_check=False)
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
@@ -258,8 +289,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
   # exception thrown anymore.
   def testSubnetFlagZoneAndRegionNotSpecified(self):
     daisy_step = self.GetNetworkStepForExport(subnet=self.subnet,
-                                              include_zone=False)
+                                              zone='')
     self.PrepareDaisyMocksForExport(daisy_step)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
@@ -274,6 +306,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     build_step = self.GetNetworkStepForExport(
         network=self.network, subnet=self.subnet)
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks(expect_destination_bucket_check=False)
 
     properties.VALUES.compute.zone.Set('my-region-c')
     self.Run("""
@@ -288,8 +321,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
   def testSubnetFlagRegionAsProperty(self):
     build_step = self.GetNetworkStepForExport(
-        network=self.network, subnet=self.subnet, include_zone=False)
+        network=self.network, subnet=self.subnet, zone='')
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks()
 
     properties.VALUES.compute.region.Set('my-region')
     self.Run("""
@@ -303,7 +337,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testScratchBucketCreatedInSourceRegion(self):
-    build_step = self.GetNetworkStepForExport(include_zone=False)
+    build_step = self.GetNetworkStepForExport(zone='')
     self.PrepareDaisyMocks(build_step, is_import=False)
 
     self.mocked_storage_v1.buckets.Get.Expect(
@@ -337,6 +371,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         ),
         response=self.storage_v1_messages.Buckets(
             items=[self.storage_v1_messages.Bucket(id=daisy_bucket_name)]))
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -411,8 +446,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
             items=[self.storage_v1_messages.Bucket(id=daisy_bucket_name)]))
 
     build_step = self.GetNetworkStepForExport(
-        include_zone=False, daisy_bucket_name=daisy_bucket_name)
+        zone='', daisy_bucket_name=daisy_bucket_name)
     self.PrepareDaisyMocks(build_step, is_import=False)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -496,8 +532,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
             members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
             role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
     ])
-    build_step = self.GetNetworkStepForExport(include_zone=False)
+    build_step = self.GetNetworkStepForExport(zone='')
     self.PrepareDaisyMocksForExport(build_step, permissions=actual_permissions)
+    self.prepareArtifactRegistryMocks()
 
     # mock for 2 service accounts.
     for _ in range(2):
@@ -533,6 +570,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
   def testAllowFailedIamGetRoles(self):
     self.PrepareDaisyBucketMocksWithRegion()
+    self.prepareArtifactRegistryMocks()
     self._ExpectServiceUsage()
 
     self.mocked_crm_v1.projects.Get.Expect(
@@ -569,7 +607,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     # Called once for each missed service account role.
     self._ExpectAddIamPolicyBinding(5)
 
-    self._ExpectCloudBuild(self.GetNetworkStepForExport(include_zone=False))
+    self._ExpectCloudBuild(self.GetNetworkStepForExport(zone=''))
 
     self.Run("""
              compute images export --image {0}
@@ -598,8 +636,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
             ],
             role=daisy_utils.ROLE_EDITOR),
     ])
-    build_step = self.GetNetworkStepForExport(include_zone=False)
+    build_step = self.GetNetworkStepForExport(zone='')
     self.PrepareDaisyMocksForExport(build_step, permissions=actual_permissions)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -628,8 +667,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
             ],
             role='roles/custom'),
     ])
-    build_step = self.GetNetworkStepForExport(include_zone=False)
+    build_step = self.GetNetworkStepForExport(zone='')
     self.PrepareDaisyMocksForExport(build_step, permissions=actual_permissions)
+    self.prepareArtifactRegistryMocks()
 
     self.Run("""
              compute images export --image {0}
@@ -647,17 +687,81 @@ class ImagesExportTestBeta(ImagesExportTestGA):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
+  def SetUp(self):
+    super(ImagesExportTestBeta, self).SetUp()
+    self.builder = ''
+
+  def prepareArtifactRegistryMocks(self,
+                                   expect_destination_bucket_check=True,
+                                   expected_builder_location=''):
+    expected_builder_location = self.GetScratchBucketRegion().lower(
+    ) if not expected_builder_location else expected_builder_location
+    if expect_destination_bucket_check:
+      self.mocked_storage_v1.buckets.Get.Expect(
+          self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
+          response=self.storage_v1_messages.Bucket(
+              name='31dd',
+              storageClass='REGIONAL',
+              location=expected_builder_location),
+      )
+    full_builder_location = 'projects/compute-image-tools/locations/{}'.format(
+        expected_builder_location)
+    repo_name = '{}/repositories/wrappers'.format(full_builder_location)
+    package_name = '{}/packages/gce_vm_image_export'.format(repo_name)
+
+    msgs = self.mocked_artifacts_v1beta2_messages
+    self.mocked_artifacts_v1beta2.projects_locations.List.Expect(
+        msgs.ArtifactregistryProjectsLocationsListRequest(
+            name='projects/compute-image-tools'),
+        response=msgs.ListLocationsResponse(locations=[
+            msgs.Location(
+                name=full_builder_location,
+                locationId=expected_builder_location)
+        ]))
+
+    self.mocked_artifacts_v1beta2.projects_locations_repositories.Get.Expect(
+        msgs.ArtifactregistryProjectsLocationsRepositoriesGetRequest(
+            name=repo_name),
+        response=msgs.Repository(
+            name=repo_name,
+            format=msgs.Repository.FormatValueValuesEnum.DOCKER))
+
+    self.mocked_artifacts_v1beta2.projects_locations_repositories_packages.Get.Expect(
+        msgs.ArtifactregistryProjectsLocationsRepositoriesPackagesGetRequest(
+            name=package_name),
+        response=msgs.Package(name=package_name))
+
+  def GetBuilder(self,
+                 zone='',
+                 region='',
+                 tag=daisy_utils._DEFAULT_BUILDER_VERSION):
+    if self.builder:
+      return self.builder
+
+    builder_region = ''
+    if zone:
+      builder_region = daisy_utils.GetRegionFromZone(zone).lower()
+    elif region:
+      builder_region = region.lower()
+
+    if builder_region:
+      return daisy_utils._REGIONALIZED_BUILDER_DOCKER_PATTERN.format(
+          executable=daisy_utils._IMAGE_EXPORT_BUILDER_EXECUTABLE,
+          region=builder_region,
+          docker_image_tag=tag)
+    else:
+      return daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
+          executable=daisy_utils._IMAGE_EXPORT_BUILDER_EXECUTABLE,
+          docker_image_tag=tag)
+
   def testDockerImageTag(self):
-    self.builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._IMAGE_EXPORT_BUILDER_EXECUTABLE,
-        docker_image_tag=daisy_utils._DEFAULT_BUILDER_VERSION)
     self.testCommonCase()
 
-    self.builder = daisy_utils._DEFAULT_BUILDER_DOCKER_PATTERN.format(
-        executable=daisy_utils._IMAGE_EXPORT_BUILDER_EXECUTABLE,
-        docker_image_tag='latest')
-    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.builder = self.GetBuilder(tag='latest', region='my-region')
+    build_step = self.GetNetworkStepForExport(zone='')
     self.PrepareDaisyMocksForExport(build_step)
+    self.prepareArtifactRegistryMocks()
+
     self.Run("""
              compute images export --image {0}
              --destination-uri {1}

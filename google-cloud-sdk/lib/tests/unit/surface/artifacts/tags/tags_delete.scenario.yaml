@@ -26,7 +26,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -39,7 +39,7 @@ actions:
               locationId: us-east1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags/my-tag?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -60,7 +60,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations?alt=json
           method: GET
           headers: {}
           body: null
@@ -73,7 +73,7 @@ actions:
               locationId: us-east1
     - api_call:
         expect_request:
-          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/repositories/my-repo/packages/@scope%252Fmy-pkg/tags/my-tag?alt=json
+          uri: https://artifactregistry.googleapis.com/v1beta2/projects/fake-project/locations/us-east1/repositories/my-repo/packages/@scope%252Fmy-pkg/tags/my-tag?alt=json
           method: DELETE
           headers: {}
           body: null

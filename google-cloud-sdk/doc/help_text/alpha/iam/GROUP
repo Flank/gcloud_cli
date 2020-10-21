@@ -39,6 +39,9 @@ GROUPS
      service-accounts
         (ALPHA) Create and manipulate service accounts.
 
+     workload-identity-pools
+        (ALPHA) Manage IAM WorkloadIdentityPools.
+
 COMMANDS
     COMMAND is one of the following:
 

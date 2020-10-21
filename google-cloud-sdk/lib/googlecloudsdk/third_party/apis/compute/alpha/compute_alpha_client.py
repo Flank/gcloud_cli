@@ -843,6 +843,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def SetEdgeSecurityPolicy(self, request, global_params=None):
+      r"""Sets the edge security policy for the specified backend bucket.
+
+      Args:
+        request: (ComputeBackendBucketsSetEdgeSecurityPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetEdgeSecurityPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetEdgeSecurityPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.backendBuckets.setEdgeSecurityPolicy',
+        ordered_params=['project', 'backendBucket'],
+        path_params=['backendBucket', 'project'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/global/backendBuckets/{backendBucket}/setEdgeSecurityPolicy',
+        request_field='securityPolicyReference',
+        request_type_name='ComputeBackendBucketsSetEdgeSecurityPolicyRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any existing policy.
 
@@ -1165,6 +1191,32 @@ Example request body:
         relative_path='projects/{project}/global/backendServices/{backendService}',
         request_field='backendServiceResource',
         request_type_name='ComputeBackendServicesPatchRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def SetEdgeSecurityPolicy(self, request, global_params=None):
+      r"""Sets the edge security policy for the specified backend service.
+
+      Args:
+        request: (ComputeBackendServicesSetEdgeSecurityPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetEdgeSecurityPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetEdgeSecurityPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.backendServices.setEdgeSecurityPolicy',
+        ordered_params=['project', 'backendService'],
+        path_params=['backendService', 'project'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/global/backendServices/{backendService}/setEdgeSecurityPolicy',
+        request_field='securityPolicyReference',
+        request_type_name='ComputeBackendServicesSetEdgeSecurityPolicyRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -13107,6 +13159,32 @@ For more information, see Deleting instantSnapshots.
         supports_download=False,
     )
 
+    def Export(self, request, global_params=None):
+      r"""Export the changed blocks between two instant snapshots to a customer?s bucket in the user specified format.
+
+      Args:
+        request: (ComputeRegionInstantSnapshotsExportRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Export')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Export.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.regionInstantSnapshots.export',
+        ordered_params=['project', 'region', 'instantSnapshot'],
+        path_params=['instantSnapshot', 'project', 'region'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/regions/{region}/instantSnapshots/{instantSnapshot}/export',
+        request_field='instantSnapshotExportParams',
+        request_type_name='ComputeRegionInstantSnapshotsExportRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def Get(self, request, global_params=None):
       r"""Returns the specified InstantSnapshot resource in the specified region.
 
@@ -14249,6 +14327,8 @@ This method is called on a best-effort basis. Specifically:
 
     def InvalidateCache(self, request, global_params=None):
       r"""Initiates a cache invalidation operation, invalidating the specified path, scoped to the specified UrlMap.
+
+For more information, see [Invalidating cached content](/cdn/docs/invalidating-cached-content).
 
       Args:
         request: (ComputeRegionUrlMapsInvalidateCacheRequest) input message
@@ -18716,6 +18796,8 @@ For more information, see Deleting snapshots.
     def InvalidateCache(self, request, global_params=None):
       r"""Initiates a cache invalidation operation, invalidating the specified path, scoped to the specified UrlMap.
 
+For more information, see [Invalidating cached content](/cdn/docs/invalidating-cached-content).
+
       Args:
         request: (ComputeUrlMapsInvalidateCacheRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -19533,6 +19615,32 @@ For more information, see Deleting instantSnapshots.
         relative_path='projects/{project}/zones/{zone}/instantSnapshots/{instantSnapshot}',
         request_field='',
         request_type_name='ComputeZoneInstantSnapshotsDeleteRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def Export(self, request, global_params=None):
+      r"""Export the changed blocks between two instant snapshots to a customer?s bucket in the user specified format.
+
+      Args:
+        request: (ComputeZoneInstantSnapshotsExportRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Export')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Export.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.zoneInstantSnapshots.export',
+        ordered_params=['project', 'zone', 'instantSnapshot'],
+        path_params=['instantSnapshot', 'project', 'zone'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/zones/{zone}/instantSnapshots/{instantSnapshot}/export',
+        request_field='instantSnapshotExportParams',
+        request_type_name='ComputeZoneInstantSnapshotsExportRequest',
         response_type_name='Operation',
         supports_download=False,
     )

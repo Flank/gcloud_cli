@@ -11,7 +11,7 @@ gcloud alpha network\-connectivity spokes create \- create a new spoke
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha network\-connectivity spokes create\fR (\fISPOKE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-hub\fR=\fIHUB\fR (\fB\-\-interconnect\-attachment\fR=[\fIINTERCONNECT_ATTACHMENT\fR,...]\ |\ \fB\-\-router\-appliance\-instance\fR=[\fIROUTER_APPLIANCE_INSTANCE\fR,...]\ |\ \fB\-\-vpn\-tunnel\fR=[\fIVPN_TUNNEL\fR,...]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha network\-connectivity spokes create\fR (\fISPOKE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-hub\fR=\fIHUB\fR (\fB\-\-interconnect\-attachment\fR=[\fIINTERCONNECT_ATTACHMENT\fR,...]\ |\ \fB\-\-router\-appliance\fR=\fIROUTER_APPLIANCE\fR\ |\ \fB\-\-vpn\-tunnel\fR=[\fIVPN_TUNNEL\fR,...]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,8 +65,14 @@ Exactly one of these must be specified:
 Interconnect attachment that this spoke links to.
 
 .TP 2m
-\fB\-\-router\-appliance\-instance\fR=[\fIROUTER_APPLIANCE_INSTANCE\fR,...]
-Router appliance instance that this spoke links to.
+\fB\-\-router\-appliance\fR=\fIROUTER_APPLIANCE\fR
+Router appliance instance(s)and that this spoke links to.
+
+For example, use \f5\-\-router\-appliance=instance=ins_1,ip=10.10.0.1\fR to add
+a single router\-appliance instance, or
+\f5\-\-router\-appliance=instance=ins_1,ip=10.10.0.1
+\-\-router\-appliance=instance=ins_2,ip=10.10.0.1 ...\fR to add multiple
+instances.
 
 .TP 2m
 \fB\-\-vpn\-tunnel\fR=[\fIVPN_TUNNEL\fR,...]
@@ -87,6 +93,10 @@ Return immediately, without waiting for the operation in progress to complete.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Description of the spoke to be created.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+List of label KEY=VALUE pairs to add.
 
 
 .RE

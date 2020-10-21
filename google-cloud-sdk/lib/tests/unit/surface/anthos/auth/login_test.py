@@ -27,6 +27,9 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
 
   def SetUp(self):
     self.StartObjectPatch(anthoscli_backend,
+                          'GetFileOrURL',
+                          return_value=('my-login-config.yaml', None, False))
+    self.StartObjectPatch(anthoscli_backend,
                           'GetPreferredAuthForCluster',
                           return_value=('oidc1', None, None))
 
@@ -41,7 +44,9 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
             '--cluster',
             'my-test-cluster',
             '--login-config',
-            'my-login-config.yaml',])
+            'my-login-config.yaml',
+            '--preferred-auth',
+            'oidc1',])
     self.AssertErrContains('Configuring Anthos authentication')
 
   def testLoginDryRun(self):
@@ -56,7 +61,9 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
             'my-test-cluster',
             '--login-config',
             'my-login-config.yaml',
-            '--dry-run',])
+            '--dry-run',
+            '--preferred-auth',
+            'oidc1',])
     self.AssertErrContains('Configuring Anthos authentication')
 
   def testLoginExplicit(self):
@@ -77,7 +84,9 @@ class LoginTest(anthos_test_base.AuthUnitTestBase):
             '--login-config-cert',
             'mycert',
             '--user',
-            'testuser',])
+            'testuser',
+            '--preferred-auth',
+            'oidc1',])
     self.AssertErrContains('Configuring Anthos authentication')
 
 

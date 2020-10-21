@@ -3,7 +3,8 @@ NAME
         Compute Engine router
 
 SYNOPSIS
-    gcloud alpha compute routers remove-bgp-peer NAME --peer-name=PEER_NAME
+    gcloud alpha compute routers remove-bgp-peer NAME
+        (--peer-name=PEER_NAME | --peer-names=[PEER_NAME,...])
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -15,8 +16,13 @@ POSITIONAL ARGUMENTS
         Name of the router to update.
 
 REQUIRED FLAGS
-     --peer-name=PEER_NAME
-        The name of the peer being removed.
+     Exactly one of these must be specified:
+
+       --peer-name=PEER_NAME
+          The name of the peer being removed.
+
+       --peer-names=[PEER_NAME,...]
+          The list of names for peers being removed.
 
 OPTIONAL FLAGS
      --region=REGION

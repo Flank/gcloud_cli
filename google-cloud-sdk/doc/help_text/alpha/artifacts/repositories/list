@@ -8,11 +8,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List all Artifact Registry and Container Registry repositories in
-    the specified project.
-
-    To perform actions on the Container Registry repositories, use gcloud
-    container images.
+    (ALPHA) List all Artifact Registry repositories in the specified project.
 
     To specify the maximum number of repositories to list, use the --limit
     flag.

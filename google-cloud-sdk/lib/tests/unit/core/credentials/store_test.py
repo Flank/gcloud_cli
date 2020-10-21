@@ -372,7 +372,7 @@ gs_oauth2_refresh_token = fake-token
         self.fake_account))
 
     # Load() refreshes expired tokens
-    creds_loaded = store.Load(self.fake_account, use_google_auth=True)
+    creds_loaded = store.Load(self.fake_account)
 
     expected_creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
     expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
@@ -590,11 +590,13 @@ gs_oauth2_refresh_token = fake-token
     # Load() refreshes expired tokens
     creds_loaded = store.Load(self.fake_account, use_google_auth=True)
 
-    expected_creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict.clear()
+    expected_creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
     expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
     expected_expired = False
+    self.assertIsInstance(creds_loaded, c_creds.P12CredentialsGoogleAuth)
     self.AssertCredentials(creds_loaded,
-                           c_creds.CredentialType.P12_SERVICE_ACCOUNT,
+                           c_creds.CredentialTypeGoogleAuth.P12_SERVICE_ACCOUNT,
                            expected_creds_dict, expected_expired)
 
   def testStoreGoogleAuth_LoadGoogleAuth_ServiceAccountCreds(self):
@@ -1317,6 +1319,16 @@ gs_oauth2_refresh_token = fake-token
     loaded_google_auth_creds = store.Load(
         self.fake_account, use_google_auth=True)
     self.assertEqual(loaded_google_auth_creds._token_uri, 'fake-token-host')
+
+  def testLoadP12GoogleAuthCredentials_ForceRefresh(self):
+    refresh_mock = self.StartObjectPatch(store, '_Refresh')
+
+    creds_stored = self.MakeP12ServiceAccountCredentials()
+    creds_stored.token_expiry = (
+        datetime.datetime.utcnow() + datetime.timedelta(hours=1))
+    store.Store(creds_stored, self.fake_account)
+    store.Load(self.fake_account, use_google_auth=True)
+    refresh_mock.assset_called()
 
 
 @test_case.Filters.RunOnlyOnLinux

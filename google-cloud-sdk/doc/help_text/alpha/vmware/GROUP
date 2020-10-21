@@ -1,11 +1,11 @@
 NAME
-    gcloud alpha vmware - manage Cloud VMware resources
+    gcloud alpha vmware - manage Google Cloud VMware Engine resources
 
 SYNOPSIS
     gcloud alpha vmware GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Cloud VMware resources.
+    (ALPHA) Manage Google Cloud VMware Engine resources.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -19,10 +19,10 @@ GROUPS
     GROUP is one of the following:
 
      clusters
-        (ALPHA) Manage clusters in VMware privateclouds.
+        (ALPHA) Manage clusters in VMware Engine private clouds.
 
      privateclouds
-        (ALPHA) Manage privateclouds in Cloud VMware.
+        (ALPHA) Manage private clouds in Google Cloud VMware Engine.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

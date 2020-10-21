@@ -9,8 +9,8 @@ SYNOPSIS
         [--gce-image=GCE_IMAGE]
         [--machine-type=MACHINE_TYPE; default="n1-standard-1"] [--name=NAME]
         [--network=NETWORK; default="default"] [--preemptible]
-        [--preemptible-vm] [--tf-version=TF_VERSION] [--use-dl-images]
-        [--vm-only] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--preemptible-vm] [--tf-version=TF_VERSION] [--tpu-only]
+        [--use-dl-images] [--vm-only] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create Google Compute TPUs along with VMs.
@@ -66,6 +66,12 @@ FLAGS
         Set the version of TensorFlow to use when creating the Compute Engine
         VM and the Cloud TPU. (It defaults to auto-selecting the latest stable
         release.)
+
+     --tpu-only
+        Do not allocate a VM, only allocate a TPU. To be used after the command
+        has been run with a --vm-only flag and the user is ready to run on a
+        TPU. Ensure that the name matches the name passed in when creating with
+        the --vm-only flag.
 
      --use-dl-images
         Use Deep Learning VM Images (see docs -

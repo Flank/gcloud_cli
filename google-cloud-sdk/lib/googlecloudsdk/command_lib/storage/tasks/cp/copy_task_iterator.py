@@ -20,9 +20,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.storage import plurality_checkable_iterator
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import wildcard_iterator
+from googlecloudsdk.command_lib.storage.resources import resource_reference
 from googlecloudsdk.command_lib.storage.tasks.cp import copy_task_factory
 
 
@@ -164,7 +164,7 @@ class CopyTaskIterator:
       # Schema might give us incorrect suffix for Windows.
       # TODO(b/169093672) This will not be required if we get rid of file://
       schemaless_url = source_url.versionless_url_string.rpartition(
-          source_url.scheme + '://')[2]
+          source_url.scheme.value + '://')[2]
 
       destination_suffix = schemaless_url.rpartition(source_url.delimiter)[2]
 

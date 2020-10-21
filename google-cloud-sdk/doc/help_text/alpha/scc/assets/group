@@ -77,28 +77,28 @@ EXAMPLES
     compute instance, service etc):
 
         $ gcloud alpha scc assets group 123456 \
-            --group-by "security_center_properties.resource_type"
+            --group-by="security_center_properties.resource_type"
 
     Group compute instances (assets) under organization 123456 by their
     respective projects:
 
         $ gcloud alpha scc assets group 123456 \
-            --filter \
-            "security_center_properties.resource_type=\"google.compute.Insta\
-        nce\"" --group-by "security_center_properties.resource_project"
+            --filter="security_center_properties.resource_type=\"google.comp\
+        ute.Instance\""\
+         --group-by="security_center_properties.resource_project"
 
     Group assets that were updated on or after 2019-01-01T01:00:00 GMT by their
     types.
 
         $ gcloud alpha scc assets group 123456 \
-            --filter "update_time >= 1546304400000" \
-            --group-by "security_center_properties.resource_type"
+            --filter="update_time >= 1546304400000" \
+            --group-by="security_center_properties.resource_type"
 
     Group assets into following 3 state_changes (ADDED/DELETED/ACTIVE) based on
     the activity during past 24 hours:
 
-        $ gcloud alpha scc assets group 123456 --compare-duration 86400s \
-            --group-by "state_change"
+        $ gcloud alpha scc assets group 123456 --compare-duration=86400s \
+            --group-by="state_change"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -1,6 +1,6 @@
 NAME
     gcloud beta filestore instances restore - restore a Cloud Filestore
-        instance to a backup
+        instance from a backup
 
 SYNOPSIS
     gcloud beta filestore instances restore (INSTANCE : --zone=ZONE)
@@ -9,7 +9,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Restore an existing Cloud Filestore instance to an existing backup.
+    (BETA) Restore an existing Cloud Filestore instance from an existing
+    backup.
 
 POSITIONAL ARGUMENTS
      Instance resource - Arguments and flags that specify the Filestore
@@ -30,7 +31,7 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --file-share=FILE_SHARE
-        File share destination of the restored snapshot.
+        File share to restore from the backup.
 
      --source-backup=SOURCE_BACKUP
         Name of the Filestore backup to restore from.

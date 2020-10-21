@@ -5,7 +5,10 @@ NAME
 SYNOPSIS
     gcloud beta sql instances patch INSTANCE
         [--activation-policy=ACTIVATION_POLICY] [--[no-]assign-ip] [--async]
-        [--availability-type=AVAILABILITY_TYPE] [--cpu=CPU] [--diff]
+        [--availability-type=AVAILABILITY_TYPE] [--cpu=CPU]
+        [--deny-maintenance-period-end-date=DENY_MAINTENANCE_PERIOD_END_DATE]
+        [--deny-maintenance-period-start-date=DENY_MAINTENANCE_PERIOD_START_DATE]
+        [--deny-maintenance-period-time=DENY_MAINTENANCE_PERIOD_TIME] [--diff]
         [--[no-]enable-bin-log] [--[no-]enable-database-replication]
         [--enable-point-in-time-recovery] [--follow-gae-app=FOLLOW_GAE_APP]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
@@ -13,8 +16,8 @@ SYNOPSIS
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
         [--maintenance-window-hour=MAINTENANCE_WINDOW_HOUR] [--memory=MEMORY]
         [--network=NETWORK] [--pricing-plan=PRICING_PLAN, -p PRICING_PLAN]
-        [--replication=REPLICATION] [--[no-]require-ssl]
-        [--storage-auto-increase]
+        [--remove-deny-maintenance-period] [--replication=REPLICATION]
+        [--[no-]require-ssl] [--storage-auto-increase]
         [--storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT]
         [--storage-size=STORAGE_SIZE] [--tier=TIER, -t TIER]
         [--update-labels=[KEY=VALUE,...]]
@@ -68,6 +71,16 @@ FLAGS
         Whole number value indicating how many cores are desired in the
         machine. Both --cpu and --memory must be specified if a custom machine
         type is desired, and the --tier flag must be omitted.
+
+     --deny-maintenance-period-end-date=DENY_MAINTENANCE_PERIOD_END_DATE
+        Date when the deny maintenance period ends, that is ``2021-01-10".
+
+     --deny-maintenance-period-start-date=DENY_MAINTENANCE_PERIOD_START_DATE
+        Date when the deny maintenance period begins, that is ``2020-11-01".
+
+     --deny-maintenance-period-time=DENY_MAINTENANCE_PERIOD_TIME
+        Time when the deny maintenance period starts or ends, that is
+        ``05:00:00".
 
      --diff
         Show what changed as a result of the update.
@@ -136,6 +149,9 @@ FLAGS
      --pricing-plan=PRICING_PLAN, -p PRICING_PLAN
         First Generation instances only. The pricing plan for this instance.
         PRICING_PLAN must be one of: PER_USE, PACKAGE.
+
+     --remove-deny-maintenance-period
+        Removes the user-specified deny maintenance period.
 
      --replication=REPLICATION
         Type of replication this instance uses. The default is synchronous.

@@ -1,12 +1,12 @@
 NAME
     gcloud alpha container hub config-management enable - enable Config
-        Management feature
+        Management Feature
 
 SYNOPSIS
     gcloud alpha container hub config-management enable [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command enables Config Management feature in Hub.
+    (ALPHA) This command enables Config Management Feature in Hub.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

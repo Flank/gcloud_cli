@@ -28,6 +28,7 @@ from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import creds
 from googlecloudsdk.core.credentials import devshell
+from googlecloudsdk.core.credentials import flow
 from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import platforms
@@ -36,6 +37,7 @@ from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
 
 import mock
+from oauthlib.oauth2.rfc6749 import errors as rfc6749_errors
 import six
 from google.auth import jwt
 
@@ -484,6 +486,37 @@ class LoginTestGoogleAuth(LoginTestMixin, cli_test_base.CliTestBase,
     cred_mock.id_token = 'id_token'
     self.mock_jwt_decode.return_value = {'email': account}
     return cred_mock
+
+
+class LoginTestContextAwareAccess(cli_test_base.CliTestBase):
+
+  def SetUp(self):
+    self.mock_load = self.StartObjectPatch(store, 'Load', autospec=True)
+    self.mock_flow = self.StartObjectPatch(
+        flow.InstalledAppFlow, 'run_local_server', autospec=True)
+    self.mock_browser = self.StartPatch('webbrowser.get', autospec=True)
+    self.mock_browser.return_value.name = 'Chrome'
+
+    self.mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
+    self.mock_metadata.return_value.connected = False
+    self.mock_metadata.return_value.Project = lambda: 'metadata-project'
+    self.StartDictPatch('os.environ', {'DISPLAY': ':1'})
+
+  def Login(self, account='', more_args=''):
+    return self.Run(
+        'auth login {account}{more_args} --no-use-oauth2client'.format(
+            account=account, more_args=more_args))
+
+  def testWebFlowError_ContextAwareAccessDenied(self):
+    """When login was denied because of context aware access policies."""
+    self.mock_load.return_value = None  # No creds to start.
+    self.mock_flow.side_effect = rfc6749_errors.AccessDeniedError(
+        'access_denied: Account restricted')
+
+    with self.assertRaisesRegex(flow.Error,
+                                'access_denied: Account restricted'):
+      self.Login(account='foo@google.com')
+    self.AssertErrContains('Access was blocked due to an organization policy')
 
 
 def _GetJsonUserADC():

@@ -11,7 +11,7 @@ gcloud alpha compute routers remove\-bgp\-peer \- remove a BGP peer from a Compu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers remove\-bgp\-peer\fR \fINAME\fR \fB\-\-peer\-name\fR=\fIPEER_NAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers remove\-bgp\-peer\fR \fINAME\fR (\fB\-\-peer\-name\fR=\fIPEER_NAME\fR\ |\ \fB\-\-peer\-names\fR=[\fIPEER_NAME\fR,...]) [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,10 +37,20 @@ Name of the router to update.
 
 .RS 2m
 .TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-peer\-name\fR=\fIPEER_NAME\fR
 The name of the peer being removed.
 
+.TP 2m
+\fB\-\-peer\-names\fR=[\fIPEER_NAME\fR,...]
+The list of names for peers being removed.
 
+
+.RE
 .RE
 .sp
 

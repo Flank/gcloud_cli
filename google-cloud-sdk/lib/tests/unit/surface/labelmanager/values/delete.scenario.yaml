@@ -156,5 +156,5 @@ actions:
               status: PERMISSION_DENIED
     - expect_exit:
         code: 1
-        message: 'User [fake_account] does not have permission to access labelValue
+        message: 'User [fake_account] does not have permission to access labelValues instance
           [112] (or it may not exist): The caller does not have permission'

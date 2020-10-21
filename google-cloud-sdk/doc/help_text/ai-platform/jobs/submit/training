@@ -138,12 +138,12 @@ FLAGS
         accelerators to attach to each server (COUNT).
 
          type
-            The type of the accelerator. Choices are
+            Type of the accelerator. Choices are
             nvidia-tesla-a100,nvidia-tesla-k80,nvidia-tesla-p100,nvidia-tesla-p4,nvidia-tesla-t4,nvidia-tesla-v100,tpu-v2,tpu-v2-pod,tpu-v3,tpu-v3-pod
 
          count
-            The number of accelerators to attach to each machine running the
-            job. Must be greater than 0.
+            Number of accelerators to attach to each machine running the job.
+            Must be greater than 0.
 
      --master-image-uri=MASTER_IMAGE_URI
         Docker image to run on each master worker. This image must be in
@@ -178,12 +178,12 @@ FLAGS
         accelerators to attach to each server (COUNT).
 
          type
-            The type of the accelerator. Choices are
+            Type of the accelerator. Choices are
             nvidia-tesla-a100,nvidia-tesla-k80,nvidia-tesla-p100,nvidia-tesla-p4,nvidia-tesla-t4,nvidia-tesla-v100,tpu-v2,tpu-v2-pod,tpu-v3,tpu-v3-pod
 
          count
-            The number of accelerators to attach to each machine running the
-            job. Must be greater than 0.
+            Number of accelerators to attach to each machine running the job.
+            Must be greater than 0.
 
      --parameter-server-image-uri=PARAMETER_SERVER_IMAGE_URI
         Docker image to run on each parameter server. This image must be in
@@ -284,12 +284,12 @@ FLAGS
         to attach to each server (COUNT).
 
          type
-            The type of the accelerator. Choices are
+            Type of the accelerator. Choices are
             nvidia-tesla-a100,nvidia-tesla-k80,nvidia-tesla-p100,nvidia-tesla-p4,nvidia-tesla-t4,nvidia-tesla-v100,tpu-v2,tpu-v2-pod,tpu-v3,tpu-v3-pod
 
          count
-            The number of accelerators to attach to each machine running the
-            job. Must be greater than 0.
+            Number of accelerators to attach to each machine running the job.
+            Must be greater than 0.
 
      --worker-image-uri=WORKER_IMAGE_URI
         Docker image to run on each worker node. This image must be in
@@ -334,9 +334,9 @@ FLAGS
      Configure parameter server machine type settings.
 
        --parameter-server-count=PARAMETER_SERVER_COUNT
-          The number of parameter servers to use for the training job. This
-          flag must be specified if any of the other arguments in this group
-          are specified.
+          Number of parameter servers to use for the training job. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
 
        --parameter-server-machine-type=PARAMETER_SERVER_MACHINE_TYPE
           Type of virtual machine to use for training job's parameter servers.
@@ -348,9 +348,8 @@ FLAGS
      Configure worker node machine type settings.
 
        --worker-count=WORKER_COUNT
-          The number of worker nodes to use for the training job. This flag
-          must be specified if any of the other arguments in this group are
-          specified.
+          Number of worker nodes to use for the training job. This flag must be
+          specified if any of the other arguments in this group are specified.
 
        --worker-machine-type=WORKER_MACHINE_TYPE
           Type of virtual machine to use for training job's worker nodes. This

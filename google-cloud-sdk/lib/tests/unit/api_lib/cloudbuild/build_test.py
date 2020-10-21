@@ -252,7 +252,7 @@ class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
                                                                url=error_url))
 
     with self.AssertRaisesHttpErrorMatchesAsHttpException(
-        'Project [my-project] not found: ' + error_msg):
+        'Projects instance [my-project] not found: ' + error_msg):
       self.client.ExecuteCloudBuild(self.build, project='my-project')
 
     self.assertEqual(self.mock_log_content, '')

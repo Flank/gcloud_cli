@@ -148,7 +148,7 @@ def AddScenarioTestMethodToTestClass(
 
 
 class Unit(test_base.ScenarioTestBase,
-           sdk_test_base.WithFakeAuth,
+           sdk_test_base.WithFakeAuthScenarioTests,
            parameterized.TestCase):
   """Unit tests all go here (unit tests cannot be run as REMOTE)."""
   EXECUTION_MODE = session.ExecutionMode.LOCAL
@@ -158,7 +158,7 @@ for testcase in DATA.TestParamsUnit():
 
 
 class E2ELocal(test_base.ScenarioTestBase,
-               sdk_test_base.WithFakeAuth,
+               sdk_test_base.WithFakeAuthScenarioTests,
                parameterized.TestCase):
   """Tests that can be run REMOTE go here when LOCAL mode is requested."""
   EXECUTION_MODE = session.ExecutionMode.LOCAL

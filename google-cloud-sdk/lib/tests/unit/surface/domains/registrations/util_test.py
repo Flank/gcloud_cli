@@ -25,12 +25,14 @@ from googlecloudsdk.core import exceptions
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 
+API_VERSION = 'v1beta1'
+
 
 class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
                                 sdk_test_base.SdkBase):
 
   def testGoogleDomainsNameServersEquivalent(self):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
 
     prev_dns_settings = messages.DnsSettings(
         googleDomainsDns=messages.GoogleDomainsDns(
@@ -45,7 +47,7 @@ class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
         dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
 
   def testCustomNameServersEquivalent(self):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
 
     prev_dns_settings = messages.DnsSettings(
         customDns=messages.CustomDns(
@@ -58,7 +60,7 @@ class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
         dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
 
   def testCustomNameServersDifferentOrderEquivalent(self):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
 
     prev_dns_settings = messages.DnsSettings(
         customDns=messages.CustomDns(
@@ -71,7 +73,7 @@ class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
         dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
 
   def testDifferentNameServersNotEquivalent(self):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
 
     prev_dns_settings = messages.DnsSettings(
         customDns=messages.CustomDns(
@@ -83,7 +85,7 @@ class NameServersEquivalentTest(sdk_test_base.WithFakeAuth,
         dns_util.NameServersEquivalent(prev_dns_settings, new_dns_settings))
 
   def testDifferentDnsProvidersNotEquivalent(self):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
 
     prev_dns_settings = messages.DnsSettings(
         googleDomainsDns=messages.GoogleDomainsDns(
@@ -102,21 +104,21 @@ class ParseYearlyPriceTest(sdk_test_base.WithFakeAuth, sdk_test_base.SdkBase,
 
   @parameterized.parameters(('12USD'), ('12.00USD'), ('12 USD'), ('12.00 USD'))
   def test12USD(self, price_string):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
     expected = messages.Money(units=12, nanos=0, currencyCode='USD')
-    self.assertEqual(util.ParseYearlyPrice(price_string), expected)
+    self.assertEqual(util.ParseYearlyPrice(API_VERSION, price_string), expected)
 
   @parameterized.parameters(('0.50PLN'), ('0.50 PLN'))
   def test050PLN(self, price_string):
-    messages = registrations.GetMessagesModule()
+    messages = registrations.GetMessagesModule(API_VERSION)
     expected = messages.Money(units=0, nanos=50 * 10**7, currencyCode='PLN')
-    self.assertEqual(util.ParseYearlyPrice(price_string), expected)
+    self.assertEqual(util.ParseYearlyPrice(API_VERSION, price_string), expected)
 
   @parameterized.parameters(('USD12'), ('12$'), ('$12.'), ('-34USD'), ('12'),
                             ('USD'))
   def testIncorrect(self, price_string):
     with self.assertRaises(exceptions.Error):
-      util.ParseYearlyPrice(price_string)
+      util.ParseYearlyPrice(API_VERSION, price_string)
 
 
 class NormalizeDomainNameTest(sdk_test_base.WithFakeAuth, sdk_test_base.SdkBase,

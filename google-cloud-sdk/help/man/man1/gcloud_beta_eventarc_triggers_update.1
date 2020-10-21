@@ -1,0 +1,155 @@
+
+.TH "GCLOUD_BETA_EVENTARC_TRIGGERS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta eventarc triggers update \- update an Eventarc trigger
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta eventarc triggers update\fR (\fITRIGGER\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-destination\-run\-region\fR=\fIDESTINATION_RUN_REGION\fR] [\fB\-\-destination\-run\-service\fR=\fIDESTINATION_RUN_SERVICE\fR] [\fB\-\-matching\-criteria\fR=[\fIATTRIBUTE\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-destination\-run\-path\fR\ |\ \fB\-\-destination\-run\-path\fR=\fIDESTINATION_RUN_PATH\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ :\ \fB\-\-clear\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Update an Eventarc trigger.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Trigger resource \- The trigger to update. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [trigger] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fITRIGGER\fR
+ID of the trigger or fully qualified identifier for the trigger. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location for the Eventarc trigger, which should be either \f5\fIglobal\fR\fR
+or one of the supported regions. Alternatively, set the [eventarc/location]
+property.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-destination\-run\-region\fR=\fIDESTINATION_RUN_REGION\fR
+The region in which the destination Cloud Run service can be found. If not
+specified, it is assumed that the service is in the same region as the trigger.
+
+.TP 2m
+\fB\-\-destination\-run\-service\fR=\fIDESTINATION_RUN_SERVICE\fR
+The name of the Cloud Run fully\-managed service that receives the events for
+the trigger. The service must be in the same project as the trigger.
+
+.TP 2m
+\fB\-\-matching\-criteria\fR=[\fIATTRIBUTE\fR=\fIVALUE\fR,...]
+The criteria by which events are filtered for the trigger, specified as a
+comma\-separated list of CloudEvents attribute names and values. This flag can
+also be repeated to add more criteria to the list. Only events that match with
+this criteria will be sent to the destination. The criteria must include the
+\f5\fItype\fR\fR attribute, as well as any other attributes that are expected
+for the chosen type.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-destination\-run\-path\fR
+Clear the relative path on the destination Cloud Run service to which the events
+for the trigger should be sent.
+
+.TP 2m
+\fB\-\-destination\-run\-path\fR=\fIDESTINATION_RUN_PATH\fR
+The relative path on the destination Cloud Run service to which the events for
+the trigger should be sent. Examples: \f5\fI/route\fR\fR, \f5\fIroute\fR\fR,
+\f5\fIroute/subroute\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+
+Service account resource \- The IAM service account associated with the trigger,
+specified with an email address or a uniqueId. Unless a full resource name is
+provided, the service account is assumed to be in the same project as the
+trigger. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-service\-account] on the command line with
+a fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+ID of the service account or fully qualified identifier for the service account.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-clear\-service\-account\fR
+Clear the IAM service account associated with the trigger.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the trigger \f5\fImy\-trigger\fR\fR by setting its destination Cloud
+Run service to \f5\fImy\-service\fR\fR, run:
+
+.RS 2m
+$ gcloud beta eventarc triggers update my\-trigger \e
+     \-\-destination\-run\-service=my\-service
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

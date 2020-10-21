@@ -8,7 +8,9 @@ SYNOPSIS
         [--timeout=TIMEOUT] [--type=TYPE] [--xcode-version=XCODE_VERSION]
         [--xctestrun-file=XCTESTRUN_FILE] [--additional-ipas=IPA,[IPA,...]]
         [--app=APP] [--async] [--client-details=[KEY=VALUE,...]]
-        [--num-flaky-test-attempts=int] [--record-video]
+        [--directories-to-pull=[DIR_TO_PULL,...]]
+        [--num-flaky-test-attempts=int]
+        [--other-files=DEVICE_PATH=FILE_PATH,[...]] [--record-video]
         [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
         [--scenario-numbers=int,[int,...]] [--test-special-entitlements]
@@ -125,6 +127,17 @@ FLAGS
 
             --client-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull-request
 
+     --directories-to-pull=[DIR_TO_PULL,...]
+        A list of paths that will be copied from the device's storage to the
+        designated results bucket after the test is complete. These must be
+        absolute paths under /private/var/mobile/Media or /Documents of the app
+        under test. If the path is under an app's /Documents, it must be
+        prefixed with the app's bundle id and a colon.
+
+        Example:
+
+            --directories-to-pull=com.my.app:/Documents/output,/private/var/mobile/Media/output
+
      --num-flaky-test-attempts=int
         Specifies the number of times a test execution should be reattempted if
         one or more of its test cases fail for any reason. An execution that
@@ -132,6 +145,22 @@ FLAGS
 
         The maximum number of reruns allowed is 10. (Default: 0, which implies
         no reruns.) All additional attempts are executed in parallel.
+
+     --other-files=DEVICE_PATH=FILE_PATH,[...]
+        A list of device-path=file-path pairs that specify the paths of the
+        test device and the files you want pushed to the device prior to
+        testing.
+
+        Device paths should either be under the Media shared folder (e.g.
+        prefixed with /private/var/mobile/Media) or within the documents
+        directory of the filesystem of an app under test (e.g. /Documents).
+        Device paths to app filesystems should be prefixed by the bundle ID and
+        a colon. Source file paths may be in the local filesystem or in Google
+        Cloud Storage (gs://...).
+
+        Examples:
+
+            --other-files com.my.app:/Documents/file.txt=local/file.txt,/private/var/mobile/Media/file.jpg=gs://bucket/file.jpg
 
      --record-video
         Enable video recording during the test. Enabled by default, use
@@ -222,8 +251,8 @@ EXAMPLES
     --device flag more than once:
 
         $ gcloud beta firebase test ios run --test=XCTEST_ZIP \
-            --device=model=iphone7
-        --device=model=ipadmini4,version=11.2 --device=model=iphonese
+            --device=model=iphone7 --device=model=ipadmini4,version=11.2 \
+            --device=model=iphonese
 
     To run your XCTest using a specific version of Xcode, say 9.4.1, run:
 
@@ -239,6 +268,14 @@ EXAMPLES
 
         $ gcloud beta firebase test ios run --type=game-loop --app=app.ipa \
             --scenario-numbers=1,2,3
+
+    To run a test that pushes a local file onto the device before testing, use
+    the --other-files flag:
+
+        $ gcloud beta firebase test ios run --type=game-loop --app=app.ipa \
+            --scenario-numbers=1 \
+            --other-files=/private/var/mobile/Media/file.txt=/path/to/\
+        file.txt
 
     All test arguments for a given test may alternatively be stored in an
     argument group within a YAML-formatted argument file. The ARG_FILE may

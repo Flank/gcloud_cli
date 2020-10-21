@@ -1,5 +1,9 @@
+filters:
+  skip:
+    reason: stdout changed
+    bug: b/170744546
 title: Create, describe, list, and delete a Lite topic
-release_tracks: [BETA]
+release_tracks: [GA]
 actions:
 - generate_resource_id:
     reference: my-topic
@@ -108,8 +112,7 @@ actions:
                 }
               },
               "retentionConfig": {
-                "perPartitionBytes": "32212254720",
-                "period": "0s"
+                "perPartitionBytes": "32212254720"
               }
             }
     - expect_stdout: |
@@ -121,7 +124,6 @@ actions:
           count: '1'
         retentionConfig:
           perPartitionBytes: '32212254720'
-          period: 0s
     - expect_exit:
         code: 0
 
@@ -171,8 +173,7 @@ actions:
                     }
                   },
                   "retentionConfig": {
-                    "perPartitionBytes": "32212254720",
-                    "period": "0s"
+                    "perPartitionBytes": "32212254720"
                   }
                 }
               ]
@@ -187,8 +188,7 @@ actions:
               subscribeMibPerSec: 10
             count: '1'
           retentionConfig:
-            perPartitionBytes: '32212254720'
-            period: 0s.*
+            perPartitionBytes: '32212254720'.*
     - expect_exit:
         code: 0
 

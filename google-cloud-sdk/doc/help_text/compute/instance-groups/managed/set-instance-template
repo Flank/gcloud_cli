@@ -1,6 +1,6 @@
 NAME
-    gcloud compute instance-groups managed set-instance-template - set instance
-        template for managed instance group
+    gcloud compute instance-groups managed set-instance-template - set the
+        instance template for a managed instance group
 
 SYNOPSIS
     gcloud compute instance-groups managed set-instance-template NAME
@@ -8,12 +8,19 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instance-groups managed set-instance-template updates the
+    gcloud compute instance-groups managed set-instance-template sets the
     instance template for an existing managed instance group.
 
-    The new template won't apply to existing instances in the group unless they
-    are recreated using the recreate-instances command. But the new template
-    does apply to all new instances added to the managed instance group.
+    The new template applies to all new instances added to the managed instance
+    group.
+
+    To apply the new template to existing instances in the group, use one of
+    the following methods:
+
+      o Update instances using the update-instances command.
+      o Recreate instances using the recreate-instances command.
+      o Use the rolling-action start-update command.
+      o Use the API to set the group's updatePolicy.type to PROACTIVE.
 
 POSITIONAL ARGUMENTS
      NAME

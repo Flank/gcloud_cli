@@ -85,7 +85,7 @@ EXAMPLES
     To create a certificate map entry with name simple-entry, run:
 
         $ gcloud alpha certificate-manager maps entries create simple-map \
-            --map simple-entry --certificates simple-cert
+            --map=simple-entry --certificates=simple-cert
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

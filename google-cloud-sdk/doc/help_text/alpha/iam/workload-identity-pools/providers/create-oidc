@@ -191,15 +191,16 @@ EXAMPLES
             --display-name='My workload pool provider' \
             --description='My workload pool provider description' \
             --disabled \
-            --atribute-mapping='google.subject=assertion.sub' \
+            --attribute-mapping='google.subject=assertion.sub' \
             --attribute-condition='true' \
             --issuer-uri=https://test-idp.com \
             --allowed-audiences=https://test-audience-1.com,https://test-audience-2.com
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access allowlist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access allowlist. This variant is also available:
+
+        $ gcloud beta iam workload-identity-pools providers create-oidc
 

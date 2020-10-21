@@ -26,12 +26,15 @@ from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.api_lib.storage import errors as cloud_errors
 from googlecloudsdk.api_lib.storage import gcs_api
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.command_lib.storage import resource_reference
+from googlecloudsdk.command_lib.storage import storage_url
+from googlecloudsdk.command_lib.storage.resources import gcs_resource_reference
+from googlecloudsdk.command_lib.storage.resources import resource_reference
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.app import cloud_storage_util
+from tests.lib.surface.storage import test_resources
 
 import mock
 
@@ -42,6 +45,7 @@ TEST_OBJECT = 'fake-object'
 TEST_PROJECT = 'fake-project'
 
 
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class CreateBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
                        sdk_test_base.SdkBase):
 
@@ -51,48 +55,69 @@ class CreateBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     self.messages = core_apis.GetMessagesModule('storage', 'v1')
     self.default_projection = (self.messages.StorageBucketsInsertRequest
                                .ProjectionValueValuesEnum.noAcl)
-    self.bucket = self.messages.Bucket(name=TEST_BUCKET)
     self.gcs_client = gcs_api.GcsApi()
 
   def test_create_bucket(self):
-    expected_reference = gcs_api._BucketResourceFromMetadata(self.bucket)
+    bucket_metadata = self.messages.Bucket(name=TEST_BUCKET)
     self.apitools_client.buckets.Insert.Expect(
         self.messages.StorageBucketsInsertRequest(
-            bucket=self.bucket, project=TEST_PROJECT,
+            bucket=bucket_metadata, project=TEST_PROJECT,
             projection=self.default_projection),
-        response=self.bucket)
+        response=bucket_metadata)
 
-    bucket_reference = self.gcs_client.CreateBucket(self.bucket)
-    self.assertEqual(bucket_reference, expected_reference)
+    expected_resource = gcs_api._bucket_resource_from_metadata(bucket_metadata)
+    observed_resource = self.gcs_client.create_bucket(expected_resource)
+    self.assertEqual(observed_resource, expected_resource)
+
+  def test_creates_missing_bucket_metadata(self):
+    expected_metadata = self.messages.Bucket(name='b')
+    self.apitools_client.buckets.Insert.Expect(
+        self.messages.StorageBucketsInsertRequest(
+            bucket=expected_metadata, project=TEST_PROJECT,
+            projection=self.default_projection),
+        response=expected_metadata)
+
+    expected_resource = gcs_api._bucket_resource_from_metadata(
+        expected_metadata)
+    observed_resource = self.gcs_client.create_bucket(
+        test_resources.from_url_string('gs://b'))
+    self.assertEqual(observed_resource, expected_resource)
 
   def test_create_bucket_api_error(self):
+    bucket_metadata = self.messages.Bucket(name=TEST_BUCKET)
     self.apitools_client.buckets.Insert.Expect(
         self.messages.StorageBucketsInsertRequest(
-            bucket=self.bucket, project=TEST_PROJECT,
+            bucket=bucket_metadata, project=TEST_PROJECT,
             projection=self.default_projection),
         exception=apitools_exceptions.HttpError(None, None, None))
+    bucket_resource = gcs_api._bucket_resource_from_metadata(bucket_metadata)
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.CreateBucket(self.bucket)
+      self.gcs_client.create_bucket(bucket_resource)
 
   def test_create_bucket_invalid_fields_scope(self):
+    bucket_metadata = self.messages.Bucket(name=TEST_BUCKET)
+    bucket_resource = gcs_api._bucket_resource_from_metadata(bucket_metadata)
     with self.assertRaises(ValueError):
-      self.gcs_client.CreateBucket(self.bucket, fields_scope='football field')
+      self.gcs_client.create_bucket(
+          bucket_resource, fields_scope='football field')
 
   @parameterized.parameters(
       (cloud_api.FieldsScope.SHORT, 'noAcl'),
       (cloud_api.FieldsScope.NO_ACL, 'noAcl'),
       (cloud_api.FieldsScope.FULL, 'full'))
   def test_create_bucket_valid_fields_scope(self, fields_scope, projection):
+    bucket_metadata = self.messages.Bucket(name=TEST_BUCKET)
     request = self.messages.StorageBucketsInsertRequest(
-        bucket=self.bucket,
+        bucket=bucket_metadata,
         project=TEST_PROJECT,
         projection=getattr(self.messages.StorageBucketsInsertRequest
                            .ProjectionValueValuesEnum, projection))
+    bucket_resource = gcs_api._bucket_resource_from_metadata(bucket_metadata)
 
     with mock.patch.object(self.apitools_client.buckets,
                            'Insert') as mock_insert:
-      self.gcs_client.CreateBucket(self.bucket, fields_scope=fields_scope)
+      self.gcs_client.create_bucket(bucket_resource, fields_scope=fields_scope)
       mock_insert.assert_called_once_with(request)
 
 
@@ -110,7 +135,7 @@ class DeleteBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         self.messages.StorageBucketsDeleteRequest(bucket=TEST_BUCKET),
         response=self.messages.StorageBucketsDeleteResponse())
 
-    self.gcs_client.DeleteBucket(TEST_BUCKET)
+    self.gcs_client.delete_bucket(TEST_BUCKET)
 
   def test_delete_bucket_api_error(self):
     self.apitools_client.buckets.Delete.Expect(
@@ -118,7 +143,7 @@ class DeleteBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.DeleteBucket(TEST_BUCKET)
+      self.gcs_client.delete_bucket(TEST_BUCKET)
 
   def test_delete_bucket_precondition_metageneration_match(self):
     precondition_metageneration_match = 1
@@ -130,7 +155,7 @@ class DeleteBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     request_config = gcs_api.GcsRequestConfig(
         precondition_metageneration_match=precondition_metageneration_match)
-    self.gcs_client.DeleteBucket(TEST_BUCKET, request_config)
+    self.gcs_client.delete_bucket(TEST_BUCKET, request_config)
 
 
 class GetBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
@@ -150,7 +175,7 @@ class GetBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
             bucket=TEST_BUCKET, projection=self.default_projection),
         response=self.messages.Bucket())
 
-    self.gcs_client.GetBucket(TEST_BUCKET)
+    self.gcs_client.get_bucket(TEST_BUCKET)
 
   def test_get_bucket_api_error(self):
     self.apitools_client.buckets.Get.Expect(
@@ -159,11 +184,11 @@ class GetBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.GetBucket(TEST_BUCKET)
+      self.gcs_client.get_bucket(TEST_BUCKET)
 
   def test_get_bucket_invalid_fields_scope(self):
     with self.assertRaises(ValueError):
-      self.gcs_client.GetBucket(TEST_BUCKET, fields_scope='football field')
+      self.gcs_client.get_bucket(TEST_BUCKET, fields_scope='football field')
 
   @parameterized.parameters(
       (cloud_api.FieldsScope.SHORT, 'noAcl'),
@@ -176,7 +201,7 @@ class GetBucketTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
                            .ProjectionValueValuesEnum, projection))
 
     with mock.patch.object(self.apitools_client.buckets, 'Get') as mock_get:
-      self.gcs_client.GetBucket(TEST_BUCKET, fields_scope=fields_scope)
+      self.gcs_client.get_bucket(TEST_BUCKET, fields_scope=fields_scope)
       mock_get.assert_called_once_with(request)
 
 
@@ -201,7 +226,7 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
             project=TEST_PROJECT, projection=self.default_projection),
         response=self.messages.Buckets(items=buckets))
 
-    names = [b.metadata.name for b in self.gcs_client.ListBuckets()]
+    names = [b.metadata.name for b in self.gcs_client.list_buckets()]
     self.assertCountEqual(names, self._BUCKET_NAMES)
 
   def test_list_buckets_api_error(self):
@@ -211,11 +236,11 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      list(self.gcs_client.ListBuckets())
+      list(self.gcs_client.list_buckets())
 
   def test_list_buckets_invalid_fields_scope(self):
     with self.assertRaises(ValueError):
-      list(self.gcs_client.ListBuckets(fields_scope='football field'))
+      list(self.gcs_client.list_buckets(fields_scope='football field'))
 
   @parameterized.parameters(
       (cloud_api.FieldsScope.SHORT, 'noAcl', 'items/name'),
@@ -235,7 +260,7 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
       global_params.fields = fields
 
     with mock.patch.object(list_pager, 'YieldFromList') as mock_yield_from_list:
-      list(self.gcs_client.ListBuckets(fields_scope))
+      list(self.gcs_client.list_buckets(fields_scope))
 
       # Checks for correct projection value inside request.
       # Checks for correct fields value inside global_params.
@@ -246,7 +271,7 @@ class ListBucketsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
           global_params=global_params)
 
 
-@test_case.Filters.DoNotRunOnPy2('Storage does not support python 2')
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
                       sdk_test_base.SdkBase):
 
@@ -270,7 +295,7 @@ class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         response=objects
     )
 
-    names = [o.name for o in self.gcs_client.ListObjects(TEST_BUCKET)]
+    names = [o.name for o in self.gcs_client.list_objects(TEST_BUCKET)]
     self.assertCountEqual(names, file_list)
 
   def test_list_objects_api_error(self):
@@ -281,12 +306,13 @@ class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      list(self.gcs_client.ListObjects(TEST_BUCKET))
+      list(self.gcs_client.list_objects(TEST_BUCKET))
 
   def test_list_objects_invalid_fields_scope(self):
     with self.assertRaises(ValueError):
-      list(self.gcs_client.ListObjects(TEST_BUCKET,
-                                       fields_scope='football field'))
+      list(
+          self.gcs_client.list_objects(
+              TEST_BUCKET, fields_scope='football field'))
 
   def test_list_objects_and_prefixes(self):
     file_list = ['obj1', 'obj2', 'obj3']
@@ -305,8 +331,8 @@ class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     object_names = []
     prefixes_names = []
 
-    for resource in self.gcs_client.ListObjects(TEST_BUCKET):
-      if isinstance(resource, resource_reference.ObjectResource):
+    for resource in self.gcs_client.list_objects(TEST_BUCKET):
+      if isinstance(resource, gcs_resource_reference.GcsObjectResource):
         object_names.append(resource.name)
       elif isinstance(resource, resource_reference.PrefixResource):
         prefixes_names.append(resource.prefix)
@@ -320,7 +346,7 @@ class ListObjectsTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 @test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
                                          sdk_test_base.SdkBase):
-  """Test class to test ListObjects without using apitools.mock.
+  """Test class to test list_objects without using apitools.mock.
 
   apitools_client.objects.List.Expect does work for testing global_params or
   for cases where we make multiple API calls. Hence, instead of relying on
@@ -359,7 +385,7 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
     with mock.patch.object(core_apis, 'GetClientInstance', autospec=True,
                            return_value=api_client) as mock_get_instance:
       gcs_client = gcs_api.GcsApi()
-      list(gcs_client.ListObjects(TEST_BUCKET, fields_scope=fields_scope))
+      list(gcs_client.list_objects(TEST_BUCKET, fields_scope=fields_scope))
 
       mock_get_instance.assert_called_once_with('storage', 'v1')
       api_client.objects.List.assert_called_once_with(
@@ -399,7 +425,7 @@ class ListObjectsWithoutApitoolsMockTest(parameterized.TestCase,
     gcs_client = gcs_api.GcsApi()
     mock_get_instance.assert_called_once_with('storage', 'v1')
 
-    objects = list(gcs_client.ListObjects(TEST_BUCKET))
+    objects = list(gcs_client.list_objects(TEST_BUCKET))
 
     # Check that we looped over all the objects.
     self.assertCountEqual(
@@ -439,7 +465,7 @@ class DeleteObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
                                                   object=TEST_OBJECT),
         response=self.messages.StorageObjectsDeleteResponse())
 
-    self.gcs_client.DeleteObject(TEST_BUCKET, TEST_OBJECT)
+    self.gcs_client.delete_object(TEST_BUCKET, TEST_OBJECT)
 
   def test_delete_object_api_error(self):
     self.apitools_client.objects.Delete.Expect(
@@ -448,7 +474,7 @@ class DeleteObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
         exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.DeleteObject(TEST_BUCKET, TEST_OBJECT)
+      self.gcs_client.delete_object(TEST_BUCKET, TEST_OBJECT)
 
   def test_delete_object_generation(self):
     generation = 1
@@ -459,8 +485,8 @@ class DeleteObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
             generation=generation),
         response=self.messages.StorageObjectsDeleteResponse())
 
-    self.gcs_client.DeleteObject(TEST_BUCKET, TEST_OBJECT,
-                                 generation=generation)
+    self.gcs_client.delete_object(
+        TEST_BUCKET, TEST_OBJECT, generation=generation)
 
   def test_delete_object_precondition_generation_match(self):
     precondition_generation_match = 1
@@ -473,8 +499,8 @@ class DeleteObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     request_config = gcs_api.GcsRequestConfig(
         precondition_generation_match=precondition_generation_match)
-    self.gcs_client.DeleteObject(TEST_BUCKET, TEST_OBJECT,
-                                 request_config=request_config)
+    self.gcs_client.delete_object(
+        TEST_BUCKET, TEST_OBJECT, request_config=request_config)
 
   def test_delete_object_precondition_metageneration_match(self):
     precondition_metageneration_match = 1
@@ -487,8 +513,8 @@ class DeleteObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
 
     request_config = gcs_api.GcsRequestConfig(
         precondition_metageneration_match=precondition_metageneration_match)
-    self.gcs_client.DeleteObject(TEST_BUCKET, TEST_OBJECT,
-                                 request_config=request_config)
+    self.gcs_client.delete_object(
+        TEST_BUCKET, TEST_OBJECT, request_config=request_config)
 
 
 class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
@@ -512,9 +538,9 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     self.apitools_client.objects.Get.Expect(request,
                                             response=metadata_object)
 
-    object_reference = self.gcs_client.GetObjectMetadata(TEST_BUCKET,
-                                                         TEST_OBJECT)
-    expected_object_reference = gcs_api._ObjectResourceFromMetadata(
+    object_reference = self.gcs_client.get_object_metadata(
+        TEST_BUCKET, TEST_OBJECT)
+    expected_object_reference = gcs_api._object_resource_from_metadata(
         metadata_object)
     self.assertEqual(object_reference.metadata,
                      expected_object_reference.metadata)
@@ -530,7 +556,7 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
         request, exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT)
+      self.gcs_client.get_object_metadata(TEST_BUCKET, TEST_OBJECT)
 
   def test_get_object_metadata_not_found_error(self):
     request = self.messages.StorageObjectsGetRequest(
@@ -542,7 +568,7 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
         exception=apitools_exceptions.HttpNotFoundError(None, None, None))
 
     with self.assertRaises(cloud_errors.NotFoundError):
-      self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT)
+      self.gcs_client.get_object_metadata(TEST_BUCKET, TEST_OBJECT)
 
   def test_get_object_metadata_generation(self):
     request = self.messages.StorageObjectsGetRequest(
@@ -553,14 +579,13 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     self.apitools_client.objects.Get.Expect(request,
                                             response=self.messages.Object())
 
-    self.gcs_client.GetObjectMetadata(TEST_BUCKET,
-                                      TEST_OBJECT,
-                                      generation='1')
+    self.gcs_client.get_object_metadata(
+        TEST_BUCKET, TEST_OBJECT, generation='1')
 
   def test_get_object_metadata_invalid_fields_scope(self):
     with self.assertRaises(ValueError):
-      self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT,
-                                        fields_scope='football field')
+      self.gcs_client.get_object_metadata(
+          TEST_BUCKET, TEST_OBJECT, fields_scope='football field')
 
   @parameterized.parameters(
       (cloud_api.FieldsScope.SHORT, 'noAcl'),
@@ -575,11 +600,12 @@ class GetObjectMetadataTest(cloud_storage_util.WithGCSCalls,
                            .ProjectionValueValuesEnum, projection))
 
     with mock.patch.object(self.apitools_client.objects, 'Get') as mock_get:
-      self.gcs_client.GetObjectMetadata(TEST_BUCKET, TEST_OBJECT,
-                                        fields_scope=fields_scope)
+      self.gcs_client.get_object_metadata(
+          TEST_BUCKET, TEST_OBJECT, fields_scope=fields_scope)
       mock_get.assert_called_once_with(request)
 
 
+@test_case.Filters.DoNotRunOnPy2('Storage does not support Python 2.')
 class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
                               parameterized.TestCase, sdk_test_base.SdkBase):
 
@@ -587,98 +613,109 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     properties.VALUES.core.account.Set(TEST_ACCOUNT)
     properties.VALUES.core.project.Set(TEST_PROJECT)
     self.messages = core_apis.GetMessagesModule('storage', 'v1')
-    self.patched_object = self.messages.Object()
     self.default_projection = (self.messages.StorageObjectsPatchRequest
                                .ProjectionValueValuesEnum.noAcl)
     self.gcs_client = gcs_api.GcsApi()
 
   def test_patch_object_metadata(self):
+    patched_object = self.messages.Object()
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         projection=self.default_projection)
-    self.apitools_client.objects.Patch.Expect(request,
-                                              response=self.patched_object)
+    self.apitools_client.objects.Patch.Expect(request, response=patched_object)
 
-    object_reference = self.gcs_client.PatchObjectMetadata(TEST_BUCKET,
-                                                           TEST_OBJECT,
-                                                           self.patched_object)
-    expected_object_reference = gcs_api._ObjectResourceFromMetadata(
-        self.patched_object)
-    self.assertEqual(object_reference.metadata,
-                     expected_object_reference.metadata)
-    self.assertEqual(object_reference.storage_url,
-                     expected_object_reference.storage_url)
+    expected_resource = gcs_api._object_resource_from_metadata(patched_object)
+    observed_resource = self.gcs_client.patch_object_metadata(
+        TEST_BUCKET, TEST_OBJECT, expected_resource)
+    self.assertEqual(observed_resource, expected_resource)
+
+  def test_patch_object_metadata_populates_missing_metadata(self):
+    return_metadata = self.messages.Object(name='o', bucket='b')
+    request = self.messages.StorageObjectsPatchRequest(
+        bucket=TEST_BUCKET,
+        object=TEST_OBJECT,
+        objectResource=return_metadata,
+        projection=self.default_projection)
+    self.apitools_client.objects.Patch.Expect(request, response=return_metadata)
+
+    expected_resource = gcs_api._object_resource_from_metadata(return_metadata)
+    patch_resource = test_resources.from_url_string('gs://b/o')
+    observed_resource = self.gcs_client.patch_object_metadata(
+        TEST_BUCKET, TEST_OBJECT, patch_resource)
+    self.assertEqual(observed_resource, expected_resource)
 
   def test_patch_object_metadata_api_error(self):
+    patched_object = self.messages.Object()
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         projection=self.default_projection)
     self.apitools_client.objects.Patch.Expect(
         request, exception=apitools_exceptions.HttpError(None, None, None))
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.PatchObjectMetadata(
-          TEST_BUCKET,
-          TEST_OBJECT,
-          self.patched_object)
+      self.gcs_client.patch_object_metadata(TEST_BUCKET, TEST_OBJECT,
+                                            object_resource)
 
   def test_patch_object_metadata_generation(self):
+    patched_object = self.messages.Object()
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         generation=1,
         projection=self.default_projection)
-    self.apitools_client.objects.Patch.Expect(request,
-                                              response=self.patched_object)
+    self.apitools_client.objects.Patch.Expect(request, response=patched_object)
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
 
-    self.gcs_client.PatchObjectMetadata(TEST_BUCKET,
-                                        TEST_OBJECT,
-                                        self.patched_object,
-                                        generation='1')
+    self.gcs_client.patch_object_metadata(
+        TEST_BUCKET, TEST_OBJECT, object_resource, generation='1')
 
   def test_patch_object_metadata_precondition_generation_match(self):
+    patched_object = self.messages.Object()
     precondition_generation_match = 1
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         ifGenerationMatch=precondition_generation_match,
         projection=self.default_projection)
-    self.apitools_client.objects.Patch.Expect(request,
-                                              response=self.patched_object)
+    self.apitools_client.objects.Patch.Expect(request, response=patched_object)
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
 
-    self.gcs_client.PatchObjectMetadata(
+    self.gcs_client.patch_object_metadata(
         TEST_BUCKET,
         TEST_OBJECT,
-        self.patched_object,
+        object_resource,
         request_config=gcs_api.GcsRequestConfig(
             precondition_generation_match=precondition_generation_match))
 
   def test_patch_object_metadata_precondition_metageneration_match(self):
+    patched_object = self.messages.Object()
     precondition_metageneration_match = 1
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         ifMetagenerationMatch=precondition_metageneration_match,
         projection=self.default_projection)
-    self.apitools_client.objects.Patch.Expect(request,
-                                              response=self.patched_object)
+    self.apitools_client.objects.Patch.Expect(request, response=patched_object)
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
 
-    self.gcs_client.PatchObjectMetadata(
+    self.gcs_client.patch_object_metadata(
         TEST_BUCKET,
         TEST_OBJECT,
-        self.patched_object,
+        object_resource,
         request_config=gcs_api.GcsRequestConfig(
             precondition_metageneration_match=precondition_metageneration_match)
-        )
+    )
 
   def test_patch_object_metadata_predefined_acl_string(self):
+    patched_object = self.messages.Object()
     predefined_acl_string = 'authenticatedRead'
     predefined_acl = getattr(
         self.messages.StorageObjectsPatchRequest.PredefinedAclValueValuesEnum,
@@ -687,7 +724,7 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         predefinedAcl=predefined_acl,
         projection=self.default_projection)
     self.apitools_client.objects.Patch.Expect(request,
@@ -695,17 +732,22 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
 
     request_config = gcs_api.GcsRequestConfig(
         predefined_acl_string=predefined_acl_string)
-    self.gcs_client.PatchObjectMetadata(
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
+    self.gcs_client.patch_object_metadata(
         TEST_BUCKET,
         TEST_OBJECT,
-        self.patched_object,
+        object_resource,
         request_config=request_config)
 
   def test_patch_object_metadata_invalid_fields_scope(self):
+    patched_object = self.messages.Object()
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
     with self.assertRaises(ValueError):
-      self.gcs_client.PatchObjectMetadata(TEST_BUCKET, TEST_OBJECT,
-                                          self.patched_object,
-                                          fields_scope='football field')
+      self.gcs_client.patch_object_metadata(
+          TEST_BUCKET,
+          TEST_OBJECT,
+          object_resource,
+          fields_scope='football field')
 
   @parameterized.parameters(
       (cloud_api.FieldsScope.SHORT, 'noAcl'),
@@ -713,17 +755,18 @@ class PatchObjectMetadataTest(cloud_storage_util.WithGCSCalls,
       (cloud_api.FieldsScope.FULL, 'full'))
   def test_patch_object_metadata_valid_fields_scope(self, fields_scope,
                                                     projection):
+    patched_object = self.messages.Object()
+    object_resource = gcs_api._object_resource_from_metadata(patched_object)
     request = self.messages.StorageObjectsPatchRequest(
         bucket=TEST_BUCKET,
         object=TEST_OBJECT,
-        objectResource=self.patched_object,
+        objectResource=patched_object,
         projection=getattr(self.messages.StorageObjectsPatchRequest
                            .ProjectionValueValuesEnum, projection))
 
     with mock.patch.object(self.apitools_client.objects, 'Patch') as mock_patch:
-      self.gcs_client.PatchObjectMetadata(TEST_BUCKET, TEST_OBJECT,
-                                          self.patched_object,
-                                          fields_scope=fields_scope)
+      self.gcs_client.patch_object_metadata(
+          TEST_BUCKET, TEST_OBJECT, object_resource, fields_scope=fields_scope)
       mock_patch.assert_called_once_with(request)
 
 
@@ -733,76 +776,70 @@ class CopyObjectTest(cloud_storage_util.WithGCSCalls, sdk_test_base.SdkBase):
     properties.VALUES.core.account.Set(TEST_ACCOUNT)
     properties.VALUES.core.project.Set(TEST_PROJECT)
     self.messages = core_apis.GetMessagesModule('storage', 'v1')
-    self.source_object = self.messages.Object(name='o', bucket='b', etag='e')
-    self.destination_object = self.messages.Object(name='goodname', bucket='b')
     self.default_projection = (self.messages.StorageObjectsPatchRequest
                                .ProjectionValueValuesEnum.noAcl)
     self.gcs_client = gcs_api.GcsApi()
 
-  def test_object_copy(self):
+  def test_copies_objects(self):
+    source_resource = resource_reference.UnknownResource(
+        storage_url.storage_url_from_string('gs://b/o'))
+    destination_metadata = self.messages.Object(name='o2', bucket='b')
+    destination_resource = resource_reference.UnknownResource(
+        storage_url.storage_url_from_string('gs://b/o2'))
+
     request = self.messages.StorageObjectsCopyRequest(
-        sourceBucket=self.source_object.bucket,
-        sourceObject=self.source_object.name,
-        destinationBucket=self.destination_object.bucket,
-        destinationObject=self.destination_object.name)
+        sourceBucket=source_resource.storage_url.bucket_name,
+        sourceObject=source_resource.storage_url.object_name,
+        destinationBucket=destination_resource.storage_url.bucket_name,
+        destinationObject=destination_resource.storage_url.object_name)
     self.apitools_client.objects.Copy.Expect(request,
-                                             response=self.destination_object)
+                                             response=destination_metadata)
 
-    object_reference = self.gcs_client.CopyObject(
-        self.source_object, self.destination_object)
-    expected_object_reference = gcs_api._ObjectResourceFromMetadata(
-        self.destination_object)
+    observed_resource = self.gcs_client.copy_object(source_resource,
+                                                    destination_resource)
+    expected_resource = gcs_api._object_resource_from_metadata(
+        destination_metadata)
+    self.assertEqual(observed_resource, expected_resource)
 
-    self.assertEqual(object_reference.metadata,
-                     expected_object_reference.metadata)
-    self.assertEqual(object_reference.storage_url,
-                     expected_object_reference.storage_url)
+  def test_copy_handles_api_error(self):
+    source_resource = resource_reference.UnknownResource(
+        storage_url.storage_url_from_string('gs://b/o'))
+    destination_resource = resource_reference.UnknownResource(
+        storage_url.storage_url_from_string('gs://b/o2'))
 
-  def test_object_copy_api_error(self):
     request = self.messages.StorageObjectsCopyRequest(
-        sourceBucket=self.source_object.bucket,
-        sourceObject=self.source_object.name,
-        destinationBucket=self.destination_object.bucket,
-        destinationObject=self.destination_object.name)
+        sourceBucket=source_resource.storage_url.bucket_name,
+        sourceObject=source_resource.storage_url.object_name,
+        destinationBucket=destination_resource.storage_url.bucket_name,
+        destinationObject=destination_resource.storage_url.object_name)
     self.apitools_client.objects.Copy.Expect(
         request, exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.CopyObject(self.source_object,
-                                 self.destination_object)
+      self.gcs_client.copy_object(source_resource, destination_resource)
 
-  def test_object_copy_source_missing(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(None, self.destination_object)
+  def test_copy_handles_generation(self):
+    source_resource = resource_reference.UnknownResource(
+        storage_url.storage_url_from_string('gs://b/o'))
+    destination_metadata = self.messages.Object(name='o2', bucket='b')
+    destination_resource = resource_reference.UnknownResource(
+        storage_url.storage_url_from_string('gs://b/o2'))
 
-  def test_object_copy_source_no_name(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(self.messages.Object(bucket='b', etag='e'),
-                                 self.destination_object)
+    request = self.messages.StorageObjectsCopyRequest(
+        sourceBucket=source_resource.storage_url.bucket_name,
+        sourceObject=source_resource.storage_url.object_name,
+        destinationBucket=destination_resource.storage_url.bucket_name,
+        destinationObject=destination_resource.storage_url.object_name,
+        ifSourceGenerationMatch=1)
+    self.apitools_client.objects.Copy.Expect(request,
+                                             response=destination_metadata)
 
-  def test_object_copy_source_no_bucket(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(self.messages.Object(name='o', etag='e'),
-                                 self.destination_object)
-
-  def test_object_copy_source_no_etag(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(self.messages.Object(name='o', bucket='b'),
-                                 self.destination_object)
-
-  def test_object_copy_destination_missing(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(self.source_object, None)
-
-  def test_object_copy_destination_no_name(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(self.source_object,
-                                 self.messages.Object(bucket='b'))
-
-  def test_object_copy_destination_no_bucket(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.CopyObject(self.source_object,
-                                 self.messages.Object(name='o'))
+    request_config = gcs_api.GcsRequestConfig(precondition_generation_match=1)
+    observed_resource = self.gcs_client.copy_object(
+        source_resource, destination_resource, request_config=request_config)
+    expected_resource = gcs_api._object_resource_from_metadata(
+        destination_metadata)
+    self.assertEqual(observed_resource, expected_resource)
 
   # TODO(b/161900052): Test resumable copies.
   # TODO(b/161898251): Test encryption and decryption.
@@ -827,8 +864,8 @@ class DownloadObjectTest(cloud_storage_util.WithGCSCalls,
     self.apitools_client.objects.Get.Expect(
         request, response=self.messages.Object())
 
-    self.gcs_client.DownloadObject(
-        TEST_BUCKET, TEST_OBJECT, self.download_stream)
+    self.gcs_client.download_object(TEST_BUCKET, TEST_OBJECT,
+                                    self.download_stream)
     mock_from_stream.assert_called_once_with(
         self.download_stream,
         auto_transfer=False,
@@ -847,8 +884,8 @@ class DownloadObjectTest(cloud_storage_util.WithGCSCalls,
         request, exception=apitools_exceptions.HttpError(None, None, None))
 
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.DownloadObject(
-          TEST_BUCKET, TEST_OBJECT, self.download_stream)
+      self.gcs_client.download_object(TEST_BUCKET, TEST_OBJECT,
+                                      self.download_stream)
 
   @mock.patch.object(apitools_transfer.Download, 'FromStream')
   def test_object_download_compressed_encoding(self, mock_from_stream):
@@ -862,14 +899,16 @@ class DownloadObjectTest(cloud_storage_util.WithGCSCalls,
     self.apitools_client.objects.Get.Expect(
         request, response=self.messages.Object())
 
-    self.gcs_client.DownloadObject(
-        TEST_BUCKET, TEST_OBJECT,
-        self.download_stream, compressed_encoding=True)
+    self.gcs_client.download_object(
+        TEST_BUCKET,
+        TEST_OBJECT,
+        self.download_stream,
+        compressed_encoding=True)
 
     mock_download.StreamMedia.assert_called_once_with(
         additional_headers={'accept-encoding': 'gzip'},
-        callback=gcs_api._NoOpCallback,
-        finish_callback=gcs_api._NoOpCallback,
+        callback=gcs_api._no_op_callback,
+        finish_callback=gcs_api._no_op_callback,
         use_chunks=False)
 
   @mock.patch.object(apitools_transfer.Download, 'FromStream')
@@ -883,7 +922,7 @@ class DownloadObjectTest(cloud_storage_util.WithGCSCalls,
     self.apitools_client.objects.Get.Expect(
         request, response=self.messages.Object())
 
-    self.gcs_client.DownloadObject(
+    self.gcs_client.download_object(
         TEST_BUCKET, TEST_OBJECT, self.download_stream, generation='1')
 
   @mock.patch.object(apitools_transfer.Download, 'FromStream')
@@ -897,7 +936,7 @@ class DownloadObjectTest(cloud_storage_util.WithGCSCalls,
     self.apitools_client.objects.Get.Expect(
         request, response=self.messages.Object())
 
-    self.gcs_client.DownloadObject(
+    self.gcs_client.download_object(
         TEST_BUCKET, TEST_OBJECT, self.download_stream, object_size=object_size)
 
     mock_from_stream.assert_called_once_with(
@@ -918,97 +957,84 @@ class UploadObjectTest(cloud_storage_util.WithGCSCalls, parameterized.TestCase,
     properties.VALUES.core.project.Set(TEST_PROJECT)
     self.messages = core_apis.GetMessagesModule('storage', 'v1')
     self.gcs_client = gcs_api.GcsApi()
-    self.upload_stream = mock.mock_open()
-    self.upload_object = self.messages.Object(name='o', bucket='b')
 
-  def test_object_upload(self):
+  def test_uploads_object_with_object_resource(self):
+    upload_metadata = self.messages.Object(name='o', bucket='b')
     request = self.messages.StorageObjectsInsertRequest(
-        bucket=self.upload_object.bucket,
-        object=self.upload_object)
+        bucket=upload_metadata.bucket,
+        object=upload_metadata)
     self.apitools_client.objects.Insert.Expect(request,
-                                               response=self.upload_object)
+                                               response=upload_metadata)
 
+    upload_stream = mock.mock_open()
+    upload_resource = resource_reference.FileObjectResource(
+        storage_url.storage_url_from_string('gs://b/o'))
+    expected_resource = gcs_api._object_resource_from_metadata(upload_metadata)
     with mock.patch.object(apitools_transfer, 'Upload') as mock_upload:
-      object_reference = self.gcs_client.UploadObject(
-          self.upload_stream,
-          self.upload_object)
-      expected_object_reference = gcs_api._ObjectResourceFromMetadata(
-          self.upload_object)
-      self.assertEqual(object_reference.metadata,
-                       expected_object_reference.metadata)
-      self.assertEqual(object_reference.storage_url,
-                       expected_object_reference.storage_url)
+      observed_resource = self.gcs_client.upload_object(upload_stream,
+                                                        upload_resource)
+      self.assertEqual(observed_resource, expected_resource)
 
       mock_upload.assert_called_once_with(
-          self.upload_stream,
+          upload_stream,
           gcs_api.DEFAULT_CONTENT_TYPE,
           total_size=None,
           auto_transfer=True,
           num_retries=gcs_api.DEFAULT_NUM_RETRIES,
-          gzip_encoded=False
-      )
+          gzip_encoded=False)
 
-  def test_object_upload_api_error(self):
+  def test_object_upload_handles_api_error(self):
+    upload_metadata = self.messages.Object(name='o', bucket='b')
     request = self.messages.StorageObjectsInsertRequest(
-        bucket=self.upload_object.bucket,
-        object=self.upload_object)
+        bucket=upload_metadata.bucket,
+        object=upload_metadata)
     self.apitools_client.objects.Insert.Expect(
         request, exception=apitools_exceptions.HttpError(None, None, None))
 
+    upload_resource = resource_reference.FileObjectResource(
+        storage_url.storage_url_from_string('gs://b/o'))
     with self.assertRaises(cloud_errors.GcsApiError):
-      self.gcs_client.UploadObject(self.upload_stream, self.upload_object)
-
-  def test_object_upload_missing(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.UploadObject(self.upload_stream, None)
-
-  def test_object_upload_no_name(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.UploadObject(
-          self.upload_stream,
-          self.messages.Object(bucket='b'))
-
-  def test_object_upload_no_bucket(self):
-    with self.assertRaises(ValueError):
-      self.gcs_client.UploadObject(
-          self.upload_stream,
-          self.messages.Object(name='turtleking12'))
+      self.gcs_client.upload_object(mock.mock_open(), upload_resource)
 
   def test_object_upload_predefined_acl_string(self):
+    upload_metadata = self.messages.Object(name='o', bucket='b')
     predefined_acl_string = 'authenticatedRead'
     predefined_acl = getattr(
         self.messages.StorageObjectsInsertRequest.PredefinedAclValueValuesEnum,
         predefined_acl_string)
 
     request = self.messages.StorageObjectsInsertRequest(
-        bucket=self.upload_object.bucket,
-        object=self.upload_object,
+        bucket=upload_metadata.bucket,
+        object=upload_metadata,
         predefinedAcl=predefined_acl)
     self.apitools_client.objects.Insert.Expect(request,
-                                               response=self.messages.Object())
+                                               response=upload_metadata)
 
     request_config = gcs_api.GcsRequestConfig(
         predefined_acl_string=predefined_acl_string)
-    self.gcs_client.UploadObject(
-        self.upload_stream,
-        self.upload_object,
-        request_config=request_config)
+    upload_resource = resource_reference.FileObjectResource(
+        storage_url.storage_url_from_string('gs://b/o'))
+    self.gcs_client.upload_object(
+        mock.mock_open(), upload_resource, request_config=request_config)
 
   def test_object_upload_gzip_encoded(self):
+    upload_metadata = self.messages.Object(name='o', bucket='b')
     request = self.messages.StorageObjectsInsertRequest(
-        bucket=self.upload_object.bucket,
-        object=self.upload_object)
+        bucket=upload_metadata.bucket,
+        object=upload_metadata)
     self.apitools_client.objects.Insert.Expect(request,
-                                               response=self.upload_object)
+                                               response=upload_metadata)
 
+    upload_stream = mock.mock_open()
+    upload_resource = resource_reference.FileObjectResource(
+        storage_url.storage_url_from_string('gs://b/o'))
     with mock.patch.object(apitools_transfer, 'Upload') as mock_upload:
       request_config = gcs_api.GcsRequestConfig(gzip_encoded=True)
-      self.gcs_client.UploadObject(
-          self.upload_stream,
-          self.upload_object,
-          request_config=request_config)
+      self.gcs_client.upload_object(
+          upload_stream, upload_resource, request_config=request_config)
+
       mock_upload.assert_called_once_with(
-          self.upload_stream,
+          upload_stream,
           gcs_api.DEFAULT_CONTENT_TYPE,
           total_size=None,
           auto_transfer=True,

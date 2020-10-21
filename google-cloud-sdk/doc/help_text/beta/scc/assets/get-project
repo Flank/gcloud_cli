@@ -57,12 +57,12 @@ EXAMPLES
     e.g. //storage.googleapis.com/my-bucket under organization 123456:
 
         $ gcloud beta scc assets get-project 123456 \
-            --resource-name "//storage.googleapis.com/my-bucket"
+            --resource-name="//storage.googleapis.com/my-bucket"
 
     Get project id given an asset's Cloud SCC id 5678 under organization
     123456.
 
-        $ gcloud beta scc assets get-project 123456 --asset 5678
+        $ gcloud beta scc assets get-project 123456 --asset=5678
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -3066,6 +3066,23 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
             desiredPrivateIpv6GoogleAccess=types[access_type]),
         flags='--private-ipv6-google-access-type={0}'.format(access_type))
 
+  def testDisableWorkloadIdentityCertificates(self):
+    update = self.msgs.ClusterUpdate(
+        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
+            issuingCertificateAuthority=''))
+    self._TestUpdate(
+        update=update, flags='--disable-workload-identity-certificates ')
+
+  def testUpdateWorkloadIdentityCertificates(self):
+    update = self.msgs.ClusterUpdate(
+        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
+            issuingCertificateAuthority='//privateca.googleapis.com/projects/foobar/locations/us-moon1/certificateAuthorities/prod-two'
+        ))
+    self._TestUpdate(
+        update=update,
+        flags='--workload-identity-certificate-authority=//privateca.googleapis.com/projects/foobar/locations/us-moon1/certificateAuthorities/prod-two'
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

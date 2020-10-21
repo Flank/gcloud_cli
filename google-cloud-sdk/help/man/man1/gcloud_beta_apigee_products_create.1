@@ -1,0 +1,366 @@
+
+.TH "GCLOUD_BETA_APIGEE_PRODUCTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta apigee products create \- create an Apigee API product
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta apigee products create\fR [\fIINTERNAL_NAME\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-attributes\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-manual\-approval\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-all\-environments\fR\ |\ \fB\-\-environments\fR=\fIENVIRONMENT\fR,[\fIENVIRONMENT\fR,...]] [\fB\-\-all\-proxies\fR\ |\ \fB\-\-apis\fR=[\fIAPI\fR,...]\ \fB\-\-resources\fR=\fIRESOURCE\fR#[\fIRESOURCE\fR#...]] [\fB\-\-internal\-access\fR\ |\ \fB\-\-private\-access\fR\ |\ \fB\-\-public\-access\fR] [\fB\-\-quota\fR=\fIQUOTA\fR\ \fB\-\-quota\-interval\fR=\fIQUOTA_INTERVAL\fR\ \fB\-\-quota\-unit\fR=\fIQUOTA_UNIT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create an Apigee API product.
+
+\f5gcloud beta apigee products create\fR publishes a collection of API proxy
+resources as an API product.
+
+API products combine their underlying API proxies with quota settings and
+metadata, to deliver customized and productized API bundles to the developer
+community.
+
+API products enable the repackaging of APIs on\-the\-fly, without having to do
+any additional coding or configuration. Apigee recommends starting with a simple
+API product including only required elements, and then provisioning credentials
+to apps to enable them to start testing those APIs.
+
+At minimum, a new API product requires an internal name, access policy, and
+declaration of what environments and API proxies to include in the product. If
+these aren't provided, interactive calls will prompt for the missing values, and
+non\-interactive calls will fail.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+API product resource \- API product to be created. Characters in a product's
+internal name are restricted to: \f5A\-Za\-z0\-9._\-$ %\fR. The arguments in
+this group can be used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fIINTERNAL_NAME\fR
+ID of the API product or fully qualified identifier for the API product. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Apigee organization containing the API product. If unspecified, the Cloud
+Platform project's associated organization will be used.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-attributes\fR=[\fINAME\fR=\fIVALUE\fR,...]
+Key\-value attribute pairs that may be used to extend the default API product
+profile with customer\-specific metadata. Up to 17 attributes can be specified.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Overview of the API product. Include key information about the API product that
+is not captured by other fields.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Name to be displayed in the UI or developer portal to developers registering for
+API access.
+
+.TP 2m
+\fB\-\-manual\-approval\fR
+Require manual approval of developer requests to access this API product before
+their consumer keys can be used. If unset, the consumer key is generated in an
+"approved" state and can be used immediately.
+
+.TP 2m
+\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]
+Comma\-separated list of OAuth scopes that are validated at runtime. Apigee
+validates that the scopes in any access token presented match the scopes defined
+in the OAuth policy assoicated with the API product.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-all\-environments\fR
+Make all environments accessible through this API product.
+
+.TP 2m
+\fB\-\-environments\fR=\fIENVIRONMENT\fR,[\fIENVIRONMENT\fR,...]
+Environments to which the API product is bound. Requests to environments that
+are not listed are rejected, preventing developers from accessing those
+resources through API Proxies deployed in another environment.
+
+For example, this can prevent resources associated with API proxies in a
+\f5\fIprod\fR\fR environment from also granting access to matching API proxies
+deployed in a \f5\fItest\fR\fR environment.
+
+To get a list of available environments, run:
+
+.RS 2m
+$ gcloud beta apigee environments list
+.RE
+
+.RE
+.sp
+.TP 2m
+
+Arguments specifying which API proxies and resources to expose. At most one of
+these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-all\-proxies\fR
+Expose all available API proxies and their resources. Must be explicitly
+specified if neither \f5\-\-apis\fR nor \f5\-\-resources\fR is provided.
+
+.TP 2m
+
+Arguments that restrict exposed API proxies. One or both of these may be
+specified if \f5\-\-all\-proxies\fR is not:
+
+.RS 2m
+.TP 2m
+\fB\-\-apis\fR=[\fIAPI\fR,...]
+Comma\-separated names of API proxies to which this API product is bound. Only
+those API proxies will be accessible through the new API product.
+
+If not provided, all deployed API proxies will be included in the product, so
+long as they match the other parameters.
+
+The API proxy names must already be deployed to the bound environments, or
+creation of the API product will fail. To get a list of deployed API proxies,
+run:
+
+.RS 2m
+$ gcloud beta apigee deployments list
+.RE
+
+To deploy an API proxy, run:
+
+.RS 2m
+$ gcloud beta apigee apis deploy
+.RE
+
+.TP 2m
+\fB\-\-resources\fR=\fIRESOURCE\fR#[\fIRESOURCE\fR#...]
+API resources to be bundled in the API product, separated by \f5#\fR signs.
+
+By default, the resource paths are mapped from the \f5proxy.pathsuffix\fR
+variable.
+
+The proxy path suffix is defined as the URI fragment following the ProxyEndpoint
+base path. For example, if \f5\fI/forecastrss\fR\fR is given as an element of
+this list, and the base path defined for the API proxy is \f5/weather\fR, then
+only requests to \f5/weather/forecastrss\fR are permitted by the API product.
+
+Proxy paths can use asterisks as wildcards; \f5/**\fR indicates that all
+sub\-URIs are included, whereas a single asterisk indicates that only URIs one
+level down are included.
+
+By default, \f5/\fR supports the same resources as \f5/**\fR as well as the base
+path defined by the API proxy.
+
+For example, if the base path of the API proxy is \f5/v1/weatherapikey\fR, then
+the API product supports requests to \f5/v1/weatherapikey\fR and to any
+sub\-URIs, such as \f5/v1/weatherapikey/forecastrss\fR,
+\f5/v1/weatherapikey/region/CA\fR, and so on.
+
+If not provided, all deployed API resources will be included in the product, so
+long as they match the other parameters.
+
+The API proxy resources must already be deployed to the bound environments, or
+creation of the API product will fail.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-internal\-access\fR
+Prevent external access to this API product.
+
+.TP 2m
+\fB\-\-private\-access\fR
+Hide this API product in the developer portal but make it accessible by external
+developers.
+
+.TP 2m
+\fB\-\-public\-access\fR
+Make this API product visible to developers in the Apigee developer portal.
+
+.RE
+.sp
+.TP 2m
+
+To impose a quota limit on calls to the API product, specify all of the
+following:
+
+.RS 2m
+.TP 2m
+\fB\-\-quota\fR=\fIQUOTA\fR
+Number of request messages permitted per app by this API product for the
+specified \f5\-\-quota\-interval\fR and \f5\-\-quota\-unit\fR.
+
+For example, to create an API product that allows 50 requests every twelve hours
+to every deployed API proxy, run:
+
+.RS 2m
+$ gcloud beta apigee products create PRODUCT \-\-all\-environments \e
+  \-\-all\-proxies \-\-public\-access \-\-quota=50 \-\-quota\-interval=12 \e
+  \-\-quota\-unit=hour
+.RE
+
+If specified, \f5\-\-quota\-interval\fR and \f5\-\-quota\-unit\fR must be
+specified too.
+
+.TP 2m
+\fB\-\-quota\-interval\fR=\fIQUOTA_INTERVAL\fR
+Time interval over which the number of request messages is calculated.
+
+If specified, \f5\-\-quota\fR and \f5\-\-quota\-unit\fR must be specified too.
+
+.TP 2m
+\fB\-\-quota\-unit\fR=\fIQUOTA_UNIT\fR
+Time unit for \f5\-\-quota\-interval\fR.
+
+If specified, \f5\-\-quota\fR and \f5\-\-quota\-interval\fR must be specified
+too.
+
+\fIQUOTA_UNIT\fR must be one of: \fBminute\fR, \fBhour\fR, \fBday\fR,
+\fBmonth\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a basic API product in the active Cloud Platform project by answering
+interactive prompts, run:
+
+.RS 2m
+$ gcloud beta apigee products create
+.RE
+
+To create an API product that publicly exposes all API proxies deployed to the
+\f5\fIprod\fR\fR environment, run:
+
+.RS 2m
+$ gcloud beta apigee products create kitchen\-sink \e
+  \-\-environments=prod \-\-all\-proxies \-\-public\-access
+.RE
+
+To require manual approval of developers before they can access the new API
+product, run:
+
+.RS 2m
+$ gcloud beta apigee products create kitchen\-sink \e
+  \-\-environments=prod \-\-all\-proxies \-\-public\-access \e
+  \-\-manual\-approval
+.RE
+
+To hide the new API product while still making it accessible to developers, run:
+
+.RS 2m
+$ gcloud beta apigee products create kitchen\-sink \e
+  \-\-environments=prod \-\-all\-proxies \-\-private\-access
+.RE
+
+To restrict the new API product to internal users only, run:
+
+.RS 2m
+$ gcloud beta apigee products create kitchen\-sink \e
+  \-\-environments=prod \-\-all\-proxies \-\-internal\-access
+.RE
+
+To expose all API proxies that are deployed to a URI fragment beginning with
+\f5\fI/v1\fR\fR or \f5\fI/v0\fR\fR, run:
+
+.RS 2m
+$ gcloud beta apigee products create legacy \-\-all\-environments \e
+  \-\-resources="/v0/**#/v1/**" \-\-public\-access
+.RE
+
+To expose a few specific API proxies on all URI paths where they're deployed,
+run:
+
+.RS 2m
+$ gcloud beta apigee products create consumer \-\-environments=prod \e
+  \-\-apis=menu,cart,delivery\-tracker \-\-public\-access
+.RE
+
+To expose only those API calls that match both a set of API proxies and a set of
+API resources, run:
+
+.RS 2m
+$ gcloud beta apigee products create legacy\-consumer \e
+  \-\-environments=prod \-\-apis=menu,cart,delivery\-tracker \e
+  \-\-resources="/v0/**#/v1/**" \-\-public\-access
+.RE
+
+To impose a quota of 50 calls per half\-hour on a new all\-inclusive API
+product, and output the new API product as a JSON object, run:
+
+.RS 2m
+$ gcloud beta apigee products create kitchen\-sink \e
+  \-\-environments=prod \-\-all\-proxies \-\-public\-access \-\-quota=50 \e
+  \-\-quota\-interval=30 \-\-quota\-unit=minute \-\-format=json
+.RE
+
+To specify a human\-friendly display name and description for the product, run:
+
+.RS 2m
+$ gcloud beta apigee products create consumer \-\-environments=prod \e
+  \-\-apis=menu,cart,delivery\-tracker \-\-public\-access \e
+  \-\-display\-name="Consumer APIs" \e
+  \-\-description="APIs for the consumer side of the delivery\e
+network: ordering food and tracking deliveries."
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud apigee products create
+$ gcloud alpha apigee products create
+.RE
+

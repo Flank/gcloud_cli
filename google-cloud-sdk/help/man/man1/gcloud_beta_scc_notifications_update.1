@@ -86,28 +86,28 @@ Update all mutable fields in \f5\fImy\-config\fR\fR (description + pubsub topic
 
 .RS 2m
 $ gcloud beta scc notifications update my\-config \e
-    \-\-organization=123456 \-\-description "New description" \e
-    \-\-pubsub_topic "projects/22222/topics/newtopic"
+    \-\-organization=123456 \-\-description="New description" \e
+    \-\-pubsub\-topic="projects/22222/topics/newtopic"
 .RE
 
 .RS 2m
 $ gcloud beta scc notifications update \e
     organizations/123456/notificationConfigs/my\-config \e
-    \-\-description "New description" \e
-    \-\-pubsub_topic "projects/22222/topics/newtopic"
+    \-\-description="New description" \e
+    \-\-pubsub\-topic="projects/22222/topics/newtopic"
 .RE
 
 Update my\-config's description
 
 .RS 2m
 $ gcloud beta scc notifications update my\-config \e
-    \-\-organization=123456 \-\-description "New description"
+    \-\-organization=123456 \-\-description="New description"
 .RE
 
 .RS 2m
 $ gcloud beta scc notifications update \e
     organizations/123456/notificationConfigs/my\-config \e
-    \-\-description "New description"
+    \-\-description="New description"
 .RE
 
 Update my\-config's pubsub\-topic
@@ -115,13 +115,13 @@ Update my\-config's pubsub\-topic
 .RS 2m
 $ gcloud beta scc notifications update my\-config \e
     \-\-organization=123456 \e
-    \-\-pubsub_topic "projects/22222/topics/newtopic"
+    \-\-pubsub\-topic="projects/22222/topics/newtopic"
 .RE
 
 .RS 2m
 $ gcloud beta scc notifications update \e
     organizations/123456/notificationConfigs/my\-config \e
-    \-\-pubsub_topic "projects/22222/topics/newtopic"
+    \-\-pubsub\-topic="projects/22222/topics/newtopic"
 .RE
 
 Update my\-config's filter

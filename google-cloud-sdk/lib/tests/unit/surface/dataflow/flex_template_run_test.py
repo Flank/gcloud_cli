@@ -94,5 +94,74 @@ class RunUnitTest(base.DataflowMockingTestBase,
     self.assertEqual(JOB_1_ID, result.job.id)
     self.assertEqual('myjob', result.job.name)
 
+  def testRunWithFlexTemplateRuntimeEnvironmentValues(self):
+    response = base.MESSAGE_MODULE.LaunchFlexTemplateResponse(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment, job_name='myjob')
+        )
+    labels = [('label1', 'value1')]
+    experiments = ['experiment1', 'experiment2']
+    self.MockRunFlexTemplateJob(
+        job_response=response,
+        location='us-central1',
+        gcs_location='gs://foo',
+        job_name='myjob',
+        service_account_email='a@b.com',
+        worker_zone='us-foo1-a',
+        max_workers=5,
+        num_workers=5,
+        worker_machine_type='n1-standard-1',
+        network='network',
+        subnetwork='subnetwork',
+        kms_key_name='cloud-kms-key-foobar',
+        staging_location='gs://staging',
+        additional_user_labels=labels,
+        additional_experiments=experiments
+        )
+    result = self.Run(
+        'dataflow flex-template run myjob --template-file-gcs-location=gs://foo '
+        '--service-account-email=a@b.com --worker-zone=us-foo1-a --max-workers=5 '
+        '--num-workers=5 --worker-machine-type=n1-standard-1 --network=network '
+        '--subnetwork=subnetwork --dataflow-kms-key=cloud-kms-key-foobar '
+        '--staging-location=gs://staging '
+        '--additional-user-labels="label1"="value1" '
+        '--additional-experiments="experiment1,experiment2"')
+    self.assertEqual(JOB_1_ID, result.job.id)
+    self.assertEqual('myjob', result.job.name)
+
+  def testRunWithFlexTemplatePrivateIpEnvironmentValue(self):
+    response = base.MESSAGE_MODULE.LaunchFlexTemplateResponse(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment, job_name='myjob')
+        )
+    self.MockRunFlexTemplateJob(
+        job_response=response,
+        location='us-central1',
+        gcs_location='gs://foo',
+        job_name='myjob',
+        disable_public_ips=True)
+    result = self.Run(
+        'dataflow flex-template run myjob --template-file-gcs-location=gs://foo '
+        '--disable-public-ips')
+    self.assertEqual(JOB_1_ID, result.job.id)
+    self.assertEqual('myjob', result.job.name)
+
+  def testRunWithFlexTemplateEnableStreamingEngineEnvironmentValue(self):
+    response = base.MESSAGE_MODULE.LaunchFlexTemplateResponse(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment, job_name='myjob')
+        )
+    self.MockRunFlexTemplateJob(
+        job_response=response,
+        location='us-central1',
+        gcs_location='gs://foo',
+        job_name='myjob',
+        enable_streaming_engine=True)
+    result = self.Run(
+        'dataflow flex-template run myjob --template-file-gcs-location=gs://foo '
+        '--enable-streaming-engine')
+    self.assertEqual(JOB_1_ID, result.job.id)
+    self.assertEqual('myjob', result.job.name)
+
 if __name__ == '__main__':
   test_case.main()

@@ -32,7 +32,7 @@ class InstancesCreateFleetAlpha(
     m = self.messages
     self.Run("""
         compute instances create instance-1
-          --maintenance-freeze-duration=168
+          --maintenance-freeze-duration=1d2h60m
           --zone central2-a
         """)
 
@@ -69,7 +69,56 @@ class InstancesCreateFleetAlpha(
                   ],
                   scheduling=m.Scheduling(
                       automaticRestart=True,
-                      maintenanceFreezeDurationHours=168),
+                      maintenanceFreezeDurationHours=27),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+  def testMaintenanceInterval(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1
+          --maintenance-interval=periodic
+          --zone central2-a
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[m.AttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      initializeParams=m.AttachedDiskInitializeParams(
+                          sourceImage=self._default_image,
+                      ),
+                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[m.NetworkInterface(
+                      accessConfigs=[m.AccessConfig(
+                          name='external-nat',
+                          type=self._one_to_one_nat)],
+                      network=self._default_network)],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='default',
+                          scopes=create_test_base.DEFAULT_SCOPES
+                      ),
+                  ],
+                  scheduling=m.Scheduling(
+                      automaticRestart=True,
+                      maintenanceInterval=m.Scheduling.
+                      MaintenanceIntervalValueValuesEnum.PERIODIC),
               ),
               project='my-project',
               zone='central2-a',

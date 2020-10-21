@@ -37,11 +37,12 @@ EXAMPLES
     your project within location LOCATION:
 
         $ gcloud beta data-catalog taxonomies import \
-            --taxonomies="/tmp/taxonomies.json" --location="LOCATION"
+            "/tmp/taxonomies.json" --location="LOCATION"
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud data-catalog taxonomies import
         $ gcloud alpha data-catalog taxonomies import
 

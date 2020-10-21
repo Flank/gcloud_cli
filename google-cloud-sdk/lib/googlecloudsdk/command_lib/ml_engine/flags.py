@@ -122,7 +122,7 @@ def GetDescriptionFlag(noun):
       '--description',
       required=False,
       default=None,
-      help='The description of the {noun}.'.format(noun=noun))
+      help='Description of the {noun}.'.format(noun=noun))
 
 # Run flags
 DISTRIBUTED = base.Argument(
@@ -252,7 +252,7 @@ SERVICE_ACCOUNT = base.Argument(
 NETWORK = base.Argument(
     '--network',
     help="""\
-The full name of the Google Compute Engine
+Full name of the Google Compute Engine
 network (https://cloud.google.com/vpc/docs) to which the Job
 is peered with. For example, ``projects/12345/global/networks/myVPC''. The
 format is of the form projects/{project}/global/networks/{network}, where
@@ -367,7 +367,7 @@ FRAMEWORK_MAPPER = arg_utils.ChoiceEnumMapper(
     (versions_api.GetMessagesModule().
      GoogleCloudMlV1Version.FrameworkValueValuesEnum),
     custom_mappings=_FRAMEWORK_CHOICES,
-    help_str=('The ML framework used to train this version of the model. '
+    help_str=('ML framework used to train this version of the model. '
               'If not specified, defaults to \'tensorflow\''))
 
 
@@ -433,7 +433,7 @@ SIGNATURE_NAME = base.Argument(
     required=False,
     type=str,
     help="""\
-    The name of the signature defined in the SavedModel to use for
+    Name of the signature defined in the SavedModel to use for
     this job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
     https://www.tensorflow.org/api_docs/python/tf/compat/v1/saved_model/signature_constants,
     which is "serving_default". Only applies to TensorFlow models.
@@ -492,13 +492,13 @@ def GetPredictJobSummary():
 def ModelAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='model',
-      help_text='The model for the {resource}.')
+      help_text='Model for the {resource}.')
 
 
 def VersionAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='version',
-      help_text='The version for the {resource}.')
+      help_text='Version for the {resource}.')
 
 
 def GetVersionResourceSpec():
@@ -583,7 +583,7 @@ def AddUserCodeArgs(parser):
   user_code_group.AddArgument(base.Argument(
       '--prediction-class',
       help="""\
-          The fully-qualified name of the custom prediction class in the package
+          Fully-qualified name of the custom prediction class in the package
           provided for custom prediction.
 
           For example, `--prediction-class=my_package.SequenceModel`.
@@ -606,7 +606,7 @@ def GetAcceleratorFlag():
           spec={
               'type': str,
               'count': int,
-          }, required_keys=['type', 'count']),
+          }, required_keys=['type']),
       help="""\
 Manage the accelerator config for GPU serving. When deploying a model with
 Compute Engine Machine Types, a GPU accelerator may also
@@ -615,8 +615,10 @@ be selected.
 *type*::: The type of the accelerator. Choices are {}.
 
 *count*::: The number of accelerators to attach to each machine running the job.
- This is usually 1; scaling parameters are configured using `manualScaling` or
-`autoScaling` flags.""".format(', '.join(
+ If not specified, the default value is 1. Your model must be specially designed
+to accommodate more than 1 accelerator per machine. To configure how many
+replicas your model has, set the `manualScaling` or `autoScaling`
+parameters.""".format(', '.join(
     ["'{}'".format(c) for c in _OP_ACCELERATOR_TYPE_MAPPER.choices])))
 
 
@@ -630,7 +632,7 @@ def ParseAcceleratorFlag(accelerator):
     raise ArgumentError("""\
 The type of the accelerator can only be one of the following: {}.
 """.format(', '.join(["'{}'".format(c) for c in types])))
-  accelerator_count = accelerator.get('count', 0)
+  accelerator_count = accelerator.get('count', 1)
   if accelerator_count <= 0:
     raise ArgumentError("""\
 The count of the accelerator must be greater than 0.
@@ -702,7 +704,7 @@ _ACCELERATOR_TYPE_MAPPER = arg_utils.ChoiceEnumMapper(
     'generic-accelerator',
     jobs.GetMessagesModule(
     ).GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum,
-    help_str='The available types of accelerators.',
+    help_str='Available types of accelerators.',
     include_filter=lambda x: x != 'ACCELERATOR_TYPE_UNSPECIFIED',
     required=False)
 
@@ -710,7 +712,7 @@ _OP_ACCELERATOR_TYPE_MAPPER = arg_utils.ChoiceEnumMapper(
     'generic-accelerator',
     jobs.GetMessagesModule().GoogleCloudMlV1AcceleratorConfig
     .TypeValueValuesEnum,
-    help_str='The available types of accelerators.',
+    help_str='Available types of accelerators.',
     include_filter=lambda x: x.startswith('NVIDIA'),
     required=False)
 
@@ -737,9 +739,9 @@ def _ValidateAcceleratorCount(accelerator_count):
 
 def _MakeAcceleratorArgConfigArg(arg_name, arg_help, required=False):
   """Creates an ArgDict representing an AcceleratorConfig message."""
-  type_help = '*type*::: The type of the accelerator. Choices are {}'.format(
+  type_help = '*type*::: Type of the accelerator. Choices are {}'.format(
       ','.join(_ACCELERATOR_TYPE_MAPPER.choices))
-  count_help = ('*count*::: The number of accelerators to attach to each '
+  count_help = ('*count*::: Number of accelerators to attach to each '
                 'machine running the job. Must be greater than 0.')
   arg = base.Argument(
       arg_name,
@@ -801,7 +803,7 @@ def GetParameterServerMachineTypeConfig():
       '--parameter-server-count',
       type=arg_parsers.BoundedInt(1, sys.maxsize, unlimited=True),
       required=True,
-      help=('The number of parameter servers to use for the training job.'))
+      help=('Number of parameter servers to use for the training job.'))
 
   machine_type_group = base.ArgumentGroup(
       required=False,
@@ -841,7 +843,7 @@ def GetWorkerMachineConfig():
       '--worker-count',
       type=arg_parsers.BoundedInt(1, sys.maxsize, unlimited=True),
       required=True,
-      help='The number of worker nodes to use for the training job.')
+      help='Number of worker nodes to use for the training job.')
 
   machine_type_group = base.ArgumentGroup(
       required=False,

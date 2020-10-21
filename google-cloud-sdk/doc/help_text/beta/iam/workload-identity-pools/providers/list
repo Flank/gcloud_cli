@@ -76,10 +76,11 @@ EXAMPLES
     default project, including soft-deleted pools:
 
         $ gcloud beta iam workload-identity-pools providers list \
-            --location global --show-deleted
+            --location=global --show-deleted
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha iam workload-identity-pools providers list
 

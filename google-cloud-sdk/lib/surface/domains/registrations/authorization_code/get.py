@@ -24,7 +24,7 @@ from googlecloudsdk.command_lib.domains import resource_args
 from googlecloudsdk.command_lib.domains import util
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class GetAuthorizationCode(base.DescribeCommand):
   """Get authorization code of a specific Cloud Domains registration.
 
@@ -47,11 +47,12 @@ class GetAuthorizationCode(base.DescribeCommand):
 
   def Run(self, args):
     """Run get authorization code command."""
-    client = registrations.RegistrationsClient()
+    api_version = registrations.GetApiVersionFromArgs(args)
+    client = registrations.RegistrationsClient(api_version)
     args.registration = util.NormalizeResourceName(args.registration)
     registration_ref = args.CONCEPTS.registration.Parse()
 
     registration = client.Get(registration_ref)
-    util.AssertRegistrationOperational(registration)
+    util.AssertRegistrationOperational(api_version, registration)
 
     return client.RetrieveAuthorizationCode(registration_ref)

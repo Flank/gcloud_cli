@@ -80,8 +80,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertNotIn('RoutesReady', tracker)
@@ -97,8 +97,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertNotIn('RoutesReady', tracker)
@@ -129,8 +129,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertNotIn('RoutesReady', tracker)
@@ -149,8 +149,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertIn('RoutesReady', tracker)
@@ -183,8 +183,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithImage(self):
@@ -197,8 +197,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self.AssertErrContains('Deploying container')
     self._AssertSuccessMessage('image')
 
@@ -212,8 +212,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=True,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self.AssertErrContains('Deploying container')
     self.AssertErrContains('Service [image] is deploying asynchronously')
 
@@ -231,8 +231,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithSetEnvVars(self):
@@ -252,8 +252,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithRemoveEnvVars(self):
@@ -267,8 +267,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithClearEnvVars(self):
@@ -282,8 +282,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithUpdateRemoveEnvVars(self):
@@ -303,8 +303,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployToCluster(self):
@@ -389,8 +389,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=True,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
 
   def testDeployWithNoAllowUnauthenticated(self):
     """Test the --no-allow-unauthenticated flag."""
@@ -401,8 +401,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=False,
         prefetch=self.service,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
 
   def testAllowUnauthenticatedFailsWithCluster(self):
     """Test that --allow-unauthenticated fails when operating on GKE."""
@@ -426,8 +426,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=True,
         prefetch=None,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self.AssertErrContains('Allow unauthenticated invocations to [image]')
 
   def testPromptAllowUnauthNo(self):
@@ -445,8 +445,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         asyn=False,
         allow_unauthenticated=None,
         prefetch=None,
-        build_log_url=None,
-        build_op_ref=None)
+        build_config=None,
+        build_messages=None)
     self.AssertErrContains('Allow unauthenticated invocations to [image]')
 
 

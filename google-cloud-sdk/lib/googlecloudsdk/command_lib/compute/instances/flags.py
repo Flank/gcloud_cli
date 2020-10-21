@@ -32,6 +32,7 @@ from googlecloudsdk.api_lib.compute.zones import service as zones_service
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags as compute_flags
@@ -181,6 +182,18 @@ def InstanceArgumentForRoute(required=True):
       zone_explanation=ZONE_PROPERTY_EXPLANATION)
 
 
+def InstanceArgumentForRouter(required=False, operation_type='added'):
+  return compute_flags.ResourceArgument(
+      resource_name='instance',
+      name='--instance',
+      completer=compute_completers.InstancesCompleter,
+      required=required,
+      zonal_collection='compute.instances',
+      short_help='Router appliance instance of the BGP peer being {0}.'
+      .format(operation_type),
+      zone_explanation=ZONE_PROPERTY_EXPLANATION)
+
+
 def InstanceArgumentForTargetInstance(required=True):
   return compute_flags.ResourceArgument(
       resource_name='instance',
@@ -305,14 +318,33 @@ def AddPrivateIpv6GoogleAccessArg(parser, api_version):
       parser)
 
 
-def AddMaintenanceFreezeDuration(parser):
-  parser.add_argument(
-      '--maintenance-freeze-duration',
-      type=int,
+def AddMaintenanceInterval():
+  return base.Argument(
+      '--maintenance-interval',
+      type=lambda x: x.upper(),
       hidden=True,
+      choices=['PERIODIC'],
       help="""
-        Specifies the number of hours after instance creation where the instance
-        won't be scheduled for maintenance""")
+      Set maintenance interval for the instance.
+      """
+  )
+
+
+def AddMaintenanceFreezeDuration():
+  return base.Argument(
+      '--maintenance-freeze-duration',
+      type=arg_parsers.Duration(),
+      help="""
+        Specifies the amount of hours after instance creation where the instance
+        won't be scheduled for maintenance, e.g. `4h`, `2d6h`.
+        See $ gcloud topic datetimes for information on duration formats."""
+  )
+
+
+def AddStableFleetArgs(parser):
+  """Add flags related to Stable Fleet."""
+  AddMaintenanceInterval().AddToParser(parser)
+  AddMaintenanceFreezeDuration().AddToParser(parser)
 
 
 def GetPrivateIpv6GoogleAccessTypeFlagMapper(messages):
@@ -735,13 +767,11 @@ def AddCreateDiskArgs(parser,
     disk_help += """
       *source-snapshot-csek-required*::: The CSK protected source disk snapshot
       that will be used to create the disk. This can be provided as a full URL
-      to the snapshot or just the snapshot name. For example, the following
-      are valid values:
+      to the snapshot or just the snapshot name. Must be specified with
+      `source-snapshot-csek-key-file`. The following are valid values:
 
         * https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
         * snapshot
-
-      Must be specified with `source-snapshot-csek-key-file`.
 
       *source-snapshot-csek-key-file::: Path to a Customer-Supplied Encryption
       Key (CSEK) key file for the source snapshot. Must be specified with
@@ -2023,8 +2053,8 @@ def AddShieldedInstanceIntegrityPolicyArgs(parser):
 def AddConfidentialComputeArgs(parser):
   """Adds flags for confidential compute for instance."""
   help_text = """\
-  The instance will boot with confidential compute enabled. Confidential
-  Compute is based on Secure Encrypted Virtualization (SEV), an AMD
+  The instance will boot with Confidential Computing enabled. Confidential
+  Computing is based on Secure Encrypted Virtualization (SEV), an AMD
   virtualization feature for running confidential instances.
   """
   parser.add_argument(

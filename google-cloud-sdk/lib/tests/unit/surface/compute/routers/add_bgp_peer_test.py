@@ -236,6 +236,11 @@ class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
 
+  def composeRouterApplianceInstance(self):
+    return ('https://compute.googleapis.com/compute/' + self.api_version +
+            '/projects/fake-project/'
+            'zones/us-central1-std/instances/my-instance')
+
   def _GetRouterBgpPeerBfdMessage(self):
     return self.messages.RouterBgpPeerBfd(
         mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.ACTIVE,
@@ -244,6 +249,44 @@ class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
         minReceiveInterval=400,
         minTransmitInterval=500,
         multiplier=5)
+
+  def testAddBgpPeerRouterAppliance_success(self):
+    self.SelectApi(self.track, self.api_version)
+
+    orig = router_test_utils.CreateMinimalRouterMessage(self.messages)
+    updated = copy.deepcopy(orig)
+
+    new_peer = router_test_utils.CreateMinimalBgpPeerMessage(self.messages)
+    new_peer.interfaceName = 'my-if'
+    new_peer.peerIpAddress = '10.0.0.2'
+    new_peer.advertisedRoutePriority = 1
+    new_peer.enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.FALSE
+    new_peer.bfd = self._GetRouterBgpPeerBfdMessage()
+    new_peer.routerApplianceInstance = self.composeRouterApplianceInstance()
+    updated.bgpPeers.append(new_peer)
+
+    self.ExpectGet(orig)
+    self.ExpectPatch(updated)
+    self.ExpectOperationsPolling()
+    self.ExpectGet(updated)
+
+    self.Run("""
+        compute routers add-bgp-peer my-router --region us-central1
+        --peer-name my-peer
+        --peer-asn 66000
+        --interface my-if
+        --peer-ip-address 10.0.0.2
+        --advertised-route-priority 1
+        --no-enabled
+        --bfd-session-initialization-mode ACTIVE
+        --bfd-min-receive-interval 400
+        --bfd-min-transmit-interval 500
+        --bfd-multiplier 5
+        --instance my-instance
+        --instance-zone us-central1-std
+        """)
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating peer [my-peer] in router [my-router]')
 
 
 if __name__ == '__main__':

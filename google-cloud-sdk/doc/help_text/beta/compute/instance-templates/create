@@ -100,9 +100,10 @@ FLAGS
         non-matching destination or source IP addresses.
 
      --confidential-compute
-        The instance will boot with confidential compute enabled. Confidential
-        Compute is based on Secure Encrypted Virtualization (SEV), an AMD
-        virtualization feature for running confidential instances.
+        The instance will boot with Confidential Computing enabled.
+        Confidential Computing is based on Secure Encrypted Virtualization
+        (SEV), an AMD virtualization feature for running confidential
+        instances.
 
      --configure-disk=[PROPERTY=VALUE,...]
         This option has effect only when used with --source-instance. It allows

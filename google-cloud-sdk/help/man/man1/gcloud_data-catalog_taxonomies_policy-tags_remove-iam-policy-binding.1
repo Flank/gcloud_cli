@@ -1,0 +1,147 @@
+
+.TH "GCLOUD_DATA\-CATALOG_TAXONOMIES_POLICY\-TAGS_REMOVE\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud data\-catalog taxonomies policy\-tags remove\-iam\-policy\-binding \- remove an IAM policy binding from a Cloud Data Catalog policy tag
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud data\-catalog taxonomies policy\-tags remove\-iam\-policy\-binding\fR (\fIPOLICY_TAG\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-taxonomy\fR=\fITAXONOMY\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Remove an IAM policy binding from a Cloud Data Catalog policy tag.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy tag resource \- Policy tag from which to remove the IAM policy binding.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[policy_tag] on the command line with a fully specified name; set the property
+[core/project]; provide the argument [\-\-project] on the command line. This
+must be specified.
+
+.RS 2m
+.TP 2m
+\fIPOLICY_TAG\fR
+ID of the policy tag or fully qualified identifier for the policy tag. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the policy tag.
+
+.TP 2m
+\fB\-\-taxonomy\fR=\fITAXONOMY\fR
+Taxonomy of the policy tag.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to remove the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+The role to remove the member from.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+To remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on policy tag 'POLICY_TAG' in location 'LOCATION' and
+taxonomy 'TAXONOMY', run:
+
+.RS 2m
+$ gcloud data\-catalog taxonomies policy\-tags \e
+    remove\-iam\-policy\-binding POLICY_TAG \-\-location='LOCATION' \e
+    \-\-taxonomy='TAXONOMY' \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
+.RE
+
+To remove an IAM policy binding for the role of 'roles/editor' from all
+authenticated users on policy tag 'POLICY_TAG' in location 'LOCATION' and
+taxonomy 'TAXONOMY', run:
+
+.RS 2m
+$ gcloud data\-catalog taxonomies policy\-tags \e
+    remove\-iam\-policy\-binding POLICY_TAG \-\-location='LOCATION' \e
+    \-\-taxonomy='TAXONOMY' \-\-member='allAuthenticatedUsers' \e
+    \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog taxonomies policy\-tags \e
+    remove\-iam\-policy\-binding
+$ gcloud beta data\-catalog taxonomies policy\-tags \e
+    remove\-iam\-policy\-binding
+.RE
+

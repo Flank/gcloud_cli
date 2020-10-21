@@ -23,8 +23,9 @@ import boto3
 import botocore
 from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.api_lib.storage import errors
-from googlecloudsdk.command_lib.storage import resource_reference
 from googlecloudsdk.command_lib.storage import storage_url
+from googlecloudsdk.command_lib.storage.resources import resource_reference
+from googlecloudsdk.command_lib.storage.resources import s3_resource_reference
 from googlecloudsdk.core import exceptions as core_exceptions
 
 
@@ -38,7 +39,7 @@ _GCS_TO_S3_PREDEFINED_ACL_TRANSLATION_DICT = {
 }
 
 
-def _TranslatePredefinedAclStringToS3(predefined_acl_string):
+def _translate_predefined_acl_string_to_s3(predefined_acl_string):
   """Translates Apitools predefined ACL enum key (as string) to S3 equivalent.
 
   Args:
@@ -61,11 +62,13 @@ class S3Api(cloud_api.CloudApi):
   """S3 Api client."""
 
   def __init__(self):
-    self.scheme = cloud_api.ProviderPrefix.S3.value
-    self.client = boto3.client(self.scheme)
+    self.scheme = storage_url.ProviderPrefix.S3
+    self.client = boto3.client(self.scheme.value)
 
-  def _GetObjectUrlFromS3Response(
-      self, object_dict, bucket_name, object_name=None):
+  def _get_object_url_from_s3_response(self,
+                                       object_dict,
+                                       bucket_name,
+                                       object_name=None):
     """Creates storage_url.CloudUrl from S3 API response.
 
     Args:
@@ -86,9 +89,11 @@ class S3Api(cloud_api.CloudApi):
 
     return object_url
 
-  def _GetObjectResourceFromS3Response(self, object_dict, bucket_name,
-                                       object_name=None):
-    """Creates resource_reference.ObjectResource from S3 API response.
+  def _get_object_resource_from_s3_response(self,
+                                            object_dict,
+                                            bucket_name,
+                                            object_name=None):
+    """Creates resource_reference.S3ObjectResource from S3 API response.
 
     Args:
       object_dict (dict): Dictionary representing S3 API response.
@@ -96,20 +101,39 @@ class S3Api(cloud_api.CloudApi):
       object_name (str | None): Object if relevant to query.
 
     Returns:
-      resource_reference.ObjectResource populated with data.
+      resource_reference.S3ObjectResource populated with data.
     """
-    object_url = self._GetObjectUrlFromS3Response(
+    object_url = self._get_object_url_from_s3_response(
         object_dict, bucket_name, object_name or object_dict['Key'])
     etag = None
     if 'ETag' in object_dict:
       etag = object_dict['ETag']
     elif 'CopyObjectResult' in object_dict:
       etag = object_dict['CopyObjectResult']['ETag']
+    size = object_dict.get('Size')
+    if size is None:
+      size = object_dict.get('ContentLength')
 
-    return resource_reference.ObjectResource(
-        object_url, etag=etag, metadata=object_dict)
+    return s3_resource_reference.S3ObjectResource(
+        object_url, etag=etag, metadata=object_dict, size=size)
 
-  def GetBucket(self, bucket_name, fields_scope=cloud_api.FieldsScope.SHORT):
+  def _get_prefix_resource_from_s3_response(self, prefix_dict, bucket_name):
+    """Creates resource_reference.PrefixResource from S3 API response.
+
+    Args:
+      prefix_dict (dict): The S3 API response representing a prefix.
+      bucket_name (str): Bucket for the prefix.
+
+    Returns:
+      A resource_reference.PrefixResource instance.
+    """
+    prefix = prefix_dict['Prefix']
+    return resource_reference.PrefixResource(
+        storage_url.CloudUrl(
+            scheme=self.scheme, bucket_name=bucket_name, object_name=prefix),
+        prefix=prefix)
+
+  def get_bucket(self, bucket_name, fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
     metadata = {'Name': bucket_name}
     # TODO (b/168716392): As new commands are implemented, they may want
@@ -134,7 +158,7 @@ class S3Api(cloud_api.CloudApi):
         try:
           api_result = api_call(Bucket=bucket_name)
           # Some results are wrapped in dictionaries with keys matching "key".
-          metadata[key] = api_result[key] if result_has_key else api_result
+          metadata[key] = api_result.get(key) if result_has_key else api_result
         except botocore.exceptions.ClientError as error:
           metadata[key] = errors.S3ApiError(error)
 
@@ -145,89 +169,111 @@ class S3Api(cloud_api.CloudApi):
         except botocore.exceptions.ClientError as error:
           metadata['ACL'] = errors.S3ApiError(error)
 
-    return resource_reference.BucketResource(
-        storage_url.CloudUrl(cloud_api.ProviderPrefix.S3.value, bucket_name),
+    return s3_resource_reference.S3BucketResource(
+        storage_url.CloudUrl(storage_url.ProviderPrefix.S3, bucket_name),
         metadata=metadata)
 
-  def ListBuckets(self, fields_scope=None):
+  def list_buckets(self, fields_scope=cloud_api.FieldsScope.NO_ACL):
     """See super class."""
     try:
       response = self.client.list_buckets()
       for bucket in response['Buckets']:
-        yield resource_reference.BucketResource(
-            storage_url.CloudUrl(cloud_api.ProviderPrefix.S3.value,
-                                 bucket['Name']),
-            metadata={'Bucket': bucket, 'Owner': response['Owner']})
+        if fields_scope == cloud_api.FieldsScope.FULL:
+          yield self.get_bucket(bucket['Name'], fields_scope)
+        else:
+          yield s3_resource_reference.S3BucketResource(
+              storage_url.CloudUrl(
+                  storage_url.ProviderPrefix.S3, bucket['Name']),
+              metadata={'Bucket': bucket, 'Owner': response['Owner']})
     except botocore.exceptions.ClientError as error:
       core_exceptions.reraise(errors.S3ApiError(error))
 
-  def ListObjects(self,
-                  bucket_name,
-                  prefix=None,
-                  delimiter=None,
-                  all_versions=None,
-                  fields_scope=None):
+  def list_objects(self,
+                   bucket_name,
+                   prefix=None,
+                   delimiter=None,
+                   all_versions=False,
+                   fields_scope=None):
     """See super class."""
+    if all_versions:
+      api_method_name = 'list_object_versions'
+      objects_key = 'Versions'
+    else:
+      api_method_name = 'list_objects_v2'
+      objects_key = 'Contents'
     try:
-      paginator = self.client.get_paginator('list_objects_v2')
-      page_iterator = paginator.paginate(Bucket=bucket_name)
+      paginator = self.client.get_paginator(api_method_name)
+      page_iterator = paginator.paginate(
+          Bucket=bucket_name,
+          Prefix=prefix if prefix is not None else '',
+          Delimiter=delimiter if delimiter is not None else '')
       for page in page_iterator:
-        if 'Contents' not in page:
-          continue
-        for object_dict in page['Contents']:
-          yield self._GetObjectResourceFromS3Response(object_dict, bucket_name)
+        for object_dict in page.get(objects_key, []):
+          if fields_scope is cloud_api.FieldsScope.FULL:
+            # The metadata present in the list_objects_v2 response or the
+            # list_object_versions response is not enough
+            # for a FULL scope. Hence, calling the GetObjectMetadata method
+            # to get the additonal metadata and ACLs information.
+            yield self.get_object_metadata(
+                bucket_name=bucket_name,
+                object_name=object_dict['Key'],
+                generation=object_dict.get('VersionId'),
+                fields_scope=fields_scope)
+          else:
+            yield self._get_object_resource_from_s3_response(object_dict,
+                                                             bucket_name)
+        for prefix_dict in page.get('CommonPrefixes', []):
+          yield self._get_prefix_resource_from_s3_response(
+              prefix_dict, bucket_name)
     except botocore.exceptions.ClientError as error:
       core_exceptions.reraise(errors.S3ApiError(error))
 
-  # pylint: disable=unused-argument
-  def CopyObject(self,
-                 source_object_metadata,
-                 destination_object_metadata,
-                 source_object_generation=None,
-                 progress_callback=None,
-                 request_config=None):
+  def copy_object(self,
+                  source_resource,
+                  destination_resource,
+                  progress_callback=None,
+                  request_config=None):
     """See super class."""
-    cloud_api.ValidateObjectMetadata(source_object_metadata)
-    cloud_api.ValidateObjectMetadata(destination_object_metadata)
+    del progress_callback
 
-    source_object_kwargs = {'Bucket': source_object_metadata.bucket,
-                            'Key': source_object_metadata.name}
-    if source_object_generation:
-      source_object_kwargs['VersionId'] = source_object_generation
+    source_kwargs = {'Bucket': source_resource.storage_url.bucket_name,
+                     'Key': source_resource.storage_url.object_name}
+    if source_resource.storage_url.generation:
+      source_kwargs['VersionId'] = source_resource.storage_url.generation
 
-    kwargs = {'Bucket': destination_object_metadata.bucket,
-              'Key': destination_object_metadata.name,
-              'CopySource': source_object_kwargs,}
+    kwargs = {'Bucket': destination_resource.storage_url.bucket_name,
+              'Key': destination_resource.storage_url.object_name,
+              'CopySource': source_kwargs}
 
     if request_config and request_config.predefined_acl_string:
-      kwargs['ACL'] = _TranslatePredefinedAclStringToS3(
+      kwargs['ACL'] = _translate_predefined_acl_string_to_s3(
           request_config.predefined_acl_string)
 
     try:
       response = self.client.copy_object(**kwargs)
-      return self._GetObjectResourceFromS3Response(
-          response, kwargs['Bucket'], kwargs['Key'])
+      return self._get_object_resource_from_s3_response(response,
+                                                        kwargs['Bucket'],
+                                                        kwargs['Key'])
     except botocore.exceptions.ClientError as error:
       core_exceptions.reraise(errors.S3ApiError(error))
 
     # TODO(b/161900052): Implement resumable copies.
-    # pylint:enable=unused-argument
 
   # pylint: disable=unused-argument
-  def DownloadObject(self,
-                     bucket_name,
-                     object_name,
-                     download_stream,
-                     compressed_encoding=False,
-                     decryption_wrapper=None,
-                     digesters=None,
-                     download_strategy=cloud_api.DownloadStrategy.ONE_SHOT,
-                     generation=None,
-                     object_size=None,
-                     progress_callback=None,
-                     serialization_data=None,
-                     start_byte=0,
-                     end_byte=None):
+  def download_object(self,
+                      bucket_name,
+                      object_name,
+                      download_stream,
+                      compressed_encoding=False,
+                      decryption_wrapper=None,
+                      digesters=None,
+                      download_strategy=cloud_api.DownloadStrategy.ONE_SHOT,
+                      generation=None,
+                      object_size=None,
+                      progress_callback=None,
+                      serialization_data=None,
+                      start_byte=0,
+                      end_byte=None):
     """See super class."""
     kwargs = {'Bucket': bucket_name, 'Key': object_name}
     if generation:
@@ -243,11 +289,11 @@ class S3Api(cloud_api.CloudApi):
     # TODO(b/161460749): Handle download retries.
     # pylint:enable=unused-argument
 
-  def GetObjectMetadata(self,
-                        bucket_name,
-                        object_name,
-                        generation=None,
-                        fields_scope=None):
+  def get_object_metadata(self,
+                          bucket_name,
+                          object_name,
+                          generation=None,
+                          fields_scope=None):
     """See super class."""
     request = {'Bucket': bucket_name, 'Key': object_name}
 
@@ -261,29 +307,38 @@ class S3Api(cloud_api.CloudApi):
     except botocore.exceptions.ClientError as error:
       core_exceptions.reraise(errors.S3ApiError(error))
 
-    return self._GetObjectResourceFromS3Response(
+    # User requested ACL's with FieldsScope.FULL.
+    if fields_scope is cloud_api.FieldsScope.FULL:
+      try:
+        acl_response = self.client.get_object_acl(**request)
+        acl_response.pop('ResponseMetadata', None)
+        object_dict['ACL'] = acl_response
+      except botocore.exceptions.ClientError as error:
+        object_dict['ACL'] = errors.S3ApiError(error)
+
+    return self._get_object_resource_from_s3_response(
         object_dict, bucket_name, object_name)
 
-  def UploadObject(self,
-                   upload_stream,
-                   object_metadata,
-                   progress_callback=None,
-                   request_config=None):
+  def upload_object(self,
+                    upload_stream,
+                    upload_resource,
+                    progress_callback=None,
+                    request_config=None):
     """See super class."""
     # TODO(b/160998556): Implement resumable upload.
     del progress_callback
 
-    cloud_api.ValidateObjectMetadata(object_metadata)
-    kwargs = {'Bucket': object_metadata.bucket,
-              'Key': object_metadata.name,
+    kwargs = {'Bucket': upload_resource.storage_url.bucket_name,
+              'Key': upload_resource.storage_url.object_name,
               'Body': upload_stream.read()}
     if request_config and request_config.predefined_acl_string:
-      kwargs['ACL'] = _TranslatePredefinedAclStringToS3(
+      kwargs['ACL'] = _translate_predefined_acl_string_to_s3(
           request_config.predefined_acl_string)
 
     try:
       response = self.client.put_object(**kwargs)
-      return self._GetObjectResourceFromS3Response(
-          response, object_metadata.bucket, object_metadata.name)
+      return self._get_object_resource_from_s3_response(
+          response, upload_resource.storage_url.bucket_name,
+          upload_resource.storage_url.object_name)
     except botocore.exceptions.ClientError as error:
       core_exceptions.reraise(errors.S3ApiError(error))

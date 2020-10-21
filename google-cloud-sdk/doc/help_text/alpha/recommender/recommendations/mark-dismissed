@@ -3,37 +3,61 @@ NAME
         recommendation's state as DISMISSED
 
 SYNOPSIS
-    gcloud alpha recommender recommendations mark-dismissed
-        (RECOMMENDATION : --location=LOCATION --recommender=RECOMMENDER)
-        --etag=ETAG [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha recommender recommendations mark-dismissed RECOMMENDATION
+        --etag=etag
+        (--billing-account=BILLING_ACCOUNT | --folder=FOLDER_ID
+          | --organization=ORGANIZATION_ID | --project=PROJECT_ID)
+        [--location=LOCATION] [--recommender=RECOMMENDER]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Mark recommendation's state as DISMISSED. Can be applied to
-    recommendations in ACTIVE state.
+    recommendations in ACTIVE state. The following parent resources are
+    supported: project, billing account, folder, and organization as parent
+    resources for recommendations.
 
 POSITIONAL ARGUMENTS
-     Recommendation resource - The Cloud Recommendation to mark as dismissed.
-     The arguments in this group can be used to specify the attributes of this
-     resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the
-     argument [recommendation] on the command line with a fully specified name;
-     provide the argument [--project] on the command line; set the property
-     [core/project]. This must be specified.
-
-       RECOMMENDATION
-          ID of the recommendation or fully qualified identifier for the
-          recommendation. This positional must be specified if any of the other
-          arguments in this group are specified.
-
-       --location=LOCATION
-          The location ID.
-
-       --recommender=RECOMMENDER
-          The recommender ID.
+     RECOMMENDATION
+        Recommendation id which will be marked as dismissed
 
 REQUIRED FLAGS
-     --etag=ETAG
-        The fingerprint of the recommendation.
+     --etag=etag
+        Etag of a recommendation
+
+     Resource that is associated with cloud entity type. Currently four
+     mutually exclusive flags are supported, --project, --billing-account,
+     --folder, --organization. Exactly one of these must be specified:
+
+       --billing-account=BILLING_ACCOUNT
+          The Google Cloud Platform Billing Account ID to use for this
+          invocation.
+
+       --folder=FOLDER_ID
+          Folder ID to use for this invocation.
+
+       --organization=ORGANIZATION_ID
+          The Google Cloud Platform Organization ID to use for this invocation.
+
+       --project=PROJECT_ID
+          The Google Cloud Platform Project Number to use for this invocation.
+
+          The Google Cloud Platform project ID to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
+
+OPTIONAL FLAGS
+     --location=LOCATION
+        Location
+
+     --recommender=RECOMMENDER
+        Recommender of the recommendations
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -43,17 +67,12 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
-API REFERENCE
-    This command uses the recommender/v1alpha2 API. The full documentation for
-    this API can be found at: https://cloud.google.com/recommender/docs/
-
 EXAMPLES
     To mark a recommendation as DISMISSED:
 
         $ gcloud alpha recommender recommendations mark-dismissed \
-          abcd-1234 --project=project-name --location=global \
-          --recommender=google.compute.instance.MachineTypeRecommender \
-          --etag=abc123
+            abcd-1234 --project=project-name --location=global
+    --recommender=google.compute.instance.MachineTypeRecommender --etag=abc123
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

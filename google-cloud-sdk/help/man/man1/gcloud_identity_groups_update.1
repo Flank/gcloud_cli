@@ -1,0 +1,109 @@
+
+.TH "GCLOUD_IDENTITY_GROUPS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud identity groups update \- update a group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud identity groups update\fR \fIEMAIL\fR [\fB\-\-clear\-description\fR\ |\ \fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-clear\-display\-name\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update a group.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIEMAIL\fR
+The email address of the group to be updated.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-description\fR
+Clear existing description on group being updated.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Replace existing description on group being updated.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-display\-name\fR
+Clear existing display name on group being updated.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Replace existing display name on group being updated.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudidentity/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/identity/
+
+
+
+.SH "EXAMPLES"
+
+To update a group:
+
+.RS 2m
+$ gcloud identity groups update eng\-discuss@foo.com  \e
+    \-\-display\-name="New Engineer Discuss"  \e
+    \-\-description="Group for engineering discussions"
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha identity groups update
+$ gcloud beta identity groups update
+.RE
+

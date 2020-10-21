@@ -418,3 +418,7 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     return [
         self.messages.EgressPolicy(egressFrom=egress_from, egressTo=egress_to)
     ]
+
+  def _MakeGcpUserAccessBinding(self, access_level, group_key=None, name=None):
+    return self.messages.GcpUserAccessBinding(
+        name=name, groupKey=group_key, accessLevels=[access_level])

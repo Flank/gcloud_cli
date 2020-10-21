@@ -252,10 +252,14 @@ class ApisUnitTest(base.DataflowMockingTestBase,
     name = 'job name'
     gcs_path = 'gs://my_gcs_path'
     template_args = apis.TemplateArguments(job_name=name, gcs_location=gcs_path,
+                                           worker_region=base.DEFAULT_REGION,
                                            project_id=self.Project())
     launch_params = apis.Templates.FLEX_TEMPLATE_PARAMETER(
         jobName=template_args.job_name,
         containerSpecGcsPath=template_args.gcs_location,
+        environment=apis.Templates.FLEX_TEMPLATE_ENVIRONMENT(
+            workerRegion=base.DEFAULT_REGION,
+            additionalExperiments=[]),
         parameters=None)
     request = apis.Templates.LAUNCH_FLEX_TEMPLATE_REQUEST(
         launchParameter=launch_params)

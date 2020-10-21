@@ -71,7 +71,7 @@ class StatusTest(base.FeaturesTestBase):
     split_out = out.split()
     log.warning(split_out)
     header = ['Name', 'Status', 'Last_Synced_Token', 'Sync_Branch',
-              'Last_Synced_Time']
+              'Last_Synced_Time', 'Policy_Controller']
     for i, _ in enumerate(header):
       self.assertEqual(split_out[i], header[i])
     self.assertEqual(split_out[len(header)], cluster_name)

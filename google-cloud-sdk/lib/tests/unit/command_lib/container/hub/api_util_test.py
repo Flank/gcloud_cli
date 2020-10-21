@@ -46,6 +46,20 @@ class SubstringValidator(object):
     return self.substring in other
 
 
+class GetGKEURIAndResourceNameTest(sdk_test_base.SdkBase):
+
+  def testOK(self):
+    project_id = 'test-project'
+    cluster_location = 'us-central1-a'
+    cluster_name = 'test-cluster'
+    gke_resource = '//container.googleapis.com/projects/test-project/locations/us-central1-a/clusters/test-cluster'
+    gke_uri = 'https://container.googleapis.com/v1/projects/test-project/locations/us-central1-a/clusters/test-cluster'
+    expect_resource, expect_uri = api_util.GetGKEURIAndResourceName(
+        project_id, cluster_location, cluster_name)
+    self.assertEqual(gke_resource, expect_resource)
+    self.assertEqual(gke_uri, expect_uri)
+
+
 class ParseBucketIssuerURLTest(sdk_test_base.SdkBase, parameterized.TestCase):
 
   @parameterized.parameters(

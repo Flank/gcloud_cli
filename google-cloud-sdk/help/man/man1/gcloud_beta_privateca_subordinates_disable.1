@@ -1,0 +1,81 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_SUBORDINATES_DISABLE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca subordinates disable \- disable a subordinate certificate authority
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca subordinates disable\fR (\fICERTIFICATE_AUTHORITY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Disables a subordinate certificate authority. The subordinate
+certificate authority will not be allowed to issue certificates once disabled.
+It may still revoke certificates and/or generate CRLs.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+CERTIFICATE AUTHORITY resource \- The certificate authority to disable. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[CERTIFICATE_AUTHORITY] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fICERTIFICATE_AUTHORITY\fR
+ID of the CERTIFICATE_AUTHORITY or fully qualified identifier for the
+CERTIFICATE_AUTHORITY. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the CERTIFICATE_AUTHORITY. Alternatively, you can set the
+property [privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To disable a subordinate CA:
+
+.RS 2m
+$ gcloud beta privateca subordinates disable server\-tls1 \e
+  \-\-location=us\-west1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

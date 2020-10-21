@@ -44,6 +44,36 @@ class GetServerConfigTestGA(base.GATestBase,
     with self.assertRaises(exceptions.MinimumArgumentException):
       self.Run(self.get_server_config_command_base)
 
+  def testFilter(self):
+    self.ExpectGetServerConfig(self.ZONE)
+    self.Run(self.get_server_config_command_base +
+             ' --zone={0}'.format(self.ZONE) +
+             ' --flatten=channels --filter="channels.channel=RAPID"' +
+             ' --format="value(channels.channel)"')
+    self.AssertOutputContains('RAPID')
+    self.AssertOutputNotContains('REGULAR')
+    self.AssertOutputNotContains('STABLE')
+
+  def testSortBy(self):
+    self.ExpectGetServerConfig(self.ZONE)
+    self.Run(self.get_server_config_command_base +
+             ' --zone={0}'.format(self.ZONE) +
+             ' --flatten=channels --sort-by="~channels.channel" --limit=1' +
+             ' --format="value(channels.channel)"')
+    self.AssertOutputContains('STABLE')
+    self.AssertOutputNotContains('REGULAR')
+    self.AssertOutputNotContains('RAPID')
+
+  def testLimit(self):
+    self.ExpectGetServerConfig(self.ZONE)
+    self.Run(self.get_server_config_command_base +
+             ' --zone={0}'.format(self.ZONE) +
+             ' --flatten=channels --limit=1' +
+             ' --format="value(channels.channel)"')
+    self.AssertOutputContains('RAPID')
+    self.AssertOutputNotContains('REGULAR')
+    self.AssertOutputNotContains('STABLE')
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.

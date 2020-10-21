@@ -95,7 +95,10 @@ class ApigeeV1(base_api.BaseApiClient):
     self.organizations_sharedflows_revisions_deployments = self.OrganizationsSharedflowsRevisionsDeploymentsService(self)
     self.organizations_sharedflows_revisions = self.OrganizationsSharedflowsRevisionsService(self)
     self.organizations_sharedflows = self.OrganizationsSharedflowsService(self)
+    self.organizations_sites_apicategories = self.OrganizationsSitesApicategoriesService(self)
+    self.organizations_sites = self.OrganizationsSitesService(self)
     self.organizations = self.OrganizationsService(self)
+    self.projects = self.ProjectsService(self)
 
   class HybridIssuersService(base_api.BaseApiService):
     """Service class for the hybrid_issuers resource."""
@@ -2878,7 +2881,7 @@ class ApigeeV1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates an alias from a key, certificate pair. The structure of the request is controlled by the `format` query parameter: * `keycertfile` - Separate PEM-encoded key and certificate files are uploaded. The request must have `Content-Type: multipart/form-data` and include fields `keyFile` and `certFile`. If uploading to a truststore, omit `keyFile`. * `pkcs12` - A PKCS12 file is uploaded. The request must have `Content-Type: multipart/form-data` with the file provided in the only field. * `selfsignedcert` - A new private key and certificate are generated. The request must have `Content-Type: application/json` and a body of CertificateGenerationSpec.
+      r"""Creates an alias from a key, certificate pair. The structure of the request is controlled by the `format` query parameter: * `keycertfile` - Separate PEM-encoded key and certificate files are uploaded. The request must have `Content-Type: multipart/form-data` and include fields `keyFile` and `certFile`. If uploading to a truststore, omit `keyFile`. A `password` field should be provided for encrypted keys. * `pkcs12` - A PKCS12 file is uploaded. The request must have `Content-Type: multipart/form-data` with the file provided in the `file` field and a `password` field if the file is encrypted. * `selfsignedcert` - A new private key and certificate are generated. The request must have `Content-Type: application/json` and a body of CertificateGenerationSpec.
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsKeystoresAliasesCreateRequest) input message
@@ -3478,7 +3481,7 @@ class ApigeeV1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a resource file. Specify the `Content-Type` as `application/octet-stream` or `multipart/form-data`. For more information about resource files, see [Resource files](/api-platform/develop/resource-files).
+      r"""Creates a resource file. Specify the `Content-Type` as `application/octet-stream` or `multipart/form-data`. For more information about resource files, see [Resource files](https://cloud.google.com/apigee/docs/api-platform/develop/resource-files).
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsResourcefilesCreateRequest) input message
@@ -3505,7 +3508,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a resource file. For more information about resource files, see [Resource files](/api-platform/develop/resource-files).
+      r"""Deletes a resource file. For more information about resource files, see [Resource files](https://cloud.google.com/apigee/docs/api-platform/develop/resource-files).
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsResourcefilesDeleteRequest) input message
@@ -3532,7 +3535,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets the contents of a resource file. For more information about resource files, see [Resource files](/api-platform/develop/resource-files).
+      r"""Gets the contents of a resource file. For more information about resource files, see [Resource files](https://cloud.google.com/apigee/docs/api-platform/develop/resource-files).
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsResourcefilesGetRequest) input message
@@ -3559,7 +3562,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""Lists all resource files. For more information about resource files, see [Resource files](/api-platform/develop/resource-files).
+      r"""Lists all resource files, optionally filtering by type. For more information about resource files, see [Resource files](https://cloud.google.com/apigee/docs/api-platform/develop/resource-files).
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsResourcefilesListRequest) input message
@@ -3586,7 +3589,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def ListEnvironmentResources(self, request, global_params=None):
-      r"""Lists all resource files. For more information about resource files, see [Resource files](/api-platform/develop/resource-files).
+      r"""Lists all resource files, optionally filtering by type. For more information about resource files, see [Resource files](https://cloud.google.com/apigee/docs/api-platform/develop/resource-files).
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsResourcefilesListEnvironmentResourcesRequest) input message
@@ -3613,7 +3616,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def Update(self, request, global_params=None):
-      r"""Updates a resource file. Specify the `Content-Type` as `application/octet-stream` or `multipart/form-data`. For more information about resource files, see [Resource files](/api-platform/develop/resource-files).
+      r"""Updates a resource file. Specify the `Content-Type` as `application/octet-stream` or `multipart/form-data`. For more information about resource files, see [Resource files](https://cloud.google.com/apigee/docs/api-platform/develop/resource-files).
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsResourcefilesUpdateRequest) input message
@@ -4078,7 +4081,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def GetIamPolicy(self, request, global_params=None):
-      r"""Gets the IAM policy on an environment. For more information, see [Manage users, roles, and permissions using the API](https://docs.apigee.com/hybrid/latest/manage-users-roles). You must have the `apigee.environments.getIamPolicy` permission to call this API.
+      r"""Gets the IAM policy on an environment. For more information, see [Manage users, roles, and permissions using the API](https://cloud.google.com/apigee/docs/api-platform/system-administration/manage-users-roles). You must have the `apigee.environments.getIamPolicy` permission to call this API.
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsGetIamPolicyRequest) input message
@@ -4105,7 +4108,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def SetIamPolicy(self, request, global_params=None):
-      r"""Sets the IAM policy on an environment, if the policy already exists it will be replaced. For more information, see [Manage users, roles, and permissions using the API](https://docs.apigee.com/hybrid/latest/manage-users-roles). You must have the `apigee.environments.setIamPolicy` permission to call this API.
+      r"""Sets the IAM policy on an environment, if the policy already exists it will be replaced. For more information, see [Manage users, roles, and permissions using the API](https://cloud.google.com/apigee/docs/api-platform/system-administration/manage-users-roles). You must have the `apigee.environments.setIamPolicy` permission to call this API.
 
       Args:
         request: (ApigeeOrganizationsEnvironmentsSetIamPolicyRequest) input message
@@ -5112,6 +5115,161 @@ class ApigeeV1(base_api.BaseApiClient):
         supports_download=False,
     )
 
+  class OrganizationsSitesApicategoriesService(base_api.BaseApiService):
+    """Service class for the organizations_sites_apicategories resource."""
+
+    _NAME = 'organizations_sites_apicategories'
+
+    def __init__(self, client):
+      super(ApigeeV1.OrganizationsSitesApicategoriesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Create(self, request, global_params=None):
+      r"""Creates a new category on the portal.
+
+      Args:
+        request: (ApigeeOrganizationsSitesApicategoriesCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudApigeeV1ApiCategory) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/organizations/{organizationsId}/sites/{sitesId}/apicategories',
+        http_method='POST',
+        method_id='apigee.organizations.sites.apicategories.create',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=[],
+        relative_path='v1/{+parent}/apicategories',
+        request_field='googleCloudApigeeV1ApiCategoryData',
+        request_type_name='ApigeeOrganizationsSitesApicategoriesCreateRequest',
+        response_type_name='GoogleCloudApigeeV1ApiCategory',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes a category from the portal.
+
+      Args:
+        request: (ApigeeOrganizationsSitesApicategoriesDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudApigeeV1ApiResponseWrapper) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/organizations/{organizationsId}/sites/{sitesId}/apicategories/{apicategoriesId}',
+        http_method='DELETE',
+        method_id='apigee.organizations.sites.apicategories.delete',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='ApigeeOrganizationsSitesApicategoriesDeleteRequest',
+        response_type_name='GoogleCloudApigeeV1ApiResponseWrapper',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Gets a category on the portal.
+
+      Args:
+        request: (ApigeeOrganizationsSitesApicategoriesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudApigeeV1ApiCategory) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/organizations/{organizationsId}/sites/{sitesId}/apicategories/{apicategoriesId}',
+        http_method='GET',
+        method_id='apigee.organizations.sites.apicategories.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='ApigeeOrganizationsSitesApicategoriesGetRequest',
+        response_type_name='GoogleCloudApigeeV1ApiCategory',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists the categories on the portal.
+
+      Args:
+        request: (ApigeeOrganizationsSitesApicategoriesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudApigeeV1ListApiCategoriesResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/organizations/{organizationsId}/sites/{sitesId}/apicategories',
+        http_method='GET',
+        method_id='apigee.organizations.sites.apicategories.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=[],
+        relative_path='v1/{+parent}/apicategories',
+        request_field='',
+        request_type_name='ApigeeOrganizationsSitesApicategoriesListRequest',
+        response_type_name='GoogleCloudApigeeV1ListApiCategoriesResponse',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Updates a category on the portal.
+
+      Args:
+        request: (GoogleCloudApigeeV1ApiCategoryData) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudApigeeV1ApiCategory) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/organizations/{organizationsId}/sites/{sitesId}/apicategories/{apicategoriesId}',
+        http_method='PATCH',
+        method_id='apigee.organizations.sites.apicategories.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='<request>',
+        request_type_name='GoogleCloudApigeeV1ApiCategoryData',
+        response_type_name='GoogleCloudApigeeV1ApiCategory',
+        supports_download=False,
+    )
+
+  class OrganizationsSitesService(base_api.BaseApiService):
+    """Service class for the organizations_sites resource."""
+
+    _NAME = 'organizations_sites'
+
+    def __init__(self, client):
+      super(ApigeeV1.OrganizationsSitesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
   class OrganizationsService(base_api.BaseApiService):
     """Service class for the organizations resource."""
 
@@ -5123,7 +5281,7 @@ class ApigeeV1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates an Apigee organization. See [Create an organization](https://docs.apigee.com/hybrid/latest/precog-provision).
+      r"""Creates an Apigee organization. See [Create an Apigee organization](https://cloud.google.com/apigee/docs/api-platform/get-started/create-org).
 
       Args:
         request: (ApigeeOrganizationsCreateRequest) input message
@@ -5149,7 +5307,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets the profile for an Apigee organization. See [Organizations](https://docs.apigee.com/hybrid/latest/terminology#organizations).
+      r"""Gets the profile for an Apigee organization. See [Understanding organizations](https://cloud.google.com/apigee/docs/api-platform/fundamentals/organization-structure).
 
       Args:
         request: (ApigeeOrganizationsGetRequest) input message
@@ -5194,7 +5352,7 @@ class ApigeeV1(base_api.BaseApiClient):
         method_id='apigee.organizations.getDeployedIngressConfig',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=[],
+        query_params=['view'],
         relative_path='v1/{+name}',
         request_field='',
         request_type_name='ApigeeOrganizationsGetDeployedIngressConfigRequest',
@@ -5203,7 +5361,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def GetSyncAuthorization(self, request, global_params=None):
-      r"""Lists the service accounts with the permissions required to allow the Synchronizer to download environment data from the control plane. An ETag is returned in the response to `getSyncAuthorization`. Pass that ETag when calling [setSyncAuthorization](setSyncAuthorization) to ensure that you are updating the correct version. If you don't pass the ETag in the call to `setSyncAuthorization`, then the existing authorization is overwritten indiscriminately. For more information, see [Enable Synchronizer access](https://docs.apigee.com/hybrid/latest/synchronizer-access#enable-synchronizer-access). **Note**: Available to Apigee hybrid only.
+      r"""Lists the service accounts with the permissions required to allow the Synchronizer to download environment data from the control plane. An ETag is returned in the response to `getSyncAuthorization`. Pass that ETag when calling [setSyncAuthorization](setSyncAuthorization) to ensure that you are updating the correct version. If you don't pass the ETag in the call to `setSyncAuthorization`, then the existing authorization is overwritten indiscriminately. For more information, see [Configure the Synchronizer](https://cloud.google.com/apigee/docs/hybrid/latest/synchronizer-access). **Note**: Available to Apigee hybrid only.
 
       Args:
         request: (ApigeeOrganizationsGetSyncAuthorizationRequest) input message
@@ -5230,7 +5388,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""Lists the Apigee organizations and associated GCP projects that you have permission to access. See [Organizations](https://docs.apigee.com/hybrid/latest/terminology#organizations).
+      r"""Lists the Apigee organizations and associated GCP projects that you have permission to access. See [Understanding organizations](https://cloud.google.com/apigee/docs/api-platform/fundamentals/organization-structure).
 
       Args:
         request: (ApigeeOrganizationsListRequest) input message
@@ -5257,7 +5415,7 @@ class ApigeeV1(base_api.BaseApiClient):
     )
 
     def SetSyncAuthorization(self, request, global_params=None):
-      r"""Sets the permissions required to allow the Synchronizer to download environment data from the control plane. You must call this API to enable proper functioning of hybrid. Pass the ETag when calling `setSyncAuthorization` to ensure that you are updating the correct version. To get an ETag, call [getSyncAuthorization](getSyncAuthorization). If you don't pass the ETag in the call to `setSyncAuthorization`, then the existing authorization is overwritten indiscriminately. For more information, see [Enable Synchronizer access](https://docs.apigee.com/hybrid/latest/synchronizer-access#enable-synchronizer-access). **Note**: Available to Apigee hybrid only.
+      r"""Sets the permissions required to allow the Synchronizer to download environment data from the control plane. You must call this API to enable proper functioning of hybrid. Pass the ETag when calling `setSyncAuthorization` to ensure that you are updating the correct version. To get an ETag, call [getSyncAuthorization](getSyncAuthorization). If you don't pass the ETag in the call to `setSyncAuthorization`, then the existing authorization is overwritten indiscriminately. For more information, see [Configure the Synchronizer](https://cloud.google.com/apigee/docs/hybrid/latest/synchronizer-access). **Note**: Available to Apigee hybrid only.
 
       Args:
         request: (ApigeeOrganizationsSetSyncAuthorizationRequest) input message
@@ -5307,5 +5465,42 @@ class ApigeeV1(base_api.BaseApiClient):
         request_field='<request>',
         request_type_name='GoogleCloudApigeeV1Organization',
         response_type_name='GoogleCloudApigeeV1Organization',
+        supports_download=False,
+    )
+
+  class ProjectsService(base_api.BaseApiService):
+    """Service class for the projects resource."""
+
+    _NAME = 'projects'
+
+    def __init__(self, client):
+      super(ApigeeV1.ProjectsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def ProvisionOrganization(self, request, global_params=None):
+      r"""Provisions a new Apigee organization with a functioning runtime. This is the standard way to create trial organizations for a free Apigee trial.
+
+      Args:
+        request: (ApigeeProjectsProvisionOrganizationRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('ProvisionOrganization')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ProvisionOrganization.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}:provisionOrganization',
+        http_method='POST',
+        method_id='apigee.projects.provisionOrganization',
+        ordered_params=['project'],
+        path_params=['project'],
+        query_params=[],
+        relative_path='v1/{+project}:provisionOrganization',
+        request_field='googleCloudApigeeV1ProvisionOrganizationRequest',
+        request_type_name='ApigeeProjectsProvisionOrganizationRequest',
+        response_type_name='GoogleLongrunningOperation',
         supports_download=False,
     )

@@ -19,43 +19,34 @@ gcloud beta compute forwarding\-rules create \- create a forwarding rule to dire
 
 \fB(BETA)\fR \fBgcloud beta compute forwarding\-rules create\fR is used to
 create a forwarding rule. A forwarding rule directs traffic that matches a
-destination IP address.RS 2m
-(and possibly a TCP or UDP port) to a forwarding target (load balancer,
-VPN gateway or VM instance).
+destination IP address (and possibly a TCP or UDP port) to a forwarding target
+(load balancer, VPN gateway or VM instance).
 
-.RE
-
-.RS 2m
 Forwarding rules can be either global or regional, specified with the
-`_\-\-global_` or `_\-\-region=REGION_` flags. For more information about
-the scope of a forwarding rule, refer to
+\f5\fI\-\-global\fR\fR or \f5\fI\-\-region=REGION\fR\fR flags. For more
+information about the scope of a forwarding rule, refer to
 https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts.
-.RE
 
-.RS 2m
-Forwarding rules can be external, internal, internal managed, or
-internal self\-managed, specified with the
-`_\-\-load\-balancing\-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]_`
-flag. External forwarding rules are accessible from the internet, while
-internal forwarding rules are only accessible from within their VPC
-networks. You can specify a reserved static external or internal IP
-address with the `_\-\-address=ADDRESS_` flag for the forwarding rule.
-Otherwise, if the flag is unspecified, an ephemeral IP address is
-automatically assigned (global IP addresses for global forwarding rules
-and regional IP addresses for regional forwarding rules); an internal
-forwarding rule is automatically assigned an ephemeral internal IP
-address from the subnet specified with the `_\-\-subnet_` flag. You must
-provide an IP address for an internal self\-managed forwarding rule.
-.RE
+Forwarding rules can be external, internal, internal managed, or internal
+self\-managed, specified with the
+\f5\fI\-\-load\-balancing\-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]\fR\fR
+flag. External forwarding rules are accessible from the internet, while internal
+forwarding rules are only accessible from within their VPC networks. You can
+specify a reserved static external or internal IP address with the
+\f5\fI\-\-address=ADDRESS\fR\fR flag for the forwarding rule. Otherwise, if the
+flag is unspecified, an ephemeral IP address is automatically assigned (global
+IP addresses for global forwarding rules and regional IP addresses for regional
+forwarding rules); an internal forwarding rule is automatically assigned an
+ephemeral internal IP address from the subnet specified with the
+\f5\fI\-\-subnet\fR\fR flag. You must provide an IP address for an internal
+self\-managed forwarding rule.
 
-.RS 2m
-Different types of load balancers work at different layers of the OSI
-networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4
-targets include target pools, target SSL proxies, target TCP proxies,
-and backend services. Layer 7 targets include target HTTP proxies and
-target HTTPS proxies. For more information, refer to
+Different types of load balancers work at different layers of the OSI networking
+model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4 targets include
+target pools, target SSL proxies, target TCP proxies, and backend services.
+Layer 7 targets include target HTTP proxies and target HTTPS proxies. For more
+information, refer to
 https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts.
-.RE
 
 
 When creating a forwarding rule, exactly one of

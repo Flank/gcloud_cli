@@ -58,7 +58,7 @@ class DeleteTest(base.ErrorReportingTestBase):
             projectName='projects/' + self.FAKE_PROJECT),
         exception=http_error.MakeHttpError(404, url=url))
     with self.AssertRaisesHttpExceptionMatches(
-        'Project [{0}] not found: Resource not found.'.format(
+        'Project instance [{0}] not found: Resource not found.'.format(
             self.FAKE_PROJECT)):
       self.RunCmd(self.COMMAND)
 

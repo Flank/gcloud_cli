@@ -24,12 +24,11 @@ import time
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import sign_url_utils
-from googlecloudsdk.core import http
+from googlecloudsdk.core import requests
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import test_case
 
-import httplib2
 import mock
 
 
@@ -355,33 +354,29 @@ class ValidationTestsGA(SignUrlTestsBase):
 
   def SetUp(self):
     super(ValidationTestsGA, self).SetUp()
-    http_mock = self.StartObjectPatch(http, 'HttpClient')
+    http_mock = self.StartObjectPatch(requests, 'GetSession')
     self.http_request_mock = http_mock.return_value.request
-    self.http_response_mock = self.StartObjectPatch(
-        httplib2, 'Response', autospec=True)
 
   def _SetUpReleaseTrack(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  def _MockResponseForRequest(self, url, response_code):
+  def _MockResponseForRequest(self, response_code):
     """Mocks the response for the specified request URL."""
-    self.http_response_mock.status = response_code
-    response_body = b''
-    self.http_request_mock.return_value = (self.http_response_mock,
-                                           response_body)
+    self.http_request_mock.return_value = mock.PropertyMock(
+        status_code=response_code)
 
   def _VerifyValidationRequest(self, expected_signed_url):
     """Verifies the HEAD request was sent for the specified Signed URL."""
     self.http_request_mock.assert_called_once()
-    args, kwargs = self.http_request_mock.call_args
-    self.assertEqual(args[0], expected_signed_url)
-    self.assertEqual(kwargs['method'], 'HEAD')
+    args, _ = self.http_request_mock.call_args
+    self.assertEqual(args[0], 'HEAD')
+    self.assertEqual(args[1], expected_signed_url)
 
   def testValidationSuccess(self):
     """Verifies successful validation for a Signed URL."""
     input_url = 'https://www.example.com/foo/bar?q1=abc'
     expected_signed_url = self._GetExpectedSignedUrl(input_url, True, 300)
-    self._MockResponseForRequest(expected_signed_url, 200)
+    self._MockResponseForRequest(200)
 
     result = self._RunSignUrl([
         '--key-name', 'key1', '--key-file', self.key_file, '--expires-in',
@@ -394,7 +389,7 @@ class ValidationTestsGA(SignUrlTestsBase):
     """Verifies validation failure for a Signed URL."""
     input_url = 'https://www.example.com/foo/bar?q1=abc'
     expected_signed_url = self._GetExpectedSignedUrl(input_url, True, 300)
-    self._MockResponseForRequest(expected_signed_url, 403)
+    self._MockResponseForRequest(403)
 
     result = self._RunSignUrl([
         '--key-name', 'key1', '--key-file', self.key_file, '--expires-in',

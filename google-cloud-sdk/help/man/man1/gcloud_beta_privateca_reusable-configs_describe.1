@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_BETA_PRIVATECA_REUSABLE\-CONFIGS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta privateca reusable\-configs describe \- show details about a reusable config
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta privateca reusable\-configs describe\fR (\fIREUSABLE_CONFIG\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Show details about a reusable config.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Reusable config resource \- The reusable config to describe. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [REUSABLE_CONFIG] on the
+command line with a fully specified name; project will default to
+privateca\-data. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREUSABLE_CONFIG\fR
+ID of the reusable config or fully qualified identifier for the reusable config.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the reusable config. Alternatively, you can set the property
+[privateca/location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To show details about a reusable config, run:
+
+.RS 2m
+$ gcloud beta privateca reusable\-configs describe leaf\-server\-tls
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

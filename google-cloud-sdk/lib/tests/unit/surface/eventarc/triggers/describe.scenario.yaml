@@ -34,8 +34,25 @@ summary:
         value: google.cloud.pubsub.topic.v1.messagePublished
       name: projects/fake-project/locations/us-central1/triggers/fake-trigger2
       updateTime: '3000-01-01T00:00:00Z'
-  - stderr: |
-      WARNING: The trigger was recently modified and may take up to 10 minutes to start functioning.
+- execute:
+  - command: |
+      eventarc triggers describe fake-trigger3 --location us-central1
+  - stdout: |
+      destination:
+        cloudRunService:
+          service: fake-service3
+      matchingCriteria:
+      - attribute: type
+        value: google.cloud.audit.log.v1.written
+      - attribute: serviceName
+        value: storage.googleapis.com
+      - attribute: methodName
+        value: storage.buckets.create
+      name: projects/fake-project/locations/us-central1/triggers/fake-trigger3
+      updateTime: '3000-01-01T00:00:00Z'
+  - stderr: |-
+      WARNING: The trigger was recently modified and will become active by ..:10:00.
+      $
 
 actions:
 - execute_command:
@@ -117,7 +134,50 @@ actions:
           value: google.cloud.pubsub.topic.v1.messagePublished
         name: projects/fake-project/locations/us-central1/triggers/fake-trigger2
         updateTime: '3000-01-01T00:00:00Z'
-    - expect_stderr: |
-        WARNING: The trigger was recently modified and may take up to 10 minutes to start functioning.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      eventarc triggers describe fake-trigger3 --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://eventarc.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/triggers/fake-trigger3?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            destination:
+              cloudRunService:
+                service: fake-service3
+            matchingCriteria:
+            - attribute: type
+              value: google.cloud.audit.log.v1.written
+            - attribute: serviceName
+              value: storage.googleapis.com
+            - attribute: methodName
+              value: storage.buckets.create
+            name: projects/fake-project/locations/us-central1/triggers/fake-trigger3
+            updateTime: '3000-01-01T00:00:00Z'
+    - expect_stdout: |
+        destination:
+          cloudRunService:
+            service: fake-service3
+        matchingCriteria:
+        - attribute: type
+          value: google.cloud.audit.log.v1.written
+        - attribute: serviceName
+          value: storage.googleapis.com
+        - attribute: methodName
+          value: storage.buckets.create
+        name: projects/fake-project/locations/us-central1/triggers/fake-trigger3
+        updateTime: '3000-01-01T00:00:00Z'
+    - expect_stderr:
+        matches: |
+          WARNING: The trigger was recently modified and will become active by ..:10:00.
     - expect_exit:
         code: 0

@@ -20,16 +20,17 @@ REQUIRED FLAGS
           Path to the job configuration file. This file should be a YAML
           document containing a CustomJobSpec. If an option is specified both
           in the configuration file **and** via command line arguments, the
-          command line arguments override the configuration file.
+          command line arguments override the configuration file. Note that
+          keys with underscore are invalid.
 
           Example(YAML):
 
-              worker_pool_specs:
-                machine_spec:
-                  machine_type: n1-highmem-2
-                replica_count: 1
-                container_spec:
-                  image_uri: gcr.io/ucaip-test/ucaip-training-test
+              workerPoolSpecs:
+                machineSpec:
+                  machineType: n1-highmem-2
+                replicaCount: 1
+                containerSpec:
+                  imageUri: gcr.io/ucaip-test/ucaip-training-test
 
        --worker-pool-spec=[WORKER_POOL_SPEC,...]
           Define the worker pool configuration used by the custom job. You can

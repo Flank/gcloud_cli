@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha metastore services create (SERVICE : --location=LOCATION)
-        [--async] [--hive-metastore-version=HIVE_METASTORE_VERSION]
+        [--async] [--no-data-catalog-sync]
+        [--hive-metastore-version=HIVE_METASTORE_VERSION]
         [--labels=[KEY=VALUE,...]] [--network=NETWORK; default="default"]
         [--port=PORT; default=9083] [--tier=TIER]
         [--hive-metastore-configs=KEY=VALUE
@@ -44,6 +45,11 @@ FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --data-catalog-sync
+        A boolean flag to determine whether Dataproc Metastore metadata sync to
+        Data Catalog should be enabled, true if unspecified. Enabled by
+        default, use --no-data-catalog-sync to disable.
 
      --hive-metastore-version=HIVE_METASTORE_VERSION
         The Hive metastore schema version. If unspecified, the default version

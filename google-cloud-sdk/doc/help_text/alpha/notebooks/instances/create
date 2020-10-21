@@ -150,7 +150,7 @@ OPTIONAL FLAGS
        --boot-disk-type=BOOT_DISK_TYPE
           The type of disk attached to this instance, defaults to standard
           persistent disk (PD_STANDARD). BOOT_DISK_TYPE must be one of:
-          PD_STANDARD, PD_SSD.
+          PD_STANDARD, PD_SSD, PD_BALANCED.
 
      GPU driver configurations.
 

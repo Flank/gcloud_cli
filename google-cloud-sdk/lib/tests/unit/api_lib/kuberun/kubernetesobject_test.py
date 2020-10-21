@@ -31,6 +31,16 @@ class KubernetesObjectTest(parameterized.TestCase):
     console_attr.ResetConsoleAttr()
     super(KubernetesObjectTest, self)
 
+  def testLastModifier(self):
+    self.assertEqual(
+        kubernetesobject.KubernetesObject({
+            "metadata": {
+                "annotations": {
+                    "serving.knative.dev/lastModifier": "foo@example.com"
+                }
+            }
+        }).last_modifier, "foo@example.com")
+
   def testReadyCondition(self):
     self.assertFalse(
         kubernetesobject.KubernetesObject({
@@ -94,6 +104,7 @@ class KubernetesObjectTest(parameterized.TestCase):
                                   ("Not ready", "False", "X"),
                                   ("Unknown", "Unknown", "."))
   def testReadySymbol(self, ready_status, expected):
+    console_attr.ResetConsoleAttr("ascii")
     self.assertEqual(
         kubernetesobject.KubernetesObject({
             "status": {

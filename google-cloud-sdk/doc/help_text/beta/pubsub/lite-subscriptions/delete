@@ -45,8 +45,9 @@ EXAMPLES
             --zone=us-central1-a
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud pubsub lite-subscriptions delete
         $ gcloud alpha pubsub lite-subscriptions delete
 

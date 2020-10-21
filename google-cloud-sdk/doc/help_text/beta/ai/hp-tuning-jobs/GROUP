@@ -29,6 +29,9 @@ COMMANDS
         (BETA) Get detail information about the hyperparameter tuning job by
         given id.
 
+     list
+        (BETA) List existing hyperparameter tuning jobs.
+
 NOTES
     This command is currently in BETA and may change without notice. This
     variant is also available:
