@@ -1,3 +1,0 @@
-imports:
-- path: ../shared_helper.jinja
-  name: shared_helper.jinja

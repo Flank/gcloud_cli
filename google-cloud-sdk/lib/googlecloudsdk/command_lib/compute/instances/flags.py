@@ -104,6 +104,14 @@ INSTANCE_ARG = compute_flags.ResourceArgument(
     zonal_collection='compute.instances',
     zone_explanation=ZONE_PROPERTY_EXPLANATION)
 
+INSTANCE_ARG_NOT_REQUIRED = compute_flags.ResourceArgument(
+    resource_name='instance',
+    name='instance_name',
+    required=False,
+    completer=compute_completers.InstancesCompleter,
+    zonal_collection='compute.instances',
+    zone_explanation=ZONE_PROPERTY_EXPLANATION)
+
 INSTANCES_ARG = compute_flags.ResourceArgument(
     resource_name='instance',
     name='instance_names',
@@ -231,6 +239,18 @@ def MakeSourceInstanceTemplateArg():
                   'be created from.\n\nUsers can also override machine '
                   'type and labels. Values of other flags will be ignored and '
                   '`--source-instance-template` will be used instead.'))
+
+
+def MakeBulkSourceInstanceTemplateArg():
+  return compute_flags.ResourceArgument(
+      name='--source-instance-template',
+      resource_name='instance template',
+      completer=compute_completers.InstanceTemplatesCompleter,
+      required=False,
+      global_collection='compute.instanceTemplates',
+      short_help=('The name of the instance template that the instance will '
+                  'be created from. Users can override fields by specifying '
+                  'other flags.'))
 
 
 def AddMachineImageArg():
@@ -1128,7 +1148,8 @@ def ValidateImageFlags(args):
 
 def AddAddressArgs(parser,
                    instances=True,
-                   multiple_network_interface_cards=True):
+                   multiple_network_interface_cards=True,
+                   support_network_interface_nic_type=False):
   """Adds address arguments for instances and instance-templates."""
   addresses = parser.add_mutually_exclusive_group()
   AddNoAddressArg(addresses)
@@ -1162,6 +1183,18 @@ def AddAddressArgs(parser,
           '--network-interface', 'Invalid value for network-tier')
 
   multiple_network_interface_cards_spec['network-tier'] = ValidateNetworkTier
+
+  def ValidateNetworkInterfaceNicType(nic_type_input):
+    nic_type = nic_type_input.upper()
+    if nic_type in constants.NETWORK_INTERFACE_NIC_TYPE_CHOICES:
+      return nic_type
+    else:
+      raise exceptions.InvalidArgumentException(
+          '--network-interface', 'Invalid value for nic-type [%s]' % nic_type)
+
+  if support_network_interface_nic_type:
+    multiple_network_interface_cards_spec[
+        'nic-type'] = ValidateNetworkInterfaceNicType
 
   if multiple_network_interface_cards:
     multiple_network_interface_cards_spec['aliases'] = str
@@ -1200,6 +1233,13 @@ def AddAddressArgs(parser,
         If network key is also specified this must be a subnetwork of the
         specified network.
         """
+
+    if support_network_interface_nic_type:
+      network_interface_help += """
+        *nic-type*::: Specifies the NIC type for the interface.
+        ``NIC_TYPE'' must be one of: `GVNIC`, `VIRTIO_NET`.
+        """
+
     network_interface_help += """
         *aliases*::: Specifies the IP alias ranges to allocate for this
         interface.  If there are multiple IP alias ranges, they are separated
@@ -1233,6 +1273,7 @@ def AddAddressArgs(parser,
           unspecified, it defaults to the primary IP range of the subnet.
           The IP allocator will pick an available range with the specified
           netmask and allocate it to this network interface."""
+
     parser.add_argument(
         '--network-interface',
         type=arg_parsers.ArgDict(
@@ -2587,7 +2628,9 @@ def AddBulkCreateArgs(parser):
       '--count',
       type=int,
       help="""
-      Number of Compute Engine virtual machines to create. If not specified,
+      Number of Compute Engine virtual machines to create. If specified, and
+      `--predefined-names` is specified, count must equal the amount of names
+      provided to `--predefined-names`. If not specified,
       the number of virtual machines created will equal the number of names
       provided to `--predefined-names`.
     """)
@@ -2608,7 +2651,9 @@ def AddBulkCreateArgs(parser):
       required=True,
       help="""
         List of predefined names for the Compute Engine virtual machines being
-        created. If `--count` is not specified, the number of virtual machines
+        created. If `--count` is specified alongside this flag, provided count
+        must equal the amount of names provided to this flag. If `--count` is
+        not specified, the number of virtual machines
         created will equal the number of names provided.
       """)
   location = parser.add_group(required=True, mutex=True)

@@ -140,9 +140,7 @@ class CloudRunService(_messages.Message):
       should be sent to. The value must conform to the definition of URI path
       segment (section 3.3 of RFC2396). Examples: "/route", "route",
       "route/subroute".
-    region: Optional. The region the Cloud Run service is deployed in. If not
-      set, the location of the trigger is used. For triggers in the "global"
-      location, setting this field is mandatory.
+    region: Required. The region the Cloud Run service is deployed in.
     service: Required. The name of the Cloud run service being addressed (see
       https://cloud.google.com/run/docs/reference/rest/v1/namespaces.services)
       . Only services located in the same project of the trigger object can be
@@ -961,10 +959,8 @@ class Trigger(_messages.Message):
       projects/{project}/locations/{location}/triggers/{trigger}
     serviceAccount: Optional. The IAM service account email associated with
       the trigger. The service account represents the identity of the trigger.
-      If not specified, the default compute service account will be used (see
-      https://cloud.google.com/compute/docs/access/service-
-      accounts#default_service_account). The principal who calls this API must
-      have `iam.serviceAccounts.actAs` permission in the service account. See
+      The principal who calls this API must have `iam.serviceAccounts.actAs`
+      permission in the service account. See
       https://cloud.google.com/iam/docs/understanding-service-
       accounts?hl=en#sa_common for more information. For Cloud Run
       destinations, this service account is used to generate identity tokens

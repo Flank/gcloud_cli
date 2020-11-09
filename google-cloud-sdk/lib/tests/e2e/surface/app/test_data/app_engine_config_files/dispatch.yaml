@@ -1,8 +1,0 @@
-dispatch:
-# Default module serves the typical web resources and all static resources.
-- url: "*/favicon.ico"
-  service: default
-
-# Default module serves simple hostname request.
-- url: "simple-sample.appspot.com/"
-  service: default

@@ -1610,7 +1610,7 @@ class AuthorizationLoggingOptions(_messages.Message):
 class Autoscaler(_messages.Message):
   r"""Represents an Autoscaler resource.  Google Compute Engine has two
   Autoscaler resources:  *
-  [Global](/compute/docs/reference/rest/{$api_version}/autoscalers) *
+  [Zonal](/compute/docs/reference/rest/{$api_version}/autoscalers) *
   [Regional](/compute/docs/reference/rest/{$api_version}/regionAutoscalers)
   Use autoscalers to automatically add or delete instances from a managed
   instance group according to your defined autoscaling policy. For more
@@ -7172,6 +7172,85 @@ class ComputeGlobalOperationsWaitRequest(_messages.Message):
 
   operation = _messages.StringField(1, required=True)
   project = _messages.StringField(2, required=True)
+
+
+class ComputeGlobalOrganizationOperationsDeleteRequest(_messages.Message):
+  r"""A ComputeGlobalOrganizationOperationsDeleteRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to delete.
+    parentId: Parent ID for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  parentId = _messages.StringField(2)
+
+
+class ComputeGlobalOrganizationOperationsDeleteResponse(_messages.Message):
+  r"""An empty ComputeGlobalOrganizationOperationsDelete response."""
+
+
+class ComputeGlobalOrganizationOperationsGetRequest(_messages.Message):
+  r"""A ComputeGlobalOrganizationOperationsGetRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to return.
+    parentId: Parent ID for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  parentId = _messages.StringField(2)
+
+
+class ComputeGlobalOrganizationOperationsListRequest(_messages.Message):
+  r"""A ComputeGlobalOrganizationOperationsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    parentId: Parent ID for this request.
+    returnPartialSuccess: Opt-in for partial success behavior which provides
+      partial results in case of failure. The default value is false and the
+      logic is the same as today.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  parentId = _messages.StringField(5)
+  returnPartialSuccess = _messages.BooleanField(6)
 
 
 class ComputeHealthChecksAggregatedListRequest(_messages.Message):
@@ -22014,7 +22093,7 @@ class DistributionPolicy(_messages.Message):
 
   Fields:
     zones: Zones where the regional managed instance group will create and
-      manage instances.
+      manage its instances.
   """
 
   zones = _messages.MessageField('DistributionPolicyZoneConfiguration', 1, repeated=True)
@@ -27003,8 +27082,8 @@ class InstanceGroupManager(_messages.Message):
       of those actions.
     description: An optional description of this resource. Provide this
       property when you create the resource.
-    distributionPolicy: Policy specifying intended distribution of instances
-      in regional managed instance group.
+    distributionPolicy: Policy specifying the intended distribution of managed
+      instances across zones in a regional managed instance group.
     fingerprint: Fingerprint of this resource. This field may be used in
       optimistic locking. It will be ignored when inserting an
       InstanceGroupManager. An up-to-date fingerprint must be provided in
@@ -27016,7 +27095,10 @@ class InstanceGroupManager(_messages.Message):
     instanceGroup: [Output Only] The URL of the Instance Group resource.
     instanceTemplate: The URL of the instance template that is specified for
       this managed instance group. The group uses this template to create all
-      new instances in the managed instance group.
+      new instances in the managed instance group. The templates for existing
+      instances in the group do not change unless you run recreateInstances,
+      run applyUpdatesToInstances, or set the group's updatePolicy.type to
+      PROACTIVE.
     kind: [Output Only] The resource type, which is always
       compute#instanceGroupManager for managed instance groups.
     name: The name of the managed instance group. The name must be 1-63
@@ -27045,8 +27127,8 @@ class InstanceGroupManager(_messages.Message):
       one version must leave the targetSize field unset. That version will be
       applied to all remaining instances. For more information, read about
       canary updates.
-    zone: [Output Only] The URL of the zone where the managed instance group
-      is located (for zonal resources).
+    zone: [Output Only] The URL of a zone where the managed instance group is
+      located (for zonal resources).
   """
 
   autoHealingPolicies = _messages.MessageField('InstanceGroupManagerAutoHealingPolicy', 1, repeated=True)
@@ -27632,7 +27714,11 @@ class InstanceGroupManagerVersion(_messages.Message):
     instanceTemplate: The URL of the instance template that is specified for
       this managed instance group. The group uses this template to create new
       instances in the managed instance group until the `targetSize` for this
-      version is reached.
+      version is reached. The templates for existing instances in the group do
+      not change unless you run recreateInstances, run
+      applyUpdatesToInstances, or set the group's updatePolicy.type to
+      PROACTIVE; in those cases, existing instances are updated until the
+      `targetSize` for this version is reached.
     name: Name of the version. Unique among all versions in the scope of this
       managed instance group.
     targetSize: Specifies the intended number of instances to be created from
@@ -28086,7 +28172,10 @@ class InstanceGroupManagersSetInstanceTemplateRequest(_messages.Message):
   Fields:
     instanceTemplate: The URL of the instance template that is specified for
       this managed instance group. The group uses this template to create all
-      new instances in the managed instance group.
+      new instances in the managed instance group. The templates for existing
+      instances in the group do not change unless you run recreateInstances,
+      run applyUpdatesToInstances, or set the group's updatePolicy.type to
+      PROACTIVE.
   """
 
   instanceTemplate = _messages.StringField(1)
@@ -36403,6 +36492,10 @@ class PacketMirroringAggregatedList(_messages.Message):
 class PacketMirroringFilter(_messages.Message):
   r"""A PacketMirroringFilter object.
 
+  Enums:
+    DirectionValueValuesEnum: Direction of traffic to mirror, either INGRESS,
+      EGRESS, or BOTH. The default is BOTH.
+
   Fields:
     IPProtocols: Protocols that apply as filter on mirrored traffic. If no
       protocols are specified, all traffic that matches the specified CIDR
@@ -36413,10 +36506,26 @@ class PacketMirroringFilter(_messages.Message):
       ranges are specified, all traffic that matches the specified IPProtocols
       is mirrored. If neither cidrRanges nor IPProtocols is specified, all
       traffic is mirrored.
+    direction: Direction of traffic to mirror, either INGRESS, EGRESS, or
+      BOTH. The default is BOTH.
   """
+
+  class DirectionValueValuesEnum(_messages.Enum):
+    r"""Direction of traffic to mirror, either INGRESS, EGRESS, or BOTH. The
+    default is BOTH.
+
+    Values:
+      BOTH: <no description>
+      EGRESS: <no description>
+      INGRESS: <no description>
+    """
+    BOTH = 0
+    EGRESS = 1
+    INGRESS = 2
 
   IPProtocols = _messages.StringField(1, repeated=True)
   cidrRanges = _messages.StringField(2, repeated=True)
+  direction = _messages.EnumField('DirectionValueValuesEnum', 3)
 
 
 class PacketMirroringForwardingRuleInfo(_messages.Message):
@@ -37399,6 +37508,7 @@ class Quota(_messages.Message):
       URL_MAPS: <no description>
       VPN_GATEWAYS: <no description>
       VPN_TUNNELS: <no description>
+      XPN_SERVICE_PROJECTS: <no description>
     """
     A2_CPUS = 0
     AFFINITY_GROUPS = 1
@@ -37506,6 +37616,7 @@ class Quota(_messages.Message):
     URL_MAPS = 103
     VPN_GATEWAYS = 104
     VPN_TUNNELS = 105
+    XPN_SERVICE_PROJECTS = 106
 
   limit = _messages.FloatField(1)
   metric = _messages.EnumField('MetricValueValuesEnum', 2)
@@ -41057,6 +41168,7 @@ class RouterNat(_messages.Message):
     drainNatIps: A list of URLs of the IP resources to be drained. These IPs
       must be valid static external IPs that have been assigned to the NAT.
       These IPs should be used for updating/patching a NAT only.
+    enableEndpointIndependentMapping: A boolean attribute.
     icmpIdleTimeoutSec: Timeout (in seconds) for ICMP connections. Defaults to
       30s if not set.
     logConfig: Configure logging on this NAT.
@@ -41133,17 +41245,18 @@ class RouterNat(_messages.Message):
     LIST_OF_SUBNETWORKS = 2
 
   drainNatIps = _messages.StringField(1, repeated=True)
-  icmpIdleTimeoutSec = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  logConfig = _messages.MessageField('RouterNatLogConfig', 3)
-  minPortsPerVm = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  name = _messages.StringField(5)
-  natIpAllocateOption = _messages.EnumField('NatIpAllocateOptionValueValuesEnum', 6)
-  natIps = _messages.StringField(7, repeated=True)
-  sourceSubnetworkIpRangesToNat = _messages.EnumField('SourceSubnetworkIpRangesToNatValueValuesEnum', 8)
-  subnetworks = _messages.MessageField('RouterNatSubnetworkToNat', 9, repeated=True)
-  tcpEstablishedIdleTimeoutSec = _messages.IntegerField(10, variant=_messages.Variant.INT32)
-  tcpTransitoryIdleTimeoutSec = _messages.IntegerField(11, variant=_messages.Variant.INT32)
-  udpIdleTimeoutSec = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  enableEndpointIndependentMapping = _messages.BooleanField(2)
+  icmpIdleTimeoutSec = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  logConfig = _messages.MessageField('RouterNatLogConfig', 4)
+  minPortsPerVm = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  name = _messages.StringField(6)
+  natIpAllocateOption = _messages.EnumField('NatIpAllocateOptionValueValuesEnum', 7)
+  natIps = _messages.StringField(8, repeated=True)
+  sourceSubnetworkIpRangesToNat = _messages.EnumField('SourceSubnetworkIpRangesToNatValueValuesEnum', 9)
+  subnetworks = _messages.MessageField('RouterNatSubnetworkToNat', 10, repeated=True)
+  tcpEstablishedIdleTimeoutSec = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  tcpTransitoryIdleTimeoutSec = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  udpIdleTimeoutSec = _messages.IntegerField(13, variant=_messages.Variant.INT32)
 
 
 class RouterNatLogConfig(_messages.Message):
@@ -43185,10 +43298,10 @@ class SslPoliciesListAvailableFeaturesResponse(_messages.Message):
 
 
 class SslPolicy(_messages.Message):
-  r"""Represents a Google Cloud Armor security policy resource.  Only external
-  backend services used by HTTP or HTTPS load balancers can reference a
-  security policy. For more information, see  Google Cloud Armor security
-  policy overview. (== resource_for {$api_version}.sslPolicies ==)
+  r"""Represents an SSL Policy resource.  Use SSL policies to control the SSL
+  features, such as versions and cipher suites, offered by an HTTPS or SSL
+  Proxy load balancer. For more information, read  SSL Policy Concepts. (==
+  resource_for {$api_version}.sslPolicies ==)
 
   Enums:
     MinTlsVersionValueValuesEnum: The minimum version of SSL protocol that can

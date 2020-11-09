@@ -657,7 +657,8 @@ class Condition(_messages.Message):
         CREDS_TYPE_EMERGENCY is supported. It is not permitted to grant access
         based on the *absence* of a credentials type, so the conditions can
         only be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-      CREDS_ASSERTION: EXPERIMENTAL -- DO NOT USE.
+      CREDS_ASSERTION: EXPERIMENTAL -- DO NOT USE. The conditions can only be
+        used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
     """
     NO_ATTR = 0
     AUTHORITY = 1
@@ -1730,7 +1731,8 @@ class MetricValue(_messages.Message):
     distributionValue: A distribution value.
     doubleValue: A double precision floating point value.
     endTime: The end of the time period over which this metric value's
-      measurement applies.
+      measurement applies. If not specified,
+      google.api.servicecontrol.v1.Operation.end_time will be used.
     int64Value: A signed 64-bit integer value.
     labels: The labels describing the metric value. See comments on
       google.api.servicecontrol.v1.Operation.labels for the overriding
@@ -1740,7 +1742,9 @@ class MetricValue(_messages.Message):
     startTime: The start of the time period over which this metric value's
       measurement applies. The time period has different semantics for
       different metric types (cumulative, delta, and gauge). See the metric
-      definition documentation in the service configuration for details.
+      definition documentation in the service configuration for details. If
+      not specified, google.api.servicecontrol.v1.Operation.start_time will be
+      used.
     stringValue: A text string value.
   """
 
@@ -1800,7 +1804,7 @@ class Money(_messages.Message):
   r"""Represents an amount of money with its currency type.
 
   Fields:
-    currencyCode: The 3-letter currency code defined in ISO 4217.
+    currencyCode: The three-letter currency code defined in ISO 4217.
     nanos: Number of nano (10^-9) units of the amount. The value must be
       between -999,999,999 and +999,999,999 inclusive. If `units` is positive,
       `nanos` must be positive or zero. If `units` is zero, `nanos` can be
@@ -1971,7 +1975,7 @@ class Operation(_messages.Message):
       DEBUG: In addition to the behavior described in HIGH, DEBUG enables
         additional validation logic that is only useful during the onboarding
         process. This is only available to Google internal services and the
-        service must be whitelisted by chemist-dev@google.com in order to use
+        service must be allowlisted by chemist-dev@google.com in order to use
         this level.
     """
     LOW = 0
@@ -2711,8 +2715,8 @@ class SddcProjectsLocationsClusterGroupsIpAddressesCreateRequest(_messages.Messa
     ipAddressId: Required. The user-provided ID of the IpAddress to be
       created. This id must be unique among IpAddresses within the parent and
       will become the final token in the name URI.
-    parent: Required. The ClusterGroup in which the IpAddress will be created.
-      For example: `projects/my-project/locations/us-
+    parent: Required. The ClusterGroup or PrivateCloud in which the IpAddress
+      will be created. For example: `projects/my-project/locations/us-
       central1/clusterGroups/my-group`
   """
 
@@ -2756,8 +2760,8 @@ class SddcProjectsLocationsClusterGroupsIpAddressesListRequest(_messages.Message
       call. Provide this to retrieve the subsequent page. When paginating, all
       other parameters provided to `ListIpAddressesRequest` must match the
       call that provided the page token.
-    parent: Required. The parent ClusterGroup of which the IpAddresses belong
-      to. For example: `projects/my-project/locations/us-
+    parent: Required. The parent ClusterGroup or PrivateCloud of which the
+      IpAddresses belong to. For example: `projects/my-project/locations/us-
       central1/clusterGroups/my-group`
   """
 
@@ -2972,6 +2976,70 @@ class SddcProjectsLocationsPrivateCloudsGetRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class SddcProjectsLocationsPrivateCloudsIpAddressesCreateRequest(_messages.Message):
+  r"""A SddcProjectsLocationsPrivateCloudsIpAddressesCreateRequest object.
+
+  Fields:
+    ipAddress: A IpAddress resource to be passed as the request body.
+    ipAddressId: Required. The user-provided ID of the IpAddress to be
+      created. This id must be unique among IpAddresses within the parent and
+      will become the final token in the name URI.
+    parent: Required. The ClusterGroup or PrivateCloud in which the IpAddress
+      will be created. For example: `projects/my-project/locations/us-
+      central1/clusterGroups/my-group`
+  """
+
+  ipAddress = _messages.MessageField('IpAddress', 1)
+  ipAddressId = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SddcProjectsLocationsPrivateCloudsIpAddressesDeleteRequest(_messages.Message):
+  r"""A SddcProjectsLocationsPrivateCloudsIpAddressesDeleteRequest object.
+
+  Fields:
+    name: Required. The resource name of the ClusterGroupBackup to be deleted.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SddcProjectsLocationsPrivateCloudsIpAddressesGetRequest(_messages.Message):
+  r"""A SddcProjectsLocationsPrivateCloudsIpAddressesGetRequest object.
+
+  Fields:
+    name: Required. The resource name of the IpAddress to retrieve. Resource
+      names are schemeless URI's that follow the conventions in
+      https://cloud.google.com/apis/design/resource_names For example,
+      `projects/my-project/locations/us-central1/clusterGroups/my-
+      group/ipAddresses/my-ip`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SddcProjectsLocationsPrivateCloudsIpAddressesListRequest(_messages.Message):
+  r"""A SddcProjectsLocationsPrivateCloudsIpAddressesListRequest object.
+
+  Fields:
+    filter: List filter.
+    pageSize: The maximum number of IpAddresses to return. The service may
+      return fewer than this value.
+    pageToken: A page token, received from a previous `ListIpAddressesRequest`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListIpAddressesRequest` must match the
+      call that provided the page token.
+    parent: Required. The parent ClusterGroup or PrivateCloud of which the
+      IpAddresses belong to. For example: `projects/my-project/locations/us-
+      central1/clusterGroups/my-group`
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class SddcProjectsLocationsPrivateCloudsListRequest(_messages.Message):

@@ -1,8 +1,0 @@
-imports:
-- path: shared_helper.jinja
-- path: sub_directory/shared.jinja
-  name: shared.jinja
-
-resources:
-- type: blah
-  name: blah-name

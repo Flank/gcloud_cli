@@ -1,6 +1,0 @@
-runtime: python
-env: flex
-entrypoint: gunicorn --timeout 30 -b :$PORT main:app
-
-manual_scaling:
-  instances: 1

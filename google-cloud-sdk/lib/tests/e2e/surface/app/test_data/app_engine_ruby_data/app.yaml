@@ -1,9 +1,0 @@
-runtime: ruby
-api_version: 1
-env: flex
-manual_scaling:
-  instances: 1
-entrypoint: bundle exec rackup -p 8080 /app/config.ru
-resources:
-  memory_gb: 0.9
-  cpu: 0.5

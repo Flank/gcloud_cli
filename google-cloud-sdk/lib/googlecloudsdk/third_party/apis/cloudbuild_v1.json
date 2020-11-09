@@ -1113,7 +1113,7 @@
           }
         },
         "nextPageToken": {
-          "description": "Token to receive the next page of results.",
+          "description": "Token to receive the next page of results. This will be absent if the end of the response list has been reached.",
           "type": "string"
         }
       }
@@ -1348,7 +1348,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The full resource name for the GitHubEnterpriseConfig For example: \"projects\/{$project_id}\/githubEnterpriseConfig\/{$config_id}\"",
+          "description": "Optional. The full resource name for the GitHubEnterpriseConfig For example: \"projects\/{$project_id}\/githubEnterpriseConfig\/{$config_id}\"",
           "type": "string"
         },
         "hostUrl": {
@@ -1356,12 +1356,12 @@
           "type": "string"
         },
         "appId": {
-          "description": "The GitHub app id of the Cloud Build app on the GitHub Enterprise server.",
+          "description": "Required. The GitHub app id of the Cloud Build app on the GitHub Enterprise server.",
           "type": "string",
           "format": "int64"
         },
         "appConfigJson": {
-          "description": "GCS location of the encrypted GitHub App config information.",
+          "description": "Optional. Cloud Storage location of the encrypted GitHub App config information.",
           "$ref": "GCSLocation"
         },
         "createTime": {
@@ -1369,12 +1369,24 @@
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
+        },
+        "webhookKey": {
+          "description": "Optional. The key that should be attached to webhook calls to the ReceiveWebhook endpoint.",
+          "type": "string"
+        },
+        "peeredNetwork": {
+          "description": "Optional. The network to be used when reaching out to the GitHub Enterprise server. The VPC network must be enabled for private service connection. This should be set if the GitHub Enterprise server is hosted on-premises and not reachable by public internet. If this field is left empty, no network peering will occur and calls to the GitHub Enterprise server will be made over the public internet. Must be in the format `projects\/{project}\/global\/networks\/{network}`, where {project} is a project number or id and {network} is the name of a VPC network in the project.",
+          "type": "string"
+        },
+        "secrets": {
+          "description": "Optional. Names of secrets in Secret Manager.",
+          "$ref": "GitHubEnterpriseSecrets"
         }
       }
     },
     "GCSLocation": {
       "id": "GCSLocation",
-      "description": "Represents a storage location in GCS",
+      "description": "Represents a storage location in Cloud Storage",
       "type": "object",
       "properties": {
         "bucket": {
@@ -1389,6 +1401,29 @@
           "description": "Google Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "GitHubEnterpriseSecrets": {
+      "id": "GitHubEnterpriseSecrets",
+      "description": "GitHubEnterpriseSecrets represents the names of all necessary secrets in Secret Manager for a GitHub Enterprise server. Format is: projects\/\/secrets\/.",
+      "type": "object",
+      "properties": {
+        "privateKeyName": {
+          "description": "The resource name for the private key secret.",
+          "type": "string"
+        },
+        "webhookSecretName": {
+          "description": "The resource name for the webhook secret in Secret Manager.",
+          "type": "string"
+        },
+        "oauthSecretName": {
+          "description": "The resource name for the OAuth secret in Secret Manager.",
+          "type": "string"
+        },
+        "oauthClientIdName": {
+          "description": "The resource name for the OAuth client ID secret in Secret Manager.",
+          "type": "string"
         }
       }
     },
@@ -2063,7 +2098,7 @@
                       "format": "int32"
                     },
                     "pageToken": {
-                      "description": "Token to provide to skip to a particular spot in the list.",
+                      "description": "The page token for the next page of Builds. If unspecified, the first page of results is returned. If the token is rejected for any reason, INVALID_ARGUMENT will be thrown. In this case, the token should be discarded, and pagination should be restarted from the first page of results. See https:\/\/google.aip.dev\/158 for more.",
                       "location": "query",
                       "type": "string"
                     },
@@ -2238,7 +2273,7 @@
                   "format": "int32"
                 },
                 "pageToken": {
-                  "description": "Token to provide to skip to a particular spot in the list.",
+                  "description": "The page token for the next page of Builds. If unspecified, the first page of results is returned. If the token is rejected for any reason, INVALID_ARGUMENT will be thrown. In this case, the token should be discarded, and pagination should be restarted from the first page of results. See https:\/\/google.aip.dev\/158 for more.",
                   "location": "query",
                   "type": "string"
                 },
@@ -2925,7 +2960,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "The full resource name for the GitHubEnterpriseConfig For example: \"projects\/{$project_id}\/githubEnterpriseConfig\/{$config_id}\"",
+                  "description": "Optional. The full resource name for the GitHubEnterpriseConfig For example: \"projects\/{$project_id}\/githubEnterpriseConfig\/{$config_id}\"",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/githubEnterpriseConfigs\/[^\/]+$",
@@ -3210,12 +3245,12 @@
           "httpMethod": "GET",
           "parameters": {
             "hostUrl": {
-              "description": "The host url that the oauth credentials are associated with. For GitHub, this would be \"https:\/\/github.com\". For GitHubEnterprise, this would be the host name of their github enterprise instance.",
+              "description": "Required. The host url that the oauth credentials are associated with. For GitHub, this would be \"https:\/\/github.com\". For GitHubEnterprise, this would be the host name of their github enterprise instance.",
               "location": "query",
               "type": "string"
             },
             "namespace": {
-              "description": "The namespace that the credential belongs to.",
+              "description": "Required. The namespace that the credential belongs to.",
               "location": "query",
               "type": "string",
               "enumDescriptions": [
@@ -3228,7 +3263,12 @@
               ]
             },
             "githubEnterpriseConfig": {
-              "description": "The full resource name of the github enterprise resource if applicable.",
+              "description": "Optional. The full resource name of the github enterprise resource if applicable.",
+              "location": "query",
+              "type": "string"
+            },
+            "authUser": {
+              "description": "Optional. For users who are logged in using multiple accounts, specify the auth user parameter so that the registration url redirects back to the cloud console using the proper account.",
               "location": "query",
               "type": "string"
             }

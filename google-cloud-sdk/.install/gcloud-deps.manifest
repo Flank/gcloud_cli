@@ -1222,6 +1222,11 @@ lib/third_party/gae_ext_runtime/__init__.py
 lib/third_party/gae_ext_runtime/comm.py
 lib/third_party/gae_ext_runtime/ext_runtime.py
 lib/third_party/gae_ext_runtime/testutil.py
+lib/third_party/gcloud_crcmod/LICENSE
+lib/third_party/gcloud_crcmod/__init__.py
+lib/third_party/gcloud_crcmod/_crcfunpy.py
+lib/third_party/gcloud_crcmod/crcmod.py
+lib/third_party/gcloud_crcmod/predefined.py
 lib/third_party/google/LICENSE
 lib/third_party/google/__init__.py
 lib/third_party/google/api/__init__.py
@@ -1530,11 +1535,13 @@ lib/third_party/httplib2/python2/httplib2/__init__.py
 lib/third_party/httplib2/python2/httplib2/cacerts.txt
 lib/third_party/httplib2/python2/httplib2/certs.py
 lib/third_party/httplib2/python2/httplib2/iri2uri.py
+lib/third_party/httplib2/python2/httplib2/socks.py
 lib/third_party/httplib2/python3/__init__.py
 lib/third_party/httplib2/python3/httplib2/__init__.py
 lib/third_party/httplib2/python3/httplib2/cacerts.txt
 lib/third_party/httplib2/python3/httplib2/certs.py
 lib/third_party/httplib2/python3/httplib2/iri2uri.py
+lib/third_party/httplib2/python3/httplib2/socks.py
 lib/third_party/httplib2shim/LICENSE
 lib/third_party/httplib2shim/__init__.py
 lib/third_party/idna/LICENSE
@@ -3586,10 +3593,6 @@ lib/third_party/six/LICENSE
 lib/third_party/six/__init__.py
 lib/third_party/socks/LICENSE
 lib/third_party/socks/__init__.py
-lib/third_party/socks/python2/__init__.py
-lib/third_party/socks/python2/socks/__init__.py
-lib/third_party/socks/python3/__init__.py
-lib/third_party/socks/python3/socks/__init__.py
 lib/third_party/sqlparse/LICENSE
 lib/third_party/sqlparse/__init__.py
 lib/third_party/sqlparse/__main__.py

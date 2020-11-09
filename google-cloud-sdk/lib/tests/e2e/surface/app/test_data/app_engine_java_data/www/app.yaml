@@ -1,9 +1,0 @@
-runtime: java8
-api_version: '1.0'
-threadsafe: true
-
-handlers:
-- url: /helloappengine
-  script: unused
-  login: optional
-  secure: optional

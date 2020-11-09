@@ -1,5 +1,0 @@
-The www directory is generated from the app_engine_java_data directory by
-invoking ant with build.xml.  Since we want easy testing, and ant is not
-necessarily set up on test machines, the www directory has been checked in.
-If you need to change the test, you need to rebuild it and update the www
-directory.

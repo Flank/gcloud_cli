@@ -4757,6 +4757,13 @@ class GoogleCloudApigeeV1Organization(_messages.Message):
     name: Output only. Name of the Apigee organization.
     projectId: The project ID associated with the Apigee organization.
     properties: Properties defined in the Apigee organization profile.
+    runtimeDatabaseEncryptionKeyName: Cloud KMS key name used for encrypting
+      the data that is stored and replicated across runtime instances. Update
+      is not allowed after the organization is created. If not specified, a
+      Google-Managed encryption key will be used. Valid only when
+      [RuntimeType] is CLOUD. For example:
+      "projects/foo/locations/us/keyRings/bar/cryptoKeys/baz". **Note:** Not
+      supported for Apigee hybrid.
     runtimeType: Required. Runtime type of the Apigee organization based on
       the Apigee subscription purchased.
     subscriptionType: Output only. Subscription type of the Apigee
@@ -4825,9 +4832,10 @@ class GoogleCloudApigeeV1Organization(_messages.Message):
   name = _messages.StringField(11)
   projectId = _messages.StringField(12)
   properties = _messages.MessageField('GoogleCloudApigeeV1Properties', 13)
-  runtimeType = _messages.EnumField('RuntimeTypeValueValuesEnum', 14)
-  subscriptionType = _messages.EnumField('SubscriptionTypeValueValuesEnum', 15)
-  type = _messages.EnumField('TypeValueValuesEnum', 16)
+  runtimeDatabaseEncryptionKeyName = _messages.StringField(14)
+  runtimeType = _messages.EnumField('RuntimeTypeValueValuesEnum', 15)
+  subscriptionType = _messages.EnumField('SubscriptionTypeValueValuesEnum', 16)
+  type = _messages.EnumField('TypeValueValuesEnum', 17)
 
 
 class GoogleCloudApigeeV1OrganizationProjectMapping(_messages.Message):
@@ -5345,7 +5353,8 @@ class GoogleCloudApigeeV1RuntimeTraceConfigOverride(_messages.Message):
     samplingConfig: Trace configuration override for a specific API proxy in
       an environment.
     uid: Unique ID for the configuration override. The ID will only change if
-      the override is deleted and recreated.
+      the override is deleted and recreated. Corresponds to name's "override"
+      field.
   """
 
   apiProxy = _messages.StringField(1)
@@ -5357,38 +5366,20 @@ class GoogleCloudApigeeV1RuntimeTraceConfigOverride(_messages.Message):
 
 
 class GoogleCloudApigeeV1RuntimeTraceSamplingConfig(_messages.Message):
-  r"""NEXT ID: 6 RuntimeTraceSamplingConfig represents the detail settings of
+  r"""NEXT ID: 3 RuntimeTraceSamplingConfig represents the detail settings of
   distributed tracing. Only the fields that are defined in the distributed
   trace configuration can be overridden using the distribute trace
   configuration override APIs.
 
   Enums:
-    ErrorSourcesValueListEntryValuesEnum:
     SamplerValueValuesEnum: Sampler of distributed tracing. OFF is the default
       value.
 
   Fields:
-    errorSources: Error sources from which to capture errors. If none are
-      specified, error codes are captured from all sources.
-    responseCodeRanges: List of response code ranges.
-    responseCodes: List of single response codes.
     sampler: Sampler of distributed tracing. OFF is the default value.
-    samplingRate: Field sampling rate. This value is only valid when is only
-      applicable when sampling value is probabilistic(PROBABILITY). The
-      supported values are > 0 and <= 0.5.
+    samplingRate: Field sampling rate. This value is only applicable when
+      using the PROBABILITY sampler. The supported values are > 0 and <= 0.5.
   """
-
-  class ErrorSourcesValueListEntryValuesEnum(_messages.Enum):
-    r"""ErrorSourcesValueListEntryValuesEnum enum type.
-
-    Values:
-      ERROR_SOURCE_UNSPECIFIED: Error source is unspecified.
-      APIGEE: Only capture trace errors within the Apigee system.
-      TARGET: Only capture trace errors from target server.
-    """
-    ERROR_SOURCE_UNSPECIFIED = 0
-    APIGEE = 1
-    TARGET = 2
 
   class SamplerValueValuesEnum(_messages.Enum):
     r"""Sampler of distributed tracing. OFF is the default value.
@@ -5397,37 +5388,16 @@ class GoogleCloudApigeeV1RuntimeTraceSamplingConfig(_messages.Message):
       SAMPLER_UNSPECIFIED: Sampler unspecified.
       OFF: OFF means distributed trace is disabled, or the sampling
         probability is 0.
-      ON: ON means distributed trace is enabled always for all api calls, and
-        sampling probability is 0.5.
       PROBABILITY: PROBABILITY means traces are captured on a probability that
         defined by sampling_rate. The sampling rate is limited to 0 to 0.5
         when this is set.
     """
     SAMPLER_UNSPECIFIED = 0
     OFF = 1
-    ON = 2
-    PROBABILITY = 3
+    PROBABILITY = 2
 
-  errorSources = _messages.EnumField('ErrorSourcesValueListEntryValuesEnum', 1, repeated=True)
-  responseCodeRanges = _messages.MessageField('GoogleCloudApigeeV1RuntimeTraceSamplingConfigResponseCodeRange', 2, repeated=True)
-  responseCodes = _messages.IntegerField(3, repeated=True, variant=_messages.Variant.INT32)
-  sampler = _messages.EnumField('SamplerValueValuesEnum', 4)
-  samplingRate = _messages.FloatField(5, variant=_messages.Variant.FLOAT)
-
-
-class GoogleCloudApigeeV1RuntimeTraceSamplingConfigResponseCodeRange(_messages.Message):
-  r"""ResponseCodeRange represents a group of response codes to capture, from
-  the first response code to the last response code. Each range is a close
-  interval. For example, if an interval is [400, 403], then that means 400,
-  401, 402, 403 will be all captured.
-
-  Fields:
-    firstResponseCode: The first response code to capture.
-    lastResponseCode: The last response code to capture.
-  """
-
-  firstResponseCode = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  lastResponseCode = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  sampler = _messages.EnumField('SamplerValueValuesEnum', 1)
+  samplingRate = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
 
 
 class GoogleCloudApigeeV1Schema(_messages.Message):

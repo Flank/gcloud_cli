@@ -94,85 +94,13 @@ def _GetBuildTimeout():
 
 
 def _SetBuildSteps(tag, no_cache, messages, substitutions, arg_config,
-                   timeout_str):
+                   timeout_str, buildpack):
   """Set build steps."""
   if tag is not None:
     if (properties.VALUES.builds.check_tag.GetBool() and
         not any(reg in tag for reg in _SUPPORTED_REGISTRIES)):
       raise c_exceptions.InvalidArgumentException(
-          '--tag', 'Tag value must be in the gcr.io/*, *.gcr.io/*, '
-                   'or *.pkg.dev/* namespace.')
-    if properties.VALUES.builds.use_kaniko.GetBool():
-      if no_cache:
-        ttl = '0h'
-      else:
-        ttl = '{}h'.format(properties.VALUES.builds.kaniko_cache_ttl.Get())
-      build_config = messages.Build(
-          steps=[
-              messages.BuildStep(
-                  name=properties.VALUES.builds.kaniko_image.Get(),
-                  args=[
-                      '--destination',
-                      tag,
-                      '--cache',
-                      '--cache-ttl',
-                      ttl,
-                      '--cache-dir',
-                      '',
-                  ],
-              ),
-          ],
-          timeout=timeout_str,
-          substitutions=cloudbuild_util.EncodeSubstitutions(
-              substitutions, messages))
-    else:
-      if no_cache:
-        raise c_exceptions.InvalidArgumentException(
-            'no-cache',
-            'Cannot specify --no-cache if builds/use_kaniko property is '
-            'False')
-      build_config = messages.Build(
-          images=[tag],
-          steps=[
-              messages.BuildStep(
-                  name='gcr.io/cloud-builders/docker',
-                  args=[
-                      'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                      tag, '.'
-                  ],
-              ),
-          ],
-          timeout=timeout_str,
-          substitutions=cloudbuild_util.EncodeSubstitutions(
-              substitutions, messages))
-  elif arg_config is not None:
-    if no_cache:
-      raise c_exceptions.ConflictingArgumentsException('--config', '--no-cache')
-    if not arg_config:
-      raise c_exceptions.InvalidArgumentException(
-          '--config', 'Config file path must not be empty.')
-    build_config = config.LoadCloudbuildConfigFromPath(
-        arg_config, messages, params=substitutions)
-  else:
-    raise c_exceptions.OneOfArgumentsRequiredException(
-        ['--tag', '--config'], 'Requires either a docker tag or a config file.')
-
-  # If timeout was set by flag, overwrite the config file.
-  if timeout_str:
-    build_config.timeout = timeout_str
-
-  return build_config
-
-
-def _SetBuildStepsAlpha(tag, no_cache, messages, substitutions, arg_config,
-                        timeout_str, buildpack):
-  """Set build steps."""
-  if tag is not None:
-    if (properties.VALUES.builds.check_tag.GetBool() and
-        not any(reg in tag for reg in _SUPPORTED_REGISTRIES)):
-      raise c_exceptions.InvalidArgumentException(
-          '--tag', 'Tag value must be in the gcr.io/*, *.gcr.io/*, '
-          'or *.pkg.dev/* namespace.')
+          '--tag', 'Tag value must be in the *gcr.io* or *pkg.dev* namespace.')
     if properties.VALUES.builds.use_kaniko.GetBool():
       if no_cache:
         ttl = '0h'
@@ -232,7 +160,7 @@ def _SetBuildStepsAlpha(tag, no_cache, messages, substitutions, arg_config,
         not any(reg in image for reg in _SUPPORTED_REGISTRIES)):
       raise c_exceptions.InvalidArgumentException(
           '--pack',
-          'Image value must be in the gcr.io/*, *.gcr.io/*, or *.pkg.dev/* namespace.'
+          'Image value must be in the *gcr.io* or *pkg.dev* namespace'
       )
     env = buildpack[0].get('env')
     pack_args = ['build', image, '--builder', builder]
@@ -288,7 +216,7 @@ def _SetClusterAlpha(build_config, messages, arg_cluster_name,
 
 
 def _SetSource(build_config, messages, is_specified_source, no_source, source,
-               gcs_source_staging_dir, ignore_file):
+               gcs_source_staging_dir, ignore_file, hide_logs=False):
   """Set the source for the build config."""
   default_gcs_source = False
   default_bucket_name = None
@@ -358,12 +286,16 @@ def _SetSource(build_config, messages, is_specified_source, no_source, source,
         source_snapshot = snapshot.Snapshot(source, ignore_file=ignore_file)
         size_str = resource_transform.TransformSize(
             source_snapshot.uncompressed_size)
-        log.status.Print(
-            'Creating temporary tarball archive of {num_files} file(s)'
-            ' totalling {size} before compression.'.format(
-                num_files=len(source_snapshot.files), size=size_str))
+        if not hide_logs:
+          log.status.Print(
+              'Creating temporary tarball archive of {num_files} file(s)'
+              ' totalling {size} before compression.'.format(
+                  num_files=len(source_snapshot.files), size=size_str))
         staged_source_obj = source_snapshot.CopyTarballToGCS(
-            gcs_client, gcs_source_staging, ignore_file=ignore_file)
+            gcs_client,
+            gcs_source_staging,
+            ignore_file=ignore_file,
+            hide_logs=hide_logs)
         build_config.source = messages.Source(
             storageSource=messages.StorageSource(
                 bucket=staged_source_obj.bucket,
@@ -375,12 +307,13 @@ def _SetSource(build_config, messages, is_specified_source, no_source, source,
         if ext not in _ALLOWED_SOURCE_EXT:
           raise c_exceptions.BadFileException('Local file [{src}] is none of ' +
                                               ', '.join(_ALLOWED_SOURCE_EXT))
-        log.status.Print('Uploading local file [{src}] to '
-                         '[gs://{bucket}/{object}].'.format(
-                             src=source,
-                             bucket=gcs_source_staging.bucket,
-                             object=gcs_source_staging.object,
-                         ))
+        if not hide_logs:
+          log.status.Print('Uploading local file [{src}] to '
+                           '[gs://{bucket}/{object}].'.format(
+                               src=source,
+                               bucket=gcs_source_staging.bucket,
+                               object=gcs_source_staging.object,
+                           ))
         staged_source_obj = gcs_client.CopyFileToGCS(source, gcs_source_staging)
         build_config.source = messages.Source(
             storageSource=messages.StorageSource(
@@ -446,12 +379,13 @@ def _SetWorkerPool(build_config, messages, arg_worker_pool):
 def CreateBuildConfig(tag, no_cache, messages, substitutions, arg_config,
                       is_specified_source, no_source, source,
                       gcs_source_staging_dir, ignore_file, arg_gcs_log_dir,
-                      arg_machine_type, arg_disk_size, arg_worker_pool):
+                      arg_machine_type, arg_disk_size, arg_worker_pool,
+                      buildpack):
   """Returns a build config."""
 
   timeout_str = _GetBuildTimeout()
   build_config = _SetBuildSteps(tag, no_cache, messages, substitutions,
-                                arg_config, timeout_str)
+                                arg_config, timeout_str, buildpack)
   build_config = _SetSource(build_config, messages, is_specified_source,
                             no_source, source, gcs_source_staging_dir,
                             ignore_file)
@@ -468,15 +402,15 @@ def CreateBuildConfigAlpha(tag, no_cache, messages, substitutions, arg_config,
                            gcs_source_staging_dir, ignore_file, arg_gcs_log_dir,
                            arg_machine_type, arg_disk_size, arg_worker_pool,
                            buildpack, arg_cluster_name=None,
-                           arg_cluster_location=None):
+                           arg_cluster_location=None, hide_logs=False):
   """Returns a build config."""
   timeout_str = _GetBuildTimeout()
 
-  build_config = _SetBuildStepsAlpha(tag, no_cache, messages, substitutions,
-                                     arg_config, timeout_str, buildpack)
+  build_config = _SetBuildSteps(tag, no_cache, messages, substitutions,
+                                arg_config, timeout_str, buildpack)
   build_config = _SetSource(build_config, messages, is_specified_source,
                             no_source, source, gcs_source_staging_dir,
-                            ignore_file)
+                            ignore_file, hide_logs=hide_logs)
   build_config = _SetLogsBucket(build_config, arg_gcs_log_dir)
   build_config = _SetMachineType(build_config, messages, arg_machine_type)
   build_config = _SetDiskSize(build_config, messages, arg_disk_size)
@@ -519,7 +453,7 @@ def DetermineBuildRegion(build_config, desired_region=None):
   return wp_region
 
 
-def Build(messages, async_, build_config, show_logs=False, build_region=None):
+def Build(messages, async_, build_config, hide_logs=False, build_region=None):
   """Starts the build."""
   log.debug('submitting build: ' + repr(build_config))
   client = cloudbuild_util.GetClientInstance(region=build_region)
@@ -534,7 +468,7 @@ def Build(messages, async_, build_config, show_logs=False, build_region=None):
       projectId=build.projectId,
       id=build.id)
 
-  if not show_logs:
+  if not hide_logs:
     log.CreatedResource(build_ref)
     if build.logUrl:
       log.status.Print(

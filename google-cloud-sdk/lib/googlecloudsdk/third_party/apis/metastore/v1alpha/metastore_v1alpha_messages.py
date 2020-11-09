@@ -128,19 +128,6 @@ class Binding(_messages.Message):
   role = _messages.StringField(3)
 
 
-class DataCatalogConfig(_messages.Message):
-  r"""Specifies how metastore metadata should be integrated with the Data
-  Catalog service.
-
-  Fields:
-    disabled: Defines whether the metastore metadata should be synced to Data
-      Catalog. The default value is to enable syncing metastore metadata to
-      Data Catalog.
-  """
-
-  disabled = _messages.BooleanField(1)
-
-
 class DatabaseDump(_messages.Message):
   r"""A specification of the location of and metadata about a database dump
   from a relational database management system.
@@ -498,8 +485,8 @@ class MetadataImport(_messages.Message):
       database.
     description: The description of the metadata import.
     name: Immutable. The relative resource name of the metadata import, of the
-      form:"projects/{project_id}/locations/{location_id}/services/{service_id
-      }/metadataImports/{metadata_import_id}".
+      form:"projects/{project_number}/locations/{location_id}/services/{servic
+      e_id}/metadataImports/{metadata_import_id}".
     state: Output only. The current state of the metadata import.
     updateTime: Output only. The time when the metadata import was last
       updated.
@@ -533,12 +520,8 @@ class MetadataImport(_messages.Message):
 class MetadataIntegration(_messages.Message):
   r"""Specifies how metastore metadata should be integrated with external
   services.
-
-  Fields:
-    dataCatalogConfig: The integration config for the Data Catalog service.
   """
 
-  dataCatalogConfig = _messages.MessageField('DataCatalogConfig', 1)
 
 
 class MetastoreProjectsLocationsGetRequest(_messages.Message):
@@ -609,7 +592,7 @@ class MetastoreProjectsLocationsServicesCreateRequest(_messages.Message):
   Fields:
     parent: Required. The relative resource name of the location in which to
       create a metastore service, in the following
-      form:"projects/{project_id}/locations/{location_id}".
+      form:"projects/{project_number}/locations/{location_id}".
     requestId: Optional. A request ID. Specify a unique request ID to allow
       the server to ignore the request if it has completed. The server will
       ignore subsequent requests that provide a duplicate request ID for at
@@ -622,8 +605,9 @@ class MetastoreProjectsLocationsServicesCreateRequest(_messages.Message):
     service: A Service resource to be passed as the request body.
     serviceId: Required. The ID of the metastore service, which is used as the
       final component of the metastore service's name.This value must be
-      between 1 and 64 characters long, begin with a letter, end with a letter
-      or number, and consist of alpha-numeric ASCII characters or hyphens.
+      between 2 and 63 characters long inclusive, begin with a letter, end
+      with a letter or number, and consist of alpha-numeric ASCII characters
+      or hyphens.
   """
 
   parent = _messages.StringField(1, required=True)
@@ -637,8 +621,8 @@ class MetastoreProjectsLocationsServicesDeleteRequest(_messages.Message):
 
   Fields:
     name: Required. The relative resource name of the metastore service to
-      delete, in the following form:"projects/{project_id}/locations/{location
-      _id}/services/{service_id}".
+      delete, in the following form:"projects/{project_number}/locations/{loca
+      tion_id}/services/{service_id}".
     requestId: Optional. A request ID. Specify a unique request ID to allow
       the server to ignore the request if it has completed. The server will
       ignore subsequent requests that provide a duplicate request ID for at
@@ -680,8 +664,8 @@ class MetastoreProjectsLocationsServicesGetRequest(_messages.Message):
 
   Fields:
     name: Required. The relative resource name of the metastore service to
-      retrieve, in the following form:"projects/{project_id}/locations/{locati
-      on_id}/services/{service_id}".
+      retrieve, in the following form:"projects/{project_number}/locations/{lo
+      cation_id}/services/{service_id}".
   """
 
   name = _messages.StringField(1, required=True)
@@ -707,7 +691,7 @@ class MetastoreProjectsLocationsServicesListRequest(_messages.Message):
       page token.
     parent: Required. The relative resource name of the location of metastore
       services to list, in the following
-      form:"projects/{project_id}/locations/{location_id}".
+      form:"projects/{project_number}/locations/{location_id}".
   """
 
   filter = _messages.StringField(1)
@@ -728,8 +712,8 @@ class MetastoreProjectsLocationsServicesMetadataImportsCreateRequest(_messages.M
       between 1 and 64 characters long, begin with a letter, end with a letter
       or number, and consist of alpha-numeric ASCII characters or hyphens.
     parent: Required. The relative resource name of the service in which to
-      create a metastore import, in the following form:"projects/{project_id}/
-      locations/{location_id}/services/{service_id}"
+      create a metastore import, in the following form:"projects/{project_numb
+      er}/locations/{location_id}/services/{service_id}"
     requestId: Optional. A request ID. Specify a unique request ID to allow
       the server to ignore the request if it has completed. The server will
       ignore subsequent requests that provide a duplicate request ID for at
@@ -752,8 +736,8 @@ class MetastoreProjectsLocationsServicesMetadataImportsGetRequest(_messages.Mess
 
   Fields:
     name: Required. The relative resource name of the metadata import to
-      retrieve, in the following form:"projects/{project_id}/locations/{locati
-      on_id}/services/{service_id}/metadataImports/{import_id}".
+      retrieve, in the following form:"projects/{project_number}/locations/{lo
+      cation_id}/services/{service_id}/metadataImports/{import_id}".
   """
 
   name = _messages.StringField(1, required=True)
@@ -778,8 +762,8 @@ class MetastoreProjectsLocationsServicesMetadataImportsListRequest(_messages.Mes
       DataprocMetastore.ListServices must match the call that provided the
       page token.
     parent: Required. The relative resource name of the service whose metadata
-      imports to list, in the following form:"projects/{project_id}/locations/
-      {location_id}/services/{service_id}/metadataImports".
+      imports to list, in the following form:"projects/{project_number}/locati
+      ons/{location_id}/services/{service_id}/metadataImports".
   """
 
   filter = _messages.StringField(1)
@@ -796,8 +780,8 @@ class MetastoreProjectsLocationsServicesMetadataImportsPatchRequest(_messages.Me
     metadataImport: A MetadataImport resource to be passed as the request
       body.
     name: Immutable. The relative resource name of the metadata import, of the
-      form:"projects/{project_id}/locations/{location_id}/services/{service_id
-      }/metadataImports/{metadata_import_id}".
+      form:"projects/{project_number}/locations/{location_id}/services/{servic
+      e_id}/metadataImports/{metadata_import_id}".
     requestId: Optional. A request ID. Specify a unique request ID to allow
       the server to ignore the request if it has completed. The server will
       ignore subsequent requests that provide a duplicate request ID for at
@@ -824,8 +808,8 @@ class MetastoreProjectsLocationsServicesPatchRequest(_messages.Message):
 
   Fields:
     name: Immutable. The relative resource name of the metastore service, of
-      the form:"projects/{project_id}/locations/{location_id}/services/{servic
-      e_id}".
+      the form:"projects/{project_number}/locations/{location_id}/services/{se
+      rvice_id}".
     requestId: Optional. A request ID. Specify a unique request ID to allow
       the server to ignore the request if it has completed. The server will
       ignore subsequent requests that provide a duplicate request ID for at
@@ -985,33 +969,6 @@ class Operation(_messages.Message):
   response = _messages.MessageField('ResponseValue', 5)
 
 
-class OperationMetadata(_messages.Message):
-  r"""Represents the metadata of a long-running operation.
-
-  Fields:
-    apiVersion: Output only. API version used to start the operation.
-    createTime: Output only. The time the operation was created.
-    endTime: Output only. The time the operation finished running.
-    requestedCancellation: Output only. Identifies whether the caller has
-      requested cancellation of the operation. Operations that have
-      successfully been cancelled have Operation.error value with a
-      google.rpc.Status.code of 1, corresponding to Code.CANCELLED.
-    statusMessage: Output only. Human-readable status of the operation, if
-      any.
-    target: Output only. Server-defined resource path for the target of the
-      operation.
-    verb: Output only. Name of the verb executed by the operation.
-  """
-
-  apiVersion = _messages.StringField(1)
-  createTime = _messages.StringField(2)
-  endTime = _messages.StringField(3)
-  requestedCancellation = _messages.BooleanField(4)
-  statusMessage = _messages.StringField(5)
-  target = _messages.StringField(6)
-  verb = _messages.StringField(7)
-
-
 class Policy(_messages.Message):
   r"""An Identity and Access Management (IAM) policy, which specifies access
   controls for Google Cloud resources.A Policy is a collection of bindings. A
@@ -1087,8 +1044,8 @@ class Secret(_messages.Message):
 
   Fields:
     cloudSecret: The relative resource name of a Secret Manager secret
-      version, in the following
-      form:"projects/{project_id}/secrets/{secret_id}/versions/{version_id}".
+      version, in the following form:"projects/{project_number}/secrets/{secre
+      t_id}/versions/{version_id}".
   """
 
   cloudSecret = _messages.StringField(1)
@@ -1121,12 +1078,12 @@ class Service(_messages.Message):
     metadataIntegration: The setting that defines how metastore metadata
       should be integrated with external services and systems.
     name: Immutable. The relative resource name of the metastore service, of
-      the form:"projects/{project_id}/locations/{location_id}/services/{servic
-      e_id}".
+      the form:"projects/{project_number}/locations/{location_id}/services/{se
+      rvice_id}".
     network: Immutable. The relative resource name of the VPC network on which
       the instance can be accessed. The network must belong to the same
       project as the metastore instance. It is specified in the following
-      form:"projects/{project_id}/global/networks/{network_id}".
+      form:"projects/{project_number}/global/networks/{network_id}".
     port: The TCP port at which the metastore service is reached. Default:
       9083.
     state: Output only. The current state of the metastore service.

@@ -1,8 +1,0 @@
-{
-	"name": "name",
-	"parameters": [{
-		"helpText": "help text for input param",
-		"label": "input",
-		"name": "input"
-	}]
-}

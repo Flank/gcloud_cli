@@ -1,5 +1,0 @@
-2019-02-07 11:44:06,129 DEBUG    root            Loaded Command Group: [u'gcloud', u'compute']
-2019-02-07 11:44:06,131 DEBUG    root            Loaded Command Group: [u'gcloud', u'compute', u'instances']
-2019-02-07 11:44:06,138 DEBUG    root            Loaded Command Group: [u'gcloud', u'compute', u'instances', u'list']
-2019-02-07 11:44:06,141 DEBUG    root            Running [gcloud.compute.instances.list] with arguments: []
-2019-02-07 11:36:55,432 INFO     root            Display format: "none"

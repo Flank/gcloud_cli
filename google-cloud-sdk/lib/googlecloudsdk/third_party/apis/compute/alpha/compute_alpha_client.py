@@ -4768,7 +4768,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def SetInstanceTemplate(self, request, global_params=None):
-      r"""Specifies the instance template to use when creating new instances in this group. The templates for existing instances in the group do not change unless you recreate them.
+      r"""Specifies the instance template to use when creating new instances in this group. The templates for existing instances in the group do not change unless you run recreateInstances, run applyUpdatesToInstances, or set the group's updatePolicy.type to PROACTIVE.
 
       Args:
         request: (ComputeInstanceGroupManagersSetInstanceTemplateRequest) input message
@@ -17378,6 +17378,32 @@ For more information, see Deleting snapshots.
         request_field='',
         request_type_name='ComputeTargetHttpsProxiesListRequest',
         response_type_name='TargetHttpsProxyList',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Patches the specified TargetHttpsProxy resource with the data included in the request. This method supports PATCH semantics and uses JSON merge patch format and processing rules. (== suppress_warning http-rest-shadowed ==).
+
+      Args:
+        request: (ComputeTargetHttpsProxiesPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='PATCH',
+        method_id='compute.targetHttpsProxies.patch',
+        ordered_params=['project', 'targetHttpsProxy'],
+        path_params=['project', 'targetHttpsProxy'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/global/targetHttpsProxies/{targetHttpsProxy}',
+        request_field='targetHttpsProxyResource',
+        request_type_name='ComputeTargetHttpsProxiesPatchRequest',
+        response_type_name='Operation',
         supports_download=False,
     )
 

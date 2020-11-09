@@ -1361,6 +1361,7 @@ platform/gsutil/third_party/google-reauth-python/google_reauth/errors.py
 platform/gsutil/third_party/google-reauth-python/google_reauth/reauth.py
 platform/gsutil/third_party/google-reauth-python/google_reauth/reauth_creds.py
 platform/gsutil/third_party/google-reauth-python/nox.py
+platform/gsutil/third_party/google-reauth-python/noxfile.py
 platform/gsutil/third_party/google-reauth-python/setup.cfg
 platform/gsutil/third_party/google-reauth-python/setup.py
 platform/gsutil/third_party/google-reauth-python/tests/__init__.py

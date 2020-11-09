@@ -1,8 +1,0 @@
-cron:
-- url: '/cron/sendmessages'
-  schedule: 'every 5 minutes'
-  description: 'Send all due notifications'
-- url: '/cron/exportreportstocerp'
-  schedule: 'every day 18:05'
-  timezone: 'America/Los_Angeles'
-  description: 'Automatically export reports of last quarter to cerp everyday'

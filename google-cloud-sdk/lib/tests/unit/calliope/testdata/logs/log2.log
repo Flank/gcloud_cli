@@ -1,4 +1,0 @@
-2019-02-07 11:36:50,998 DEBUG    root            Loaded Command Group: [u'gcloud', u'components']
-2019-02-07 11:36:51,002 DEBUG    root            Loaded Command Group: [u'gcloud', u'components', u'update']
-2019-02-07 11:36:51,004 DEBUG    root            Running [gcloud.components.update] with arguments: [--allow-no-backup: "True", --quiet: "True", COMPONENT-IDS:3: "[u'core', u'gcloud-deps', u'gcloud']"]
-2019-02-07 11:36:55,432 INFO     root            Display format: "none"

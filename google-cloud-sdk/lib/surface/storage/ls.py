@@ -98,6 +98,31 @@ class Ls(base.Command):
         help='The path of objects and directories to list. The path must begin'
              ' with gs:// and may or may not contain wildcard characters.')
     parser.add_argument(
+        '-a', '--all-versions',
+        action='store_true',
+        help='Includes non-current object versions / generations in the listing'
+             ' (only useful with a versioning-enabled bucket). If combined with'
+             ' --long option also prints metageneration for each listed object.'
+    )
+    parser.add_argument(
+        '-e', '--etag',
+        action='store_true',
+        help='Include ETag in long listing (-l) output.')
+    parser.add_argument(
+        '-L',
+        '--full',
+        action='store_true',
+        help='Lists all available metadata about items in rows.')
+    parser.add_argument(
+        '-j',
+        '--json',
+        action='store_true',
+        help='Lists all available metadata about items as a JSON dump.')
+    parser.add_argument(
+        '-l', '--long',
+        action='store_true',
+        help='Lists extended metadata about items.')
+    parser.add_argument(
         '-R', '-r', '--recursive',
         action='store_true',
         help='Recursively list the contents of any directories that match the'
@@ -115,7 +140,17 @@ class Ls(base.Command):
     else:
       storage_urls = [storage_url.CloudUrl(cloud_api.DEFAULT_PROVIDER)]
 
-    tasks = [
-        cloud_list_task.CloudListTask(
-            url, recursion_flag=args.recursive) for url in storage_urls]
+    display_detail = cloud_list_task.DisplayDetail.SHORT
+    if args.full:
+      display_detail = cloud_list_task.DisplayDetail.FULL
+    if args.json:
+      display_detail = cloud_list_task.DisplayDetail.JSON
+    if args.long:
+      display_detail = cloud_list_task.DisplayDetail.LONG
+
+    tasks = []
+    for url in storage_urls:
+      tasks.append(cloud_list_task.CloudListTask(
+          url, all_versions=args.all_versions, display_detail=display_detail,
+          include_etag=args.etag, recursion_flag=args.recursive))
     task_executor.ExecuteTasks(tasks)

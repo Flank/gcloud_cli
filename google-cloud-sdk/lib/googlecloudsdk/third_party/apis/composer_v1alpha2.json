@@ -315,6 +315,10 @@
           "description": "Optional. The maintenance window is the period when Cloud Composer components may undergo maintenance. It is defined so that maintenance is not executed during peak hours or critical time periods. The system will not be under maintenance for every occurrence of this window, but when maintenance is planned, it will be scheduled during the window. The maintenance window period must encompass at least 12 hours per week. This may be split into multiple chunks, each with a size of at least 4 hours. If this value is omitted, Cloud Composer components may be subject to maintenance at any time.",
           "$ref": "MaintenanceWindow"
         },
+        "autoscalingConfig": {
+          "description": "Optional. The Autoscaling settings for GKE cluster within Composer environment. GKE cluster handles Airflow scheduler and workers workload.",
+          "$ref": "AutoscalingConfig"
+        },
         "airflowUri": {
           "description": "Output only. The URI of the Apache Airflow Web UI hosted within this environment (see [Airflow web interface](\/composer\/docs\/how-to\/accessing\/airflow-web-interface)).",
           "readOnly": true,
@@ -585,6 +589,37 @@
         }
       }
     },
+    "AutoscalingConfig": {
+      "id": "AutoscalingConfig",
+      "description": "The configuration settings for autoscaling for GKE cluster within Composer environment. GKE cluster handles Airflow scheduler and workers workload.",
+      "type": "object",
+      "properties": {
+        "mode": {
+          "description": "Optional. Represents information on whether autoscaling is enabled.",
+          "type": "string",
+          "enumDescriptions": [
+            "The mode of autoscaling is set to the default value by Composer.",
+            "Autoscaling is disabled.",
+            "Autoscaling is enabled."
+          ],
+          "enum": [
+            "DEFAULT",
+            "DISABLED",
+            "ENABLED"
+          ]
+        },
+        "maximumCpu": {
+          "description": "Optional. Maximum number of CPU in the environment.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "maximumMemory": {
+          "description": "Optional. Memory limit in GB in the environment.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "ListEnvironmentsResponse": {
       "id": "ListEnvironmentsResponse",
       "description": "The environments in a project and location.",
@@ -664,21 +699,21 @@
     },
     "Date": {
       "id": "Date",
-      "description": "Represents a whole or partial calendar date, e.g. a birthday. The time of day and time zone are either specified elsewhere or are not significant. The date is relative to the Proleptic Gregorian Calendar. This can represent: * A full date, with non-zero year, month and day values * A month and day value, with a zero year, e.g. an anniversary * A year on its own, with zero month and day values * A year and month value, with a zero day, e.g. a credit card expiration date Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.",
+      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day value, with a zero year, such as an anniversary * A year on its own, with zero month and day values * A year and month value, with a zero day, such as a credit card expiration date Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.",
       "type": "object",
       "properties": {
         "year": {
-          "description": "Year of date. Must be from 1 to 9999, or 0 if specifying a date without a year.",
+          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
           "type": "integer",
           "format": "int32"
         },
         "month": {
-          "description": "Month of year. Must be from 1 to 12, or 0 if specifying a year without a month and day.",
+          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
           "type": "integer",
           "format": "int32"
         },
         "day": {
-          "description": "Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year by itself or a year and month where the day is not significant.",
+          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
           "type": "integer",
           "format": "int32"
         }

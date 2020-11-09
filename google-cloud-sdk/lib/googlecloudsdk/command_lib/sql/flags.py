@@ -279,6 +279,7 @@ def AddDatabaseVersion(parser, restrict_choices=True):
       'POSTGRES_10',
       'POSTGRES_11',
       'POSTGRES_12',
+      'POSTGRES_13',
       'SQLSERVER_2017_EXPRESS',
       'SQLSERVER_2017_WEB',
       'SQLSERVER_2017_STANDARD',
@@ -458,7 +459,6 @@ def AddMaintenanceReleaseChannel(parser):
 
 
 def AddMaintenanceWindowDay(parser):
-  # TODO(b/79740068) Convert to ChoiceArgument when resolved.
   parser.add_argument(
       '--maintenance-window-day',
       choices=arg_parsers.DayOfWeek.DAYS,

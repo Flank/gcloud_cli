@@ -1,7 +1,0 @@
-{
-  "--file-share":
-    {
-      "capacity": "102400",
-      "name": "my_vol"
-    }
-}

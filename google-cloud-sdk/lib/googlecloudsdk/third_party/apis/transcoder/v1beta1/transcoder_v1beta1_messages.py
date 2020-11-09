@@ -225,6 +225,24 @@ class Color(_messages.Message):
   saturation = _messages.FloatField(3)
 
 
+class Crop(_messages.Message):
+  r"""Video cropping configuration.
+
+  Fields:
+    bottomPixels: The number of pixels to crop from the bottom. The default is
+      0.
+    leftPixels: The number of pixels to crop from the left. The default is 0.
+    rightPixels: The number of pixels to crop from the right. The default is
+      0.
+    topPixels: The number of pixels to crop from the top. The default is 0.
+  """
+
+  bottomPixels = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  leftPixels = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  rightPixels = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  topPixels = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
 class Deblock(_messages.Message):
   r"""Deblock preprocessing configuration.
 
@@ -645,14 +663,16 @@ class PreprocessingConfig(_messages.Message):
   Fields:
     audio: Audio preprocessing configuration.
     color: Color preprocessing configuration.
+    crop: Specify the video cropping configuration.
     deblock: Deblock preprocessing configuration.
     denoise: Denoise preprocessing configuration.
   """
 
   audio = _messages.MessageField('Audio', 1)
   color = _messages.MessageField('Color', 2)
-  deblock = _messages.MessageField('Deblock', 3)
-  denoise = _messages.MessageField('Denoise', 4)
+  crop = _messages.MessageField('Crop', 3)
+  deblock = _messages.MessageField('Deblock', 4)
+  denoise = _messages.MessageField('Denoise', 5)
 
 
 class Progress(_messages.Message):
@@ -980,8 +1000,8 @@ class VideoStream(_messages.Message):
       supported on all decoders. The default is `false`.
     bitrateBps: Required. The video bitrate in bits per second. Must be
       between 1 and 1,000,000,000.
-    codec: Codec type. The default is `"h264"`. Supported codecs: - 'h264' -
-      'h265' - 'vp9'
+    codec: Codec type. The following codecs are supported: * `h264` (default)
+      * `h265` * `vp9`
     crfLevel: Target CRF level. Must be between 10 and 36, where 10 is the
       highest quality and 36 is the most efficient compression. The default is
       21.
@@ -1016,13 +1036,22 @@ class VideoStream(_messages.Message):
       'yuv422p10' 10-bit HDR pixel format. - 'yuv444p10' 10-bit HDR pixel
       format. - 'yuv420p12' 12-bit HDR pixel format. - 'yuv422p12' 12-bit HDR
       pixel format. - 'yuv444p12' 12-bit HDR pixel format.
-    preset: Enforce specified codec preset. The default is `"veryfast"`.
-    profile: Enforce specified codec profile. The default is `"high"`.
-      Supported codec profiles: - 'baseline' - 'main' - 'high'
+    preset: Enforces the specified codec preset. The default is `veryfast`.
+      The available options are FFmpeg-compatible. Note that certain values
+      for this field may cause the transcoder to override other fields you set
+      in the `VideoStream` message.
+    profile: Enforces the specified codec profile. The following profiles are
+      supported: * `baseline` * `main` * `high` (default) The available
+      options are FFmpeg-compatible. Note that certain values for this field
+      may cause the transcoder to override other fields you set in the
+      `VideoStream` message.
     rateControlMode: Specify the `rate_control_mode`. The default is `"vbr"`.
       Supported rate control modes: - 'vbr' - variable bitrate - 'crf' -
       constant rate factor
-    tune: Enforce specified codec tune.
+    tune: Enforces the specified codec tune. The available options are FFmpeg-
+      compatible. Note that certain values for this field may cause the
+      transcoder to override other fields you set in the `VideoStream`
+      message.
     vbvFullnessBits: Initial fullness of the Video Buffering Verifier (VBV)
       buffer in bits. Must be greater than zero. The default is equal to 90%
       of `VideoStream.vbv_size_bits`.

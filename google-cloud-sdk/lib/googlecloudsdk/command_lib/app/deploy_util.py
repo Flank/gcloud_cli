@@ -28,7 +28,7 @@ import os
 import re
 
 from apitools.base.py import exceptions as apitools_exceptions
-
+from googlecloudsdk.api_lib import scheduler
 from googlecloudsdk.api_lib import tasks
 from googlecloudsdk.api_lib.app import build as app_cloud_build
 from googlecloudsdk.api_lib.app import deploy_app_command_util
@@ -117,6 +117,17 @@ class InvalidRuntimeNameError(Error):
     super(InvalidRuntimeNameError, self).__init__(
         'Invalid runtime name: [{}]. '
         'Must match regular expression [{}].'.format(runtime, allowed_regex))
+
+
+class RequiredFileMissingError(Error):
+  """Error for skipped/ignored files that must be uploaded."""
+
+  def __init__(self, filename):
+    super(RequiredFileMissingError, self).__init__(
+        'Required file is not uploaded: [{}]. '
+        'This file should not be added to a ignore list ('
+        'https://cloud.google.com/sdk/gcloud/reference/topic/gcloudignore)'
+        .format(filename))
 
 
 class FlexImageBuildOptions(enum.Enum):
@@ -259,8 +270,9 @@ class ServiceDeployer(object):
       BuildArtifact, a wrapper which contains either the build ID for
         an in-progress build, or the name of the container image for a serial
         build. Possibly None if the service does not require an image.
+    Raises:
+      RequiredFileMissingError: if a required file is not uploaded.
     """
-
     build = None
     if image:
       if service.RequiresImage() and service.parsed.skip_files.regex:
@@ -269,6 +281,9 @@ class ServiceDeployer(object):
                     'already been built.'.format(new_version.service))
       return app_cloud_build.BuildArtifact.MakeImageArtifact(image)
     elif service.RequiresImage():
+      if not _AppYamlInSourceFiles(source_files, service.GetAppYamlBasename()):
+        raise RequiredFileMissingError(service.GetAppYamlBasename())
+
       if flex_image_build_option == FlexImageBuildOptions.ON_SERVER:
         cloud_build_options = {
             'appYamlPath': service.GetAppYamlBasename(),
@@ -337,6 +352,9 @@ class ServiceDeployer(object):
 
     Returns:
       Dictionary mapping source files to Google Cloud Storage locations.
+
+    Raises:
+      RequiredFileMissingError: if a required file is not uploaded.
     """
     manifest = None
     # "Non-hermetic" services require file upload outside the Docker image
@@ -344,6 +362,10 @@ class ServiceDeployer(object):
     if (not image and
         (flex_image_build_option == FlexImageBuildOptions.ON_SERVER or
          not service_info.is_hermetic)):
+      if (service_info.env == env.FLEX and not _AppYamlInSourceFiles(
+          source_files, service_info.GetAppYamlBasename())):
+        raise RequiredFileMissingError(service_info.GetAppYamlBasename())
+
       limit = None
       if (service_info.env == env.STANDARD and
           service_info.runtime in _RUNTIMES_WITH_FILE_SIZE_LIMITS):
@@ -478,8 +500,9 @@ def ArgsDeploy(parser):
       instances are always running.""")
   parser.add_argument(
       '--image-url',
-      help='Deploy with a specific Docker image.  Docker url must be from one '
-      'of the valid gcr hostnames.')
+      help='(App Engine flexible environment only.) Deploy with a specific '
+      'Docker image. Docker url must be from one of the valid Container '
+      'Registry hostnames.')
   parser.add_argument(
       '--appyaml',
       help='Deploy with a specific app.yaml that will replace '
@@ -681,6 +704,31 @@ def RunDeploy(
   }
 
 
+def _GetDeployableConfigsFromArgs(args):
+  """Get parsed YAML configs for any deployables specified in args.
+
+  Args:
+    args: argparse.Namespace, An object that contains the values for the
+        arguments specified in the ArgsDeploy() function.
+
+  Returns:
+    A list of yaml_parsing.ConfigYamlInfos object for the parsed YAML file(s)
+    we are going to process.
+
+  Raises:
+    FileNotFoundError: If the path specified for a deployable does not exist.
+  """
+  paths = [os.path.abspath(x) for x in args.deployables]
+  configs = []
+  for path in paths:
+    if not os.path.exists(path):
+      raise exceptions.FileNotFoundError(path)
+    config = yaml_parsing.ConfigYamlInfo.FromFile(path)
+    if config:
+      configs.append(config)
+  return configs
+
+
 def RunDeployCloudTasks(args):
   """Perform a deployment using Cloud Tasks API based on the given args.
 
@@ -691,25 +739,45 @@ def RunDeployCloudTasks(args):
   Returns:
     A list of config file identifiers, see yaml_parsing.ConfigYamlInfo.
   """
-  paths = [os.path.abspath(x) for x in args.deployables]
-  configs = []
-  for path in paths:
-    if not os.path.exists(path):
-      raise exceptions.FileNotFoundError(path)
-    config = yaml_parsing.ConfigYamlInfo.FromFile(path)
-    if config:
-      configs.append(config)
+  configs = _GetDeployableConfigsFromArgs(args)
   if configs:
     # TODO(b/169069379): Confirm the same metric name can be used twice in the
     # same run.
     metrics.CustomTimedEvent(metric_names.UPDATE_CONFIG_START)
     # TODO(b/169069379): Upgrade to use GA once the relevant code is promoted
     tasks_api = tasks.GetApiAdapter(base.ReleaseTrack.BETA)
-    queues_data = app_deploy_migration_util.FetchCurrrentQueuesData(tasks_api)
+    queues_data = app_deploy_migration_util.FetchCurrentQueuesData(tasks_api)
     for config in configs:
-      app_deploy_migration_util.ValidateYamlFileConfig(config)
+      app_deploy_migration_util.ValidateQueueYamlFileConfig(config)
       app_deploy_migration_util.DeployQueuesYamlFile(
           tasks_api, config, queues_data)
+    metrics.CustomTimedEvent(metric_names.UPDATE_CONFIG)
+  return [c.name for c in configs]
+
+
+def RunDeployCloudScheduler(args):
+  """Perform a deployment using Cloud Scheduler APIs based on the given args.
+
+  Args:
+    args: argparse.Namespace, An object that contains the values for the
+        arguments specified in the ArgsDeploy() function.
+
+  Returns:
+    A list of config file identifiers, see yaml_parsing.ConfigYamlInfo.
+  """
+  configs = _GetDeployableConfigsFromArgs(args)
+  if configs:
+    # TODO(b/169069379): Confirm the same metric name can be used twice in the
+    # same run.
+    metrics.CustomTimedEvent(metric_names.UPDATE_CONFIG_START)
+    # TODO(b/169069379): Upgrade to use GA once the relevant code is promoted
+    scheduler_api = scheduler.GetApiAdapter(base.ReleaseTrack.ALPHA,
+                                            legacy_cron=True)
+    jobs_data = app_deploy_migration_util.FetchCurrentJobsData(scheduler_api)
+    for config in configs:
+      app_deploy_migration_util.ValidateCronYamlFileConfig(config)
+      app_deploy_migration_util.DeployCronYamlFile(
+          scheduler_api, config, jobs_data)
     metrics.CustomTimedEvent(metric_names.UPDATE_CONFIG)
   return [c.name for c in configs]
 
@@ -872,3 +940,13 @@ def GetRuntimeBuilderStrategy(release_track):
     return runtime_builders.RuntimeBuilderStrategy.WHITELIST_BETA
   else:
     raise ValueError('Unrecognized release track [{}]'.format(release_track))
+
+
+def _AppYamlInSourceFiles(source_files, app_yaml_path):
+  if not source_files:
+    return False
+
+  # TODO(b/171495697) until the bug is fixed, the app yaml has to be located in
+  #  the root of the app code, hence we're searching only the filename
+  app_yaml_filename = os.path.basename(app_yaml_path)
+  return any([f == app_yaml_filename for f in source_files])
