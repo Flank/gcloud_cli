@@ -13,10 +13,18 @@ VERSION=$1
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk-$VERSION-linux-x86_64.tar.gz
 
-if [ ! -f "$SDK_TESTS" ]; then
-  gsutil cp gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS .
+SDK_TESTS_GS_PATH=gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS
+gsutil -q stat $SDK_TESTS_GS_PATH
+STATUS=$?
+
+if [[ $status == 0 ]]; then
+  if [ ! -f "$SDK_TESTS" ]; then
+    gsutil cp $SDK_TESTS_GS_PATH .
+  else
+    echo "$SDK_TESTS exists"
+  fi
 else
-  echo "$SDK_TESTS exists"
+  echo "File does not exist"
 fi
 
 if [ ! -f "$SDK" ]; then
