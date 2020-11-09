@@ -17,7 +17,7 @@ SDK_TESTS_GS_PATH=gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS
 gsutil -q stat $SDK_TESTS_GS_PATH
 STATUS=$?
 
-if [[ $status == 0 ]]; then
+if [[ $STATUS == 0 ]]; then
   if [ ! -f "$SDK_TESTS" ]; then
     gsutil cp $SDK_TESTS_GS_PATH .
   else
