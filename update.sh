@@ -14,8 +14,7 @@ SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk-$VERSION-linux-x86_64.tar.gz
 
 SDK_TESTS_GS_PATH=gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS
-gsutil -q stat $SDK_TESTS_GS_PATH
-STATUS=$?
+STATUS=$(gsutil -q stat $SDK_TESTS_GS_PATH || echo 1)
 
 if [[ $STATUS == 0 ]]; then
   if [ ! -f "$SDK_TESTS" ]; then
