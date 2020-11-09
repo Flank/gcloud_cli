@@ -33,11 +33,15 @@ else
     echo "$SDK exists"
 fi
 
+
 echo "Updating google-cloud-sdk"
 rm -rf google-cloud-sdk
 
+if test -f "$SDK_TESTS"; then
+    tar -xzf google-cloud-sdk-tests_$VERSION.orig.tar.gz
+fi
+
 tar -xzf google-cloud-sdk_$VERSION.orig.tar.gz
-tar -xzf google-cloud-sdk-tests_$VERSION.orig.tar.gz
 
 # Over GitHub 100MB file limit
 rm google-cloud-sdk/bin/anthoscli
