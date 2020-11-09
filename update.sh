@@ -11,25 +11,36 @@ set -euxo pipefail
 
 VERSION=$1
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
-SDK=google-cloud-sdk_$VERSION.orig.tar.gz
+SDK=google-cloud-sdk-$VERSION-linux-x86_64.tar.gz
 
-if [ ! -f "$SDK_TESTS" ]; then
-  gsutil cp gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS .
+SDK_TESTS_GS_PATH=gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS
+STATUS=$(gsutil -q stat $SDK_TESTS_GS_PATH || echo 1)
+
+if [[ $STATUS == 0 ]]; then
+  if [ ! -f "$SDK_TESTS" ]; then
+    gsutil cp $SDK_TESTS_GS_PATH .
+  else
+    echo "$SDK_TESTS exists"
+  fi
 else
-  echo "$SDK_TESTS exists"
+  echo "File does not exist"
 fi
 
 if [ ! -f "$SDK" ]; then
-  gsutil cp gs://cloud-sdk-release/for_packagers/linux/$SDK .
+    curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/$SDK --output $SDK
 else
     echo "$SDK exists"
 fi
 
+
 echo "Updating google-cloud-sdk"
 rm -rf google-cloud-sdk
 
-tar -xzf google-cloud-sdk_$VERSION.orig.tar.gz
-tar -xzf google-cloud-sdk-tests_$VERSION.orig.tar.gz
+if test -f "$SDK_TESTS"; then
+    tar -xzf $SDK_TESTS
+fi
+
+tar -xzf $SDK
 
 # Over GitHub 100MB file limit
 rm google-cloud-sdk/bin/anthoscli
