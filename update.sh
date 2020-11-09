@@ -11,7 +11,7 @@ set -euxo pipefail
 
 VERSION=$1
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
-SDK=google-cloud-sdk_$VERSION.orig.tar.gz
+SDK=google-cloud-sdk-$VERSION-linux-x86_64.tar.gz
 
 if [ ! -f "$SDK_TESTS" ]; then
   gsutil cp gs://cloud-sdk-release/for_packagers/linux/$SDK_TESTS .
@@ -20,7 +20,7 @@ else
 fi
 
 if [ ! -f "$SDK" ]; then
-  gsutil cp gs://cloud-sdk-release/for_packagers/linux/$SDK .
+    curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/$SDK --output $SDK
 else
     echo "$SDK exists"
 fi
