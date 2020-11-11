@@ -1224,9 +1224,14 @@ lib/third_party/gae_ext_runtime/ext_runtime.py
 lib/third_party/gae_ext_runtime/testutil.py
 lib/third_party/gcloud_crcmod/LICENSE
 lib/third_party/gcloud_crcmod/__init__.py
-lib/third_party/gcloud_crcmod/_crcfunpy.py
-lib/third_party/gcloud_crcmod/crcmod.py
-lib/third_party/gcloud_crcmod/predefined.py
+lib/third_party/gcloud_crcmod/python2/__init__.py
+lib/third_party/gcloud_crcmod/python2/_crcfunpy.py
+lib/third_party/gcloud_crcmod/python2/crcmod.py
+lib/third_party/gcloud_crcmod/python2/predefined.py
+lib/third_party/gcloud_crcmod/python3/__init__.py
+lib/third_party/gcloud_crcmod/python3/_crcfunpy.py
+lib/third_party/gcloud_crcmod/python3/crcmod.py
+lib/third_party/gcloud_crcmod/python3/predefined.py
 lib/third_party/google/LICENSE
 lib/third_party/google/__init__.py
 lib/third_party/google/api/__init__.py

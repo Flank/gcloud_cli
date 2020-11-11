@@ -954,6 +954,9 @@ lib/googlecloudsdk/command_lib/compute/security_policies/flags.py
 lib/googlecloudsdk/command_lib/compute/security_policies/rules/__init__.py
 lib/googlecloudsdk/command_lib/compute/security_policies/rules/flags.py
 lib/googlecloudsdk/command_lib/compute/security_policies/security_policies_utils.py
+lib/googlecloudsdk/command_lib/compute/service_attachments/__init__.py
+lib/googlecloudsdk/command_lib/compute/service_attachments/flags.py
+lib/googlecloudsdk/command_lib/compute/service_attachments/service_attachments_utils.py
 lib/googlecloudsdk/command_lib/compute/sign_url_utils.py
 lib/googlecloudsdk/command_lib/compute/signed_url_flags.py
 lib/googlecloudsdk/command_lib/compute/snapshots/__init__.py
@@ -1256,6 +1259,8 @@ lib/googlecloudsdk/command_lib/iam/hooks.py
 lib/googlecloudsdk/command_lib/iam/iam_util.py
 lib/googlecloudsdk/command_lib/iam/policies_flags.py
 lib/googlecloudsdk/command_lib/iam/resources.yaml
+lib/googlecloudsdk/command_lib/iam/workload_identity_pools/__init__.py
+lib/googlecloudsdk/command_lib/iam/workload_identity_pools/cred_config.py
 lib/googlecloudsdk/command_lib/iap/__init__.py
 lib/googlecloudsdk/command_lib/iap/exceptions.py
 lib/googlecloudsdk/command_lib/iap/resources.yaml
@@ -1584,6 +1589,7 @@ lib/googlecloudsdk/command_lib/storage/tasks/ls/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/cloud_list_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/task.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_executor.py
+lib/googlecloudsdk/command_lib/storage/tasks/task_graph_executor.py
 lib/googlecloudsdk/command_lib/storage/util.py
 lib/googlecloudsdk/command_lib/storage/wildcard_iterator.py
 lib/googlecloudsdk/command_lib/survey/__init__.py
@@ -2750,6 +2756,12 @@ lib/googlecloudsdk/third_party/apis/gkehub_v1.json
 lib/googlecloudsdk/third_party/apis/gkehub_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/gkehub_v1alpha2.json
 lib/googlecloudsdk/third_party/apis/gkehub_v1beta1.json
+lib/googlecloudsdk/third_party/apis/gsuiteaddons/__init__.py
+lib/googlecloudsdk/third_party/apis/gsuiteaddons/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/gsuiteaddons/v1/gsuiteaddons_v1_client.py
+lib/googlecloudsdk/third_party/apis/gsuiteaddons/v1/gsuiteaddons_v1_messages.py
+lib/googlecloudsdk/third_party/apis/gsuiteaddons/v1/resources.py
+lib/googlecloudsdk/third_party/apis/gsuiteaddons_v1.json
 lib/googlecloudsdk/third_party/apis/healthcare/__init__.py
 lib/googlecloudsdk/third_party/apis/healthcare/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/healthcare/v1/healthcare_v1_client.py
@@ -3182,11 +3194,7 @@ lib/googlecloudsdk/third_party/apis/spanner/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/spanner/v1/resources.py
 lib/googlecloudsdk/third_party/apis/spanner/v1/spanner_v1_client.py
 lib/googlecloudsdk/third_party/apis/spanner/v1/spanner_v1_messages.py
-lib/googlecloudsdk/third_party/apis/spanner/v1alpha/__init__.py
-lib/googlecloudsdk/third_party/apis/spanner/v1alpha/spanner_v1alpha_client.py
-lib/googlecloudsdk/third_party/apis/spanner/v1alpha/spanner_v1alpha_messages.py
 lib/googlecloudsdk/third_party/apis/spanner_v1.json
-lib/googlecloudsdk/third_party/apis/spanner_v1alpha.json
 lib/googlecloudsdk/third_party/apis/speech/__init__.py
 lib/googlecloudsdk/third_party/apis/speech/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/speech/v1/resources.py
@@ -3664,6 +3672,7 @@ lib/surface/apigee/developers/__init__.py
 lib/surface/apigee/developers/describe.py
 lib/surface/apigee/developers/list.py
 lib/surface/apigee/environments/__init__.py
+lib/surface/apigee/environments/describe.py
 lib/surface/apigee/environments/list.py
 lib/surface/apigee/operations/__init__.py
 lib/surface/apigee/operations/describe.py
@@ -4549,6 +4558,8 @@ lib/surface/compute/security_policies/rules/delete.py
 lib/surface/compute/security_policies/rules/describe.py
 lib/surface/compute/security_policies/rules/update.py
 lib/surface/compute/security_policies/update.py
+lib/surface/compute/service_attachments/__init__.py
+lib/surface/compute/service_attachments/create.py
 lib/surface/compute/shared_vpc/__init__.py
 lib/surface/compute/shared_vpc/associated_projects/__init__.py
 lib/surface/compute/shared_vpc/associated_projects/add.py
@@ -5736,8 +5747,8 @@ lib/surface/kuberun/core/revisions/delete.py
 lib/surface/kuberun/core/revisions/describe.py
 lib/surface/kuberun/core/revisions/list.py
 lib/surface/kuberun/core/services/__init__.py
+lib/surface/kuberun/core/services/create.py
 lib/surface/kuberun/core/services/delete.py
-lib/surface/kuberun/core/services/deploy.py
 lib/surface/kuberun/core/services/describe.py
 lib/surface/kuberun/core/services/list.py
 lib/surface/kuberun/core/services/update.py
@@ -5892,14 +5903,18 @@ lib/surface/metastore/operations/describe.yaml
 lib/surface/metastore/operations/list.yaml
 lib/surface/metastore/operations/wait.yaml
 lib/surface/metastore/services/__init__.py
+lib/surface/metastore/services/add_iam_policy_binding.yaml
 lib/surface/metastore/services/create.yaml
 lib/surface/metastore/services/delete.py
 lib/surface/metastore/services/describe.yaml
+lib/surface/metastore/services/get_iam_policy.yaml
 lib/surface/metastore/services/imports/__init__.py
 lib/surface/metastore/services/imports/create.yaml
 lib/surface/metastore/services/imports/describe.yaml
 lib/surface/metastore/services/imports/list.yaml
 lib/surface/metastore/services/list.yaml
+lib/surface/metastore/services/remove_iam_policy_binding.yaml
+lib/surface/metastore/services/set_iam_policy.yaml
 lib/surface/metastore/services/update.yaml
 lib/surface/ml/__init__.py
 lib/surface/ml/language/__init__.py
@@ -6013,6 +6028,7 @@ lib/surface/network_connectivity/spokes/create.yaml
 lib/surface/network_connectivity/spokes/delete.yaml
 lib/surface/network_connectivity/spokes/describe.yaml
 lib/surface/network_connectivity/spokes/list.yaml
+lib/surface/network_connectivity/spokes/update.yaml
 lib/surface/network_management/__init__.py
 lib/surface/network_management/connectivity_tests/__init__.py
 lib/surface/network_management/connectivity_tests/create.yaml

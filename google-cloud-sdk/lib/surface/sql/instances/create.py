@@ -99,6 +99,10 @@ def AddBaseArgs(parser):
   flags.AddDenyMaintenancePeriodStartDate(parser)
   flags.AddDenyMaintenancePeriodEndDate(parser)
   flags.AddDenyMaintenancePeriodTime(parser)
+  flags.AddInsightsConfigQueryInsightsEnabled(parser)
+  flags.AddInsightsConfigQueryStringLength(parser)
+  flags.AddInsightsConfigRecordApplicationTags(parser)
+  flags.AddInsightsConfigRecordClientAddress(parser)
   parser.add_argument(
       '--master-instance-name',
       required=False,

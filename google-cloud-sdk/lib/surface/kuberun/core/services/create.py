@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Deploy a Knative service."""
+"""Creates a new Knative service."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -24,8 +24,9 @@ from googlecloudsdk.command_lib.kuberun import kuberun_command
 from googlecloudsdk.core import log
 
 _DETAILED_HELP = {
-    'EXAMPLES': """
-        To deploy a Knative service, run
+    'EXAMPLES':
+        """
+        To create a new Knative service, run
 
             $ {command} <service-name> --image=<image-url> [optional flags]
         """,
@@ -33,25 +34,25 @@ _DETAILED_HELP = {
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Deploy(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
-  """Deploy a Knative service."""
+class Create(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
+  """Creates a new Knative service."""
 
   detailed_help = _DETAILED_HELP
   flags = [
       flags.ClusterConnectionFlags(),
-      flags.CommonServiceFlags(is_deploy=True),
+      flags.CommonServiceFlags(is_create=True),
       flags.AsyncFlag(),
   ]
 
   @classmethod
   def Args(cls, parser):
-    super(Deploy, cls).Args(parser)
+    super(Create, cls).Args(parser)
     parser.add_argument(
         'service',
         help='ID of the service or fully qualified identifier for the service.')
 
   def BuildKubeRunArgs(self, args):
-    return [args.service] + super(Deploy, self).BuildKubeRunArgs(args)
+    return [args.service] + super(Create, self).BuildKubeRunArgs(args)
 
   def OperationResponseHandler(self, response, args):
     if response.failed:
@@ -64,4 +65,4 @@ class Deploy(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
     return response.stdout
 
   def Command(self):
-    return ['core', 'services', 'deploy']
+    return ['core', 'services', 'create']

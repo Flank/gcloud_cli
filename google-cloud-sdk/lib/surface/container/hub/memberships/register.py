@@ -433,7 +433,8 @@ class Register(base.CreateCommand):
               cancel_on_no=True)
           try:
             api_util.UpdateMembership(resource_name, obj, 'authority',
-                                      self.ReleaseTrack(), issuer_url)
+                                      self.ReleaseTrack(),
+                                      issuer_url=issuer_url)
             log.status.Print(
                 'Updated the membership [{}] for the cluster [{}]'.format(
                     resource_name, args.CLUSTER_NAME))

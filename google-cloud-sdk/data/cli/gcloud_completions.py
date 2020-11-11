@@ -1726,11 +1726,14 @@ STATIC_COMPLETION_CLI_TREE = {
                   "flags": {
                     "--accelerator": "value",
                     "--display-name": "value",
+                    "--enable-access-logging": "bool",
+                    "--enable-container-logging": "bool",
                     "--machine-type": "value",
                     "--max-replica-count": "value",
                     "--min-replica-count": "value",
                     "--model": "value",
                     "--region": "dynamic",
+                    "--service-account": "value",
                     "--traffic-split": "value"
                   }
                 },
@@ -2986,6 +2989,12 @@ STATIC_COMPLETION_CLI_TREE = {
             },
             "environments": {
               "commands": {
+                "describe": {
+                  "commands": {},
+                  "flags": {
+                    "--organization": "value"
+                  }
+                },
                 "list": {
                   "commands": {},
                   "flags": {
@@ -3272,6 +3281,7 @@ STATIC_COMPLETION_CLI_TREE = {
                         "--limit": "value",
                         "--occurrence-filter": "value",
                         "--page-size": "value",
+                        "--show-occurrences": "bool",
                         "--show-occurrences-from": "value",
                         "--sort-by": "value"
                       }
@@ -4316,7 +4326,8 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--credit-types-treatment": [
                       "credit-types-treatment-unspecified",
                       "exclude-all-credits",
-                      "include-all-credits"
+                      "include-all-credits",
+                      "include-specified-credits"
                     ],
                     "--disable-default-iam-recipients": "bool",
                     "--display-name": "value",
@@ -4362,7 +4373,8 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--credit-types-treatment": [
                       "credit-types-treatment-unspecified",
                       "exclude-all-credits",
-                      "include-all-credits"
+                      "include-all-credits",
+                      "include-specified-credits"
                     ],
                     "--disable-default-iam-recipients": "bool",
                     "--display-name": "value",
@@ -8410,6 +8422,7 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--machine-type": "dynamic",
                     "--network": "value",
                     "--network-tier": "value",
+                    "--no-address": "bool",
                     "--node": "value",
                     "--node-affinity-file": "value",
                     "--node-group": "value",
@@ -11064,6 +11077,25 @@ STATIC_COMPLETION_CLI_TREE = {
                   "flags": {
                     "--description": "value",
                     "--enable-ml": "bool"
+                  }
+                }
+              },
+              "flags": {}
+            },
+            "service-attachments": {
+              "commands": {
+                "create": {
+                  "commands": {},
+                  "flags": {
+                    "--connection-preference": [
+                      "ACCEPT_AUTOMATIC"
+                    ],
+                    "--description": "value",
+                    "--nat-subnets": "dynamic",
+                    "--nat-subnets-region": "dynamic",
+                    "--producer-forwarding-rule": "dynamic",
+                    "--producer-forwarding-rule-region": "dynamic",
+                    "--region": "dynamic"
                   }
                 }
               },
@@ -19033,8 +19065,10 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--app-id-uri": "value",
                     "--aws": "bool",
                     "--azure": "bool",
+                    "--credential-source-field-name": "value",
                     "--credential-source-file": "value",
                     "--credential-source-headers": "value",
+                    "--credential-source-type": "value",
                     "--credential-source-url": "value",
                     "--output-file": "value",
                     "--service-account": "value",
@@ -19274,6 +19308,7 @@ STATIC_COMPLETION_CLI_TREE = {
                   "flags": {
                     "--folder": "value",
                     "--organization": "value",
+                    "--region": "value",
                     "--resource-type": [
                       "app-engine",
                       "compute",
@@ -19289,6 +19324,7 @@ STATIC_COMPLETION_CLI_TREE = {
                   "flags": {
                     "--folder": "value",
                     "--organization": "value",
+                    "--region": "value",
                     "--resource-type": [
                       "app-engine",
                       "compute",
@@ -21050,6 +21086,14 @@ STATIC_COMPLETION_CLI_TREE = {
             },
             "services": {
               "commands": {
+                "add-iam-policy-binding": {
+                  "commands": {},
+                  "flags": {
+                    "--location": "value",
+                    "--member": "value",
+                    "--role": "dynamic"
+                  }
+                },
                 "create": {
                   "commands": {},
                   "flags": {
@@ -21080,6 +21124,16 @@ STATIC_COMPLETION_CLI_TREE = {
                   "commands": {},
                   "flags": {
                     "--location": "value"
+                  }
+                },
+                "get-iam-policy": {
+                  "commands": {},
+                  "flags": {
+                    "--filter": "value",
+                    "--limit": "value",
+                    "--location": "value",
+                    "--page-size": "value",
+                    "--sort-by": "value"
                   }
                 },
                 "imports": {
@@ -21128,6 +21182,20 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--page-size": "value",
                     "--sort-by": "value",
                     "--uri": "bool"
+                  }
+                },
+                "remove-iam-policy-binding": {
+                  "commands": {},
+                  "flags": {
+                    "--location": "value",
+                    "--member": "value",
+                    "--role": "dynamic"
+                  }
+                },
+                "set-iam-policy": {
+                  "commands": {},
+                  "flags": {
+                    "--location": "value"
                   }
                 },
                 "update": {
@@ -22902,6 +22970,15 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--page-size": "value",
                     "--region": "value",
                     "--sort-by": "value"
+                  }
+                },
+                "update": {
+                  "commands": {},
+                  "flags": {
+                    "--async": "bool",
+                    "--description": "value",
+                    "--labels": "value",
+                    "--region": "value"
                   }
                 }
               },
@@ -27104,6 +27181,10 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--enable-point-in-time-recovery": "bool",
                     "--failover-replica-name": "value",
                     "--gce-zone": "value",
+                    "--insights-config-query-insights-enabled": "bool",
+                    "--insights-config-query-string-length": "value",
+                    "--insights-config-record-application-tags": "bool",
+                    "--insights-config-record-client-address": "bool",
                     "--labels": "value",
                     "--maintenance-release-channel": [
                       "preview",
@@ -27226,6 +27307,10 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--enable-point-in-time-recovery": "bool",
                     "--follow-gae-app": "value",
                     "--gce-zone": "value",
+                    "--insights-config-query-insights-enabled": "bool",
+                    "--insights-config-query-string-length": "value",
+                    "--insights-config-record-application-tags": "bool",
+                    "--insights-config-record-client-address": "bool",
                     "--maintenance-release-channel": [
                       "preview",
                       "production"
@@ -28645,6 +28730,16 @@ STATIC_COMPLETION_CLI_TREE = {
                 ],
                 "--splits": "value"
               }
+            },
+            "update": {
+              "commands": {},
+              "flags": {
+                "--ingress": [
+                  "all",
+                  "internal-and-cloud-load-balancing",
+                  "internal-only"
+                ]
+              }
             }
           },
           "flags": {}
@@ -28783,6 +28878,7 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--limit": "value",
                     "--occurrence-filter": "value",
                     "--page-size": "value",
+                    "--show-occurrences": "bool",
                     "--show-occurrences-from": "value",
                     "--sort-by": "value"
                   }
@@ -29838,11 +29934,14 @@ STATIC_COMPLETION_CLI_TREE = {
                   "flags": {
                     "--accelerator": "value",
                     "--display-name": "value",
+                    "--enable-access-logging": "bool",
+                    "--enable-container-logging": "bool",
                     "--machine-type": "value",
                     "--max-replica-count": "value",
                     "--min-replica-count": "value",
                     "--model": "value",
                     "--region": "dynamic",
+                    "--service-account": "value",
                     "--traffic-split": "value"
                   }
                 },
@@ -31655,6 +31754,7 @@ STATIC_COMPLETION_CLI_TREE = {
                         "--limit": "value",
                         "--occurrence-filter": "value",
                         "--page-size": "value",
+                        "--show-occurrences": "bool",
                         "--show-occurrences-from": "value",
                         "--sort-by": "value"
                       }
@@ -32710,7 +32810,8 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--credit-types-treatment": [
                       "credit-types-treatment-unspecified",
                       "exclude-all-credits",
-                      "include-all-credits"
+                      "include-all-credits",
+                      "include-specified-credits"
                     ],
                     "--disable-default-iam-recipients": "bool",
                     "--display-name": "value",
@@ -32756,7 +32857,8 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--credit-types-treatment": [
                       "credit-types-treatment-unspecified",
                       "exclude-all-credits",
-                      "include-all-credits"
+                      "include-all-credits",
+                      "include-specified-credits"
                     ],
                     "--disable-default-iam-recipients": "bool",
                     "--display-name": "value",
@@ -33337,6 +33439,7 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--prefix-length": "value",
                     "--purpose": [
                       "GCE_ENDPOINT",
+                      "PRIVATE_SERVICE_CONNECT",
                       "SHARED_LOADBALANCER_VIP",
                       "VPC_PEERING"
                     ],
@@ -34248,6 +34351,7 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--service-label": "value",
                     "--subnet": "value",
                     "--subnet-region": "dynamic",
+                    "--target-google-apis-bundle": "value",
                     "--target-grpc-proxy": "value",
                     "--target-http-proxy": "value",
                     "--target-http-proxy-region": "dynamic",
@@ -36055,6 +36159,7 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--machine-type": "dynamic",
                     "--network": "value",
                     "--network-tier": "value",
+                    "--no-address": "bool",
                     "--node": "value",
                     "--node-affinity-file": "value",
                     "--node-group": "value",
@@ -45926,8 +46031,10 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--app-id-uri": "value",
                     "--aws": "bool",
                     "--azure": "bool",
+                    "--credential-source-field-name": "value",
                     "--credential-source-file": "value",
                     "--credential-source-headers": "value",
+                    "--credential-source-type": "value",
                     "--credential-source-url": "value",
                     "--output-file": "value",
                     "--service-account": "value",
@@ -53192,6 +53299,10 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--enable-point-in-time-recovery": "bool",
                     "--failover-replica-name": "value",
                     "--gce-zone": "value",
+                    "--insights-config-query-insights-enabled": "bool",
+                    "--insights-config-query-string-length": "value",
+                    "--insights-config-record-application-tags": "bool",
+                    "--insights-config-record-client-address": "bool",
                     "--labels": "value",
                     "--maintenance-release-channel": [
                       "preview",
@@ -53313,6 +53424,10 @@ STATIC_COMPLETION_CLI_TREE = {
                     "--enable-point-in-time-recovery": "bool",
                     "--follow-gae-app": "value",
                     "--gce-zone": "value",
+                    "--insights-config-query-insights-enabled": "bool",
+                    "--insights-config-query-string-length": "value",
+                    "--insights-config-record-application-tags": "bool",
+                    "--insights-config-record-client-address": "bool",
                     "--maintenance-release-channel": [
                       "preview",
                       "production"
@@ -55365,6 +55480,7 @@ STATIC_COMPLETION_CLI_TREE = {
               "commands": {},
               "flags": {
                 "--async": "bool",
+                "--chain-name": "value",
                 "--csek-key-file": "value",
                 "--description": "value",
                 "--guest-flush": "bool",
@@ -70399,6 +70515,10 @@ STATIC_COMPLETION_CLI_TREE = {
                 "--enable-point-in-time-recovery": "bool",
                 "--failover-replica-name": "value",
                 "--gce-zone": "value",
+                "--insights-config-query-insights-enabled": "bool",
+                "--insights-config-query-string-length": "value",
+                "--insights-config-record-application-tags": "bool",
+                "--insights-config-record-client-address": "bool",
                 "--maintenance-release-channel": [
                   "preview",
                   "production"
@@ -70509,6 +70629,10 @@ STATIC_COMPLETION_CLI_TREE = {
                 "--enable-point-in-time-recovery": "bool",
                 "--follow-gae-app": "value",
                 "--gce-zone": "value",
+                "--insights-config-query-insights-enabled": "bool",
+                "--insights-config-query-string-length": "value",
+                "--insights-config-record-application-tags": "bool",
+                "--insights-config-record-client-address": "bool",
                 "--maintenance-release-channel": [
                   "preview",
                   "production"

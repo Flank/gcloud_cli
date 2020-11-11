@@ -24,8 +24,8 @@ from googlecloudsdk.api_lib.logging import util
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core import gapic_util
 from googlecloudsdk.core import log
-from googlecloudsdk.core.gapic_util import StoredCredentials
 
 from google.api_core import bidi
 
@@ -110,7 +110,8 @@ class Tail(base.Command):
         log.error('The buffer window must be set between 0s and 1m.')
       buffer_window_seconds = args.buffer_window
     transport = LoggingServiceV2GrpcTransport(
-        credentials=StoredCredentials(), address='logging.googleapis.com:443')
+        credentials=gapic_util.StoredCredentials(),
+        address='logging.googleapis.com:443')
 
     # By default and up to the INFO verbosity, all console output is included in
     # the log file. When tailing logs, coarse filters could cause very large

@@ -42,10 +42,10 @@ __all__ = '''mkCrcFun Crc
 # If the extension module was not built, drop back to the Python implementation
 # even though it is significantly slower.
 try:
-    import gcloud_crcmod._crcfunext as _crcfun
+    import gcloud_crcmod.python3._crcfunext as _crcfun
     _usingExtension = True
 except ImportError:
-    import gcloud_crcmod._crcfunpy as _crcfun
+    from gcloud_crcmod.python3 import _crcfunpy as _crcfun
     _usingExtension = False
 
 import sys, struct
