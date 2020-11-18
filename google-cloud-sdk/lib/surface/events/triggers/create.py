@@ -72,6 +72,7 @@ class Create(base.Command):
     flags.AddSourceFlag(source_group)
     flags.AddParametersFlags(source_group)
     flags.AddSecretsFlag(source_group)
+    flags.AddResourcesFlag(source_group)
     trigger_presentation = presentation_specs.ResourcePresentationSpec(
         'trigger',
         resource_args.GetTriggerResourceSpec(),

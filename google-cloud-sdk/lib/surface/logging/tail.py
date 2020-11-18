@@ -136,12 +136,20 @@ class Tail(base.Command):
 
 
 Tail.detailed_help = {
-    'DESCRIPTION':
-        ('{command} streams newly received log entries. Log entries matching '
-         '*log-filter* are returned in the order that they were received by '
-         'Cloud Logging. If the log entries come from multiple logs, then '
-         'entries from different logs might be intermingled in the results. To '
-         'help return log entries in order, use `--buffer-window`.'),
+    'DESCRIPTION': """
+         {command} streams newly received log entries. Log entries matching
+         *log-filter* are returned in the order that they were received by
+         Cloud Logging. If the log entries come from multiple logs, then
+         entries from different logs might be intermingled in the results. To
+         help return log entries in order, use `--buffer-window`.
+
+         Before you can use {command}, you must complete the installation
+         instructions at
+         [Live tailing log entries](https://cloud.google.com/logging/docs/reference/tools/gcloud-logging#live-tailing).
+
+         For the quotas and limits associated with {command},
+         see [Logging API quotas and limits](https://cloud.google.com/logging/quotas#api-limits).
+    """,
     'EXAMPLES':
         """\
         To stream log entries from Google Compute Engine instances, run:

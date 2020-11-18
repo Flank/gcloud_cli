@@ -85,6 +85,9 @@ def AddBaseArgs(parser):
   flags.AddInstanceCollation(parser)
   flags.AddDatabaseFlags(parser)
   flags.AddEnableBinLog(parser, show_negated_in_help=False)
+  flags.AddRetainedBackupsCount(parser)
+  flags.AddRetainedTransactionLogDays(parser)
+
   parser.add_argument(
       '--failover-replica-name',
       required=False,

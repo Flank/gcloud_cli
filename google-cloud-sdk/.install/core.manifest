@@ -433,6 +433,7 @@ lib/googlecloudsdk/api_lib/kuberun/component.py
 lib/googlecloudsdk/api_lib/kuberun/component_template.py
 lib/googlecloudsdk/api_lib/kuberun/devkit.py
 lib/googlecloudsdk/api_lib/kuberun/domainmapping.py
+lib/googlecloudsdk/api_lib/kuberun/environment.py
 lib/googlecloudsdk/api_lib/kuberun/kubernetesobject.py
 lib/googlecloudsdk/api_lib/kuberun/mapobject.py
 lib/googlecloudsdk/api_lib/kuberun/metadata.py
@@ -592,6 +593,7 @@ lib/googlecloudsdk/api_lib/storage/api_factory.py
 lib/googlecloudsdk/api_lib/storage/cloud_api.py
 lib/googlecloudsdk/api_lib/storage/errors.py
 lib/googlecloudsdk/api_lib/storage/gcs_api.py
+lib/googlecloudsdk/api_lib/storage/patch_gcs_messages.py
 lib/googlecloudsdk/api_lib/storage/s3_api.py
 lib/googlecloudsdk/api_lib/storage/storage_api.py
 lib/googlecloudsdk/api_lib/storage/storage_util.py
@@ -605,6 +607,9 @@ lib/googlecloudsdk/api_lib/tasks/task_queues_convertors.py
 lib/googlecloudsdk/api_lib/tasks/tasks.py
 lib/googlecloudsdk/api_lib/trace/__init__.py
 lib/googlecloudsdk/api_lib/trace/util.py
+lib/googlecloudsdk/api_lib/transcoder/__init__.py
+lib/googlecloudsdk/api_lib/transcoder/jobs.py
+lib/googlecloudsdk/api_lib/transcoder/templates.py
 lib/googlecloudsdk/api_lib/util/__init__.py
 lib/googlecloudsdk/api_lib/util/apis.py
 lib/googlecloudsdk/api_lib/util/apis_internal.py
@@ -1319,6 +1324,7 @@ lib/googlecloudsdk/command_lib/lifesciences/__init__.py
 lib/googlecloudsdk/command_lib/lifesciences/operation_poller.py
 lib/googlecloudsdk/command_lib/lifesciences/resources.yaml
 lib/googlecloudsdk/command_lib/logs/__init__.py
+lib/googlecloudsdk/command_lib/logs/read.py
 lib/googlecloudsdk/command_lib/logs/stream.py
 lib/googlecloudsdk/command_lib/memcache/__init__.py
 lib/googlecloudsdk/command_lib/memcache/instances_util.py
@@ -1411,7 +1417,8 @@ lib/googlecloudsdk/command_lib/org_policies/interfaces.py
 lib/googlecloudsdk/command_lib/org_policies/utils.py
 lib/googlecloudsdk/command_lib/organizations/__init__.py
 lib/googlecloudsdk/command_lib/organizations/flags.py
-lib/googlecloudsdk/command_lib/organizations/orgs_base.py
+lib/googlecloudsdk/command_lib/organizations/hooks.py
+lib/googlecloudsdk/command_lib/organizations/org_utils.py
 lib/googlecloudsdk/command_lib/organizations/resources.yaml
 lib/googlecloudsdk/command_lib/oslogin/__init__.py
 lib/googlecloudsdk/command_lib/oslogin/flags.py
@@ -1588,7 +1595,9 @@ lib/googlecloudsdk/command_lib/storage/tasks/cp/intra_cloud_copy_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/cloud_list_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/task.py
+lib/googlecloudsdk/command_lib/storage/tasks/task_buffer.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_executor.py
+lib/googlecloudsdk/command_lib/storage/tasks/task_graph.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_graph_executor.py
 lib/googlecloudsdk/command_lib/storage/util.py
 lib/googlecloudsdk/command_lib/storage/wildcard_iterator.py
@@ -1604,6 +1613,10 @@ lib/googlecloudsdk/command_lib/tasks/flags.py
 lib/googlecloudsdk/command_lib/tasks/list_formats.py
 lib/googlecloudsdk/command_lib/tasks/parsers.py
 lib/googlecloudsdk/command_lib/tasks/resources.yaml
+lib/googlecloudsdk/command_lib/transcoder/__init__.py
+lib/googlecloudsdk/command_lib/transcoder/flags.py
+lib/googlecloudsdk/command_lib/transcoder/resource_args.py
+lib/googlecloudsdk/command_lib/transcoder/util.py
 lib/googlecloudsdk/command_lib/util/__init__.py
 lib/googlecloudsdk/command_lib/util/anthos/__init__.py
 lib/googlecloudsdk/command_lib/util/anthos/binary_operations.py
@@ -3172,11 +3185,6 @@ lib/googlecloudsdk/third_party/apis/serviceusage/v1beta1/serviceusage_v1beta1_me
 lib/googlecloudsdk/third_party/apis/serviceusage_v1.json
 lib/googlecloudsdk/third_party/apis/serviceusage_v1alpha.json
 lib/googlecloudsdk/third_party/apis/serviceusage_v1beta1.json
-lib/googlecloudsdk/third_party/apis/serviceuser/__init__.py
-lib/googlecloudsdk/third_party/apis/serviceuser/v1/__init__.py
-lib/googlecloudsdk/third_party/apis/serviceuser/v1/serviceuser_v1_client.py
-lib/googlecloudsdk/third_party/apis/serviceuser/v1/serviceuser_v1_messages.py
-lib/googlecloudsdk/third_party/apis/serviceuser_v1.json
 lib/googlecloudsdk/third_party/apis/source/__init__.py
 lib/googlecloudsdk/third_party/apis/source/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/source/v1/resources.py
@@ -4560,6 +4568,9 @@ lib/surface/compute/security_policies/rules/update.py
 lib/surface/compute/security_policies/update.py
 lib/surface/compute/service_attachments/__init__.py
 lib/surface/compute/service_attachments/create.py
+lib/surface/compute/service_attachments/delete.py
+lib/surface/compute/service_attachments/describe.py
+lib/surface/compute/service_attachments/list.py
 lib/surface/compute/shared_vpc/__init__.py
 lib/surface/compute/shared_vpc/associated_projects/__init__.py
 lib/surface/compute/shared_vpc/associated_projects/add.py
@@ -5735,6 +5746,7 @@ lib/surface/kuberun/applications/describe.py
 lib/surface/kuberun/applications/init.py
 lib/surface/kuberun/components/__init__.py
 lib/surface/kuberun/components/add.py
+lib/surface/kuberun/components/dev.py
 lib/surface/kuberun/components/list.py
 lib/surface/kuberun/core/__init__.py
 lib/surface/kuberun/core/domain_mappings/__init__.py
@@ -6340,6 +6352,8 @@ lib/surface/run/revisions/__init__.py
 lib/surface/run/revisions/delete.py
 lib/surface/run/revisions/describe.py
 lib/surface/run/revisions/list.py
+lib/surface/run/revisions/logs/__init__.py
+lib/surface/run/revisions/logs/read.py
 lib/surface/run/routes/__init__.py
 lib/surface/run/routes/describe.py
 lib/surface/run/routes/list.py
@@ -6349,6 +6363,8 @@ lib/surface/run/services/delete.py
 lib/surface/run/services/describe.py
 lib/surface/run/services/get_iam_policy.yaml
 lib/surface/run/services/list.py
+lib/surface/run/services/logs/__init__.py
+lib/surface/run/services/logs/read.py
 lib/surface/run/services/remove_iam_policy_binding.yaml
 lib/surface/run/services/replace.py
 lib/surface/run/services/set_iam_policy.yaml
@@ -6722,6 +6738,17 @@ lib/surface/trace/sinks/delete.py
 lib/surface/trace/sinks/describe.py
 lib/surface/trace/sinks/list.py
 lib/surface/trace/sinks/update.py
+lib/surface/transcoder/__init__.py
+lib/surface/transcoder/jobs/__init__.py
+lib/surface/transcoder/jobs/create.py
+lib/surface/transcoder/jobs/delete.py
+lib/surface/transcoder/jobs/describe.py
+lib/surface/transcoder/jobs/list.py
+lib/surface/transcoder/templates/__init__.py
+lib/surface/transcoder/templates/create.py
+lib/surface/transcoder/templates/delete.py
+lib/surface/transcoder/templates/describe.py
+lib/surface/transcoder/templates/list.py
 lib/surface/version.py
 lib/surface/vmware/__init__.py
 lib/surface/vmware/clusters/__init__.py

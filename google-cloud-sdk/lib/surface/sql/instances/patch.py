@@ -158,6 +158,8 @@ def AddBaseArgs(parser):
   backups_enabled_group = backups_group.add_group()
   flags.AddBackupStartTime(backups_enabled_group)
   flags.AddBackupLocation(backups_enabled_group, allow_empty=True)
+  flags.AddRetainedBackupsCount(backups_enabled_group)
+  flags.AddRetainedTransactionLogDays(backups_enabled_group)
 
   backups_group.add_argument(
       '--no-backup',

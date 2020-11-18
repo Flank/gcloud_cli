@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.kuberun import flags
 from googlecloudsdk.command_lib.kuberun import kuberun_command
-from googlecloudsdk.core import log
 
 _DETAILED_HELP = {
     'EXAMPLES':
@@ -53,16 +52,6 @@ class Create(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
 
   def BuildKubeRunArgs(self, args):
     return [args.service] + super(Create, self).BuildKubeRunArgs(args)
-
-  def OperationResponseHandler(self, response, args):
-    if response.failed:
-      log.error(response.stderr)
-      return None
-
-    if response.stderr:
-      log.status.Print(response.stderr)
-
-    return response.stdout
 
   def Command(self):
     return ['core', 'services', 'create']

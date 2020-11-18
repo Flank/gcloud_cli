@@ -28,7 +28,6 @@ platform/gsutil/gslib/addlhelp/retries.py
 platform/gsutil/gslib/addlhelp/security.py
 platform/gsutil/gslib/addlhelp/subdirs.py
 platform/gsutil/gslib/addlhelp/support.py
-platform/gsutil/gslib/addlhelp/throttling.py
 platform/gsutil/gslib/addlhelp/versions.py
 platform/gsutil/gslib/addlhelp/wildcards.py
 platform/gsutil/gslib/boto_resumable_upload.py
