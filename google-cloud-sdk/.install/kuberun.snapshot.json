@@ -1,0 +1,40 @@
+{
+  "components": [
+    {
+      "dependencies": [
+        "kuberun-darwin-x86_64",
+        "kuberun-linux-x86_64",
+        "kuberun-windows-x86_64"
+      ],
+      "details": {
+        "description": "Provides kuberun executable.",
+        "display_name": "Kuberun"
+      },
+      "id": "kuberun",
+      "is_configuration": false,
+      "is_hidden": true,
+      "is_required": false,
+      "platform": {
+        "architectures": [
+          "x86_64"
+        ],
+        "operating_systems": [
+          "LINUX",
+          "MACOSX",
+          "WINDOWS"
+        ]
+      },
+      "version": {
+        "build_number": 0,
+        "version_string": "0.0.1"
+      }
+    }
+  ],
+  "revision": 20201204174910,
+  "schema_version": {
+    "no_update": false,
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
+    "version": 3
+  },
+  "version": "320.0.0"
+}

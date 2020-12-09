@@ -343,6 +343,7 @@ lib/googlecloudsdk/api_lib/dns/export_util.py
 lib/googlecloudsdk/api_lib/dns/import_util.py
 lib/googlecloudsdk/api_lib/dns/managed_zones.py
 lib/googlecloudsdk/api_lib/dns/operations.py
+lib/googlecloudsdk/api_lib/dns/resource_record_sets.py
 lib/googlecloudsdk/api_lib/dns/transaction_util.py
 lib/googlecloudsdk/api_lib/dns/util.py
 lib/googlecloudsdk/api_lib/domains/__init__.py
@@ -624,6 +625,7 @@ lib/googlecloudsdk/api_lib/util/resource_search.py
 lib/googlecloudsdk/api_lib/util/waiter.py
 lib/googlecloudsdk/api_lib/vmware/__init__.py
 lib/googlecloudsdk/api_lib/vmware/clusters.py
+lib/googlecloudsdk/api_lib/vmware/ipaddresses.py
 lib/googlecloudsdk/api_lib/vmware/privateclouds.py
 lib/googlecloudsdk/api_lib/vmware/util.py
 lib/googlecloudsdk/api_lib/web_security_scanner/__init__.py
@@ -683,6 +685,7 @@ lib/googlecloudsdk/command_lib/active_directory/util.py
 lib/googlecloudsdk/command_lib/admin_service_cluster/__init__.py
 lib/googlecloudsdk/command_lib/admin_service_cluster/instances/__init__.py
 lib/googlecloudsdk/command_lib/admin_service_cluster/instances/create_utils.py
+lib/googlecloudsdk/command_lib/admin_service_cluster/instances/utils.py
 lib/googlecloudsdk/command_lib/admin_service_cluster/resources.yaml
 lib/googlecloudsdk/command_lib/ai/__init__.py
 lib/googlecloudsdk/command_lib/ai/constants.py
@@ -800,6 +803,7 @@ lib/googlecloudsdk/command_lib/code/run_subprocess.py
 lib/googlecloudsdk/command_lib/code/skaffold.py
 lib/googlecloudsdk/command_lib/code/yaml_helper.py
 lib/googlecloudsdk/command_lib/commerce_procurement/__init__.py
+lib/googlecloudsdk/command_lib/commerce_procurement/flags.py
 lib/googlecloudsdk/command_lib/commerce_procurement/resource_args.py
 lib/googlecloudsdk/command_lib/components/__init__.py
 lib/googlecloudsdk/command_lib/components/completers.py
@@ -1223,12 +1227,13 @@ lib/googlecloudsdk/command_lib/firestore/util.py
 lib/googlecloudsdk/command_lib/flag_coverage/__init__.py
 lib/googlecloudsdk/command_lib/flag_coverage/generate.py
 lib/googlecloudsdk/command_lib/functions/__init__.py
-lib/googlecloudsdk/command_lib/functions/deploy/__init__.py
-lib/googlecloudsdk/command_lib/functions/deploy/env_vars_util.py
-lib/googlecloudsdk/command_lib/functions/deploy/labels_util.py
-lib/googlecloudsdk/command_lib/functions/deploy/source_util.py
-lib/googlecloudsdk/command_lib/functions/deploy/trigger_util.py
 lib/googlecloudsdk/command_lib/functions/flags.py
+lib/googlecloudsdk/command_lib/functions/v1/__init__.py
+lib/googlecloudsdk/command_lib/functions/v1/deploy/__init__.py
+lib/googlecloudsdk/command_lib/functions/v1/deploy/env_vars_util.py
+lib/googlecloudsdk/command_lib/functions/v1/deploy/labels_util.py
+lib/googlecloudsdk/command_lib/functions/v1/deploy/source_util.py
+lib/googlecloudsdk/command_lib/functions/v1/deploy/trigger_util.py
 lib/googlecloudsdk/command_lib/game/__init__.py
 lib/googlecloudsdk/command_lib/game/resources.yaml
 lib/googlecloudsdk/command_lib/game/servers/__init__.py
@@ -1298,6 +1303,8 @@ lib/googlecloudsdk/command_lib/iot/resource_args.py
 lib/googlecloudsdk/command_lib/iot/resources.yaml
 lib/googlecloudsdk/command_lib/iot/util.py
 lib/googlecloudsdk/command_lib/kms/__init__.py
+lib/googlecloudsdk/command_lib/kms/crc32c.py
+lib/googlecloudsdk/command_lib/kms/e2e_integrity.py
 lib/googlecloudsdk/command_lib/kms/flags.py
 lib/googlecloudsdk/command_lib/kms/get_digest.py
 lib/googlecloudsdk/command_lib/kms/maps.py
@@ -1376,6 +1383,7 @@ lib/googlecloudsdk/command_lib/ml/vision/product_search/utils.py
 lib/googlecloudsdk/command_lib/ml/vision/resources.yaml
 lib/googlecloudsdk/command_lib/ml/vision/util.py
 lib/googlecloudsdk/command_lib/ml_engine/__init__.py
+lib/googlecloudsdk/command_lib/ml_engine/constants.py
 lib/googlecloudsdk/command_lib/ml_engine/endpoint_util.py
 lib/googlecloudsdk/command_lib/ml_engine/flags.py
 lib/googlecloudsdk/command_lib/ml_engine/jobs_prep.py
@@ -1387,6 +1395,7 @@ lib/googlecloudsdk/command_lib/ml_engine/log_utils.py
 lib/googlecloudsdk/command_lib/ml_engine/models_util.py
 lib/googlecloudsdk/command_lib/ml_engine/operations_util.py
 lib/googlecloudsdk/command_lib/ml_engine/predict_utilities.py
+lib/googlecloudsdk/command_lib/ml_engine/region_util.py
 lib/googlecloudsdk/command_lib/ml_engine/resources.yaml
 lib/googlecloudsdk/command_lib/ml_engine/uploads.py
 lib/googlecloudsdk/command_lib/ml_engine/versions_util.py
@@ -1681,6 +1690,9 @@ lib/googlecloudsdk/command_lib/workflows/__init__.py
 lib/googlecloudsdk/command_lib/workflows/flags.py
 lib/googlecloudsdk/command_lib/workflows/hooks.py
 lib/googlecloudsdk/command_lib/workflows/resources.yaml
+lib/googlecloudsdk/command_lib/workspace_add_ons/__init__.py
+lib/googlecloudsdk/command_lib/workspace_add_ons/resources.yaml
+lib/googlecloudsdk/command_lib/workspace_add_ons/util.py
 lib/googlecloudsdk/core/__init__.py
 lib/googlecloudsdk/core/argv_utils.py
 lib/googlecloudsdk/core/cache/__init__.py
@@ -1713,6 +1725,7 @@ lib/googlecloudsdk/core/console/style/text.py
 lib/googlecloudsdk/core/context_aware.py
 lib/googlecloudsdk/core/credentials/__init__.py
 lib/googlecloudsdk/core/credentials/creds.py
+lib/googlecloudsdk/core/credentials/creds_context_managers.py
 lib/googlecloudsdk/core/credentials/devshell.py
 lib/googlecloudsdk/core/credentials/flow.py
 lib/googlecloudsdk/core/credentials/gce.py
@@ -1795,6 +1808,7 @@ lib/googlecloudsdk/core/resources.py
 lib/googlecloudsdk/core/survey/__init__.py
 lib/googlecloudsdk/core/survey/survey_check.py
 lib/googlecloudsdk/core/transport.py
+lib/googlecloudsdk/core/transports.py
 lib/googlecloudsdk/core/updater/__init__.py
 lib/googlecloudsdk/core/updater/installers.py
 lib/googlecloudsdk/core/updater/local_state.py
@@ -2253,6 +2267,10 @@ lib/googlecloudsdk/third_party/apis/bigtableclusteradmin/v1/bigtableclusteradmin
 lib/googlecloudsdk/third_party/apis/bigtableclusteradmin/v1/resources.py
 lib/googlecloudsdk/third_party/apis/bigtableclusteradmin_v1.json
 lib/googlecloudsdk/third_party/apis/billingbudgets/__init__.py
+lib/googlecloudsdk/third_party/apis/billingbudgets/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/billingbudgets/v1/billingbudgets_v1_client.py
+lib/googlecloudsdk/third_party/apis/billingbudgets/v1/billingbudgets_v1_messages.py
+lib/googlecloudsdk/third_party/apis/billingbudgets/v1/resources.py
 lib/googlecloudsdk/third_party/apis/billingbudgets/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/billingbudgets/v1alpha1/billingbudgets_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/billingbudgets/v1alpha1/billingbudgets_v1alpha1_messages.py
@@ -2261,6 +2279,7 @@ lib/googlecloudsdk/third_party/apis/billingbudgets/v1beta1/__init__.py
 lib/googlecloudsdk/third_party/apis/billingbudgets/v1beta1/billingbudgets_v1beta1_client.py
 lib/googlecloudsdk/third_party/apis/billingbudgets/v1beta1/billingbudgets_v1beta1_messages.py
 lib/googlecloudsdk/third_party/apis/billingbudgets/v1beta1/resources.py
+lib/googlecloudsdk/third_party/apis/billingbudgets_v1.json
 lib/googlecloudsdk/third_party/apis/billingbudgets_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/billingbudgets_v1beta1.json
 lib/googlecloudsdk/third_party/apis/binaryauthorization/__init__.py
@@ -2898,7 +2917,12 @@ lib/googlecloudsdk/third_party/apis/metastore/v1alpha/__init__.py
 lib/googlecloudsdk/third_party/apis/metastore/v1alpha/metastore_v1alpha_client.py
 lib/googlecloudsdk/third_party/apis/metastore/v1alpha/metastore_v1alpha_messages.py
 lib/googlecloudsdk/third_party/apis/metastore/v1alpha/resources.py
+lib/googlecloudsdk/third_party/apis/metastore/v1beta/__init__.py
+lib/googlecloudsdk/third_party/apis/metastore/v1beta/metastore_v1beta_client.py
+lib/googlecloudsdk/third_party/apis/metastore/v1beta/metastore_v1beta_messages.py
+lib/googlecloudsdk/third_party/apis/metastore/v1beta/resources.py
 lib/googlecloudsdk/third_party/apis/metastore_v1alpha.json
+lib/googlecloudsdk/third_party/apis/metastore_v1beta.json
 lib/googlecloudsdk/third_party/apis/ml/__init__.py
 lib/googlecloudsdk/third_party/apis/ml/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/ml/v1/ml_v1_client.py
@@ -3226,6 +3250,12 @@ lib/googlecloudsdk/third_party/apis/storage/v1/resources.py
 lib/googlecloudsdk/third_party/apis/storage/v1/storage_v1_client.py
 lib/googlecloudsdk/third_party/apis/storage/v1/storage_v1_messages.py
 lib/googlecloudsdk/third_party/apis/storage_v1.json
+lib/googlecloudsdk/third_party/apis/storagetransfer/__init__.py
+lib/googlecloudsdk/third_party/apis/storagetransfer/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/storagetransfer/v1/resources.py
+lib/googlecloudsdk/third_party/apis/storagetransfer/v1/storagetransfer_v1_client.py
+lib/googlecloudsdk/third_party/apis/storagetransfer/v1/storagetransfer_v1_messages.py
+lib/googlecloudsdk/third_party/apis/storagetransfer_v1.json
 lib/googlecloudsdk/third_party/apis/testing/__init__.py
 lib/googlecloudsdk/third_party/apis/testing/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/testing/v1/resources.py
@@ -3314,6 +3344,7 @@ lib/googlecloudsdk/third_party/apis/websecurityscanner/v1beta/websecurityscanner
 lib/googlecloudsdk/third_party/apis/websecurityscanner_v1beta.json
 lib/googlecloudsdk/third_party/apis/workflowexecutions/__init__.py
 lib/googlecloudsdk/third_party/apis/workflowexecutions/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/workflowexecutions/v1/resources.py
 lib/googlecloudsdk/third_party/apis/workflowexecutions/v1/workflowexecutions_v1_client.py
 lib/googlecloudsdk/third_party/apis/workflowexecutions/v1/workflowexecutions_v1_messages.py
 lib/googlecloudsdk/third_party/apis/workflowexecutions/v1alpha1/__init__.py
@@ -3766,7 +3797,9 @@ lib/surface/artifacts/docker/__init__.py
 lib/surface/artifacts/docker/images/__init__.py
 lib/surface/artifacts/docker/images/delete.py
 lib/surface/artifacts/docker/images/describe.py
+lib/surface/artifacts/docker/images/get_operation.yaml
 lib/surface/artifacts/docker/images/list.py
+lib/surface/artifacts/docker/images/list_vulnerabilities.yaml
 lib/surface/artifacts/docker/tags/__init__.py
 lib/surface/artifacts/docker/tags/add.py
 lib/surface/artifacts/docker/tags/delete.py
@@ -3804,6 +3837,7 @@ lib/surface/artifacts/versions/list.yaml
 lib/surface/asset/__init__.py
 lib/surface/asset/analyze_iam_policy.py
 lib/surface/asset/analyze_iam_policy_longrunning.py
+lib/surface/asset/bulk_export.py
 lib/surface/asset/export.py
 lib/surface/asset/export_iam_policy_analysis.py
 lib/surface/asset/feeds/__init__.py
@@ -4013,6 +4047,12 @@ lib/surface/commerce_procurement/consumer/free_trials/create.py
 lib/surface/commerce_procurement/consumer/free_trials/list.py
 lib/surface/commerce_procurement/consumer/operations/__init__.py
 lib/surface/commerce_procurement/consumer/operations/describe.py
+lib/surface/commerce_procurement/consumer/orderallocations/__init__.py
+lib/surface/commerce_procurement/consumer/orderallocations/create.py
+lib/surface/commerce_procurement/consumer/orderallocations/delete.py
+lib/surface/commerce_procurement/consumer/orderallocations/describe.py
+lib/surface/commerce_procurement/consumer/orderallocations/list.py
+lib/surface/commerce_procurement/consumer/orderallocations/update.py
 lib/surface/commerce_procurement/consumer/orders/__init__.py
 lib/surface/commerce_procurement/consumer/orders/cancel.py
 lib/surface/commerce_procurement/consumer/orders/create.py
@@ -4039,6 +4079,7 @@ lib/surface/composer/environments/delete.py
 lib/surface/composer/environments/describe.py
 lib/surface/composer/environments/list.py
 lib/surface/composer/environments/list_upgrades.py
+lib/surface/composer/environments/restart_web_server.py
 lib/surface/composer/environments/run.py
 lib/surface/composer/environments/storage/__init__.py
 lib/surface/composer/environments/storage/dags/__init__.py
@@ -5191,6 +5232,7 @@ lib/surface/dns/record_sets/__init__.py
 lib/surface/dns/record_sets/changes/__init__.py
 lib/surface/dns/record_sets/changes/describe.py
 lib/surface/dns/record_sets/changes/list.py
+lib/surface/dns/record_sets/create.py
 lib/surface/dns/record_sets/export.py
 lib/surface/dns/record_sets/import.py
 lib/surface/dns/record_sets/list.py
@@ -5323,6 +5365,7 @@ lib/surface/filestore/locations/__init__.py
 lib/surface/filestore/locations/describe.py
 lib/surface/filestore/locations/list.py
 lib/surface/filestore/operations/__init__.py
+lib/surface/filestore/operations/cancel.py
 lib/surface/filestore/operations/describe.py
 lib/surface/filestore/operations/list.py
 lib/surface/filestore/regions/__init__.py
@@ -5487,6 +5530,7 @@ lib/surface/healthcare/datasets/update.yaml
 lib/surface/healthcare/dicom_stores/__init__.py
 lib/surface/healthcare/dicom_stores/add_iam_policy_binding.yaml
 lib/surface/healthcare/dicom_stores/create.yaml
+lib/surface/healthcare/dicom_stores/deidentify.yaml
 lib/surface/healthcare/dicom_stores/delete.yaml
 lib/surface/healthcare/dicom_stores/describe.yaml
 lib/surface/healthcare/dicom_stores/export/__init__.py
@@ -5502,6 +5546,7 @@ lib/surface/healthcare/dicom_stores/update.yaml
 lib/surface/healthcare/fhir_stores/__init__.py
 lib/surface/healthcare/fhir_stores/add_iam_policy_binding.yaml
 lib/surface/healthcare/fhir_stores/create.yaml
+lib/surface/healthcare/fhir_stores/deidentify.yaml
 lib/surface/healthcare/fhir_stores/delete.yaml
 lib/surface/healthcare/fhir_stores/describe.yaml
 lib/surface/healthcare/fhir_stores/export/__init__.py
@@ -5746,6 +5791,7 @@ lib/surface/kuberun/applications/describe.py
 lib/surface/kuberun/applications/init.py
 lib/surface/kuberun/components/__init__.py
 lib/surface/kuberun/components/add.py
+lib/surface/kuberun/components/build.py
 lib/surface/kuberun/components/dev.py
 lib/surface/kuberun/components/list.py
 lib/surface/kuberun/core/__init__.py
@@ -5769,6 +5815,8 @@ lib/surface/kuberun/deploy.py
 lib/surface/kuberun/devkits/__init__.py
 lib/surface/kuberun/devkits/describe.py
 lib/surface/kuberun/devkits/list.py
+lib/surface/kuberun/environments/__init__.py
+lib/surface/kuberun/environments/list.py
 lib/surface/kuberun/render.py
 lib/surface/labelmanager/__init__.py
 lib/surface/labelmanager/bindings/__init__.py
@@ -5919,6 +5967,8 @@ lib/surface/metastore/services/add_iam_policy_binding.yaml
 lib/surface/metastore/services/create.yaml
 lib/surface/metastore/services/delete.py
 lib/surface/metastore/services/describe.yaml
+lib/surface/metastore/services/export/__init__.py
+lib/surface/metastore/services/export/gcs.yaml
 lib/surface/metastore/services/get_iam_policy.yaml
 lib/surface/metastore/services/imports/__init__.py
 lib/surface/metastore/services/imports/create.yaml
@@ -6244,6 +6294,7 @@ lib/surface/recaptcha/keys/list.yaml
 lib/surface/recaptcha/keys/update.yaml
 lib/surface/recommender/__init__.py
 lib/surface/recommender/insights/__init__.py
+lib/surface/recommender/insights/describe.py
 lib/surface/recommender/insights/describe.yaml
 lib/surface/recommender/insights/list.py
 lib/surface/recommender/insights/list.yaml
@@ -6252,6 +6303,7 @@ lib/surface/recommender/insights/mark_accepted.yaml
 lib/surface/recommender/insights/mark_active.py
 lib/surface/recommender/insights/mark_dismissed.py
 lib/surface/recommender/recommendations/__init__.py
+lib/surface/recommender/recommendations/describe.py
 lib/surface/recommender/recommendations/describe.yaml
 lib/surface/recommender/recommendations/list.py
 lib/surface/recommender/recommendations/list.yaml
@@ -6758,11 +6810,17 @@ lib/surface/vmware/clusters/delete.py
 lib/surface/vmware/clusters/describe.py
 lib/surface/vmware/clusters/list.py
 lib/surface/vmware/clusters/removenodes.py
+lib/surface/vmware/ipaddresses/__init__.py
+lib/surface/vmware/ipaddresses/create.py
+lib/surface/vmware/ipaddresses/delete.py
+lib/surface/vmware/ipaddresses/describe.py
+lib/surface/vmware/ipaddresses/list.py
 lib/surface/vmware/privateclouds/__init__.py
 lib/surface/vmware/privateclouds/create.py
 lib/surface/vmware/privateclouds/delete.py
 lib/surface/vmware/privateclouds/describe.py
 lib/surface/vmware/privateclouds/list.py
+lib/surface/vmware/privateclouds/update.py
 lib/surface/web_security_scanner/__init__.py
 lib/surface/web_security_scanner/scan_configs/__init__.py
 lib/surface/web_security_scanner/scan_configs/create.yaml
@@ -6792,6 +6850,16 @@ lib/surface/workflows/executions/wait.py
 lib/surface/workflows/executions/wait_last.py
 lib/surface/workflows/list.yaml
 lib/surface/workflows/run.py
+lib/surface/workspace_add_ons/__init__.py
+lib/surface/workspace_add_ons/deployments/__init__.py
+lib/surface/workspace_add_ons/deployments/create.yaml
+lib/surface/workspace_add_ons/deployments/delete.yaml
+lib/surface/workspace_add_ons/deployments/describe.yaml
+lib/surface/workspace_add_ons/deployments/install.yaml
+lib/surface/workspace_add_ons/deployments/install_status.yaml
+lib/surface/workspace_add_ons/deployments/list.yaml
+lib/surface/workspace_add_ons/deployments/uninstall.yaml
+lib/surface/workspace_add_ons/get_authorization.yaml
 lib/tools/__init__.py
 lib/tools/regen_apis/__init__.py
 lib/tools/regen_apis/main.py
