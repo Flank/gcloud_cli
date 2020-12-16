@@ -1,5 +1,6 @@
 bin/bootstrapping/gsutil.py
 data/cli/gsutil.json
+platform/gsutil/.github/workflows/ci.yml
 platform/gsutil/CHANGES.md
 platform/gsutil/CHECKSUM
 platform/gsutil/CONTRIBUTING.md
@@ -23,7 +24,6 @@ platform/gsutil/gslib/addlhelp/encryption.py
 platform/gsutil/gslib/addlhelp/metadata.py
 platform/gsutil/gslib/addlhelp/naming.py
 platform/gsutil/gslib/addlhelp/prod.py
-platform/gsutil/gslib/addlhelp/projects.py
 platform/gsutil/gslib/addlhelp/retries.py
 platform/gsutil/gslib/addlhelp/security.py
 platform/gsutil/gslib/addlhelp/subdirs.py
@@ -77,6 +77,7 @@ platform/gsutil/gslib/commands/update.py
 platform/gsutil/gslib/commands/version.py
 platform/gsutil/gslib/commands/versioning.py
 platform/gsutil/gslib/commands/web.py
+platform/gsutil/gslib/context_config.py
 platform/gsutil/gslib/cred_types.py
 platform/gsutil/gslib/cs_api_map.py
 platform/gsutil/gslib/daisy_chain_wrapper.py
@@ -117,11 +118,14 @@ platform/gsutil/gslib/tests/rewrite_helper.py
 platform/gsutil/gslib/tests/signurl_signatures.py
 platform/gsutil/gslib/tests/test_Doption.py
 platform/gsutil/gslib/tests/test_acl.py
+platform/gsutil/gslib/tests/test_boto_util.py
 platform/gsutil/gslib/tests/test_bucketconfig.py
 platform/gsutil/gslib/tests/test_bucketpolicyonly.py
 platform/gsutil/gslib/tests/test_cat.py
+platform/gsutil/gslib/tests/test_cloud_api_delegator.py
 platform/gsutil/gslib/tests/test_command_runner.py
 platform/gsutil/gslib/tests/test_compose.py
+platform/gsutil/gslib/tests/test_context_config.py
 platform/gsutil/gslib/tests/test_copy_helper_funcs.py
 platform/gsutil/gslib/tests/test_copy_objects_iterator.py
 platform/gsutil/gslib/tests/test_cors.py
@@ -139,6 +143,7 @@ platform/gsutil/gslib/tests/test_defstorageclass.py
 platform/gsutil/gslib/tests/test_du.py
 platform/gsutil/gslib/tests/test_encryption_helper.py
 platform/gsutil/gslib/tests/test_file_part.py
+platform/gsutil/gslib/tests/test_gcs_json_api.py
 platform/gsutil/gslib/tests/test_gcs_json_media.py
 platform/gsutil/gslib/tests/test_gsutil.py
 platform/gsutil/gslib/tests/test_hash.py
@@ -153,6 +158,7 @@ platform/gsutil/gslib/tests/test_logging.py
 platform/gsutil/gslib/tests/test_ls.py
 platform/gsutil/gslib/tests/test_mb.py
 platform/gsutil/gslib/tests/test_metrics.py
+platform/gsutil/gslib/tests/test_mtls.py
 platform/gsutil/gslib/tests/test_mv.py
 platform/gsutil/gslib/tests/test_naming.py
 platform/gsutil/gslib/tests/test_notification.py

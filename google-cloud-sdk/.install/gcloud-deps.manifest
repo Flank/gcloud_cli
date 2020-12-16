@@ -3682,6 +3682,8 @@ lib/third_party/websocket/_socket.py
 lib/third_party/websocket/_ssl_compat.py
 lib/third_party/websocket/_url.py
 lib/third_party/websocket/_utils.py
+lib/third_party/win_inet_pton/LICENSE
+lib/third_party/win_inet_pton/__init__.py
 lib/third_party/yaml/LICENSE
 lib/third_party/yaml/__init__.py
 lib/third_party/yaml/composer.py
