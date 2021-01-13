@@ -32,11 +32,6 @@ import six
 DEFAULT_CLUSTER_NAME = 'gcloud-local-dev'
 
 
-def GetKindVersion():
-  """Returns the current version of minikube."""
-  return six.ensure_text(subprocess.check_output([_FindKind(), 'version']))
-
-
 class _KubeCluster(object):
   """A kubernetes cluster.
 
@@ -48,7 +43,7 @@ class _KubeCluster(object):
   """
 
   def __init__(self, context_name, shared_docker):
-    """Initializes KindCluster with cluster name.
+    """Initializes KubeCluster with cluster name.
 
     Args:
       context_name: Kubernetes context.
@@ -61,100 +56,6 @@ class _KubeCluster(object):
   @property
   def env_vars(self):
     return {}
-
-
-class KindCluster(_KubeCluster):
-  """A cluster on kind.
-
-  Attributes:
-    context_name: Kubernetes context name.
-    env_vars: Docker env vars.
-    shared_docker: Whether the kubernetes cluster shares a docker instance with
-      the developer's machine.
-  """
-
-  def __init__(self, cluster_name):
-    """Initializes KindCluster with cluster name.
-
-    Args:
-      cluster_name: Name of cluster.
-    """
-    super(KindCluster, self).__init__('kind-' + cluster_name, False)
-
-
-class KindClusterContext(object):
-  """Context Manager for running Kind."""
-
-  def __init__(self, cluster_name, delete_cluster=True):
-    """Initialize KindContextManager.
-
-    Args:
-      cluster_name: Name of the kind cluster.
-      delete_cluster: Delete the cluster when the context is exited.
-    """
-    self._cluster_name = cluster_name
-    self._delete_cluster = delete_cluster
-
-  def __enter__(self):
-    _StartKindCluster(self._cluster_name)
-    return KindCluster(self._cluster_name)
-
-  def __exit__(self, exc_type, exc_value, tb):
-    if self._delete_cluster:
-      _DeleteKindCluster(self._cluster_name)
-
-
-def DeleteKindClusterIfExists(cluster_name):
-  """Delete a kind cluster if it is up."""
-  if _IsKindClusterUp(cluster_name):
-    _DeleteKindCluster(cluster_name)
-
-
-def _StartKindCluster(cluster_name):
-  """Starts a kind kubernetes cluster.
-
-  Starts a cluster if a cluster with that name isn't already running.
-
-  Args:
-    cluster_name: Name of the kind cluster.
-  """
-  if not _IsKindClusterUp(cluster_name):
-    cmd = [_FindKind(), 'create', 'cluster', '--name', cluster_name]
-    print("Creating local development environment '%s' ..." % cluster_name)
-    run_subprocess.Run(cmd, timeout_sec=150, show_output=True)
-    print('Development environment created.')
-
-
-def _IsKindClusterUp(cluster_name):
-  """Checks if a cluster is running.
-
-  Args:
-    cluster_name: Name of the cluster
-
-  Returns:
-    True if a cluster with the given name is running.
-  """
-  cmd = [_FindKind(), 'get', 'clusters']
-  clusters = run_subprocess.GetOutputLines(
-      cmd, timeout_sec=20, show_stderr=False, strip_output=True)
-  return cluster_name in clusters
-
-
-def _DeleteKindCluster(cluster_name):
-  """Deletes a kind kubernetes cluster.
-
-  Args:
-    cluster_name: Name of the cluster.
-  """
-  cmd = [_FindKind(), 'delete', 'cluster', '--name', cluster_name]
-  print("Deleting development environment '%s' ..." % cluster_name)
-  run_subprocess.Run(cmd, timeout_sec=150, show_output=False)
-  print('Development environment deleted.')
-
-
-def _FindKind():
-  """Finds a path to kind."""
-  return run_subprocess.GetGcloudPreferredExecutable('kind')
 
 
 def GetMinikubeVersion():
@@ -200,7 +101,8 @@ class Minikube(object):
 
 
 def _FindMinikube():
-  return run_subprocess.GetGcloudPreferredExecutable('minikube')
+  return (properties.VALUES.code.minikube_path_override.Get() or
+          run_subprocess.GetGcloudPreferredExecutable('minikube'))
 
 
 class MinikubeStartError(exceptions.Error):

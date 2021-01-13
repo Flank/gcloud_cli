@@ -284,6 +284,8 @@ apis:
       discovery_doc: cloudresourcemanager_v2beta1.json
     v2:
       discovery_doc: cloudresourcemanager_v2.json
+    v3:
+      discovery_doc: cloudresourcemanager_v3.json
   cloudshell:
     v1alpha1:
       discovery_doc: cloudshell_v1alpha1.json
@@ -730,6 +732,9 @@ apis:
   orgpolicy:
     v2alpha1:
       discovery_doc: orgpolicy_v2alpha1.json
+    v2:
+      discovery_doc: orgpolicy_v2.json
+      default: true
   policytroubleshooter:
     v1beta:
       resources:

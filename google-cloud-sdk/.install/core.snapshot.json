@@ -2,7 +2,7 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "c729e0d05af0eeaa95879bd2530eab3816842b4d3d12d5f4cc0b6ad0b037c5d3",
+        "contents_checksum": "ba7d7efdbf3341b4be11cfd439274a19b66b869cd94cf0697309db1335f3e0c2",
         "source": "",
         "type": "tar"
       },
@@ -22,16 +22,16 @@
       "is_required": true,
       "platform": {},
       "version": {
-        "build_number": 20201211155722,
-        "version_string": "2020.12.11"
+        "build_number": 20210108161247,
+        "version_string": "2021.01.08"
       }
     }
   ],
-  "revision": 20201211155722,
+  "revision": 20210108161247,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "321.0.0"
+  "version": "323.0.0"
 }

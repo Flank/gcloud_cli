@@ -31,6 +31,7 @@ from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import messages_util
+from googlecloudsdk.command_lib.run import platforms
 from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import resource_change_validators
@@ -60,7 +61,7 @@ def GetAllowUnauth(args, operations, service_ref, service_exists):
      None means to retain the current value for the service.
   """
   allow_unauth = None
-  if flags.GetPlatform() == flags.PLATFORM_MANAGED:
+  if platforms.GetPlatform() == platforms.PLATFORM_MANAGED:
     allow_unauth = flags.GetAllowUnauthenticated(args, operations, service_ref,
                                                  not service_exists)
     # Avoid failure removing a policy binding for a service that
@@ -115,7 +116,6 @@ class Deploy(base.Command):
     cluster_group = flags.GetClusterArgGroup(parser)
     flags.AddSecretsFlags(cluster_group)
     flags.AddConfigMapsFlags(cluster_group)
-    flags.AddHttp2Flag(cluster_group)
 
     # Flags not specific to any platform
     service_presentation = presentation_specs.ResourcePresentationSpec(
@@ -124,6 +124,7 @@ class Deploy(base.Command):
         'Service to deploy to.',
         required=True,
         prefixes=False)
+    flags.AddPlatformAndLocationFlags(parser)
     flags.AddFunctionArg(parser)
     flags.AddMutexEnvVarsFlags(parser)
     flags.AddMemoryFlag(parser)
@@ -152,9 +153,11 @@ class Deploy(base.Command):
     cluster_group = flags.GetClusterArgGroup(parser)
     flags.AddMinInstancesFlag(cluster_group)
     flags.AddEndpointVisibilityEnum(cluster_group)
+    flags.AddHttp2Flag(cluster_group)
 
   def Run(self, args):
     """Deploy a container to Cloud Run."""
+    flags.GetAndValidatePlatform(args, self.ReleaseTrack(), flags.Product.RUN)
     service_ref = flags.GetService(args)
     build_type = None
     image = None
@@ -257,6 +260,7 @@ class BetaDeploy(Deploy):
     flags.AddMinInstancesFlag(parser)
     flags.AddDeployTagFlag(parser)
     flags.AddIngressFlag(parser)
+    flags.AddHttp2Flag(parser)
 
     # Flags specific to deploy from source
     flags.AddSourceFlag(parser)
@@ -279,6 +283,7 @@ class AlphaDeploy(Deploy):
     flags.AddMinInstancesFlag(parser)
     flags.AddDeployTagFlag(parser)
     flags.AddIngressFlag(parser)
+    flags.AddHttp2Flag(parser)
 
     # Flags specific to deploy from source
     flags.AddSourceFlag(parser)

@@ -22,8 +22,6 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.instances import flags as instance_flags
 
-# TODO(b/129054682): fix the format in text render.
-
 
 def GetDescriptionFlag():
   return base.Argument(
@@ -127,7 +125,23 @@ def GetSharedSettingFlag():
   folders.
   """
   return base.Argument(
-      '--share-setting', choices=['organization'], help=help_text)
+      '--share-setting',
+      choices=['organization', 'projects', 'folders'],
+      help=help_text)
+
+
+def GetShareWithFlag():
+  """Gets the --share-with flag."""
+  help_text = """\
+  A list of specific projects or folders this reservation should be shared with.
+  List must contain all project ID's or all folder ID's--depending on what the
+  share-setting is set to.
+  """
+  return base.Argument(
+      '--share-with',
+      type=arg_parsers.ArgList(min_length=1),
+      metavar='PROJECT',
+      help=help_text)
 
 
 def AddCreateFlags(parser,
@@ -158,4 +172,5 @@ def AddCreateFlags(parser,
         'Manage the properties of a shared reservation to create',
         required=False)
     share_group.AddArgument(GetSharedSettingFlag())
+    share_group.AddArgument(GetShareWithFlag())
     share_group.AddToParser(parser)

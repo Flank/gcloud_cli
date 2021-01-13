@@ -76,7 +76,9 @@ class AnimationFade(_messages.Message):
       Default: 0
     xy: Normalized coordinates based on output video resolution. Valid values:
       `0.0`\u2013`1.0`. `xy` is the upper-left coordinate of the overlay
-      object.
+      object. For example, use the x and y coordinates {0,0} to position the
+      top-left corner of the overlay animation in the top-left corner of the
+      output video.
   """
 
   class FadeTypeValueValuesEnum(_messages.Enum):
@@ -105,7 +107,9 @@ class AnimationStatic(_messages.Message):
       seconds. Default: 0
     xy: Normalized coordinates based on output video resolution. Valid values:
       `0.0`\u2013`1.0`. `xy` is the upper-left coordinate of the overlay
-      object.
+      object. For example, use the x and y coordinates {0,0} to position the
+      top-left corner of the overlay animation in the top-left corner of the
+      output video.
   """
 
   startTimeOffset = _messages.StringField(1)
@@ -226,7 +230,8 @@ class Color(_messages.Message):
 
 
 class Crop(_messages.Message):
-  r"""Video cropping configuration.
+  r"""Video cropping configuration for the input video. The cropped input
+  video is scaled to match the output resolution.
 
   Fields:
     bottomPixels: The number of pixels to crop from the bottom. The default is
@@ -356,7 +361,7 @@ class Image(_messages.Message):
   r"""Overlaid jpeg image.
 
   Fields:
-    alpha: Target image opacity. Valid values: `1` (solid, default), `0`
+    alpha: Target image opacity. Valid values: `1.0` (solid, default) to `0.0`
       (transparent).
     resolution: Normalized image resolution, based on output video resolution.
       Valid values: `0.0`\u2013`1.0`. To respect the original image aspect
@@ -427,6 +432,9 @@ class Job(_messages.Message):
       `Job.config`. The default is `preset/web-hd`. Preset Transcoder
       templates: - `preset/{preset_id}` - User defined JobTemplate:
       `{job_template_id}`
+    ttlAfterCompletionDays: Job time to live value in days, which will be
+      effective after job completion. Job should be deleted automatically
+      after the given TTL. Enter a value between 1 and 90. The default is 30.
   """
 
   class StateValueValuesEnum(_messages.Enum):
@@ -460,6 +468,7 @@ class Job(_messages.Message):
   startTime = _messages.StringField(12)
   state = _messages.EnumField('StateValueValuesEnum', 13)
   templateId = _messages.StringField(14)
+  ttlAfterCompletionDays = _messages.IntegerField(15, variant=_messages.Variant.INT32)
 
 
 class JobConfig(_messages.Message):
@@ -1016,14 +1025,15 @@ class VideoStream(_messages.Message):
       frame rate if larger than the input frame rate. The API will generate an
       output FPS that is divisible by the input FPS, and smaller or equal to
       the target FPS. The following table shows the computed video FPS given
-      the target FPS (in parenthesis) and input FPS (in the first column): | |
-      (30) | (60) | (25) | (50) | |--------|--------|--------|------|------| |
-      240 | Fail | Fail | Fail | Fail | | 120 | 30 | 60 | 20 | 30 | | 100 | 25
-      | 50 | 20 | 30 | | 50 | 25 | 50 | 20 | 30 | | 60 | 30 | 60 | 20 | 30 | |
-      59.94 | 29.97 | 59.94 | 20 | 30 | | 48 | 24 | 48 | 20 | 30 | | 30 | 30 |
-      30 | 20 | 30 | | 25 | 25 | 25 | 20 | 30 | | 24 | 24 | 24 | 20 | 30 | |
-      23.976 | 23.976 | 23.976 | 20 | 30 | | 15 | 15 | 15 | 20 | 30 | | 12 |
-      12 | 12 | 20 | 30 | | 10 | 10 | 10 | 20 | 30 |
+      the target FPS (in parenthesis) and input FPS (in the first column): ```
+      | | (30) | (60) | (25) | (50) |
+      |--------|--------|--------|------|------| | 240 | Fail | Fail | Fail |
+      Fail | | 120 | 30 | 60 | 20 | 30 | | 100 | 25 | 50 | 20 | 30 | | 50 | 25
+      | 50 | 20 | 30 | | 60 | 30 | 60 | 20 | 30 | | 59.94 | 29.97 | 59.94 | 20
+      | 30 | | 48 | 24 | 48 | 20 | 30 | | 30 | 30 | 30 | 20 | 30 | | 25 | 25 |
+      25 | 20 | 30 | | 24 | 24 | 24 | 20 | 30 | | 23.976 | 23.976 | 23.976 |
+      20 | 30 | | 15 | 15 | 15 | 20 | 30 | | 12 | 12 | 12 | 20 | 30 | | 10 |
+      10 | 10 | 20 | 30 | ```
     gopDuration: Select the GOP size based on the specified duration. The
       default is `"3s"`.
     gopFrameCount: Select the GOP size based on the specified frame count.

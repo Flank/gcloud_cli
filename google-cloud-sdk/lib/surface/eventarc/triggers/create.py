@@ -62,28 +62,38 @@ class Create(base.CreateCommand):
     flags.AddDestinationRunServiceArg(parser, required=True)
     flags.AddDestinationRunPathArg(parser)
     flags.AddDestinationRunRegionArg(parser)
+    flags.AddTransportTopicResourceArg(parser, cls.ReleaseTrack())
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
     """Run the create command."""
     client = triggers.CreateTriggersClient(self.ReleaseTrack())
     trigger_ref = args.CONCEPTS.trigger.Parse()
+    transport_topic_ref = args.CONCEPTS.transport_topic.Parse()
     event_filters = flags.GetEventFiltersArg(args, self.ReleaseTrack())
     operation = client.Create(trigger_ref, event_filters, args.service_account,
                               args.destination_run_service,
                               args.destination_run_path,
-                              args.destination_run_region)
+                              args.destination_run_region,
+                              transport_topic_ref)
     self._event_type = event_filters['type']
     if args.async_:
       return operation
     response = client.WaitFor(operation)
     trigger_dict = encoding.MessageToPyValue(response)
     if types.IsPubsubType(self._event_type):
-      log.status.Print('Created Pub/Sub topic [{}].'.format(
-          trigger_dict['transport']['pubsub']['topic']))
-      log.status.Print(
-          'Publish to this topic to receive events in Cloud Run service [{}].'
-          .format(args.destination_run_service))
+      topic = trigger_dict['transport']['pubsub']['topic']
+      if args.IsSpecified('transport_topic'):
+        log.status.Print('Publish to Pub/Sub topic [{}] to receive events '
+                         'in Cloud Run service [{}].'.format(
+                             topic,
+                             args.destination_run_service))
+      else:
+        log.status.Print('Created Pub/Sub topic [{}].'.format(
+            topic))
+        log.status.Print(
+            'Publish to this topic to receive events in Cloud Run service [{}].'
+            .format(args.destination_run_service))
     return response
 
   def Epilog(self, resources_were_displayed):

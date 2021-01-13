@@ -527,6 +527,26 @@ class ReplicationStatus(_messages.Message):
   userManaged = _messages.MessageField('UserManagedStatus', 2)
 
 
+class Rotation(_messages.Message):
+  r"""The rotation time and period for a Secret. At next_rotation_time, Secret
+  Manager will send a Pub/Sub notification to the topics configured on the
+  Secret. Secret.topics must be set to configure rotation.
+
+  Fields:
+    nextRotationTime: Optional. Timestamp in UTC at which the Secret is
+      scheduled to rotate. next_rotation_time MUST be set if rotation_period
+      is set.
+    rotationPeriod: Input only. The Duration between rotation notifications.
+      Must be in seconds and at least 3600s (1h) and at most 3153600000s (100
+      years). If rotation_period is set, next_rotation_time must be set.
+      next_rotation_time will be advanced by this period when the service
+      automatically sends rotation notifications.
+  """
+
+  nextRotationTime = _messages.StringField(1)
+  rotationPeriod = _messages.StringField(2)
+
+
 class Secret(_messages.Message):
   r"""A Secret is a logical secret whose value and versions can be accessed. A
   Secret is made up of zero or more SecretVersions that represent the secret
@@ -543,6 +563,9 @@ class Secret(_messages.Message):
 
   Fields:
     createTime: Output only. The time at which the Secret was created.
+    expireTime: Optional. Timestamp in UTC when the Secret is scheduled to
+      expire. This is always provided on output, regardless of what was sent
+      on input.
     labels: The labels assigned to this Secret. Label keys must be between 1
       and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and
       must conform to the following PCRE regular expression:
@@ -555,6 +578,9 @@ class Secret(_messages.Message):
     replication: Required. Immutable. The replication policy of the secret
       data attached to the Secret. The replication policy cannot be changed
       after the Secret has been created.
+    rotation: Optional. Rotation policy attached to the Secret. May be
+      excluded if there is no rotation policy.
+    ttl: Input only. The TTL for the Secret.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -588,9 +614,12 @@ class Secret(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   createTime = _messages.StringField(1)
-  labels = _messages.MessageField('LabelsValue', 2)
-  name = _messages.StringField(3)
-  replication = _messages.MessageField('Replication', 4)
+  expireTime = _messages.StringField(2)
+  labels = _messages.MessageField('LabelsValue', 3)
+  name = _messages.StringField(4)
+  replication = _messages.MessageField('Replication', 5)
+  rotation = _messages.MessageField('Rotation', 6)
+  ttl = _messages.StringField(7)
 
 
 class SecretPayload(_messages.Message):
@@ -749,14 +778,6 @@ class SecretmanagerProjectsSecretsListRequest(_messages.Message):
   r"""A SecretmanagerProjectsSecretsListRequest object.
 
   Fields:
-    filter: Optional. Filter string, adhering to the rules in [List-operation
-      sorting and filtering](https://cloud.google.com/secret-
-      manager/docs/sorting-and-filtering). List only secrets matching the
-      filter. If filter is empty, all secrets are listed.
-    orderBy: Optional. Order_by string. Use "name" or leave empty for listing
-      secrets sorted by name in the ascending order. Use "name desc" for
-      listing secrets sorted by name in the descending order, or
-      "create_time"/"create_time desc" for sorting secrets by creation time.
     pageSize: Optional. The maximum number of results to be returned in a
       single page. If set to 0, the server decides the number of results to
       return. If the number is greater than 25000, it is capped at 25000.
@@ -766,11 +787,9 @@ class SecretmanagerProjectsSecretsListRequest(_messages.Message):
       Secrets, in the format `projects/*`.
   """
 
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  parent = _messages.StringField(5, required=True)
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class SecretmanagerProjectsSecretsPatchRequest(_messages.Message):
@@ -888,14 +907,6 @@ class SecretmanagerProjectsSecretsVersionsListRequest(_messages.Message):
   r"""A SecretmanagerProjectsSecretsVersionsListRequest object.
 
   Fields:
-    filter: Optional. Filter string, adhering to the rules in [List-operation
-      sorting and filtering](https://cloud.google.com/secret-
-      manager/docs/sorting-and-filtering). List only secret versions matching
-      the filter. If filter is empty, all secret versions are listed.
-    orderBy: Optional. Order_by string. Use "create_time desc" or leave empty
-      for listing secret versions sorted by creation time starting from the
-      latest, or "create_time" for listing them sorted by creation time
-      starting from the oldest.
     pageSize: Optional. The maximum number of results to be returned in a
       single page. If set to 0, the server decides the number of results to
       return. If the number is greater than 25000, it is capped at 25000.
@@ -905,11 +916,9 @@ class SecretmanagerProjectsSecretsVersionsListRequest(_messages.Message):
       SecretVersions to list, in the format `projects/*/secrets/*`.
   """
 
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  parent = _messages.StringField(5, required=True)
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class SetIamPolicyRequest(_messages.Message):

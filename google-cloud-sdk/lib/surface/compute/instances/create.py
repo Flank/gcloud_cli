@@ -100,7 +100,7 @@ def _CommonArgs(parser,
                 supports_erase_vss=False,
                 snapshot_csek=False,
                 image_csek=False,
-                support_multi_writer=True,
+                support_multi_writer=False,
                 support_replica_zones=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
@@ -205,18 +205,22 @@ class Create(base.CreateCommand):
   _support_enable_nested_virtualization = False
   _support_threads_per_core = False
   _support_replica_zones = False
-  _support_network_interface_nic_type = False
+  _support_multi_writer = False
+  _support_network_interface_nic_type = True
   _support_stack_type = False
   _support_ipv6_network_tier = False
+  _support_ipv6_public_ptr_domain = False
 
   @classmethod
   def Args(cls, parser):
     _CommonArgs(
         parser,
         enable_kms=cls._support_kms,
-        support_multi_writer=False,
+        support_multi_writer=cls._support_multi_writer,
         support_replica_zones=cls._support_replica_zones,
-        enable_regional=cls._support_regional)
+        enable_regional=cls._support_regional,
+        support_network_interface_nic_type=cls
+        ._support_network_interface_nic_type)
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -276,7 +280,8 @@ class Create(base.CreateCommand):
         skip_defaults=skip_defaults,
         support_public_dns=self._support_public_dns,
         support_stack_type=self._support_stack_type,
-        support_ipv6_network_tier=self._support_ipv6_network_tier)
+        support_ipv6_network_tier=self._support_ipv6_network_tier,
+        support_ipv6_public_ptr_domain=self._support_ipv6_public_ptr_domain)
 
     confidential_vm = (
         args.IsSpecified('confidential_compute') and args.confidential_compute)
@@ -328,7 +333,8 @@ class Create(base.CreateCommand):
             support_boot_snapshot_uri=self._support_boot_snapshot_uri,
             support_image_csek=self._support_image_csek,
             support_create_disk_snapshots=self._support_create_disk_snapshots,
-            support_replica_zones=self._support_replica_zones)
+            support_replica_zones=self._support_replica_zones,
+            support_multi_writer=self._support_multi_writer)
 
       machine_type_uri = None
       if instance_utils.CheckSpecifiedMachineTypeArgs(args, skip_defaults):
@@ -538,7 +544,8 @@ class CreateBeta(Create):
   _support_create_disk_snapshots = True
   _support_boot_snapshot_uri = True
   _support_replica_zones = False
-  _support_network_interface_nic_type = False
+  _support_multi_writer = True
+  _support_network_interface_nic_type = True
 
   def GetSourceMachineImage(self, args, resources):
     """Retrieves the specified source machine image's selflink.
@@ -564,7 +571,10 @@ class CreateBeta(Create):
         enable_kms=cls._support_kms,
         enable_resource_policy=cls._support_disk_resource_policy,
         supports_erase_vss=cls._support_erase_vss,
-        support_replica_zones=cls._support_replica_zones)
+        support_replica_zones=cls._support_replica_zones,
+        support_multi_writer=cls._support_multi_writer,
+        support_network_interface_nic_type=cls
+        ._support_network_interface_nic_type)
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -601,9 +611,11 @@ class CreateAlpha(CreateBeta):
   _support_enable_nested_virtualization = True
   _support_threads_per_core = True
   _support_replica_zones = True
+  _support_multi_writer = True
   _support_network_interface_nic_type = True
   _support_stack_type = True
   _support_ipv6_network_tier = True
+  _support_ipv6_public_ptr_domain = True
 
   @classmethod
   def Args(cls, parser):
@@ -619,7 +631,8 @@ class CreateAlpha(CreateBeta):
         supports_erase_vss=cls._support_erase_vss,
         snapshot_csek=cls._support_source_snapshot_csek,
         image_csek=cls._support_image_csek,
-        support_replica_zones=cls._support_replica_zones)
+        support_replica_zones=cls._support_replica_zones,
+        support_multi_writer=cls._support_multi_writer)
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -628,6 +641,7 @@ class CreateAlpha(CreateBeta):
     instances_flags.AddSourceMachineImageEncryptionKey(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
     instances_flags.AddPublicDnsArgs(parser, instance=True)
+    instances_flags.AddIpv6PublicPtrDomainArg(parser)
     instances_flags.AddLocalSsdArgsWithSize(parser)
     instances_flags.AddLocalNvdimmArgs(parser)
     instances_flags.AddConfidentialComputeArgs(parser)

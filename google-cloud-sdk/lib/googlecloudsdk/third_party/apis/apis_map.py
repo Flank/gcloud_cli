@@ -581,6 +581,14 @@ MAP = {
                 default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
+        'v3':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.cloudresourcemanager.v3',
+                client_classpath='cloudresourcemanager_v3_client.CloudresourcemanagerV3',
+                messages_modulepath='cloudresourcemanager_v3_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
     },
     'cloudscheduler': {
         'v1':
@@ -1461,12 +1469,20 @@ MAP = {
                 mtls_endpoint_override=''),
     },
     'orgpolicy': {
+        'v2':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.orgpolicy.v2',
+                client_classpath='orgpolicy_v2_client.OrgpolicyV2',
+                messages_modulepath='orgpolicy_v2_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
         'v2alpha1':
             APIDef(
                 class_path='googlecloudsdk.third_party.apis.orgpolicy.v2alpha1',
                 client_classpath='orgpolicy_v2alpha1_client.OrgpolicyV2alpha1',
                 messages_modulepath='orgpolicy_v2alpha1_messages',
-                default_version=True,
+                default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
@@ -1557,20 +1573,12 @@ MAP = {
                 mtls_endpoint_override=''),
     },
     'privateca': {
-        'v1alpha1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.privateca.v1alpha1',
-                client_classpath='privateca_v1alpha1_client.PrivatecaV1alpha1',
-                messages_modulepath='privateca_v1alpha1_messages',
-                default_version=True,
-                enable_mtls=False,
-                mtls_endpoint_override=''),
         'v1beta1':
             APIDef(
                 class_path='googlecloudsdk.third_party.apis.privateca.v1beta1',
                 client_classpath='privateca_v1beta1_client.PrivatecaV1beta1',
                 messages_modulepath='privateca_v1beta1_messages',
-                default_version=False,
+                default_version=True,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },

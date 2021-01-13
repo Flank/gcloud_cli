@@ -19,7 +19,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import abc
 import collections
+import io
 
 from google.auth.transport import requests as google_auth_requests
 from googlecloudsdk.core import context_aware
@@ -36,8 +38,10 @@ import socks
 from urllib3.util.ssl_ import create_urllib3_context
 
 
-def GetSession(timeout='unset', response_encoding=None, ca_certs=None,
-               session=None):
+def GetSession(timeout='unset',
+               ca_certs=None,
+               session=None,
+               streaming_response_body=False):
   """Get a requests.Session that is properly configured for use by gcloud.
 
   This method does not add credentials to the client. For a requests.Session
@@ -48,21 +52,20 @@ def GetSession(timeout='unset', response_encoding=None, ca_certs=None,
         socket level timeout. If timeout is None, timeout is infinite. If
         default argument 'unset' is given, a sensible default is selected using
         transport.GetDefaultTimeout().
-    response_encoding: str, the encoding to decode with when accessing
-        response.text. If none, then the encoding will be inferred from the
-        response.
     ca_certs: str, absolute filename of a ca_certs file that overrides the
         default. The gcloud config property for ca_certs, in turn, overrides
         this argument.
     session: requests.Session instance
+    streaming_response_body: bool, True indicates that the response body will
+        be a streaming body.
 
   Returns:
     A requests.Session object configured with all the required settings
     for gcloud.
   """
   http_client = _CreateRawSession(timeout, ca_certs, session)
-  http_client = RequestWrapper().WrapWithDefaults(http_client,
-                                                  response_encoding)
+  http_client = RequestWrapper().WrapWithDefaults(
+      http_client, streaming_response_body=streaming_response_body)
   return http_client
 
 
@@ -196,6 +199,7 @@ def Session(
 
   proxy_info = GetProxyInfo()
   if proxy_info:
+    session.trust_env = False
     session.proxies = {
         'http': proxy_info,
         'https': proxy_info,
@@ -249,7 +253,7 @@ def _CreateRawSession(timeout='unset', ca_certs=None, session=None):
 def _GetURIFromRequestArgs(url, params):
   """Gets the complete URI by merging url and params from the request args."""
   url_parts = urllib.parse.urlsplit(url)
-  query_params = urllib.parse.parse_qs(url_parts.query)
+  query_params = urllib.parse.parse_qs(url_parts.query, keep_blank_values=True)
   for param, value in six.iteritems(params or {}):
     query_params[param] = value
   # Need to do this to convert a SplitResult into a list so it can be modified.
@@ -308,7 +312,9 @@ class RequestWrapper(transport.RequestWrapper):
   response_class = Response
 
   def DecodeResponse(self, response, response_encoding):
-    response.encoding = response_encoding
+    """Returns the response without decoding."""
+    del response_encoding  # unused
+    # The response decoding is handled by the _ApitoolsRequests.request method.
     return response
 
 
@@ -327,9 +333,9 @@ class _GoogleAuthApitoolsCredentials():
     self.credentials.refresh(auth_request)
 
 
-def GetApitoolsRequests(session):
+def GetApitoolsRequests(session, response_handler=None, response_encoding=None):
   """Returns an authenticated httplib2.Http-like object for use by apitools."""
-  http_client = _ApitoolsRequests(session)
+  http_client = _ApitoolsRequests(session, response_handler, response_encoding)
   # apitools needs this attribute to do credential refreshes during batch API
   # requests.
   if hasattr(session, '_googlecloudsdk_credentials'):
@@ -347,14 +353,55 @@ def GetApitoolsRequests(session):
   return http_client
 
 
+class ResponseHandler(six.with_metaclass(abc.ABCMeta)):
+  """Handler to process the Http Response.
+
+  Attributes:
+    use_stream: bool, if True, the response body gets returned as a stream
+        of data instead of returning the entire body at once.
+  """
+
+  def __init__(self, use_stream):
+    """Initializes ResponseHandler.
+
+    Args:
+      use_stream: bool, if True, the response body gets returned as a stream of
+        data instead of returning the entire body at once.
+    """
+    self.use_stream = use_stream
+
+  @abc.abstractmethod
+  def handle(self, response_stream):
+    """Handles the http response."""
+
+
 class _ApitoolsRequests():
   """A httplib2.Http-like object for use by apitools."""
 
-  def __init__(self, session):
+  def __init__(self, session, response_handler=None, response_encoding=None):
     self.session = session
     # Mocks the dictionary of connection instances that apitools iterates over
     # to modify the underlying connection.
     self.connections = {}
+    if response_handler:
+      if not isinstance(response_handler, ResponseHandler):
+        raise ValueError('response_handler should be of type ResponseHandler.')
+    self._response_handler = response_handler
+    self._response_encoding = response_encoding
+
+  def ResponseHook(self, response, *args, **kwargs):
+    """Response hook to be used if response_handler has been set."""
+    del args, kwargs  # Unused.
+    if (self._response_handler.use_stream and
+        properties.VALUES.core.log_http.GetBool() and
+        properties.VALUES.core.log_http_streaming_body.GetBool()):
+      # The response_handler uses streaming body, but since a request was
+      # made to log the response body, we should retain a copy of the response
+      # data. A call to response.content would read the entire data in-memory.
+      stream = io.BytesIO(response.content)
+    else:
+      stream = response.raw
+    self._response_handler.handle(stream)
 
   def request(
       self,
@@ -369,11 +416,29 @@ class _ApitoolsRequests():
     del connection_type  # Unused
 
     self.session.max_redirects = redirections
-    response = self.session.request(method, uri, data=body, headers=headers)
+
+    hooks = {}
+    if self._response_handler is not None:
+      hooks['response'] = self.ResponseHook
+      use_stream = self._response_handler.use_stream
+    else:
+      use_stream = False
+
+    response = self.session.request(
+        method, uri, data=body, headers=headers, stream=use_stream, hooks=hooks)
     headers = dict(response.headers)
     headers['status'] = response.status_code
 
-    if response.encoding is not None:
+    if use_stream:
+      # If use_stream is True, we assume that the data will be read from the
+      # response_handler
+      content = b''
+    elif self._response_encoding is not None:
+      # We update response.encoding before calling response.text because
+      # response.text property will try to make an educated guess about the
+      # encoding based on the response header, which might be different from
+      # the self._response_encoding set by the caller.
+      response.encoding = self._response_encoding
       content = response.text
     else:
       content = response.content
