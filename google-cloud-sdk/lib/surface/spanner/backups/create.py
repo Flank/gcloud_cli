@@ -27,8 +27,7 @@ from googlecloudsdk.command_lib.spanner import resource_args
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
-                    base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   """Creates a backup of a Cloud Spanner database.
 
@@ -77,6 +76,35 @@ class Create(base.CreateCommand):
 
     backup_ref = args.CONCEPTS.backup.Parse()
     op = backups.CreateBackup(backup_ref, args)
+    if args.async_:
+      log.status.Print('Create request issued for: [{}]\n'
+                       'Check operation [{}] for status.'.format(
+                           args.backup, op.name))
+      return op
+
+    op_result = backup_operations.Await(
+        op, 'Waiting for operation [{}] to complete'.format(op.name))
+    if op.error is None:
+      log.CreatedResource(op_result)
+    return op_result
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaCreate(Create):
+  """Creates a backup of a Cloud Spanner database with ALPHA features."""
+  __doc__ = Create.__doc__
+
+  @staticmethod
+  def Args(parser):
+    Create.Args(parser)
+    resource_args.AddCreateBackupEncryptionTypeArg(parser)
+
+  def Run(self, args):
+    """This is what gets called when the user runs this command."""
+
+    backup_ref = args.CONCEPTS.backup.Parse()
+    encryption_type = resource_args.GetCreateBackupEncryptionType(args)
+    op = backups.CreateBackup(backup_ref, args, encryption_type)
     if args.async_:
       log.status.Print('Create request issued for: [{}]\n'
                        'Check operation [{}] for status.'.format(

@@ -69,13 +69,20 @@ class Describe(gcloud_base.ListCommand):
 
     feature_spec_memberships = state_util.parse_feature_spec_memberships(
         response)
+    feature_state_memberships = state_util.parse_feature_state_memberships(
+        response)
     # Populate and print out status of memberships.
     ais_status = []
     for name in memberships:
+      cluster_in_spec = None
+      cluster_in_state = None
       if name in feature_spec_memberships:
-        cluster_in = feature_spec_memberships[name]
+        cluster_in_spec = feature_spec_memberships[name]
+        if name in feature_state_memberships:
+          cluster_in_state = feature_state_memberships[name].value
         cluster_out = state_util.IdentityServiceMembershipState(
-            name, cluster_in=cluster_in)
+            name, cluster_in_spec=cluster_in_spec,
+            cluster_in_state=cluster_in_state)
         ais_status.append(cluster_out)
       else:
         ais_status.append({name: 'config not applied'})

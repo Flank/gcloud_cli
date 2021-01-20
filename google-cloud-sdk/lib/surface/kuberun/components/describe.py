@@ -21,7 +21,9 @@ from __future__ import unicode_literals
 import json
 from googlecloudsdk.api_lib.kuberun import component
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.kuberun import component_printer
 from googlecloudsdk.command_lib.kuberun import kuberun_command
+from googlecloudsdk.core.resource import resource_printer
 
 
 _DETAILED_HELP = {
@@ -45,7 +47,10 @@ class Describe(kuberun_command.KubeRunCommandWithOutput, base.DescribeCommand):
   def Args(cls, parser):
     super(Describe, cls).Args(parser)
     parser.add_argument('component', help='Name of the component.')
-    parser.display_info.AddFormat('yaml')
+    resource_printer.RegisterFormatter(
+        component_printer.COMPONENT_PRINTER_FORMAT,
+        component_printer.ComponentPrinter, hidden=True)
+    parser.display_info.AddFormat(component_printer.COMPONENT_PRINTER_FORMAT)
 
   def Command(self):
     return ['components', 'describe']

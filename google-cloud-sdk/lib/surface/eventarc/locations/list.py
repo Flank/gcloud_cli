@@ -35,7 +35,7 @@ _DETAILED_HELP = {
 _FORMAT = 'table(locationId:label=NAME)'
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List locations available for Eventarc."""
 
@@ -48,5 +48,5 @@ class List(base.ListCommand):
 
   def Run(self, args):
     """Run the list command."""
-    client = locations.LocationsClient()
+    client = locations.LocationsClient(self.ReleaseTrack())
     return client.List(limit=args.limit, page_size=args.page_size)
