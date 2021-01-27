@@ -1,0 +1,14 @@
+{
+    "name": "{{.FunctionName.SnakeCase}}",
+    "version": "1.0.0",
+    "description": "{{.FunctionName.SnakeCase}} http function in Node.js",
+    "main": "index.js",
+    "scripts": {
+      "start": "functions-framework --target={{.FunctionName.CamelCase}}"
+    },
+    "author": "",
+    "license": "Apache-2.0",
+    "dependencies": {
+      "@google-cloud/functions-framework": "^1.5.1"
+    }
+}

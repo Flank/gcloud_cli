@@ -1,0 +1,41 @@
+{
+  "components": [
+    {
+      "data": {
+        "contents_checksum": "9d47c27927978889c8215a80d68225b689465907c3119f58f5d7c9887f4b4c3e",
+        "source": "",
+        "type": "tar"
+      },
+      "dependencies": [
+        "kuberun"
+      ],
+      "details": {
+        "description": "Provides kuberun executable.",
+        "display_name": "Kuberun"
+      },
+      "id": "kuberun-linux-x86_64",
+      "is_configuration": false,
+      "is_hidden": true,
+      "is_required": false,
+      "platform": {
+        "architectures": [
+          "x86_64"
+        ],
+        "operating_systems": [
+          "LINUX"
+        ]
+      },
+      "version": {
+        "build_number": 20210122155144,
+        "version_string": "0.0.1"
+      }
+    }
+  ],
+  "revision": 20210122155144,
+  "schema_version": {
+    "no_update": false,
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
+    "version": 3
+  },
+  "version": "325.0.0"
+}

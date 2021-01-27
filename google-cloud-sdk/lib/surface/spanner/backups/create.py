@@ -98,13 +98,16 @@ class AlphaCreate(Create):
   def Args(parser):
     Create.Args(parser)
     resource_args.AddCreateBackupEncryptionTypeArg(parser)
+    resource_args.AddKmsKeyResourceArg(parser,
+                                       'to create the Cloud Spanner backup')
 
   def Run(self, args):
     """This is what gets called when the user runs this command."""
 
     backup_ref = args.CONCEPTS.backup.Parse()
     encryption_type = resource_args.GetCreateBackupEncryptionType(args)
-    op = backups.CreateBackup(backup_ref, args, encryption_type)
+    kms_key = resource_args.GetAndValidateKmsKeyName(args)
+    op = backups.CreateBackup(backup_ref, args, encryption_type, kms_key)
     if args.async_:
       log.status.Print('Create request issued for: [{}]\n'
                        'Check operation [{}] for status.'.format(

@@ -19,6 +19,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.kuberun import flags
 from googlecloudsdk.command_lib.kuberun import kuberun_command
 
 _DETAILED_HELP = {
@@ -31,12 +32,20 @@ _DETAILED_HELP = {
 }
 
 
+def _CleanFlag():
+  return flags.BooleanFlag(
+      '--clean',
+      help='If set, the component directory will be deleted in addition to the '
+      'component reference.',
+      required=False)
+
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Remove(kuberun_command.KubeRunStreamingCommand, base.DeleteCommand):
   """Remove a Component."""
 
   detailed_help = _DETAILED_HELP
-  flags = []
+  flags = [_CleanFlag()]
 
   @classmethod
   def Args(cls, parser):
@@ -47,7 +56,7 @@ class Remove(kuberun_command.KubeRunStreamingCommand, base.DeleteCommand):
     return ['components', 'remove']
 
   def BuildKubeRunArgs(self, args):
-    return [args.component]
+    return [args.component] + super(Remove, self).BuildKubeRunArgs(args)
 
   def FormatOutput(self, out, args):
     return out

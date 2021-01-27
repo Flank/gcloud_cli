@@ -1,0 +1,16 @@
+package {{.Package}}
+
+import (
+        "fmt"
+        "net/http"
+        "os"
+)
+
+func {{.FunctionName.PascalCase}}(w http.ResponseWriter, r *http.Request) {
+        // TODO(you): make stuff happen here!
+        target := os.Getenv("TARGET")
+        if target == "" {
+                target = "from {{.FunctionName.PascalCase}} in Go"
+        }
+        fmt.Fprintf(w, "Hello %s!\n", target)
+}
