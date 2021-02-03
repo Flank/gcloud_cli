@@ -45,7 +45,7 @@ class Update(base.Command):
           To update a TagValue dev under organization/456/env,
           run:
 
-            $ {command} organizations/465/env/dev --description="foobar"
+            $ {command} 465/env/dev --description="foobar"
           """
   }
 
@@ -59,8 +59,12 @@ class Update(base.Command):
     service = tags.TagValuesService()
     messages = tags.TagMessages()
 
-    tag_value = tag_utils.GetResourceFromNamespacedName(
-        args.RESOURCE_NAME, 'tagValues')
+    if args.RESOURCE_NAME.find('tagValues/') == 0:
+      tag_value = tag_utils.GetResourceFromNamespacedName(
+          args.RESOURCE_NAME, 'tagValues')
+    else:
+      tag_value = tag_utils.GetTagValueFromNamespacedName(
+          args.RESOURCE_NAME)
 
     tag_value.description = args.description
 

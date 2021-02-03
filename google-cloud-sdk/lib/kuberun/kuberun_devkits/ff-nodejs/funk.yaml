@@ -1,6 +1,6 @@
 functions:
 - name: http
-  description: "Create a Node.js function with HTTP input/output."
+  description: "DEPRECATED. Create a Node.js function with HTTP input/output."
   files:
   - file: "http/index.js.tmpl"
     dest: "{{.FunctionName.AsProvided}}/index.js"

@@ -44,7 +44,6 @@ class ExtractionFailedError(core_exceptions.Error):
   pass
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class Scan(base.Command):
   """Perform a vulnerability scan on a container image.

@@ -39,12 +39,12 @@ class Update(base.Command):
           """
           To update a TagKey with id '123', run:
 
-            $ {command} --resource_name=tagKeys/123 --description="foobar"
+            $ {command} --resource_name=tagKeys/123 --description=foobar
 
           To update a TagKey with the 'name' env under organization '456',
           run:
 
-            $ {command} --resource_name='456/env' --description="foobar"
+            $ {command} --resource_name=456/env --description=foobar
           """
   }
 
@@ -58,8 +58,12 @@ class Update(base.Command):
     service = tags.TagKeysService()
     messages = tags.TagMessages()
 
-    tag_key = tag_utils.GetResourceFromNamespacedName(
-        args.RESOURCE_NAME, 'tagKeys')
+    if args.RESOURCE_NAME.find('tagKeys/') == 0:
+      tag_key = tag_utils.GetResourceFromNamespacedName(
+          args.RESOURCE_NAME, 'tagKeys')
+    else:
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(
+          args.RESOURCE_NAME)
 
     tag_key.description = args.description
 

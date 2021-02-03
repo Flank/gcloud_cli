@@ -52,7 +52,7 @@ class RemoveIamPolicyBinding(base.Command):
           'roles/resourcemanager.tagUser' for the user 'test-user@gmail.com',
           run:
 
-            $ {command} organizations/456/env --member='user:test-user@gmail.com' --role='roles/resourcemanager.tagUser'
+            $ {command} 456/env --member='user:test-user@gmail.com' --role='roles/resourcemanager.tagUser'
 
           See https://cloud.google.com/iam/docs/managing-policies for details of
           policy role and member types.
@@ -74,8 +74,8 @@ class RemoveIamPolicyBinding(base.Command):
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
       tag_key = args.RESOURCE_NAME
     else:
-      tag_key = tag_utils.GetResourceFromNamespacedName(
-          args.RESOURCE_NAME, 'tagKeys').name
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(
+          args.RESOURCE_NAME).name
 
     get_iam_policy_req = (
         messages.CloudresourcemanagerTagKeysGetIamPolicyRequest(

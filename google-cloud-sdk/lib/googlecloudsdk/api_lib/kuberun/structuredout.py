@@ -19,6 +19,9 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 
+_ROOT_ALIAS_KEY = 'aliases'
+
+
 class DictWithAliases(dict):
   """A dict intended for serialized results which need computed values.
 
@@ -37,10 +40,18 @@ class DictWithAliases(dict):
   def MakeSerializable(self):
     """Returns the underlying data without the aliases key for serialization."""
     data = self.copy()
-    data.pop('aliases', None)
+    data.pop(_ROOT_ALIAS_KEY, None)
     return data
 
+  def AddAlias(self, key, value):
+    self.setdefault(_ROOT_ALIAS_KEY, {})[key] = value
 
+
+# NOTE: The kuberun surface is generally moving away from using MapObject in
+# favor of having commands return dictionaries. In cases where a plain Python
+# dictionary can't be used and computed values are needed, the DictWithAliases
+# class provides a means to add computed data to a python dictionary which will
+# be excluded in the serialized output.
 class MapObject(object):
   """Base class to wrap dict-like structures and support attributes for keys."""
 

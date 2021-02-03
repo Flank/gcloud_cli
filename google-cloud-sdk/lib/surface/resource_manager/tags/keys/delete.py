@@ -60,8 +60,8 @@ class Delete(base.Command):
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
       tag_key = args.RESOURCE_NAME
     else:
-      tag_key = tag_utils.GetResourceFromNamespacedName(
-          args.RESOURCE_NAME, 'tagKeys').name
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(
+          args.RESOURCE_NAME).name
 
     delete_request = messages.CloudresourcemanagerTagKeysDeleteRequest(
         name=tag_key)

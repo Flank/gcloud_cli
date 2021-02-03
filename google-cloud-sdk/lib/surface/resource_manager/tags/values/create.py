@@ -37,28 +37,31 @@ class Create(base.Command):
   """
 
   detailed_help = {
-      'EXAMPLES':
+      "EXAMPLES":
           """
           To create a TagValue with the short name 'test' and the
           description 'description' under a TagKey with a short name 'env'
           under 'organizations/123', run:
 
-            $ {command} test --parent='organizations/123/env'
-                 --description='description'
+            $ {command} test --parent=123/env
+                 --description=description
 
           To create a TagValue with the short name 'test' under TagKey
           with id '456', run:
 
-            $ {command} test --parent='tagKeys/456'
-                --description='description'
+            $ {command} test --parent=tagKeys/456
+                --description=description
           """
   }
 
   @staticmethod
   def Args(parser):
-    group = parser.add_argument_group('TagValue.', required=True)
+    group = parser.add_argument_group("TagValue.", required=True)
     arguments.AddShortNameArgToParser(group)
-    arguments.AddParentArgToParser(group)
+    arguments.AddParentArgToParser(
+        group,
+        message=("Parent of the TagValue in either in the form of "
+                 "tagKeys/{id} or {org_id}/{tagkey_short_name}"))
     arguments.AddDescriptionArgToParser(parser)
     arguments.AddAsyncArgToParser(parser)
 
@@ -69,11 +72,10 @@ class Create(base.Command):
     short_name = args.short_name
     description = args.description
 
-    if args.parent.find('tagKeys/') == 0:
+    if args.parent.find("tagKeys/") == 0:
       tag_key = args.parent
     else:
-      tag_key = tag_utils.GetResourceFromNamespacedName(
-          args.parent, 'tagKeys').name
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(args.parent).name
 
     tag_value = messages.TagValue(
         shortName=short_name, description=description, parent=tag_key)
@@ -87,6 +89,6 @@ class Create(base.Command):
     else:
       return operations.WaitForOperation(
           op,
-          'Waiting for TagValue [{}] to be created with [{}]'.format(
+          "Waiting for TagValue [{}] to be created with [{}]".format(
               short_name, op.name),
           service=service)

@@ -44,7 +44,7 @@ class Delete(base.Command):
           To delete a TagValue with the 'name' env under organization '456',
           run:
 
-            $ {command} --resource_name=organizations/456/env/dev
+            $ {command} --resource_name=456/env/dev
           """
   }
 
@@ -60,8 +60,8 @@ class Delete(base.Command):
     if args.RESOURCE_NAME.find('tagValues/') == 0:
       tag_value = args.RESOURCE_NAME
     else:
-      tag_value = tag_utils.GetResourceFromNamespacedName(
-          args.RESOURCE_NAME, 'tagValues').name
+      tag_value = tag_utils.GetTagValueFromNamespacedName(
+          args.RESOURCE_NAME).name
 
     delete_request = messages.CloudresourcemanagerTagValuesDeleteRequest(
         name=tag_value)

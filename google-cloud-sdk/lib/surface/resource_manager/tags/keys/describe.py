@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
+from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
 @base.Hidden
@@ -42,7 +43,7 @@ class Describe(base.Command):
           To describe a TagKey with the name 'env' under organizations '456',
           run:
 
-            $ {command} organizations/456/env
+            $ {command} 456/env
           """
   }
 
@@ -54,6 +55,13 @@ class Describe(base.Command):
     service = tags.TagKeysService()
     messages = tags.TagMessages()
 
+    if args.RESOURCE_NAME.find('tagKeys/') == 0:
+      tag_key = args.RESOURCE_NAME
+    else:
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(
+          args.RESOURCE_NAME).name
+
     get_request = messages.CloudresourcemanagerTagKeysGetRequest(
-        name=args.RESOURCE_NAME)
+        name=tag_key)
     return service.Get(get_request)
+

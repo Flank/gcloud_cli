@@ -43,7 +43,7 @@ class GetIamPolicy(base.Command):
           To get the IAM policy for a TagKey with the name 'env' under
           'organizations/456', run:
 
-            $ {command} organizations/456/env
+            $ {command} 456/env
           """
   }
 
@@ -58,8 +58,8 @@ class GetIamPolicy(base.Command):
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
       tag_key = args.RESOURCE_NAME
     else:
-      tag_key = tag_utils.GetResourceFromNamespacedName(
-          args.RESOURCE_NAME, 'tagKeys').name
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(
+          args.RESOURCE_NAME).name
 
     request = messages.CloudresourcemanagerTagKeysGetIamPolicyRequest(
         resource=tag_key)

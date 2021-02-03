@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
+from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
 @base.Hidden
@@ -32,19 +33,25 @@ class List(base.ListCommand):
 
   To list all the TagValues under ``organizations/123/env", run:
 
-        $ {command} --parent=organizations/123/env
+        $ {command} --parent=123/env
   """
 
   @staticmethod
   def Args(parser):
-    arguments.AddParentArgToParser(parser)
-    parser.display_info.AddFormat('table(name:sort=1, short_name)')
+    arguments.AddParentArgToParser(
+        parser,
+        message=("Parent of the TagValue in either in the form of "
+                 "tagKeys/{id} or {org_id}/{tagkey_short_name}"))
+    parser.display_info.AddFormat("table(name:sort=1, short_name)")
 
   def Run(self, args):
     service = tags.TagValuesService()
     messages = tags.TagMessages()
 
-    tag_key = args.parent
+    if args.parent.find("tagKeys/") == 0:
+      tag_key = args.parent
+    else:
+      tag_key = tag_utils.GetTagKeyFromNamespacedName(args.parent).name
 
     list_request = messages.CloudresourcemanagerTagValuesListRequest(
         parent=tag_key)

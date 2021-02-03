@@ -23,4 +23,4 @@ from googlecloudsdk.calliope import base
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class BackendBindings(base.Group):
-  """Create and manage backend bindings with Compute Engine backend service for Knative services."""
+  """Create and manage backend bindings with Compute Engine backend service for KubeRun services."""

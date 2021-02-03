@@ -34,15 +34,17 @@ class Create(base.Command):
   To create a TagKey with the name env under 'organizations/123' with
   description 'description', run:
 
-        $ {command} env --parent='organizations/123'
-        --description='description'
+        $ {command} env --parent=organizations/123
+        --description=description
   """
 
   @staticmethod
   def Args(parser):
-    group = parser.add_argument_group('TagKey.', required=True)
+    group = parser.add_argument_group("TagKey.", required=True)
     arguments.AddShortNameArgToParser(group)
-    arguments.AddParentArgToParser(group, required=True)
+    arguments.AddParentArgToParser(
+        group,
+        message="Parent of the TagKey in the form of organizations/{org_id}.")
     arguments.AddDescriptionArgToParser(parser)
     arguments.AddAsyncArgToParser(parser)
 
@@ -65,7 +67,7 @@ class Create(base.Command):
     else:
       done_op = operations.WaitForOperation(
           op,
-          'Waiting for TagKey [{}] to be created with [{}]'.format(
+          "Waiting for TagKey [{}] to be created with [{}]".format(
               short_name, op.name),
           service=service)
       return done_op

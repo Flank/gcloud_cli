@@ -19,7 +19,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import json
-from googlecloudsdk.api_lib.kuberun import component
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.kuberun import component_printer
 from googlecloudsdk.command_lib.kuberun import kuberun_command
@@ -59,4 +58,4 @@ class Describe(kuberun_command.KubeRunCommandWithOutput, base.DescribeCommand):
     return [args.component]
 
   def FormatOutput(self, out, args):
-    return component.Component.FromJSON(json.loads(out))
+    return json.loads(out)

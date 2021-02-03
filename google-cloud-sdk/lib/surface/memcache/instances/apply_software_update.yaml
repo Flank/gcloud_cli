@@ -6,10 +6,9 @@
       Apply a software update to nodes in a Memcached instance to the latest available software
       version.
 
-      To check if a Memcache instance and its nodes have a new software update available, look for
-      the 'updateAvailable' field when you run:
+      To check if a Memcache instance and its nodes have a new software update available, run:
 
-        $ gcloud beta memcache instances describe my-memcache-instance --region=us-central1
+        $ gcloud beta memcache instances describe my-memcache-instance --format="table(updateAvailable,memcacheNodes:format='table(nodeId,updateAvailable)')" --region=us-central1
 
       Applying a software update to a node causes a full cache flush on that node.
     examples: |

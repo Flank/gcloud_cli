@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to create a new Kuberun Component."""
+"""Command to delete a Kuberun Component."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -25,52 +25,38 @@ from googlecloudsdk.command_lib.kuberun import kuberun_command
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To create a new Component, run:
+        To delete a component reference from the application, run:
 
-            $ {command} COMPONENT --type TYPE --devkit DEVKIT
-
-        To create a new Component in a user-defined directory, run:
-
-            $ {command} COMPONENT --type TYPE --devkit DEVKIT --directory DIR
+            $ {command} COMPONENT
         """,
 }
 
 
-def _DevKitFlag():
-  return flags.StringFlag(
-      '--devkit',
-      help='Name of the Development Kit to use for this Component.',
-      required=True)
-
-
-def _TypeFlag():
-  return flags.StringFlag(
-      '--type',
-      help='Type of Component to create. See `kuberun devkits describe` for available Component Types.',
-      required=True)
-
-
-def _DirectoryFlag():
-  return flags.StringFlag(
-      '--directory',
-      help='Base directory path relative to current working directory where Component will be created.  This path must be within the application git repository.',
+def _CleanFlag():
+  return flags.BooleanFlag(
+      '--clean',
+      help='If set, the component directory will be deleted in addition to the '
+      'component reference.',
       required=False)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Add(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
-  """Create a new Component."""
+class Delete(kuberun_command.KubeRunStreamingCommand, base.DeleteCommand):
+  """Delete a Component."""
 
   detailed_help = _DETAILED_HELP
-  flags = [_DevKitFlag(), _TypeFlag(), _DirectoryFlag()]
+  flags = [_CleanFlag()]
 
   @classmethod
   def Args(cls, parser):
-    super(Add, cls).Args(parser)
+    super(Delete, cls).Args(parser)
     parser.add_argument('component', help='Name of the component.')
 
   def Command(self):
-    return ['components', 'add']
+    return ['components', 'delete']
 
   def BuildKubeRunArgs(self, args):
-    return [args.component] + super(Add, self).BuildKubeRunArgs(args)
+    return [args.component] + super(Delete, self).BuildKubeRunArgs(args)
+
+  def FormatOutput(self, out, args):
+    return out

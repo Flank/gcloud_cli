@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
+from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
 @base.Hidden
@@ -43,7 +44,7 @@ class Describe(base.Command):
           'organizations ``456",
           run:
 
-            $ {command} organizations/456/env/dev
+            $ {command} 456/env/dev
           """
   }
 
@@ -55,6 +56,12 @@ class Describe(base.Command):
     service = tags.TagValuesService()
     messages = tags.TagMessages()
 
+    if args.RESOURCE_NAME.find('tagValues/') == 0:
+      tag_value = args.RESOURCE_NAME
+    else:
+      tag_value = tag_utils.GetTagValueFromNamespacedName(
+          args.RESOURCE_NAME).name
+
     get_request = messages.CloudresourcemanagerTagValuesGetRequest(
-        name=args.RESOURCE_NAME)
+        name=tag_value)
     return service.Get(get_request)

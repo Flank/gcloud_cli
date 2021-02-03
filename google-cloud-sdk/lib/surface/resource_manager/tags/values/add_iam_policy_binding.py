@@ -51,7 +51,7 @@ class AddIamPolicyBinding(base.Command):
           'organization/456/env' for the role of 'roles/resourcemanager.tagUser' for
           the user 'test-user@gmail.com', run:
 
-            $ {command} organizations/456/env/dev --member='user:test-user@gmail.com' --role='roles/resourcemanager.tagUser'
+            $ {command} 456/env/dev --member='user:test-user@gmail.com' --role='roles/resourcemanager.tagUser'
 
           See https://cloud.google.com/iam/docs/managing-policies for details of
           policy role and member types.
@@ -73,8 +73,8 @@ class AddIamPolicyBinding(base.Command):
     if args.RESOURCE_NAME.find('tagValues/') == 0:
       tag_value = args.RESOURCE_NAME
     else:
-      tag_value = tag_utils.GetResourceFromNamespacedName(
-          args.RESOURCE_NAME, 'tagValues').name
+      tag_value = tag_utils.GetTagValueFromNamespacedName(
+          args.RESOURCE_NAME).name
 
     get_iam_policy_req = (
         messages.CloudresourcemanagerTagValuesGetIamPolicyRequest(

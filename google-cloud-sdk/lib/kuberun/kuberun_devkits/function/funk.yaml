@@ -1,0 +1,38 @@
+functions:
+- name: go-http
+  description: "Create a Go function with HTTP input/output."
+  files:
+  - file: "go-http/go.mod.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/go.mod"
+  - file: "go-http/main.go.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/cmd/main.go"
+  - file: "go-http/funk.go.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/funk.go"
+  - file: "go-http/project.toml.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/project.toml"
+  vars:
+  - name: "Package"
+    default: "funk"
+- name: java-http
+  description: "Create a Java function with HTTP input/output."
+  files:
+  - file: "java-http/main.java.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/src/main/java/{{.PackagePath}}/{{.FunctionName.PascalCase}}Function.java"
+  - file: "java-http/pom.xml.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/pom.xml"
+  - file: "java-http/project.toml.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/project.toml"
+  vars:
+  - name: "Package"
+    default: "com.example"
+  - name: "PackagePath"
+    default: "com/example"
+- name: nodejs-http
+  description: "Create a Node.js function with HTTP input/output."
+  files:
+  - file: "nodejs-http/index.js.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/index.js"
+  - file: "nodejs-http/package.json.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/package.json"
+  - file: "nodejs-http/project.toml.tmpl"
+    dest: "{{.FunctionName.AsProvided}}/project.toml"

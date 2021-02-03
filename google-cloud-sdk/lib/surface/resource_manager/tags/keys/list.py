@@ -37,8 +37,10 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    arguments.AddParentArgToParser(parser, required=True)
-    parser.display_info.AddFormat('table(name:sort=1, short_name)')
+    arguments.AddParentArgToParser(
+        parser,
+        message="Parent of the TagKey in the form of organizations/{org_id}.")
+    parser.display_info.AddFormat("table(name:sort=1, short_name)")
 
   def Run(self, args):
     service = tags.TagKeysService()

@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Create a backend binding for a Knative service."""
+"""Create a backend binding for a KubeRun service."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,7 +31,7 @@ _DETAILED_HELP = {
         """
         To bind KubeRun service `myservice` in the default namespace as a backend
         to Compute Engine backend service `mybackendservice` with a maximum
-        limit of 200 requests per second limit that the service can handle, run
+        limit of 200 requests per second that the service can handle, run
 
             $ {command} --service=myservice --backend-service=mybackendservice --max-rate=200
         """,
@@ -42,19 +42,23 @@ _DETAILED_HELP = {
 class Create(kuberun_command.KubeRunStreamingCommandWithResult):
   """Creates a backend binding."""
 
+  detailed_help = _DETAILED_HELP
+  flags = [
+      flags.NamespaceFlag(),
+      flags.ClusterConnectionFlags(),
+      flags.MaxRateFlag(True),
+  ]
+
   @classmethod
   def Args(cls, parser):
     super(Create, cls).Args(parser)
     parser.add_argument(
-        '--service', help='The KubeRun service to use as the backend.',
+        '--service',
+        help='KubeRun service to use as the backend.',
         required=True)
     parser.add_argument(
         '--backend-service',
-        help='The Compute Engine backend service to bind a KubeRun service to.',
-        required=True)
-    parser.add_argument(
-        '--max-rate',
-        help='The maximum number of HTTP requests per second that the KubeRun service can handle.',
+        help='Compute Engine backend service to bind the KubeRun service to.',
         required=True)
     parser.display_info.AddFormat("""table(
         name:label=NAME,
@@ -62,9 +66,9 @@ class Create(kuberun_command.KubeRunStreamingCommandWithResult):
         ready:label=READY)""")
 
   def BuildKubeRunArgs(self, args):
-    return ['--service', args.service, '--backend-service',
-            args.backend_service, '--max-rate', args.max_rate] + super(
-                Create, self).BuildKubeRunArgs(args)
+    return [
+        '--service', args.service, '--backend-service', args.backend_service,
+    ] + super(Create, self).BuildKubeRunArgs(args)
 
   def Command(self):
     return ['core', 'backend-bindings', 'create']
@@ -73,9 +77,6 @@ class Create(kuberun_command.KubeRunStreamingCommandWithResult):
     if out:
       return backendbinding.BackendBinding(json.loads(out))
     else:
-      raise exceptions.Error('Could not map domain [{}] to service [{}]'.format(
-          args.domain, args.service))
-
-
-Create.detailed_help = _DETAILED_HELP
-Create.flags = [flags.NamespaceFlag(), flags.ClusterConnectionFlags()]
+      raise exceptions.Error(
+          'Could not create backend binding [{}] for service [{}]'.format(
+              args.domain, args.service))

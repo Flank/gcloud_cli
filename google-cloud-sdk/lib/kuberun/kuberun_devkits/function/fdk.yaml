@@ -1,0 +1,3 @@
+version: "0.0"
+name: "GCP Functions Framework Dev Kit"
+description: "Create functions with the GCP Functions Framework."

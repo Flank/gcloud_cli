@@ -47,7 +47,7 @@ class SetIamPolicy(base.Command):
           'organization/456' and tag key short name 'env' and IAM policy
           defined in a JSON file '/path/to/my_policy.json', run:
 
-            $ {command} organizations/456/env/dev /path/to/my_policy.json
+            $ {command} 456/env/dev /path/to/my_policy.json
           """
   }
 
@@ -63,8 +63,8 @@ class SetIamPolicy(base.Command):
     if args.RESOURCE_NAME.find('tagValues/') == 0:
       tag_value = args.RESOURCE_NAME
     else:
-      tag_value = tag_utils.GetResourceFromNamespacedName(
-          args.RESOURCE_NAME, 'tagValues').name
+      tag_value = tag_utils.GetTagValueFromNamespacedName(
+          args.RESOURCE_NAME).name
 
     policy = iam_util.ParsePolicyFile(args.POLICY_FILE, messages.Policy)
     policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION

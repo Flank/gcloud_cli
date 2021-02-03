@@ -1,6 +1,6 @@
 functions:
 - name: http
-  description: "Create a function with HTTP input/output."
+  description: "DEPRECATED. Create a function with HTTP input/output."
   files:
   - file: "http/main.java.tmpl"
     dest: "{{.FunctionName.AsProvided}}/src/main/java/{{.PackagePath}}/{{.FunctionName.PascalCase}}Function.java"

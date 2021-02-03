@@ -1,6 +1,6 @@
 functions:
 - name: http
-  description: "Create a Go function with HTTP input/output."
+  description: "DEPRECATED. Create a Go function with HTTP input/output."
   files:
   - file: "http/go.mod.tmpl"
     dest: "{{.FunctionName.AsProvided}}/go.mod"
