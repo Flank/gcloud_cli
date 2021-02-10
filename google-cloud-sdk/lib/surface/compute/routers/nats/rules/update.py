@@ -102,7 +102,7 @@ class Update(base.UpdateCommand):
     operation_poller = poller.Poller(service, target_router_ref)
     return waiter.WaitFor(
         operation_poller, operation_ref,
-        'Creating Rule [{0}] in NAT [{1}]'.format(rule_number, nat_name))
+        'Updating Rule [{0}] in NAT [{1}]'.format(rule_number, nat_name))
 
 
 Update.detailed_help = {

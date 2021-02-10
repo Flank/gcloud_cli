@@ -24,7 +24,6 @@ from googlecloudsdk.command_lib.kuberun import component_printer
 from googlecloudsdk.command_lib.kuberun import kuberun_command
 from googlecloudsdk.core.resource import resource_printer
 
-
 _DETAILED_HELP = {
     'EXAMPLES':
         """
@@ -36,7 +35,7 @@ _DETAILED_HELP = {
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Describe(kuberun_command.KubeRunCommandWithOutput, base.DescribeCommand):
+class Describe(kuberun_command.KubeRunCommand, base.DescribeCommand):
   """Describe a KubeRun Component."""
 
   detailed_help = _DETAILED_HELP

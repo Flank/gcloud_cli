@@ -71,6 +71,6 @@ Update.detailed_help = {
     To update an organization firewall policy with ID ``123456789" to change the
     description to ``New description", run:
 
-      $ {command} update 123456789 --description='New description'
+      $ {command} 123456789 --description='New description'
     """,
 }

@@ -68,6 +68,6 @@ Describe.detailed_help = {
     To describe a rule with priority ``10" in an organization firewall policy
     with ID ``123456789", run:
 
-      $ {command} describe 10 --firewall-policy=123456789
+      $ {command} 10 --firewall-policy=123456789
     """,
 }

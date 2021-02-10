@@ -37,14 +37,14 @@ class Delete(base.Command):
   detailed_help = {
       'EXAMPLES':
           """
-          To delete a TagKey with id '123', run:
+          To delete a TagKey with id ``123'', run:
 
-            $ {command} --resource_name=tagKeys/123
+            $ {command} tagKeys/123
 
-          To delete a TagKey with the 'name' env under organization '456',
+          To delete a TagKey named ``env'' under organization ``456'',
           run:
 
-            $ {command} --resource_name='456/env'
+            $ {command} 456/env
           """
   }
 
@@ -68,12 +68,10 @@ class Delete(base.Command):
 
     op = service.Delete(delete_request)
 
-    if args.async_ or op.done:
+    if args.async_:
       return op
-    else:
-      done_op = operations.WaitForOperation(
-          op,
-          'Waiting for TagKey [{}] to be deleted with [{}]'.format(
-              tag_key, op.name),
-          service=service)
-      return done_op
+
+    return operations.WaitForOperation(
+        op,
+        'Waiting for TagKey [{}] to be deleted'.format(tag_key),
+        service=service)

@@ -48,9 +48,17 @@ class Create(base.Command):
           """,
       'EXAMPLES':
           """
-          To create a trigger for a Cloud Pub/Sub event type:
+          To create a trigger for a Cloud Pub/Sub event type in the default
+          namespace, run:
 
               $ {command} TRIGGER --type=google.cloud.pubsub.topic.v1.messagePublished
+                  --parameters="topic=my-topic" --target-service=my-service
+
+          To create a trigger for a Cloud Pub/Sub event type in namespace
+          ``NAMESPACE'', run:
+
+              $ {command} TRIGGER --namespace=NAMESPACE
+                  --type=google.cloud.pubsub.topic.v1.messagePublished
                   --parameters="topic=my-topic" --target-service=my-service
           """,
   }

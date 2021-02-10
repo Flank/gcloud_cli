@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.resource_manager import endpoint_utils as endpoints
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
 
 
@@ -45,13 +46,18 @@ class List(base.ListCommand):
   @staticmethod
   def Args(parser):
     arguments.AddParentArgToParser(
-        parser,
-        message="Full resource name attached to the binding")
+        parser, message="Full resource name attached to the binding")
+    arguments.AddLocationArgToParser(
+        parser, ("Region or zone of the resource for listing TagBindings. This "
+                 "field should not be set if the resource is a global resource "
+                 "like projects, folders and organizations."))
 
   def Run(self, args):
-    service = tags.TagBindingsService()
-    messages = tags.TagMessages()
+    location = args.location if args.IsSpecified("location") else None
+    with endpoints.CrmEndpointOverrides(location):
+      service = tags.TagBindingsService()
+      messages = tags.TagMessages()
 
-    list_req = messages.CloudresourcemanagerTagBindingsListRequest(
-        parent=args.parent)
-    return service.List(list_req)
+      list_req = messages.CloudresourcemanagerTagBindingsListRequest(
+          parent=args.parent)
+      return service.List(list_req)

@@ -13,6 +13,9 @@
     collection: networkservices.projects.locations.edgeCacheOrigins
     api_version: v1alpha1
 
+  async:
+    collection: networkservices.projects.locations.operations
+
   arguments:
     resource:
       help_text: The name of the EdgeCacheOrigin to create.

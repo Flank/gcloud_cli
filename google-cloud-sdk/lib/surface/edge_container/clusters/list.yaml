@@ -7,7 +7,7 @@
     examples: |
       To list the clusters, run:
 
-        $ {command}
+        $ {command} --location <my-location> --cluster <my-cluster>
 
   request:
     collection: kubernetesedge.projects.locations.clusters
@@ -20,13 +20,11 @@
     resource:
       help_text: Parent Kubernetesedge location to list all contained Kubernetesedge clusters.
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:location
-
   output:
     format: |
       table(
-        name,
-        createTime,
+        name.basename():label=NAME,
         hub:label=HUB,
         labels:label=LABELS,
-        updateTime:label=UPDATETIME
+        createTime.date():label=CREATED
       )

@@ -32,6 +32,23 @@ from googlecloudsdk.command_lib.util.concepts import presentation_specs
 class List(commands.List):
   """List brokers."""
 
+  detailed_help = {
+      'DESCRIPTION':
+          """\
+          {description}
+          """,
+      'EXAMPLES':
+          """\
+          To list brokers in the default namespace, run:
+
+              $ {command}
+
+          To list brokers in namespace ``NAMESPACE'', run:
+
+              $ {command} --namespace=NAMESPACE
+          """,
+  }
+
   @classmethod
   def Args(cls, parser):
     namespace_presentation = presentation_specs.ResourcePresentationSpec(

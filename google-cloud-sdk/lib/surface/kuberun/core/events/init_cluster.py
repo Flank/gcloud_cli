@@ -18,12 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.kuberun.core import events_constants
 from googlecloudsdk.api_lib.services import services_util
 from googlecloudsdk.api_lib.services import serviceusage
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.events import eventflow_operations
 from googlecloudsdk.command_lib.events import flags
 from googlecloudsdk.command_lib.kuberun import connection_context
+from googlecloudsdk.command_lib.kuberun import events_flags
 from googlecloudsdk.command_lib.kuberun.core.events import init_shared
 from googlecloudsdk.command_lib.kuberun.core.events import operator
 from googlecloudsdk.core import log
@@ -54,6 +56,7 @@ class Init(base.Command):
     flags.AddControlPlaneServiceAccountFlag(parser)
     flags.AddBrokerServiceAccountFlag(parser)
     flags.AddSourcesServiceAccountFlag(parser)
+    events_flags.AddAuthenticationFlag(parser)
 
   @staticmethod
   def Args(parser):
@@ -67,11 +70,11 @@ class Init(base.Command):
     with eventflow_operations.Connect(conn_context) as client:
       operator.install_eventing_via_operator(client, self.ReleaseTrack())
 
-      # Eventing has been installed and enabled, but not initialized yet
-      cluster_eventing_type = init_shared.determine_cluster_eventing_type(
-          client)
+      # Eventing has been installed and enabled, but not initialized yet.
+      product_type = init_shared.determine_product_type(client,
+                                                        args.authentication)
 
-      if client.IsClusterInitialized():
+      if client.IsClusterInitialized(product_type):
         console_io.PromptContinue(
             message='This cluster has already been initialized.',
             prompt_string='Would you like to re-run initialization?',
@@ -79,20 +82,22 @@ class Init(base.Command):
 
       _EnableMissingServices(project)
 
-      # Dict[ServiceAccountConfig, GsaEmail]
-      gsa_emails = {}
+      if args.authentication == events_constants.AUTH_SECRETS:
+        # Create secrets for each Google service account and adds to cluster.
+        gsa_emails = init_shared.construct_service_accounts(args, product_type)
+        init_shared.initialize_eventing_secrets(client, gsa_emails,
+                                                product_type)
 
-      # Create services accounts if missing
-      for sa_config in init_shared.SERVICE_ACCOUNT_CONFIGS:
-        gsa_emails[sa_config] = init_shared.construct_service_account_email(
-            sa_config, args, cluster_eventing_type)
+      elif args.authentication == events_constants.AUTH_WI_GSA:
+        # Bind controller and broker GSA to KSA via workload identity.
+        gsa_emails = init_shared.construct_service_accounts(args, product_type)
+        init_shared.initialize_workload_identity_gsa(client, gsa_emails)
+      else:
+        log.status.Print('Skipped initializing cluster.')
 
-      # Create secrets for each google service account and adds to cluster
-      init_shared.initialize_eventing_secrets(client, gsa_emails,
-                                              cluster_eventing_type)
-
-    log.status.Print(_InitializedMessage(
-        self.ReleaseTrack(), conn_context.cluster_name))
+    log.status.Print(
+        _InitializedMessage(self.ReleaseTrack(), conn_context.cluster_name,
+                            args.authentication))
 
 
 def _EnableMissingServices(project):
@@ -119,18 +124,21 @@ def _EnableMissingServices(project):
   log.status.Print('Services successfully enabled.')
 
 
-def _InitializedMessage(release_track, cluster_name):
+def _InitializedMessage(release_track, cluster_name, authentication):
+  """Returns a string containing recommended next initialization steps."""
   command_prefix = 'gcloud '
   if release_track != base.ReleaseTrack.GA:
     command_prefix += release_track.prefix + ' '
-  ns_init_command = command_prefix + ('kuberun core events init-namespace'
-                                      '--copy-default-secret')
+  ns_init_command = command_prefix + (
+      'kuberun core events init-namespace --authentication={}'.format(
+          authentication))
+  if authentication == events_constants.AUTH_SECRETS:
+    ns_init_command += ' --copy-default-secret'
   brokers_create_command = command_prefix + ('kuberun core brokers create '
                                              'default')
-  return ('Initialized cluster [{}] for Kube Run eventing. '
+  setup_commands = '`{}` and `{}`'.format(ns_init_command,
+                                          brokers_create_command)
+
+  return ('Initialized cluster [{}] for KubeRun eventing. '
           'Next, initialize the namespace(s) you plan to use and '
-          'create a broker via `{}` and `{}`.'.format(
-              cluster_name,
-              ns_init_command,
-              brokers_create_command,
-          ))
+          'create a broker via {}.'.format(cluster_name, setup_commands))

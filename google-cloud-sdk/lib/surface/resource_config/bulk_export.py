@@ -33,10 +33,10 @@ _DETAILED_HELP = {
 
       $ {command} --organization=12345 --path=-
 
-    To export all resources in a folder to stdout in Terraform hcl format,
+    To export all resources in a folder to stdout in Terraform terraform format,
     run:
 
-      $ {command} --folder=12345 --path=- --resource-format=hcl
+      $ {command} --folder=12345 --path=- --resource-format=terraform
     """
 }
 

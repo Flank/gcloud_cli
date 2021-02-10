@@ -124,7 +124,7 @@ Create.detailed_help = {
     To create a rule with priority ``10" in an organization firewall policy with ID
     ``123456789", run:
 
-      $ {command} create 10 --firewall-policy=123456789 --action=allow
+      $ {command} 10 --firewall-policy=123456789 --action=allow
       --description=example-rule
     """,
 }

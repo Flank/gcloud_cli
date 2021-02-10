@@ -24,10 +24,9 @@
   output:
     format: |
       table(
-        name,
-        createTime:label=CREATETIME
-        labels:label=LABELS
-        nodeCount:label=NODECOUNT
-        site:label=SITE
-        updateTime:label=UPDATETIME
+        name.basename():label=NAME,
+        nodeCount:label=NODECOUNT,
+        site:label=SITE,
+        labels:label=LABELS,
+        createTime.date():label=CREATED
       )

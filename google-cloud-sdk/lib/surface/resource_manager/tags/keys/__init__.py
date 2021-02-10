@@ -22,7 +22,6 @@ from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class TagKeys(base.Group):
   """Create and manipulate TagKeys.

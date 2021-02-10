@@ -58,7 +58,7 @@ def _DirectoryFlag():
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Create(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
+class Create(kuberun_command.KubeRunCommand, base.CreateCommand):
   """Create a new Component."""
 
   detailed_help = _DETAILED_HELP
@@ -74,3 +74,8 @@ class Create(kuberun_command.KubeRunStreamingCommand, base.CreateCommand):
 
   def BuildKubeRunArgs(self, args):
     return [args.component] + super(Create, self).BuildKubeRunArgs(args)
+
+  @property
+  def should_stream_stdout(self):
+    # TODO(b/170872460): Delete once this command stops streaming stdout.
+    return True

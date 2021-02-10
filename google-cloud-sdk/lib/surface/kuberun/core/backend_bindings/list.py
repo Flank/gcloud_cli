@@ -28,15 +28,15 @@ from googlecloudsdk.core import exceptions
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To show all backend bindings in the default namespace, run
+        To show all backend bindings in the default namespace, run:
 
             $ {command}
 
-        To show all backend bindings in namespace `mynamespace`, run
+        To show all backend bindings in namespace ``NAMESPACE'', run:
 
-            $ {command} --namespace=mynamespace
+            $ {command} --namespace=NAMESPACE
 
-        To show all backend bindings from all namespaces, run
+        To show all backend bindings from all namespaces, run:
 
             $ {command} --all-namespaces
         """,
@@ -44,7 +44,7 @@ _DETAILED_HELP = {
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class List(kuberun_command.KubeRunCommandWithOutput, base.ListCommand):
+class List(kuberun_command.KubeRunCommand, base.ListCommand):
   """Lists backend bindings in a KubeRun cluster."""
 
   detailed_help = _DETAILED_HELP

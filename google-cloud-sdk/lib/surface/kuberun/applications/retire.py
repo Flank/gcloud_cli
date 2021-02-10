@@ -33,7 +33,7 @@ _DETAILED_HELP = ({
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Retire(kuberun_command.KubeRunStreamingCommand, base.DeleteCommand):
+class Retire(kuberun_command.KubeRunCommand, base.DeleteCommand):
   """Retires a KubeRun application in this directory."""
 
   detailed_help = _DETAILED_HELP
@@ -47,3 +47,8 @@ class Retire(kuberun_command.KubeRunStreamingCommand, base.DeleteCommand):
 
   def Command(self):
     return ['applications', 'retire']
+
+  @property
+  def should_stream_stdout(self):
+    # TODO(b/170872460): Delete once this command stops streaming stdout.
+    return True

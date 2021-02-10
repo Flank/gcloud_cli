@@ -43,9 +43,13 @@ class Describe(base.Command):
           """,
       'EXAMPLES':
           """\
-          To get details about a given broker:
+          To get details about a given broker in the default namespace, run:
 
               $ {command} BROKER
+
+          To get details about a given broker in namespace ``NAMESPACE'', run:
+
+              $ {command} BROKER --namespace=NAMESPACE
           """,
   }
 

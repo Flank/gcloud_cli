@@ -97,6 +97,6 @@ Create.detailed_help = {
     To associate an organization firewall policy under folder with ID
     ``123456789" to folder ``987654321", run:
 
-      $ {command} create --firewall-policy=123456789 --folder=987654321
+      $ {command} --firewall-policy=123456789 --folder=987654321
     """,
 }

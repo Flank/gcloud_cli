@@ -21,6 +21,9 @@
     collection: networkservices.projects.locations.edgeCacheKeysets
     api_version: v1alpha1
 
+  async:
+    collection: networkservices.projects.locations.operations
+
   arguments:
     resource:
       help_text: The EdgeCacheKeyset you want to import.

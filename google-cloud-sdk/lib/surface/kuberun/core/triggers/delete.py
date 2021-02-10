@@ -41,9 +41,13 @@ class Delete(base.Command):
           """,
       'EXAMPLES':
           """
-          To delete a trigger:
+          To delete a trigger in the default namespace, run:
 
               $ {command} TRIGGER
+
+          To delete a trigger in namespace ``NAMESPACE'', run:
+
+              $ {command} TRIGGER --namespace=NAMESPACE
           """,
   }
 

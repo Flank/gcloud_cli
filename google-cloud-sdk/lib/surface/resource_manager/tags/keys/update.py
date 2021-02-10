@@ -37,14 +37,14 @@ class Update(base.Command):
   detailed_help = {
       'EXAMPLES':
           """
-          To update a TagKey with id '123', run:
+          To update a TagKey with id ``123'', run:
 
-            $ {command} --resource_name=tagKeys/123 --description=foobar
+            $ {command} tagKeys/123 --description=foobar
 
-          To update a TagKey with the 'name' env under organization '456',
+          To update a TagKey named ``env" under organization ``456'',
           run:
 
-            $ {command} --resource_name=456/env --description=foobar
+            $ {command} 456/env --description=foobar
           """
   }
 
@@ -71,12 +71,10 @@ class Update(base.Command):
         name=tag_key.name, tagKey=tag_key, updateMask='description')
     op = service.Patch(update_request)
 
-    if args.async_ or op.done:
+    if args.async_:
       return op
-    else:
-      done_op = operations.WaitForOperation(
-          op,
-          'Waiting for TagKey [{}] to be updated with [{}]'.format(
-              tag_key.name, op.name),
-          service=service)
-      return done_op
+
+    return operations.WaitForOperation(
+        op,
+        'Waiting for TagKey [{}] to be updated'.format(tag_key.name),
+        service=service)

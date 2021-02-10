@@ -25,7 +25,6 @@
     format: |
       table(
         name.basename():label=NAME,
-        createTime:label=CREATETIME
-        labels:label=LABELS
-        updateTime:label=UPDATETIME
+        labels:label=LABELS,
+        createTime.date():label=CREATED
       )

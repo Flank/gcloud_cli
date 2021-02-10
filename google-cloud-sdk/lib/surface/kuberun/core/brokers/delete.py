@@ -40,9 +40,13 @@ class Delete(base.Command):
           """,
       'EXAMPLES':
           """\
-          To delete a broker:
+          To delete a broker in the default namespace, run:
 
               $ {command} BROKER
+
+          To delete a broker in the namespace ``NAMESPACE'', run:
+
+              $ {command} BROKER --namespace=NAMESPACE
           """,
   }
 

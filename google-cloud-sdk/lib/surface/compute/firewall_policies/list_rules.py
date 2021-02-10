@@ -93,12 +93,12 @@ ListRules.detailed_help = {
     To list the rules of an organization firewall policy with ID
     ``123456789", run:
 
-      $ {command} list-rules 123456789
+      $ {command} 123456789
 
     To list all the fields of the rules of an organization firewall policy with
     ID ``123456789", run:
 
-      $ {command} list-rules 123456789 --format="table(
+      $ {command} 123456789 --format="table(
         priority,
         action,
         direction,

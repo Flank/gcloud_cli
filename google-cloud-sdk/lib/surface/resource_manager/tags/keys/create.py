@@ -62,12 +62,10 @@ class Create(base.Command):
         tagKey=tag_key)
     op = service.Create(create_req)
 
-    if args.async_ or op.done:
+    if args.async_:
       return op
-    else:
-      done_op = operations.WaitForOperation(
-          op,
-          "Waiting for TagKey [{}] to be created with [{}]".format(
-              short_name, op.name),
-          service=service)
-      return done_op
+
+    return operations.WaitForOperation(
+        op,
+        "Waiting for TagKey [{}] to be created".format(short_name),
+        service=service)

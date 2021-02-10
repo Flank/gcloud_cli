@@ -69,6 +69,6 @@ Delete.detailed_help = {
     To delete a rule with priority ``10" in an organization firewall policy with
     ID ``123456789", run:
 
-      $ {command} delete 10 --firewall-policy=123456789
+      $ {command} 10 --firewall-policy=123456789
     """,
 }

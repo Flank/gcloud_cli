@@ -28,7 +28,7 @@ class EdgeCache(base.Group):
   category = base.NETWORKING_CATEGORY
 
   detailed_help = {
-      "DESCRIPTION": "Manage Media Connect resources",
+      "DESCRIPTION": "Manage Cloud Media Edge resources.",
       "EXAMPLES":
           """
           To list Services in the active Cloud Platform project, run:

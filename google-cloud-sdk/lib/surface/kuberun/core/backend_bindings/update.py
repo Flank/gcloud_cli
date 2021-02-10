@@ -30,15 +30,15 @@ _DETAILED_HELP = {
     'EXAMPLES':
         """
         To update the maximum number of requests per second for the backend
-        binding associated with backend service `mybackendservice` to 200, run
+        binding associated with a backend service to ``200'', run:
 
-            $ {command} mybackendservice --max-rate=200
+            $ {command} BACKEND_SERVICE --max-rate=200
         """,
 }
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Update(kuberun_command.KubeRunStreamingCommandWithResult):
+class Update(kuberun_command.KubeRunCommand):
   """Updates a backend binding."""
 
   detailed_help = _DETAILED_HELP
@@ -72,4 +72,3 @@ class Update(kuberun_command.KubeRunStreamingCommandWithResult):
     else:
       raise exceptions.Error('Could not update backend binding [{}]'.format(
           args.backend_binding))
-

@@ -65,6 +65,6 @@ Delete.detailed_help = {
         """\
     To delete an organization firewall policy with ID ``123456789", run:
 
-      $ {command} delete 123456789
+      $ {command} 123456789
     """,
 }

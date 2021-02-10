@@ -47,9 +47,13 @@ class Describe(base.Command):
           """,
       'EXAMPLES':
           """
-          To get details about a given trigger:
+          To get details about a given trigger in the default namespace, run:
 
               $ {command} TRIGGER
+
+          To get details about a given trigger in namespace ``NAMESPACE'', run:
+
+              $ {command} TRIGGER --namespace=NAMESPACE
           """,
   }
 

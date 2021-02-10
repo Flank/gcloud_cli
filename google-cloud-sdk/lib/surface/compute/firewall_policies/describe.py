@@ -67,6 +67,6 @@ Describe.detailed_help = {
         """\
     To describe an organization firewall policy with ID ``123456789", run:
 
-      $ {command} describe 123456789
+      $ {command} 123456789
     """,
 }

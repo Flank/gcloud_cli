@@ -21,17 +21,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.kuberun import flags
 from googlecloudsdk.command_lib.kuberun import kuberun_command
-from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To delete backend binding `mybackendservice` in the default namespace,
-        i.e. remove its target KubeRun service from the backends list of Compute
-        Engine backend service `mybackendservice`, run
+        To delete a backend binding in the default namespace, i.e. remove its
+        target KubeRun service from the backends list of a Compute Engine
+        backend service, run:
 
-            $ {command} mybackendservice
+            $ {command} BACKEND_SERVICE
         """,
 }
 
@@ -58,11 +57,6 @@ class Delete(kuberun_command.KubeRunCommand, base.DeleteCommand):
     return ['core', 'backend-bindings', 'delete']
 
   def OperationResponseHandler(self, response, args):
-    if response.failed:
-      raise exceptions.Error(response.stderr)
-
-    if response.stderr:
-      log.status.Print(response.stderr)
-
+    super(Delete, self).OperationResponseHandler(response, args)
     log.DeletedResource(args.backend_binding, 'backend binding')
     return None

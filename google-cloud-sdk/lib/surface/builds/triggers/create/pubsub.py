@@ -122,8 +122,7 @@ def ParseTriggerFromFlags(args):
   # Build Config
   project = properties.VALUES.core.project.Get(required=True)
   default_image = 'gcr.io/%s/gcb-%s:$COMMIT_SHA' % (project, args.name)
-  trigger_utils.ParseBuildConfigArgs(trigger, args, messages, default_image)
-
-  trigger_utils.ParseGitRepoSource(trigger, args, messages)
+  trigger_utils.ParseBuildConfigArgs(
+      trigger, args, messages, default_image, need_repo=True)
 
   return trigger

@@ -29,17 +29,17 @@ from googlecloudsdk.core import exceptions
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To bind KubeRun service `myservice` in the default namespace as a backend
-        to Compute Engine backend service `mybackendservice` with a maximum
-        limit of 200 requests per second that the service can handle, run
+        To bind KubeRun service ``SERVICE'' in the default namespace as a
+        backend to a Compute Engine backend service with a maximum limit of
+        ``200'' requests per second that the service can handle, run:
 
-            $ {command} --service=myservice --backend-service=mybackendservice --max-rate=200
+            $ {command} --service=SERVICE --backend-service=BACKEND_SERVICE --max-rate=200
         """,
 }
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Create(kuberun_command.KubeRunStreamingCommandWithResult):
+class Create(kuberun_command.KubeRunCommand):
   """Creates a backend binding."""
 
   detailed_help = _DETAILED_HELP

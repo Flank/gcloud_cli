@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.events import eventflow_operations
 from googlecloudsdk.command_lib.events import flags
 from googlecloudsdk.command_lib.events import resource_args
 from googlecloudsdk.command_lib.kuberun import connection_context
+from googlecloudsdk.command_lib.kuberun import events_flags
 from googlecloudsdk.command_lib.kuberun.core.events import init_shared
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
@@ -53,6 +54,7 @@ class Init(base.Command):
   @staticmethod
   def Args(parser):
     flags.AddCopyDefaultSecret(parser)
+    events_flags.AddAuthenticationFlag(parser)
     namespace_presentation = presentation_specs.ResourcePresentationSpec(
         'namespace',
         resource_args.GetCoreNamespaceResourceSpec(),
@@ -67,9 +69,14 @@ class Init(base.Command):
     namespace_ref = args.CONCEPTS.namespace.Parse()
 
     with eventflow_operations.Connect(conn_context) as client:
-      cluster_eventing_type = init_shared.determine_cluster_eventing_type(
-          client)
-      client.CreateOrReplaceSourcesSecret(namespace_ref, cluster_eventing_type)
+      product_type = init_shared.determine_product_type(client,
+                                                        args.authentication)
+
+      if not client.GetNamespace(namespace_ref):
+        client.CreateNamespace(namespace_ref)
+
+      if args.authentication == 'secrets':
+        client.CreateOrReplaceSourcesSecret(namespace_ref, product_type)
 
     log.status.Print('Initialized namespace [{}] for Cloud Run eventing with '
                      'secret {}'.format(namespace_ref.Name(),

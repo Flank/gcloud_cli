@@ -76,6 +76,6 @@ Move.detailed_help = {
     To move an organization firewall policy under folder with ID ``123456789" to
     folder ``987654321", run:
 
-      $ {command} move 123456789 --folder=987654321
+      $ {command} 123456789 --folder=987654321
     """,
 }

@@ -63,6 +63,6 @@ List.detailed_help = {
     To list organization firewall policies under folder with ID
     ``123456789", run:
 
-      $ {command} list --folder=123456789
+      $ {command} --folder=123456789
     """,
 }

@@ -65,6 +65,6 @@ Delete.detailed_help = {
     To delete an association with name ``example-association" of an organization
     firewall policy with ID ``123456789", run:
 
-      $ {command} delete example-association --firewall-policy=123456789
+      $ {command} example-association --firewall-policy=123456789
     """,
 }

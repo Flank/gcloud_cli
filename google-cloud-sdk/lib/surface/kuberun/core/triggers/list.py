@@ -44,9 +44,13 @@ class List(commands.List):
           """,
       'EXAMPLES':
           """
-          To list existing triggers:
+          To list existing triggers in the default namespace, run:
 
               $ {command}
+
+          To list existing triggers in namespace ``NAMESPACE'', run:
+
+              $ {command} --namespace=NAMESPACE
           """,
   }
 

@@ -39,16 +39,21 @@ class Create(base.Command):
   """Create a broker to initialize a namespace for eventing."""
 
   detailed_help = {
-      'DESCRIPTION': """
+      'DESCRIPTION':
+          """
           {description}
           Creates a new broker for the given namespace.
-          Currently, you can only create a broker named "default".
           This command is only available with Cloud Run for Anthos.
           """,
-      'EXAMPLES': """
-          To create a broker, run:
+      'EXAMPLES':
+          """
+          To create a broker in the default namespace, run:
 
-              $ {command} default
+              $ {command} BROKER
+
+          To create a broker in namespace ``NAMESPACE'', run:
+
+              $ {command} BROKER --namespace=NAMESPACE
           """,
   }
 

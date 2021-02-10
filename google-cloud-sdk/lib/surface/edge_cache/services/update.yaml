@@ -14,6 +14,9 @@
     api_version: v1alpha1
     method: patch
 
+  async:
+    collection: networkservices.projects.locations.operations
+
   arguments:
     resource:
       help_text: The name of the EdgeCacheService to create.

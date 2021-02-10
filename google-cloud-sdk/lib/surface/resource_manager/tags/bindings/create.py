@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.resource_manager import endpoint_utils as endpoints
 from googlecloudsdk.command_lib.resource_manager import operations
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
 from googlecloudsdk.command_lib.resource_manager import tag_utils
@@ -42,12 +43,12 @@ class Create(base.Command):
       "EXAMPLES":
           """
           To create a TagBinding  between tagValues/123 and Project with name
-          '//cloudresourcemanager.googleapis.com/projects/1234' run:
+          ``//cloudresourcemanager.googleapis.com/projects/1234'' run:
 
             $ {command} --tag-value=tagValues/123 --parent=//cloudresourcemanager.googleapis.com/projects/1234
 
-          To create a TagBinding between TagValue 'test' under TagKey 'env' and
-          Project with name '//cloudresourcemanager.googleapis.com/projects/1234' run:
+          To create a TagBinding between TagValue ``test'' under TagKey ``env'' and
+          Project with name ``//cloudresourcemanager.googleapis.com/projects/1234'' run:
 
             $ {command} --tag-value=789/env/test --parent=//cloudresourcemanager.googleapis.com/projects/1234
             """
@@ -60,30 +61,35 @@ class Create(base.Command):
         parser,
         message="Full resource name of the resource to attach to the tagValue.")
     arguments.AddAsyncArgToParser(parser)
+    arguments.AddLocationArgToParser(
+        parser,
+        ("Region or zone of the resource to bind to the TagValue. This "
+         "field is not required if the resource is a global resource like "
+         "projects, folders and organizations."))
 
   def Run(self, args):
-    service = tags.TagBindingsService()
     messages = tags.TagMessages()
 
     if args.tag_value.find("tagValues/") == 0:
       tag_value = args.tag_value
     else:
-      tag_value = tag_utils.GetTagValueFromNamespacedName(
-          args.tag_value).name
+      tag_value = tag_utils.GetTagValueFromNamespacedName(args.tag_value).name
 
-    tag_binding = messages.TagBinding(
-        parent=args.parent, tagValue=tag_value)
+    tag_binding = messages.TagBinding(parent=args.parent, tagValue=tag_value)
 
     create_req = messages.CloudresourcemanagerTagBindingsCreateRequest(
         tagBinding=tag_binding)
 
-    op = service.Create(create_req)
+    location = args.location if args.IsSpecified("location") else None
+    with endpoints.CrmEndpointOverrides(location):
+      service = tags.TagBindingsService()
+      op = service.Create(create_req)
 
-    if args.async_ or op.done:
-      return op
-    else:
-      return operations.WaitForOperation(
-          op,
-          "Waiting for TagBinding for parent [{}] and tag value [{}] to be "
-          "created with [{}]".format(args.parent, args.tag_value, op.name),
-          service=service)
+      if args.async_ or op.done:
+        return op
+      else:
+        return operations.WaitForOperation(
+            op,
+            "Waiting for TagBinding for parent [{}] and tag value [{}] to be "
+            "created with [{}]".format(args.parent, args.tag_value, op.name),
+            service=service)

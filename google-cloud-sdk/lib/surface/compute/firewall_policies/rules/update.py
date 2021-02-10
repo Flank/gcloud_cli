@@ -138,7 +138,7 @@ Update.detailed_help = {
     with ID ``123456789" to change the action to ``allow" and description to
     ``new-example-rule", run:
 
-      $ {command} create 10 --firewall-policy=123456789 --action=allow
+      $ {command} 10 --firewall-policy=123456789 --action=allow
       --description=new-example-rule
     """,
 }

@@ -38,11 +38,12 @@ class Update(base.Command):
   detailed_help = {
       'EXAMPLES':
           """
-          To update a TagValue with id '123', run:
+          To update a TagValue with id ``123'', run:
 
             $ {command} tagValues/123 --description="foobar"
 
-          To update a TagValue dev under organization/456/env,
+          To update a TagValue named ``dev'' with the tagKey ``env''
+          under organization ``456'',
           run:
 
             $ {command} 465/env/dev --description="foobar"
@@ -72,12 +73,10 @@ class Update(base.Command):
         name=tag_value.name, tagValue=tag_value, updateMask='description')
     op = service.Patch(update_request)
 
-    if args.async_ or op.done:
+    if args.async_:
       return op
-    else:
-      done_op = operations.WaitForOperation(
-          op,
-          'Waiting for TagValue [{}] to be updated with [{}]'.format(
-              tag_value.name, op.name),
-          service=service)
-      return done_op
+
+    return operations.WaitForOperation(
+        op,
+        'Waiting for TagValue [{}] to be updated'.format(tag_value.name),
+        service=service)
