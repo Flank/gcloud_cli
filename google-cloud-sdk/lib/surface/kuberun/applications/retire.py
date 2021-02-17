@@ -25,7 +25,7 @@ from googlecloudsdk.command_lib.kuberun import kuberun_command
 _DETAILED_HELP = ({
     'EXAMPLES':
         """
-        To retire a KubeRun application in environment ENV, run
+        To retire a KubeRun application in environment ``ENV'', run:
 
             $ {command} --environment ENV
         """,
@@ -47,8 +47,3 @@ class Retire(kuberun_command.KubeRunCommand, base.DeleteCommand):
 
   def Command(self):
     return ['applications', 'retire']
-
-  @property
-  def should_stream_stdout(self):
-    # TODO(b/170872460): Delete once this command stops streaming stdout.
-    return True

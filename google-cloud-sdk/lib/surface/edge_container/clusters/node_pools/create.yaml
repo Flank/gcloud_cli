@@ -32,3 +32,6 @@
         Default site used by this node pool.
     labels:
       api_field: nodePool.labels
+
+  async:
+    collection: kubernetesedge.projects.locations.operations

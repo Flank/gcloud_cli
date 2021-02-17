@@ -69,6 +69,14 @@ class Create(base.CreateCommand):
         'least 6 hours and at most 30 days. See `$ gcloud topic '
         'datetimes` for information on duration formats.')
 
+    parser.add_argument(
+        '--version-time',
+        metavar='TIMESTAMP',
+        help='The backup will contain an externally consistent copy of the '
+        'database at the timestamp specified by `--version-time`. If '
+        '`--version-time` is not specified, the system will use the creation '
+        'time of the backup.')
+
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):

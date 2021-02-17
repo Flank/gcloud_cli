@@ -42,7 +42,7 @@ class List(base.ListCommand):
         parser,
         message=("Parent of the TagValue in either in the form of "
                  "tagKeys/{id} or {org_id}/{tagkey_short_name}"))
-    parser.display_info.AddFormat("table(name:sort=1, short_name)")
+    parser.display_info.AddFormat("table(name:sort=1, short_name, description)")
 
   def Run(self, args):
     service = tags.TagValuesService()

@@ -17,3 +17,6 @@
     resource:
       help_text: Kubernetesedge nodePool to delete.
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:nodePool
+
+  async:
+    collection: kubernetesedge.projects.locations.operations

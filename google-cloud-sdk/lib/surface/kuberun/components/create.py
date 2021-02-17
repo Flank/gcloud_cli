@@ -74,8 +74,3 @@ class Create(kuberun_command.KubeRunCommand, base.CreateCommand):
 
   def BuildKubeRunArgs(self, args):
     return [args.component] + super(Create, self).BuildKubeRunArgs(args)
-
-  @property
-  def should_stream_stdout(self):
-    # TODO(b/170872460): Delete once this command stops streaming stdout.
-    return True

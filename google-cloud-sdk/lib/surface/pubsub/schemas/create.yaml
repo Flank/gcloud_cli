@@ -1,0 +1,33 @@
+- release_tracks: [ALPHA, BETA]
+
+  help_text:
+    brief: Create a Pub/Sub schema.
+    description: |
+      Create a new Pub/Sub schema.
+    examples: |
+      To create a PROTOCOL_BUFFER schema called "key-schema" that requires exactly one string field named "key", run:
+        $ {command} key-schema --definition="syntax = 'proto3'; message Message { optional string key = 1; }" --type=PROTOCOL_BUFFER
+
+      To create an equivalent AVRO schema, run:
+        $ {command} key-schema --definition='{ "type": "record", "namespace": "my.ns", "name": "KeyMsg", "fields": [ { "name": "key", "type": "string" } ] }' --type=AVRO
+
+  request:
+    collection: pubsub.projects.schemas
+    api_version: v1
+
+  arguments:
+    resource:
+      help_text: Pub/Sub schema to create.
+      spec: !REF googlecloudsdk.command_lib.pubsub.resources:schema
+
+    params:
+    - arg_name: definition
+      api_field: schema.definition
+      required: true
+      help_text: |
+        Schema definition.
+    - arg_name: type
+      api_field: schema.type
+      required: true
+      help_text: |
+        Type of the schema.

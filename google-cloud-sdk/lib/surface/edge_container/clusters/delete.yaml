@@ -17,3 +17,6 @@
     resource:
       help_text: Kubernetesedge cluster to delete.
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:cluster
+
+  async:
+    collection: kubernetesedge.projects.locations.operations

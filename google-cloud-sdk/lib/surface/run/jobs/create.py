@@ -80,6 +80,8 @@ class Deploy(base.Command):
     flags.AddArgsFlag(parser)
     flags.AddClientNameAndVersionFlags(parser)
     flags.AddSandboxArg(parser)
+    flags.AddBinAuthzPolicyFlags(parser, with_clear=False)
+    flags.AddBinAuthzBreakglassFlag(parser)
 
     polling_group = parser.add_mutually_exclusive_group()
     flags.AddAsyncFlag(polling_group)

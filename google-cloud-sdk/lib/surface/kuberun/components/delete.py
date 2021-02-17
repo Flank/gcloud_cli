@@ -60,8 +60,3 @@ class Delete(kuberun_command.KubeRunCommand, base.DeleteCommand):
 
   def FormatOutput(self, out, args):
     return out
-
-  @property
-  def should_stream_stdout(self):
-    # TODO(b/170872460): Delete once this command stops streaming stdout.
-    return True

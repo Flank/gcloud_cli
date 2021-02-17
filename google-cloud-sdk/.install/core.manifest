@@ -277,6 +277,7 @@ lib/googlecloudsdk/api_lib/container/binauthz/containeranalysis_apis.py
 lib/googlecloudsdk/api_lib/container/binauthz/iam.py
 lib/googlecloudsdk/api_lib/container/binauthz/kms.py
 lib/googlecloudsdk/api_lib/container/binauthz/policies.py
+lib/googlecloudsdk/api_lib/container/binauthz/system_policy.py
 lib/googlecloudsdk/api_lib/container/binauthz/util.py
 lib/googlecloudsdk/api_lib/container/constants.py
 lib/googlecloudsdk/api_lib/container/hub/__init__.py
@@ -596,6 +597,7 @@ lib/googlecloudsdk/api_lib/spanner/databases.py
 lib/googlecloudsdk/api_lib/spanner/instance_configs.py
 lib/googlecloudsdk/api_lib/spanner/instance_operations.py
 lib/googlecloudsdk/api_lib/spanner/instances.py
+lib/googlecloudsdk/api_lib/spanner/response_util.py
 lib/googlecloudsdk/api_lib/sql/__init__.py
 lib/googlecloudsdk/api_lib/sql/api_util.py
 lib/googlecloudsdk/api_lib/sql/cert.py
@@ -615,6 +617,7 @@ lib/googlecloudsdk/api_lib/storage/api_factory.py
 lib/googlecloudsdk/api_lib/storage/cloud_api.py
 lib/googlecloudsdk/api_lib/storage/errors.py
 lib/googlecloudsdk/api_lib/storage/gcs_api.py
+lib/googlecloudsdk/api_lib/storage/gcs_metadata_util.py
 lib/googlecloudsdk/api_lib/storage/patch_gcs_messages.py
 lib/googlecloudsdk/api_lib/storage/s3_api.py
 lib/googlecloudsdk/api_lib/storage/storage_api.py
@@ -2451,12 +2454,16 @@ lib/googlecloudsdk/third_party/apis/cloudasset/v1p4beta1/cloudasset_v1p4beta1_me
 lib/googlecloudsdk/third_party/apis/cloudasset/v1p5beta1/__init__.py
 lib/googlecloudsdk/third_party/apis/cloudasset/v1p5beta1/cloudasset_v1p5beta1_client.py
 lib/googlecloudsdk/third_party/apis/cloudasset/v1p5beta1/cloudasset_v1p5beta1_messages.py
+lib/googlecloudsdk/third_party/apis/cloudasset/v1p7beta1/__init__.py
+lib/googlecloudsdk/third_party/apis/cloudasset/v1p7beta1/cloudasset_v1p7beta1_client.py
+lib/googlecloudsdk/third_party/apis/cloudasset/v1p7beta1/cloudasset_v1p7beta1_messages.py
 lib/googlecloudsdk/third_party/apis/cloudasset_v1.json
 lib/googlecloudsdk/third_party/apis/cloudasset_v1p1beta1.json
 lib/googlecloudsdk/third_party/apis/cloudasset_v1p2beta1.json
 lib/googlecloudsdk/third_party/apis/cloudasset_v1p4alpha1.json
 lib/googlecloudsdk/third_party/apis/cloudasset_v1p4beta1.json
 lib/googlecloudsdk/third_party/apis/cloudasset_v1p5beta1.json
+lib/googlecloudsdk/third_party/apis/cloudasset_v1p7beta1.json
 lib/googlecloudsdk/third_party/apis/cloudbilling/__init__.py
 lib/googlecloudsdk/third_party/apis/cloudbilling/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/cloudbilling/v1/cloudbilling_v1_client.py
@@ -3143,10 +3150,15 @@ lib/googlecloudsdk/third_party/apis/notebooks/v1beta1/resources.py
 lib/googlecloudsdk/third_party/apis/notebooks_v1.json
 lib/googlecloudsdk/third_party/apis/notebooks_v1beta1.json
 lib/googlecloudsdk/third_party/apis/ondemandscanning/__init__.py
+lib/googlecloudsdk/third_party/apis/ondemandscanning/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/ondemandscanning/v1/ondemandscanning_v1_client.py
+lib/googlecloudsdk/third_party/apis/ondemandscanning/v1/ondemandscanning_v1_messages.py
+lib/googlecloudsdk/third_party/apis/ondemandscanning/v1/resources.py
 lib/googlecloudsdk/third_party/apis/ondemandscanning/v1beta1/__init__.py
 lib/googlecloudsdk/third_party/apis/ondemandscanning/v1beta1/ondemandscanning_v1beta1_client.py
 lib/googlecloudsdk/third_party/apis/ondemandscanning/v1beta1/ondemandscanning_v1beta1_messages.py
 lib/googlecloudsdk/third_party/apis/ondemandscanning/v1beta1/resources.py
+lib/googlecloudsdk/third_party/apis/ondemandscanning_v1.json
 lib/googlecloudsdk/third_party/apis/ondemandscanning_v1beta1.json
 lib/googlecloudsdk/third_party/apis/orgpolicy/__init__.py
 lib/googlecloudsdk/third_party/apis/orgpolicy/v2/__init__.py
@@ -3782,6 +3794,7 @@ lib/surface/ai/custom_jobs/cancel.py
 lib/surface/ai/custom_jobs/create.py
 lib/surface/ai/custom_jobs/describe.py
 lib/surface/ai/custom_jobs/list.py
+lib/surface/ai/custom_jobs/local_run.py
 lib/surface/ai/custom_jobs/stream_logs.py
 lib/surface/ai/endpoints/__init__.py
 lib/surface/ai/endpoints/create.py
@@ -3806,6 +3819,7 @@ lib/surface/ai/models/list.py
 lib/surface/ai/models/upload.py
 lib/surface/ai/tensorboards/__init__.py
 lib/surface/ai/tensorboards/create.py
+lib/surface/ai/tensorboards/describe.py
 lib/surface/ai_platform/__init__.py
 lib/surface/ai_platform/explain.py
 lib/surface/ai_platform/jobs/__init__.py
@@ -3896,6 +3910,8 @@ lib/surface/apigee/apis/undeploy.py
 lib/surface/apigee/applications/__init__.py
 lib/surface/apigee/applications/describe.py
 lib/surface/apigee/applications/list.py
+lib/surface/apigee/archives/__init__.py
+lib/surface/apigee/archives/deploy.py
 lib/surface/apigee/deployments/__init__.py
 lib/surface/apigee/deployments/describe.py
 lib/surface/apigee/deployments/list.py
@@ -3985,6 +4001,8 @@ lib/surface/app/versions/migrate.py
 lib/surface/app/versions/start.py
 lib/surface/app/versions/stop.py
 lib/surface/artifacts/__init__.py
+lib/surface/artifacts/apt/__init__.py
+lib/surface/artifacts/apt/import.py
 lib/surface/artifacts/docker/__init__.py
 lib/surface/artifacts/docker/images/__init__.py
 lib/surface/artifacts/docker/images/delete.py
@@ -4009,6 +4027,7 @@ lib/surface/artifacts/print_settings/__init__.py
 lib/surface/artifacts/print_settings/gradle.py
 lib/surface/artifacts/print_settings/mvn.py
 lib/surface/artifacts/print_settings/npm.py
+lib/surface/artifacts/print_settings/pypi.py
 lib/surface/artifacts/repositories/__init__.py
 lib/surface/artifacts/repositories/add_iam_policy_binding.yaml
 lib/surface/artifacts/repositories/create.yaml
@@ -4027,9 +4046,12 @@ lib/surface/artifacts/tags/update.yaml
 lib/surface/artifacts/versions/__init__.py
 lib/surface/artifacts/versions/delete.yaml
 lib/surface/artifacts/versions/list.yaml
+lib/surface/artifacts/yum/__init__.py
+lib/surface/artifacts/yum/import.py
 lib/surface/asset/__init__.py
 lib/surface/asset/analyze_iam_policy.py
 lib/surface/asset/analyze_iam_policy_longrunning.py
+lib/surface/asset/analyze_move.py
 lib/surface/asset/export.py
 lib/surface/asset/export_iam_policy_analysis.py
 lib/surface/asset/feeds/__init__.py
@@ -5050,6 +5072,7 @@ lib/surface/container/binauthz/create_signature_payload.py
 lib/surface/container/binauthz/policy/__init__.py
 lib/surface/container/binauthz/policy/add_iam_policy_binding.yaml
 lib/surface/container/binauthz/policy/export.py
+lib/surface/container/binauthz/policy/export_system_policy.py
 lib/surface/container/binauthz/policy/get_iam_policy.py
 lib/surface/container/binauthz/policy/import.py
 lib/surface/container/binauthz/policy/remove_iam_policy_binding.yaml
@@ -5480,6 +5503,12 @@ lib/surface/dns/response_policies/create.py
 lib/surface/dns/response_policies/delete.yaml
 lib/surface/dns/response_policies/describe.yaml
 lib/surface/dns/response_policies/list.yaml
+lib/surface/dns/response_policies/rules/__init__.py
+lib/surface/dns/response_policies/rules/create.py
+lib/surface/dns/response_policies/rules/delete.yaml
+lib/surface/dns/response_policies/rules/describe.yaml
+lib/surface/dns/response_policies/rules/list.yaml
+lib/surface/dns/response_policies/rules/update.py
 lib/surface/dns/response_policies/update.py
 lib/surface/docker.py
 lib/surface/domains/__init__.py
@@ -5543,6 +5572,9 @@ lib/surface/edge_container/clusters/node_pools/create.yaml
 lib/surface/edge_container/clusters/node_pools/delete.yaml
 lib/surface/edge_container/clusters/node_pools/describe.yaml
 lib/surface/edge_container/clusters/node_pools/list.yaml
+lib/surface/edge_container/operations/__init__.py
+lib/surface/edge_container/operations/describe.yaml
+lib/surface/edge_container/operations/wait.yaml
 lib/surface/edge_container/sites/__init__.py
 lib/surface/edge_container/sites/describe.yaml
 lib/surface/edge_container/sites/list.yaml
@@ -6143,6 +6175,7 @@ lib/surface/kuberun/environments/__init__.py
 lib/surface/kuberun/environments/list.py
 lib/surface/kuberun/render.py
 lib/surface/kuberun/resources/__init__.py
+lib/surface/kuberun/resources/create.py
 lib/surface/kuberun/resources/describe.py
 lib/surface/labelmanager/__init__.py
 lib/surface/labelmanager/bindings/__init__.py
@@ -6571,6 +6604,11 @@ lib/surface/pubsub/lite_topics/describe.yaml
 lib/surface/pubsub/lite_topics/list.yaml
 lib/surface/pubsub/lite_topics/list_subscriptions.yaml
 lib/surface/pubsub/lite_topics/update.yaml
+lib/surface/pubsub/schemas/__init__.py
+lib/surface/pubsub/schemas/create.yaml
+lib/surface/pubsub/schemas/delete.yaml
+lib/surface/pubsub/schemas/describe.yaml
+lib/surface/pubsub/schemas/list.yaml
 lib/surface/pubsub/snapshots/__init__.py
 lib/surface/pubsub/snapshots/create.py
 lib/surface/pubsub/snapshots/delete.py

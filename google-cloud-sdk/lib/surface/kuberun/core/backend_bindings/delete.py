@@ -12,7 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Deletes a backend binding of a KubeRun service."""
+"""Deletes the backend binding.
+
+This removes the binding between the Compute
+   Engine backend service and your KubeRun service.
+"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -26,11 +30,15 @@ from googlecloudsdk.core import log
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To delete a backend binding in the default namespace, i.e. remove its
-        target KubeRun service from the backends list of a Compute Engine
-        backend service, run:
+        To delete a backend binding ``BACKEND_BINDING'' in the default
+        namespace, run:
 
-            $ {command} BACKEND_SERVICE
+            $ {command} BACKEND_BINDING
+
+        To delete a backend binding ``BACKEND_BINDING'' in a specific namespace
+        ``NAMESPACE'', run:
+
+            $ {command} BACKEND_BINDING --namespace=NAMESPACE
         """,
 }
 
@@ -47,8 +55,8 @@ class Delete(kuberun_command.KubeRunCommand, base.DeleteCommand):
     super(Delete, cls).Args(parser)
     parser.add_argument(
         'backend_binding',
-        help="""Backend binding to delete. Its name is the same as the
-        Compute Engine backend service it's bound to.""")
+        help="""Name of the backend binding to delete. This name
+        is the same as the Compute Engine backend service.""")
 
   def BuildKubeRunArgs(self, args):
     return [args.backend_binding] + super(Delete, self).BuildKubeRunArgs(args)

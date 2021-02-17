@@ -12,7 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Create a backend binding for a KubeRun service."""
+"""Create a backend binding.
+
+Binds a Compute Engine backend service to your KubeRun service.
+"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -29,11 +32,17 @@ from googlecloudsdk.core import exceptions
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To bind KubeRun service ``SERVICE'' in the default namespace as a
-        backend to a Compute Engine backend service with a maximum limit of
-        ``200'' requests per second that the service can handle, run:
+        To bind a KubeRun service ``SERVICE'' in the default namespace
+        to a Compute Engine backend service ``BACKEND_SERVICE'' with a maximum
+        requests per second limit ``MAX_RATE'', run:
 
-            $ {command} --service=SERVICE --backend-service=BACKEND_SERVICE --max-rate=200
+            $ {command} --service=SERVICE --backend-service=BACKEND_SERVICE --max-rate=MAX_RATE
+
+        To bind a KubeRun service ``SERVICE'' in a specific namespace
+        ``NAMESPACE'' to a Compute Engine backend service ``BACKEND_SERVICE''
+        with a maximum requests per second limit ``MAX_RATE'', run:
+
+            $ {command} --service=SERVICE --namespace=NAMESPACE --backend-service=BACKEND_SERVICE --max-rate=MAX_RATE
         """,
 }
 
@@ -54,11 +63,11 @@ class Create(kuberun_command.KubeRunCommand):
     super(Create, cls).Args(parser)
     parser.add_argument(
         '--service',
-        help='KubeRun service to use as the backend.',
+        help='Name of the KubeRun service to bind to a Compute Engine backend service.',
         required=True)
     parser.add_argument(
         '--backend-service',
-        help='Compute Engine backend service to bind the KubeRun service to.',
+        help='Name of the Compute Engine backend service to bind to the KubeRun service.',
         required=True)
     parser.display_info.AddFormat("""table(
         name:label=NAME,

@@ -1,4 +1,6 @@
-- hidden: true
+- release_tracks: [ALPHA, BETA, GA]
+  GA:
+    hidden: true
   help_text:
     brief: |
       Apply software update to nodes in a Memorystore Memcached instance.

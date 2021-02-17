@@ -29,10 +29,15 @@ from googlecloudsdk.core import exceptions
 _DETAILED_HELP = {
     'EXAMPLES':
         """
-        To update the maximum number of requests per second for the backend
-        binding associated with a backend service to ``200'', run:
+        To update the maximum number of requests per second ``MAX_RATE'' for
+        the backend service in the default namespace, run:
 
-            $ {command} BACKEND_SERVICE --max-rate=200
+            $ {command} BACKEND_BINDING --max-rate=MAX_RATE
+
+        To update the maximum number of requests per second ``MAX_RATE'' for
+        the backend service in a specific namespace ``NAMESPACE'', run:
+
+            $ {command} BACKEND_BINDING --namespace=NAMESPACE --max-rate=MAX_RATE
         """,
 }
 
@@ -53,8 +58,8 @@ class Update(kuberun_command.KubeRunCommand):
     super(Update, cls).Args(parser)
     parser.add_argument(
         'backend_binding',
-        help="""Backend binding to update. Its name is the same as the
-        Compute Engine backend service it's bound to.""")
+        help="""Name of the backend binding to update. This name
+        is the same as the Compute Engine backend service.""")
     parser.display_info.AddFormat("""table(
         name:label=NAME,
         service:label=SERVICE,
