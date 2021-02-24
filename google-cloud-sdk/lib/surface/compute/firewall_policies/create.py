@@ -64,6 +64,6 @@ Create.detailed_help = {
     To create an organization firewall policy under folder with ID ``123456789",
     run:
 
-      $ {command} --folder=123456789
+      $ {command} --short-name=my-policy --folder=123456789
     """,
 }

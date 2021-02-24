@@ -23,7 +23,7 @@ from googlecloudsdk.command_lib.util.declarative import flags as declarative_fla
 from googlecloudsdk.command_lib.util.declarative.clients import kcc_client
 
 _DETAILED_HELP = {
-    "EXAMPLES":
+    'EXAMPLES':
         """
     To export all resources in a project to a local directory, run:
 
@@ -33,10 +33,15 @@ _DETAILED_HELP = {
 
       $ {command} --organization=12345 --path=-
 
-    To export all resources in a folder to stdout in Terraform terraform format,
+    To export all resources in a folder to stdout in Terraform format,
     run:
 
       $ {command} --folder=12345 --path=- --resource-format=terraform
+
+    To export all Storage Bucket and Compute Instances resources in project my-project to stdout,
+    run:
+
+      $ {command} --project=my-project --resource-types=storage.googleapis.com/Bucket,compute.googleapis.com/Instance
     """
 }
 
@@ -53,5 +58,8 @@ class Export(base.DeclarativeCommand):
 
   def Run(self, args):
     client = kcc_client.KccClient()
-    client.BulkExport(args)
+    if args.IsSpecified('resource_types'):
+      client.BulkExportFromAssetList(args)
+    else:
+      client.BulkExport(args)
     return

@@ -62,7 +62,7 @@ class Describe(kuberun_command.KubeRunCommand, base.DescribeCommand):
   def Command(self):
     return ['core', 'backend-bindings', 'describe']
 
-  def FormatOutput(self, out, args):
+  def SuccessResult(self, out, args):
     if out:
       return backendbinding.BackendBinding(json.loads(out))
     else:

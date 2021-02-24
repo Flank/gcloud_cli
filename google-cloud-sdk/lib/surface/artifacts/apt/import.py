@@ -46,7 +46,8 @@ class Import(base.Command):
         required=True,
         type=arg_parsers.ArgList(),
         help="""\
-            The Google Cloud Storage location of a package to import.""")
+            The Google Cloud Storage location of a package to import.
+            Wildcards may be added at the end to import multiple packages.""")
 
   def Run(self, args):
     """Run package import command."""
@@ -55,7 +56,8 @@ class Import(base.Command):
 
     repo_ref = args.CONCEPTS.repository.Parse()
     gcs_source = messages.GoogleDevtoolsArtifactregistryV1alpha1ImportAptArtifactsGcsSource(
-        uris=args.gcs_source)
+        uris=args.gcs_source,
+        useWildcards=True)
     import_request = messages.GoogleDevtoolsArtifactregistryV1alpha1ImportAptArtifactsRequest(
         gcsSource=gcs_source)
 
@@ -82,6 +84,17 @@ Import.detailed_help = {
       `my-repo`, run:
 
         $ {0} my-repo --location=us-central1 --gcs-source={1},{2}
+
+      To import all packages from `my-directory` into `my-repo`, run:
+
+        $ {0} my-repo --location=us-central1 --gcs-source={3}
+
+      To import all packages in all subdirectories from a Google Cloud
+      Storage bucket into `my-repo`, run:
+
+        $ {0} my-repo --location=us-central1 --gcs-source={4}
     """.format('{command}', 'gs://my-bucket/path/to/my-package.deb',
-               'gs://my-bucket/path/to/other-package.deb')
+               'gs://my-bucket/path/to/other-package.deb',
+               'gs://my-bucket/my-directory/*',
+               'gs://my-bucket/**')
 }

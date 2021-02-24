@@ -71,7 +71,7 @@ class Update(kuberun_command.KubeRunCommand):
   def Command(self):
     return ['core', 'backend-bindings', 'update']
 
-  def FormatOutput(self, out, args):
+  def SuccessResult(self, out, args):
     if out:
       return backendbinding.BackendBinding(json.loads(out))
     else:

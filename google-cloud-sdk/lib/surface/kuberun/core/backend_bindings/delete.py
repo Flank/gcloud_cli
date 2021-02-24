@@ -64,7 +64,5 @@ class Delete(kuberun_command.KubeRunCommand, base.DeleteCommand):
   def Command(self):
     return ['core', 'backend-bindings', 'delete']
 
-  def OperationResponseHandler(self, response, args):
-    super(Delete, self).OperationResponseHandler(response, args)
+  def SuccessResult(self, out, args):
     log.DeletedResource(args.backend_binding, 'backend binding')
-    return None

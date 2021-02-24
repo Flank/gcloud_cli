@@ -65,7 +65,7 @@ class List(kuberun_command.KubeRunCommand, base.ListCommand):
   def Command(self):
     return ['core', 'backend-bindings', 'list']
 
-  def FormatOutput(self, out, args):
+  def SuccessResult(self, out, args):
     if out:
       json_object = json.loads(out)
       return [backendbinding.BackendBinding(x) for x in json_object]

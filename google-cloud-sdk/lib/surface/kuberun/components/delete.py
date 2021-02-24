@@ -57,6 +57,3 @@ class Delete(kuberun_command.KubeRunCommand, base.DeleteCommand):
 
   def BuildKubeRunArgs(self, args):
     return [args.component] + super(Delete, self).BuildKubeRunArgs(args)
-
-  def FormatOutput(self, out, args):
-    return out

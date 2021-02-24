@@ -1255,6 +1255,8 @@ lib/third_party/fasteners/_utils.py
 lib/third_party/fasteners/lock.py
 lib/third_party/fasteners/process_lock.py
 lib/third_party/fasteners/version.py
+lib/third_party/frozendict/LICENSE
+lib/third_party/frozendict/__init__.py
 lib/third_party/functools32/LICENSE
 lib/third_party/functools32/__init__.py
 lib/third_party/functools32/_dummy_thread32.py

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google LLC. All Rights Reserved.
+# Copyright 2021 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import os
 import re
 
 from apitools.base.py import exceptions as apitools_exceptions
-from googlecloudsdk.api_lib.functions import exceptions
-from googlecloudsdk.api_lib.functions import operations
+from googlecloudsdk.api_lib.functions.v1 import exceptions
+from googlecloudsdk.api_lib.functions.v1 import operations
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import exceptions as exceptions_util

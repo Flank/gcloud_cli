@@ -58,5 +58,5 @@ class Describe(kuberun_command.KubeRunCommand, base.DescribeCommand):
   def BuildKubeRunArgs(self, args):
     return [args.resource]
 
-  def FormatOutput(self, out, args):
+  def SuccessResult(self, out, args):
     return json.loads(out)

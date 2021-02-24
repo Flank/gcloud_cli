@@ -51,7 +51,6 @@
     confirmation_prompt: |
       WARNING: Applying software update will cause a full cache flush to the selected nodes in
       instance [{__name__}] in [{locationsId}].
-    default_continue: false
 
   request:
     api_version: v1beta2
