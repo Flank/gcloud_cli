@@ -27,7 +27,6 @@ from googlecloudsdk.command_lib.resource_manager import tag_utils
 from six.moves.urllib.parse import quote
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Delete(base.Command):
   """Deletes a TagBinding.

@@ -33,14 +33,14 @@ MEMBERSHIP_FLAG = '--membership'
 
 
 class Upgrade(base.UpdateCommand):
-  r"""Upgrades the version of the Config Management Feature.
+  r"""Upgrade the version of the Config Management Feature.
 
-  Upgrades a specified membership to the latest version of the
-  Config Management Feature.
+  Upgrade a specified membership to the latest version of the Config Management
+  Feature.
 
   ## Examples
 
-  Upgrade a membership named CLUSTER_NAME
+  Upgrade a membership named CLUSTER_NAME:
 
     $ {command} --membership=CLUSTER_NAME \
   """
@@ -111,7 +111,7 @@ class Upgrade(base.UpdateCommand):
     return True
 
   def _get_feature(self, project):
-    """Fetches the Config Management Feature.
+    """Fetch the Config Management Feature.
 
     Args:
       project: project id
@@ -137,7 +137,7 @@ class Upgrade(base.UpdateCommand):
 
 
 def _parse_versions(response, membership):
-  """Extracts the declared version and cluster version.
+  """Extract the declared version and cluster version.
 
   Args:
     response: A response from fetching the Config Management Feature
@@ -164,7 +164,7 @@ def _parse_versions(response, membership):
 
 
 def _get_or_prompt_membership(args, project):
-  """Retrieves the membership name from args or prompts the user.
+  """Retrieve the membership name from args or user prompt choice.
 
   Args:
     args: command line args

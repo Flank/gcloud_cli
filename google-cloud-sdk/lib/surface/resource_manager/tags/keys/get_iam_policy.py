@@ -24,7 +24,6 @@ from googlecloudsdk.command_lib.resource_manager import tag_arguments as argumen
 from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class GetIamPolicy(base.Command):
   """Gets the IAM policy for a TagKey resource.

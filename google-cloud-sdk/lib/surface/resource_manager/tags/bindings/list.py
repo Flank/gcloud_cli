@@ -24,7 +24,6 @@ from googlecloudsdk.command_lib.resource_manager import endpoint_utils as endpoi
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
   """Lists TagBindings bound to the specified resource.

@@ -79,7 +79,6 @@ class Deploy(base.Command):
     flags.AddCommandFlag(parser)
     flags.AddArgsFlag(parser)
     flags.AddClientNameAndVersionFlags(parser)
-    flags.AddSandboxArg(parser)
     flags.AddBinAuthzPolicyFlags(parser, with_clear=False)
     flags.AddBinAuthzBreakglassFlag(parser)
 

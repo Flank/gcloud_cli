@@ -28,7 +28,6 @@ from googlecloudsdk.command_lib.resource_manager import tag_utils
 import six.moves.http_client
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class AddIamPolicyBinding(base.Command):
   """Adds a policy binding to the IAM policy of a TagValue.

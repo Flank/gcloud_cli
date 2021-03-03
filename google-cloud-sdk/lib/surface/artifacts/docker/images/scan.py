@@ -29,6 +29,9 @@ from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
+from googlecloudsdk.core.updater import local_state
+from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import platforms
 import six
 
 # Extract stage messages to constants for convenience.
@@ -45,7 +48,7 @@ class ExtractionFailedError(core_exceptions.Error):
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
-class Scan(base.Command):
+class ScanBeta(base.Command):
   """Perform a vulnerability scan on a container image.
 
   You can scan a container image in a Google Cloud registry (Artifact Registry
@@ -101,8 +104,35 @@ class Scan(base.Command):
 
     Returns:
       AnalyzePackages operation.
+
+    Raises:
+      UnsupportedOS: when the command is run on a Windows machine.
     """
-    # Create the command wrapper immediately so we can fail fast if necessary.
+    if platforms.OperatingSystem.IsWindows():
+      raise ods_util.UnsupportedOS(
+          'On-Demand Scanning is not supported on Windows')
+
+    # Verify that the local-extract component is installed, and prompt the user
+    # to install it if it's not.
+    try:
+      # If the user has access to the gcloud components manager, this will
+      # prompt the user to install it. If they do not have access, it will
+      # instead print the command to install it using a package manager.
+      update_manager.UpdateManager.EnsureInstalledAndRestart(['local-extract'])
+    except update_manager.MissingRequiredComponentsError:
+      # Two possibilities with this error:
+      #   1. The user has access to the gcloud components manager but decided
+      #      against intalling it.
+      #   2. The user does not have access to the gcloud components manager. A
+      #      message was printed to the user with the command to install the
+      #      component using their package manager (e.g. apt-get).
+      raise
+    except local_state.InvalidSDKRootError:
+      # This happens when gcloud is run locally, but not when distributed.
+      pass
+
+    # Construct the object which invokes the `local-extract` component. This
+    # might still fail if the binary is run locally.
     cmd = Command()
 
     # TODO(b/173619679): Validate RESOURCE_URI argument.
@@ -118,7 +148,7 @@ class Scan(base.Command):
     if not args.async_:
       stages += [progress_tracker.Stage(POLL_MESSAGE, key='poll')]
 
-    messages = api_util.GetMessages()
+    messages = self.GetMessages()
     with progress_tracker.StagedProgressTracker(
         SCAN_MESSAGE, stages=stages) as tracker:
       # Stage 1) Extract.
@@ -147,7 +177,7 @@ class Scan(base.Command):
 
       # Stage 2) Make the RPC to the On-Demand Scanning API.
       tracker.StartStage('rpc')
-      op = api_util.AnalyzePackages(
+      op = self.AnalyzePackages(
           properties.VALUES.core.project.Get(required=True), args.location,
           args.RESOURCE_URI, pkgs)
       tracker.CompleteStage('rpc')
@@ -157,13 +187,54 @@ class Scan(base.Command):
       if not args.async_:
         tracker.StartStage('poll')
         tracker.UpdateStage('poll', '[{}]'.format(op.name))
-        response = ods_util.WaitForOperation(op)
+        response = self.WaitForOperation(op)
         tracker.CompleteStage('poll')
 
     if args.async_:
       log.status.Print('Check operation [{}] for status.'.format(op.name))
       return op
     return response
+
+  def AnalyzePackages(self, project, location, resource_uri, pkgs):
+    return api_util.AnalyzePackagesBeta(project, location, resource_uri, pkgs)
+
+  def GetMessages(self):
+    return api_util.GetMessages('v1beta1')
+
+  def WaitForOperation(self, op):
+    return ods_util.WaitForOperation(op, 'v1beta1')
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.GA)
+class ScanGA(ScanBeta):
+  """Perform a vulnerability scan on a container image.
+
+  You can scan a container image in a Google Cloud registry (Artifact Registry
+  or Container Registry), or a local container image.
+
+  Reference an image by tag or digest using any of the formats:
+
+    Artifact Registry:
+      LOCATION-docker.pkg.dev/PROJECT-ID/REPOSITORY-ID/IMAGE[:tag]
+      LOCATION-docker.pkg.dev/PROJECT-ID/REPOSITORY-ID/IMAGE@sha256:digest
+
+    Container Registry:
+      [LOCATION.]gcr.io/PROJECT-ID/REPOSITORY-ID/IMAGE[:tag]
+      [LOCATION.]gcr.io/PROJECT-ID/REPOSITORY-ID/IMAGE@sha256:digest
+
+    Local:
+      IMAGE[:tag]
+  """
+
+  def AnalyzePackages(self, project, location, resource_uri, pkgs):
+    return api_util.AnalyzePackagesGA(project, location, resource_uri, pkgs)
+
+  def GetMessages(self):
+    return api_util.GetMessages('v1')
+
+  def WaitForOperation(self, op):
+    return ods_util.WaitForOperation(op, 'v1')
 
 
 class Command(binary_operations.BinaryBackedOperation):

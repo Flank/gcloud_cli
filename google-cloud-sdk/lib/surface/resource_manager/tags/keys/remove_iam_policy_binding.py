@@ -28,7 +28,6 @@ from googlecloudsdk.command_lib.resource_manager import tag_utils
 import six.moves.http_client
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class RemoveIamPolicyBinding(base.Command):
   """Removes a policy binding from the IAM policy of a TagKey.

@@ -20,6 +20,10 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.ai import flags
+from googlecloudsdk.command_lib.ai import local_util
+from googlecloudsdk.command_lib.ai.docker import build as docker_builder
+from googlecloudsdk.command_lib.ai.docker import run as docker_runner
+from googlecloudsdk.core.util import files
 
 
 # TODO(b/176214485): Keep this hidden until public preview
@@ -52,7 +56,31 @@ class Create(base.CreateCommand):
   @staticmethod
   def Args(parser):
     flags.AddLocalRunCustomJobFlags(parser)
+    # TODO(b/177787597): Consider adding more validation.
 
   def Run(self, args):
-    # TODO(b/177787597): implementation
-    pass
+    # Mirrors the working directory and $HOME from host to container by default.
+    home_dir = files.GetHomeDir()
+
+    working_dir = args.work_dir or files.GetCWD()
+    working_dir = files.ExpandHomeDir(working_dir)
+
+    # TODO(b/176214485): Support extra custom packages.
+    extra_packages = []
+
+    script = args.script or local_util.ModuleToPath(args.python_module)
+
+    with files.ChDir(working_dir):
+      # TODO(b/176214485): Consider including the image id in the build result.
+      built_image = docker_builder.BuildImage(
+          container_home=home_dir,
+          base_image=args.base_image,
+          build_path=working_dir,
+          main_script=script,
+          python_module=args.python_module,
+          requirements=args.requirements,
+          extra_packages=extra_packages,
+          output_image_name=args.output_image_uri)
+
+      docker_runner.RunContainer(
+          image=built_image, enable_gpu=args.gpu, user_args=args.args)
