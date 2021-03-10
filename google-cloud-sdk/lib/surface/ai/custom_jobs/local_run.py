@@ -18,12 +18,44 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import os
+import textwrap
+
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.ai import errors
 from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.command_lib.ai import local_util
 from googlecloudsdk.command_lib.ai.docker import build as docker_builder
 from googlecloudsdk.command_lib.ai.docker import run as docker_runner
+from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files
+
+
+def _ValidateArgs(args, workdir, script):
+  """Validates arguments specified via flags."""
+
+  # Validate main script's existence:
+  script_path = os.path.normpath(os.path.join(workdir, script))
+  if not os.path.exists(script_path) or not os.path.isfile(script_path):
+    raise errors.ArgumentError(
+        r"File '{}' is not found under the working directory: '{}'.".format(
+            script, workdir))
+
+  # Validate extra custom packages specified:
+  for package in (args.extra_packages or []):
+    package_path = os.path.normpath(os.path.join(workdir, package))
+    if not os.path.exists(package_path) or not os.path.isfile(package_path):
+      raise errors.ArgumentError(
+          r"Package file '{}' is not found under the working directory: '{}'."
+          .format(package, workdir))
+
+  # Validate extra directorys specified:
+  for directory in (args.extra_dirs or []):
+    dir_path = os.path.normpath(os.path.join(workdir, directory))
+    if not os.path.exists(dir_path) or not os.path.isdir(directory):
+      raise errors.ArgumentError(
+          r"Directory '{}' is not found under the working directory: '{}'."
+          .format(directory, workdir))
 
 
 # TODO(b/176214485): Keep this hidden until public preview
@@ -36,7 +68,51 @@ class Create(base.CreateCommand):
   """
   detailed_help = {
       'DESCRIPTION':
-          '{description}',
+          textwrap.dedent("""\
+          {description}
+
+          You should execute this command in the top folder which includes all
+          the code and resources you want to pack and run, or specify the
+          'work-dir' flag to point to it. Any other path you specified via flags
+          should be a relative path to the work-dir and under it; otherwise it
+          will be unaccessible.
+
+          Supposing your directories are like the following structures:
+
+            /root
+              - my_project
+                  - my_training
+                      - task.py
+                      - util.py
+                      - setup.py
+                  - other_modules
+                      - some_module.py
+                  - dataset
+                      - small.dat
+                      - large.dat
+                  - config
+                  - dep
+                      - foo.tar.gz
+                  - bar.whl
+                  - requirements.txt
+              - another_project
+                  - something
+
+          If you set 'my_project' as the working directory, then you should
+          execute the task.py by specifying "--script=my_training/task.py" or
+          "--python-module=my_training.task", the 'requirements.txt' will be
+          processed. And you will also be able to install extra packages by,
+          e.g. specifying "--extra-packages=dep/foo.tar.gz,bar.whl" or include
+          extra directories, e.g. specifying "--extra-dirs=dataset,config".
+
+          If you set 'my_training' as the working directory, then you should
+          execute the task.py by specifying "--script=task.py" or
+          "--python-module=task", the 'setup.py' will be processed. However, you
+          won't be able to access any other files or directories that are not in
+          'my_training' folder.
+
+          See more details in the HELP info of the corresponding flags.
+          """),
       'EXAMPLES':
           """\
           To execute an python module with required dependencies, run:
@@ -65,22 +141,33 @@ class Create(base.CreateCommand):
     working_dir = args.work_dir or files.GetCWD()
     working_dir = files.ExpandHomeDir(working_dir)
 
-    # TODO(b/176214485): Support extra custom packages.
-    extra_packages = []
-
     script = args.script or local_util.ModuleToPath(args.python_module)
 
+    _ValidateArgs(args, working_dir, script)
+
     with files.ChDir(working_dir):
+      log.info('Working directory is set to {}'.format(working_dir))
       # TODO(b/176214485): Consider including the image id in the build result.
       built_image = docker_builder.BuildImage(
-          container_home=home_dir,
           base_image=args.base_image,
-          build_path=working_dir,
+          host_workdir=working_dir,
           main_script=script,
+          container_home=home_dir,
+          container_workdir=working_dir,
           python_module=args.python_module,
           requirements=args.requirements,
-          extra_packages=extra_packages,
+          extra_packages=args.extra_packages,
+          extra_dirs=args.extra_dirs,
           output_image_name=args.output_image_uri)
 
       docker_runner.RunContainer(
           image=built_image, enable_gpu=args.gpu, user_args=args.args)
+
+      log.info(
+          'A local run is finished successfully and build image: {}.'.format(
+              built_image.name))
+
+      # Clean generated cache
+      script_dir, _ = os.path.split(script) or working_dir
+      if local_util.ClearPyCache(script_dir):
+        log.info('Cleaned Python cache from directory: {}'.format(script_dir))

@@ -64,7 +64,8 @@ class Update(base.UpdateCommand):
             constants.OPERATION_CREATION_DISPLAY_MESSAGE.format(
                 name=operation.name,
                 verb='update index',
-                id=op_ref.Name()))
+                id=op_ref.Name(),
+                sub_commands='--index={}'.format(index_ref.Name())))
         # We will not wait for the operation since it can take up to hours.
         return operation
 

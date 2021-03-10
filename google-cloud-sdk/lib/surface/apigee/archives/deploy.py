@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.apigee import archives as cmd_lib
 from googlecloudsdk.command_lib.apigee import defaults
 from googlecloudsdk.command_lib.apigee import errors
 from googlecloudsdk.command_lib.apigee import resource_args
+from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
@@ -58,6 +59,12 @@ class Deploy(base.DescribeCommand):
 
     $ {command} --organization=my-org --environment=my-demo --source=/apigee/dev
 
+  To deploy the contents of the current working directory as an archive
+  deployment, with the user-defined labels ``my-label1=foo'' and
+  ``my-label2=bar'', to an environment named ``my-test'', given that the Cloud
+  Platform project has been set in gcloud settings, run:
+
+    $ {command} --environment=my-test --labels=my-label1=foo,my-label2=bar
   """
   }
 
@@ -84,33 +91,82 @@ class Deploy(base.DescribeCommand):
               "deployed to the specified environment.\n\n"
               "To monitor the operation once it's been launched, run "
               "`{grandparent_command} operations describe OPERATION_NAME`."))
+    # This adds the --labels flag.
+    labels_util.AddCreateLabelsFlags(parser)
+
+  def _GetUploadUrl(self, identifiers):
+    """Gets the signed URL for uploading the archive deployment.
+
+    Args:
+      identifiers: A dict of resource identifers. Must contain "organizationsId"
+        and "environmentsId"
+
+    Returns:
+      A str of the upload URL.
+
+    Raises:
+      googlecloudsdk.command_lib.apigee.errors.RequestError if the "uploadUri"
+        field is not included in the GetUploadUrl response.
+    """
+    get_upload_url_resp = apigee.ArchivesClient.GetUploadUrl(identifiers)
+    if "uploadUri" not in get_upload_url_resp:
+      raise errors.RequestError(
+          resource_type="getUploadUrl",
+          resource_identifier=identifiers,
+          body=get_upload_url_resp,
+          user_help="Please try again.")
+    return get_upload_url_resp["uploadUri"]
+
+  def _UploadArchive(self, upload_url, zip_file_path):
+    """Issues an HTTP PUT call to the upload URL with the zip file payload.
+
+    Args:
+      upload_url: A str containing the full upload URL.
+      zip_file_path: A str of the local path to the zip file.
+
+    Raises:
+      googlecloudsdk.command_lib.apigee.errors.HttpRequestError if the response
+        status of the HTTP PUT call is not 200 (OK).
+    """
+    upload_archive_resp = cmd_lib.UploadArchive(upload_url, zip_file_path)
+    if not upload_archive_resp.ok:
+      raise errors.HttpRequestError(upload_archive_resp.status_code,
+                                    upload_archive_resp.reason,
+                                    upload_archive_resp.content)
+
+  def _DeployArchive(self, identifiers, upload_url, labels):
+    """Creates the archive deployment.
+
+    Args:
+      identifiers: A dict of resource identifers. Must contain "organizationsId"
+        and "environmentsId"
+      upload_url: A str containing the full upload URL.
+      labels: A dict of the key/value pairs to add as labels.
+
+    Returns:
+      A dict containing the operation metadata.
+    """
+    post_data = {}
+    post_data["gcs_uri"] = upload_url
+    if labels:
+      post_data["labels"] = {}
+      for k, v in labels.items():
+        post_data["labels"][k] = v
+    api_response = apigee.ArchivesClient.CreateArchiveDeployment(
+        identifiers, post_data)
+    operation = apigee.OperationsClient.SplitName(api_response)
+    return operation
 
   def Run(self, args):
     """Run the deploy command."""
     identifiers = args.CONCEPTS.environment.Parse().AsDict()
+    labels_arg = labels_util.GetUpdateLabelsDictFromArgs(args)
     # Using as a context manager automatically cleans up the temp file on exit.
     with cmd_lib.LocalDirectoryArchive(args.source) as local_dir_archive:
       zip_file_path = local_dir_archive.Zip()
-      get_upload_url_resp = apigee.ArchivesClient.GetUploadUrl(identifiers)
-      if "uploadUri" not in get_upload_url_resp:
-        raise errors.RequestError(
-            resource_type="getUploadUrl",
-            resource_identifier=identifiers,
-            body=get_upload_url_resp,
-            user_help="Please try again.")
-      upload_url = get_upload_url_resp["uploadUri"]
-      # HTTP PUT request to upload the local archive to GCS.
-      upload_archive_resp = cmd_lib.UploadArchive(upload_url, zip_file_path)
-      if not upload_archive_resp.ok:
-        raise errors.HttpRequestError(upload_archive_resp.status_code,
-                                      upload_archive_resp.reason,
-                                      upload_archive_resp.url,
-                                      upload_archive_resp.request.method)
-      # CreateArchiveDeployment starts an LRO.
-      create_archive_deployment_resp = \
-          apigee.ArchivesClient.CreateArchiveDeployment(identifiers, upload_url)
-      operation = apigee.OperationsClient.SplitName(
-          create_archive_deployment_resp)
+      upload_url = self._GetUploadUrl(identifiers)
+      self._UploadArchive(upload_url, zip_file_path)
+      operation = self._DeployArchive(identifiers, upload_url, labels_arg)
       if "organization" not in operation or "uuid" not in operation:
         raise waiter.OperationError(
             "Unknown operation response: {}".format(operation))

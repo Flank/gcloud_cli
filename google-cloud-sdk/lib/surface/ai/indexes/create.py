@@ -59,9 +59,13 @@ class Create(base.CreateCommand):
     with endpoint_util.AiplatformEndpointOverrides(version, region=region):
       operation = client.IndexesClient().CreateBeta(region_ref, args)
       op_ref = indexes_util.ParseIndexOperation(operation.name)
+      index_id = op_ref.AsDict()['indexesId']
       log.status.Print(
           constants.OPERATION_CREATION_DISPLAY_MESSAGE.format(
-              name=operation.name, verb='create index', id=op_ref.Name()))
+              name=operation.name,
+              verb='create index',
+              id=op_ref.Name(),
+              sub_commands='--index={}'.format(index_id)))
       return operation
 
   def Run(self, args):

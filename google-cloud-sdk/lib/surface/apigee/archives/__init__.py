@@ -33,5 +33,18 @@ class Archives(base.Group):
 
               $ {command} deploy --environment=test
 
+          To list all archive deployments in the ``dev'' environment, run:
+
+              $ {command} list --environment=dev
+
+          To describe the archive deployment with id ``abcdef01234'' in the
+          ``demo'' environment of the ``my-org'' Apigee organization, run:
+
+              $ {command} describe abcdef01234 --environment=demo --organization=my-org
+
+          To update the labels of the archive deployment with id
+          ``uvxwzy56789'' in the ``test'' environment, run:
+
+              $ {command} update uvxwzy56789 --environment=demo --update-labels=foo=1,bar=2
       """,
   }

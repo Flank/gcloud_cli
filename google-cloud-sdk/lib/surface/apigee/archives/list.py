@@ -36,7 +36,8 @@ class List(base.ListCommand):
 
       $ {command} --environment=my-env
 
-  To list all archive deployments in an organization called ``my-org'', run:
+  To list all archive deployments, for an environment named ``my-env'', in an
+  organization called ``my-org'', run:
 
       $ {command} --environment=my-env --organization=my-org
 
@@ -74,7 +75,10 @@ class List(base.ListCommand):
     created_col = ("archiveDeployments.createdAt.date("
                    "format='%Y-%m-%d %H:%M:%S %Z', unit=1000000, tz=LOCAL)"
                    ":label='DEPLOYED AT'")
-    cols = ", ".join([archive_id_col, env_id_col, created_col])
+    # The labels field is a list of key/value pairs so it is flattened to
+    # display in the table.
+    labels_col = "archiveDeployments.labels.flatten()"
+    cols = ", ".join([archive_id_col, env_id_col, created_col, labels_col])
     # Format the column definitions into a table.
     table_fmt = "table({})".format(cols)
     parser.display_info.AddFormat(table_fmt)
@@ -82,5 +86,4 @@ class List(base.ListCommand):
   def Run(self, args):
     """Run the list command."""
     identifiers = args.CONCEPTS.environment.Parse().AsDict()
-    result = apigee.ArchivesClient.List(identifiers)
-    return result
+    return apigee.ArchivesClient.List(identifiers)

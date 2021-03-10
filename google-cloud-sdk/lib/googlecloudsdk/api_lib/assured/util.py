@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2020 Google LLC. All Rights Reserved.
+# Copyright 2021 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,23 +19,25 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
-import six
+from googlecloudsdk.calliope.base import ReleaseTrack
 
-ALPHA_API_VERSION = 'v1beta1'
-BETA_API_VERSION = 'v1beta1'
+VERSION_MAP = {
+    ReleaseTrack.ALPHA: 'v1beta1',
+    ReleaseTrack.BETA: 'v1beta1',
+    ReleaseTrack.GA: 'v1'
+}
 API_NAME = 'assuredworkloads'
 
 
-def GetClientInstance(release_track, no_http=False):
-  api_version = GetApiVersion(release_track)
-  return apis.GetClientInstance(API_NAME, api_version, no_http=no_http)
+def GetMessagesModule(release_track=ReleaseTrack.GA):
+  api_version = VERSION_MAP.get(release_track)
+  return apis.GetMessagesModule(API_NAME, api_version)
 
 
-def GetApiVersion(release_track):
-  release_track = six.text_type(release_track)
-  if release_track == 'BETA':
-    return BETA_API_VERSION
-  if release_track == 'ALPHA':
-    return ALPHA_API_VERSION
-  else:
-    raise Exception('Release track {} not recognised.'.format(release_track))
+def GetClientInstance(release_track=ReleaseTrack.GA, no_http=False):
+  api_version = VERSION_MAP.get(release_track)
+  return apis.GetClientInstance(API_NAME, api_version, no_http)
+
+
+def GetApiVersion(release_track=ReleaseTrack.GA):
+  return VERSION_MAP.get(release_track)

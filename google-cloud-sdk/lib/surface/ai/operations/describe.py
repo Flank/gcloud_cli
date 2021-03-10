@@ -23,6 +23,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.ai import constants
 from googlecloudsdk.command_lib.ai import endpoint_util
 from googlecloudsdk.command_lib.ai import flags
+from googlecloudsdk.command_lib.ai import indexes_util
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
@@ -31,21 +32,38 @@ class Describe(base.DescribeCommand):
 
   ## EXAMPLES
 
-  Describe an operation `123` of project `example` in region `us-central1`, run:
+  To describe an operation ``123'' of project ``example'' in region
+  ``us-central1'', run:
 
     $ {command} 123 --project=example --region=us-central1
+
+  To describe an operation ``123'' belongs to parent index resource ``456'' of
+  project ``example'' in region ``us-central1'', run:
+
+    $ {command} 123 --index=456 --project=example --region=us-central1
   """
 
   @staticmethod
   def Args(parser):
     flags.AddOperationResourceArg(parser)
+    flags.GetIndexIdArg(
+        required=False,
+        helper_text="""\
+     ID of the index. Applies to operations belongs to an index resource. Do not set otherwise.
+    """).AddToParser(parser)
 
   def _Run(self, args, version):
-    # TODO(b/168234089): Support multi-parent operation format.
-    # This is the default operation name in format of
+    # This is the default operation name in the format of
     # `projects/123/locations/us-central1/operations/456`.
     operation_ref = args.CONCEPTS.operation.Parse()
+    project_id = operation_ref.AsDict()['projectsId']
     region = operation_ref.AsDict()['locationsId']
+    operation_id = operation_ref.AsDict()['operationsId']
+
+    if args.index is not None:
+      # Override the operation name using the multi-parent format.
+      operation_ref = indexes_util.BuildIndexParentOperation(
+          project_id, region, args.index, operation_id)
     with endpoint_util.AiplatformEndpointOverrides(version, region=region):
       return operations.OperationsClient().Get(operation_ref)
 

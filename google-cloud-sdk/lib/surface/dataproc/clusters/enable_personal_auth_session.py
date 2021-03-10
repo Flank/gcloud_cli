@@ -249,6 +249,13 @@ class EnablePersonalAuthSession(base.Command):
 
   # def Run(self, args: argparse.Namespace):
   def Run(self, args):
+    message = ('A personal authentication session will propagate your personal '
+               'credentials to the cluster, so make sure you trust the cluster '
+               'and the user who created it.')
+    console_io.PromptContinue(
+        message=message,
+        cancel_on_no=True,
+        cancel_string='Enabling session aborted by user')
     dataproc = dp.Dataproc(self.ReleaseTrack())
 
     cluster_ref = args.CONCEPTS.cluster.Parse()

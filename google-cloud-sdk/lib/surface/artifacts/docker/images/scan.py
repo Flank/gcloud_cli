@@ -25,7 +25,6 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.artifacts import flags
 from googlecloudsdk.command_lib.artifacts import ondemandscanning_util as ods_util
 from googlecloudsdk.command_lib.util.anthos import binary_operations
-from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
@@ -40,11 +39,6 @@ EXTRACT_MESSAGE = ('Locally extracting packages and versions from {} '
                    'container image')
 RPC_MESSAGE = 'Remotely initiating analysis of packages and versions'
 POLL_MESSAGE = 'Waiting for analysis operation to complete'
-
-
-class ExtractionFailedError(core_exceptions.Error):
-  """Raised when extraction fails."""
-  pass
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -159,8 +153,18 @@ class ScanBeta(base.Command):
           fake_extraction=args.fake_extraction,
       )
       if operation_result.exit_code:
-        tracker.FailStage('extract',
-                          ExtractionFailedError(operation_result.stderr))
+        # Filter out any log messages on std err and only include any actual
+        # extraction errors.
+        extraction_error = None
+        if operation_result.stderr:
+          extraction_error = '\n'.join([
+              line for line in operation_result.stderr.splitlines()
+              if line.startswith('Extraction failed')
+          ])
+        if not extraction_error:
+          extraction_error = 'Unknown extraction error'
+        tracker.FailStage(
+            'extract', ods_util.ExtractionFailedError(extraction_error))
         return
 
       # Parse stdout for the JSON-ified PackageData protos.
