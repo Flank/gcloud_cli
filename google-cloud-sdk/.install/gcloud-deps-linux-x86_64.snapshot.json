@@ -26,17 +26,18 @@
           "LINUX"
         ]
       },
+      "platform_required": false,
       "version": {
-        "build_number": 20210305142528,
-        "version_string": "2021.03.05"
+        "build_number": 20210312165631,
+        "version_string": "2021.03.12"
       }
     }
   ],
-  "revision": 20210305142528,
+  "revision": 20210312165631,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "331.0.0"
+  "version": "332.0.0"
 }

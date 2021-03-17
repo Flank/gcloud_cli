@@ -1,0 +1,19 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: Delete a Cloud Deploy target.
+    description: |
+      Delete a Cloud Deploy target.
+    examples: |
+      To delete a target called 'test-target' for delivery pipeline 'test-pipeline' in region 'us-central1', run:
+
+        $ {command} test-target --delivery-pipeline=test-pipeline --region=us-central1
+
+  request:
+    collection: clouddeploy.projects.locations.deliveryPipelines.targets
+    api_version: v1alpha1
+
+  arguments:
+    resource:
+      help_text: The Cloud Deploy target to delete.
+      spec: !REF googlecloudsdk.command_lib.deploy.resources:target

@@ -18,7 +18,8 @@
     description: Search transitive groups of a member.
     examples: |
       To search transitive groups of a member.
-        $ {command} --member-email=eng-discuss@foo.com --page-size=10
+
+        $ {command} --labels=cloudidentity.googleapis.com/groups.discussion_forum --member-email=eng-discuss@foo.com --page-size=10
 
   request:
     collection: cloudidentity.groups.memberships

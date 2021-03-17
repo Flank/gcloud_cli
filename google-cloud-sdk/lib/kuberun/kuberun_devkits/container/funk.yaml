@@ -1,4 +1,0 @@
-functions:
-- name: http
-  description: "Create a pre-built container based component with HTTP input/output."
-  files:

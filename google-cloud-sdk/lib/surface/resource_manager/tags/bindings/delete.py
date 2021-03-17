@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py.exceptions import HttpBadRequestError
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import endpoint_utils as endpoints
@@ -25,6 +26,8 @@ from googlecloudsdk.command_lib.resource_manager import operations
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
 from googlecloudsdk.command_lib.resource_manager import tag_utils
 from six.moves.urllib.parse import quote
+
+PROJECTS_PREFIX = "//cloudresourcemanager.googleapis.com/projects/"
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -80,15 +83,39 @@ class Delete(base.Command):
         name=binding_name)
 
     location = args.location if args.IsSpecified("location") else None
-    with endpoints.CrmEndpointOverrides(location):
-      service = tags.TagBindingsService()
-      op = service.Delete(del_req)
 
-      if args.async_ or op.done:
-        return op
-      else:
-        return operations.WaitForOperation(
-            op,
-            "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
-            "deleted with [{}]".format(args.parent, args.tag_value, op.name),
-            service=service)
+    try:
+      with endpoints.CrmEndpointOverrides(location):
+        service = tags.TagBindingsService()
+        op = service.Delete(del_req)
+
+        if args.async_ or op.done:
+          return op
+        else:
+          return operations.WaitForOperation(
+              op,
+              "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
+              "deleted with [{}]".format(args.parent, args.tag_value, op.name),
+              service=service)
+    except HttpBadRequestError:
+      if args.parent.find(PROJECTS_PREFIX) != 0:
+        raise
+
+     # Attempt to fetch and delete the binding for the given project id.
+      binding_name = tag_utils.ProjectNameToBinding(args.parent, tag_value,
+                                                    location)
+      del_req = messages.CloudresourcemanagerTagBindingsDeleteRequest(
+          name=binding_name)
+
+      with endpoints.CrmEndpointOverrides(location):
+        service = tags.TagBindingsService()
+        op = service.Delete(del_req)
+
+        if args.async_ or op.done:
+          return op
+        else:
+          return operations.WaitForOperation(
+              op,
+              "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
+              "deleted with [{}]".format(args.parent, tag_value, op.name),
+              service=service)

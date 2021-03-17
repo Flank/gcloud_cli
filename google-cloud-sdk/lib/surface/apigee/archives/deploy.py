@@ -26,6 +26,7 @@ from googlecloudsdk.command_lib.apigee import errors
 from googlecloudsdk.command_lib.apigee import resource_args
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
+from googlecloudsdk.core.util import files
 
 
 @base.Hidden
@@ -80,7 +81,10 @@ class Deploy(base.DescribeCommand):
         positional=False,
         required=True)
     parser.add_argument(
-        "--source", required=False, help="The source directory to upload.")
+        "--source",
+        required=False,
+        type=files.ExpandHomeAndVars,
+        help="The source directory to upload.")
     parser.add_argument(
         "--async",
         action="store_true",

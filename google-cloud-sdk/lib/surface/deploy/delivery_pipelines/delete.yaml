@@ -1,0 +1,18 @@
+- release_tracks: [ALPHA]
+  help_text:
+    brief: Delete a delivery pipeline.
+    description: Delete a delivery pipeline.
+    examples: |
+      To delete a delivery pipeline 'test-pipeline', in region 'us-central1', run:
+
+        $ {command} test-pipeline --region=us-central1
+  request:
+    collection: clouddeploy.projects.locations.deliveryPipelines
+    api_version: v1alpha1
+
+  arguments:
+    resource:
+      help_text: The Cloud Deploy delivery pipeline to delete.
+      spec: !REF googlecloudsdk.command_lib.deploy.resources:delivery_pipeline_positional
+  input:
+    confirmation_prompt: Once a delivery pipeline is deleted, it cannot be recovered.

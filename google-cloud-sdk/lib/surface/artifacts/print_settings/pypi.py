@@ -20,11 +20,12 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.artifacts import flags
-from googlecloudsdk.command_lib.artifacts import settings_util
+from googlecloudsdk.command_lib.artifacts.print_settings import settings_util
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Pypi(base.Command):
   """Print credential settings to add to the .pypirc and pip.conf file.
 

@@ -1,0 +1,22 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: List Cloud Deploy targets.
+    description: |
+      List Cloud Deploy targets.
+    examples: |
+      To list the targets for delivery pipeline 'test-pipeline' in region 'us-central1', run:
+
+        $ {command} --delivery-pipeline=test-pipeline --region=us-central1
+
+  request:
+    collection: clouddeploy.projects.locations.deliveryPipelines.targets
+    api_version: v1alpha1
+
+  response:
+    id_field: name
+
+  arguments:
+    resource:
+      help_text: The delivery pipeline you want to list the targets for.
+      spec: !REF googlecloudsdk.command_lib.deploy.resources:delivery_pipeline

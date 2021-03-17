@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.calliope import base as gcloud_base
 from googlecloudsdk.command_lib.container.hub.features import base
-from googlecloudsdk.command_lib.container.hub.identity_service import state_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
@@ -67,23 +66,4 @@ class Describe(gcloud_base.ListCommand):
       log.status.Print('No Memberships available in Hub.')
       return {}
 
-    feature_spec_memberships = state_util.parse_feature_spec_memberships(
-        response)
-    feature_state_memberships = state_util.parse_feature_state_memberships(
-        response)
-    # Populate and print out status of memberships.
-    ais_status = []
-    for name in memberships:
-      cluster_in_spec = None
-      cluster_in_state = None
-      if name in feature_spec_memberships:
-        cluster_in_spec = feature_spec_memberships[name]
-        if name in feature_state_memberships:
-          cluster_in_state = feature_state_memberships[name].value
-        cluster_out = state_util.IdentityServiceMembershipState(
-            name, cluster_in_spec=cluster_in_spec,
-            cluster_in_state=cluster_in_state)
-        ais_status.append(cluster_out)
-      else:
-        ais_status.append({name: 'config not applied'})
-    return {'Membership Status for Identity Service': ais_status}
+    return {'Identity Service Feature': response}
