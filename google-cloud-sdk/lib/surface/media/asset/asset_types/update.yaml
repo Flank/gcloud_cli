@@ -34,3 +34,10 @@
 
     params:
     - _REF_: googlecloudsdk.command_lib.media.asset.flags:update-asset-type-config-file
+
+  response:
+    modify_response_hooks:
+    - googlecloudsdk.command_lib.media.asset.asset_types.hooks:ProcessOutput
+
+  update:
+    read_modify_update: true

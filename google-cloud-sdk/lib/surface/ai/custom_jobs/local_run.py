@@ -52,7 +52,7 @@ def _ValidateArgs(args, workdir, script):
   # Validate extra directorys specified:
   for directory in (args.extra_dirs or []):
     dir_path = os.path.normpath(os.path.join(workdir, directory))
-    if not os.path.exists(dir_path) or not os.path.isdir(directory):
+    if not os.path.exists(dir_path) or not os.path.isdir(dir_path):
       raise errors.ArgumentError(
           r"Directory '{}' is not found under the working directory: '{}'."
           .format(directory, workdir))
@@ -135,39 +135,36 @@ class Create(base.CreateCommand):
     # TODO(b/177787597): Consider adding more validation.
 
   def Run(self, args):
-    # Mirrors the working directory and $HOME from host to container by default.
-    home_dir = files.GetHomeDir()
-
     working_dir = args.work_dir or files.GetCWD()
-    working_dir = files.ExpandHomeDir(working_dir)
+    working_dir = os.path.abspath(files.ExpandHomeDir(working_dir))
 
     script = args.script or local_util.ModuleToPath(args.python_module)
 
     _ValidateArgs(args, working_dir, script)
 
     with files.ChDir(working_dir):
-      log.info('Working directory is set to {}'.format(working_dir))
+      log.status.Print('Working directory is set to {}.'.format(working_dir))
       # TODO(b/176214485): Consider including the image id in the build result.
       built_image = docker_builder.BuildImage(
           base_image=args.base_image,
           host_workdir=working_dir,
           main_script=script,
-          container_home=home_dir,
-          container_workdir=working_dir,
           python_module=args.python_module,
           requirements=args.requirements,
           extra_packages=args.extra_packages,
           extra_dirs=args.extra_dirs,
           output_image_name=args.output_image_uri)
 
+      log.status.Print('A training image is ready. Starting to run ...')
       docker_runner.RunContainer(
           image=built_image, enable_gpu=args.gpu, user_args=args.args)
 
-      log.info(
+      log.out.Print(
           'A local run is finished successfully and build image: {}.'.format(
               built_image.name))
 
       # Clean generated cache
       script_dir, _ = os.path.split(script) or working_dir
       if local_util.ClearPyCache(script_dir):
-        log.info('Cleaned Python cache from directory: {}'.format(script_dir))
+        log.status.Print(
+            'Cleaned Python cache from directory: {}'.format(script_dir))

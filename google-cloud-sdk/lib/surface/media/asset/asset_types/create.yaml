@@ -34,3 +34,7 @@
     - _REF_: googlecloudsdk.command_lib.media.asset.flags:create-asset-type-config-file
     labels:
       api_field: assetType.labels
+
+  response:
+    modify_response_hooks:
+    - googlecloudsdk.command_lib.media.asset.asset_types.hooks:ProcessOutput

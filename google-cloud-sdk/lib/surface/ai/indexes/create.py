@@ -56,6 +56,7 @@ class Create(base.CreateCommand):
     validation.ValidateDisplayName(args.display_name)
     region_ref = args.CONCEPTS.region.Parse()
     region = region_ref.AsDict()['locationsId']
+    project_id = region_ref.AsDict()['projectsId']
     with endpoint_util.AiplatformEndpointOverrides(version, region=region):
       operation = client.IndexesClient().CreateBeta(region_ref, args)
       op_ref = indexes_util.ParseIndexOperation(operation.name)
@@ -65,7 +66,8 @@ class Create(base.CreateCommand):
               name=operation.name,
               verb='create index',
               id=op_ref.Name(),
-              sub_commands='--index={}'.format(index_id)))
+              sub_commands='--index={} [--project={}]'.format(
+                  index_id, project_id)))
       return operation
 
   def Run(self, args):

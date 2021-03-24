@@ -52,6 +52,10 @@ lib/googlecloudsdk/api_lib/ai/models/client.py
 lib/googlecloudsdk/api_lib/ai/operations.py
 lib/googlecloudsdk/api_lib/ai/tensorboard_experiments/__init__.py
 lib/googlecloudsdk/api_lib/ai/tensorboard_experiments/client.py
+lib/googlecloudsdk/api_lib/ai/tensorboard_runs/__init__.py
+lib/googlecloudsdk/api_lib/ai/tensorboard_runs/client.py
+lib/googlecloudsdk/api_lib/ai/tensorboard_time_series/__init__.py
+lib/googlecloudsdk/api_lib/ai/tensorboard_time_series/client.py
 lib/googlecloudsdk/api_lib/ai/tensorboards/__init__.py
 lib/googlecloudsdk/api_lib/ai/tensorboards/client.py
 lib/googlecloudsdk/api_lib/api_gateway/__init__.py
@@ -146,6 +150,9 @@ lib/googlecloudsdk/api_lib/cloudbuild/snapshot.py
 lib/googlecloudsdk/api_lib/cloudbuild/transforms.py
 lib/googlecloudsdk/api_lib/cloudbuild/trigger_config.py
 lib/googlecloudsdk/api_lib/cloudbuild/workerpool_config.py
+lib/googlecloudsdk/api_lib/clouddeploy/__init__.py
+lib/googlecloudsdk/api_lib/clouddeploy/client_util.py
+lib/googlecloudsdk/api_lib/clouddeploy/release.py
 lib/googlecloudsdk/api_lib/cloudiot/__init__.py
 lib/googlecloudsdk/api_lib/cloudiot/devices.py
 lib/googlecloudsdk/api_lib/cloudiot/registries.py
@@ -478,6 +485,8 @@ lib/googlecloudsdk/api_lib/logging/__init__.py
 lib/googlecloudsdk/api_lib/logging/common.py
 lib/googlecloudsdk/api_lib/logging/tailing.py
 lib/googlecloudsdk/api_lib/logging/util.py
+lib/googlecloudsdk/api_lib/lux/__init__.py
+lib/googlecloudsdk/api_lib/lux/api_util.py
 lib/googlecloudsdk/api_lib/memcache/__init__.py
 lib/googlecloudsdk/api_lib/meta/__init__.py
 lib/googlecloudsdk/api_lib/meta/help_html_data/__init__.py
@@ -1192,7 +1201,12 @@ lib/googlecloudsdk/command_lib/datastore/flags.py
 lib/googlecloudsdk/command_lib/datastore/resources.yaml
 lib/googlecloudsdk/command_lib/debug/__init__.py
 lib/googlecloudsdk/command_lib/debug/flags.py
+lib/googlecloudsdk/command_lib/deploy/__init__.py
+lib/googlecloudsdk/command_lib/deploy/flags.py
+lib/googlecloudsdk/command_lib/deploy/release_util.py
+lib/googlecloudsdk/command_lib/deploy/resource_args.py
 lib/googlecloudsdk/command_lib/deploy/resources.yaml
+lib/googlecloudsdk/command_lib/deploy/staging_bucket_util.py
 lib/googlecloudsdk/command_lib/deployment_manager/__init__.py
 lib/googlecloudsdk/command_lib/deployment_manager/alpha_flags.py
 lib/googlecloudsdk/command_lib/deployment_manager/composite_types.py
@@ -1422,6 +1436,8 @@ lib/googlecloudsdk/command_lib/lifesciences/resources.yaml
 lib/googlecloudsdk/command_lib/logs/__init__.py
 lib/googlecloudsdk/command_lib/logs/read.py
 lib/googlecloudsdk/command_lib/logs/stream.py
+lib/googlecloudsdk/command_lib/lux/__init__.py
+lib/googlecloudsdk/command_lib/lux/flags.py
 lib/googlecloudsdk/command_lib/media/__init__.py
 lib/googlecloudsdk/command_lib/media/asset/__init__.py
 lib/googlecloudsdk/command_lib/media/asset/asset_types/__init__.py
@@ -1693,6 +1709,7 @@ lib/googlecloudsdk/command_lib/storage/copying.py
 lib/googlecloudsdk/command_lib/storage/errors.py
 lib/googlecloudsdk/command_lib/storage/expansion.py
 lib/googlecloudsdk/command_lib/storage/file_part.py
+lib/googlecloudsdk/command_lib/storage/hash_util.py
 lib/googlecloudsdk/command_lib/storage/name_expansion.py
 lib/googlecloudsdk/command_lib/storage/paths.py
 lib/googlecloudsdk/command_lib/storage/plurality_checkable_iterator.py
@@ -1728,7 +1745,6 @@ lib/googlecloudsdk/command_lib/storage/tasks/task_executor.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_graph.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_graph_executor.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_status.py
-lib/googlecloudsdk/command_lib/storage/temporary_components.py
 lib/googlecloudsdk/command_lib/storage/thread_messages.py
 lib/googlecloudsdk/command_lib/storage/tracker_file_util.py
 lib/googlecloudsdk/command_lib/storage/util.py
@@ -2004,6 +2020,7 @@ lib/googlecloudsdk/schemas/compute/alpha/BackendServiceCdnPolicy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/BackendServiceCdnPolicyBypassCacheOnRequestHeader.yaml
 lib/googlecloudsdk/schemas/compute/alpha/BackendServiceCdnPolicyNegativeCachingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/BackendServiceCloudFunctionBackend.yaml
+lib/googlecloudsdk/schemas/compute/alpha/BackendServiceConnectionTrackingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/BackendServiceFailoverPolicy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/BackendServiceIAP.yaml
 lib/googlecloudsdk/schemas/compute/alpha/BackendServiceIAPOAuth2ClientInfo.yaml
@@ -2024,6 +2041,7 @@ lib/googlecloudsdk/schemas/compute/alpha/DisplayDevice.yaml
 lib/googlecloudsdk/schemas/compute/alpha/Duration.yaml
 lib/googlecloudsdk/schemas/compute/alpha/FileContentBuffer.yaml
 lib/googlecloudsdk/schemas/compute/alpha/ForwardingRule.yaml
+lib/googlecloudsdk/schemas/compute/alpha/ForwardingRuleServiceDirectoryRegistration.yaml
 lib/googlecloudsdk/schemas/compute/alpha/GrpcServiceConfig.yaml
 lib/googlecloudsdk/schemas/compute/alpha/GuestOsFeature.yaml
 lib/googlecloudsdk/schemas/compute/alpha/HostRule.yaml
@@ -2080,6 +2098,7 @@ lib/googlecloudsdk/schemas/compute/alpha/ShieldedInstanceIntegrityPolicy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/ShieldedVmConfig.yaml
 lib/googlecloudsdk/schemas/compute/alpha/ShieldedVmIntegrityPolicy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/SslPolicy.yaml
+lib/googlecloudsdk/schemas/compute/alpha/Subsetting.yaml
 lib/googlecloudsdk/schemas/compute/alpha/Tags.yaml
 lib/googlecloudsdk/schemas/compute/alpha/TargetGrpcProxy.yaml
 lib/googlecloudsdk/schemas/compute/alpha/TargetHttpProxy.yaml
@@ -2111,6 +2130,7 @@ lib/googlecloudsdk/schemas/compute/beta/BackendServiceCdnPolicy.yaml
 lib/googlecloudsdk/schemas/compute/beta/BackendServiceCdnPolicyBypassCacheOnRequestHeader.yaml
 lib/googlecloudsdk/schemas/compute/beta/BackendServiceCdnPolicyNegativeCachingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/beta/BackendServiceCloudFunctionBackend.yaml
+lib/googlecloudsdk/schemas/compute/beta/BackendServiceConnectionTrackingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/beta/BackendServiceFailoverPolicy.yaml
 lib/googlecloudsdk/schemas/compute/beta/BackendServiceIAP.yaml
 lib/googlecloudsdk/schemas/compute/beta/BackendServiceIAPOAuth2ClientInfo.yaml
@@ -2182,6 +2202,7 @@ lib/googlecloudsdk/schemas/compute/beta/ShieldedInstanceConfig.yaml
 lib/googlecloudsdk/schemas/compute/beta/ShieldedInstanceIntegrityPolicy.yaml
 lib/googlecloudsdk/schemas/compute/beta/ShieldedVmConfig.yaml
 lib/googlecloudsdk/schemas/compute/beta/ShieldedVmIntegrityPolicy.yaml
+lib/googlecloudsdk/schemas/compute/beta/Subsetting.yaml
 lib/googlecloudsdk/schemas/compute/beta/Tags.yaml
 lib/googlecloudsdk/schemas/compute/beta/TargetHttpProxy.yaml
 lib/googlecloudsdk/schemas/compute/beta/TargetHttpsProxy.yaml
@@ -2203,6 +2224,8 @@ lib/googlecloudsdk/schemas/compute/v1/AttachedDiskInitializeParams.yaml
 lib/googlecloudsdk/schemas/compute/v1/Backend.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendService.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicy.yaml
+lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicyBypassCacheOnRequestHeader.yaml
+lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicyNegativeCachingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceFailoverPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceIAP.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceLogConfig.yaml
@@ -2249,6 +2272,7 @@ lib/googlecloudsdk/schemas/compute/v1/RequestMirrorPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/ReservationAffinity.yaml
 lib/googlecloudsdk/schemas/compute/v1/Scheduling.yaml
 lib/googlecloudsdk/schemas/compute/v1/SchedulingNodeAffinity.yaml
+lib/googlecloudsdk/schemas/compute/v1/SecuritySettings.yaml
 lib/googlecloudsdk/schemas/compute/v1/ServiceAccount.yaml
 lib/googlecloudsdk/schemas/compute/v1/ShieldedInstanceConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/ShieldedInstanceIntegrityPolicy.yaml
@@ -3411,6 +3435,7 @@ lib/googlecloudsdk/third_party/apis/remotebuildexecution_v1alpha.json
 lib/googlecloudsdk/third_party/apis/replicapoolupdater_v1beta1.json
 lib/googlecloudsdk/third_party/apis/resourcesettings/__init__.py
 lib/googlecloudsdk/third_party/apis/resourcesettings/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/resourcesettings/v1/resources.py
 lib/googlecloudsdk/third_party/apis/resourcesettings/v1/resourcesettings_v1_client.py
 lib/googlecloudsdk/third_party/apis/resourcesettings/v1/resourcesettings_v1_messages.py
 lib/googlecloudsdk/third_party/apis/resourcesettings/v1alpha1/__init__.py
@@ -3948,6 +3973,18 @@ lib/surface/ai/tensorboard_experiments/delete.py
 lib/surface/ai/tensorboard_experiments/describe.py
 lib/surface/ai/tensorboard_experiments/list.py
 lib/surface/ai/tensorboard_experiments/update.py
+lib/surface/ai/tensorboard_runs/__init__.py
+lib/surface/ai/tensorboard_runs/create.py
+lib/surface/ai/tensorboard_runs/delete.py
+lib/surface/ai/tensorboard_runs/describe.py
+lib/surface/ai/tensorboard_runs/list.py
+lib/surface/ai/tensorboard_runs/update.py
+lib/surface/ai/tensorboard_time_series/__init__.py
+lib/surface/ai/tensorboard_time_series/create.py
+lib/surface/ai/tensorboard_time_series/delete.py
+lib/surface/ai/tensorboard_time_series/describe.py
+lib/surface/ai/tensorboard_time_series/list.py
+lib/surface/ai/tensorboard_time_series/update.py
 lib/surface/ai/tensorboards/__init__.py
 lib/surface/ai/tensorboards/create.py
 lib/surface/ai/tensorboards/delete.py
@@ -5277,6 +5314,10 @@ lib/surface/container/hub/service_directory/__init__.py
 lib/surface/container/hub/service_directory/describe.py
 lib/surface/container/hub/service_directory/disable.py
 lib/surface/container/hub/service_directory/enable.py
+lib/surface/container/hub/service_mesh/__init__.py
+lib/surface/container/hub/service_mesh/describe.py
+lib/surface/container/hub/service_mesh/disable.py
+lib/surface/container/hub/service_mesh/enable.py
 lib/surface/container/images/__init__.py
 lib/surface/container/images/add_tag.py
 lib/surface/container/images/delete.py
@@ -5538,6 +5579,7 @@ lib/surface/deploy/delivery_pipelines/delete.yaml
 lib/surface/deploy/delivery_pipelines/export.yaml
 lib/surface/deploy/delivery_pipelines/list.yaml
 lib/surface/deploy/releases/__init__.py
+lib/surface/deploy/releases/create.py
 lib/surface/deploy/releases/delete.yaml
 lib/surface/deploy/releases/describe.yaml
 lib/surface/deploy/releases/list.yaml
@@ -6420,6 +6462,9 @@ lib/surface/logging/views/describe.py
 lib/surface/logging/views/list.py
 lib/surface/logging/views/update.py
 lib/surface/logging/write.py
+lib/surface/lux/__init__.py
+lib/surface/lux/clusters/__init__.py
+lib/surface/lux/clusters/list.py
 lib/surface/media/__init__.py
 lib/surface/media/asset/__init__.py
 lib/surface/media/asset/asset_types/__init__.py
@@ -7223,7 +7268,6 @@ lib/surface/spanner/instances/list.py
 lib/surface/spanner/instances/remove_iam_policy_binding.yaml
 lib/surface/spanner/instances/set_iam_policy.yaml
 lib/surface/spanner/instances/update.py
-lib/surface/spanner/instances/update.yaml
 lib/surface/spanner/operations/__init__.py
 lib/surface/spanner/operations/cancel.py
 lib/surface/spanner/operations/describe.py

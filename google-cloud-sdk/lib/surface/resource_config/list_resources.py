@@ -18,20 +18,33 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util.declarative import flags as declarative_flags
 from googlecloudsdk.command_lib.util.declarative.clients import kcc_client
 
+try:
+  # Python 3.3 and above.
+  collections_abc = collections.abc
+except AttributeError:
+  collections_abc = collections
+
+
 _DETAILED_HELP = {
-    "EXAMPLES":
+    'EXAMPLES':
         """
-    To list all resources supported by bulk-export, run:
+    To list all exportable resource types, run:
 
       $ {command}
 
-    To list all resources supported by bulk-export in yaml format, run:
+    To list all exportable resource types in yaml format, run:
 
       $ {command} --output-format=yaml
+
+    To list all exportable resource typesin project `my-project` in json format, run:
+
+      $ {command} --output-format=json --project=my-project
     """
 }
 
@@ -44,8 +57,35 @@ class ListResources(base.DeclarativeCommand):
 
   @classmethod
   def Args(cls, parser):
-    declarative_flags.AddListResourcesFormatFlag(parser)
+    declarative_flags.AddListResourcesFlags(parser)
+    parser.display_info.AddFormat(kcc_client.RESOURCE_LIST_FORMAT)
 
   def Run(self, args):
     client = kcc_client.KccClient()
-    return client.ListResources(args.output_format)
+    if not (args.IsSpecified('project') or args.IsSpecified('folder') or
+            args.IsSpecified('organization')):
+      args.format = 'default'
+    elif args.output_format != 'table':
+      args.format = args.output_format
+    output = client.ListResources(output_format=args.output_format,
+                                  project=args.project,
+                                  organization=args.organization,
+                                  folder=args.folder)
+    if isinstance(output, list):
+      return [_GcloudToKccKrm(x) for x in output]
+
+    return output
+
+
+def _GcloudToKccKrm(kind_val):
+  """Convert KrmGroupValueKind to config-connector output format."""
+  gvk = collections.OrderedDict()
+  output = collections.OrderedDict()
+  gvk['Group'] = kind_val['group']
+  gvk['Kind'] = kind_val['kind']
+  gvk['Version'] = ''
+  output['GVK'] = gvk
+  output['ResourceNameFormat'] = kind_val['resource_name_format']
+  output['SupportsBulkExport'] = kind_val['bulk_export_supported']
+  output['SupportsExport'] = kind_val['export_supported']
+  return output

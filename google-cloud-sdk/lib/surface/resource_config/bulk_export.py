@@ -41,7 +41,7 @@ _DETAILED_HELP = {
     To export all Storage Bucket and Compute Instances resources in project my-project to stdout,
     run:
 
-      $ {command} --project=my-project --resource-types=storage.googleapis.com/Bucket,compute.googleapis.com/Instance
+      $ {command} --project=my-project --resource-types=storage.cnrm.cloud.google.com/StorageBucket,ComputeInstance
     """
 }
 

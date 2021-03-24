@@ -109,9 +109,7 @@
         enum_value: EDGE_CACHE
         help_text: |
           Certificates with scope EDGE_CACHE are special-purposed certificates,
-          scoped for use with Edge Cache services only.
-
-          Currently allowed only for managed certificates.
+          scoped for use with Media Edge services only.
     - arg_name: description
       api_field: certificate.description
       help_text: |

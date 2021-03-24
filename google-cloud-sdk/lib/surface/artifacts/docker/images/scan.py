@@ -40,6 +40,14 @@ EXTRACT_MESSAGE = ('Locally extracting packages and versions from {} '
 RPC_MESSAGE = 'Remotely initiating analysis of packages and versions'
 POLL_MESSAGE = 'Waiting for analysis operation to complete'
 
+# Error messages used to fill in for unknown error cases.
+EXTRACTION_KILLED_ERROR_TEMPLATE = (
+    'Extraction failed: image extraction was either stopped or crashed '
+    '(possibly due to a lack of available memory) with exit code '
+    '{exit_code}')
+UNKNOWN_EXTRACTION_ERROR_TEMPLATE = (
+    'Extraction failed: unknown error (exit code: {exit_code})')
+
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class ScanBeta(base.Command):
@@ -162,7 +170,14 @@ class ScanBeta(base.Command):
               if line.startswith('Extraction failed')
           ])
         if not extraction_error:
-          extraction_error = 'Unknown extraction error'
+          if operation_result.exit_code < 0:
+            extraction_error = EXTRACTION_KILLED_ERROR_TEMPLATE.format(
+                exit_code=operation_result.exit_code,
+            )
+          else:
+            extraction_error = UNKNOWN_EXTRACTION_ERROR_TEMPLATE.format(
+                exit_code=operation_result.exit_code,
+            )
         tracker.FailStage(
             'extract', ods_util.ExtractionFailedError(extraction_error))
         return

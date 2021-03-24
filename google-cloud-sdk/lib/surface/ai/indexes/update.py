@@ -55,6 +55,7 @@ class Update(base.UpdateCommand):
   def _Run(self, args, version):
     index_ref = args.CONCEPTS.index.Parse()
     region = index_ref.AsDict()['locationsId']
+    project_id = index_ref.AsDict()['projectsId']
     with endpoint_util.AiplatformEndpointOverrides(version, region=region):
       operation = client.IndexesClient().PatchBeta(index_ref, args)
       if args.metadata_file is not None:
@@ -65,7 +66,8 @@ class Update(base.UpdateCommand):
                 name=operation.name,
                 verb='update index',
                 id=op_ref.Name(),
-                sub_commands='--index={}'.format(index_ref.Name())))
+                sub_commands='--index={} [--project={}]'.format(
+                    index_ref.Name(), project_id)))
         # We will not wait for the operation since it can take up to hours.
         return operation
 

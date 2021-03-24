@@ -26,8 +26,7 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class DeleteBeta(base.DeleteCommand):
+class Delete(base.DeleteCommand):
   """Delete a record-set in a managed-zone.
 
   This command deletes a record-set contained within the specified
@@ -50,7 +49,8 @@ class DeleteBeta(base.DeleteCommand):
     parser.display_info.AddCacheUpdater(None)
 
   def Run(self, args):
-    api_version = 'v1beta2'
+    api_version = util.GetApiFromTrack(self.ReleaseTrack())
+
     messages = apis.GetMessagesModule('dns', api_version)
 
     dns_client = util.GetApiClient(api_version)
