@@ -118,7 +118,6 @@ class ListAlpha(_List, base.ListCommand):
       return None
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class ListGA(_List, base.ListCommand):
   """List Database Migration Service connection profiles.

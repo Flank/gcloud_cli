@@ -224,7 +224,6 @@ class ScanBeta(base.Command):
     return ods_util.WaitForOperation(op, 'v1beta1')
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class ScanGA(ScanBeta):
   """Perform a vulnerability scan on a container image.

@@ -22,6 +22,7 @@ from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import endpoint_utils as endpoints
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
+from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -53,10 +54,13 @@ class List(base.ListCommand):
 
   def Run(self, args):
     location = args.location if args.IsSpecified("location") else None
+    resource_name = tag_utils.GetCanonicalResourceName(
+        args.parent, location, base.ReleaseTrack.GA)
+
     with endpoints.CrmEndpointOverrides(location):
       service = tags.TagBindingsService()
       messages = tags.TagMessages()
 
       list_req = messages.CloudresourcemanagerTagBindingsListRequest(
-          parent=args.parent)
+          parent=resource_name)
       return service.List(list_req)

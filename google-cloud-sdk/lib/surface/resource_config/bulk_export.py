@@ -36,12 +36,17 @@ _DETAILED_HELP = {
     To export all resources in a folder to stdout in Terraform format,
     run:
 
-      $ {command} --folder=12345 --path=- --resource-format=terraform
+      $ {command} --folder=12345 --resource-format=terraform
 
     To export all Storage Bucket and Compute Instances resources in project my-project to stdout,
     run:
 
       $ {command} --project=my-project --resource-types=storage.cnrm.cloud.google.com/StorageBucket,ComputeInstance
+
+    To export all resource types in file 'types-file.txt' in project my-project to stdout,
+    run:
+
+      $ {command} --project=my-project --resource-types-file=types-file.txt
     """
 }
 
@@ -58,7 +63,8 @@ class Export(base.DeclarativeCommand):
 
   def Run(self, args):
     client = kcc_client.KccClient()
-    if args.IsSpecified('resource_types'):
+    if (args.IsSpecified('resource_types') or
+        args.IsSpecified('resource_types_file')):
       client.BulkExportFromAssetList(args)
     else:
       client.BulkExport(args)

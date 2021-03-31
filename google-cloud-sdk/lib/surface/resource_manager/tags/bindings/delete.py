@@ -70,19 +70,22 @@ class Delete(base.Command):
          "projects, folders and organizations."))
 
   def Run(self, args):
-    messages = tags.TagMessages()
+    location = args.location if args.IsSpecified("location") else None
+
+    resource_name = tag_utils.GetCanonicalResourceName(
+        args.parent, location, base.ReleaseTrack.GA)
 
     if args.tag_value.find("tagValues/") == 0:
       tag_value = args.tag_value
     else:
       tag_value = tag_utils.GetTagValueFromNamespacedName(args.tag_value).name
 
+    messages = tags.TagMessages()
+
     binding_name = "/".join(
-        ["tagBindings", quote(args.parent, safe=""), tag_value])
+        ["tagBindings", quote(resource_name, safe=""), tag_value])
     del_req = messages.CloudresourcemanagerTagBindingsDeleteRequest(
         name=binding_name)
-
-    location = args.location if args.IsSpecified("location") else None
 
     try:
       with endpoints.CrmEndpointOverrides(location):
@@ -101,8 +104,8 @@ class Delete(base.Command):
       if args.parent.find(PROJECTS_PREFIX) != 0:
         raise
 
-     # Attempt to fetch and delete the binding for the given project id.
-      binding_name = tag_utils.ProjectNameToBinding(args.parent, tag_value,
+    # Attempt to fetch and delete the binding for the given project id.
+      binding_name = tag_utils.ProjectNameToBinding(resource_name, tag_value,
                                                     location)
       del_req = messages.CloudresourcemanagerTagBindingsDeleteRequest(
           name=binding_name)

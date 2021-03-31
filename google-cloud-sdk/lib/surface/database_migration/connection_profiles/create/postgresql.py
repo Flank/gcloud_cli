@@ -37,12 +37,11 @@ DETAILED_HELP = {
 
         If the source is a Cloud SQL database, run:
 
-            $ {command} CONNECTION_PROFILE --region=us-central1 --password=123456 --username=fakeuser --display-name=my-profile --host=1.2.3.4 --port=1111 --instance=my-instance
+            $ {command} CONNECTION_PROFILE --region=us-central1 --password=123456 --username=fakeuser --display-name=my-profile --host=1.2.3.4 --port=1111 --cloudsql-instance=my-instance
         """,
 }
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class PostgreSQL(base.Command):
   """Create a Database Migration Service connection profile for PostgreSQL."""

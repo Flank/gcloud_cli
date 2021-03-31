@@ -111,7 +111,8 @@ class Deploy(base.Command):
 
     with serverless_operations.Connect(conn_context) as operations:
       pretty_print.Info(
-          messages_util.GetStartDeployMessage(conn_context, job_ref, 'job'))
+          messages_util.GetStartDeployMessage(conn_context, job_ref, 'Creating',
+                                              'job'))
       header_msg = 'Creating and {} job...'.format(
           'running' if args.wait_for_completion else 'starting')
       with progress_tracker.StagedProgressTracker(

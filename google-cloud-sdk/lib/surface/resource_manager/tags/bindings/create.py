@@ -74,12 +74,15 @@ class Create(base.Command):
     else:
       tag_value = tag_utils.GetTagValueFromNamespacedName(args.tag_value).name
 
-    tag_binding = messages.TagBinding(parent=args.parent, tagValue=tag_value)
+    location = args.location if args.IsSpecified("location") else None
+
+    resource_name = tag_utils.GetCanonicalResourceName(
+        args.parent, location, base.ReleaseTrack.GA)
+    tag_binding = messages.TagBinding(parent=resource_name, tagValue=tag_value)
 
     create_req = messages.CloudresourcemanagerTagBindingsCreateRequest(
         tagBinding=tag_binding)
 
-    location = args.location if args.IsSpecified("location") else None
     with endpoints.CrmEndpointOverrides(location):
       service = tags.TagBindingsService()
       op = service.Create(create_req)
@@ -90,5 +93,5 @@ class Create(base.Command):
         return operations.WaitForOperation(
             op,
             "Waiting for TagBinding for parent [{}] and tag value [{}] to be "
-            "created with [{}]".format(args.parent, args.tag_value, op.name),
+            "created with [{}]".format(resource_name, tag_value, op.name),
             service=service)

@@ -21,6 +21,7 @@ platform/bq/third_party/absl/_enum_module.py
 platform/bq/third_party/absl/app.py
 platform/bq/third_party/absl/command_name.py
 platform/bq/third_party/absl/flags/__init__.py
+platform/bq/third_party/absl/flags/__init__.pyi
 platform/bq/third_party/absl/flags/_argument_parser.py
 platform/bq/third_party/absl/flags/_argument_parser.pyi
 platform/bq/third_party/absl/flags/_defines.py
@@ -35,6 +36,12 @@ platform/bq/third_party/absl/flags/_validators.py
 platform/bq/third_party/absl/flags/argparse_flags.py
 platform/bq/third_party/absl/logging/__init__.py
 platform/bq/third_party/absl/logging/converter.py
+platform/bq/third_party/fasteners/LICENSE
+platform/bq/third_party/fasteners/__init__.py
+platform/bq/third_party/fasteners/_utils.py
+platform/bq/third_party/fasteners/lock.py
+platform/bq/third_party/fasteners/process_lock.py
+platform/bq/third_party/fasteners/version.py
 platform/bq/third_party/gflags/AUTHORS
 platform/bq/third_party/gflags/COPYING
 platform/bq/third_party/gflags/ChangeLog
@@ -104,6 +111,8 @@ platform/bq/third_party/httplib2/python3/socks.py
 platform/bq/third_party/inflection/LICENSE
 platform/bq/third_party/inflection/__init__.py
 platform/bq/third_party/inflection/inflection.py
+platform/bq/third_party/monotonic/LICENSE
+platform/bq/third_party/monotonic/__init__.py
 platform/bq/third_party/oauth2client_4_0/LICENSE
 platform/bq/third_party/oauth2client_4_0/__init__.py
 platform/bq/third_party/oauth2client_4_0/_helpers.py
@@ -117,6 +126,7 @@ platform/bq/third_party/oauth2client_4_0/contrib/__init__.py
 platform/bq/third_party/oauth2client_4_0/contrib/_metadata.py
 platform/bq/third_party/oauth2client_4_0/contrib/devshell.py
 platform/bq/third_party/oauth2client_4_0/contrib/gce.py
+platform/bq/third_party/oauth2client_4_0/contrib/multiprocess_file_storage.py
 platform/bq/third_party/oauth2client_4_0/crypt.py
 platform/bq/third_party/oauth2client_4_0/file.py
 platform/bq/third_party/oauth2client_4_0/service_account.py
