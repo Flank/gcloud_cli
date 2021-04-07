@@ -39,6 +39,9 @@ arguments:
     help_text: |
       Time in RFC3339 format, for example: 2012-11-15T16:19:00.094Z
 
+async:
+  collection: redis.projects.locations.operations
+
 request:
   ALPHA:
     api_version: v1alpha1
@@ -46,6 +49,3 @@ request:
     - googlecloudsdk.command_lib.redis.instances_reschedule_util:CheckSpecificTimeField
   collection: redis.projects.locations.instances
   method: rescheduleMaintenance
-
-output:
-  format: none

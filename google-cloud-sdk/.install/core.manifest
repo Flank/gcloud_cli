@@ -1320,6 +1320,8 @@ lib/googlecloudsdk/command_lib/functions/v1/deploy/source_util.py
 lib/googlecloudsdk/command_lib/functions/v1/deploy/trigger_util.py
 lib/googlecloudsdk/command_lib/functions/v1/describe/__init__.py
 lib/googlecloudsdk/command_lib/functions/v1/describe/command.py
+lib/googlecloudsdk/command_lib/functions/v1/list/__init__.py
+lib/googlecloudsdk/command_lib/functions/v1/list/command.py
 lib/googlecloudsdk/command_lib/functions/v2/__init__.py
 lib/googlecloudsdk/command_lib/functions/v2/delete/__init__.py
 lib/googlecloudsdk/command_lib/functions/v2/delete/command.py
@@ -1328,6 +1330,8 @@ lib/googlecloudsdk/command_lib/functions/v2/deploy/command.py
 lib/googlecloudsdk/command_lib/functions/v2/deploy/env_vars_util.py
 lib/googlecloudsdk/command_lib/functions/v2/describe/__init__.py
 lib/googlecloudsdk/command_lib/functions/v2/describe/command.py
+lib/googlecloudsdk/command_lib/functions/v2/list/__init__.py
+lib/googlecloudsdk/command_lib/functions/v2/list/command.py
 lib/googlecloudsdk/command_lib/game/__init__.py
 lib/googlecloudsdk/command_lib/game/resources.yaml
 lib/googlecloudsdk/command_lib/game/servers/__init__.py
@@ -1560,6 +1564,7 @@ lib/googlecloudsdk/command_lib/privateca/create_utils.py
 lib/googlecloudsdk/command_lib/privateca/exceptions.py
 lib/googlecloudsdk/command_lib/privateca/filter_rewrite.py
 lib/googlecloudsdk/command_lib/privateca/flags.py
+lib/googlecloudsdk/command_lib/privateca/flags_v1.py
 lib/googlecloudsdk/command_lib/privateca/hooks.py
 lib/googlecloudsdk/command_lib/privateca/iam.py
 lib/googlecloudsdk/command_lib/privateca/key_generation.py
@@ -1742,6 +1747,7 @@ lib/googlecloudsdk/command_lib/storage/tasks/cp/file_upload_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/finalize_sliced_download_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/intra_cloud_copy_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/create_bucket_task.py
+lib/googlecloudsdk/command_lib/storage/tasks/delete_bucket_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/delete_object_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/cloud_list_task.py
@@ -3301,6 +3307,10 @@ lib/googlecloudsdk/third_party/apis/osconfig/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1/osconfig_v1_client.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1/osconfig_v1_messages.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1/resources.py
+lib/googlecloudsdk/third_party/apis/osconfig/v1alpha/__init__.py
+lib/googlecloudsdk/third_party/apis/osconfig/v1alpha/osconfig_v1alpha_client.py
+lib/googlecloudsdk/third_party/apis/osconfig/v1alpha/osconfig_v1alpha_messages.py
+lib/googlecloudsdk/third_party/apis/osconfig/v1alpha/resources.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1alpha1/osconfig_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1alpha1/osconfig_v1alpha1_messages.py
@@ -3314,6 +3324,7 @@ lib/googlecloudsdk/third_party/apis/osconfig/v1beta/osconfig_v1beta_client.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1beta/osconfig_v1beta_messages.py
 lib/googlecloudsdk/third_party/apis/osconfig/v1beta/resources.py
 lib/googlecloudsdk/third_party/apis/osconfig_v1.json
+lib/googlecloudsdk/third_party/apis/osconfig_v1alpha.json
 lib/googlecloudsdk/third_party/apis/osconfig_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/osconfig_v1alpha2.json
 lib/googlecloudsdk/third_party/apis/osconfig_v1beta.json
@@ -3995,6 +4006,7 @@ lib/surface/ai/tensorboard_time_series/create.py
 lib/surface/ai/tensorboard_time_series/delete.py
 lib/surface/ai/tensorboard_time_series/describe.py
 lib/surface/ai/tensorboard_time_series/list.py
+lib/surface/ai/tensorboard_time_series/read.py
 lib/surface/ai/tensorboard_time_series/update.py
 lib/surface/ai/tensorboards/__init__.py
 lib/surface/ai/tensorboards/create.py
@@ -4092,6 +4104,7 @@ lib/surface/apigee/applications/__init__.py
 lib/surface/apigee/applications/describe.py
 lib/surface/apigee/applications/list.py
 lib/surface/apigee/archives/__init__.py
+lib/surface/apigee/archives/delete.py
 lib/surface/apigee/archives/deploy.py
 lib/surface/apigee/archives/describe.py
 lib/surface/apigee/archives/list.py
@@ -5285,6 +5298,10 @@ lib/surface/container/clusters/update.py
 lib/surface/container/clusters/upgrade.py
 lib/surface/container/get_server_config.py
 lib/surface/container/hub/__init__.py
+lib/surface/container/hub/cloudrun/__init__.py
+lib/surface/container/hub/cloudrun/describe.py
+lib/surface/container/hub/cloudrun/disable.py
+lib/surface/container/hub/cloudrun/enable.py
 lib/surface/container/hub/config_management/__init__.py
 lib/surface/container/hub/config_management/apply.py
 lib/surface/container/hub/config_management/delete.py
@@ -7380,6 +7397,7 @@ lib/surface/storage/delete.py
 lib/surface/storage/list.py
 lib/surface/storage/ls.py
 lib/surface/storage/mb.py
+lib/surface/storage/rb.py
 lib/surface/survey.py
 lib/surface/tasks/__init__.py
 lib/surface/tasks/acknowledge.py

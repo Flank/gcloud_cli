@@ -27,16 +27,16 @@
       },
       "platform_required": false,
       "version": {
-        "build_number": 20210326130332,
+        "build_number": 20210402142714,
         "version_string": "0.2.16"
       }
     }
   ],
-  "revision": 20210326130332,
+  "revision": 20210402142714,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "334.0.0"
+  "version": "335.0.0"
 }

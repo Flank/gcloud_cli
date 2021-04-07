@@ -25,20 +25,20 @@ from googlecloudsdk.command_lib.storage.tasks import task
 class DeleteObjectTask(task.Task):
   """Deletes an object."""
 
-  def __init__(self, object_resource):
+  def __init__(self, object_url):
     """Initializes task.
 
     Args:
-      object_resource (resource_reference.ObjectResource): The object to delete.
+      object_url (storage_url.CloudUrl): URL of the object to delete.
     """
     super().__init__()
-    self._object_resource = object_resource
+    self._object_url = object_url
 
   def execute(self, task_status_queue=None):
-    provider = self._object_resource.storage_url.scheme
-    api_factory.get_api(provider).delete_object(self._object_resource)
+    provider = self._object_url.scheme
+    api_factory.get_api(provider).delete_object(self._object_url)
 
   def __eq__(self, other):
     if not isinstance(other, DeleteObjectTask):
       return NotImplemented
-    return self._object_resource == other._object_resource
+    return self._object_url == other._object_url

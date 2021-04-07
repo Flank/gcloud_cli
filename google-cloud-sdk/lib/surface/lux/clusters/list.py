@@ -12,11 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Lists clusters in a given project and region.
-
-Lists clusters in a given project in the alphabetical order of the
-cluster name.
-"""
+"""Lists Lux clusters."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,7 +27,7 @@ from googlecloudsdk.core import properties
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
-  """Lists Lux clusters in a given region.
+  """Lists Lux clusters in a given project and region.
 
   Lists Lux clusters in a given project in the alphabetical
   order of the cluster name.
@@ -39,7 +35,21 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    flags.AddRegion(parser)
+    """Specifies additional command flags.
+
+    --region: an optional flag that, if specified, will only list clusters
+        within that given region.
+
+    Args:
+      parser: argparse.Parser: Parser object for command line inputs
+    """
+    parser.add_argument(
+        '--region',
+        default='-',
+        help=('Regional location (e.g. asia-east1, us-east1). See the full '
+              'list of regions at '
+              'https://cloud.google.com/sql/docs/instance-locations. '
+              'Default: list clusters in all regions.'))
     parser.display_info.AddFormat(flags.GetClusterListFormat())
 
   def Run(self, args):
@@ -50,25 +60,21 @@ class List(base.ListCommand):
           with.
 
     Returns:
-      Lux cluster resource iterator.
+      Lux cluster resource iterator used for displaying resources.
     """
     client = api_util.LuxClient(api_util.API_VERSION_DEFAULT)
     lux_client = client.lux_client
     lux_messages = client.lux_messages
-    project_id = properties.VALUES.core.project.Get(required=True)
-    collection_info = client.resource_parser.GetCollectionInfo(
-        'luxadmin.projects.locations', api_util.API_VERSION_DEFAULT)
-    path = collection_info.GetPath('')
-    params = {
-        'projectsId': project_id,
-        'locationsId': args.region
-    }
-    path = path.format(**params)
+    project_ref = client.resource_parser.Create(
+        'luxadmin.projects.locations',
+        projectsId=properties.VALUES.core.project.GetOrFail,
+        locationsId=args.region)
 
     result = list_pager.YieldFromList(
         lux_client.projects_locations_clusters,
         lux_messages.LuxadminProjectsLocationsClustersListRequest(
-            parent=path),
+            parent=project_ref.RelativeName(), pageSize=args.limit),
         field='resources',
         batch_size_attribute=None)
+
     return result
