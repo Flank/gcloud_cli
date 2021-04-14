@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.storage import api_factory
+from googlecloudsdk.command_lib.storage import progress_callbacks
 from googlecloudsdk.command_lib.storage.tasks import task
 from googlecloudsdk.core import log
 
@@ -26,27 +27,26 @@ from googlecloudsdk.core import log
 class DeleteBucketTask(task.Task):
   """Deletes cloud storage bucket."""
 
-  def __init__(self, url, ignore_error=False):
+  def __init__(self, url):
     """Initializes task.
 
     Args:
       url (storage_url.StorageUrl): Should only contain bucket. Objects will be
         ignored.
-      ignore_error (bool): Do not raise errors if there is an issue deleting the
-        bucket.
     """
     super().__init__()
     self._url = url
-    self._ignore_error = ignore_error
+    self.parallel_processing_key = url.url_string
 
   def execute(self, task_status_queue=None):
     log.status.Print('Removing {}...'.format(self._url))
     api_client = api_factory.get_api(self._url.scheme)
-
     try:
       api_client.delete_bucket(self._url.bucket_name)
+      if task_status_queue:
+        progress_callbacks.increment_count_callback(task_status_queue)
     # pylint:disable=broad-except
-    except Exception:
+    except Exception as e:
       # pylint:enable=broad-except
-      if not self._ignore_error:
-        raise
+      # TODO(b/184388666): Suggest "rm -r" command if bucket not empty error.
+      log.error(e)

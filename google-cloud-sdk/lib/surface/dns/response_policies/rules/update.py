@@ -33,6 +33,11 @@ def _AddArgsCommon(parser, messages):
   flags.GetLocalDataResourceRecordSets().AddToParser(parser)
   flags.AddResponsePolicyRulesBehaviorFlagArgs(parser, messages)
 
+  parser.add_argument(
+      '--dns-name',
+      required=False,
+      help='DNS name (wildcard or exact) to apply this rule to.')
+
 
 def _FetchResponsePolicyRule(response_policy, response_policy_rule,
                              api_version):
@@ -53,6 +58,10 @@ class UpdateBeta(base.UpdateCommand):
       This command updates a new Cloud DNS response policy rule.
 
       ## EXAMPLES
+
+      To update a new response policy rule with DNS name, run:
+
+        $ {command} myresponsepolicyrule --response-policy="myresponsepolicy" --dns-name="www.newzone.com." # pylint: disable=line-too-long
 
       To update a new response policy rule with local data rrsets, run:
 
@@ -90,9 +99,13 @@ class UpdateBeta(base.UpdateCommand):
                                               response_policy_rule.ruleName,\
                                               api_version)
 
-    if not args.IsSpecified('local_data') and not args.IsSpecified('behavior'):
+    if not args.IsSpecified('dns_name') and not args.IsSpecified(
+        'local_data') and not args.IsSpecified('behavior'):
       log.status.Print('Nothing to update.')
       return to_update
+
+    if args.IsSpecified('dns_name'):
+      to_update.dnsName = args.dns_name
 
     if args.IsSpecified('local_data'):
       to_update.behavior = None
@@ -133,6 +146,10 @@ class UpdateAlpha(UpdateBeta):
       This command updates a new Cloud DNS response policy rule.
 
       ## EXAMPLES
+
+      To update a new response policy rule with DNS name, run:
+
+        $ {command} myresponsepolicyrule --response-policy="myresponsepolicy" --dns-name="www.newzone.com." # pylint: disable=line-too-long
 
       To update a new response policy rule with local data rrsets, run:
 

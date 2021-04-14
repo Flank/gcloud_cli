@@ -12,29 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The command to get the status of Service Mesh Feature."""
-
+"""The command group for Media Asset's Asset Transformations CLI."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.command_lib.container.hub.features import base
+from googlecloudsdk.calliope import base
 
 
-class Describe(base.DescribeCommand):
-  """Describe the status of Service Mesh Feature resource.
-
-  Describe the status of Service Mesh Feature resource in Hub.
-
-  ## Examples
-
-  Describe Service Feature:
-
-    $ {command}
-  """
-
-  FEATURE_NAME = 'servicemesh'
-  FEATURE_DISPLAY_NAME = 'Service Mesh'
-
-  def Run(self, args):
-    return self.RunCommand(args)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AssetTransformations(base.Group):
+  """Manage Cloud Media Asset's Transformations."""

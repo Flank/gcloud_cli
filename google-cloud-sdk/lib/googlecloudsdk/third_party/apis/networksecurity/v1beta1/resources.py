@@ -17,31 +17,13 @@
 import enum
 
 
-BASE_URL = 'https://run.googleapis.com/v1beta1/'
-DOCS_URL = 'https://cloud.google.com/run/'
+BASE_URL = 'https://networksecurity.googleapis.com/v1beta1/'
+DOCS_URL = 'https://cloud.google.com/networking'
 
 
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
-  NAMESPACES = (
-      'namespaces',
-      'namespaces/{namespacesId}',
-      {},
-      ['namespacesId'],
-      True
-  )
-  NAMESPACES_CUSTOMRESOURCEDEFINITIONS = (
-      'namespaces.customresourcedefinitions',
-      '{+name}',
-      {
-          '':
-              'namespaces/{namespacesId}/customresourcedefinitions/'
-              '{customresourcedefinitionsId}',
-      },
-      ['name'],
-      True
-  )
   PROJECTS = (
       'projects',
       'projects/{projectsId}',
@@ -51,18 +33,54 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS = (
       'projects.locations',
-      'projects/{projectsId}/locations/{locationsId}',
-      {},
-      ['projectsId', 'locationsId'],
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}',
+      },
+      ['name'],
       True
   )
-  PROJECTS_LOCATIONS_CUSTOMRESOURCEDEFINITIONS = (
-      'projects.locations.customresourcedefinitions',
+  PROJECTS_LOCATIONS_AUTHORIZATIONPOLICIES = (
+      'projects.locations.authorizationPolicies',
       '{+name}',
       {
           '':
               'projects/{projectsId}/locations/{locationsId}/'
-              'customresourcedefinitions/{customresourcedefinitionsId}',
+              'authorizationPolicies/{authorizationPoliciesId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_CLIENTTLSPOLICIES = (
+      'projects.locations.clientTlsPolicies',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'clientTlsPolicies/{clientTlsPoliciesId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_OPERATIONS = (
+      'projects.locations.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/operations/'
+              '{operationsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_SERVERTLSPOLICIES = (
+      'projects.locations.serverTlsPolicies',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'serverTlsPolicies/{serverTlsPoliciesId}',
       },
       ['name'],
       True

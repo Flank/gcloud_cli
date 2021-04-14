@@ -152,8 +152,11 @@ lib/googlecloudsdk/api_lib/cloudbuild/trigger_config.py
 lib/googlecloudsdk/api_lib/cloudbuild/workerpool_config.py
 lib/googlecloudsdk/api_lib/clouddeploy/__init__.py
 lib/googlecloudsdk/api_lib/clouddeploy/client_util.py
+lib/googlecloudsdk/api_lib/clouddeploy/delivery_pipeline.py
 lib/googlecloudsdk/api_lib/clouddeploy/deploy.py
 lib/googlecloudsdk/api_lib/clouddeploy/release.py
+lib/googlecloudsdk/api_lib/clouddeploy/rollout.py
+lib/googlecloudsdk/api_lib/clouddeploy/target.py
 lib/googlecloudsdk/api_lib/cloudiot/__init__.py
 lib/googlecloudsdk/api_lib/cloudiot/devices.py
 lib/googlecloudsdk/api_lib/cloudiot/registries.py
@@ -488,6 +491,7 @@ lib/googlecloudsdk/api_lib/logging/tailing.py
 lib/googlecloudsdk/api_lib/logging/util.py
 lib/googlecloudsdk/api_lib/lux/__init__.py
 lib/googlecloudsdk/api_lib/lux/api_util.py
+lib/googlecloudsdk/api_lib/lux/cluster_operations.py
 lib/googlecloudsdk/api_lib/memcache/__init__.py
 lib/googlecloudsdk/api_lib/meta/__init__.py
 lib/googlecloudsdk/api_lib/meta/help_html_data/__init__.py
@@ -740,6 +744,7 @@ lib/googlecloudsdk/command_lib/ai/custom_jobs_util.py
 lib/googlecloudsdk/command_lib/ai/docker/__init__.py
 lib/googlecloudsdk/command_lib/ai/docker/build.py
 lib/googlecloudsdk/command_lib/ai/docker/run.py
+lib/googlecloudsdk/command_lib/ai/docker/utils.py
 lib/googlecloudsdk/command_lib/ai/endpoint_util.py
 lib/googlecloudsdk/command_lib/ai/endpoints_util.py
 lib/googlecloudsdk/command_lib/ai/errors.py
@@ -1203,6 +1208,7 @@ lib/googlecloudsdk/command_lib/datastore/resources.yaml
 lib/googlecloudsdk/command_lib/debug/__init__.py
 lib/googlecloudsdk/command_lib/debug/flags.py
 lib/googlecloudsdk/command_lib/deploy/__init__.py
+lib/googlecloudsdk/command_lib/deploy/describe.py
 lib/googlecloudsdk/command_lib/deploy/flags.py
 lib/googlecloudsdk/command_lib/deploy/release_util.py
 lib/googlecloudsdk/command_lib/deploy/resource_args.py
@@ -1452,6 +1458,8 @@ lib/googlecloudsdk/command_lib/media/asset/complex_types/hooks.py
 lib/googlecloudsdk/command_lib/media/asset/flags.yaml
 lib/googlecloudsdk/command_lib/media/asset/hooks.py
 lib/googlecloudsdk/command_lib/media/asset/resources.yaml
+lib/googlecloudsdk/command_lib/media/asset/transformations/__init__.py
+lib/googlecloudsdk/command_lib/media/asset/transformations/hooks.py
 lib/googlecloudsdk/command_lib/media/asset/transformers/__init__.py
 lib/googlecloudsdk/command_lib/media/asset/transformers/hooks.py
 lib/googlecloudsdk/command_lib/media/asset/utils.py
@@ -1572,6 +1580,7 @@ lib/googlecloudsdk/command_lib/privateca/kms.py
 lib/googlecloudsdk/command_lib/privateca/operations.py
 lib/googlecloudsdk/command_lib/privateca/p4sa.py
 lib/googlecloudsdk/command_lib/privateca/pem_utils.py
+lib/googlecloudsdk/command_lib/privateca/preset_profiles.py
 lib/googlecloudsdk/command_lib/privateca/resource_args.py
 lib/googlecloudsdk/command_lib/privateca/resources.yaml
 lib/googlecloudsdk/command_lib/privateca/response_utils.py
@@ -1598,6 +1607,7 @@ lib/googlecloudsdk/command_lib/recommender/flags.py
 lib/googlecloudsdk/command_lib/recommender/resources.yaml
 lib/googlecloudsdk/command_lib/redis/__init__.py
 lib/googlecloudsdk/command_lib/redis/instances_create_util.py
+lib/googlecloudsdk/command_lib/redis/instances_describe_util.py
 lib/googlecloudsdk/command_lib/redis/instances_reschedule_util.py
 lib/googlecloudsdk/command_lib/redis/instances_update_util.py
 lib/googlecloudsdk/command_lib/redis/operations_util.py
@@ -1747,10 +1757,12 @@ lib/googlecloudsdk/command_lib/storage/tasks/cp/file_upload_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/finalize_sliced_download_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/intra_cloud_copy_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/create_bucket_task.py
-lib/googlecloudsdk/command_lib/storage/tasks/delete_bucket_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/delete_object_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/ls/cloud_list_task.py
+lib/googlecloudsdk/command_lib/storage/tasks/rb/__init__.py
+lib/googlecloudsdk/command_lib/storage/tasks/rb/delete_bucket_task.py
+lib/googlecloudsdk/command_lib/storage/tasks/rb/delete_bucket_task_iterator.py
 lib/googlecloudsdk/command_lib/storage/tasks/task.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_buffer.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_executor.py
@@ -3262,7 +3274,12 @@ lib/googlecloudsdk/third_party/apis/networksecurity/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/networksecurity/v1alpha1/networksecurity_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/networksecurity/v1alpha1/networksecurity_v1alpha1_messages.py
 lib/googlecloudsdk/third_party/apis/networksecurity/v1alpha1/resources.py
+lib/googlecloudsdk/third_party/apis/networksecurity/v1beta1/__init__.py
+lib/googlecloudsdk/third_party/apis/networksecurity/v1beta1/networksecurity_v1beta1_client.py
+lib/googlecloudsdk/third_party/apis/networksecurity/v1beta1/networksecurity_v1beta1_messages.py
+lib/googlecloudsdk/third_party/apis/networksecurity/v1beta1/resources.py
 lib/googlecloudsdk/third_party/apis/networksecurity_v1alpha1.json
+lib/googlecloudsdk/third_party/apis/networksecurity_v1beta1.json
 lib/googlecloudsdk/third_party/apis/networkservices/__init__.py
 lib/googlecloudsdk/third_party/apis/networkservices/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/networkservices/v1alpha1/networkservices_v1alpha1_client.py
@@ -3475,7 +3492,6 @@ lib/googlecloudsdk/third_party/apis/run/v1alpha1/resources.py
 lib/googlecloudsdk/third_party/apis/run/v1alpha1/run_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/run/v1alpha1/run_v1alpha1_messages.py
 lib/googlecloudsdk/third_party/apis/run/v1beta1/__init__.py
-lib/googlecloudsdk/third_party/apis/run/v1beta1/resources.py
 lib/googlecloudsdk/third_party/apis/run/v1beta1/run_v1beta1_client.py
 lib/googlecloudsdk/third_party/apis/run/v1beta1/run_v1beta1_messages.py
 lib/googlecloudsdk/third_party/apis/run_v1.json
@@ -5334,6 +5350,10 @@ lib/surface/container/hub/memberships/list.yaml
 lib/surface/container/hub/memberships/register.py
 lib/surface/container/hub/memberships/unregister.py
 lib/surface/container/hub/memberships/update.yaml
+lib/surface/container/hub/mesh/__init__.py
+lib/surface/container/hub/mesh/describe.py
+lib/surface/container/hub/mesh/disable.py
+lib/surface/container/hub/mesh/enable.py
 lib/surface/container/hub/multi_cluster_services/__init__.py
 lib/surface/container/hub/multi_cluster_services/describe.py
 lib/surface/container/hub/multi_cluster_services/disable.py
@@ -5342,10 +5362,6 @@ lib/surface/container/hub/service_directory/__init__.py
 lib/surface/container/hub/service_directory/describe.py
 lib/surface/container/hub/service_directory/disable.py
 lib/surface/container/hub/service_directory/enable.py
-lib/surface/container/hub/service_mesh/__init__.py
-lib/surface/container/hub/service_mesh/describe.py
-lib/surface/container/hub/service_mesh/disable.py
-lib/surface/container/hub/service_mesh/enable.py
 lib/surface/container/images/__init__.py
 lib/surface/container/images/add_tag.py
 lib/surface/container/images/delete.py
@@ -5606,6 +5622,7 @@ lib/surface/deploy/apply.py
 lib/surface/deploy/delete.py
 lib/surface/deploy/delivery_pipelines/__init__.py
 lib/surface/deploy/delivery_pipelines/delete.yaml
+lib/surface/deploy/delivery_pipelines/describe.py
 lib/surface/deploy/delivery_pipelines/export.yaml
 lib/surface/deploy/delivery_pipelines/list.yaml
 lib/surface/deploy/releases/__init__.py
@@ -5619,6 +5636,7 @@ lib/surface/deploy/rollouts/describe.yaml
 lib/surface/deploy/rollouts/list.yaml
 lib/surface/deploy/targets/__init__.py
 lib/surface/deploy/targets/delete.yaml
+lib/surface/deploy/targets/describe.py
 lib/surface/deploy/targets/export.yaml
 lib/surface/deploy/targets/list.yaml
 lib/surface/deployment_manager/__init__.py
@@ -6494,6 +6512,8 @@ lib/surface/logging/views/update.py
 lib/surface/logging/write.py
 lib/surface/lux/__init__.py
 lib/surface/lux/clusters/__init__.py
+lib/surface/lux/clusters/create.py
+lib/surface/lux/clusters/describe.py
 lib/surface/lux/clusters/list.py
 lib/surface/media/__init__.py
 lib/surface/media/asset/__init__.py
@@ -6509,6 +6529,9 @@ lib/surface/media/asset/complex_types/delete.yaml
 lib/surface/media/asset/complex_types/get.yaml
 lib/surface/media/asset/complex_types/list.yaml
 lib/surface/media/asset/complex_types/update.yaml
+lib/surface/media/asset/transformations/__init__.py
+lib/surface/media/asset/transformations/get.yaml
+lib/surface/media/asset/transformations/list.yaml
 lib/surface/media/asset/transformers/__init__.py
 lib/surface/media/asset/transformers/create.yaml
 lib/surface/memcache/__init__.py

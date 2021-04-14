@@ -20,10 +20,12 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import errors
+from googlecloudsdk.command_lib.storage import plurality_checkable_iterator
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import wildcard_iterator
-from googlecloudsdk.command_lib.storage.tasks import delete_bucket_task
 from googlecloudsdk.command_lib.storage.tasks import task_executor
+from googlecloudsdk.command_lib.storage.tasks import task_status
+from googlecloudsdk.command_lib.storage.tasks.rb import delete_bucket_task_iterator
 
 
 class Rb(base.Command):
@@ -55,24 +57,29 @@ class Rb(base.Command):
   def Args(parser):
     parser.add_argument(
         'urls', nargs='+', help='Specifies the URLs of the buckets to delete.')
-    parser.add_argument(
-        '--force',
-        '-f',
-        action='store_true',
-        help='Continues silently when there is a bucket delete error.'
-        ' Normally, an error would be raised, and the command would stop.')
 
   def Run(self, args):
+    bucket_wildcard_iterators = []
     for url_string in args.urls:
       url_object = storage_url.storage_url_from_string(url_string)
       if not url_object.is_bucket():
         raise errors.InvalidUrlError(
             'rb only accepts cloud bucket URLs. Example: "gs://bucket"')
 
-      bucket_iterator = wildcard_iterator.CloudWildcardIterator(url_object)
-      tasks = [
-          delete_bucket_task.DeleteBucketTask(
-              resource.storage_url, ignore_error=args.force)
-          for resource in bucket_iterator
-      ]
-      task_executor.ExecuteTasks(tasks, is_parallel=True)
+      bucket_wildcard_iterators.append(
+          wildcard_iterator.CloudWildcardIterator(url_object))
+
+    with task_status.ProgressManager(
+        task_status.ProgressType.COUNT) as progress_manager:
+      tasks_iterator = plurality_checkable_iterator.PluralityCheckableIterator(
+          delete_bucket_task_iterator.DeleteBucketTaskIterator(
+              bucket_wildcard_iterators,
+              task_status_queue=progress_manager.task_status_queue))
+
+      if tasks_iterator.is_empty():
+        raise errors.InvalidUrlError('Wildcard query matched no buckets.')
+
+      task_executor.ExecuteTasks(
+          tasks_iterator,
+          is_parallel=True,
+          task_status_queue=progress_manager.task_status_queue)

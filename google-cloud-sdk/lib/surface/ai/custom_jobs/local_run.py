@@ -27,6 +27,7 @@ from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.command_lib.ai import local_util
 from googlecloudsdk.command_lib.ai.docker import build as docker_builder
 from googlecloudsdk.command_lib.ai.docker import run as docker_runner
+from googlecloudsdk.command_lib.ai.docker import utils as docker_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files
 
@@ -56,6 +57,16 @@ def _ValidateArgs(args, workdir, script):
       raise errors.ArgumentError(
           r"Directory '{}' is not found under the working directory: '{}'."
           .format(directory, workdir))
+
+  # Validate output image uri is in valid format
+  if args.output_image_uri:
+    output_image = args.output_image_uri
+    try:
+      docker_utils.ValidateRepositoryAndTag(output_image)
+    except ValueError as e:
+      raise errors.ArgumentError(
+          r'"{}" is not a valid container image uri: {}'.format(
+              output_image, e))
 
 
 # TODO(b/176214485): Keep this hidden until public preview
@@ -132,7 +143,6 @@ class Create(base.CreateCommand):
   @staticmethod
   def Args(parser):
     flags.AddLocalRunCustomJobFlags(parser)
-    # TODO(b/177787597): Consider adding more validation.
 
   def Run(self, args):
     working_dir = args.work_dir or files.GetCWD()
