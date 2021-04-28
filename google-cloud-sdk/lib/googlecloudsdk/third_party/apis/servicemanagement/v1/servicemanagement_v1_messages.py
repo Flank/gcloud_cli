@@ -230,12 +230,13 @@ class AuthRequirement(_messages.Message):
 
 
 class Authentication(_messages.Message):
-  r"""`Authentication` defines the authentication configuration for an API.
-  Example for an API targeted for external use: name: calendar.googleapis.com
+  r"""`Authentication` defines the authentication configuration for API
+  methods provided by an API service. Example: name: calendar.googleapis.com
   authentication: providers: - id: google_calendar_auth jwks_uri:
   https://www.googleapis.com/oauth2/v1/certs issuer:
   https://securetoken.google.com rules: - selector: "*" requirements:
-  provider_id: google_calendar_auth
+  provider_id: google_calendar_auth - selector: google.calendar.Delegate
+  oauth: canonical_scopes: https://www.googleapis.com/auth/calendar.read
 
   Fields:
     providers: Defines a set of authentication providers that a service
@@ -1089,9 +1090,6 @@ class Endpoint(_messages.Message):
   example.googleapis.com allow_cors: true
 
   Fields:
-    aliases: DEPRECATED: This field is no longer supported. Instead of using
-      aliases, please specify multiple google.api.Endpoint for each of the
-      intended aliases. Additional names that this endpoint will be hosted on.
     allowCors: Allowing [CORS](https://en.wikipedia.org/wiki/Cross-
       origin_resource_sharing), aka cross-domain traffic, would allow the
       backends served from this endpoint to receive and respond to HTTP
@@ -1105,10 +1103,9 @@ class Endpoint(_messages.Message):
       example, "8.8.8.8" or "myservice.appspot.com".
   """
 
-  aliases = _messages.StringField(1, repeated=True)
-  allowCors = _messages.BooleanField(2)
-  name = _messages.StringField(3)
-  target = _messages.StringField(4)
+  allowCors = _messages.BooleanField(1)
+  name = _messages.StringField(2)
+  target = _messages.StringField(3)
 
 
 class Enum(_messages.Message):

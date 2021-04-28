@@ -35,10 +35,6 @@ class SpecialVersion(enum.Enum):
   # as opposed to being a file with one secret version.
   MOUNT_ALL = 0
 
-  # The user didn't set a version and we're leaving the behavior (assume
-  # 'latest', error, etc) up to the service.
-  UNSET = 1
-
 
 class SpecialConnector(enum.Enum):
   """Special cases for ReachableSecret._connector."""
@@ -144,12 +140,17 @@ class ReachableSecret(object):
   adds to that annotation as needed.
   """
 
-  _PROJECT_NUMBER_PARTIAL = r'[0-9]{1,19}'  # int64, not the project 'id'.
-  _SECRET_NAME_PARTIAL = r'[a-zA-Z0-9-_]{1,255}'
+  _PROJECT_NUMBER_PARTIAL = r'(?P<project>[0-9]{1,19})'
+  _SECRET_NAME_PARTIAL = r'(?P<secret>[a-zA-Z0-9-_]{1,255})'
+  _REMOTE_SECRET_VERSION_SHORT = r':(?P<version_short>.+)'
+  _REMOTE_SECRET_VERSION_LONG = r'/versions/(?P<version_long>.+)'
+  _REMOTE_SECRET_VERSION = (r'(?:' + _REMOTE_SECRET_VERSION_SHORT + r'|' +
+                            _REMOTE_SECRET_VERSION_LONG + r')?')
 
   # The user syntax for referring to a secret in another project.
-  _REMOTE_SECRET_FLAG_VALUE = (r'^projects/(' + _PROJECT_NUMBER_PARTIAL +
-                               r')/secrets/(' + _SECRET_NAME_PARTIAL + r')$')
+  _REMOTE_SECRET_FLAG_VALUE = (r'^projects/' + _PROJECT_NUMBER_PARTIAL +
+                               r'/secrets/' + _SECRET_NAME_PARTIAL +
+                               _REMOTE_SECRET_VERSION + r'$')
 
   @staticmethod
   def IsRemotePath(secret_name):
@@ -171,9 +172,15 @@ class ReachableSecret(object):
     if platforms.IsManaged():
       match = re.search(self._REMOTE_SECRET_FLAG_VALUE, flag_value)
       if match:
-        self.remote_project_number = match.groups()[0]
-        self.secret_name = match.groups()[1]
-        self.secret_version = 'latest'
+        self.remote_project_number = match.group('project')
+        self.secret_name = match.group('secret')
+
+        self.secret_version = match.group('version_short')
+        if self.secret_version is None:
+          self.secret_version = match.group('version_long')
+        if self.secret_version is None:
+          self.secret_version = 'latest'
+
         return
 
     self._InitWithLocalSecret(flag_value, connector_name)
@@ -204,7 +211,7 @@ class ReachableSecret(object):
   def __repr__(self):
     # Used in testing.
     version_display = self.secret_version
-    if self.secret_version in [SpecialVersion.MOUNT_ALL, SpecialVersion.UNSET]:
+    if self.secret_version == SpecialVersion.MOUNT_ALL:
       version_display = version_display.name
     project_display = ('project=%s ' % self.remote_project_number
                        if self.remote_project_number is not None else '')
@@ -239,7 +246,11 @@ class ReachableSecret(object):
       ConfigurationError: If the key is required on this platform.
     """
     if platforms.IsManaged():
-      return SpecialVersion.UNSET
+      # Service returns an error for this, but we can make a better one.
+      raise exceptions.ConfigurationError(
+          'No secret version specified for {name}. '
+          'Use {name}:latest to reference the latest version.'.format(
+              name=name))
     else:  # for GKE+K8S
       if self._connector is SpecialConnector.PATH_OR_ENV:
         raise TypeError("Can't determine default key for secret named %r." %
@@ -313,7 +324,6 @@ class ReachableSecret(object):
     """
     if not self._IsRemote():
       raise TypeError('Only remote paths go in annotations')
-    # Note: This currently omits the secret version.
     return 'projects/{remote_project_number}/secrets/{secret_name}'.format(
         remote_project_number=self.remote_project_number,
         secret_name=self.secret_name)
@@ -336,9 +346,7 @@ class ReachableSecret(object):
     messages = resource.MessagesModule()
     out = messages.SecretVolumeSource(
         secretName=self._GetOrCreateAlias(resource))
-    item = messages.KeyToPath(path=self._PathTail())
-    if self.secret_version != SpecialVersion.UNSET:
-      item.key = self.secret_version
+    item = messages.KeyToPath(path=self._PathTail(), key=self.secret_version)
     out.items.append(item)
     return out
 
@@ -361,7 +369,6 @@ class ReachableSecret(object):
       messages.EnvVarSource
     """
     messages = resource.MessagesModule()
-    selector = messages.SecretKeySelector(name=self._GetOrCreateAlias(resource))
-    if self.secret_version != SpecialVersion.UNSET:
-      selector.key = self.secret_version
+    selector = messages.SecretKeySelector(
+        name=self._GetOrCreateAlias(resource), key=self.secret_version)
     return messages.EnvVarSource(secretKeyRef=selector)

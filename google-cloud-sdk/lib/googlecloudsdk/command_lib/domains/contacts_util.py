@@ -154,18 +154,39 @@ def _PromptForSingleContact(domains_messages, unused_current_contact=None):
   contact.postalAddress.regionCode = util.PromptWithValidator(
       validator=util.ValidateRegionCode,
       error_message=(
-          ' Country code must be in ISO 3166-1 format, e.g. "US" or "PL".\n'
-          ' See https://support.google.com/business/answer/6270107 for a list '
-          'of valid choices.'),
-      prompt_string='Country code:  ',
-      message='Enter two-letter country code, e.g. "US" or "PL".')
+          ' Country / Region code must be in ISO 3166-1 format, e.g. "US" or '
+          '"PL".\n See https://support.google.com/business/answer/6270107 for a'
+          ' list of valid choices.'),
+      prompt_string='Country / Region code:  ',
+      message='Enter two-letter Country / Region code, e.g. "US" or "PL".')
+  if contact.postalAddress.regionCode != 'US':
+    log.status.Print('Refer to the guidelines for entering address field '
+                     'information at '
+                     'https://support.google.com/business/answer/6397478.')
   contact.postalAddress.postalCode = console_io.PromptResponse(
-      'Postal code/zipcode:  ')
+      'Postal / ZIP code:  ')
   contact.postalAddress.administrativeArea = console_io.PromptResponse(
-      'State (if applicable):  ')
-  contact.postalAddress.locality = console_io.PromptResponse('City:  ')
+      'State / Administrative area (if applicable):  ')
+  contact.postalAddress.locality = console_io.PromptResponse(
+      'City / Locality:  ')
   contact.postalAddress.addressLines.append(
-      console_io.PromptResponse('Street address (incl. building, apt):  '))
+      util.PromptWithValidator(
+          validator=util.ValidateNonEmpty,
+          error_message=' Address Line 1 must not be empty.',
+          prompt_string='Address Line 1:  '))
+
+  optional_address_lines = []
+  address_line_num = 2
+  while len(optional_address_lines) < 4:
+    address_line_num = 2 + len(optional_address_lines)
+    address_line = console_io.PromptResponse(
+        'Address Line {} (if applicable):  '.format(address_line_num))
+    if not address_line:
+      break
+    optional_address_lines += [address_line]
+
+  if optional_address_lines:
+    contact.postalAddress.addressLines.extend(optional_address_lines)
   return contact
 
 

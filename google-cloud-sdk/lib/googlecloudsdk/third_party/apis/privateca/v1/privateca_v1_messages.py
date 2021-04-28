@@ -64,30 +64,12 @@ class AllowedKeyType(_messages.Message):
   qualified key algorithm, such as RSA 4096, or a family of key algorithms,
   such as any RSA key.
 
-  Enums:
-    EllipticCurveValueValuesEnum: Represents an allowed Elliptic Curve key
-      type.
-
   Fields:
     ellipticCurve: Represents an allowed Elliptic Curve key type.
     rsa: Represents an allowed RSA key type.
   """
 
-  class EllipticCurveValueValuesEnum(_messages.Enum):
-    r"""Represents an allowed Elliptic Curve key type.
-
-    Values:
-      NAMED_CURVE_UNSPECIFIED: Not specified.
-      ECDSA_P256: Refers to the NIST P-256 curve.
-      ECDSA_P384: Refers to the NIST P-384 curve.
-      EDDSA_25519: Refers to the Ed25519 curve, as described in RFC 8410.
-    """
-    NAMED_CURVE_UNSPECIFIED = 0
-    ECDSA_P256 = 1
-    ECDSA_P384 = 2
-    EDDSA_25519 = 3
-
-  ellipticCurve = _messages.EnumField('EllipticCurveValueValuesEnum', 1)
+  ellipticCurve = _messages.MessageField('EcKeyType', 1)
   rsa = _messages.MessageField('RsaKeyType', 2)
 
 
@@ -368,7 +350,7 @@ class Certificate(_messages.Message):
         service based on the caller's identity. This mode will ignore any
         explicitly specified Subject and/or SubjectAltNames in the certificate
         request. This mode requires the caller to have the
-        `privateca.certificates.createReflected` permission.
+        `privateca.certificates.createForSelf` permission.
     """
     SUBJECT_REQUEST_MODE_UNSPECIFIED = 0
     DEFAULT = 1
@@ -888,6 +870,42 @@ class DisableCertificateAuthorityRequest(_messages.Message):
   """
 
   requestId = _messages.StringField(1)
+
+
+class EcKeyType(_messages.Message):
+  r"""Describes an Elliptic Curve key that may be used in a Certificate issued
+  from a CaPool.
+
+  Enums:
+    SignatureAlgorithmValueValuesEnum: Optional. A signature algorithm that
+      must be used. If this is omitted, any EC-based signature algorithm will
+      be allowed.
+
+  Fields:
+    signatureAlgorithm: Optional. A signature algorithm that must be used. If
+      this is omitted, any EC-based signature algorithm will be allowed.
+  """
+
+  class SignatureAlgorithmValueValuesEnum(_messages.Enum):
+    r"""Optional. A signature algorithm that must be used. If this is omitted,
+    any EC-based signature algorithm will be allowed.
+
+    Values:
+      EC_SIGNATURE_ALGORITHM_UNSPECIFIED: Not specified. Signifies that any
+        signature algorithm may be used.
+      ECDSA_P256: Refers to the Elliptic Curve Digital Signature Algorithm
+        over the NIST P-256 curve.
+      ECDSA_P384: Refers to the Elliptic Curve Digital Signature Algorithm
+        over the NIST P-384 curve.
+      EDDSA_25519: Refers to the Edwards-curve Digital Signature Algorithm
+        over curve 25519, as described in RFC 8410.
+    """
+    EC_SIGNATURE_ALGORITHM_UNSPECIFIED = 0
+    ECDSA_P256 = 1
+    ECDSA_P384 = 2
+    EDDSA_25519 = 3
+
+  signatureAlgorithm = _messages.EnumField('SignatureAlgorithmValueValuesEnum', 1)
 
 
 class Empty(_messages.Message):
@@ -2421,7 +2439,7 @@ class PrivatecaProjectsLocationsListRequest(_messages.Message):
       documented in more detail in [AIP-160](https://google.aip.dev/160).
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """

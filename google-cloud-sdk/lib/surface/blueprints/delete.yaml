@@ -1,0 +1,24 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: "Delete a deployment."
+    description: "This deletes a deployment and all of its child revisions."
+    examples: |
+      Delete a deployment:
+
+        $ {command} my-deployment
+
+  request:
+    collection: config.projects.locations.deployments
+    static_fields:
+      force: true
+
+  async:
+    collection: config.projects.locations.operations
+    api_version: v1alpha1
+    extract_resource_result: false
+
+  arguments:
+    resource:
+      help_text: "The deployment to be deleted."
+      spec: !REF googlecloudsdk.command_lib.blueprints.resources:deployment

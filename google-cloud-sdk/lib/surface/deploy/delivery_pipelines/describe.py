@@ -25,6 +25,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.deploy import describe
 from googlecloudsdk.command_lib.deploy import resource_args
+from googlecloudsdk.command_lib.deploy import target_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -105,11 +106,15 @@ class Describe(base.DescribeCommand):
       try:
         deploy_target = target.TargetsClient().Get(target_ref.RelativeName())
       except apitools_exceptions.HttpError as error:
-        log.status.Print('failed to get target {}: {}'.format(
-            target_ref.Name(), error))
+        log.debug('Failed to get target {}: {}'.format(
+            target_ref.RelativeName(), error))
+        log.status.Print('Unable to get target {}'.format(
+            target_ref.RelativeName()))
         continue
       detail = {'Target': target_ref.Name()}
-      releases, detail = describe.GetCurrentRelease(target_ref, detail)
+      releases, current_rollout = target_util.GetReleasesAndCurrentRollout(
+          target_ref)
+      detail = describe.SetCurrentReleaseAndRollout(current_rollout, detail)
       if deploy_target.approvalRequired:
         detail = describe.ListPendingApprovals(releases, target_ref, detail)
       targets.append(detail)

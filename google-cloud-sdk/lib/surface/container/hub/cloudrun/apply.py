@@ -1,0 +1,150 @@
+# -*- coding: utf-8 -*- #
+# Copyright 2019 Google LLC. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""The command to update Cloud Run CR."""
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.container.hub import kube_util
+from googlecloudsdk.command_lib.container.hub import util as hub_util
+from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import log
+from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import files
+
+CONFIG_YAML_FLAG = '--config'
+membership = None
+
+
+class Apply(base.CreateCommand):
+  r"""Update the CloudRun CR.
+
+  Update a user-specified config file to a CloudRun Custom Resource.
+  The config file should be a yaml file.
+
+  ## Examples
+
+  Apply CloudRun yaml file:
+
+    $ {command} --kubeconfig=user-kubeconfig \
+    --config=/path/to/cloud-run-cr.yaml
+  """
+
+  FEATURE_NAME = 'appdevexperience'
+  FEATURE_DISPLAY_NAME = 'CloudRun'
+  FEATURE_API = 'appdevelopmentexperience.googleapis.com'
+
+  @classmethod
+  def Args(cls, parser):
+    hub_util.AddClusterConnectionCommonArgs(parser)
+
+    parser.add_argument(
+        CONFIG_YAML_FLAG,
+        type=str,
+        help='The path to Cloud Run Config Yaml.',
+        required=False,
+        hidden=True)
+
+  def Run(self, args):
+    kube_client = kube_util.KubernetesClient(
+        gke_uri=getattr(args, 'gke_uri', None),
+        gke_cluster=getattr(args, 'gke_cluster', None),
+        kubeconfig=getattr(args, 'kubeconfig', None),
+        context=getattr(args, 'context', None),
+        public_issuer_url=getattr(args, 'public_issuer_url', None),
+        enable_workload_identity=getattr(args, 'enable_workload_identity',
+                                         False),
+        manage_workload_identity_bucket=getattr(
+            args, 'manage_workload_identity_bucket', False),
+    )
+    kube_util.ValidateClusterIdentifierFlags(kube_client, args)
+
+    yaml_string = files.ReadFileContents(
+        args.config) if args.config is not None else _default_cr()
+
+    _validate_cr(yaml_string)
+
+    _apply_cr_to_membership_cluster(kube_client, yaml_string)
+
+    log.status.Print('Added CloudRun CR')
+
+
+def _apply_cr_to_membership_cluster(kube_client, yaml_string):
+  """Apply the CloudRun CR to the cluster.
+
+  Args:
+    kube_client: a kubernetes client.
+    yaml_string: the cloudrun yaml.
+  """
+  _, err = kube_client.Apply(yaml_string)
+  if err:
+    raise exceptions.Error(
+        'Failed to apply manifest to cluster: {}'.format(err))
+
+
+def _validate_cr(yaml_string):
+  """Validate the parsed cloudrun yaml.
+
+  Args:
+    yaml_string: The yaml string to validate.
+  """
+
+  try:
+    cloudrun_cr = yaml.load(yaml_string)
+  except yaml.Error as e:
+    raise exceptions.Error('Invalid cloudrun yaml {}'.format(yaml_string), e)
+
+  if not isinstance(cloudrun_cr, dict):
+    raise exceptions.Error('Invalid CloudRun template.')
+  if 'apiVersion' not in cloudrun_cr:
+    raise exceptions.Error(
+        'The resource is missing a required field "apiVersion".')
+  if cloudrun_cr['apiVersion'] != 'operator.run.cloud.google.com/v1alpha1':
+    raise exceptions.Error(
+        'The resource "apiVersion" field must be set to: "operator.run.cloud.google.com/v1alpha1". If you believe the apiVersion is correct, you may need to upgrade your gcloud installation.'
+    )
+
+  if 'kind' not in cloudrun_cr:
+    raise exceptions.Error('The resource is missing a required field "kind".')
+
+  if cloudrun_cr['kind'] != 'CloudRun':
+    raise exceptions.Error(
+        'The resource "kind" field must be set to: "CloudRun".')
+
+  if 'metadata' not in cloudrun_cr:
+    raise cloudrun_cr.Error(
+        'The resource is missing a required field "metadata".')
+
+  metadata = cloudrun_cr['metadata']
+  if ('namespace' not in metadata or
+      metadata['namespace'] != 'cloud-run-system'):
+    raise exceptions.Error(
+        'The resource "metadata.namespace" field must be set to "cloud-run-system"'
+    )
+  if ('name' not in metadata or metadata['name'] != 'cloud-run'):
+    raise exceptions.Error(
+        'The resource "metadata.name" field must be set to "cloud-run"')
+
+
+def _default_cr():
+  return r"""
+  apiVersion: operator.run.cloud.google.com/v1alpha1
+  kind: CloudRun
+  metadata:
+    name: cloud-run
+    namespace: cloud-run-system
+  """

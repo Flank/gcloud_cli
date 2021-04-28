@@ -20,11 +20,30 @@
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:cluster
 
     params:
+    - arg_name: default-max-pods-per-node
+      api_field: cluster.defaultMaxPodsPerNode
+      help_text: |
+        The default maximum number of pods per node.
     - arg_name: hub-membership
       api_field: cluster.hub.membership
       help_text: |
         Name of the membership resource to use when registering this cluster to GKE
         Hub e.g. projects/{project}/locations/global/memberships/{membership}.
+    - arg_name: cluster-ipv4-cidr
+      api_field: cluster.networking.clusterIpv4CidrBlocks
+      repeated: false
+      help_text: |
+        All services in the cluster are assigned an RFC1918 IPv4 address from
+        this block. This field cannot be changed after creation.
+      default: "10.0.0.0/17"
+    - arg_name: services-ipv4-cidr
+      api_field: cluster.networking.servicesIpv4CidrBlocks
+      repeated: false
+      help_text: |
+        All pods in the cluster are assigned an RFC1918 IPv4 address from this
+        block. This field cannot be changed after creation.
+      default: "10.96.0.0/12"
+
     labels:
       api_field: cluster.labels
 

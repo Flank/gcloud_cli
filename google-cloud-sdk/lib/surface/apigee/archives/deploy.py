@@ -80,11 +80,19 @@ class Deploy(base.DescribeCommand):
         fallthroughs=fallthroughs,
         positional=False,
         required=True)
-    parser.add_argument(
+    # Create a argument group to manage that only one of either --source or
+    # --bundle-file flags are provided on the command line.
+    source_input_group = parser.add_group(mutex=True, help="Source input.")
+    source_input_group.add_argument(
         "--source",
         required=False,
         type=files.ExpandHomeAndVars,
-        help="The source directory to upload.")
+        help="The source directory of the archive to upload.")
+    source_input_group.add_argument(
+        "--bundle-file",
+        required=False,
+        type=files.ExpandHomeAndVars,
+        help="The zip file containing an archive to upload.")
     parser.add_argument(
         "--async",
         action="store_true",
@@ -165,9 +173,13 @@ class Deploy(base.DescribeCommand):
     """Run the deploy command."""
     identifiers = args.CONCEPTS.environment.Parse().AsDict()
     labels_arg = labels_util.GetUpdateLabelsDictFromArgs(args)
-    # Using as a context manager automatically cleans up the temp file on exit.
-    with cmd_lib.LocalDirectoryArchive(args.source) as local_dir_archive:
-      zip_file_path = local_dir_archive.Zip()
+    try:
+      local_dir_archive = cmd_lib.LocalDirectoryArchive(args.source)
+      if args.bundle_file:
+        local_dir_archive.ValidateZipFilePath(args.bundle_file)
+        zip_file_path = args.bundle_file
+      else:
+        zip_file_path = local_dir_archive.Zip()
       upload_url = self._GetUploadUrl(identifiers)
       self._UploadArchive(upload_url, zip_file_path)
       operation = self._DeployArchive(identifiers, upload_url, labels_arg)
@@ -182,3 +194,5 @@ class Deploy(base.DescribeCommand):
           operation["uuid"],
           message="Waiting for operation [{}] to complete".format(
               operation["uuid"]))
+    finally:
+      local_dir_archive.Close()

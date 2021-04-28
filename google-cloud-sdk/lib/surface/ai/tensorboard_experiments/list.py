@@ -26,7 +26,15 @@ from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.core import resources
 
 
-def _GetUri(tensorboard):
+def _GetUriBeta(tensorboard):
+  ref = resources.REGISTRY.ParseRelativeName(
+      tensorboard.name,
+      constants.TENSORBOARD_EXPERIMENTS_COLLECTION,
+      api_version=constants.AI_PLATFORM_API_VERSION[constants.BETA_VERSION])
+  return ref.SelfLink()
+
+
+def _GetUriAlpha(tensorboard):
   ref = resources.REGISTRY.ParseRelativeName(
       tensorboard.name,
       constants.TENSORBOARD_EXPERIMENTS_COLLECTION,
@@ -34,26 +42,41 @@ def _GetUri(tensorboard):
   return ref.SelfLink()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class List(base.ListCommand):
+def _Run(args, version):
+  tensorboard_ref = args.CONCEPTS.tensorboard.Parse()
+  region = tensorboard_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    return client.TensorboardExperimentsClient(version=version).List(
+        tensorboard_ref=tensorboard_ref,
+        limit=args.limit,
+        page_size=args.page_size,
+        sort_by=args.sort_by)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ListBeta(base.ListCommand):
   """List the Tensorboard experiments of the given project, region, and Tensorboard."""
 
   @staticmethod
   def Args(parser):
     flags.AddTensorboardResourceArg(parser,
                                     'to create a Tensorboard experiment')
-    parser.display_info.AddUriFunc(_GetUri)
-
-  def _Run(self, args, version):
-    tensorboard_ref = args.CONCEPTS.tensorboard.Parse()
-    region = tensorboard_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=version, region=region):
-      return client.TensorboardExperimentsClient(version=version).List(
-          tensorboard_ref=tensorboard_ref,
-          limit=args.limit,
-          page_size=args.page_size,
-          sort_by=args.sort_by)
+    parser.display_info.AddUriFunc(_GetUriBeta)
 
   def Run(self, args):
-    return self._Run(args, constants.ALPHA_VERSION)
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(base.ListCommand):
+  """List the Tensorboard experiments of the given project, region, and Tensorboard."""
+
+  @staticmethod
+  def Args(parser):
+    flags.AddTensorboardResourceArg(parser,
+                                    'to create a Tensorboard experiment')
+    parser.display_info.AddUriFunc(_GetUriAlpha)
+
+  def Run(self, args):
+    return _Run(args, constants.ALPHA_VERSION)

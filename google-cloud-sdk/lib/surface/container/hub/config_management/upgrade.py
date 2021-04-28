@@ -47,7 +47,7 @@ class Upgrade(base.UpdateCommand):
 
   FEATURE_NAME = 'configmanagement'
   FEATURE_DISPLAY_NAME = 'Config Management'
-  LATEST_VERSION = '1.6.0'
+  LATEST_VERSION = '1.7.0'
   FEATURE_API = 'anthosconfigmanagement.googleapis.com'
 
   @classmethod

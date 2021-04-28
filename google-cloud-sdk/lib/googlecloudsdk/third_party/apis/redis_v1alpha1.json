@@ -592,6 +592,12 @@
         "canReschedule": {
           "description": "If the scheduled maintenance can be rescheduled, default is true.",
           "type": "boolean"
+        },
+        "scheduleDeadlineTime": {
+          "description": "Output only. The time deadline any schedule start time cannot go beyond, including reschedule.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -951,7 +957,7 @@
                   "type": "string"
                 },
                 "pageSize": {
-                  "description": "The maximum number of results to return. If not set, the service will select a default.",
+                  "description": "The maximum number of results to return. If not set, the service selects a default.",
                   "location": "query",
                   "type": "integer",
                   "format": "int32"

@@ -68,7 +68,7 @@ class Deploy(base.Command):
     flags.AddLabelsFlag(parser)
     flags.AddParallelismFlag(parser)
     flags.AddCompletionsFlag(parser)
-    flags.AddMaxAttemptsFlag(parser)
+    flags.AddMaxRetriesFlag(parser)
     flags.AddServiceAccountFlag(parser)
     flags.AddSetEnvVarsFlag(parser)
     flags.AddSetCloudSQLFlag(parser)

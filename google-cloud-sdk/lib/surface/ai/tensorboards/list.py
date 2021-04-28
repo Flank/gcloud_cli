@@ -26,7 +26,15 @@ from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.core import resources
 
 
-def _GetUri(tensorboard):
+def _GetUriBeta(tensorboard):
+  ref = resources.REGISTRY.ParseRelativeName(
+      tensorboard.name,
+      constants.TENSORBOARDS_COLLECTION,
+      api_version=constants.AI_PLATFORM_API_VERSION[constants.BETA_VERSION])
+  return ref.SelfLink()
+
+
+def _GetUriAlpha(tensorboard):
   ref = resources.REGISTRY.ParseRelativeName(
       tensorboard.name,
       constants.TENSORBOARDS_COLLECTION,
@@ -34,25 +42,41 @@ def _GetUri(tensorboard):
   return ref.SelfLink()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class List(base.ListCommand):
+def _Run(args, version):
+  region_ref = args.CONCEPTS.region.Parse()
+  region = region_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    return client.TensorboardsClient(version=version).List(
+        limit=args.limit,
+        page_size=args.page_size,
+        region_ref=region_ref,
+        sort_by=args.sort_by)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ListBeta(base.ListCommand):
   """Lists the Tensorboards of the given project and region."""
 
   @staticmethod
   def Args(parser):
     flags.AddRegionResourceArg(parser, 'to list Tensorboards')
-    parser.display_info.AddUriFunc(_GetUri)
-
-  def _Run(self, args):
-    region_ref = args.CONCEPTS.region.Parse()
-    region = region_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=constants.ALPHA_VERSION, region=region):
-      return client.TensorboardsClient().List(
-          limit=args.limit,
-          page_size=args.page_size,
-          region_ref=region_ref,
-          sort_by=args.sort_by)
+    parser.display_info.AddUriFunc(_GetUriBeta)
 
   def Run(self, args):
-    return self._Run(args)
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(base.ListCommand):
+  """Lists the Tensorboards of the given project and region."""
+
+  @staticmethod
+  def Args(parser):
+    flags.AddRegionResourceArg(parser, 'to list Tensorboards')
+    parser.display_info.AddUriFunc(_GetUriAlpha)
+
+  def Run(self, args):
+    return _Run(args, constants.ALPHA_VERSION)

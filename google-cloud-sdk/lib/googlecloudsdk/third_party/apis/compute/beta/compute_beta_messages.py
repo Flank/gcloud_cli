@@ -1285,6 +1285,10 @@ class AllocationSpecificSKUAllocationAllocatedInstancePropertiesReservedDisk(_me
 class AllocationSpecificSKUAllocationReservedInstanceProperties(_messages.Message):
   r"""Properties of the SKU instances being reserved. Next ID: 9
 
+  Enums:
+    MaintenanceIntervalValueValuesEnum: For more information about maintenance
+      intervals, see Setting maintenance intervals.
+
   Fields:
     guestAccelerators: Specifies accelerator type and count.
     localSsds: Specifies amount of local ssd to reserve with each instance.
@@ -1296,14 +1300,30 @@ class AllocationSpecificSKUAllocationReservedInstanceProperties(_messages.Messag
       of vCPUs and fixed amount of memory. This also includes specifying
       custom machine type following custom-NUMBER_OF_CPUS-AMOUNT_OF_MEMORY
       pattern.
+    maintenanceFreezeDurationHours: Specifies the number of hours after
+      reservation creation where instances using the reservation won't be
+      scheduled for maintenance.
+    maintenanceInterval: For more information about maintenance intervals, see
+      Setting maintenance intervals.
     minCpuPlatform: Minimum cpu platform the reservation.
   """
+
+  class MaintenanceIntervalValueValuesEnum(_messages.Enum):
+    r"""For more information about maintenance intervals, see Setting
+    maintenance intervals.
+
+    Values:
+      PERIODIC: <no description>
+    """
+    PERIODIC = 0
 
   guestAccelerators = _messages.MessageField('AcceleratorConfig', 1, repeated=True)
   localSsds = _messages.MessageField('AllocationSpecificSKUAllocationAllocatedInstancePropertiesReservedDisk', 2, repeated=True)
   locationHint = _messages.StringField(3)
   machineType = _messages.StringField(4)
-  minCpuPlatform = _messages.StringField(5)
+  maintenanceFreezeDurationHours = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  maintenanceInterval = _messages.EnumField('MaintenanceIntervalValueValuesEnum', 6)
+  minCpuPlatform = _messages.StringField(7)
 
 
 class AllocationSpecificSKUReservation(_messages.Message):
@@ -1720,7 +1740,7 @@ class Autoscaler(_messages.Message):
 
   Fields:
     autoscalingPolicy: The configuration parameters for the autoscaling
-      algorithm. You can define one or more of the policies for an autoscaler:
+      algorithm. You can define one or more signals for an autoscaler:
       cpuUtilization, customMetricUtilizations, and loadBalancingUtilization.
       If none of these are specified, the default will be to autoscale based
       on cpuUtilization to 0.6 or 60%.
@@ -27237,14 +27257,6 @@ class FirewallPolicyRule(_messages.Message):
       applies. This field allows you to control which network's VMs get this
       rule. If this field is left blank, all VMs within the organization will
       receive the rule.
-    targetSecureLabels: A list of secure labels that controls which instances
-      the firewall rule applies to. If targetSecureLabel are specified, then
-      the firewall rule applies only to instances in the VPC network that have
-      one of those secure labels. targetSecureLabel may not be set at the same
-      time as targetServiceAccounts. If neither targetServiceAccounts nor
-      targetSecureLabel are specified, the firewall rule applies to all
-      instances on the specified network. Maximum number of target label
-      values allowed is 256.
     targetServiceAccounts: A list of service accounts indicating the sets of
       instances that are applied with this rule.
   """
@@ -27269,8 +27281,7 @@ class FirewallPolicyRule(_messages.Message):
   priority = _messages.IntegerField(8, variant=_messages.Variant.INT32)
   ruleTupleCount = _messages.IntegerField(9, variant=_messages.Variant.INT32)
   targetResources = _messages.StringField(10, repeated=True)
-  targetSecureLabels = _messages.StringField(11, repeated=True)
-  targetServiceAccounts = _messages.StringField(12, repeated=True)
+  targetServiceAccounts = _messages.StringField(11, repeated=True)
 
 
 class FirewallPolicyRuleMatcher(_messages.Message):
@@ -27283,15 +27294,11 @@ class FirewallPolicyRuleMatcher(_messages.Message):
     layer4Configs: Pairs of IP protocols and ports that the rule should match.
     srcIpRanges: CIDR IP address range. Maximum number of source CIDR IP
       ranges allowed is 256.
-    srcSecureLabels: List of firewall label values, which should be matched at
-      the source of the traffic. Maximum number of source label values allowed
-      is 256.
   """
 
   destIpRanges = _messages.StringField(1, repeated=True)
   layer4Configs = _messages.MessageField('FirewallPolicyRuleMatcherLayer4Config', 2, repeated=True)
   srcIpRanges = _messages.StringField(3, repeated=True)
-  srcSecureLabels = _messages.StringField(4, repeated=True)
 
 
 class FirewallPolicyRuleMatcherLayer4Config(_messages.Message):
@@ -27416,11 +27423,11 @@ class ForwardingRule(_messages.Message):
       is valid.  - Network Load Balancing: The load balancing scheme is
       EXTERNAL, and one of TCP or UDP is valid.
     allPorts: This field is used along with the backend_service field for
-      internal load balancing or with the target field for internal
-      TargetInstance. This field cannot be used with port or portRange fields.
-      When the load balancing scheme is INTERNAL and protocol is TCP/UDP,
-      specify this field to allow packets addressed to any ports will be
-      forwarded to the backends configured with this forwarding rule.
+      Internal TCP/UDP Load Balancing or Network Load Balancing, or with the
+      target field for internal and external TargetInstance.  You can only use
+      one of ports and port_range, or allPorts. The three are mutually
+      exclusive.  For TCP, UDP and SCTP traffic, packets addressed to any
+      ports will be forwarded to the target or backendService.
     allowGlobalAccess: This field is used along with the backend_service field
       for internal load balancing or with the target field for internal
       TargetInstance. If the field is set to TRUE, clients can access ILB from
@@ -27509,29 +27516,28 @@ class ForwardingRule(_messages.Message):
       For GlobalForwardingRule, the valid value is PREMIUM.  If this field is
       not specified, it is assumed to be PREMIUM. If IPAddress is specified,
       this value must be equal to the networkTier of the Address.
-    portRange: This field can be used only if: * Load balancing scheme is one
-      of EXTERNAL,  INTERNAL_SELF_MANAGED or INTERNAL_MANAGED, and *
-      IPProtocol is one of TCP, UDP, or SCTP.  Packets addressed to ports in
-      the specified range will be forwarded to target or  backend_service. You
-      can only use one of ports, port_range, or allPorts. The three are
-      mutually exclusive. Forwarding rules with the same [IPAddress,
-      IPProtocol] pair must have disjoint port ranges.  Some types of
-      forwarding target have constraints on the acceptable ports:   -
-      TargetHttpProxy: 80, 8080  - TargetHttpsProxy: 443  - TargetGrpcProxy:
-      no constraints  - TargetTcpProxy: 25, 43, 110, 143, 195, 443, 465, 587,
-      700, 993, 995, 1688, 1883, 5222  - TargetSslProxy: 25, 43, 110, 143,
-      195, 443, 465, 587, 700, 993, 995, 1688, 1883, 5222  - TargetVpnGateway:
-      500, 4500
+    portRange: This field can be used only if:   - Load balancing scheme is
+      one of EXTERNAL,  INTERNAL_SELF_MANAGED or INTERNAL_MANAGED  -
+      IPProtocol is one of TCP, UDP, or SCTP.    Packets addressed to ports in
+      the specified range will be forwarded to target or  backend_service.
+      You can only use one of ports, port_range, or allPorts. The three are
+      mutually exclusive.  Forwarding rules with the same [IPAddress,
+      IPProtocol] pair must have disjoint ports.  Some types of forwarding
+      target have constraints on the acceptable ports:   - TargetHttpProxy:
+      80, 8080  - TargetHttpsProxy: 443  - TargetGrpcProxy: no constraints  -
+      TargetTcpProxy: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995,
+      1688, 1883, 5222  - TargetSslProxy: 25, 43, 110, 143, 195, 443, 465,
+      587, 700, 993, 995, 1688, 1883, 5222  - TargetVpnGateway: 500, 4500
     ports: The ports field is only supported when the forwarding rule
       references a backend_service directly. Supported load balancing products
       are Internal TCP/UDP Load Balancing and Network Load Balancing. Only
       packets addressed to the specified list of ports are forwarded to
       backends.  You can only use one of ports and port_range, or allPorts.
       The three are mutually exclusive.  You can specify a list of up to five
-      ports, which can be non-contiguous.  For Internal TCP/UDP Load
-      Balancing, if you specify allPorts, you should not specify ports.  For
-      more information, see [Port specifications](/load-
-      balancing/docs/forwarding-rule-concepts#port_specifications).
+      ports, which can be non-contiguous.  Forwarding rules with the same
+      [IPAddress, IPProtocol] pair must have disjoint ports.  For more
+      information, see [Port specifications](/load-balancing/docs/forwarding-
+      rule-concepts#port_specifications).
     pscConnectionId: [Output Only] The PSC connection id of the PSC Forwarding
       Rule.
     region: [Output Only] URL of the region where the regional forwarding rule
@@ -28942,12 +28948,13 @@ class HealthCheckService(_messages.Message):
       retrieve the HealthCheckService.
     healthChecks: List of URLs to the HealthCheck resources. Must have at
       least one HealthCheck, and not more than 10. HealthCheck resources must
-      have portSpecification=USE_SERVING_PORT. For regional
-      HealthCheckService, the HealthCheck must be regional and in the same
-      region. For global HealthCheckService, HealthCheck must be global. Mix
-      of regional and global HealthChecks is not supported. Multiple regional
-      HealthChecks must belong to the same region. Regional
-      HealthChecks</code? must belong to the same region as zones of NEGs.
+      have portSpecification=USE_SERVING_PORT or
+      portSpecification=USE_FIXED_PORT. For regional HealthCheckService, the
+      HealthCheck must be regional and in the same region. For global
+      HealthCheckService, HealthCheck must be global. Mix of regional and
+      global HealthChecks is not supported. Multiple regional HealthChecks
+      must belong to the same region. Regional HealthChecks must belong to the
+      same region as zones of NEGs.
     healthStatusAggregationPolicy: Optional. Policy for how the results from
       multiple health checks for the same endpoint are aggregated. Defaults to
       NO_AGGREGATION if unspecified.   - NO_AGGREGATION. An EndpointHealth
@@ -31657,7 +31664,16 @@ class InstanceGroupList(_messages.Message):
 
 
 class InstanceGroupManager(_messages.Message):
-  r"""Represents a Managed Instance Group resource.  An instance group is a
+  r"""Whether the instance is a standby. Properties of a standby instance
+  comparing to the regular instance:
+  ========================================================================= |
+  regular | standby
+  =========================================================================
+  managed by IGM? | yes | yes added to the IG? | yes | yes counts towards
+  IGM's target size? | yes | no taken into account by Autoscaler? | yes | no
+  receives traffic from LB? | yes | no
+  =========================================================================
+  Represents a Managed Instance Group resource.  An instance group is a
   collection of VM instances that you can manage as a single entity. For more
   information, read Instance groups.  For zonal Managed Instance Group, use
   the instanceGroupManagers resource.  For regional Managed Instance Group,
@@ -36429,15 +36445,14 @@ class LocationPolicyLocation(_messages.Message):
   r"""A LocationPolicyLocation object.
 
   Enums:
-    PreferenceValueValuesEnum: Preference for a given locaction: ALLOW or
-      DENY.
+    PreferenceValueValuesEnum: Preference for a given location: ALLOW or DENY.
 
   Fields:
-    preference: Preference for a given locaction: ALLOW or DENY.
+    preference: Preference for a given location: ALLOW or DENY.
   """
 
   class PreferenceValueValuesEnum(_messages.Enum):
-    r"""Preference for a given locaction: ALLOW or DENY.
+    r"""Preference for a given location: ALLOW or DENY.
 
     Values:
       ALLOW: <no description>
@@ -48388,9 +48403,11 @@ class ScalingScheduleStatus(_messages.Message):
 
 
 class Scheduling(_messages.Message):
-  r"""Sets the scheduling options for an Instance. NextID: 20
+  r"""Sets the scheduling options for an Instance. NextID: 21
 
   Enums:
+    MaintenanceIntervalValueValuesEnum: For more information about maintenance
+      intervals, see Setting maintenance intervals.
     OnHostMaintenanceValueValuesEnum: Defines the maintenance behavior for
       this instance. For standard instances, the default behavior is MIGRATE.
       For preemptible instances, the default and only possible behavior is
@@ -48407,6 +48424,10 @@ class Scheduling(_messages.Message):
     locationHint: An opaque location hint used to place the instance close to
       other resources. This field is for use by internal tools that use the
       public API.
+    maintenanceFreezeDurationHours: Specifies the number of hours after VM
+      instance creation where the VM won't be scheduled for maintenance.
+    maintenanceInterval: For more information about maintenance intervals, see
+      Setting maintenance intervals.
     minNodeCpus: The minimum number of virtual CPUs this instance will consume
       when running on a sole-tenant node.
     nodeAffinities: A set of node affinity and anti-affinity configurations.
@@ -48421,6 +48442,15 @@ class Scheduling(_messages.Message):
       therefore, in a `TERMINATED` state. See Instance Life Cycle for more
       information on the possible instance states.
   """
+
+  class MaintenanceIntervalValueValuesEnum(_messages.Enum):
+    r"""For more information about maintenance intervals, see Setting
+    maintenance intervals.
+
+    Values:
+      PERIODIC: <no description>
+    """
+    PERIODIC = 0
 
   class OnHostMaintenanceValueValuesEnum(_messages.Enum):
     r"""Defines the maintenance behavior for this instance. For standard
@@ -48437,10 +48467,12 @@ class Scheduling(_messages.Message):
 
   automaticRestart = _messages.BooleanField(1)
   locationHint = _messages.StringField(2)
-  minNodeCpus = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  nodeAffinities = _messages.MessageField('SchedulingNodeAffinity', 4, repeated=True)
-  onHostMaintenance = _messages.EnumField('OnHostMaintenanceValueValuesEnum', 5)
-  preemptible = _messages.BooleanField(6)
+  maintenanceFreezeDurationHours = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  maintenanceInterval = _messages.EnumField('MaintenanceIntervalValueValuesEnum', 4)
+  minNodeCpus = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  nodeAffinities = _messages.MessageField('SchedulingNodeAffinity', 6, repeated=True)
+  onHostMaintenance = _messages.EnumField('OnHostMaintenanceValueValuesEnum', 7)
+  preemptible = _messages.BooleanField(8)
 
 
 class SchedulingNodeAffinity(_messages.Message):

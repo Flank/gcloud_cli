@@ -1,0 +1,20 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: "Display details of a revision."
+    description: "Display details of a revision."
+    examples: |
+      Retrieve information about a revision:
+
+        $ {command} projects/my-project/locations/us-central1/deployments/my-deployment/revisions/r-0284ac1d-8127-47c0-809b-1b000edbe77d
+
+  request:
+    collection: config.projects.locations.deployments.revisions
+
+  arguments:
+    resource:
+      help_text: "The revision resource to describe."
+      spec: !REF googlecloudsdk.command_lib.blueprints.resources:revision
+
+  response:
+    id_field: name

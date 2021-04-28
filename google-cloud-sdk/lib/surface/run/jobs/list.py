@@ -28,16 +28,29 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
 
-def _ActiveStatus(job):
-  return '{} / {}'.format(
-      job.get('status', {}).get('active', 0),
-      job.get('spec', {}).get('parallelism', 0))
-
-
 def _SucceededStatus(job):
   return '{} / {}'.format(
       job.get('status', {}).get('succeeded', 0),
       job.get('spec', {}).get('completions', 0))
+
+
+def _ByStartAndCreationTime(job):
+  """Sort key that sorts jobs by start time, newest and unstarted first.
+
+  All unstarted jobs will be first and sorted by their creation timestamp, all
+  started jobs will be second and sorted by their start time.
+
+  Args:
+    job: googlecloudsdk.api_lib.run.job.Job
+
+  Returns:
+    The lastTransitionTime of the Started condition or the creation timestamp of
+    the job if the job is unstarted.
+  """
+  return (False if job.started_condition and
+          job.started_condition['status'] is not None else True,
+          job.started_condition['lastTransitionTime']
+          if job.started_condition else job.creation_timestamp)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -60,16 +73,14 @@ class List(commands.List):
     parser.display_info.AddFormat(
         'table('
         '{ready_column},'
-        'name:label=JOB:sort=3,'
-        'active_status():label=ACTIVE:sort=1:reverse,'
+        'name:label=JOB,'
+        'status.active:label=RUNNING,'
         'succeeded_status():label=COMPLETE,'
-        'creation_timestamp.date("%Y-%m-%d %H:%M:%S %Z"):'
-        'label=CREATED:sort=2:reverse,'
+        'creation_timestamp.date("%Y-%m-%d %H:%M:%S %Z"):label=CREATED,'
         'author:label="CREATED BY")'.format(
             ready_column=pretty_print.READY_COLUMN))
     parser.display_info.AddUriFunc(cls._GetResourceUri)
     parser.display_info.AddTransforms({
-        'active_status': _ActiveStatus,
         'succeeded_status': _SucceededStatus,
     })
 
@@ -90,4 +101,7 @@ class List(commands.List):
         api_version='v1alpha1')
     with serverless_operations.Connect(conn_context) as client:
       self.SetCompleteApiEndpoint(conn_context.endpoint)
-      return commands.SortByName(client.ListJobs(namespace_ref))
+      return sorted(
+          commands.SortByName(client.ListJobs(namespace_ref)),
+          key=_ByStartAndCreationTime,
+          reverse=True)

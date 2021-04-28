@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.clouddeploy import client_util
 from googlecloudsdk.api_lib.clouddeploy import release
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.deploy import flags
+from googlecloudsdk.command_lib.deploy import promote_util
 from googlecloudsdk.command_lib.deploy import resource_args
 from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
@@ -90,4 +91,4 @@ class Create(base.CreateCommand):
         log.status.Print('Created Cloud Deploy release: {}.'.format(
             response['name']))
 
-    return client.Promote(release_ref, args.to_target)
+    promote_util.Promote(release_ref, args.to_target)

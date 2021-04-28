@@ -305,12 +305,14 @@
           "enumDescriptions": [
             "Unknown resource type.",
             "Consumer project.",
-            "Consumer project containing encryption keys."
+            "Consumer project containing encryption keys.",
+            "Keyring resource that hosts encryption keys."
           ],
           "enum": [
             "RESOURCE_TYPE_UNSPECIFIED",
             "CONSUMER_PROJECT",
-            "ENCRYPTION_KEYS_PROJECT"
+            "ENCRYPTION_KEYS_PROJECT",
+            "KEYRING"
           ]
         }
       }
@@ -391,12 +393,14 @@
           "enumDescriptions": [
             "Unknown resource type.",
             "Consumer project.",
-            "Consumer project containing encryption keys."
+            "Consumer project containing encryption keys.",
+            "Keyring resource that hosts encryption keys."
           ],
           "enum": [
             "RESOURCE_TYPE_UNSPECIFIED",
             "CONSUMER_PROJECT",
-            "ENCRYPTION_KEYS_PROJECT"
+            "ENCRYPTION_KEYS_PROJECT",
+            "KEYRING"
           ]
         }
       }
@@ -453,7 +457,9 @@
             "Criminal Justice Information Services (CJIS) Security policies.",
             "FedRAMP High data protection controls",
             "FedRAMP Moderate data protection controls",
-            "Assured Workloads For US Regions data protection controls"
+            "Assured Workloads For US Regions data protection controls",
+            "Health Insurance Portability and Accountability Act controls",
+            "Health Information Trust Alliance controls"
           ],
           "enum": [
             "COMPLIANCE_REGIME_UNSPECIFIED",
@@ -461,7 +467,9 @@
             "CJIS",
             "FEDRAMP_HIGH",
             "FEDRAMP_MODERATE",
-            "US_REGIONAL_ACCESS"
+            "US_REGIONAL_ACCESS",
+            "HIPAA",
+            "HITRUST"
           ]
         }
       }
@@ -496,7 +504,9 @@
             "Criminal Justice Information Services (CJIS) Security policies.",
             "FedRAMP High data protection controls",
             "FedRAMP Moderate data protection controls",
-            "Assured Workloads For US Regions data protection controls"
+            "Assured Workloads For US Regions data protection controls",
+            "Health Insurance Portability and Accountability Act controls",
+            "Health Information Trust Alliance controls"
           ],
           "enum": [
             "COMPLIANCE_REGIME_UNSPECIFIED",
@@ -504,7 +514,9 @@
             "CJIS",
             "FEDRAMP_HIGH",
             "FEDRAMP_MODERATE",
-            "US_REGIONAL_ACCESS"
+            "US_REGIONAL_ACCESS",
+            "HIPAA",
+            "HITRUST"
           ]
         },
         "createTime": {
@@ -561,12 +573,14 @@
           "enumDescriptions": [
             "Unknown resource type.",
             "Consumer project.",
-            "Consumer project containing encryption keys."
+            "Consumer project containing encryption keys.",
+            "Keyring resource that hosts encryption keys."
           ],
           "enum": [
             "RESOURCE_TYPE_UNSPECIFIED",
             "CONSUMER_PROJECT",
-            "ENCRYPTION_KEYS_PROJECT"
+            "ENCRYPTION_KEYS_PROJECT",
+            "KEYRING"
           ]
         }
       }
@@ -603,12 +617,14 @@
           "enumDescriptions": [
             "Unknown resource type.",
             "Consumer project.",
-            "Consumer project containing encryption keys."
+            "Consumer project containing encryption keys.",
+            "Keyring resource that hosts encryption keys."
           ],
           "enum": [
             "RESOURCE_TYPE_UNSPECIFIED",
             "CONSUMER_PROJECT",
-            "ENCRYPTION_KEYS_PROJECT"
+            "ENCRYPTION_KEYS_PROJECT",
+            "KEYRING"
           ]
         }
       }

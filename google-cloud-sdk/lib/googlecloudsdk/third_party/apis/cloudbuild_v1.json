@@ -925,6 +925,10 @@
         "cluster": {
           "description": "Details about how this build should be executed on a GKE cluster.",
           "$ref": "ClusterOptions"
+        },
+        "anthosCluster": {
+          "description": "Details about how this build should be executed on a Anthos cluster.",
+          "$ref": "AnthosWorkerPool"
         }
       }
     },
@@ -935,6 +939,17 @@
       "properties": {
         "name": {
           "description": "Identifier of the GKE Cluster this build should execute on. Example: projects\/{project_id}\/locations\/{location}\/clusters\/{cluster_name} The cluster's project ID must be the same project ID that is running the build. The cluster must exist and have the CloudBuild add-on enabled.",
+          "type": "string"
+        }
+      }
+    },
+    "AnthosWorkerPool": {
+      "id": "AnthosWorkerPool",
+      "description": "Anthos CICD cluster option.",
+      "type": "object",
+      "properties": {
+        "membership": {
+          "description": "Membership of the GKE Hub registered cluster this build should execute on. Example: \/projects\/{project}\/locations\/{location}\/memberships\/{cluster_name} The cluster's project number must be the same project ID that is running the build.",
           "type": "string"
         }
       }
@@ -1205,7 +1220,7 @@
           "$ref": "CronConfig"
         },
         "pubsubConfig": {
-          "description": "PubsubConfig [Experimental] describes the configuration of a trigger that creates a build whenever a Pub\/Sub message is published.",
+          "description": "Optional. PubsubConfig describes the configuration of a trigger that creates a build whenever a Pub\/Sub message is published.",
           "$ref": "PubsubConfig"
         },
         "webhookConfig": {
@@ -1268,7 +1283,7 @@
           "$ref": "ApprovalConfig"
         },
         "filter": {
-          "description": "A Common Expression Language string.",
+          "description": "Optional. A Common Expression Language string.",
           "type": "string"
         }
       }
@@ -1484,7 +1499,7 @@
     },
     "PubsubConfig": {
       "id": "PubsubConfig",
-      "description": "PubsubConfig [Experimental] describes the configuration of a trigger that creates a build whenever a Pub\/Sub message is published.",
+      "description": "PubsubConfig describes the configuration of a trigger that creates a build whenever a Pub\/Sub message is published.",
       "type": "object",
       "properties": {
         "subscription": {
@@ -1604,7 +1619,8 @@
           "type": "string"
         },
         "webhookKey": {
-          "description": "Immutable. UUID included in webhook requests. The UUID is used to look up the corresponding config. Once this field has been set, it cannot be changed. If you need to change it, please create another BitbucketServerConfig.",
+          "description": "Output only. UUID included in webhook requests. The UUID is used to look up the corresponding config.",
+          "readOnly": true,
           "type": "string"
         },
         "apiKey": {
@@ -1659,6 +1675,12 @@
         "repoSlug": {
           "description": "Required. Identifier for the repository.",
           "type": "string"
+        },
+        "webhookId": {
+          "description": "Output only. The ID of the webhook that was created for receiving events from this repo. We only create and manage a single webhook for each repo.",
+          "readOnly": true,
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -1887,6 +1909,43 @@
         "nextPageToken": {
           "description": "A token that can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
           "type": "string"
+        }
+      }
+    },
+    "AddBitbucketServerConnectedRepositoryRequest": {
+      "id": "AddBitbucketServerConnectedRepositoryRequest",
+      "description": "RPC request object accepted by the AddBitbucketServerConnectedRepository RPC method.",
+      "type": "object",
+      "properties": {
+        "connectedRepository": {
+          "description": "The connected repository to add.",
+          "$ref": "BitbucketServerRepositoryId"
+        }
+      }
+    },
+    "AddBitbucketServerConnectedRepositoryResponse": {
+      "id": "AddBitbucketServerConnectedRepositoryResponse",
+      "description": "RPC request object returned by the AddBitbucketServerConnectedRepository RPC method.",
+      "type": "object",
+      "properties": {
+        "config": {
+          "description": "The name of the `BitbucketServerConfig` that added connected repository. Format: `projects\/{project}\/locations\/{location}\/bitbucketServerConfigs\/{config}`",
+          "type": "string"
+        },
+        "connectedRepository": {
+          "description": "The connected repository.",
+          "$ref": "BitbucketServerRepositoryId"
+        }
+      }
+    },
+    "RemoveBitbucketServerConnectedRepositoryRequest": {
+      "id": "RemoveBitbucketServerConnectedRepositoryRequest",
+      "description": "RPC request object accepted by RemoveBitbucketServerConnectedRepository RPC method.",
+      "type": "object",
+      "properties": {
+        "connectedRepository": {
+          "description": "The connected repository to remove.",
+          "$ref": "BitbucketServerRepositoryId"
         }
       }
     },
@@ -2571,6 +2630,62 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Delete a `BitbucketServerConfig`. This API is experimental."
+                },
+                "addBitbucketServerConnectedRepository": {
+                  "id": "cloudbuild.projects.locations.bitbucketServerConfigs.addBitbucketServerConnectedRepository",
+                  "path": "v1/{+config}:addBitbucketServerConnectedRepository",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/bitbucketServerConfigs/{bitbucketServerConfigsId}:addBitbucketServerConnectedRepository",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "config": {
+                      "description": "Required. The name of the `BitbucketServerConfig` to add a connected repository. Format: `projects\/{project}\/locations\/{location}\/bitbucketServerConfigs\/{config}`",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/bitbucketServerConfigs\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "config"
+                  ],
+                  "request": {
+                    "$ref": "AddBitbucketServerConnectedRepositoryRequest"
+                  },
+                  "response": {
+                    "$ref": "AddBitbucketServerConnectedRepositoryResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Add a Bitbucket Server repository to a given BitbucketServerConfig's connected repositories. This API is experimental."
+                },
+                "removeBitbucketServerConnectedRepository": {
+                  "id": "cloudbuild.projects.locations.bitbucketServerConfigs.removeBitbucketServerConnectedRepository",
+                  "path": "v1/{+config}:removeBitbucketServerConnectedRepository",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/bitbucketServerConfigs/{bitbucketServerConfigsId}:removeBitbucketServerConnectedRepository",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "config": {
+                      "description": "Required. The name of the `BitbucketServerConfig` to remove a connected repository. Format: `projects\/{project}\/locations\/{location}\/bitbucketServerConfigs\/{config}`",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/bitbucketServerConfigs\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "config"
+                  ],
+                  "request": {
+                    "$ref": "RemoveBitbucketServerConnectedRepositoryRequest"
+                  },
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Remove a Bitbucket Server repository from an given BitbucketServerConfig\u2019s connected repositories. This API is experimental."
                 }
               }
             },

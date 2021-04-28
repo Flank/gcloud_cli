@@ -24,7 +24,7 @@ from googlecloudsdk.command_lib.essential_contacts import flags
 from googlecloudsdk.command_lib.essential_contacts import util
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Describe an essential contact.
 

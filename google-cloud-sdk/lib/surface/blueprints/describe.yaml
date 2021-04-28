@@ -1,0 +1,20 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: "Display details of a deployment."
+    description: "Display details of a deployment."
+    examples: |
+      Retrieve information about a deployment:
+
+        $ {command} my-deployment
+
+  request:
+    collection: config.projects.locations.deployments
+
+  arguments:
+    resource:
+      help_text: "The deployment resource to describe."
+      spec: !REF googlecloudsdk.command_lib.blueprints.resources:deployment
+
+  response:
+    id_field: name

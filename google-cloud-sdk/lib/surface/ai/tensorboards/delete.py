@@ -28,24 +28,40 @@ from googlecloudsdk.command_lib.ai import operations_util
 from googlecloudsdk.command_lib.ai import tensorboards_util
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Delete(base.DeleteCommand):
+def _Run(args, version):
+  tensorboard_ref = args.CONCEPTS.tensorboard.Parse()
+  region = tensorboard_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    operation = client.TensorboardsClient(
+        version=version).Delete(tensorboard_ref)
+    return operations_util.WaitForOpMaybe(
+        operations_client=operations.OperationsClient(),
+        op=operation,
+        op_ref=tensorboards_util.ParseTensorboardOperation(operation.name))
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class DeleteBeta(base.DeleteCommand):
   """Delete an existing AI platform Tensorboard."""
 
   @staticmethod
   def Args(parser):
     flags.AddTensorboardResourceArg(parser, 'to delete')
 
-  def _Run(self, args):
-    tensorboard_ref = args.CONCEPTS.tensorboard.Parse()
-    region = tensorboard_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=constants.ALPHA_VERSION, region=region):
-      operation = client.TensorboardsClient().Delete(tensorboard_ref)
-      return operations_util.WaitForOpMaybe(
-          operations_client=operations.OperationsClient(),
-          op=operation,
-          op_ref=tensorboards_util.ParseTensorboardOperation(operation.name))
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class DeleteAlpha(base.DeleteCommand):
+  """Delete an existing AI platform Tensorboard."""
+
+  @staticmethod
+  def Args(parser):
+    flags.AddTensorboardResourceArg(parser, 'to delete')
 
   def Run(self, args):
-    return self._Run(args)
+    return _Run(args, constants.ALPHA_VERSION)

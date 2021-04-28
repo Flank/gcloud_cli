@@ -645,8 +645,13 @@ def AddEgressSettingsFlag(parser):
           container_resource.EGRESS_SETTINGS_PRIVATE_RANGES_ONLY:
               'Default option. Sends outbound traffic to private IP addresses '
               'defined by RFC1918 through the VPC connector.',
+          container_resource.EGRESS_SETTINGS_ALL_TRAFFIC:
+              'Sends all outbound traffic through the VPC connector.',
           container_resource.EGRESS_SETTINGS_ALL:
-              'Sends all outbound traffic through the VPC connector.'
+              '(DEPRECATED) Sends all outbound traffic through the VPC '
+              "connector. Provides the same functionality as '{all_traffic}'."
+              " Prefer to use '{all_traffic}' instead.".format(
+                  all_traffic=container_resource.EGRESS_SETTINGS_ALL_TRAFFIC)
       })
 
 
@@ -864,17 +869,16 @@ def AddCompletionsFlag(parser):
       'considered done. Use this flag to trigger multiple runs of the job.')
 
 
-def AddMaxAttemptsFlag(parser):
-  """Add job max attempts flag to specify number of instance restarts."""
+def AddMaxRetriesFlag(parser):
+  """Add job max retries flag to specify number of instance restarts."""
   parser.add_argument(
-      '--max-attempts',
-      type=arg_parsers.BoundedInt(lower_bound=1),
+      '--max-retries',
+      type=arg_parsers.BoundedInt(lower_bound=0),
       default=6,
-      help='Number of times an instance will be allowed to run in case of '
+      help='Number of times an instance is allowed to restart in case of '
       'failure before being failed permanently. This applies per-instance, not '
-      'per-job. If set to 1, instances will only run once and never be '
-      'restarted on failure. If set to any other positive integer N, instances '
-      'will be allowed to restart N-1 times.')
+      'per-job. If set to 0, instances will only run once and never be '
+      'retried on failure.')
 
 
 def AddWaitForCompletionFlag(parser):
@@ -1280,8 +1284,8 @@ def GetConfigurationChanges(args):
     changes.append(config_changes.SpecChange('parallelism', args.parallelism))
   if FlagIsExplicitlySet(args, 'completions'):
     changes.append(config_changes.SpecChange('completions', args.completions))
-  if FlagIsExplicitlySet(args, 'max_attempts'):
-    changes.append(config_changes.JobMaxAttemptsChange(args.max_attempts))
+  if FlagIsExplicitlySet(args, 'max_retries'):
+    changes.append(config_changes.JobMaxRetriesChange(args.max_retries))
   if FlagIsExplicitlySet(args, 'binary_authorization'):
     changes.append(
         config_changes.SetAnnotationChange(
@@ -1822,9 +1826,12 @@ def GetAndValidatePlatform(args, release_track, product, allow_empty=False):
   return platform
 
 
-def AddSourceFlag(parser):
+def AddSourceAndImageFlags(parser):
   """Add deploy source flags, an image or a source for build."""
-  parser.add_argument(
+  group = parser.add_mutually_exclusive_group()
+
+  AddImageArg(group, required=False)
+  group.add_argument(
       '--source',
       help='The location of the source to build. The location can be a '
       'directory on a local disk or a gzipped archive file (.tar.gz) in '

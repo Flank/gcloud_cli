@@ -22,7 +22,7 @@ from googlecloudsdk.calliope import base
 
 
 @base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class TensorboardExperiment(base.Group):
   """AI Platform Tensorboard experiment commands."""
   pass

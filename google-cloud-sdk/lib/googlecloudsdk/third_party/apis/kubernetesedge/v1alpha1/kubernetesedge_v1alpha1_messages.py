@@ -163,10 +163,14 @@ class Cluster(_messages.Message):
 
   Fields:
     createTime: A string attribute.
+    defaultMaxPodsPerNode: The default maximum number of pods per node used if
+      a maximum value is not specified explicitly for a node pool in this
+      cluster. If unspecified, the Kubernetes default value will be used.
     endpoint: The IP address of the Kubernetes API server.
     hub: GKE Hub configuration.
     labels: A LabelsValue attribute.
     name: A string attribute.
+    networking: Cluster-wide networking configuration.
     updateTime: A string attribute.
   """
 
@@ -195,11 +199,29 @@ class Cluster(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   createTime = _messages.StringField(1)
-  endpoint = _messages.StringField(2)
-  hub = _messages.MessageField('Hub', 3)
-  labels = _messages.MessageField('LabelsValue', 4)
-  name = _messages.StringField(5)
-  updateTime = _messages.StringField(6)
+  defaultMaxPodsPerNode = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  endpoint = _messages.StringField(3)
+  hub = _messages.MessageField('Hub', 4)
+  labels = _messages.MessageField('LabelsValue', 5)
+  name = _messages.StringField(6)
+  networking = _messages.MessageField('ClusterNetworking', 7)
+  updateTime = _messages.StringField(8)
+
+
+class ClusterNetworking(_messages.Message):
+  r"""Cluster-wide networking configuration.
+
+  Fields:
+    clusterIpv4CidrBlocks: All pods in the cluster are assigned an RFC1918
+      IPv4 address from these ranges. Only a single range is supported. This
+      field cannot be changed after creation.
+    servicesIpv4CidrBlocks: All services in the cluster are assigned an
+      RFC1918 IPv4 address from these ranges. Only a single range is
+      supported. This field cannot be changed after creation.
+  """
+
+  clusterIpv4CidrBlocks = _messages.StringField(1, repeated=True)
+  servicesIpv4CidrBlocks = _messages.StringField(2, repeated=True)
 
 
 class Empty(_messages.Message):
@@ -258,6 +280,18 @@ class Hub(_messages.Message):
   """
 
   membership = _messages.StringField(1)
+
+
+class KubeletConfig(_messages.Message):
+  r"""Kubelet configuration for this node. See
+  https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta
+
+  Fields:
+    maxPods: The number of pods that can run on this Kubelet. If unspecified,
+      the Kubernetes default will be used.
+  """
+
+  maxPods = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class KubernetesedgeProjectsLocationsClustersCreateRequest(_messages.Message):
@@ -554,7 +588,7 @@ class KubernetesedgeProjectsLocationsListRequest(_messages.Message):
       documented in more detail in [AIP-160](https://google.aip.dev/160).
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """
@@ -1045,6 +1079,8 @@ class Node(_messages.Message):
     bootstrapKubeconfig: Kubeconfig data which may be used to bootstrap this
       node into its parent cluster using a TLS bootstrap token.
     createTime: A string attribute.
+    kubeletConfig: Kubelet configuration for this node. See
+      https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta
     labels: A LabelsValue attribute.
     name: A string attribute.
     updateTime: A string attribute.
@@ -1076,9 +1112,10 @@ class Node(_messages.Message):
 
   bootstrapKubeconfig = _messages.MessageField('BootstrapKubeconfig', 1)
   createTime = _messages.StringField(2)
-  labels = _messages.MessageField('LabelsValue', 3)
-  name = _messages.StringField(4)
-  updateTime = _messages.StringField(5)
+  kubeletConfig = _messages.MessageField('KubeletConfig', 3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  name = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class NodePool(_messages.Message):

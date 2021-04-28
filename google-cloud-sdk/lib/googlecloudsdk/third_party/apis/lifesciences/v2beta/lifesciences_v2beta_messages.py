@@ -539,11 +539,11 @@ class FailedEvent(_messages.Message):
         following guidelines to decide between `FAILED_PRECONDITION`,
         `ABORTED`, and `UNAVAILABLE`: (a) Use `UNAVAILABLE` if the client can
         retry just the failing call. (b) Use `ABORTED` if the client should
-        retry at a higher level (e.g., when a client-specified test-and-set
-        fails, indicating the client should restart a read-modify-write
-        sequence). (c) Use `FAILED_PRECONDITION` if the client should not
-        retry until the system state has been explicitly fixed. E.g., if an
-        "rmdir" fails because the directory is non-empty,
+        retry at a higher level. For example, when a client-specified test-
+        and-set fails, indicating the client should restart a read-modify-
+        write sequence. (c) Use `FAILED_PRECONDITION` if the client should not
+        retry until the system state has been explicitly fixed. For example,
+        if an "rmdir" fails because the directory is non-empty,
         `FAILED_PRECONDITION` should be returned since the client should not
         retry unless the files are deleted from the directory. HTTP Mapping:
         400 Bad Request
@@ -618,7 +618,7 @@ class LifesciencesProjectsLocationsListRequest(_messages.Message):
       documented in more detail in [AIP-160](https://google.aip.dev/160).
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """

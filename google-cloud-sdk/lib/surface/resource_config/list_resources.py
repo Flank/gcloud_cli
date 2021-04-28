@@ -71,21 +71,4 @@ class ListResources(base.DeclarativeCommand):
                                   project=args.project,
                                   organization=args.organization,
                                   folder=args.folder)
-    if isinstance(output, list):
-      return [_GcloudToKccKrm(x) for x in output]
-
     return output
-
-
-def _GcloudToKccKrm(kind_val):
-  """Convert KrmGroupValueKind to config-connector output format."""
-  gvk = collections.OrderedDict()
-  output = collections.OrderedDict()
-  gvk['Group'] = kind_val['group']
-  gvk['Kind'] = kind_val['kind']
-  gvk['Version'] = ''
-  output['GVK'] = gvk
-  output['ResourceNameFormat'] = kind_val['resource_name_format']
-  output['SupportsBulkExport'] = kind_val['bulk_export_supported']
-  output['SupportsExport'] = kind_val['export_supported']
-  return output

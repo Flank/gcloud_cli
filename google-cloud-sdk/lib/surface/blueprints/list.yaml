@@ -1,0 +1,30 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: "List details of multiple deployments."
+    description: "List details of multiple deployments."
+    examples: |
+      List deployments in `us-central1`:
+
+        $ {command} --location=us-central1
+
+  request:
+    collection: config.projects.locations.deployments
+
+  arguments:
+    resource:
+      help_text: "The location in which to list deployments."
+      spec: !REF googlecloudsdk.command_lib.blueprints.resources:location
+
+  response:
+    id_field: name
+
+  output:
+    format: |
+      table(
+      name,
+      state,
+      state_detail,
+      blueprint,
+      latestRevision
+      )

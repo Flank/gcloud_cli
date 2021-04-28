@@ -609,13 +609,16 @@ class MaintenanceSchedule(_messages.Message):
       true.
     endTime: Output only. The end time of any upcoming scheduled maintenance
       for this instance.
+    scheduleDeadlineTime: Output only. The time deadline any schedule start
+      time cannot go beyond, including reschedule.
     startTime: Output only. The start time of any upcoming scheduled
       maintenance for this instance.
   """
 
   canReschedule = _messages.BooleanField(1)
   endTime = _messages.StringField(2)
-  startTime = _messages.StringField(3)
+  scheduleDeadlineTime = _messages.StringField(3)
+  startTime = _messages.StringField(4)
 
 
 class MetricHealth(_messages.Message):
@@ -1067,7 +1070,7 @@ class RedisProjectsLocationsListRequest(_messages.Message):
       documented in more detail in [AIP-160](https://google.aip.dev/160).
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """

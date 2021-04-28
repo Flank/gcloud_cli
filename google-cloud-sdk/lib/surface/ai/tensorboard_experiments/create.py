@@ -28,6 +28,16 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
+def _AddArgs(parser):
+  flags.AddTensorboardResourceArg(parser, 'to create a Tensorboard experiment')
+  flags.GetDisplayNameArg(
+      'tensorboard-experiment', required=False).AddToParser(parser)
+  flags.GetDescriptionArg('tensorboard-experiment').AddToParser(parser)
+  labels_util.AddCreateLabelsFlags(parser)
+  # Required=True
+  flags.GetTensorboardExperimentIdArg().AddToParser(parser)
+
+
 def _Run(args, version):
   """Create a new AI Platform Tensorboard experiment."""
   validation.ValidateDisplayName(args.display_name)
@@ -46,21 +56,26 @@ def _Run(args, version):
 
 
 @base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Create(base.CreateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(base.CreateCommand):
   """Create a new AI Platform Tensorboard experiment."""
 
   @staticmethod
   def Args(parser):
-    flags.AddTensorboardResourceArg(parser,
-                                    'to create a Tensorboard experiment')
-    flags.GetDisplayNameArg(
-        'tensorboard-experiment', required=False).AddToParser(parser)
-    flags.GetDescriptionArg('tensorboard-experiment').AddToParser(parser)
-    labels_util.AddCreateLabelsFlags(parser)
+    _AddArgs(parser)
 
-    # Required=True
-    flags.GetTensorboardExperimentIdArg().AddToParser(parser)
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(base.CreateCommand):
+  """Create a new AI Platform Tensorboard experiment."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
 
   def Run(self, args):
     return _Run(args, constants.ALPHA_VERSION)

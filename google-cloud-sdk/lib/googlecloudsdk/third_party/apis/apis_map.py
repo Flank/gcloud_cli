@@ -150,6 +150,16 @@ MAP = {
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
+    'alloydbadmin': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.alloydbadmin.v1alpha1',
+                client_classpath='alloydbadmin_v1alpha1_client.AlloydbadminV1alpha1',
+                messages_modulepath='alloydbadmin_v1alpha1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
+    },
     'anthosevents': {
         'v1':
             APIDef(
@@ -507,12 +517,20 @@ MAP = {
                 mtls_endpoint_override=''),
     },
     'clouddeploy': {
+        'v1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.clouddeploy.v1',
+                client_classpath='clouddeploy_v1_client.ClouddeployV1',
+                messages_modulepath='clouddeploy_v1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
         'v1alpha1':
             APIDef(
                 class_path='googlecloudsdk.third_party.apis.clouddeploy.v1alpha1',
                 client_classpath='clouddeploy_v1alpha1_client.ClouddeployV1alpha1',
                 messages_modulepath='clouddeploy_v1alpha1_messages',
-                default_version=True,
+                default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
     },
@@ -781,6 +799,16 @@ MAP = {
                 default_version=True,
                 enable_mtls=True,
                 mtls_endpoint_override='https://compute.mtls.googleapis.com/compute/v1/'),
+    },
+    'config': {
+        'v1alpha1':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.config.v1alpha1',
+                client_classpath='config_v1alpha1_client.ConfigV1alpha1',
+                messages_modulepath='config_v1alpha1_messages',
+                default_version=True,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
     },
     'container': {
         'v1':
@@ -1219,6 +1247,14 @@ MAP = {
                 default_version=False,
                 enable_mtls=False,
                 mtls_endpoint_override=''),
+        'v1beta':
+            APIDef(
+                class_path='googlecloudsdk.third_party.apis.gkehub.v1beta',
+                client_classpath='gkehub_v1beta_client.GkehubV1beta',
+                messages_modulepath='gkehub_v1beta_messages',
+                default_version=False,
+                enable_mtls=False,
+                mtls_endpoint_override=''),
         'v1beta1':
             APIDef(
                 class_path='googlecloudsdk.third_party.apis.gkehub.v1beta1',
@@ -1402,16 +1438,6 @@ MAP = {
                 messages_modulepath='logging_v2_messages',
                 default_version=True,
                 enable_mtls=True,
-                mtls_endpoint_override=''),
-    },
-    'luxadmin': {
-        'v1alpha1':
-            APIDef(
-                class_path='googlecloudsdk.third_party.apis.luxadmin.v1alpha1',
-                client_classpath='luxadmin_v1alpha1_client.LuxadminV1alpha1',
-                messages_modulepath='luxadmin_v1alpha1_messages',
-                default_version=True,
-                enable_mtls=False,
                 mtls_endpoint_override=''),
     },
     'managedidentities': {

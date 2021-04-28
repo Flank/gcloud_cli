@@ -1,0 +1,25 @@
+- release_tracks: [ALPHA]
+  hidden: true
+  help_text:
+    brief: Create Anthos Config Controller instances
+    description: Create an Anthos Config Controller instance.
+    examples: |
+      To create an Anthos Config Controller instance with the name acc-default, run:
+
+        $ {command} acc-default --location=us-central1
+  request:
+    collection: krmapihosting.projects.locations.krmApiHosts
+    method: create
+    create_request_hook: googlecloudsdk.command_lib.anthos.config.controller.create_utils:CreateUpdateRequest
+
+  async:
+    collection: krmapihosting.projects.locations.operations
+  arguments:
+    resource:
+      help_text: "The identifier for an Anthos Config Controller instance."
+      spec: !REF googlecloudsdk.command_lib.anthos.config.controller.resources:instance
+    params:
+    - api_field: krmApiHost.masterIpv4CidrBlock
+      arg_name: master-ipv4-cidr-block
+      help_text: The /28 network that the masters will use. Defaults to '172.16.0.128/28' if flag is not provided.
+    additional_arguments_hook: googlecloudsdk.command_lib.anthos.config.controller.create_utils:AddExtraArgs

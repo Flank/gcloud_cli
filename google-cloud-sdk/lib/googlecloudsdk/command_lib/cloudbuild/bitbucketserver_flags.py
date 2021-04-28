@@ -18,8 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import arg_parsers
-
 
 def AddBitbucketServerConfigArgs(parser, update=False):
   """Set up all the argparse flags for creating or updating a Bitbucket Server config.
@@ -54,24 +52,6 @@ def AddBitbucketServerConfigArgs(parser, update=False):
       '--read-access-token-name',
       required=not update,
       help='Secret Manager resource containing the read access token.')
-  parser.add_argument(
-      '--webhook-secret-name',
-      required=not update,
-      help='Secret Manager resource containing the webhook secret.')
-  parser.add_argument(
-      '--connected-repositories',
-      metavar='CONNECTED-REPOSITORIES',
-      type=arg_parsers.ArgList(),
-      help='Comma-separated list of Bitbucket Server repositories in the format of projectKey/repoSlug that should be associated with this config.'
-  )
-  parser.add_argument(
-      '--webhook-key',
-      help="""\
-The unique identifier that Cloud Build expects to be set as the value for
-the query field `webhook_key` on incoming webhook requests.
-
-If this is not set, Cloud Build will generate one on the user's behalf.
-""")
   if not update:
     parser.add_argument(
         '--peered-network',

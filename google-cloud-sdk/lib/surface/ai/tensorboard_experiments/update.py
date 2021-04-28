@@ -28,6 +28,14 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
+def _AddArgs(parser):
+  flags.AddTensorboardExperimentResourceArg(parser, 'to update')
+  flags.GetDisplayNameArg(
+      'tensorboard experiment', required=False).AddToParser(parser)
+  flags.GetDescriptionArg('tensorboard experiment').AddToParser(parser)
+  labels_util.AddUpdateLabelsFlags(parser)
+
+
 def _Run(args, version):
   """Update an existing AI Platform Tensorboard experiment."""
   tensorboard_exp_ref = args.CONCEPTS.tensorboard_experiment.Parse()
@@ -38,10 +46,7 @@ def _Run(args, version):
           tensorboard_exp_ref, args)
     except errors.NoFieldsSpecifiedError:
       available_update_args = [
-          'display_name',
-          'update_labels',
-          'clear_labels',
-          'remove_labels',
+          'display_name', 'update_labels', 'clear_labels', 'remove_labels',
           'description'
       ]
       if not any(args.IsSpecified(arg) for arg in available_update_args):
@@ -53,17 +58,25 @@ def _Run(args, version):
       return op
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Update(base.UpdateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class UpdateBeta(base.UpdateCommand):
   """Update an existing AI Platform Tensorboard experiment."""
 
   @staticmethod
   def Args(parser):
-    flags.AddTensorboardExperimentResourceArg(parser, 'to update')
-    flags.GetDisplayNameArg(
-        'tensorboard experiment', required=False).AddToParser(parser)
-    flags.GetDescriptionArg('tensorboard experiment').AddToParser(parser)
-    labels_util.AddUpdateLabelsFlags(parser)
+    _AddArgs(parser)
+
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class UpdateAlpha(base.UpdateCommand):
+  """Update an existing AI Platform Tensorboard experiment."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
 
   def Run(self, args):
     return _Run(args, constants.ALPHA_VERSION)

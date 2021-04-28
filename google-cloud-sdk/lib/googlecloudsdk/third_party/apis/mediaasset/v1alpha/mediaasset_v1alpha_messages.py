@@ -68,10 +68,190 @@ class Action(_messages.Message):
   updateTime = _messages.StringField(6)
 
 
+class Annotation(_messages.Message):
+  r"""An annotation resource is associated with an AnnotationSet and
+  represents timed-metadata that can be modified and searched at a high
+  throughput.
+
+  Messages:
+    DataValue: Required. Data held by the annotation.
+    LabelsValue: The labels associated with this resource. Each label is a
+      key-value pair.
+
+  Fields:
+    createTime: Output only. The creation time of the annotation.
+    data: Required. Data held by the annotation.
+    etag: Etag of the resource used in output and update requests.
+    labels: The labels associated with this resource. Each label is a key-
+      value pair.
+    name: Output only. An automatically-generated resource name of the
+      annotation `projects/{project}/locations/{location}/assetTypes/{asset_ty
+      pe}/assets/{asset}/annotationSets/{annotation_set}/annotations/{annotati
+      on}`.
+    updateTime: Output only. The latest update time of the annotation.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class DataValue(_messages.Message):
+    r"""Required. Data held by the annotation.
+
+    Messages:
+      AdditionalProperty: An additional property for a DataValue object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a DataValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""The labels associated with this resource. Each label is a key-value
+    pair.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  createTime = _messages.StringField(1)
+  data = _messages.MessageField('DataValue', 2)
+  etag = _messages.StringField(3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  name = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
+
+
+class AnnotationSet(_messages.Message):
+  r"""An annotationSet resource is associated with an Asset and is a
+  collection of timed-metadata that can be modified and searched at a high
+  throughput.
+
+  Messages:
+    LabelsValue: The labels associated with this resource. Each label is a
+      key-value pair.
+
+  Fields:
+    createTime: Output only. The creation time of the annotationSet.
+    etag: Etag of the resource used in output and update requests.
+    labels: The labels associated with this resource. Each label is a key-
+      value pair.
+    name: A user-specified resource name of the annotationSet `projects/{proje
+      ct}/locations/{location}/assetTypes/{asset_type}/assets/{asset}/annotati
+      onSets/{annotation_set}`.
+    updateTime: Output only. The latest update time of the annotationSet.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""The labels associated with this resource. Each label is a key-value
+    pair.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  createTime = _messages.StringField(1)
+  etag = _messages.StringField(2)
+  labels = _messages.MessageField('LabelsValue', 3)
+  name = _messages.StringField(4)
+  updateTime = _messages.StringField(5)
+
+
+class AnnotationSetConfig(_messages.Message):
+  r"""Configuration of an annotationSet.
+
+  Messages:
+    IndexedFieldConfigsValue: List of indexed fields (e.g. "data.start") to
+      make available in searches with their corresponding properties.
+
+  Fields:
+    complexType: Reference to the complex type name, in the following form:
+      `projects/{project}/locations/{location}/complexTypes/{name}`.
+    indexedFieldConfigs: List of indexed fields (e.g. "data.start") to make
+      available in searches with their corresponding properties.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class IndexedFieldConfigsValue(_messages.Message):
+    r"""List of indexed fields (e.g. "data.start") to make available in
+    searches with their corresponding properties.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        IndexedFieldConfigsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        IndexedFieldConfigsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a IndexedFieldConfigsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A IndexedFieldConfig attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('IndexedFieldConfig', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  complexType = _messages.StringField(1)
+  indexedFieldConfigs = _messages.MessageField('IndexedFieldConfigsValue', 2)
+
+
 class Asset(_messages.Message):
   r"""An asset resource. An asset is a core resource that represents a media
   entity. An Asset has an asset type associated with it which specifies the
   schema of the asset.
+
+  Enums:
+    StateValueValuesEnum: State of the asset
 
   Messages:
     LabelsValue: The labels associated with this resource. Each label is a
@@ -93,7 +273,22 @@ class Asset(_messages.Message):
     metadataInfo: Information about the metadata fields.
     name: The resource name of the asset, in the following form: `projects/{pr
       oject}/locations/{location}/assetTypes/{type}/assets/{asset}`.
+    state: State of the asset
   """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""State of the asset
+
+    Values:
+      STATE_UNSPECIFIED: STATE_UNSPECIFIED maps with UNKNOWN or CREATING in
+        AssetStatus_State in status.proto
+      ACTIVE: ACTIVE maps with READY in AssetStatus_State in status.proto
+      DELETING: DELETING maps with DELETING in AssetStatus_State in
+        status.proto
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    DELETING = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -252,6 +447,7 @@ class Asset(_messages.Message):
   metadata = _messages.MessageField('MetadataValue', 6)
   metadataInfo = _messages.MessageField('MetadataInfoValue', 7)
   name = _messages.StringField(8)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
 
 
 class AssetTransformation(_messages.Message):
@@ -334,6 +530,8 @@ class AssetType(_messages.Message):
   assets.It specifies configuration of all the fields present on the asset.
 
   Messages:
+    AnnotationSetConfigsValue: Mapping of annotationSet name to its
+      configuration.
     IndexedFieldConfigsValue: List of indexed fields (e.g.
       "metadata.file.url") to make available in searches with their
       corresponding properties.
@@ -347,6 +545,7 @@ class AssetType(_messages.Message):
       configuration.
 
   Fields:
+    annotationSetConfigs: Mapping of annotationSet name to its configuration.
     createTime: The creation time.
     indexedFieldConfigs: List of indexed fields (e.g. "metadata.file.url") to
       make available in searches with their corresponding properties.
@@ -365,6 +564,32 @@ class AssetType(_messages.Message):
       configuration.
     updateTime: The last-modified time.
   """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationSetConfigsValue(_messages.Message):
+    r"""Mapping of annotationSet name to its configuration.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        AnnotationSetConfigsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        AnnotationSetConfigsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationSetConfigsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A AnnotationSetConfig attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('AnnotationSetConfig', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class IndexedFieldConfigsValue(_messages.Message):
@@ -519,16 +744,17 @@ class AssetType(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  createTime = _messages.StringField(1)
-  indexedFieldConfigs = _messages.MessageField('IndexedFieldConfigsValue', 2)
-  labels = _messages.MessageField('LabelsValue', 3)
-  linkConfigs = _messages.MessageField('LinkConfigsValue', 4)
-  linkSetConfigs = _messages.MessageField('LinkSetConfigsValue', 5)
-  metadataConfigs = _messages.MessageField('MetadataConfigsValue', 6)
-  name = _messages.StringField(7)
-  sortOrder = _messages.MessageField('SortOrderConfig', 8)
-  transformationConfigs = _messages.MessageField('TransformationConfigsValue', 9)
-  updateTime = _messages.StringField(10)
+  annotationSetConfigs = _messages.MessageField('AnnotationSetConfigsValue', 1)
+  createTime = _messages.StringField(2)
+  indexedFieldConfigs = _messages.MessageField('IndexedFieldConfigsValue', 3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  linkConfigs = _messages.MessageField('LinkConfigsValue', 5)
+  linkSetConfigs = _messages.MessageField('LinkSetConfigsValue', 6)
+  metadataConfigs = _messages.MessageField('MetadataConfigsValue', 7)
+  name = _messages.StringField(8)
+  sortOrder = _messages.MessageField('SortOrderConfig', 9)
+  transformationConfigs = _messages.MessageField('TransformationConfigsValue', 10)
+  updateTime = _messages.StringField(11)
 
 
 class AuthorizationLoggingOptions(_messages.Message):
@@ -559,6 +785,14 @@ class AuthorizationLoggingOptions(_messages.Message):
     DATA_WRITE = 4
 
   permissionType = _messages.EnumField('PermissionTypeValueValuesEnum', 1)
+
+
+class CancelActionRequest(_messages.Message):
+  r"""Request message for ActionsService.CancelAction."""
+
+
+class CancelActionResponse(_messages.Message):
+  r"""Response message of ActionsService.CancelAction."""
 
 
 class CancelOperationRequest(_messages.Message):
@@ -1353,6 +1587,32 @@ class ListActionsResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
+class ListAnnotationSetsResponse(_messages.Message):
+  r"""Response message for AnnotationSetsService.ListAnnotationSets.
+
+  Fields:
+    annotationSets: The annotationSets from the specified asset.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  annotationSets = _messages.MessageField('AnnotationSet', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListAnnotationsResponse(_messages.Message):
+  r"""Response message for AnnotationsService.ListAnnotations.
+
+  Fields:
+    annotations: The annotations from the specified asset.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  annotations = _messages.MessageField('Annotation', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class ListAssetTransformationsResponse(_messages.Message):
   r"""Response message for
   AssetTransformationsService.ListAssetTransformations.
@@ -1546,6 +1806,22 @@ class Location(_messages.Message):
   name = _messages.StringField(5)
 
 
+class MediaassetProjectsLocationsAssetTypesAssetsActionsCancelRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsActionsCancelRequest
+  object.
+
+  Fields:
+    cancelActionRequest: A CancelActionRequest resource to be passed as the
+      request body.
+    name: Required. The name of the action to cancel. Format: `projects/{proje
+      ct}/locations/{location}/assetTypes/{type}/assets/{asset}/actions/{actio
+      n}`
+  """
+
+  cancelActionRequest = _messages.MessageField('CancelActionRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class MediaassetProjectsLocationsAssetTypesAssetsActionsGetRequest(_messages.Message):
   r"""A MediaassetProjectsLocationsAssetTypesAssetsActionsGetRequest object.
 
@@ -1580,6 +1856,199 @@ class MediaassetProjectsLocationsAssetTypesAssetsActionsListRequest(_messages.Me
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
   parent = _messages.StringField(5, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsActionsTriggerRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsActionsTriggerRequest
+  object.
+
+  Fields:
+    name: Required. The name of the action to Trigger. Format: `projects/{proj
+      ect}/locations/{location}/assetTypes/{type}/assets/{asset}/actions/{acti
+      on}`
+    triggerActionRequest: A TriggerActionRequest resource to be passed as the
+      request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  triggerActionRequest = _messages.MessageField('TriggerActionRequest', 2)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsCreateRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsCr
+  eateRequest object.
+
+  Fields:
+    annotation: A Annotation resource to be passed as the request body.
+    parent: Required. The parent resource where this Annotation will be
+      created. Format: `projects/{project}/locations/{location}/assetTypes/{as
+      set_type}/assets/{asset}/annotationSets/{annotation_set}`
+  """
+
+  annotation = _messages.MessageField('Annotation', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsDeleteRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsDe
+  leteRequest object.
+
+  Fields:
+    etag: The current etag of the annotation. If an etag is provided and does
+      not match the current etag of the annotation, deletion will be blocked
+      and a FAILED_PRECONDITION error will be returned.
+    name: Required. The name of the annotation to delete. Format: `projects/{p
+      roject}/locations/{location}/assetTypes/{asset_type}/assets/{asset}/anno
+      tationSets/{annotation_set}/annotations/{annotation}`
+  """
+
+  etag = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsGetRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsGe
+  tRequest object.
+
+  Fields:
+    name: Required. The name of the Annotation to retrieve. Format: `projects/
+      {project}/locations/{location}/assetTypes/{asset_type}/assets/{asset}/an
+      notationSets/{annotation_set}/annotations/{annotation}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsListRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsLi
+  stRequest object.
+
+  Fields:
+    filter: The filter to apply to list results.
+    pageSize: The maximum number of annotations to return. The service may
+      return fewer than this value. If unspecified, at most 50 annotations
+      will be returned. The maximum value is 100; values above 100 will be
+      coerced to 100.
+    pageToken: A page token, received from a previous `ListAnnotations` call.
+      Provide this to retrieve the subsequent page. When paginating, all other
+      parameters provided to `ListAnnotations` must match the call that
+      provided the page token.
+    parent: Required. The parent, which owns this collection of annotations.
+      Format: `projects/{project}/locations/{location}/assetTypes/{asset_type}
+      /assets/{asset}/annotationSets/{annotation_set}`
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsPatchRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsPa
+  tchRequest object.
+
+  Fields:
+    annotation: A Annotation resource to be passed as the request body.
+    name: Output only. An automatically-generated resource name of the
+      annotation `projects/{project}/locations/{location}/assetTypes/{asset_ty
+      pe}/assets/{asset}/annotationSets/{annotation_set}/annotations/{annotati
+      on}`.
+    updateMask: Required. The list of fields to be updated.
+  """
+
+  annotation = _messages.MessageField('Annotation', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsCreateRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsCreateRequest
+  object.
+
+  Fields:
+    annotationSet: A AnnotationSet resource to be passed as the request body.
+    annotationSetId: The ID of the annotationSet resource to be created.
+    parent: Required. The parent resource where this AnnotationSet will be
+      created. Format: `projects/{project}/locations/{location}/assetTypes/{as
+      set_type}/assets/{asset}`
+  """
+
+  annotationSet = _messages.MessageField('AnnotationSet', 1)
+  annotationSetId = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsDeleteRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsDeleteRequest
+  object.
+
+  Fields:
+    etag: The current etag of the annotationSet. If an etag is provided and
+      does not match the current etag of the annotationSet, deletion will be
+      blocked and a FAILED_PRECONDITION error will be returned.
+    name: Required. The name of the annotationSet to delete. Format: `projects
+      /{project}/locations/{location}/assetTypes/{asset_type}/assets/{asset}/a
+      nnotationSets/{annotation_set}`
+  """
+
+  etag = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsGetRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsGetRequest
+  object.
+
+  Fields:
+    name: Required. The name of the AnnotationSet to retrieve. Format: `projec
+      ts/{project}/locations/{location}/assetTypes/{asset_type}/assets/{asset}
+      /annotationSets/{annotation_set}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsListRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsListRequest
+  object.
+
+  Fields:
+    filter: The filter to apply to list results.
+    pageSize: The maximum number of annotationSets to return. The service may
+      return fewer than this value. If unspecified, at most 50 annotationSets
+      will be returned. The maximum value is 100; values above 100 will be
+      coerced to 100.
+    pageToken: A page token, received from a previous `ListAnnotationSets`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListAnnotationSets` must match the call
+      that provided the page token.
+    parent: Required. The name of the asset that owns this collection of
+      annotationSets. Format: `projects/{project}/locations/{location}/assetTy
+      pes/{asset_type}/assets/{asset}`
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsPatchRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsPatchRequest
+  object.
+
+  Fields:
+    annotationSet: A AnnotationSet resource to be passed as the request body.
+    name: A user-specified resource name of the annotationSet `projects/{proje
+      ct}/locations/{location}/assetTypes/{asset_type}/assets/{asset}/annotati
+      onSets/{annotation_set}`.
+    updateMask: Required. The list of fields to be updated.
+  """
+
+  annotationSet = _messages.MessageField('AnnotationSet', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class MediaassetProjectsLocationsAssetTypesAssetsCreateRequest(_messages.Message):
@@ -2352,7 +2821,7 @@ class MediaassetProjectsLocationsListRequest(_messages.Message):
       locations which are not yet revealed.
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """
@@ -2759,6 +3228,7 @@ class Rule(_messages.Message):
     pubsubNotification: https://cloud.google.com/pubsub/docs/overview
       Configure the associated AssetType to publish event messages using
       Pub/Sub.
+    transformation: Configure the associated AssetType to invoke transformers.
     updateTime: Output only. The latest update time of the rule.
   """
 
@@ -2791,7 +3261,95 @@ class Rule(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 2)
   name = _messages.StringField(3)
   pubsubNotification = _messages.MessageField('CloudPubSubNotificationConfig', 4)
-  updateTime = _messages.StringField(5)
+  transformation = _messages.MessageField('RuleTransformationConfig', 5)
+  updateTime = _messages.StringField(6)
+
+
+class RuleTransformationConfig(_messages.Message):
+  r"""A RuleTransformationConfig configure the associated AssetType to invoke
+  transformers on its Assets.
+
+  Messages:
+    InputsValue: Key-value pairs representing input parameters to the
+      transformers. The key maps to the transformer input parameter name. The
+      value is interpreted as a literal or a path within asset if it's
+      prefixed by "$asset.", e.g. "$asset.file.url".
+    OutputsValue: Key-value pairs representing output parameters from the
+      transformers. The key maps to the transformer output parameter name. The
+      value will be the path to the metadata in the asset to which this output
+      should be assigned.
+
+  Fields:
+    inputs: Key-value pairs representing input parameters to the transformers.
+      The key maps to the transformer input parameter name. The value is
+      interpreted as a literal or a path within asset if it's prefixed by
+      "$asset.", e.g. "$asset.file.url".
+    outputs: Key-value pairs representing output parameters from the
+      transformers. The key maps to the transformer output parameter name. The
+      value will be the path to the metadata in the asset to which this output
+      should be assigned.
+    transformer: Required. Reference to a transformer to execute, in the
+      following form:
+      `projects/{project}/locations/{location}/transformers/{name}`.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class InputsValue(_messages.Message):
+    r"""Key-value pairs representing input parameters to the transformers. The
+    key maps to the transformer input parameter name. The value is interpreted
+    as a literal or a path within asset if it's prefixed by "$asset.", e.g.
+    "$asset.file.url".
+
+    Messages:
+      AdditionalProperty: An additional property for a InputsValue object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a InputsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class OutputsValue(_messages.Message):
+    r"""Key-value pairs representing output parameters from the transformers.
+    The key maps to the transformer output parameter name. The value will be
+    the path to the metadata in the asset to which this output should be
+    assigned.
+
+    Messages:
+      AdditionalProperty: An additional property for a OutputsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type OutputsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a OutputsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  inputs = _messages.MessageField('InputsValue', 1)
+  outputs = _messages.MessageField('OutputsValue', 2)
+  transformer = _messages.StringField(3)
 
 
 class SortOrderConfig(_messages.Message):
@@ -3161,6 +3719,14 @@ class Transformer(_messages.Message):
   name = _messages.StringField(5)
   outputs = _messages.MessageField('OutputsValue', 6)
   updateTime = _messages.StringField(7)
+
+
+class TriggerActionRequest(_messages.Message):
+  r"""Request message for ActionsService.TriggerAction."""
+
+
+class TriggerActionResponse(_messages.Message):
+  r"""Response message for ActionsService.TriggerAction."""
 
 
 encoding.AddCustomJsonFieldMapping(

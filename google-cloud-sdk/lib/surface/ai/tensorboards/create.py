@@ -32,6 +32,13 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
+def _AddArgs(parser):
+  flags.AddRegionResourceArg(parser, 'to create a Tensorboard')
+  flags.GetDisplayNameArg('tensorboard').AddToParser(parser)
+  flags.GetDescriptionArg('tensorboard').AddToParser(parser)
+  labels_util.AddCreateLabelsFlags(parser)
+
+
 def _Run(args, version):
   """Create a new AI Platform Tensorboard."""
   validation.ValidateDisplayName(args.display_name)
@@ -39,7 +46,7 @@ def _Run(args, version):
   region_ref = args.CONCEPTS.region.Parse()
   args.region = region_ref.AsDict()['locationsId']
   with endpoint_util.AiplatformEndpointOverrides(version, region=args.region):
-    tensorboards_client = client.TensorboardsClient()
+    tensorboards_client = client.TensorboardsClient(version=version)
     operation_client = operations.OperationsClient()
     op = tensorboards_client.Create(region_ref, args)
     response_msg = operations_util.WaitForOpMaybe(
@@ -54,16 +61,26 @@ def _Run(args, version):
 
 
 @base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Create(base.CreateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(base.CreateCommand):
   """Create a new AI Platform Tensorboard."""
 
   @staticmethod
   def Args(parser):
-    flags.AddRegionResourceArg(parser, 'to create a Tensorboard')
-    flags.GetDisplayNameArg('tensorboard').AddToParser(parser)
-    flags.GetDescriptionArg('tensorboard').AddToParser(parser)
-    labels_util.AddCreateLabelsFlags(parser)
+    _AddArgs(parser)
+
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(base.CreateCommand):
+  """Create a new AI Platform Tensorboard."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
 
   def Run(self, args):
     return _Run(args, constants.ALPHA_VERSION)

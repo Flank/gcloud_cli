@@ -152,6 +152,8 @@ class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Mes
       FEDRAMP_MODERATE: FedRAMP Moderate data protection controls
       US_REGIONAL_ACCESS: Assured Workloads For US Regions data protection
         controls
+      HIPAA: Health Insurance Portability and Accountability Act controls
+      HITRUST: Health Information Trust Alliance controls
     """
     COMPLIANCE_REGIME_UNSPECIFIED = 0
     IL4 = 1
@@ -159,6 +161,8 @@ class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Mes
     FEDRAMP_HIGH = 3
     FEDRAMP_MODERATE = 4
     US_REGIONAL_ACCESS = 5
+    HIPAA = 6
+    HITRUST = 7
 
   complianceRegime = _messages.EnumField('ComplianceRegimeValueValuesEnum', 1)
   createTime = _messages.StringField(2)
@@ -227,6 +231,8 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
       FEDRAMP_MODERATE: FedRAMP Moderate data protection controls
       US_REGIONAL_ACCESS: Assured Workloads For US Regions data protection
         controls
+      HIPAA: Health Insurance Portability and Accountability Act controls
+      HITRUST: Health Information Trust Alliance controls
     """
     COMPLIANCE_REGIME_UNSPECIFIED = 0
     IL4 = 1
@@ -234,6 +240,8 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
     FEDRAMP_HIGH = 3
     FEDRAMP_MODERATE = 4
     US_REGIONAL_ACCESS = 5
+    HIPAA = 6
+    HITRUST = 7
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -307,10 +315,12 @@ class GoogleCloudAssuredworkloadsV1WorkloadResourceInfo(_messages.Message):
       RESOURCE_TYPE_UNSPECIFIED: Unknown resource type.
       CONSUMER_PROJECT: Consumer project.
       ENCRYPTION_KEYS_PROJECT: Consumer project containing encryption keys.
+      KEYRING: Keyring resource that hosts encryption keys.
     """
     RESOURCE_TYPE_UNSPECIFIED = 0
     CONSUMER_PROJECT = 1
     ENCRYPTION_KEYS_PROJECT = 2
+    KEYRING = 3
 
   resourceId = _messages.IntegerField(1)
   resourceType = _messages.EnumField('ResourceTypeValueValuesEnum', 2)
@@ -341,10 +351,12 @@ class GoogleCloudAssuredworkloadsV1WorkloadResourceSettings(_messages.Message):
       RESOURCE_TYPE_UNSPECIFIED: Unknown resource type.
       CONSUMER_PROJECT: Consumer project.
       ENCRYPTION_KEYS_PROJECT: Consumer project containing encryption keys.
+      KEYRING: Keyring resource that hosts encryption keys.
     """
     RESOURCE_TYPE_UNSPECIFIED = 0
     CONSUMER_PROJECT = 1
     ENCRYPTION_KEYS_PROJECT = 2
+    KEYRING = 3
 
   resourceId = _messages.StringField(1)
   resourceType = _messages.EnumField('ResourceTypeValueValuesEnum', 2)
@@ -608,10 +620,12 @@ class GoogleCloudAssuredworkloadsV1beta1WorkloadResourceInfo(_messages.Message):
       RESOURCE_TYPE_UNSPECIFIED: Unknown resource type.
       CONSUMER_PROJECT: Consumer project.
       ENCRYPTION_KEYS_PROJECT: Consumer project containing encryption keys.
+      KEYRING: Keyring resource that hosts encryption keys.
     """
     RESOURCE_TYPE_UNSPECIFIED = 0
     CONSUMER_PROJECT = 1
     ENCRYPTION_KEYS_PROJECT = 2
+    KEYRING = 3
 
   resourceId = _messages.IntegerField(1)
   resourceType = _messages.EnumField('ResourceTypeValueValuesEnum', 2)
@@ -642,10 +656,12 @@ class GoogleCloudAssuredworkloadsV1beta1WorkloadResourceSettings(_messages.Messa
       RESOURCE_TYPE_UNSPECIFIED: Unknown resource type.
       CONSUMER_PROJECT: Consumer project.
       ENCRYPTION_KEYS_PROJECT: Consumer project containing encryption keys.
+      KEYRING: Keyring resource that hosts encryption keys.
     """
     RESOURCE_TYPE_UNSPECIFIED = 0
     CONSUMER_PROJECT = 1
     ENCRYPTION_KEYS_PROJECT = 2
+    KEYRING = 3
 
   resourceId = _messages.StringField(1)
   resourceType = _messages.EnumField('ResourceTypeValueValuesEnum', 2)

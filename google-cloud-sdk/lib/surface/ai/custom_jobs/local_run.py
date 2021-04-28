@@ -23,8 +23,8 @@ import textwrap
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.ai import errors
-from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.command_lib.ai import local_util
+from googlecloudsdk.command_lib.ai.custom_jobs import flags
 from googlecloudsdk.command_lib.ai.docker import build as docker_builder
 from googlecloudsdk.command_lib.ai.docker import run as docker_runner
 from googlecloudsdk.command_lib.ai.docker import utils as docker_utils
@@ -152,6 +152,9 @@ class Create(base.CreateCommand):
 
     _ValidateArgs(args, working_dir, script)
 
+    output_image_name = args.output_image_uri or docker_utils.GenerateImageName(
+        base_name=script)
+
     with files.ChDir(working_dir):
       log.status.Print('Working directory is set to {}.'.format(working_dir))
       # TODO(b/176214485): Consider including the image id in the build result.
@@ -163,7 +166,7 @@ class Create(base.CreateCommand):
           requirements=args.requirements,
           extra_packages=args.extra_packages,
           extra_dirs=args.extra_dirs,
-          output_image_name=args.output_image_uri)
+          output_image_name=output_image_name)
 
       log.status.Print('A training image is ready. Starting to run ...')
       docker_runner.RunContainer(

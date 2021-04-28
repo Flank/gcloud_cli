@@ -724,7 +724,7 @@ class SecretmanagerProjectsLocationsListRequest(_messages.Message):
       documented in more detail in [AIP-160](https://google.aip.dev/160).
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """
@@ -883,6 +883,8 @@ class SecretmanagerProjectsSecretsVersionsAccessRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the SecretVersion in the format
       `projects/*/secrets/*/versions/*`.
+      `projects/*/secrets/*/versions/latest` is an alias to the most recently
+      created SecretVersion.
   """
 
   name = _messages.StringField(1, required=True)
@@ -936,8 +938,8 @@ class SecretmanagerProjectsSecretsVersionsGetRequest(_messages.Message):
   Fields:
     name: Required. The resource name of the SecretVersion in the format
       `projects/*/secrets/*/versions/*`.
-      `projects/*/secrets/*/versions/latest` is an alias to the `latest`
-      SecretVersion.
+      `projects/*/secrets/*/versions/latest` is an alias to the most recently
+      created SecretVersion.
   """
 
   name = _messages.StringField(1, required=True)

@@ -25,6 +25,7 @@ import re
 
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.asset import client_util
+from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.command_lib.asset import utils as asset_utils
 from googlecloudsdk.command_lib.util.anthos import binary_operations as bin_ops
 from googlecloudsdk.command_lib.util.declarative.clients import client_base
@@ -32,6 +33,7 @@ from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.console import progress_tracker
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.resource import resource_filter
@@ -46,20 +48,74 @@ ApiClientArgs = collections.namedtuple('ApiClientArgs', [
     'content_type', 'filter_func'
 ])
 
-KrmGroupValueKind = collections.namedtuple('KrmGroupValueKind', [
-    'kind', 'service', 'group', 'bulk_export_supported', 'export_supported',
-    'resource_name_format'
-])
-
-
 RESOURCE_LIST_FORMAT = (
     'table[box](GVK.Kind, SupportsBulkExport.yesno("x", ""):label="BULK '
     'EXPORT?", SupportsExport.yesno("x", ""):label="EXPORT?", '
     'ResourceNameFormat:label="RESOURCE NAME FORMAT")')
 
 
+class KrmGroupValueKind(object):
+  """Value class for KRM Group Value Kind Data."""
+
+  def __init__(self,
+               kind,
+               service,
+               group,
+               bulk_export_supported,
+               export_supported,
+               version=None,
+               resource_name_format=None):
+    self.kind = kind
+    self.service = service
+    self.group = group
+    self.version = version
+    self.bulk_export_supported = bulk_export_supported
+    self.export_supported = export_supported
+    self.resource_name_format = resource_name_format
+
+  def AsDict(self):
+    """Convert to Config Connector compatible dict format."""
+    gvk = collections.OrderedDict()
+    output = collections.OrderedDict()
+    gvk['Group'] = self.group
+    gvk['Kind'] = self.kind
+    gvk['Version'] = self.version or ''
+    output['GVK'] = gvk
+    output['ResourceNameFormat'] = self.resource_name_format or ''
+    output['SupportsBulkExport'] = self.bulk_export_supported
+    output['SupportsExport'] = self.export_supported
+    return output
+
+  def __str__(self):
+    return yaml.dump(self.AsDict(), round_trip=True)
+
+  def __repr__(self):
+    return self.__str__()
+
+  def __eq__(self, o):
+    if not isinstance(o, KrmGroupValueKind):
+      return False
+    return (self.kind == o.kind and self.service == o.service and
+            self.group == o.group and self.version == o.version and
+            self.bulk_export_supported == o.bulk_export_supported and
+            self.export_supported == o.export_supported and
+            self.resource_name_format == o.resource_name_format)
+
+  def __hash__(self):
+    return sum(
+        map(hash, [
+            self.kind, self.service, self.group, self.version,
+            self.bulk_export_supported, self.export_supported,
+            self.resource_name_format
+        ]))
+
+
 class ResourceNotFoundException(client_base.ClientException):
   """General Purpose Exception."""
+
+
+class AssetInventoryNotEnabledException(client_base.ClientException):
+  """Exception for when Asset Inventory Is Not Enabled."""
 
 
 # TODO(b/181223251): Remove this workaround once config-connector is updated.
@@ -232,6 +288,24 @@ def _BulkExportPostStatus(preexisting_file_count, path):
         'Exported resource configuration(s) to [{}].\n'.format(path))
 
 
+def CheckForAssetInventoryEnablementWithPrompt(project=None):
+  """Checks if the cloudasset API is enabled, prompts to enable if not."""
+  project = project or properties.VALUES.core.project.GetOrFail()
+  service_name = 'cloudasset.googleapis.com'
+  if not enable_api.IsServiceEnabled(project, service_name):
+    if console_io.PromptContinue(
+        default=False,
+        prompt_string=(
+            'API [{}] is required to continue, but is not enabled on project [{}]. '
+            'Would you like to enable and retry (this will take a '
+            'few minutes)?').format(service_name, project)):
+      enable_api.EnableService(project, service_name)
+    else:
+      raise AssetInventoryNotEnabledException(
+          'Aborted by user: API [{}] must be enabled on project [{}] to continue.'
+          .format(service_name, project))
+
+
 class KccClient(client_base.DeclarativeClient):
   """KRM Yaml Export based Declarative Client."""
 
@@ -385,6 +459,8 @@ class KccClient(client_base.DeclarativeClient):
       return _ExecuteBinaryWithStreaming(cmd=cmd, in_str=asset_list_input)
 
   def BulkExport(self, args):
+    CheckForAssetInventoryEnablementWithPrompt(
+        getattr(args, 'project', None))
     cmd = self._GetBinaryCommand(args, 'bulk-export')
     return self._CallBulkExport(cmd, args, asset_list_input=None)
 
@@ -396,10 +472,12 @@ class KccClient(client_base.DeclarativeClient):
 
   def BulkExportFromAssetList(self, args):
     """BulkExport with support for resource kind/asset type and filtering."""
+    CheckForAssetInventoryEnablementWithPrompt(
+        getattr(args, 'project', None))
     args.all = True  # Remove scope (e.g. project, org & folder) from cmd.
-    kind_filters = (getattr(args, 'resource_types', None) or
-                    self._ParseKindTypesFileData(
-                        getattr(args, 'resource_types_file', None)))
+    kind_filters = (
+        getattr(args, 'resource_types', None) or self._ParseKindTypesFileData(
+            getattr(args, 'resource_types_file', None)))
     if kind_filters:
       kind_filters = self._GetKrmResourceTypeTable(filter_kinds=kind_filters)
     asset_list_input = _GetAssetInventoryListInput(
@@ -451,9 +529,7 @@ class KccClient(client_base.DeclarativeClient):
         aborted_message='Aborted Export.'):
       supported_kinds = self.ListSupportedResourcesForParent(
           project=project, organization=organization, folder=folder)
-      supported_kinds = [x._asdict() for x in supported_kinds]
-      for kind in supported_kinds:
-        del kind['service']  # Exclude 'service' from output
+      supported_kinds = [x.AsDict() for x in supported_kinds]
       return supported_kinds
 
   # TODO(b/182609806): Cache print resources data or load to static table.
@@ -473,8 +549,6 @@ class KccClient(client_base.DeclarativeClient):
           kind_val not in filter_kinds and
           group_kind_val not in filter_kinds):
         continue
-      group_val = gvk['GVK']['Group']
-      service_val = group_val.split('.')[0].lower()
       table.append(KrmGroupValueKind(
           kind=kind_val, service=service_val, group=group_val,
           bulk_export_supported=gvk['SupportsBulkExport'],

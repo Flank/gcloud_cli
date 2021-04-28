@@ -89,6 +89,10 @@ apis:
           path: projects/{projectsId}/locations/{locationsId}/indexes/{indexesId}/operations/{operationsId}
         projects.locations.endpoints.operations:
           path: projects/{projectsId}/locations/{locationsId}/endpoints/{endpointsId}/operations/{operationsId}
+  alloydbadmin:
+    v1alpha1:
+      discovery_doc: alloydbadmin_v1alpha1.json
+      default: true
   anthosevents:
     v1:
       discovery_doc: anthosevents_v1.json
@@ -176,6 +180,10 @@ apis:
     v1:
       discovery_doc: billingbudgets_v1.json
       default: true
+  config:
+    v1alpha1:
+      discovery_doc: config_v1alpha1.json
+      default: true
   certificatemanager:
     v1alpha1:
       discovery_doc: certificatemanager_v1alpha1.json
@@ -252,6 +260,9 @@ apis:
   clouddeploy:
     v1alpha1:
       discovery_doc: clouddeploy_v1alpha1.json
+    v1:
+      default: true
+      discovery_doc: clouddeploy_v1.json
   clouderrorreporting:
     v1beta1:
       discovery_doc: clouderrorreporting_v1beta1.json
@@ -581,6 +592,8 @@ apis:
       resources:
         projects.locations.global.memberships:
           path: projects/{projectsId}/locations/global/memberships
+    v1beta:
+      discovery_doc: gkehub_v1beta.json
     v1beta1:
       discovery_doc: gkehub_v1beta1.json
     v1:
@@ -634,6 +647,13 @@ apis:
   osconfig:
     v1alpha:
       discovery_doc: osconfig_v1alpha.json
+      resources:
+        projects.locations.instances:
+          path: projects/{projectsId}/locations/{locationsId}/instances/{instancesId}
+        projects.locations.instances.vulnerabilityReports:
+          path: projects/{projectsId}/locations/{locationsId}/instances/{instancesId}/vulnerabilityReport
+        projects.locations.instances.inventories:
+          path: projects/{projectsId}/locations/{locationsId}/instances/{instancesId}/inventory
     v1alpha2:
       discovery_doc: osconfig_v1alpha2.json
     v1beta:
@@ -727,10 +747,6 @@ apis:
     v2:
       enable_mtls: true
       discovery_doc: logging_v2.json
-      default: true
-  luxadmin:
-    v1alpha1:
-      discovery_doc: luxadmin_v1alpha1.json
       default: true
   memcache:
     v1beta2:

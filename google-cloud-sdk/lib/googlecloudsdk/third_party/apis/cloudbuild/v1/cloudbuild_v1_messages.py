@@ -14,6 +14,46 @@ from apitools.base.py import extra_types
 package = 'cloudbuild'
 
 
+class AddBitbucketServerConnectedRepositoryRequest(_messages.Message):
+  r"""RPC request object accepted by the AddBitbucketServerConnectedRepository
+  RPC method.
+
+  Fields:
+    connectedRepository: The connected repository to add.
+  """
+
+  connectedRepository = _messages.MessageField('BitbucketServerRepositoryId', 1)
+
+
+class AddBitbucketServerConnectedRepositoryResponse(_messages.Message):
+  r"""RPC request object returned by the AddBitbucketServerConnectedRepository
+  RPC method.
+
+  Fields:
+    config: The name of the `BitbucketServerConfig` that added connected
+      repository. Format: `projects/{project}/locations/{location}/bitbucketSe
+      rverConfigs/{config}`
+    connectedRepository: The connected repository.
+  """
+
+  config = _messages.StringField(1)
+  connectedRepository = _messages.MessageField('BitbucketServerRepositoryId', 2)
+
+
+class AnthosWorkerPool(_messages.Message):
+  r"""Anthos CICD cluster option.
+
+  Fields:
+    membership: Membership of the GKE Hub registered cluster this build should
+      execute on. Example:
+      /projects/{project}/locations/{location}/memberships/{cluster_name} The
+      cluster's project number must be the same project ID that is running the
+      build.
+  """
+
+  membership = _messages.StringField(1)
+
+
 class ApprovalConfig(_messages.Message):
   r"""ApprovalConfig describes configuration for manual approval of a build.
 
@@ -166,10 +206,8 @@ class BitbucketServerConfig(_messages.Message):
     secrets: Required. Secret Manager secrets needed by the config.
     username: Username of the account Cloud Build will use on Bitbucket
       Server.
-    webhookKey: Immutable. UUID included in webhook requests. The UUID is used
-      to look up the corresponding config. Once this field has been set, it
-      cannot be changed. If you need to change it, please create another
-      BitbucketServerConfig.
+    webhookKey: Output only. UUID included in webhook requests. The UUID is
+      used to look up the corresponding config.
   """
 
   apiKey = _messages.StringField(1)
@@ -191,10 +229,14 @@ class BitbucketServerRepositoryId(_messages.Message):
   Fields:
     projectKey: Required. Identifier for the project storing the repository.
     repoSlug: Required. Identifier for the repository.
+    webhookId: Output only. The ID of the webhook that was created for
+      receiving events from this repo. We only create and manage a single
+      webhook for each repo.
   """
 
   projectKey = _messages.StringField(1)
   repoSlug = _messages.StringField(2)
+  webhookId = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class BitbucketServerSecrets(_messages.Message):
@@ -503,6 +545,8 @@ class BuildOptions(_messages.Message):
       configuration file.
 
   Fields:
+    anthosCluster: Details about how this build should be executed on a Anthos
+      cluster.
     cluster: Details about how this build should be executed on a GKE cluster.
     diskSizeGb: Requested disk size for the VM that runs the build. Note that
       this is *NOT* "disk free"; some of the space will be used by the
@@ -635,19 +679,20 @@ class BuildOptions(_messages.Message):
     MUST_MATCH = 0
     ALLOW_LOOSE = 1
 
-  cluster = _messages.MessageField('ClusterOptions', 1)
-  diskSizeGb = _messages.IntegerField(2)
-  dynamicSubstitutions = _messages.BooleanField(3)
-  env = _messages.StringField(4, repeated=True)
-  logStreamingOption = _messages.EnumField('LogStreamingOptionValueValuesEnum', 5)
-  logging = _messages.EnumField('LoggingValueValuesEnum', 6)
-  machineType = _messages.EnumField('MachineTypeValueValuesEnum', 7)
-  requestedVerifyOption = _messages.EnumField('RequestedVerifyOptionValueValuesEnum', 8)
-  secretEnv = _messages.StringField(9, repeated=True)
-  sourceProvenanceHash = _messages.EnumField('SourceProvenanceHashValueListEntryValuesEnum', 10, repeated=True)
-  substitutionOption = _messages.EnumField('SubstitutionOptionValueValuesEnum', 11)
-  volumes = _messages.MessageField('Volume', 12, repeated=True)
-  workerPool = _messages.StringField(13)
+  anthosCluster = _messages.MessageField('AnthosWorkerPool', 1)
+  cluster = _messages.MessageField('ClusterOptions', 2)
+  diskSizeGb = _messages.IntegerField(3)
+  dynamicSubstitutions = _messages.BooleanField(4)
+  env = _messages.StringField(5, repeated=True)
+  logStreamingOption = _messages.EnumField('LogStreamingOptionValueValuesEnum', 6)
+  logging = _messages.EnumField('LoggingValueValuesEnum', 7)
+  machineType = _messages.EnumField('MachineTypeValueValuesEnum', 8)
+  requestedVerifyOption = _messages.EnumField('RequestedVerifyOptionValueValuesEnum', 9)
+  secretEnv = _messages.StringField(10, repeated=True)
+  sourceProvenanceHash = _messages.EnumField('SourceProvenanceHashValueListEntryValuesEnum', 11, repeated=True)
+  substitutionOption = _messages.EnumField('SubstitutionOptionValueValuesEnum', 12)
+  volumes = _messages.MessageField('Volume', 13, repeated=True)
+  workerPool = _messages.StringField(14)
 
 
 class BuildStep(_messages.Message):
@@ -783,7 +828,7 @@ class BuildTrigger(_messages.Message):
     disabled: If true, the trigger will never automatically execute a build.
     filename: Path, from the source root, to the build configuration file
       (i.e. cloudbuild.yaml).
-    filter: A Common Expression Language string.
+    filter: Optional. A Common Expression Language string.
     gitFileSource: The file source describing the local or remote Build
       template.
     github: GitHubEventsConfig describes the configuration of a trigger that
@@ -808,7 +853,7 @@ class BuildTrigger(_messages.Message):
       contain only alphanumeric characters and dashes. + They can be 1-64
       characters long. + They must begin and end with an alphanumeric
       character.
-    pubsubConfig: PubsubConfig [Experimental] describes the configuration of a
+    pubsubConfig: Optional. PubsubConfig describes the configuration of a
       trigger that creates a build whenever a Pub/Sub message is published.
     sourceToBuild: The repo and ref of the repository from which to build.
       This field is used only for those triggers that do not respond to SCM
@@ -1321,6 +1366,23 @@ class CloudbuildProjectsInstallationsPatchRequest(_messages.Message):
   updateMask = _messages.StringField(6)
 
 
+class CloudbuildProjectsLocationsBitbucketServerConfigsAddBitbucketServerConnectedRepositoryRequest(_messages.Message):
+  r"""A CloudbuildProjectsLocationsBitbucketServerConfigsAddBitbucketServerCon
+  nectedRepositoryRequest object.
+
+  Fields:
+    addBitbucketServerConnectedRepositoryRequest: A
+      AddBitbucketServerConnectedRepositoryRequest resource to be passed as
+      the request body.
+    config: Required. The name of the `BitbucketServerConfig` to add a
+      connected repository. Format: `projects/{project}/locations/{location}/b
+      itbucketServerConfigs/{config}`
+  """
+
+  addBitbucketServerConnectedRepositoryRequest = _messages.MessageField('AddBitbucketServerConnectedRepositoryRequest', 1)
+  config = _messages.StringField(2, required=True)
+
+
 class CloudbuildProjectsLocationsBitbucketServerConfigsCreateRequest(_messages.Message):
   r"""A CloudbuildProjectsLocationsBitbucketServerConfigsCreateRequest object.
 
@@ -1390,6 +1452,23 @@ class CloudbuildProjectsLocationsBitbucketServerConfigsPatchRequest(_messages.Me
   bitbucketServerConfig = _messages.MessageField('BitbucketServerConfig', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class CloudbuildProjectsLocationsBitbucketServerConfigsRemoveBitbucketServerConnectedRepositoryRequest(_messages.Message):
+  r"""A CloudbuildProjectsLocationsBitbucketServerConfigsRemoveBitbucketServer
+  ConnectedRepositoryRequest object.
+
+  Fields:
+    config: Required. The name of the `BitbucketServerConfig` to remove a
+      connected repository. Format: `projects/{project}/locations/{location}/b
+      itbucketServerConfigs/{config}`
+    removeBitbucketServerConnectedRepositoryRequest: A
+      RemoveBitbucketServerConnectedRepositoryRequest resource to be passed as
+      the request body.
+  """
+
+  config = _messages.StringField(1, required=True)
+  removeBitbucketServerConnectedRepositoryRequest = _messages.MessageField('RemoveBitbucketServerConnectedRepositoryRequest', 2)
 
 
 class CloudbuildProjectsLocationsBuildsCreateRequest(_messages.Message):
@@ -2467,8 +2546,8 @@ class Operation(_messages.Message):
 
 
 class PubsubConfig(_messages.Message):
-  r"""PubsubConfig [Experimental] describes the configuration of a trigger
-  that creates a build whenever a Pub/Sub message is published.
+  r"""PubsubConfig describes the configuration of a trigger that creates a
+  build whenever a Pub/Sub message is published.
 
   Enums:
     StateValueValuesEnum: Potential issues with the underlying Pub/Sub
@@ -2572,6 +2651,17 @@ class ReceiveTriggerWebhookResponse(_messages.Message):
   the ReceiveTriggerWebhook method.
   """
 
+
+
+class RemoveBitbucketServerConnectedRepositoryRequest(_messages.Message):
+  r"""RPC request object accepted by RemoveBitbucketServerConnectedRepository
+  RPC method.
+
+  Fields:
+    connectedRepository: The connected repository to remove.
+  """
+
+  connectedRepository = _messages.MessageField('BitbucketServerRepositoryId', 1)
 
 
 class RepoSource(_messages.Message):

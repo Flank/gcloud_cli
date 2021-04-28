@@ -1800,7 +1800,7 @@ class NetworkconnectivityProjectsLocationsListRequest(_messages.Message):
       documented in more detail in [AIP-160](https://google.aip.dev/160).
     name: The resource that owns the locations collection, if applicable.
     pageSize: The maximum number of results to return. If not set, the service
-      will select a default.
+      selects a default.
     pageToken: A page token received from the `next_page_token` field in the
       response. Send that page token to receive the subsequent page.
   """
@@ -2436,8 +2436,8 @@ class QuotaProperties(_messages.Message):
         not fail and available quota goes down to zero but it returns error.
       CHECK: Does not change any available quota. Only checks if there is
         enough quota. No lock is placed on the checked tokens neither.
-      RELEASE: Increases available quota by the operation cost specified for
-        the operation.
+      RELEASE: DEPRECATED: Increases available quota by the operation cost
+        specified for the operation.
     """
     ACQUIRE = 0
     ACQUIRE_BEST_EFFORT = 1
