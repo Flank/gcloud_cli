@@ -20,9 +20,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.artifacts import flags
+from googlecloudsdk.core import resources
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -39,6 +42,7 @@ class Import(base.Command):
       parser: An argparse.ArgumentPaser.
     """
     flags.GetRepoArgFromBeta().AddToParser(parser)
+    base.ASYNC_FLAG.AddToParser(parser)
 
     parser.add_argument(
         '--gcs-source',
@@ -52,7 +56,13 @@ class Import(base.Command):
   def Run(self, args):
     """Run package import command."""
     client = apis.GetClientInstance('artifactregistry', self.api_version)
+    betaclient = apis.GetClientInstance('artifactregistry', 'v1beta2')
     messages = client.MESSAGES_MODULE
+
+    for gcs_source in args.gcs_source:
+      if '*' in gcs_source and not gcs_source.endswith('*'):
+        raise exceptions.InvalidArgumentException(
+            'GCS_SOURCE', 'Wildcards must be at the end of the GCS path.')
 
     repo_ref = args.CONCEPTS.repository.Parse()
     gcs_source = messages.GoogleDevtoolsArtifactregistryV1alpha1ImportAptArtifactsGcsSource(
@@ -65,7 +75,20 @@ class Import(base.Command):
         googleDevtoolsArtifactregistryV1alpha1ImportAptArtifactsRequest=import_request,
         parent=repo_ref.RelativeName())
 
-    return client.projects_locations_repositories_aptArtifacts.Import(request)
+    op = client.projects_locations_repositories_aptArtifacts.Import(request)
+
+    op_ref = resources.REGISTRY.ParseRelativeName(
+        op.name, collection='artifactregistry.projects.locations.operations')
+
+    if args.async_:
+      return op_ref
+    else:
+      result = waiter.WaitFor(
+          waiter.CloudOperationPollerNoResources(
+              betaclient.projects_locations_operations),
+          op_ref, 'Importing package(s)')
+
+      return result
 
 
 Import.detailed_help = {

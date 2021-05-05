@@ -23,6 +23,8 @@ import textwrap
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.anthos.common import file_parsers
 from googlecloudsdk.command_lib.container.hub.features import base
+from googlecloudsdk.command_lib.container.hub.identity_service import utils
+from googlecloudsdk.command_lib.projects import util as project_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
@@ -69,8 +71,8 @@ class Apply(base.UpdateCommand):
 
   def Run(self, args):
     # Get Hub memberships (cluster registered with Hub) from GCP Project.
-    project = args.project or properties.VALUES.core.project.GetOrFail()
-    memberships = base.ListMemberships(project)
+    project_id = args.project or properties.VALUES.core.project.GetOrFail()
+    memberships = base.ListMemberships(project_id)
     if not memberships:
       raise exceptions.Error('No Memberships available in Hub.')
 
@@ -103,10 +105,11 @@ class Apply(base.UpdateCommand):
     msg = client.MESSAGES_MODULE
     member_config = _parse_config(loaded_config, msg)
 
+    project_number = project_util.GetProjectNumber(project_id)
     # UpdateFeature uses the patch method to update member_configs map, hence
     # there's no need to get the existing feature spec.
     applied_config = msg.IdentityServiceFeatureSpec.MemberConfigsValue.AdditionalProperty(
-        key=membership,
+        key=utils.full_membership_name(project_number, membership),
         value=member_config)
     m_configs = msg.IdentityServiceFeatureSpec.MemberConfigsValue(
         additionalProperties=[applied_config])

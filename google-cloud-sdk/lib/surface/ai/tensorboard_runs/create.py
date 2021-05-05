@@ -29,6 +29,15 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
+def _AddArgs(parser):
+  flags.AddTensorboardExperimentResourceArg(parser,
+                                            'to create a Tensorboard run')
+  flags.GetDisplayNameArg('tensorboard-run', required=True).AddToParser(parser)
+  flags.GetDescriptionArg('tensorboard-run').AddToParser(parser)
+  labels_util.AddCreateLabelsFlags(parser)
+  flags.GetTensorboardRunIdArg(required=True).AddToParser(parser)
+
+
 def _Run(args, version):
   """Create a new AI Platform Tensorboard run."""
   tensorboard_exp_ref = args.CONCEPTS.tensorboard_experiment.Parse()
@@ -38,27 +47,33 @@ def _Run(args, version):
     response = tensorboard_runs_client.Create(tensorboard_exp_ref, args)
     response_msg = encoding.MessageToPyValue(response)
     if 'name' in response_msg:
-      log.status.Print(
-          ('Created AI Platform Tensorboard run: {}.').format(
-              response_msg['name']))
+      log.status.Print(('Created AI Platform Tensorboard run: {}.').format(
+          response_msg['name']))
     return response
 
 
 @base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Create(base.CreateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(base.CreateCommand):
   """Create a new AI Platform Tensorboard run."""
 
   @staticmethod
   def Args(parser):
-    flags.AddTensorboardExperimentResourceArg(parser,
-                                              'to create a Tensorboard run')
-    flags.GetDisplayNameArg(
-        'tensorboard-run', required=True).AddToParser(parser)
-    flags.GetDescriptionArg('tensorboard-run').AddToParser(parser)
-    labels_util.AddCreateLabelsFlags(parser)
+    _AddArgs(parser)
 
-    flags.GetTensorboardRunIdArg(required=True).AddToParser(parser)
+  def Run(self, args):
+    validation.ValidateDisplayName(args.display_name)
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(base.CreateCommand):
+  """Create a new AI Platform Tensorboard run."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
 
   def Run(self, args):
     validation.ValidateDisplayName(args.display_name)

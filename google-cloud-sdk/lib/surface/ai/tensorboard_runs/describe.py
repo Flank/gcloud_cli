@@ -25,22 +25,37 @@ from googlecloudsdk.command_lib.ai import endpoint_util
 from googlecloudsdk.command_lib.ai import flags
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Describe(base.DescribeCommand):
+def _Run(args, version):
+  tensorboard_run_ref = args.CONCEPTS.tensorboard_run.Parse()
+  region = tensorboard_run_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    response = client.TensorboardRunsClient(
+        version=version).Get(tensorboard_run_ref)
+    return response
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class DescribeBeta(base.DescribeCommand):
   """Get detailed Tensorboard run information about the given Tensorboard run id."""
 
   @staticmethod
   def Args(parser):
     flags.AddTensorboardRunResourceArg(parser, 'to describe')
 
-  def _Run(self, args, version):
-    tensorboard_run_ref = args.CONCEPTS.tensorboard_run.Parse()
-    region = tensorboard_run_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=version, region=region):
-      response = client.TensorboardRunsClient(version=version).Get(
-          tensorboard_run_ref)
-      return response
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class DescribeAlpha(base.DescribeCommand):
+  """Get detailed Tensorboard run information about the given Tensorboard run id."""
+
+  @staticmethod
+  def Args(parser):
+    flags.AddTensorboardRunResourceArg(parser, 'to describe')
 
   def Run(self, args):
-    return self._Run(args, constants.ALPHA_VERSION)
+    return _Run(args, constants.ALPHA_VERSION)

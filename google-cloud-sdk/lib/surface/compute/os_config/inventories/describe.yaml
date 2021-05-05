@@ -21,6 +21,8 @@
 
   response:
     id_field: name
+    modify_response_hooks:
+    - googlecloudsdk.command_lib.compute.os_config.inventories.declarative:CreateDescribeTableViewResponseHook
 
   arguments:
     params:
@@ -35,3 +37,67 @@
         Location of the Compute Engine VM instance to describe. If not specified, the property
         `compute/zone` is used. For details on setting properties,
         see: https://cloud.google.com/sdk/docs/properties
+    - api_field: view
+      help_text: |
+        Specifies what information should be included in the
+        output. If unspecified, the default view is `basic`.
+      choices:
+      - arg_value: basic
+        enum_value: BASIC
+        help_text: Output is limited to operating system details.
+      - arg_value: full
+        enum_value: FULL
+        help_text: Output includes operating system details and package information.
+  output:
+    format: |
+      multi(
+        installed_packages.yumPackage:format=
+          "table[box,title='Installed Packages (Yum)']
+            (package_name:sort=1,architecture,version)",
+        installed_packages.aptPackage:format=
+          "table[box,title='Installed Packages (Apt)']
+            (package_name:sort=1,architecture,version)",
+        installed_packages.zypperPackage:format=
+          "table[box,title='Installed Packages (Zypper)']
+            (package_name:sort=1,architecture,version)",
+        installed_packages.googetPackage:format=
+          "table[box,title='Installed Packages (GooGet)']
+            (package_name:sort=1,architecture,version)",
+        installed_packages.cosPackage:format=
+          "table[box,title='Installed Packages (COS)']
+            (package_name:sort=1,architecture,version)",
+        installed_packages.zypperPatch:format=
+          "table[box,title='Installed Patches (Zypper Patch)']
+            (patch_name:sort=1,category,severity,summary)",
+        installed_packages.wuaPackage:format=
+          "table[all-box,title='Installed Packages (Windows Update Agent)']
+            (title:sort=1:wrap,categories.extract(name).flatten(separator=', '):wrap,kb_article_ids.list(),support_url)",
+        installed_packages.qfePackage:format=
+          "table[box,title='Installed Packages (Quick Fix Engineering)']
+            (caption:sort=1,description,hot_fix_id,install_time)",
+        updatedable_packages.yumPackage:format=
+          "table[box,title='Package Updates Available (Yum)']
+            (package_name:sort=1,architecture,version)",
+        updatedable_packages.aptPackage:format=
+          "table[box,title='Package Updates Available (Apt)']
+            (package_name:sort=1,architecture,version)",
+        updatedable_packages.zypperPackage:format=
+          "table[box,title='Package Updates Available (Zypper)']
+            (package_name:sort=1,architecture,version)",
+        updatedable_packages.googetPackage:format=
+          "table[box,title='Package Updates Available (GooGet)']
+            (package_name:sort=1,architecture,version)",
+        updatedable_packages.cosPackage:format=
+          "table[box,title='Package Updates Available (COS)']
+            (package_name:sort=1,architecture,version)",
+        updatedable_packages.zypperPatch:format=
+          "table[box,title='Patches Available (Zypper Patch)']
+            (patch_name:sort=1,category,severity,summary)",
+        updatedable_packages.wuaPackage:format=
+          "table[all-box,title='Package Updates Available (Windows Update Agent)']
+            (title:sort=1:wrap,categories.extract(name).flatten(separator=', '):wrap,kb_article_ids.list(),support_url)",
+        updatedable_packages.qfePackage:format=
+          "table[box,title='Package Updates Available (Quick Fix Engineering)']
+            (caption:sort=1,description,hot_fix_id,install_time)",
+        system_information:format="default"
+      )

@@ -27,7 +27,15 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import resources
 
 
-def _GetUri(tensorboard_exp):
+def _GetUriBeta(tensorboard_exp):
+  ref = resources.REGISTRY.ParseRelativeName(
+      tensorboard_exp.name,
+      constants.TENSORBOARD_RUNS_COLLECTION,
+      api_version=constants.AI_PLATFORM_API_VERSION[constants.BETA_VERSION])
+  return ref.SelfLink()
+
+
+def _GetUriAlpha(tensorboard_exp):
   ref = resources.REGISTRY.ParseRelativeName(
       tensorboard_exp.name,
       constants.TENSORBOARD_RUNS_COLLECTION,
@@ -35,8 +43,29 @@ def _GetUri(tensorboard_exp):
   return ref.SelfLink()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class List(base.ListCommand):
+def _AddArgs(parser):
+  concept_parsers.ConceptParser.ForResource(
+      '--tensorboard-experiment-id',
+      flags.GetTensorboardExperimentResourceSpec(),
+      'To list Tensorboard runs',
+      required=True).AddToParser(parser)
+
+
+def _Run(args, version):
+  tensorboard_exp_ref = args.CONCEPTS.tensorboard_experiment_id.Parse()
+  region = tensorboard_exp_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    return client.TensorboardRunsClient(version=version).List(
+        tensorboard_exp_ref=tensorboard_exp_ref,
+        limit=args.limit,
+        page_size=args.page_size,
+        sort_by=args.sort_by)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ListBeta(base.ListCommand):
   """List the Tensorboard runs of the given project, region, and Tensorboard experiment."""
 
   @staticmethod
@@ -46,18 +75,21 @@ class List(base.ListCommand):
         flags.GetTensorboardExperimentResourceSpec(),
         'To list Tensorboard runs',
         required=True).AddToParser(parser)
-    parser.display_info.AddUriFunc(_GetUri)
-
-  def _Run(self, args, version):
-    tensorboard_exp_ref = args.CONCEPTS.tensorboard_experiment_id.Parse()
-    region = tensorboard_exp_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=version, region=region):
-      return client.TensorboardRunsClient(version=version).List(
-          tensorboard_exp_ref=tensorboard_exp_ref,
-          limit=args.limit,
-          page_size=args.page_size,
-          sort_by=args.sort_by)
+    parser.display_info.AddUriFunc(_GetUriBeta)
 
   def Run(self, args):
-    return self._Run(args, constants.ALPHA_VERSION)
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(base.ListCommand):
+  """List the Tensorboard runs of the given project, region, and Tensorboard experiment."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
+    parser.display_info.AddUriFunc(_GetUriAlpha)
+
+  def Run(self, args):
+    return _Run(args, constants.ALPHA_VERSION)
