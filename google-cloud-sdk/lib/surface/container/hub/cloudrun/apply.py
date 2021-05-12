@@ -130,11 +130,6 @@ def _validate_cr(yaml_string):
         'The resource is missing a required field "metadata".')
 
   metadata = cloudrun_cr['metadata']
-  if ('namespace' not in metadata or
-      metadata['namespace'] != 'cloud-run-system'):
-    raise exceptions.Error(
-        'The resource "metadata.namespace" field must be set to "cloud-run-system"'
-    )
   if ('name' not in metadata or metadata['name'] != 'cloud-run'):
     raise exceptions.Error(
         'The resource "metadata.name" field must be set to "cloud-run"')
@@ -146,5 +141,4 @@ def _default_cr():
   kind: CloudRun
   metadata:
     name: cloud-run
-    namespace: cloud-run-system
   """

@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py import encoding
 from googlecloudsdk.api_lib.clouddeploy import client_util
 from googlecloudsdk.api_lib.clouddeploy import release
 from googlecloudsdk.calliope import base
@@ -83,12 +82,10 @@ class Create(base.CreateCommand):
     operation = client.Create(release_ref, release_config)
     operation_ref = resources.REGISTRY.ParseRelativeName(
         operation.name, collection='clouddeploy.projects.locations.operations')
-    response_msg = client_util.OperationsClient().WaitForOperation(
-        operation, operation_ref).response
-    if response_msg is not None:
-      response = encoding.MessageToPyValue(response_msg)
-      if 'name' in response:
-        log.status.Print('Created Cloud Deploy release: {}.'.format(
-            response['name']))
+    client_util.OperationsClient().WaitForOperation(operation, operation_ref)
 
-    promote_util.Promote(release_ref, args.to_target)
+    log.status.Print('Created Cloud Deploy release {}.'.format(
+        release_ref.Name()))
+
+    release_obj = release.ReleaseClient().Get(release_ref.RelativeName())
+    promote_util.Promote(release_ref, release_obj, args.to_target)

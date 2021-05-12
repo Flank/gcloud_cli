@@ -88,4 +88,5 @@ class Promote(base.CreateCommand):
                                                     to_target_id),
         cancel_on_no=True)
 
-    promote_util.Promote(release_ref, to_target_id, args.rollout_id)
+    promote_util.Promote(release_ref, release_obj, to_target_id,
+                         args.rollout_id)

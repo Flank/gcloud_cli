@@ -12,10 +12,14 @@
       $ {command} 5678 --location=us-central1-a
 
   request:
-    collection: osconfig.projects.locations.instances
-    method: getInventory
-    api_version: v1alpha
+    collection: osconfig.projects.locations.instances.inventories
+    # This command is implemented manually (without resources) so that
+    # its help documentation specifically allows instance IDs as the first
+    # positional paramater.
+    #
+    # Without this, a presubmit check will block this yaml file.
     disable_resource_check: true
+    api_version: v1alpha
     modify_request_hooks:
     - googlecloudsdk.command_lib.compute.os_config.inventories.declarative:SetNameOnDescribeRequestHook
 

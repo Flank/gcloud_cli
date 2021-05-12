@@ -19,16 +19,16 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from googlecloudsdk.command_lib.run import k8s_object_printer
-from googlecloudsdk.command_lib.run import revision_printer
-from googlecloudsdk.command_lib.run import traffic_printer
+from googlecloudsdk.command_lib.run.printers import k8s_object_printer_util as k8s_util
+from googlecloudsdk.command_lib.run.printers import revision_printer
+from googlecloudsdk.command_lib.run.printers import traffic_printer
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.resource import custom_printer_base as cp
 
 SERVICE_PRINTER_FORMAT = 'service'
 
 
-class ServicePrinter(k8s_object_printer.K8sObjectPrinter):
+class ServicePrinter(cp.CustomPrinterBase):
   """Prints the run Service in a custom human-readable format.
 
   Format specific to Cloud Run services. Only available on Cloud Run commands
@@ -43,7 +43,7 @@ class ServicePrinter(k8s_object_printer.K8sObjectPrinter):
     """Adds printers for the revision."""
     return cp.Lines([
         self._GetRevisionHeader(record),
-        self._GetLabels(record.template.labels),
+        k8s_util.GetLabels(record.template.labels),
         revision_printer.RevisionPrinter.TransformSpec(record.template),
     ])
 
@@ -52,10 +52,10 @@ class ServicePrinter(k8s_object_printer.K8sObjectPrinter):
     labels = [
         cp.Labeled([
             ('Binary Authorization',
-             k8s_object_printer.K8sObjectPrinter.GetBinAuthzPolicy(record))
+             k8s_util.GetBinAuthzPolicy(record))
         ])
     ]
-    breakglass_value = k8s_object_printer.K8sObjectPrinter.GetBinAuthzBreakglass(
+    breakglass_value = k8s_util.GetBinAuthzBreakglass(
         record)
     if breakglass_value is not None:
       # Show breakglass even if empty, but only if set. There's no skip_none
@@ -71,12 +71,12 @@ class ServicePrinter(k8s_object_printer.K8sObjectPrinter):
     """Transform a service into the output structure of marker classes."""
     service_settings = self._GetServiceSettings(record)
     fmt = cp.Lines([
-        self._GetHeader(record),
-        self._GetLabels(record.labels), ' ',
+        k8s_util.BuildHeader(record),
+        k8s_util.GetLabels(record.labels), ' ',
         traffic_printer.TransformRouteFields(record), ' ', service_settings,
         (' ' if service_settings.WillPrintOutput() else ''),
-        cp.Labeled([(self._GetLastUpdated(record),
+        cp.Labeled([(k8s_util.LastUpdatedMessage(record),
                      self._RevisionPrinters(record))]),
-        self._GetReadyMessage(record)
+        k8s_util.FormatReadyMessage(record)
     ])
     return fmt

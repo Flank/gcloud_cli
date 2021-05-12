@@ -99,7 +99,7 @@ class Upgrade(base.UpdateCommand):
       log.status.Print(
           'Membership {} already has the latest version of the {} Feature installed ({}).'
           .format(membership, self.FEATURE_DISPLAY_NAME, self.LATEST_VERSION))
-      return False
+      return True
 
     if cluster_v > self.LATEST_VERSION:
       raise exceptions.Error(

@@ -52,6 +52,10 @@ class Approve(base.CreateCommand):
 
   def Run(self, args):
     rollout_ref = args.CONCEPTS.rollout.Parse()
+    try:
+      rollout_obj = rollout.RolloutClient().Get(rollout_ref.RelativeName())
+    except apitools_exceptions.HttpError as error:
+      raise exceptions.HttpException(error)
 
     release_ref = resources.REGISTRY.ParseRelativeName(
         rollout_ref.Parent().RelativeName(),
@@ -61,8 +65,9 @@ class Approve(base.CreateCommand):
     except apitools_exceptions.HttpError as error:
       raise exceptions.HttpException(error)
 
-    prompt = 'Approving rollout {}.\n'.format(rollout_ref.RelativeName())
-    release_util.PrintDiff(release_ref, release_obj, prompt)
+    prompt = 'Approving rollout {} from {} to target {}.\n\n'.format(
+        rollout_ref.Name(), release_ref.Name(), rollout_obj.target)
+    release_util.PrintDiff(release_ref, release_obj, prompt=prompt)
 
     console_io.PromptContinue(cancel_on_no=True)
 

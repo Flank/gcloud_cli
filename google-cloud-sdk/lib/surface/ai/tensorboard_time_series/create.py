@@ -29,6 +29,18 @@ from googlecloudsdk.command_lib.ai import validation
 from googlecloudsdk.core import log
 
 
+def _AddArgs(parser):
+  flags.AddTensorboardRunResourceArg(parser,
+                                     'to create a Tensorboard time series')
+  flags.GetDisplayNameArg(
+      'tensorboard-time-series', required=True).AddToParser(parser)
+  flags.GetDescriptionArg('tensorboard-time-series').AddToParser(parser)
+  tensorboards_util.GetTensorboardTimeSeriesTypeArg(
+      'tensorboard-time-series').choice_arg.AddToParser(parser)
+  flags.GetPluginNameArg('tensorboard-time-series').AddToParser(parser)
+  flags.GetPluginDataArg('tensorboard-time-series').AddToParser(parser)
+
+
 def _Run(args, version):
   """Create a new AI Platform Tensorboard time series."""
   validation.ValidateDisplayName(args.display_name)
@@ -48,21 +60,26 @@ def _Run(args, version):
 
 
 @base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Create(base.CreateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(base.CreateCommand):
   """Create a new AI Platform Tensorboard time series."""
 
   @staticmethod
   def Args(parser):
-    flags.AddTensorboardRunResourceArg(parser,
-                                       'to create a Tensorboard time series')
-    flags.GetDisplayNameArg(
-        'tensorboard-time-series', required=True).AddToParser(parser)
-    flags.GetDescriptionArg('tensorboard-time-series').AddToParser(parser)
-    tensorboards_util.GetTensorboardTimeSeriesTypeArg(
-        'tensorboard-time-series').choice_arg.AddToParser(parser)
-    flags.GetPluginNameArg('tensorboard-time-series').AddToParser(parser)
-    flags.GetPluginDataArg('tensorboard-time-series').AddToParser(parser)
+    _AddArgs(parser)
+
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(base.CreateCommand):
+  """Create a new AI Platform Tensorboard time series."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
 
   def Run(self, args):
     return _Run(args, constants.ALPHA_VERSION)

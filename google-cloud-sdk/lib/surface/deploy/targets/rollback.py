@@ -76,13 +76,14 @@ class Rollback(base.CreateCommand):
     except apitools_exceptions.HttpError as error:
       raise exceptions.HttpException(error)
 
-    prompt = 'Rolling back target {} to release {}.\n'.format(
+    prompt = 'Rolling back target {} to release {}.\n\n'.format(
         target_ref.Name(), release_ref.Name())
     release_util.PrintDiff(release_ref, release_obj, target_ref.Name(), prompt)
 
     console_io.PromptContinue(cancel_on_no=True)
 
-    promote_util.Promote(release_ref, target_ref.Name(), args.rollout_id)
+    promote_util.Promote(release_ref, release_obj, target_ref.Name(),
+                         args.rollout_id)
 
 
 def _GetRollbackRelease(release_arg, target_ref):

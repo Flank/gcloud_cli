@@ -22,9 +22,9 @@
   output:
     format: |
       table(
-      name,
+      name.basename(),
       state,
-      state_detail,
-      blueprint,
-      latestRevision
+      state_detail.sub("projects/[\w-]+/locations/[\w-]+/deployments/[\w-]+/revisions/","").sub("projects/[\w-]+/locations/[\w-]+/deployments/[\w-]+/","").sub("revision \"[\w\d-]+\"","revision"),
+      blueprint.firstof(gcsSource,gitSource.repo):label=BLUEPRINT,
+      latestRevision.basename()
       )

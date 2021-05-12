@@ -64,8 +64,6 @@ class Apply(base.UpdateCommand):
     deploy_client = deploy.DeployClient()
     region_ref = args.CONCEPTS.region.Parse()
     region = region_ref.AsDict()['locationsId']
+
     resource_dict = deploy_client.ParseDeployConfig(loaded_yaml, region)
-    deploy_client.UpdateResources(resource_dict,
-                                  deploy_client.CreateDeliveryPipeline,
-                                  deploy_client.CreateTarget,
-                                  'Created Cloud Deploy resource: {}.')
+    deploy_client.CreateResources(resource_dict)

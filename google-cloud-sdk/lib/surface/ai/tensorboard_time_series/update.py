@@ -27,6 +27,15 @@ from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.core import log
 
 
+def _AddArgs(parser):
+  flags.AddTensorboardTimeSeriesResourceArg(parser, 'to update')
+  flags.GetDisplayNameArg(
+      'tensorboard time series', required=False).AddToParser(parser)
+  flags.GetDescriptionArg('tensorboard time series').AddToParser(parser)
+  flags.GetPluginNameArg('tensorboard-time-series').AddToParser(parser)
+  flags.GetPluginDataArg('tensorboard-time-series').AddToParser(parser)
+
+
 def _Run(args, version):
   """Update an existing AI Platform Tensorboard time series."""
   tensorboard_time_series_ref = args.CONCEPTS.tensorboard_time_series.Parse()
@@ -37,10 +46,7 @@ def _Run(args, version):
           tensorboard_time_series_ref, args)
     except errors.NoFieldsSpecifiedError:
       available_update_args = [
-          'display_name',
-          'description',
-          'plugin_name',
-          'plugin_data'
+          'display_name', 'description', 'plugin_name', 'plugin_data'
       ]
       if not any(args.IsSpecified(arg) for arg in available_update_args):
         raise
@@ -51,18 +57,27 @@ def _Run(args, version):
       return op
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Update(base.UpdateCommand):
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class UpdateBeta(base.UpdateCommand):
   """Update an existing AI Platform Tensorboard time series."""
 
   @staticmethod
   def Args(parser):
-    flags.AddTensorboardTimeSeriesResourceArg(parser, 'to update')
-    flags.GetDisplayNameArg(
-        'tensorboard time series', required=False).AddToParser(parser)
-    flags.GetDescriptionArg('tensorboard time series').AddToParser(parser)
-    flags.GetPluginNameArg('tensorboard-time-series').AddToParser(parser)
-    flags.GetPluginDataArg('tensorboard-time-series').AddToParser(parser)
+    _AddArgs(parser)
+
+  def Run(self, args):
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class UpdateAlpha(base.UpdateCommand):
+  """Update an existing AI Platform Tensorboard time series."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
 
   def Run(self, args):
     return _Run(args, constants.ALPHA_VERSION)

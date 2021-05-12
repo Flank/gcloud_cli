@@ -22,8 +22,8 @@
   output:
     format: |
       table(
-      name,
+      name.basename(),
       state,
       action,
-      blueprint
+      blueprint.firstof(gcsSource,gitSource.repo):label=BLUEPRINT
       )

@@ -45,6 +45,10 @@ def _CommonArgs(parser):
       capture some information, but behaves like an ArgumentParser.
   """
   flags.AddConfigFile(parser)
+  flags.AddForce(
+      parser,
+      'If true, the delivery pipeline with sub-resources will be deleted '
+      'and its sub-resources will also be deleted')
   resource_args.AddLocationResourceArg(parser)
 
 
@@ -64,8 +68,6 @@ class Delete(base.UpdateCommand):
     deploy_client = deploy.DeployClient()
     region_ref = args.CONCEPTS.region.Parse()
     region = region_ref.AsDict()['locationsId']
+
     resource_dict = deploy_client.ParseDeployConfig(loaded_yaml, region)
-    deploy_client.UpdateResources(resource_dict,
-                                  deploy_client.DeleteDeliveryPipeline,
-                                  deploy_client.DeleteTarget,
-                                  'Deleted Cloud Deploy resource: {}.')
+    deploy_client.DeleteResources(resource_dict, args.force)

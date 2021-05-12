@@ -1,4 +1,4 @@
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 
 help_text:
   brief: |
@@ -45,6 +45,10 @@ async:
 request:
   ALPHA:
     api_version: v1alpha1
+    modify_request_hooks:
+    - googlecloudsdk.command_lib.redis.instances_reschedule_util:CheckSpecificTimeField
+  BETA:
+    api_version: v1beta1
     modify_request_hooks:
     - googlecloudsdk.command_lib.redis.instances_reschedule_util:CheckSpecificTimeField
   collection: redis.projects.locations.instances

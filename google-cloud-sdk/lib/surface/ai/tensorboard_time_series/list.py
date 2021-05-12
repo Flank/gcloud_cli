@@ -27,7 +27,15 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import resources
 
 
-def _GetUri(tensorboard_run):
+def _GetUriBeta(tensorboard_run):
+  ref = resources.REGISTRY.ParseRelativeName(
+      tensorboard_run.name,
+      constants.TENSORBOARD_TIME_SERIES_COLLECTION,
+      api_version=constants.AI_PLATFORM_API_VERSION[constants.BETA_VERSION])
+  return ref.SelfLink()
+
+
+def _GetUriAlpha(tensorboard_run):
   ref = resources.REGISTRY.ParseRelativeName(
       tensorboard_run.name,
       constants.TENSORBOARD_TIME_SERIES_COLLECTION,
@@ -35,29 +43,49 @@ def _GetUri(tensorboard_run):
   return ref.SelfLink()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class List(base.ListCommand):
+def _AddArgs(parser):
+  concept_parsers.ConceptParser.ForResource(
+      '--tensorboard-run-id',
+      flags.GetTensorboardRunResourceSpec(),
+      'To list Tensorboard time series',
+      required=True).AddToParser(parser)
+
+
+def _Run(args, version):
+  tensorboard_run_ref = args.CONCEPTS.tensorboard_run_id.Parse()
+  region = tensorboard_run_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    return client.TensorboardTimeSeriesClient(version=version).List(
+        tensorboard_run_ref=tensorboard_run_ref,
+        limit=args.limit,
+        page_size=args.page_size,
+        sort_by=args.sort_by)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ListBeta(base.ListCommand):
   """List the Tensorboard time series of the given project, region, and Tensorboard run."""
 
   @staticmethod
   def Args(parser):
-    concept_parsers.ConceptParser.ForResource(
-        '--tensorboard-run-id',
-        flags.GetTensorboardRunResourceSpec(),
-        'To list Tensorboard time series',
-        required=True).AddToParser(parser)
-    parser.display_info.AddUriFunc(_GetUri)
-
-  def _Run(self, args, version):
-    tensorboard_run_ref = args.CONCEPTS.tensorboard_run_id.Parse()
-    region = tensorboard_run_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=version, region=region):
-      return client.TensorboardTimeSeriesClient(version=version).List(
-          tensorboard_run_ref=tensorboard_run_ref,
-          limit=args.limit,
-          page_size=args.page_size,
-          sort_by=args.sort_by)
+    _AddArgs(parser)
+    parser.display_info.AddUriFunc(_GetUriBeta)
 
   def Run(self, args):
-    return self._Run(args, constants.ALPHA_VERSION)
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(base.ListCommand):
+  """List the Tensorboard time series of the given project, region, and Tensorboard run."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
+    parser.display_info.AddUriFunc(_GetUriAlpha)
+
+  def Run(self, args):
+    return _Run(args, constants.ALPHA_VERSION)

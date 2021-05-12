@@ -20,35 +20,25 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.logging import util
 from googlecloudsdk.calliope import base
+from googlecloudsdk.core import log
 from googlecloudsdk.core.resource import resource_projector
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
-  """List long running operations.
-
-  Return a list of long running operation details in given LOCATION. The
-  operations were scheduled by other gcloud commands. For example: a
-  copy_log_entries operation scheduled by command: gcloud alpha logging
-  operations copy BUCKET_ID DESTINATION --location = LOCATION.
-
-  ## EXAMPLES
-
-  To list operations, run:
-
-    $ {command} --location=LOCATION
-  """
+  """List long running operations."""
 
   @staticmethod
   def Args(parser):
     """Register flags for this command."""
     parser.add_argument(
         '--location', required=True, help='Location of the operations.')
+    parser.add_argument(
+        '--operation-filter',
+        required=True,
+        help='Filter expression that specifies the operations to return.')
     base.URI_FLAG.RemoveFromParser(parser)
-
-    parser.display_info.AddFormat(
-        'table(name, done, source, '
-        'destination, filter, createTime, endTime, state)'
-    )
+    base.FILTER_FLAG.RemoveFromParser(parser)
 
     util.AddParentArgs(parser, 'List operations')
 
@@ -66,32 +56,57 @@ class List(base.ListCommand):
         util.GetParentFromArgs(args), 'locations', args.location)
 
     request = util.GetMessages().LoggingProjectsLocationsOperationsListRequest(
-        name=operation_name, filter=args.filter, pageSize=args.page_size)
+        name=operation_name, filter=args.operation_filter)
 
     result = util.GetClient().projects_locations_operations.List(request)
-    operations = resource_projector.MakeSerializable(result.operations)
+    self._cancellation_requested = False
+    for operation in result.operations:
+      yield operation
+      if not self._cancellation_requested:
+        serialize_op = resource_projector.MakeSerializable(operation)
+        self._cancellation_requested = serialize_op.get('metadata', {}).get(
+            'cancellationRequested', '')
 
-    for operation in operations:
-      yield self.GetOperationData(operation)
+  def Epilog(self, resources_were_displayed):
+    if self._cancellation_requested:
+      log.status.Print(
+          'Note: Cancellation happens asynchronously. It may take up to 10 '
+          "minutes for the operation's status to change to cancelled.")
 
-  def GetOperationData(self, operation):
-    """Get one operation details.
 
-    Args:
-      operation: a serialized operation infomation.
+List.detailed_help = {
+    'DESCRIPTION':
+        """
+        Return a list of long running operation details in given LOCATION. The
+        operations were scheduled by other gcloud commands. For example: a
+        copy_log_entries operation scheduled by command: gcloud alpha logging
+        operations copy BUCKET_ID DESTINATION --location=LOCATION. Note: while
+        listing the operations, the request_type must be specified in filter.
+        Example: --operation-filter=request_type=CopyLogEntries, Supported
+        operation types are: CopyLogEntries, CreateBucket and UpdateBucket.
+        Other supported filter expression are: operation_start_time,
+        operation_finish_time and operation_state.
+        """,
+    'EXAMPLES':
+        """\
+        To list CopyLogEntries operations, run:
 
-    Returns:
-      Operation details for printing.
-    """
-    metadata = operation.get('metadata', {})
-    request = metadata.get('request', {})
-    return {
-        'name': operation.get('name', '/').split('/')[-1],
-        'done': operation.get('done', ''),
-        'source': request.get('name', ''),
-        'destination': request.get('destination', ''),
-        'filter': request.get('filter', '(empty filter)'),
-        'createTime': metadata.get('createTime', ''),
-        'endTime': metadata.get('endTime', ''),
-        'state': metadata.get('state', '')
-    }
+            $ {command} --location=LOCATION --operation-filter=request_type=CopyLogEntries
+
+        To list CopyLogEntries operations that started after a specified time, run:
+
+            $ {command} --location=LOCATION --operation-filter=request_type=CopyLogEntries AND operation_start_time>TIMESTAMP
+
+        To list CopyLogEntries operations that finished before a specified time, run:
+
+            $ {command} --location=LOCATION --operation-filter=request_type=CopyLogEntries AND operation_finish_time<TIMESTAMP
+
+        To list CopyLogEntries operations that have a specified state, run:
+
+            $ {command} --location=LOCATION --operation-filter=request_type=CopyLogEntries AND operation_state=STATE
+
+        To list CopyLogEntries operations that don't have a specified state, run:
+
+            $ {command} --location=LOCATION --operation-filter=request_type=CopyLogEntries AND operation_state!=STATE
+        """
+}

@@ -20,6 +20,8 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.logging import util
 from googlecloudsdk.calliope import base
+from googlecloudsdk.core import log
+from googlecloudsdk.core.resource import resource_projector
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -65,4 +67,15 @@ class Describe(base.Command):
     request = util.GetMessages().LoggingProjectsLocationsOperationsGetRequest(
         name=parent_name)
 
-    return util.GetClient().projects_locations_operations.Get(request)
+    result = util.GetClient().projects_locations_operations.Get(request)
+    serialize_op = resource_projector.MakeSerializable(result)
+    self._cancellation_requested = serialize_op.get('metadata', {}).get(
+        'cancellationRequested', '')
+
+    return result
+
+  def Epilog(self, resources_were_displayed):
+    if self._cancellation_requested:
+      log.status.Print(
+          'Note: Cancellation happens asynchronously. It may take up to 10 '
+          "minutes for the operation's status to change to cancelled.")

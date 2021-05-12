@@ -25,26 +25,45 @@ from googlecloudsdk.command_lib.ai import endpoint_util
 from googlecloudsdk.command_lib.ai import flags
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Read(base.Command):
+def _AddArgs(parser):
+  flags.AddTensorboardTimeSeriesResourceArg(parser, 'to read data')
+  flags.AddTensorboardTimeSeriesMaxDataPointsArg().AddToParser(parser)
+  flags.AddFilterArg('tensorboard-time-series').AddToParser(parser)
+
+
+def _Run(args, version):
+  tensorboard_time_series_ref = args.CONCEPTS.tensorboard_time_series.Parse()
+  region = tensorboard_time_series_ref.AsDict()['locationsId']
+  with endpoint_util.AiplatformEndpointOverrides(
+      version=version, region=region):
+    response = client.TensorboardTimeSeriesClient(version=version).Read(
+        tensorboard_time_series_ref=tensorboard_time_series_ref,
+        max_data_points=args.max_data_points,
+        data_filter=args.filter)
+    return response
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ReadBeta(base.Command):
   """Read the Tensorboard time series data from the given Tensorboard time series id."""
 
   @staticmethod
   def Args(parser):
-    flags.AddTensorboardTimeSeriesResourceArg(parser, 'to read data')
-    flags.AddTensorboardTimeSeriesMaxDataPointsArg().AddToParser(parser)
-    flags.AddFilterArg('tensorboard-time-series').AddToParser(parser)
-
-  def _Run(self, args, version):
-    tensorboard_time_series_ref = args.CONCEPTS.tensorboard_time_series.Parse()
-    region = tensorboard_time_series_ref.AsDict()['locationsId']
-    with endpoint_util.AiplatformEndpointOverrides(
-        version=version, region=region):
-      response = client.TensorboardTimeSeriesClient(version=version).Read(
-          tensorboard_time_series_ref=tensorboard_time_series_ref,
-          max_data_points=args.max_data_points,
-          data_filter=args.filter)
-      return response
+    _AddArgs(parser)
 
   def Run(self, args):
-    return self._Run(args, constants.ALPHA_VERSION)
+    return _Run(args, constants.BETA_VERSION)
+
+
+@base.Hidden
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ReadAlpha(base.Command):
+  """Read the Tensorboard time series data from the given Tensorboard time series id."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser)
+
+  def Run(self, args):
+    return _Run(args, constants.ALPHA_VERSION)

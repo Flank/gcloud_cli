@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.run import global_methods
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.run import commands
 from googlecloudsdk.command_lib.run import connection_context
@@ -55,7 +56,7 @@ def _ByStartAndCreationTime(job):
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(commands.List):
-  """List available revisions."""
+  """List jobs."""
 
   detailed_help = {
       'DESCRIPTION': """
@@ -74,7 +75,8 @@ class List(commands.List):
         'table('
         '{ready_column},'
         'name:label=JOB,'
-        'status.active:label=RUNNING,'
+        'region:label=REGION,'
+        'status.active.yesno(no="0"):label=RUNNING,'
         'succeeded_status():label=COMPLETE,'
         'creation_timestamp.date("%Y-%m-%d %H:%M:%S %Z"):label=CREATED,'
         'author:label="CREATED BY")'.format(
@@ -88,8 +90,20 @@ class List(commands.List):
   def Args(cls, parser):
     cls.CommonArgs(parser)
 
+  def _SortJobs(self, jobs):
+    return sorted(
+        commands.SortByName(jobs), key=_ByStartAndCreationTime, reverse=True)
+
   def Run(self, args):
     """List available revisions."""
+    # Use the mixer for global request if there's no --region flag.
+    if not args.IsSpecified('region'):
+      client = global_methods.GetServerlessClientInstance(
+          api_version='v1alpha1')
+      self.SetPartialApiEndpoint(client.url)
+      # Don't consider region property here, we'll default to all regions
+      return self._SortJobs(global_methods.ListJobs(client))
+
     conn_context = connection_context.GetConnectionContext(
         args,
         flags.Product.RUN,
@@ -101,7 +115,4 @@ class List(commands.List):
         api_version='v1alpha1')
     with serverless_operations.Connect(conn_context) as client:
       self.SetCompleteApiEndpoint(conn_context.endpoint)
-      return sorted(
-          commands.SortByName(client.ListJobs(namespace_ref)),
-          key=_ByStartAndCreationTime,
-          reverse=True)
+      return self._SortJobs(client.ListJobs(namespace_ref))

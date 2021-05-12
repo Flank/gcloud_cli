@@ -70,7 +70,7 @@ class Read(base.Command):
   def Run(self, args):
     filters = [args.log_filter] if args.IsSpecified('log_filter') else []
     # TODO(b/180749348): Don't piggyback off of cloud_run_revision
-    filters.append('resource.labels.service_name = "%s"' % args.service)
+    filters.append('resource.labels.service_name = "%s"' % args.job)
     filters += read_logs_lib.MakeTimestampFilters(args)
 
     return common.FetchLogs(

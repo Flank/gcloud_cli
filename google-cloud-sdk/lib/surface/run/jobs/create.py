@@ -67,7 +67,7 @@ class Deploy(base.Command):
     flags.AddImageArg(parser)
     flags.AddLabelsFlag(parser)
     flags.AddParallelismFlag(parser)
-    flags.AddCompletionsFlag(parser)
+    flags.AddTasksFlag(parser)
     flags.AddMaxRetriesFlag(parser)
     flags.AddServiceAccountFlag(parser)
     flags.AddSetEnvVarsFlag(parser)

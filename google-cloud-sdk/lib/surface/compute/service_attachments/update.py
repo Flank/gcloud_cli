@@ -31,12 +31,13 @@ from googlecloudsdk.command_lib.compute.service_attachments import service_attac
 def _DetailedHelp():
   return {
       'brief':
-          'Update a service attachment.',
+          'Update a Google Compute Engine service attachment.',
       'DESCRIPTION':
           """\
-      *{command}* is used to update service attachments. A service attachment is
-      a component used by a service producer to setup a Private Service Connect
-      (PSC) which a service consumer could then forward traffic privately to.
+      *{command}* is used to update service attachments. A service producer
+      creates service attachments to make a service available to consumers.
+      Service consumers use Private Service Connect endpoints to privately
+      forward traffic to the service attachment.
       """,
       'EXAMPLES':
           """\
@@ -52,9 +53,9 @@ def _DetailedHelp():
   }
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Update(base.UpdateCommand):
-  """Update a service attachment."""
+  """Update a Google Compute Engine service attachment."""
 
   SERVICE_ATTACHMENT_ARG = None
   NAT_SUBNETWORK_ARG = None
