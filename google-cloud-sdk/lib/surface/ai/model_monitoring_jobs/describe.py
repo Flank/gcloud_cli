@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform model deployment monitoring jobs describe command."""
+"""Vertex AI model deployment monitoring jobs describe command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -25,7 +25,6 @@ from googlecloudsdk.command_lib.ai import endpoint_util
 from googlecloudsdk.command_lib.ai import flags
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Get detailed model deployment monitoring job information about the given job id.

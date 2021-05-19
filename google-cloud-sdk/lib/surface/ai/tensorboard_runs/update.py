@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to update a Tensorboard run in AI platform."""
+"""Command to update a Tensorboard run in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -36,7 +36,7 @@ def _AddArgs(parser):
 
 
 def _Run(args, version):
-  """Update an existing AI Platform Tensorboard run."""
+  """Update an existing Vertex AI Tensorboard run."""
   tensorboard_run_ref = args.CONCEPTS.tensorboard_run.Parse()
   args.region = tensorboard_run_ref.AsDict()['locationsId']
   with endpoint_util.AiplatformEndpointOverrides(version, region=args.region):
@@ -53,14 +53,26 @@ def _Run(args, version):
       log.status.Print('No update to perform.')
       return None
     else:
-      log.UpdatedResource(op.name, kind='AI Platform Tensorboard run')
+      log.UpdatedResource(op.name, kind='Vertex AI Tensorboard run')
       return op
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class UpdateBeta(base.UpdateCommand):
-  """Update an existing AI Platform Tensorboard run."""
+  """Update an existing Vertex AI Tensorboard run."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To update Tensorboard Time Run `my-tensorboard-run` in Tensorboard `12345`, Tensorboard Experiment `my-tensorboard-experiment`, with the display name `updated display name`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345/experiments/my-tensorboard-experiment/runs/my-tensorboard-run --display-name="updated display name"
+
+          Or with flags:
+
+              $ {command} my-tensorboard-run --tensorboard-id=12345 --tensorboard-experiment-id=my-tensorboard-experiment --display-name="updated display name"
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -70,10 +82,9 @@ class UpdateBeta(base.UpdateCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class UpdateAlpha(base.UpdateCommand):
-  """Update an existing AI Platform Tensorboard run."""
+  """Update an existing Vertex AI Tensorboard run."""
 
   @staticmethod
   def Args(parser):

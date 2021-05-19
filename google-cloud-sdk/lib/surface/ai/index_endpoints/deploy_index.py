@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform index endpoints deploy-index command."""
+"""Vertex AI index endpoints deploy-index command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -42,7 +42,7 @@ DETAILED_HELP = {
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class DeployIndex(base.Command):
-  """Deploy an index to a AI Platform index endpoint."""
+  """Deploy an index to a Vertex AI index endpoint."""
 
   detailed_help = DETAILED_HELP
 

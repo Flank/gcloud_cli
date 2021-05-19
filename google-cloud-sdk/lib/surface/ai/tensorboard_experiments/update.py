@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to update a Tensorboard experiment in AI platform."""
+"""Command to update a Tensorboard experiment in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -37,7 +37,7 @@ def _AddArgs(parser):
 
 
 def _Run(args, version):
-  """Update an existing AI Platform Tensorboard experiment."""
+  """Update an existing Vertex AI Tensorboard experiment."""
   tensorboard_exp_ref = args.CONCEPTS.tensorboard_experiment.Parse()
   args.region = tensorboard_exp_ref.AsDict()['locationsId']
   with endpoint_util.AiplatformEndpointOverrides(version, region=args.region):
@@ -54,13 +54,26 @@ def _Run(args, version):
       log.status.Print('No update to perform.')
       return None
     else:
-      log.UpdatedResource(op.name, kind='AI Platform Tensorboard experiment')
+      log.UpdatedResource(op.name, kind='Vertex AI Tensorboard experiment')
       return op
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class UpdateBeta(base.UpdateCommand):
-  """Update an existing AI Platform Tensorboard experiment."""
+  """Update an existing Vertex AI Tensorboard experiment."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To update a Tensorboard Experiment `my-tensorboard-experiment` in Tensorboard `12345`, region `us-central1`, and project `my-project`, with the display name `updated display name`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345/experiments/my-tensorboard-experiment --display-name="updated display name"
+
+          Or with flags:
+
+              $ {command} my-tensorboard-experiment --tensorboard-id=12345 --display-name="updated display name"
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -72,7 +85,7 @@ class UpdateBeta(base.UpdateCommand):
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class UpdateAlpha(base.UpdateCommand):
-  """Update an existing AI Platform Tensorboard experiment."""
+  """Update an existing Vertex AI Tensorboard experiment."""
 
   @staticmethod
   def Args(parser):

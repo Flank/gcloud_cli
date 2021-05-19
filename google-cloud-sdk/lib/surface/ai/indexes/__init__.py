@@ -23,5 +23,6 @@ from googlecloudsdk.calliope import base
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Index(base.Group):
-  """AI Platform index commands."""
-  pass
+  """Manage Vertex AI indexes."""
+
+  category = base.VERTEX_AI_CATEGORY

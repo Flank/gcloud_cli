@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform Tensorboard experiment create command."""
+"""Vertex AI Tensorboard experiment create command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -39,7 +39,7 @@ def _AddArgs(parser):
 
 
 def _Run(args, version):
-  """Create a new AI Platform Tensorboard experiment."""
+  """Create a new Vertex AI Tensorboard experiment."""
   validation.ValidateDisplayName(args.display_name)
 
   tensorboard_ref = args.CONCEPTS.tensorboard.Parse()
@@ -49,16 +49,31 @@ def _Run(args, version):
         version=version)
     response = tensorboard_experiments_client.Create(tensorboard_ref, args)
     if response.name:
-      log.status.Print(
-          ('Created AI Platform Tensorboard experiment: {}.').format(
-              response.name))
+      log.status.Print(('Created Vertex AI Tensorboard experiment: {}.').format(
+          response.name))
     return response
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(base.CreateCommand):
-  """Create a new AI Platform Tensorboard experiment."""
+  """Create a new Vertex AI Tensorboard experiment."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To create a Tensorboard Experiment in a Tensorboard `12345`, with the display name `my tensorboard experiment`:
+
+              $ {command} 12345 --tensorboard-experiment-id=my-tensorboard-experiment --display-name="my tensorboard experiment"
+
+          You may also provide a description and/or labels:
+
+              $ {command} 12345 --tensorboard-experiment-id=my-tensorboard-experiment --description="my description" --labels="label1=value1" --labels="label2=value2"
+
+          To create a Tensorboard Experiment `my-tensorboard-experiment` in a Tensorboard `12345`, region `us-central1`, and project `my-project`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345 --tensorboard-experiment-id=my-tensorboard-experiment
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -68,10 +83,9 @@ class CreateBeta(base.CreateCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(base.CreateCommand):
-  """Create a new AI Platform Tensorboard experiment."""
+  """Create a new Vertex AI Tensorboard experiment."""
 
   @staticmethod
   def Args(parser):

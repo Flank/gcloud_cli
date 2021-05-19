@@ -27,11 +27,9 @@
       table(
         name.basename():label=NAME,
         originAddress:label=ORIGINADDRESS,
-        timeout.connectTimeout:label=CONNECT_TIMEOUT,
         failoverOrigin:label=FAILOVERORIGIN,
         maxAttempts:label=MAXATTEMPTS,
         port:label=PORT,
         protocol:label=PROTOCOL,
-        retryConditions:label=RETRYCONDITIONS,
         updateTime:label=UPDATETIME
       )

@@ -31,6 +31,7 @@
     - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.port
     - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.protocol
     - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.retry_conditions
-    - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.connect_timeout
-    - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.max_attempts_timeout
+    # b/187717231
+    # - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.connect_timeout
+    # - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.max_attempts_timeout
     - _REF_: googlecloudsdk.command_lib.edge_cache.flags:origin.response_timeout

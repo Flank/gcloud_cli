@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to read Tensorboard time series data in AI platform."""
+"""Command to read Tensorboard time series data in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -43,10 +43,22 @@ def _Run(args, version):
     return response
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class ReadBeta(base.Command):
   """Read the Tensorboard time series data from the given Tensorboard time series id."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To read Tensorboard Time Series `123` data in Tensorboard `12345`, Tensorboard Experiment `my-tensorboard-experiment, Tensorboard Run `my-tensorboard-run`, region `us-central1`, and project `my-project`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345/experiments/my-tensorboard-experiment/runs/my-tensorboard-run/timeSeries/123
+
+          Or with flags:
+
+              $ {command} 123 --tensorboard-id=12345 --tensorboard-experiment-id=my-tensorboard-experiment --tensorboard-run-id=my-tensorboard-run
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -56,7 +68,6 @@ class ReadBeta(base.Command):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class ReadAlpha(base.Command):
   """Read the Tensorboard time series data from the given Tensorboard time series id."""

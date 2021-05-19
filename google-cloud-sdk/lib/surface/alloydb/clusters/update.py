@@ -45,14 +45,14 @@ class Update(base.UpdateCommand):
     flags.AddCluster(parser)
 
   def Run(self, args):
-    """This is what gets called when the user runs this command.
+    """This is what gets called when the user runs the command.
 
     Args:
-      args: An argparse namespace. All the arguments that were provided to this
-        command invocation.
+      args: argparse.Namespace, An object that contains the values for the
+          arguments specified in the .Args() method.
 
     Returns:
-      Responses that we want to have displayed later.
+      A resource object dispatched by display.Displayer().
     """
     args.format = 'default'
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)

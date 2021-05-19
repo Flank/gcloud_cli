@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to list Tensorboard experiments in AI platform."""
+"""Command to list Tensorboard experiments in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -57,6 +57,15 @@ def _Run(args, version):
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class ListBeta(base.ListCommand):
   """List the Tensorboard experiments of the given project, region, and Tensorboard."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To list Tensorboard Experiments in Tensorboard `12345`:
+
+              $ {command} 12345
+          """,
+  }
 
   @staticmethod
   def Args(parser):

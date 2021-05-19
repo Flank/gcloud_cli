@@ -64,7 +64,6 @@ def AddBlockersOnlyArgs(parser):
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
-@base.Hidden
 class AnalyzeMove(base.Command):
   """Analyzes resource move."""
 

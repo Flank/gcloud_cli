@@ -18,10 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.transfer import jobs_util
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.transfer import name_util
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_printer
 
 
@@ -48,11 +46,4 @@ class Describe(base.ListCommand):
     resource_printer.Print(resources, 'json')
 
   def Run(self, args):
-    client = apis.GetClientInstance('storagetransfer', 'v1')
-    messages = apis.GetMessagesModule('storagetransfer', 'v1')
-
-    formatted_job_name = name_util.add_job_prefix(args.job_name)
-    return client.transferJobs.Get(
-        messages.StoragetransferTransferJobsGetRequest(
-            jobName=formatted_job_name,
-            projectId=properties.VALUES.core.project.Get()))
+    return jobs_util.api_get(args.job_name)

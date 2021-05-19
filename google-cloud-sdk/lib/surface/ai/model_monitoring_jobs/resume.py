@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform deployment monitoring jobs resume command."""
+"""Vertex AI deployment monitoring jobs resume command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,10 +27,9 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Resume(base.SilentCommand):
-  """Resume a paused AI Platform model deployment monitoring job.
+  """Resume a paused Vertex AI model deployment monitoring job.
 
   ## EXAMPLES
 

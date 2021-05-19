@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform endpoints create command."""
+"""Vertex AI endpoints create command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -40,7 +40,7 @@ def _AddArgs(parser):
 
 
 def _Run(args, version):
-  """Create a new AI Platform Tensorboard."""
+  """Create a new Vertex AI Tensorboard."""
   validation.ValidateDisplayName(args.display_name)
 
   region_ref = args.CONCEPTS.region.Parse()
@@ -56,14 +56,30 @@ def _Run(args, version):
       response = encoding.MessageToPyValue(response_msg)
       if 'name' in response:
         log.status.Print(
-            ('Created AI Platform Tensorboard: {}.').format(response['name']))
+            ('Created Vertex AI Tensorboard: {}.').format(response['name']))
     return response_msg
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(base.CreateCommand):
-  """Create a new AI Platform Tensorboard."""
+  """Create a new Vertex AI Tensorboard."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To create a Tensorboard with the display name `my tensorboard`:
+
+              $ {command} --display-name="my tensorboard"
+
+          You may also provide a description:
+
+              $ {command} --description="my description"
+
+          You may also provide labels:
+
+              $ {command} --labels="label1=value1" --labels="label2=value2"
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -73,10 +89,9 @@ class CreateBeta(base.CreateCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(base.CreateCommand):
-  """Create a new AI Platform Tensorboard."""
+  """Create a new Vertex AI Tensorboard."""
 
   @staticmethod
   def Args(parser):

@@ -82,18 +82,39 @@ class List(base.ListCommand):
         " specify. Options include 'in-progress', 'paused', 'success',"
         "'failed', 'aborted'. Separate multiple statuses with commas (e.g.,"
         ' --operation-statuses=failed,aborted).')
+    parser.add_argument(
+        '--expand-table',
+        action='store_true',
+        help='Includes additional table columns (operation name, start time,'
+        ' status, data copied, status, has errors, job name) in command'
+        ' output. Tip: increase the size of your terminal before running the'
+        ' command.')
 
   def Display(self, args, resources):
     """API response display logic."""
-    del args  # Unused.
-
-    # Removes unwanted "transferOperations/" prefix.
-    format_string = """table(
-        operations.name.map().slice(19:).map().join(sep='').join(sep='\n'),
-        operations.metadata.startTime.map().date('%Y-%m-%d').join(
-            sep='\n'):label='START DATE',
-        operations.metadata.status.join(sep='\n'))
-    """
+    if args.expand_table:
+      # Removes unwanted "transferJobs/" and "transferOperations/" prefixes.
+      # Extract start date from start time string.
+      # Remove "s" from repeatInterval seconds and make ISO duration string.
+      format_string = """table(
+          operations.name.map().slice(19:).map().join(sep='').join(sep='\n'),
+          operations.metadata.startTime.map().date().join(
+              sep='\n'):label='START TIME',
+          operations.metadata.counters.bytesCopiedToSink.map().size().join(
+              sep='\n'):label='DATA COPIED',
+          operations.metadata.status.join(sep='\n'),
+          operations.metadata.errorBreakdowns.map().yesno(yes='Yes').join(
+            sep='\n'):label='HAS ERRORS',
+          operations.metadata.transferJobName.map().slice(13:).map().join(
+            sep='').join(sep='\n'):label='TRANSFER JOB NAME')
+      """
+    else:
+      format_string = """table(
+          operations.name.map().slice(19:).map().join(sep='').join(sep='\n'),
+          operations.metadata.startTime.map().date('%Y-%m-%d').join(
+              sep='\n'):label='START DATE',
+          operations.metadata.status.join(sep='\n'))
+      """
     resource_printer.Print(resources, format_string)
 
   def Run(self, args):

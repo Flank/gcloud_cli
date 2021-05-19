@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to list Tensorboard runs in AI platform."""
+"""Command to list Tensorboard runs in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -63,10 +63,18 @@ def _Run(args, version):
         sort_by=args.sort_by)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class ListBeta(base.ListCommand):
   """List the Tensorboard runs of the given project, region, and Tensorboard experiment."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To list Tensorboard Runs in Tensorboard `12345` and Tensorboard Experiment `my-tensorboard-experiment`:
+
+              $ {command} --tensorboard-id=12345 --tensorboard-experiment-id=my-tensorboard-experiment
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -81,7 +89,6 @@ class ListBeta(base.ListCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class ListAlpha(base.ListCommand):
   """List the Tensorboard runs of the given project, region, and Tensorboard experiment."""

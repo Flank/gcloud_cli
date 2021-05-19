@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform index endpoints undeploy-index command."""
+"""Vertex AI index endpoints undeploy-index command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -30,7 +30,7 @@ from googlecloudsdk.command_lib.ai import operations_util
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class UndeployIndex(base.Command):
-  """Undeploy an index from a AI Platform index endpoint.
+  """Undeploy an index from a Vertex AI index endpoint.
 
   ## EXAMPLES
 

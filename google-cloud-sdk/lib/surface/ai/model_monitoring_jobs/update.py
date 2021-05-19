@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform model deployment monitoring jobs update command."""
+"""Vertex AI model deployment monitoring jobs update command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -29,10 +29,9 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class Update(base.UpdateCommand):
-  """Update an AI Platform model deployment monitoring job.
+  """Update an Vertex AI model deployment monitoring job.
 
   ## EXAMPLES
 
@@ -87,7 +86,7 @@ class Update(base.UpdateCommand):
         return None
       else:
         log.UpdatedResource(
-            result.name, kind='AI Platform model deployment monitoring job')
+            result.name, kind='Vertex AI model deployment monitoring job')
         return result
 
   def Run(self, args):

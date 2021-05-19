@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to update a Tensorboard time series in AI platform."""
+"""Command to update a Tensorboard time series in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -37,7 +37,7 @@ def _AddArgs(parser):
 
 
 def _Run(args, version):
-  """Update an existing AI Platform Tensorboard time series."""
+  """Update an existing Vertex AI Tensorboard time series."""
   tensorboard_time_series_ref = args.CONCEPTS.tensorboard_time_series.Parse()
   args.region = tensorboard_time_series_ref.AsDict()['locationsId']
   with endpoint_util.AiplatformEndpointOverrides(version, region=args.region):
@@ -53,14 +53,26 @@ def _Run(args, version):
       log.status.Print('No update to perform.')
       return None
     else:
-      log.UpdatedResource(op.name, kind='AI Platform Tensorboard time series')
+      log.UpdatedResource(op.name, kind='Vertex AI Tensorboard time series')
       return op
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class UpdateBeta(base.UpdateCommand):
-  """Update an existing AI Platform Tensorboard time series."""
+  """Update an existing Vertex AI Tensorboard time series."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To update a Tensorboard Time Series `123` in Tensorboard `12345`, Tensorboard Experiment `my-tensorboard-experiment`, Tensorboard Run `my-tensorboard-run`, region `us-central1`, and project `my-project`, with the display name `updated display name`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345/experiments/my-tensorboard-experiment/runs/my-tensorboard-run/timeSeries/123 --display-name="updated display name"
+
+          Or with flags:
+
+              $ {command} 123 --tensorboard-id=12345 --tensorboard-experiment-id=my-tensorboard-experiment --tensorboard-run-id=my-tensorboard-run --display-name="updated display name"
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -70,10 +82,9 @@ class UpdateBeta(base.UpdateCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class UpdateAlpha(base.UpdateCommand):
-  """Update an existing AI Platform Tensorboard time series."""
+  """Update an existing Vertex AI Tensorboard time series."""
 
   @staticmethod
   def Args(parser):

@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform indexes update command."""
+"""Vertex AI indexes update command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -33,7 +33,7 @@ from googlecloudsdk.core import log
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class Update(base.UpdateCommand):
-  """Update an AI Platform index.
+  """Update an Vertex AI index.
 
   ## EXAMPLES
 
@@ -80,7 +80,7 @@ class Update(base.UpdateCommand):
       if response_msg is not None:
         response = encoding.MessageToPyValue(response_msg)
         if 'name' in response:
-          log.UpdatedResource(response['name'], kind='AI Platform index')
+          log.UpdatedResource(response['name'], kind='Vertex AI index')
       return response_msg
 
   def Run(self, args):

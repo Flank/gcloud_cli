@@ -22,4 +22,7 @@
     - api_field: krmApiHost.masterIpv4CidrBlock
       arg_name: master-ipv4-cidr-block
       help_text: The /28 network that the masters will use. Defaults to '172.16.0.128/28' if flag is not provided.
+    - api_field: krmApiHost.network
+      arg_name: network
+      help_text: Existing VPC Network to put the GKE cluster and nodes in.
     additional_arguments_hook: googlecloudsdk.command_lib.anthos.config.controller.create_utils:AddExtraArgs

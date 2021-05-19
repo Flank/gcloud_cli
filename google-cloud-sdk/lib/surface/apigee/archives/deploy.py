@@ -86,12 +86,12 @@ class Deploy(base.DescribeCommand):
     source_input_group.add_argument(
         "--source",
         required=False,
-        type=files.ExpandHomeAndVars,
+        type=files.ExpandHomeDir,
         help="The source directory of the archive to upload.")
     source_input_group.add_argument(
         "--bundle-file",
         required=False,
-        type=files.ExpandHomeAndVars,
+        type=files.ExpandHomeDir,
         help="The zip file containing an archive to upload.")
     parser.add_argument(
         "--async",

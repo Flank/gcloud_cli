@@ -21,8 +21,15 @@ from __future__ import unicode_literals
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.alloydb import api_util
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.alloydb import flags
 from googlecloudsdk.core import properties
+
+CLUSTER_FORMAT = """
+    table(
+        name,
+        network,
+        state:label=STATUS
+    )
+"""
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -50,17 +57,17 @@ class List(base.ListCommand):
               'list of regions at '
               'https://cloud.google.com/sql/docs/instance-locations. '
               'Default: list clusters in all regions.'))
-    parser.display_info.AddFormat(flags.GetClusterListFormat())
+    parser.display_info.AddFormat(CLUSTER_FORMAT)
 
   def Run(self, args):
-    """This is what gets called when the user runs this command.
+    """This is what gets called when the user runs the command.
 
     Args:
-      args: An argparse namespace. All the arguments that were provided to this
-        command invocation.
+      args: argparse.Namespace, An object that contains the values for the
+          arguments specified in the .Args() method.
 
     Returns:
-      Responses that we want to have displayed later.
+      A resource object dispatched by display.Displayer().
     """
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)
     alloydb_client = client.alloydb_client
@@ -73,8 +80,10 @@ class List(base.ListCommand):
     result = list_pager.YieldFromList(
         alloydb_client.projects_locations_clusters,
         alloydb_messages.AlloydbadminProjectsLocationsClustersListRequest(
-            parent=project_ref.RelativeName(), pageSize=args.limit),
+            parent=project_ref.RelativeName()),
         field='clusters',
-        batch_size_attribute=None)
+        limit=args.limit,
+        batch_size=args.page_size,
+        batch_size_attribute='pageSize')
 
     return result

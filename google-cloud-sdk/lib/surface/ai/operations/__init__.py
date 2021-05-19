@@ -23,5 +23,6 @@ from googlecloudsdk.calliope import base
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Operation(base.Group):
-  """AI Platform operation commands."""
-  pass
+  """Manage Vertex AI operations."""
+
+  category = base.VERTEX_AI_CATEGORY

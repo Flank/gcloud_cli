@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform model monitoring jobs create command."""
+"""Vertex AI model monitoring jobs create command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -29,10 +29,9 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
-  """Create a new AI Platform model monitoring job.
+  """Create a new Vertex AI model monitoring job.
 
   ## EXAMPLES
 
@@ -43,22 +42,25 @@ class Create(base.CreateCommand):
     --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
     --endpoint=123 --prediction-sampling-rate=0.2
 
-  To config the drift detection for all the deployed models under the endpoint
-  ``123'', run:
+  To create a model deployment monitoring job with drift detection for all the
+  deployed models under the endpoint ``123'', run:
 
     $ {command} --project=example --region=us-central1
     --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
     --endpoint=123 --prediction-sampling-rate=0.2
     --drift-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
 
-  To config different parameters for different deployed models or config the
-  skew detection, run:
+  To create a model deployment monitoring job with different drift detection for
+  different deployed models or with skew detection, run:
 
     $ {command} --project=example --region=us-central1
     --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
     --endpoint=123 --prediction-sampling-rate=0.2
     --monitoring-config-from-file=your_objective_config.yaml
 
+  After creating the monitoring job, be sure to send some predict requests.
+  We will use that to generate some metadata for analysis purpose, like predict
+  and analysis instance schema.
   """
 
   @staticmethod

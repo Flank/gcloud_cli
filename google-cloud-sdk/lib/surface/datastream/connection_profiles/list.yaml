@@ -1,0 +1,27 @@
+- release_tracks: [BETA]
+
+  help_text:
+    brief: List connection profiles.
+    description: List connection profiles.
+    examples: |
+      To list all connection profiles in a project and region 'us-central1', run:
+
+        $ {command} --region=us-central1
+
+  request:
+    collection: datastream.projects.locations.connectionProfiles
+
+  response:
+    id_field: name
+
+  arguments:
+    resource:
+      help_text: The location you want to list the connection profiles for.
+      spec: !REF googlecloudsdk.command_lib.datastream.resources:region
+
+  output:
+    format: |
+      table(
+        displayName,
+        createTime.date():label=CREATED
+      )

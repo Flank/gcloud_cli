@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform index endpoints create command."""
+"""Vertex AI index endpoints create command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -34,7 +34,7 @@ from googlecloudsdk.core import log
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
-  """Create a new AI Platform index endpoint.
+  """Create a new Vertex AI index endpoint.
 
   ## EXAMPLES
 
@@ -69,7 +69,7 @@ class Create(base.CreateCommand):
       if response_msg is not None:
         response = encoding.MessageToPyValue(response_msg)
         if 'name' in response:
-          log.status.Print(('Created AI Platform index endpoint: {}.').format(
+          log.status.Print(('Created Vertex AI index endpoint: {}.').format(
               response['name']))
       return response_msg
 

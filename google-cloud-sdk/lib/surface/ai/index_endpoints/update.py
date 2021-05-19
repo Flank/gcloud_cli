@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform index endpoints update command."""
+"""Vertex AI index endpoints update command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,7 +31,7 @@ from googlecloudsdk.core import log
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class Update(base.UpdateCommand):
-  """Update an AI Platform index endpoint.
+  """Update an Vertex AI index endpoint.
 
   ## EXAMPLES
 
@@ -67,7 +67,7 @@ class Update(base.UpdateCommand):
         log.status.Print('No update to perform.')
         return None
       else:
-        log.UpdatedResource(result.name, kind='AI Platform index endpoint')
+        log.UpdatedResource(result.name, kind='Vertex AI index endpoint')
         return result
 
   def Run(self, args):

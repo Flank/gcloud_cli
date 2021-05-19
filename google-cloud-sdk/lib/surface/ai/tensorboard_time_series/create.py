@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform Tensorboard time series create command."""
+"""Vertex AI Tensorboard time series create command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -42,7 +42,7 @@ def _AddArgs(parser):
 
 
 def _Run(args, version):
-  """Create a new AI Platform Tensorboard time series."""
+  """Create a new Vertex AI Tensorboard time series."""
   validation.ValidateDisplayName(args.display_name)
 
   tensorboard_run_ref = args.CONCEPTS.tensorboard_run.Parse()
@@ -54,15 +54,31 @@ def _Run(args, version):
     response_msg = encoding.MessageToPyValue(response)
     if 'name' in response_msg:
       log.status.Print(
-          ('Created AI Platform Tensorboard time series: {}.').format(
+          ('Created Vertex AI Tensorboard time series: {}.').format(
               response_msg['name']))
     return response
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(base.CreateCommand):
-  """Create a new AI Platform Tensorboard time series."""
+  """Create a new Vertex AI Tensorboard time series."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To create a Tensorboard Time Series in Tensorboard `12345`, Tensorboard Experiment `my-tensorboard-experiment, and in Tensorboard Run `my-tensorboard-run`, with the display name `my tensorboard time series` and type Scalar:
+
+              $ {command} my-tensorboard-run --tensorboard-experiment-id=my-tensorboard-experiment --tensorboard-id=12345 --display-name="my tensorboard time series" --type=SCALAR
+
+          You may also provide a description:
+
+              $ {command} my-tensorboard-run --tensorboard-experiment-id=my-tensorboard-experiment --tensorboard-id=12345 --display-name="my tensorboard time series" --type=SCALAR --description="my description"
+
+          To create a Tensorboard Time Series in Tensorboard `12345`, Tensorboard Experiment `my-tensorboard-experiment, Tensorboard Run `my-tensorboard-run`, region `us-central1`, and project `my-project`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345/experiments/my-tensorboard-experiment/runs/my-tensorboard-run --display-name="my tensorboard time series" --type=SCALAR
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -72,10 +88,9 @@ class CreateBeta(base.CreateCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(base.CreateCommand):
-  """Create a new AI Platform Tensorboard time series."""
+  """Create a new Vertex AI Tensorboard time series."""
 
   @staticmethod
   def Args(parser):

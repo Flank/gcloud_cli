@@ -14,7 +14,6 @@ platform/gsutil/gslib/__main__.py
 platform/gsutil/gslib/addlhelp/__init__.py
 platform/gsutil/gslib/addlhelp/acls.py
 platform/gsutil/gslib/addlhelp/anon.py
-platform/gsutil/gslib/addlhelp/apis.py
 platform/gsutil/gslib/addlhelp/command_opts.py
 platform/gsutil/gslib/addlhelp/crc32c.py
 platform/gsutil/gslib/addlhelp/creds.py
@@ -24,7 +23,6 @@ platform/gsutil/gslib/addlhelp/encryption.py
 platform/gsutil/gslib/addlhelp/metadata.py
 platform/gsutil/gslib/addlhelp/naming.py
 platform/gsutil/gslib/addlhelp/prod.py
-platform/gsutil/gslib/addlhelp/retries.py
 platform/gsutil/gslib/addlhelp/security.py
 platform/gsutil/gslib/addlhelp/subdirs.py
 platform/gsutil/gslib/addlhelp/support.py
@@ -167,6 +165,7 @@ platform/gsutil/gslib/tests/test_parallel_cp.py
 platform/gsutil/gslib/tests/test_parallelism_framework.py
 platform/gsutil/gslib/tests/test_perfdiag.py
 platform/gsutil/gslib/tests/test_plurality_checkable_iterator.py
+platform/gsutil/gslib/tests/test_psc.py
 platform/gsutil/gslib/tests/test_rb.py
 platform/gsutil/gslib/tests/test_requester_pays.py
 platform/gsutil/gslib/tests/test_resumable_streaming.py
@@ -633,7 +632,6 @@ platform/gsutil/gslib/vendored/boto/boto/vpc/vpnconnection.py
 platform/gsutil/gslib/vendored/boto/boto/vpc/vpngateway.py
 platform/gsutil/gslib/vendored/boto/pylintrc
 platform/gsutil/gslib/vendored/boto/requirements-docs.txt
-platform/gsutil/gslib/vendored/boto/requirements-py26.txt
 platform/gsutil/gslib/vendored/boto/requirements-py33.txt
 platform/gsutil/gslib/vendored/boto/requirements.txt
 platform/gsutil/gslib/vendored/boto/setup.cfg
@@ -1071,25 +1069,6 @@ platform/gsutil/gslib/vendored/oauth2client/oauth2client/service_account.py
 platform/gsutil/gslib/vendored/oauth2client/oauth2client/tools.py
 platform/gsutil/gslib/vendored/oauth2client/oauth2client/transport.py
 platform/gsutil/gslib/vendored/oauth2client/samples/call_compute_service.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/README.md
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/manage.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/myoauth/__init__.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/myoauth/settings.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/myoauth/urls.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/myoauth/wsgi.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/polls/__init__.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/polls/models.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/polls/templates/registration/login.html
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/polls/views.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/django_user/requirements.txt
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/manage.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/myoauth/__init__.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/myoauth/settings.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/myoauth/urls.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/myoauth/wsgi.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/polls/__init__.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/polls/views.py
-platform/gsutil/gslib/vendored/oauth2client/samples/django/google_user/requirements.txt
 platform/gsutil/gslib/vendored/oauth2client/samples/googleappengine/app.yaml
 platform/gsutil/gslib/vendored/oauth2client/samples/googleappengine/call_compute_service_from_gae.py
 platform/gsutil/gslib/vendored/oauth2client/samples/oauth2_for_devices.py

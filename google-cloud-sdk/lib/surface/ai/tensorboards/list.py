@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to list Tensorboards in AI platform."""
+"""Command to list Tensorboards in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -54,10 +54,18 @@ def _Run(args, version):
         sort_by=args.sort_by)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class ListBeta(base.ListCommand):
   """Lists the Tensorboards of the given project and region."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To list Tensorboards:
+
+              $ {command}
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -68,7 +76,6 @@ class ListBeta(base.ListCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class ListAlpha(base.ListCommand):
   """Lists the Tensorboards of the given project and region."""

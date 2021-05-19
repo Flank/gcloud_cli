@@ -79,17 +79,38 @@ class List(base.ListCommand):
         ' insensitive). Separate multiple statuses with commas (e.g.,'
         ' --job-statuses=enabled,deleted). If not specified, all jobs will'
         ' be listed.')
+    parser.add_argument(
+        '--expand-table',
+        action='store_true',
+        help='Includes additional table columns (job name, source, destination,'
+        ' frequency, lastest operation name, job status) in command output.'
+        ' Tip: increase the size of your terminal before running the command.')
 
   def Display(self, args, resources):
     """API response display logic."""
-    del args  # Unused.
-
-    # Removes unwanted "transferJobs/" and "transferOperations/" prefixes.
-    format_string = """table(
-        transferJobs.name.map().slice(13:).map().join(sep='').join(sep='\n'),
-        transferJobs.latestOperationName.map().slice(19:).map().join(
-            sep='').join(sep='\n'))
-    """
+    if args.expand_table:
+      # Removes unwanted "transferJobs/" and "transferOperations/" prefixes.
+      # Take first 63 characters of variable transfer source.
+      # Remove "s" from repeatInterval seconds and make ISO duration string.
+      format_string = """table(
+          transferJobs.name.map().slice(13:).map().join(sep='').join(sep='\n'),
+          transferJobs.transferSpec.firstof(
+            gcsDataSource, awsS3DataSource, httpDataSource,
+            azureBlobStorageDataSource
+            ).firstof(bucketName, listUrl, container
+            ).join(sep='\n'):label=SOURCE,
+          transferJobs.transferSpec.gcsDataSink.bucketName.join(
+            sep='\n'):label=DESTINATION,
+          transferJobs.latestOperationName.map().slice(19:).map().join(
+            sep='').join(sep='\n'),
+          transferJobs.status.join(sep='\n'))
+      """
+    else:
+      format_string = """table(
+          transferJobs.name.map().slice(13:).map().join(sep='').join(sep='\n'),
+          transferJobs.latestOperationName.map().slice(19:).map().join(
+              sep='').join(sep='\n'))
+      """
     resource_printer.Print(resources, format_string)
 
   def Run(self, args):

@@ -8,7 +8,8 @@
       To delete a target called 'test-target' for delivery pipeline 'test-pipeline' in region 'us-central1', run:
 
         $ {command} test-target --delivery-pipeline=test-pipeline --region=us-central1
-
+  async:
+    collection: clouddeploy.projects.locations.operations
   request:
     collection: clouddeploy.projects.locations.deliveryPipelines.targets
     api_version: v1

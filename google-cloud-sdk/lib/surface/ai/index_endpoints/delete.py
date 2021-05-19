@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AI Platform index endpoints delete command."""
+"""Vertex AI index endpoints delete command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,7 +31,7 @@ from googlecloudsdk.core.console import console_io
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Delete(base.DeleteCommand):
-  """Delete an existing AI Platform index endpoint.
+  """Delete an existing Vertex AI index endpoint.
 
   ## EXAMPLES
 

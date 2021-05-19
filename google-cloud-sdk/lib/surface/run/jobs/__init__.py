@@ -22,6 +22,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import platforms
+from googlecloudsdk.core import properties
 
 
 @base.Hidden
@@ -42,19 +43,19 @@ class Jobs(base.Group):
 
   @staticmethod
   def Args(parser):
-    """Adds --platform and the various related args."""
-    flags.AddPlatformAndLocationFlags(parser, managed_only=True)
+    """Adds --region flag."""
+    flags.AddRegionArg(parser)
 
   def Filter(self, context, args):
     """Runs before command.Run and validates platform with passed args."""
-    # Ensures a platform is set on the run/platform property and
-    # all other passed args are valid for this platform and release track.
-    flags.GetAndValidatePlatform(args, self.ReleaseTrack(), flags.Product.RUN)
     self._CheckPlatform()
     return context
 
   def _CheckPlatform(self):
     platform = platforms.GetPlatform(prompt_if_unset=False)
-    if platform is not None and platform != platforms.PLATFORM_MANAGED:
+    if platform is None:
+      # Set the platform property because some methods later on need it.
+      properties.VALUES.run.platform.Set(platforms.PLATFORM_MANAGED)
+    elif platform != platforms.PLATFORM_MANAGED:
       raise exceptions.PlatformError(
           'This command group is only supported for fully managed Cloud Run.')

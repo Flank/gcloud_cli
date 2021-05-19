@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to get a Tensorboard run in AI platform."""
+"""Command to get a Tensorboard run in Vertex AI."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -35,10 +35,22 @@ def _Run(args, version):
     return response
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class DescribeBeta(base.DescribeCommand):
   """Get detailed Tensorboard run information about the given Tensorboard run id."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To describe a Tensorboard Run `my-tensorboard-run` in Tensorboard `12345`, Tensorboard Experiment `my-tensorboard-experiment`, region `us-central1`, and project `my-project`:
+
+              $ {command} projects/my-project/locations/us-central1/tensorboards/12345/experiments/my-tensorboard-experiment/runs/my-tensorboard-run
+
+          Or with flags:
+
+              $ {command} my-tensorboard-run --tensorboard-id=12345 --tensorboard-experiment-id=my-tensorboard-experiment
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -48,7 +60,6 @@ class DescribeBeta(base.DescribeCommand):
     return _Run(args, constants.BETA_VERSION)
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class DescribeAlpha(base.DescribeCommand):
   """Get detailed Tensorboard run information about the given Tensorboard run id."""
