@@ -19,3 +19,18 @@
     resource:
       help_text: OS policy assignment to describe.
       spec: !REF googlecloudsdk.command_lib.compute.os_config.resources:os_policy_assignment
+
+  output:
+    format: |
+      default(
+        baseline,
+        description,
+        instanceFilter,
+        name,
+        osPolicies,
+        revisionCreateTime.date('%Y-%m-%dT%H:%M:%S'),
+        revisionId,
+        rollout,
+        rolloutState,
+        uid
+      )

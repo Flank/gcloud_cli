@@ -18,13 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import multiprocessing
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import name_expansion
+from googlecloudsdk.command_lib.storage import plurality_checkable_iterator
 from googlecloudsdk.command_lib.storage import stdin_iterator
 from googlecloudsdk.command_lib.storage.tasks import task_executor
 from googlecloudsdk.command_lib.storage.tasks import task_status
 from googlecloudsdk.command_lib.storage.tasks.rm import delete_task_iterator_factory
+from googlecloudsdk.core import log
 
 
 class Rm(base.Command):
@@ -121,20 +125,28 @@ class Rm(base.Command):
         include_buckets=args.recursive,
         recursion_requested=args.recursive)
 
-    with task_status.ProgressManager(
-        task_status.ProgressType.COUNT) as progress_manager:
-      task_iterator_factory = (
-          delete_task_iterator_factory.DeleteTaskIteratorFactory(
-              name_expansion_iterator,
-              task_status_queue=progress_manager.task_status_queue))
+    task_status_queue = multiprocessing.Queue()
 
-      task_executor.ExecuteTasks(
-          task_iterator_factory.object_iterator(),
-          is_parallel=True,
-          task_status_queue=progress_manager.task_status_queue)
+    task_iterator_factory = (
+        delete_task_iterator_factory.DeleteTaskIteratorFactory(
+            name_expansion_iterator,
+            task_status_queue=task_status_queue))
 
-      if args.recursive:
-        task_executor.ExecuteTasks(
-            task_iterator_factory.bucket_iterator(),
-            is_parallel=True,
-            task_status_queue=progress_manager.task_status_queue)
+    log.status.Print('Removing objects:')
+    task_executor.execute_tasks(
+        task_iterator_factory.object_iterator(),
+        parallelizable=True,
+        task_status_queue=task_status_queue,
+        progress_type=task_status.ProgressType.COUNT)
+
+    bucket_iterator = plurality_checkable_iterator.PluralityCheckableIterator(
+        task_iterator_factory.bucket_iterator())
+
+    # We perform the is_empty check to avoid printing unneccesary status lines.
+    if args.recursive and not bucket_iterator.is_empty():
+      log.status.Print('Removing Buckets:')
+      task_executor.execute_tasks(
+          bucket_iterator,
+          parallelizable=True,
+          task_status_queue=task_status_queue,
+          progress_type=task_status.ProgressType.COUNT)

@@ -36,6 +36,3 @@ class Disable(base.DisableCommand):
   FEATURE_NAME = 'servicedirectory'
   FEATURE_DISPLAY_NAME = 'Service Directory'
   FEATURE_API = 'servicedirectory.googleapis.com'
-
-  def Run(self, args):
-    self.RunCommand(args)

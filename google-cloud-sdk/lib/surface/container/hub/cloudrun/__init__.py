@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command group for CloudRun Feature."""
+"""Command group for CloudRun feature."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -23,7 +23,6 @@ from googlecloudsdk.calliope import base
 
 # TODO(b/179683259): Remove hidden flag for launch.
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-@base.Hidden
 class CloudRun(base.Group):
-  """Manage CloudRun Feature Feature."""
+  """Manage the CloudRun feature."""
   pass

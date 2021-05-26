@@ -103,7 +103,7 @@ class Update(base.UpdateCommand):
     ]
     return nat_subnetworks
 
-  def _Modify(self, holder, args, old_resource):
+  def _Modify(self, holder, args, old_resource, cleared_fields):
     """Returns the updated service attachment."""
     replacement = encoding.CopyProtoMessage(old_resource)
     is_updated = False
@@ -133,6 +133,9 @@ class Update(base.UpdateCommand):
           old_resource.consumerRejectLists):
         replacement.consumerRejectLists = new_reject_list
         is_updated = True
+        if not new_reject_list:
+          # The user can clear up the reject list
+          cleared_fields.append('consumerRejectLists')
 
     if args.IsSpecified('consumer_accept_list'):
       consumer_accept_list = service_attachments_utils.GetConsumerAcceptList(
@@ -145,6 +148,9 @@ class Update(base.UpdateCommand):
           key=lambda x: (x.projectIdOrNum, x.connectionLimit)):
         replacement.consumerAcceptLists = new_accept_list
         is_updated = True
+        if not new_accept_list:
+          # The user can clear up the accept list
+          cleared_fields.append('consumerAcceptLists')
 
     if is_updated:
       return replacement
@@ -157,9 +163,11 @@ class Update(base.UpdateCommand):
     service_attachment_ref = self.SERVICE_ATTACHMENT_ARG.ResolveAsResource(
         args, holder.resources, default_scope=compute_scope.ScopeEnum.REGION)
     old_resource = self._GetOldResource(client, service_attachment_ref)
-    replacement = self._Modify(holder, args, old_resource)
+    cleared_fields = []
+    replacement = self._Modify(holder, args, old_resource, cleared_fields)
     if replacement is None:
       return old_resource
 
-    return client.MakeRequests(
-        [self._GetPatchRequest(client, service_attachment_ref, replacement)])
+    with client.apitools_client.IncludeFields(cleared_fields):
+      return client.MakeRequests(
+          [self._GetPatchRequest(client, service_attachment_ref, replacement)])

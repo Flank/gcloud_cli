@@ -37,3 +37,16 @@
         Location of the VM instance to describe. If not specified, the property
         `compute/zone` is used. For details on setting properties,
         see: https://cloud.google.com/sdk/docs/properties
+
+  output:
+    format: |
+      default(
+        detailedState,
+        detailedStateReason,
+        instance,
+        lastComplianceCheckTime.date('%Y-%m-%dT%H:%M:%S'),
+        lastComplianceRunId,
+        name,
+        osPolicyCompliances,
+        state
+      )

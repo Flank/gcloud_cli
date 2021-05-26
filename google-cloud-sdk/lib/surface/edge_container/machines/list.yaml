@@ -1,0 +1,30 @@
+- release_tracks: [ALPHA]
+
+  help_text:
+    brief: List Kubernetesedge machines.
+    description: |
+      List Kubernetesedge machines.
+    examples: |
+      To list the machines, run:
+
+        $ {command}
+
+  request:
+    collection: kubernetesedge.projects.locations.machines
+    api_version: v1alpha1
+
+  response:
+    id_field: name
+
+  arguments:
+    resource:
+      help_text: Parent Kubernetesedge location to list all contained Kubernetesedge machines.
+      spec: !REF googlecloudsdk.command_lib.edge_container.resources:location
+
+  output:
+    format: |
+      table(
+        name.basename():label=NAME,
+        labels:label=LABELS,
+        createTime:label=CREATETIME
+      )

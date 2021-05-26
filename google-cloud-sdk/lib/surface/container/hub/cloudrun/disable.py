@@ -12,22 +12,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The command to disable CloudRun Feature."""
+"""The command to disable the CloudRun feature."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.features import base
 
 
-# TODO(b/179683259): Remove hidden flag for launch.
-@gbase.Hidden
 class Disable(base.DisableCommand):
-  """Disable CloudRun Feature.
+  """Disable the CloudRun feature.
 
-  This command disables CloudRun Feature in Hub.
+  This command disables the CloudRun feature in Anthos clusters.
+
+  ## Examples
+
+  Disable the CloudRun feature:
 
   ## Examples
 
@@ -39,6 +40,3 @@ class Disable(base.DisableCommand):
   FEATURE_NAME = 'appdevexperience'
   FEATURE_DISPLAY_NAME = 'CloudRun'
   FEATURE_API = 'appdevelopmentexperience.googleapis.com'
-
-  def Run(self, args):
-    self.RunCommand(args)

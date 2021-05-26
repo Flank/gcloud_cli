@@ -8,7 +8,7 @@
     examples: |
       To delete a private connection:
 
-          $ {command} PRIVATE_CONNECTION --region=us-central1 --force
+          $ {command} PRIVATE_CONNECTION --location=us-central1 --force
 
   request:
     collection: datastream.projects.locations.privateConnections
@@ -17,7 +17,7 @@
     resource:
       help_text: |
         Private connection resource - Private connection to delete.
-      spec: !REF googlecloudsdk.command_lib.datastream.resources:private_connection
+      spec: !REF googlecloudsdk.command_lib.datastream.resources:positional_private_connection
 
     params:
     - api_field: force

@@ -58,6 +58,7 @@
   17198765  2021-05-11T15:02:18Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_339.0.0.orig_amd64.tar.gz
   17198768  2021-05-11T15:03:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_340.0.0.orig_amd64.tar.gz
   17573932  2021-05-18T15:18:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_341.0.0.orig_amd64.tar.gz
+  17573932  2021-05-25T14:53:48Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_342.0.0.orig_amd64.tar.gz
  101837049  2017-05-11T16:13:51Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_155.0.0.orig_amd64.tar.gz
   97986457  2017-05-11T16:13:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_155.0.0.orig_i386.tar.gz
  101846471  2017-05-24T16:11:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_156.0.0.orig_amd64.tar.gz
@@ -460,6 +461,8 @@
    4986445  2021-05-11T15:03:31Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_340.0.0.orig_i386.tar.gz
    5109996  2021-05-18T15:18:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_341.0.0.orig_amd64.tar.gz
    4986441  2021-05-18T15:18:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_341.0.0.orig_i386.tar.gz
+   5110000  2021-05-25T14:54:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_342.0.0.orig_amd64.tar.gz
+   4986443  2021-05-25T14:53:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-go_342.0.0.orig_i386.tar.gz
   12675465  2018-03-07T16:57:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_192.0.0.orig_amd64.tar.gz
   12241061  2018-03-07T16:57:47Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_192.0.0.orig_i386.tar.gz
   12675464  2018-03-14T14:37:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_193.0.0.orig_amd64.tar.gz
@@ -776,6 +779,8 @@
    2086017  2021-05-11T15:03:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_340.0.0.orig_i386.tar.gz
    2139689  2021-05-18T15:18:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_341.0.0.orig_amd64.tar.gz
    2086016  2021-05-18T15:18:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_341.0.0.orig_i386.tar.gz
+   2139690  2021-05-25T14:54:01Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_342.0.0.orig_amd64.tar.gz
+   2086017  2021-05-25T14:53:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-grpc_342.0.0.orig_i386.tar.gz
  130689633  2017-01-13T01:44:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_139.0.0.orig.tar.gz
  130689660  2017-01-13T01:43:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_139.0.1.orig.tar.gz
  130689612  2017-01-18T17:03:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_140.0.0.orig.tar.gz
@@ -998,6 +1003,7 @@
   55714926  2021-05-11T15:02:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_339.0.0.orig.tar.gz
   55714910  2021-05-11T15:03:23Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_340.0.0.orig.tar.gz
   55714910  2021-05-18T15:18:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_341.0.0.orig.tar.gz
+  54956676  2021-05-25T14:53:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-java_342.0.0.orig.tar.gz
   29321332  2018-01-17T17:58:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_185.0.0.orig.tar.gz
   29321441  2018-01-24T15:58:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_186.0.0.orig.tar.gz
   29317726  2018-01-31T15:36:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_187.0.0.orig.tar.gz
@@ -1165,6 +1171,7 @@
   27970884  2021-05-11T15:03:06Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_339.0.0.orig.tar.gz
   27970858  2021-05-11T15:02:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_340.0.0.orig.tar.gz
   27970869  2021-05-18T15:18:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_341.0.0.orig.tar.gz
+  27970858  2021-05-25T14:54:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python-extras_342.0.0.orig.tar.gz
    7641727  2017-01-13T01:43:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_139.0.0.orig.tar.gz
    7640876  2017-01-13T01:43:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_139.0.1.orig.tar.gz
    7641929  2017-01-18T17:03:10Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_140.0.0.orig.tar.gz
@@ -1387,6 +1394,7 @@
    6306457  2021-05-11T15:02:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_339.0.0.orig.tar.gz
    6306457  2021-05-11T15:03:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_340.0.0.orig.tar.gz
    6306457  2021-05-18T15:18:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_341.0.0.orig.tar.gz
+   6306456  2021-05-25T14:54:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-app-engine-python_342.0.0.orig.tar.gz
    3520368  2017-01-13T01:43:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_139.0.0.orig_amd64.tar.gz
    3301029  2017-01-13T01:44:16Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_139.0.0.orig_i386.tar.gz
    3520356  2017-01-13T01:44:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_139.0.1.orig_amd64.tar.gz
@@ -1831,6 +1839,8 @@
    6672835  2021-05-11T15:02:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_340.0.0.orig_i386.tar.gz
    6854795  2021-05-18T15:18:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_341.0.0.orig_amd64.tar.gz
    6672822  2021-05-18T15:18:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_341.0.0.orig_i386.tar.gz
+   6854796  2021-05-25T14:53:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_342.0.0.orig_amd64.tar.gz
+   6672833  2021-05-25T14:53:37Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bigtable-emulator_342.0.0.orig_i386.tar.gz
    4290542  2017-07-14T13:03:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_162.0.0.orig_amd64.tar.gz
    4033104  2017-07-14T13:03:12Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_162.0.0.orig_i386.tar.gz
    4290581  2017-07-14T13:03:39Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_162.0.1.orig_amd64.tar.gz
@@ -2219,6 +2229,8 @@
    7816209  2021-05-11T15:02:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_340.0.0.orig_i386.tar.gz
    8064036  2021-05-18T15:18:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_341.0.0.orig_amd64.tar.gz
    7816209  2021-05-18T15:18:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_341.0.0.orig_i386.tar.gz
+   8064037  2021-05-25T14:53:24Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_342.0.0.orig_amd64.tar.gz
+   7816197  2021-05-25T14:54:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_342.0.0.orig_i386.tar.gz
    4700113  2018-07-31T17:04:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_210.0.0.orig_amd64.tar.gz
    4498812  2018-07-31T17:04:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_210.0.0.orig_i386.tar.gz
    4700171  2018-08-07T15:10:53Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_211.0.0.orig_amd64.tar.gz
@@ -2495,6 +2507,8 @@
    6347369  2021-05-11T15:03:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_340.0.0.orig_i386.tar.gz
    6592347  2021-05-18T15:18:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_341.0.0.orig_amd64.tar.gz
    6347368  2021-05-18T15:18:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_341.0.0.orig_i386.tar.gz
+   6592353  2021-05-25T14:53:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_342.0.0.orig_amd64.tar.gz
+   6347368  2021-05-25T14:54:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cloud-build-local_342.0.0.orig_i386.tar.gz
   43616713  2020-12-15T16:19:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_320.0.0.orig_amd64.tar.gz
   43616718  2020-12-15T16:20:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_321.0.0.orig_amd64.tar.gz
   43630415  2021-01-07T15:35:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_322.0.0.orig_amd64.tar.gz
@@ -2517,6 +2531,7 @@
   46996141  2021-05-11T15:02:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_339.0.0.orig_amd64.tar.gz
   46469666  2021-05-11T15:02:24Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_340.0.0.orig_amd64.tar.gz
   46469643  2021-05-18T15:18:31Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_341.0.0.orig_amd64.tar.gz
+  46717389  2021-05-25T14:53:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-config-connector_342.0.0.orig_amd64.tar.gz
      30701  2017-03-15T17:30:51Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_147.0.0.orig.tar.gz
      31126  2017-03-22T14:46:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_148.0.0.orig.tar.gz
      31090  2017-03-24T21:43:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_148.0.1.orig.tar.gz
@@ -2729,6 +2744,7 @@
      75665  2021-05-11T15:02:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_339.0.0.orig.tar.gz
      75666  2021-05-11T15:02:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_340.0.0.orig.tar.gz
      75666  2021-05-18T15:18:39Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_341.0.0.orig.tar.gz
+     75666  2021-05-25T14:53:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datalab_342.0.0.orig.tar.gz
   16194989  2017-01-13T01:43:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_139.0.0.orig.tar.gz
   16194981  2017-01-13T01:44:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_139.0.1.orig.tar.gz
   16194984  2017-01-18T17:03:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_140.0.0.orig.tar.gz
@@ -2951,6 +2967,7 @@
   19293300  2021-05-11T15:03:53Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_339.0.0.orig.tar.gz
   19293300  2021-05-11T15:02:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_340.0.0.orig.tar.gz
   19293306  2021-05-18T15:18:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_341.0.0.orig.tar.gz
+  19293300  2021-05-25T14:54:17Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-datastore-emulator_342.0.0.orig.tar.gz
   28793296  2018-11-21T14:14:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_226.0.0.orig.tar.gz
   28793365  2018-12-04T16:27:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_227.0.0.orig.tar.gz
   28793382  2018-12-11T15:58:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_228.0.0.orig.tar.gz
@@ -3073,6 +3090,7 @@
   42429308  2021-05-11T15:02:16Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_339.0.0.orig.tar.gz
   42429308  2021-05-11T15:02:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_340.0.0.orig.tar.gz
   42429308  2021-05-18T15:18:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_341.0.0.orig.tar.gz
+  42429309  2021-05-25T14:53:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-firestore-emulator_342.0.0.orig.tar.gz
    4742748  2020-01-28T16:39:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kind_278.0.0.orig_amd64.tar.gz
    4742747  2020-02-04T16:01:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kind_279.0.0.orig_amd64.tar.gz
    4742803  2020-02-11T16:21:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kind_280.0.0.orig_amd64.tar.gz
@@ -3191,6 +3209,7 @@
   12257519  2021-05-11T15:02:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kpt_339.0.0.orig_amd64.tar.gz
   12257506  2021-05-11T15:03:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kpt_340.0.0.orig_amd64.tar.gz
   12257505  2021-05-18T15:18:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kpt_341.0.0.orig_amd64.tar.gz
+  12257505  2021-05-25T14:53:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kpt_342.0.0.orig_amd64.tar.gz
   17250491  2020-12-15T16:19:18Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_320.0.0.orig_amd64.tar.gz
   17250487  2020-12-15T16:20:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_321.0.0.orig_amd64.tar.gz
   17250487  2021-01-07T15:35:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_322.0.0.orig_amd64.tar.gz
@@ -3213,6 +3232,7 @@
   17198728  2021-05-11T15:03:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_339.0.0.orig_amd64.tar.gz
   17198728  2021-05-11T15:02:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_340.0.0.orig_amd64.tar.gz
   17573918  2021-05-18T15:18:10Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_341.0.0.orig_amd64.tar.gz
+  17573918  2021-05-25T14:54:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-kubectl-oidc_342.0.0.orig_amd64.tar.gz
   13390548  2021-01-07T15:36:10Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_322.0.0.orig_amd64.tar.gz
   13390546  2021-01-12T16:03:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_323.0.0.orig_amd64.tar.gz
   13390547  2021-01-26T16:03:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_324.0.0.orig_amd64.tar.gz
@@ -3233,6 +3253,7 @@
   14217842  2021-05-11T15:03:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_339.0.0.orig_amd64.tar.gz
   14217839  2021-05-11T15:02:12Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_340.0.0.orig_amd64.tar.gz
   14217840  2021-05-18T15:18:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_341.0.0.orig_amd64.tar.gz
+  14217843  2021-05-25T14:53:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-local-extract_342.0.0.orig_amd64.tar.gz
   20085745  2020-02-11T16:21:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_280.0.0.orig_amd64.tar.gz
   20085740  2020-02-18T16:38:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_281.0.0.orig_amd64.tar.gz
   21457257  2020-02-25T18:21:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_282.0.0.orig_amd64.tar.gz
@@ -3300,6 +3321,7 @@
   26269242  2021-05-11T15:02:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_339.0.0.orig_amd64.tar.gz
   26269243  2021-05-11T15:02:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_340.0.0.orig_amd64.tar.gz
   26613659  2021-05-18T15:18:37Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_341.0.0.orig_amd64.tar.gz
+  26613659  2021-05-25T14:53:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-minikube_342.0.0.orig_amd64.tar.gz
   17077656  2017-01-13T01:43:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_139.0.0.orig.tar.gz
   17077632  2017-01-13T01:43:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_139.0.1.orig.tar.gz
   22034477  2017-01-18T17:03:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_140.0.0.orig.tar.gz
@@ -3522,6 +3544,7 @@
   63330753  2021-05-11T15:03:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_339.0.0.orig.tar.gz
   63330766  2021-05-11T15:03:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_340.0.0.orig.tar.gz
   63332558  2021-05-18T15:18:18Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_341.0.0.orig.tar.gz
+  63332558  2021-05-25T14:54:24Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-pubsub-emulator_342.0.0.orig.tar.gz
   12647680  2020-01-28T16:39:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_278.0.0.orig_amd64.tar.gz
   12647742  2020-02-04T16:01:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_279.0.0.orig_amd64.tar.gz
   12647746  2020-02-11T16:21:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_280.0.0.orig_amd64.tar.gz
@@ -3591,6 +3614,7 @@
   17562060  2021-05-11T15:02:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_339.0.0.orig_amd64.tar.gz
   17562061  2021-05-11T15:02:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_340.0.0.orig_amd64.tar.gz
   17562061  2021-05-18T15:18:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_341.0.0.orig_amd64.tar.gz
+  17668907  2021-05-25T14:53:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-skaffold_342.0.0.orig_amd64.tar.gz
   22351359  2020-04-01T14:31:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_287.0.0.orig_amd64.tar.gz
   22351456  2020-04-07T15:44:44Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_288.0.0.orig_amd64.tar.gz
   22351477  2020-04-14T15:37:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_289.0.0.orig_amd64.tar.gz
@@ -3650,6 +3674,7 @@
   22887206  2021-05-11T15:02:21Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_339.0.0.orig_amd64.tar.gz
   22887207  2021-05-11T15:03:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_340.0.0.orig_amd64.tar.gz
   22887207  2021-05-18T15:18:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_341.0.0.orig_amd64.tar.gz
+  22887209  2021-05-25T14:53:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-spanner-emulator_342.0.0.orig_amd64.tar.gz
   14374147  2017-01-13T01:44:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_139.0.0.orig.tar.gz
   14373825  2017-01-13T01:43:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_139.0.1.orig.tar.gz
   14412456  2017-01-18T17:02:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_140.0.0.orig.tar.gz
@@ -3872,6 +3897,7 @@
   29601963  2021-05-11T15:02:47Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_339.0.0.orig.tar.gz
   29633786  2021-05-11T15:03:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_340.0.0.orig.tar.gz
   29718115  2021-05-18T15:18:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_341.0.0.orig.tar.gz
+  29781745  2021-05-25T14:53:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-tests_342.0.0.orig.tar.gz
    9559856  2017-01-13T01:44:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_139.0.0.orig.tar.gz
    9558939  2017-01-13T01:44:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_139.0.1.orig.tar.gz
    9585134  2017-01-18T17:03:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_140.0.0.orig.tar.gz
@@ -4094,4 +4120,5 @@
   88435427  2021-05-11T15:03:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_339.0.0.orig.tar.gz
   88542765  2021-05-11T15:03:47Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_340.0.0.orig.tar.gz
   88760970  2021-05-18T15:18:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_341.0.0.orig.tar.gz
-TOTAL: 4096 objects, 100895760176 bytes (93.97 GiB)
+  88960542  2021-05-25T14:54:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk_342.0.0.orig.tar.gz
+TOTAL: 4123 objects, 101461047382 bytes (94.49 GiB)

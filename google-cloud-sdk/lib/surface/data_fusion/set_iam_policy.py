@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Command to set an IAM policy on a Data Fusion instance."""
+"""Command to set an IAM policy on a Data Fusion instance or a namespace."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -26,6 +26,7 @@ from googlecloudsdk.command_lib.iam import iam_util
 
 
 def SetIamPolicyFromFile(instance_ref,
+                         namespace,
                          policy_file,
                          messages,
                          client):
@@ -35,7 +36,7 @@ def SetIamPolicyFromFile(instance_ref,
       messages.Policy)
 
   return data_fusion_iam_util.DoSetIamPolicy(
-      instance_ref, new_iam_policy, messages, client)
+      instance_ref, namespace, new_iam_policy, messages, client)
 
 
 class SetIamPolicy(base.Command):
@@ -48,6 +49,10 @@ class SetIamPolicy(base.Command):
 
   $ {command} my-instance policy-file.yaml --project=my-project \
     --location=my-location
+
+  To do the same in a particular namespace, run:
+  $ {command} my-instance policy-file.yaml --project=my-project \
+    --location=my-location [--namespace=NAMESPACE]
   """
 
   @staticmethod
@@ -55,11 +60,16 @@ class SetIamPolicy(base.Command):
     resource_args.AddInstanceResourceArg(parser, 'Instance to set.')
     base.URI_FLAG.RemoveFromParser(parser)
     iam_util.AddArgForPolicyFile(parser)
+    parser.add_argument(
+        '--namespace',
+        help='CDAP Namespace whose IAM policy we wish to set. '
+        'For example: `--namespace=my-namespace`.')
 
   def Run(self, args):
     datafusion = df.Datafusion()
     instance_ref = args.CONCEPTS.instance.Parse()
 
-    results = SetIamPolicyFromFile(instance_ref, args.policy_file,
-                                   datafusion.messages, datafusion.client)
+    results = SetIamPolicyFromFile(instance_ref, args.namespace,
+                                   args.policy_file, datafusion.messages,
+                                   datafusion.client)
     return results

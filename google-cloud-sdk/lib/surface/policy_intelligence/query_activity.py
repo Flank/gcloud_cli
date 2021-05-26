@@ -32,7 +32,7 @@ _DETAILED_HELP = {
         """,
     'DESCRIPTION':
         """\
-     Query activities with certain types of specific container resource. For ACTIVITY_TYPE, supported values are:
+     Query activities with certain types of specific container resource. For --activity-type, supported values are:
      - serviceAccountLastAuthentication
      - serviceAccountKeyLastAuthentication
         """,
@@ -40,15 +40,15 @@ _DETAILED_HELP = {
         """\
     To query serviceAccountKeyLastAuthentication activities of a project, run:
 
-    $ {command} serviceAccountKeyLastAuthentication projects/project-id
+    $ {command} --activity-type=serviceAccountKeyLastAuthentication --project=project-id
 
     To query serviceAccountLastAuthentication activities of a project, run:
 
-    $ {command} serviceAccountLastAuthentication projects/project-id
+    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id
 
     To query serviceAccountLastAuthentication with filtering on certain service account, run:
 
-    $ {command} serviceAccountLastAuthentication projects/project-id --query-filter='"activities.full_resource_name=//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-id@project-id.iam.gserviceaccount.com"' --limit=unlimited
+    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id --query-filter='activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-id@project-id.iam.gserviceaccount.com"' --limit=unlimited
         """
 }
 
@@ -63,24 +63,25 @@ class QueryActivityBeta(base.Command):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        'activity_type',
-        metavar='ACTIVITY_TYPE',
+        '--activity-type',
+        required=True,
+        type=str,
         choices=[
             'serviceAccountLastAuthentication',
             'serviceAccountKeyLastAuthentication'
         ],
         help="""Type of the activities.
         """)
-    parser.add_argument(
-        'container',
-        metavar='CONTAINER',
-        help="""Container resource where activities are located.
+    parser.add_mutually_exclusive_group(required=True).add_argument(
+        '--project',
+        type=str,
+        help="""The project ID or number to query the activities.
         """)
     parser.add_argument(
         '--query-filter',
         type=str,
         default='',
-        help='Filter on activities. e.g. activities.full_resource_name=\"//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-id@project-id.iam.gserviceaccount.com\"'
+        help='Filter on activities. e.g. activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-id@project-id.iam.gserviceaccount.com"'
     )
     parser.add_argument(
         '--limit',
@@ -97,8 +98,8 @@ class QueryActivityBeta(base.Command):
 
   def Run(self, args):
     policy_analyzer_client, messages = policy_analyzer.GetClientAndMessages()
-    query_activity_parent = '{0}/locations/global/activityTypes/{1}'.format(
-        args.container, args.activity_type)
+    query_activity_parent = 'projects/{0}/locations/global/activityTypes/{1}'.format(
+        args.project, args.activity_type)
     query_activity_request = messages.PolicyanalyzerProjectsLocationsActivityTypesActivitiesQueryRequest(
         parent=query_activity_parent, filter=args.query_filter)
     policy_analyzer_service = policy_analyzer_client.ProjectsLocationsActivityTypesActivitiesService(

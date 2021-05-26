@@ -25,7 +25,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.privateca import flags_v1
 from googlecloudsdk.command_lib.privateca import operations
 from googlecloudsdk.command_lib.privateca import resource_args
-from googlecloudsdk.command_lib.privateca import update_utils
+from googlecloudsdk.command_lib.privateca import update_utils_v1
 from googlecloudsdk.command_lib.util.args import labels_util
 
 
@@ -66,7 +66,7 @@ class Update(base.UpdateCommand):
         messages.PrivatecaProjectsLocationsCaPoolsGetRequest(
             name=ca_pool_ref.RelativeName()))
 
-    pool_to_update, update_mask = update_utils.UpdateCaPoolFromArgs(
+    pool_to_update, update_mask = update_utils_v1.UpdateCaPoolFromArgs(
         args, current_ca_pool.labels)
 
     operation = client.projects_locations_caPools.Patch(

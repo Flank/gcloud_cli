@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import multiprocessing
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import name_expansion
@@ -64,17 +66,17 @@ class Rb(base.Command):
         raise errors.InvalidUrlError(
             'rb only accepts cloud bucket URLs. Example: "gs://bucket"')
 
-    with task_status.ProgressManager(
-        task_status.ProgressType.COUNT) as progress_manager:
-      bucket_iterator = delete_task_iterator_factory.DeleteTaskIteratorFactory(
-          name_expansion.NameExpansionIterator(args.urls, include_buckets=True),
-          task_status_queue=progress_manager.task_status_queue).bucket_iterator(
-          )
-      plurality_checkable_bucket_iterator = (
-          plurality_checkable_iterator.PluralityCheckableIterator(
-              bucket_iterator))
+    task_status_queue = multiprocessing.Queue()
 
-      task_executor.ExecuteTasks(
-          plurality_checkable_bucket_iterator,
-          is_parallel=True,
-          task_status_queue=progress_manager.task_status_queue)
+    bucket_iterator = delete_task_iterator_factory.DeleteTaskIteratorFactory(
+        name_expansion.NameExpansionIterator(args.urls, include_buckets=True),
+        task_status_queue=task_status_queue).bucket_iterator()
+    plurality_checkable_bucket_iterator = (
+        plurality_checkable_iterator.PluralityCheckableIterator(
+            bucket_iterator))
+
+    task_executor.execute_tasks(
+        plurality_checkable_bucket_iterator,
+        parallelizable=True,
+        task_status_queue=task_status_queue,
+        progress_type=task_status.ProgressType.COUNT)

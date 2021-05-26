@@ -7,7 +7,7 @@
     examples: |
       To delete a connection profile:
 
-          $ {command} CONNECTION_PROFILE --region=us-central1
+          $ {command} CONNECTION_PROFILE --location=us-central1
 
   request:
     collection: datastream.projects.locations.connectionProfiles

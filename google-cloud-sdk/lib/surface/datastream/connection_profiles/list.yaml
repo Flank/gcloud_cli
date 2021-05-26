@@ -6,7 +6,7 @@
     examples: |
       To list all connection profiles in a project and region 'us-central1', run:
 
-        $ {command} --region=us-central1
+        $ {command} --location=us-central1
 
   request:
     collection: datastream.projects.locations.connectionProfiles
@@ -17,7 +17,7 @@
   arguments:
     resource:
       help_text: The location you want to list the connection profiles for.
-      spec: !REF googlecloudsdk.command_lib.datastream.resources:region
+      spec: !REF googlecloudsdk.command_lib.datastream.resources:location
 
   output:
     format: |

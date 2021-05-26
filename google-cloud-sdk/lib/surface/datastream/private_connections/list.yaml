@@ -4,9 +4,9 @@
     brief: List private connections.
     description: List private connections.
     examples: |
-      To list all private connections in a project and region 'us-central1', run:
+      To list all private connections in a project and location 'us-central1', run:
 
-        $ {command} --region=us-central1
+        $ {command} --location=us-central1
 
   request:
     collection: datastream.projects.locations.privateConnections
@@ -17,7 +17,7 @@
   arguments:
     resource:
       help_text: The location you want to list the private connections for.
-      spec: !REF googlecloudsdk.command_lib.datastream.resources:region
+      spec: !REF googlecloudsdk.command_lib.datastream.resources:location
 
   output:
     format: |

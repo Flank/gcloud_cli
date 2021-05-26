@@ -32,20 +32,38 @@ class Get(base.ListCommand):
   location 'my-location', run:
 
     $ {command} my-instance --project=my-project --location=my-location
+
+  To run the same command for a specific namespace on the instance, run:
+
+    $ {command} my-instance --project=my-project --location=my-location \
+      --namespace=my-namespace
   """
 
   @staticmethod
   def Args(parser):
     resource_args.AddInstanceResourceArg(parser, 'Instance to describe.')
     base.URI_FLAG.RemoveFromParser(parser)
+    parser.add_argument(
+        '--namespace',
+        help='CDAP Namespace whose IAM policy we wish to fetch. '
+        'For example: `--namespace=my-namespace`.')
 
   def Run(self, args):
     datafusion = df.Datafusion()
     instance_ref = args.CONCEPTS.instance.Parse()
 
-    request = datafusion.messages.DatafusionProjectsLocationsInstancesGetIamPolicyRequest(
-        resource=instance_ref.RelativeName())
+    if not args.namespace:
+      request = datafusion.messages.DatafusionProjectsLocationsInstancesGetIamPolicyRequest(
+          resource=instance_ref.RelativeName())
 
-    iam_policy = datafusion.client.projects_locations_instances.GetIamPolicy(
-        request)
-    return iam_policy
+      iam_policy = datafusion.client.projects_locations_instances.GetIamPolicy(
+          request)
+      return iam_policy
+    else:
+      request = datafusion.messages.DatafusionProjectsLocationsInstancesNamespacesGetIamPolicyRequest(
+          resource='%s/namespaces/%s' %
+          (instance_ref.RelativeName(), args.namespace))
+
+      iam_policy = datafusion.client.projects_locations_instances_namespaces.GetIamPolicy(
+          request)
+      return iam_policy

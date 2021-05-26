@@ -36,6 +36,12 @@ class AddIamPolicyBinding(base.Command):
 
   $ {command} add-iam-policy-binding my-instance --location=my-location \
     --member=user:someone@example.com --role=roles/datafusion.admin
+
+  To run the same command for a specific namespace on the instance, run:
+
+  $ {command} add-iam-policy-binding my-instance --location=my-location \
+    --member=user:someone@example.com --role=roles/datafusion.admin \
+    --namespace=my-namespace
   """
 
   @staticmethod
@@ -44,19 +50,33 @@ class AddIamPolicyBinding(base.Command):
     base.URI_FLAG.RemoveFromParser(parser)
 
     iam_util.AddArgsForAddIamPolicyBinding(parser)
+    parser.add_argument(
+        '--namespace',
+        help='CDAP Namespace whose IAM policy we wish to append. '
+        'For example: `--namespace=my-namespace`.')
 
   def Run(self, args):
     datafusion = df.Datafusion()
     instance_ref = args.CONCEPTS.instance.Parse()
 
-    get_request = datafusion.messages.DatafusionProjectsLocationsInstancesGetIamPolicyRequest(
-        resource=instance_ref.RelativeName())
-    iam_policy = datafusion.client.projects_locations_instances.GetIamPolicy(
-        get_request)
+    if not args.namespace:
+      get_request = datafusion.messages.DatafusionProjectsLocationsInstancesGetIamPolicyRequest(
+          resource=instance_ref.RelativeName())
+      iam_policy = datafusion.client.projects_locations_instances.GetIamPolicy(
+          get_request)
+    else:
+      get_request = datafusion.messages.DatafusionProjectsLocationsInstancesNamespacesGetIamPolicyRequest(
+          resource='%s/namespaces/%s' %
+          (instance_ref.RelativeName(), args.namespace))
+      iam_policy = datafusion.client.projects_locations_instances_namespaces.GetIamPolicy(
+          get_request)
 
-    iam_util.AddBindingToIamPolicy(datafusion.messages.Binding, iam_policy,
-                                   args.member, args.role)
-    results = data_fusion_iam_util.DoSetIamPolicy(instance_ref, iam_policy,
+    for binding in iam_policy.bindings:
+      if binding.role == args.role:
+        binding.members.append(args.member)
+
+    results = data_fusion_iam_util.DoSetIamPolicy(instance_ref, args.namespace,
+                                                  iam_policy,
                                                   datafusion.messages,
                                                   datafusion.client)
     return results

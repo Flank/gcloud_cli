@@ -35,6 +35,3 @@ class Disable(base.DisableCommand):
 
   FEATURE_NAME = 'servicemesh'
   FEATURE_DISPLAY_NAME = 'Service Mesh'
-
-  def Run(self, args):
-    self.RunCommand(args)

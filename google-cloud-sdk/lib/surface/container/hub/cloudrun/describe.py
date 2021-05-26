@@ -12,23 +12,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The command to get the status of CloudRun Feature."""
+"""The command to get the status of the CloudRun feature."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.features import base
 
 
-# TODO(b/179683259): Remove hidden flag for launch.
-@gbase.Hidden
 class Describe(base.DescribeCommand):
-  """Describe the status of CloudRun Feature resource.
+  """Describe the status of the CloudRun feature.
 
-  This command describes the status of CloudRun Feature
-  resource in Hub.
+  This command describes the status of the CloudRun feature in Anthos clusters.
 
   ## Examples
 

@@ -5,7 +5,7 @@
     examples: |
       To show details about a stream, run:
 
-        $ {command} my-stream --region=us-central1
+        $ {command} my-stream --location=us-central1
 
   request:
     collection: datastream.projects.locations.streams

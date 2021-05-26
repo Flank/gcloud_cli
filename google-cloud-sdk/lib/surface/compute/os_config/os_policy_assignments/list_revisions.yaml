@@ -21,16 +21,16 @@
     resource:
       help_text: OS policies assignment data to describe.
       spec: !REF googlecloudsdk.command_lib.compute.os_config.resources:os_policy_assignment
-    exclude: ['sort-by']
 
   response:
-    id_field: osPolicyAssignments.name
+    id_field: name
+    result_attribute: osPolicyAssignments
 
   output:
     format: |
-      table(osPolicyAssignments:format='table(
+      table(
          name.basename():label=ASSIGNMENT_ID,
          rollout_state,
-         revision_create_time,
+         revision_create_time.date("%Y-%m-%dT%H:%M:%S"),
          revision_id
-       )')
+       )

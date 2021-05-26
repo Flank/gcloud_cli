@@ -7,7 +7,7 @@
     examples: |
       To delete a stream:
 
-          $ {command} STREAM --region=us-central1
+          $ {command} STREAM --location=us-central1
 
   request:
     collection: datastream.projects.locations.streams

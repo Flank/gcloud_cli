@@ -25,11 +25,21 @@
       spec: !REF googlecloudsdk.command_lib.pubsub.resources:project
       is_parent_resource: true
     params:
-    - arg_name: definition
-      api_field: validateSchemaRequest.schema.definition
-      required: true
-      help_text: |
-        Schema definition.
+    - group:
+        help_text: |
+          Schema definition.
+        mutex: true
+        required: true
+        params:
+        - arg_name: definition
+          api_field: validateSchemaRequest.schema.definition
+          help_text: |
+            Inline schema definition.
+        - arg_name: definition-file
+          api_field: validateSchemaRequest.schema.definition
+          type: "googlecloudsdk.calliope.arg_parsers:FileContents:"
+          help_text: |
+            File containing schema definition.
     - arg_name: type
       api_field: validateSchemaRequest.schema.type
       required: true

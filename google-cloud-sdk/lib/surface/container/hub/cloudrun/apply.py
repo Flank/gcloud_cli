@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The command to update Cloud Run CR."""
+"""The command to deploy or update the Cloud Run for Anthos feature."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,18 +27,17 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 
 CONFIG_YAML_FLAG = '--config'
-membership = None
 
 
 class Apply(base.CreateCommand):
-  r"""Update the CloudRun CR.
+  r"""Deploy or update the the CloudRun feature.
 
-  Update a user-specified config file to a CloudRun Custom Resource.
-  The config file should be a yaml file.
+  Deploy or update a user-specified config file of the CloudRun custom resource.
+  The config file should be a YAML file.
 
   ## Examples
 
-  Apply CloudRun yaml file:
+  Apply the CloudRun YAML file:
 
     $ {command} --kubeconfig=user-kubeconfig \
     --config=/path/to/cloud-run-cr.yaml
@@ -55,9 +54,8 @@ class Apply(base.CreateCommand):
     parser.add_argument(
         CONFIG_YAML_FLAG,
         type=str,
-        help='The path to Cloud Run Config Yaml.',
-        required=False,
-        hidden=True)
+        help='The path to CloudRun custom resource config file.',
+        required=False)
 
   def Run(self, args):
     kube_client = kube_util.KubernetesClient(
@@ -84,11 +82,11 @@ class Apply(base.CreateCommand):
 
 
 def _apply_cr_to_membership_cluster(kube_client, yaml_string):
-  """Apply the CloudRun CR to the cluster.
+  """Apply the CloudRun custom resource to the cluster.
 
   Args:
-    kube_client: a kubernetes client.
-    yaml_string: the cloudrun yaml.
+    kube_client: A Kubernetes client.
+    yaml_string: the CloudRun YAML file.
   """
   _, err = kube_client.Apply(yaml_string)
   if err:
@@ -97,10 +95,10 @@ def _apply_cr_to_membership_cluster(kube_client, yaml_string):
 
 
 def _validate_cr(yaml_string):
-  """Validate the parsed cloudrun yaml.
+  """Validate the parsed cloudrun YAML.
 
   Args:
-    yaml_string: The yaml string to validate.
+    yaml_string: The YAML string to validate.
   """
 
   try:

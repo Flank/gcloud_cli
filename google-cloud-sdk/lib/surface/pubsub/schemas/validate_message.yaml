@@ -36,7 +36,7 @@
         The encoding of the message.
     - group:
         help_text: |
-          Schema specification.
+          Schema definition.
         mutex: true
         required: true
         params:
@@ -47,11 +47,21 @@
             Name or full path of an existing schema.
         - group:
             params:
-            - arg_name: definition
-              api_field: validateMessageRequest.schema.definition
-              help_text: |
-                Inline schema definition.
-              required: true
+            - group:
+                help_text: |
+                  Schema specification.
+                mutex: true
+                required: true
+                params:
+                - arg_name: definition
+                  api_field: validateMessageRequest.schema.definition
+                  help_text: |
+                    Inline schema definition.
+                - arg_name: definition-file
+                  api_field: validateMessageRequest.schema.definition
+                  type: "googlecloudsdk.calliope.arg_parsers:FileContents:"
+                  help_text: |
+                    File containing schema definition.
             - arg_name: type
               api_field: validateMessageRequest.schema.type
               help_text: |

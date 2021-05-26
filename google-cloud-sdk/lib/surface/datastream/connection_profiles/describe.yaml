@@ -5,7 +5,7 @@
     examples: |
       To show details about a connection profile, run:
 
-        $ {command} my-connection-profile --region=us-central1
+        $ {command} my-connection-profile --location=us-central1
 
   request:
     collection: datastream.projects.locations.connectionProfiles

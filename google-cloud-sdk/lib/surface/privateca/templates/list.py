@@ -22,7 +22,6 @@ from apitools.base.py import list_pager
 
 from googlecloudsdk.api_lib.privateca import base as privateca_base
 from googlecloudsdk.api_lib.privateca import resource_utils
-from googlecloudsdk.api_lib.util import common_args
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.privateca import response_utils
 from googlecloudsdk.core import properties
@@ -78,7 +77,6 @@ class List(base.ListCommand):
         properties.VALUES.core.project.GetOrFail(), args.location)
     request = messages.PrivatecaProjectsLocationsCertificateTemplatesListRequest(
         parent=parent,
-        orderBy=common_args.ParseSortByArg(args.sort_by),
         filter=args.filter)
     return list_pager.YieldFromList(
         client.projects_locations_certificateTemplates,

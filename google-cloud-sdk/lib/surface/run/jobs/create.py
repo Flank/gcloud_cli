@@ -69,6 +69,7 @@ class Deploy(base.Command):
     flags.AddParallelismFlag(parser)
     flags.AddTasksFlag(parser)
     flags.AddMaxRetriesFlag(parser)
+    flags.AddJobAndTaskTimeoutFlags(parser)
     flags.AddServiceAccountFlag(parser)
     flags.AddSetEnvVarsFlag(parser)
     flags.AddSetCloudSQLFlag(parser)
@@ -105,7 +106,7 @@ class Deploy(base.Command):
         flags.Product.RUN,
         self.ReleaseTrack(),
         version_override='v1alpha1')
-    changes = flags.GetConfigurationChanges(args)
+    changes = flags.GetJobConfigurationChanges(args)
     changes.append(
         config_changes.SetLaunchStageAnnotationChange(self.ReleaseTrack()))
 

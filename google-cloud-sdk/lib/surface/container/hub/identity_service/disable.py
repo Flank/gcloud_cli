@@ -36,6 +36,3 @@ class Disable(base.DisableCommand):
   FEATURE_NAME = 'identityservice'
   FEATURE_DISPLAY_NAME = 'Identity Service'
   FEATURE_API = 'anthosidentityservice.googleapis.com'
-
-  def Run(self, args):
-    self.RunCommand(args)

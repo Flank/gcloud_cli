@@ -5,7 +5,7 @@
     examples: |
       To delete an operation.
 
-          $ {command} OPERATION --region=us-central1
+          $ {command} OPERATION --location=us-central1
 
   request:
     collection: datastream.projects.locations.operations
