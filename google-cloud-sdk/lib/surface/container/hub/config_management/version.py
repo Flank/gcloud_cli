@@ -36,11 +36,10 @@ class ConfigmanagementFeatureState(object):
     self.version = NA
 
 
-class Version(base.ListCommand):
+class Version(feature_base.FeatureCommand, base.ListCommand):
   """Print the version of all clusters with Config Management enabled."""
 
-  FEATURE_NAME = 'configmanagement'
-  FEATURE_DISPLAY_NAME = 'Anthos Config Management'
+  feature_name = 'configmanagement'
 
   @staticmethod
   def Args(parser):
@@ -52,17 +51,17 @@ class Version(base.ListCommand):
       project_id = properties.VALUES.core.project.GetOrFail()
       memberships = feature_base.ListMemberships(project_id)
       name = 'projects/{0}/locations/global/features/{1}'.format(
-          project_id, self.FEATURE_NAME)
+          project_id, self.feature_name)
       response = feature_base.GetFeature(name)
     except apitools_exceptions.HttpUnauthorizedError as e:
       raise exceptions.Error(
           'You are not authorized to see the status of {} '
           'Feature from project [{}]. Underlying error: {}'.format(
-              self.FEATURE_DISPLAY_NAME, project_id, e))
+              self.feature.display_name, project_id, e))
     except apitools_exceptions.HttpNotFoundError as e:
       raise exceptions.Error(
           '{} Feature for project [{}] is not enabled'.format(
-              self.FEATURE_DISPLAY_NAME, project_id))
+              self.feature.display_name, project_id))
     if not memberships:
       return None
 

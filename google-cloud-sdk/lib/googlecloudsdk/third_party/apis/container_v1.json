@@ -1065,7 +1065,8 @@
             "GKE_SERVICE_ACCOUNT_DELETED indicates that the user deleted their robot service account.",
             "Google Compute Engine quota was exceeded.",
             "Cluster state was manually changed by an SRE due to a system logic error.",
-            "Unable to perform an encrypt operation against the CloudKMS key used for etcd level encryption. More codes TBA"
+            "Unable to perform an encrypt operation against the CloudKMS key used for etcd level encryption.",
+            "Cluster CA is expiring soon."
           ],
           "enum": [
             "UNKNOWN",
@@ -1073,7 +1074,8 @@
             "GKE_SERVICE_ACCOUNT_DELETED",
             "GCE_QUOTA_EXCEEDED",
             "SET_BY_OPERATOR",
-            "CLOUD_KMS_KEY_ERROR"
+            "CLOUD_KMS_KEY_ERROR",
+            "CA_EXPIRING"
           ]
         },
         "message": {
@@ -1483,6 +1485,10 @@
         "defaultSnatStatus": {
           "description": "Whether the cluster disables default in-node sNAT rules. In-node sNAT rules will be disabled when default_snat_status is disabled. When disabled is set to false, default IP masquerade rules will be applied to the nodes to prevent sNAT on cluster internal traffic.",
           "$ref": "DefaultSnatStatus"
+        },
+        "enableL4ilbSubsetting": {
+          "description": "Whether L4ILB Subsetting is enabled for this cluster.",
+          "type": "boolean"
         },
         "datapathProvider": {
           "description": "The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.",
@@ -2126,6 +2132,10 @@
           "description": "The desired release channel configuration.",
           "$ref": "ReleaseChannel"
         },
+        "desiredL4ilbSubsettingConfig": {
+          "description": "The desired L4 Internal Load Balancer Subsetting configuration.",
+          "$ref": "ILBSubsettingConfig"
+        },
         "desiredDatapathProvider": {
           "description": "The desired datapath provider for the cluster.",
           "type": "string",
@@ -2181,6 +2191,17 @@
       "properties": {
         "enabled": {
           "description": "Enables intra node visibility for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "ILBSubsettingConfig": {
+      "id": "ILBSubsettingConfig",
+      "description": "ILBSubsettingConfig contains the desired config of L4 Internal LoadBalancer subsetting on this cluster.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enables l4 ILB subsetting for this cluster.",
           "type": "boolean"
         }
       }

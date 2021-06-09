@@ -27,6 +27,7 @@ from googlecloudsdk.command_lib.alloydb import flags
 from googlecloudsdk.core import properties
 
 
+@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Delete(base.DeleteCommand):
   """Deletes a new AlloyDB instance within a given cluster."""

@@ -42,8 +42,7 @@ class Unmanage(base.UpdateCommand):
     $ {command} --membership=CLUSTER_NAME
   """
 
-  FEATURE_NAME = 'configmanagement'
-  FEATURE_DISPLAY_NAME = 'Config Management'
+  feature_name = 'configmanagement'
 
   @classmethod
   def Args(cls, parser):

@@ -1123,6 +1123,32 @@ Example request body:
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeBackendServicesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.backendServices.getIamPolicy',
+        ordered_params=['project', 'resource'],
+        path_params=['project', 'resource'],
+        query_params=['optionsRequestedPolicyVersion'],
+        relative_path='projects/{project}/global/backendServices/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name='ComputeBackendServicesGetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates a BackendService resource in the specified project using the data included in the request. For more information, see  Backend services overview.
 
@@ -1224,6 +1250,32 @@ Example request body:
         request_field='securityPolicyReference',
         request_type_name='ComputeBackendServicesSetEdgeSecurityPolicyRequest',
         response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeBackendServicesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.backendServices.setIamPolicy',
+        ordered_params=['project', 'resource'],
+        path_params=['project', 'resource'],
+        query_params=[],
+        relative_path='projects/{project}/global/backendServices/{resource}/setIamPolicy',
+        request_field='globalSetPolicyRequest',
+        request_type_name='ComputeBackendServicesSetIamPolicyRequest',
+        response_type_name='Policy',
         supports_download=False,
     )
 
@@ -2178,7 +2230,7 @@ Example request body:
     )
 
     def List(self, request, global_params=None):
-      r"""Lists all the policies that have been configured for the specified project.
+      r"""Lists all the policies that have been configured for the specified folder or organization.
 
       Args:
         request: (ComputeFirewallPoliciesListRequest) input message
@@ -6713,6 +6765,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def PerformMaintenance(self, request, global_params=None):
+      r"""Perform a manual maintenance on the instance.
+
+      Args:
+        request: (ComputeInstancesPerformMaintenanceRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('PerformMaintenance')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    PerformMaintenance.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.instances.performMaintenance',
+        ordered_params=['project', 'zone', 'instance'],
+        path_params=['instance', 'project', 'zone'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/zones/{zone}/instances/{instance}/performMaintenance',
+        request_field='',
+        request_type_name='ComputeInstancesPerformMaintenanceRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def RemoveResourcePolicies(self, request, global_params=None):
       r"""Removes resource policies from an instance.
 
@@ -9145,7 +9223,7 @@ If the group is part of a backend service that has enabled connection draining, 
         method_id='compute.networkFirewallPolicies.addRule',
         ordered_params=['project', 'firewallPolicy'],
         path_params=['firewallPolicy', 'project'],
-        query_params=['requestId'],
+        query_params=['maxPriority', 'minPriority', 'requestId'],
         relative_path='projects/{project}/global/firewallPolicies/{firewallPolicy}/addRule',
         request_field='firewallPolicyRule',
         request_type_name='ComputeNetworkFirewallPoliciesAddRuleRequest',
@@ -12097,6 +12175,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeRegionBackendServicesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.regionBackendServices.getIamPolicy',
+        ordered_params=['project', 'region', 'resource'],
+        path_params=['project', 'region', 'resource'],
+        query_params=['optionsRequestedPolicyVersion'],
+        relative_path='projects/{project}/regions/{region}/backendServices/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name='ComputeRegionBackendServicesGetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates a regional BackendService resource in the specified project using the data included in the request. For more information, see  Backend services overview.
 
@@ -12175,6 +12279,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeRegionBackendServicesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.regionBackendServices.setIamPolicy',
+        ordered_params=['project', 'region', 'resource'],
+        path_params=['project', 'region', 'resource'],
+        query_params=[],
+        relative_path='projects/{project}/regions/{region}/backendServices/{resource}/setIamPolicy',
+        request_field='regionSetPolicyRequest',
+        request_type_name='ComputeRegionBackendServicesSetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
     def TestIamPermissions(self, request, global_params=None):
       r"""Returns permissions that a caller has on the specified resource.
 
@@ -12238,7 +12368,7 @@ If the group is part of a backend service that has enabled connection draining, 
           }
 
     def AggregatedList(self, request, global_params=None):
-      r"""Retrieves an aggregated list of commitments.
+      r"""Retrieves an aggregated list of commitments by region.
 
       Args:
         request: (ComputeRegionCommitmentsAggregatedListRequest) input message
@@ -14761,7 +14891,7 @@ For more information, see Deleting instantSnapshots.
         method_id='compute.regionNetworkFirewallPolicies.addRule',
         ordered_params=['project', 'region', 'firewallPolicy'],
         path_params=['firewallPolicy', 'project', 'region'],
-        query_params=['requestId'],
+        query_params=['maxPriority', 'minPriority', 'requestId'],
         relative_path='projects/{project}/regions/{region}/firewallPolicies/{firewallPolicy}/addRule',
         request_field='firewallPolicyRule',
         request_type_name='ComputeRegionNetworkFirewallPoliciesAddRuleRequest',

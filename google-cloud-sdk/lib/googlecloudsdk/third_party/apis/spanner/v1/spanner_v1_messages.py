@@ -266,11 +266,11 @@ class CommitStats(_messages.Message):
       the `mutation_count` value can help you maximize the number of mutations
       in a transaction and minimize the number of API round trips. You can
       also monitor this value to prevent transactions from exceeding the
-      system [limit](http://cloud.google.com/spanner/quotas#limits_for_creatin
-      g_reading_updating_and_deleting_data). If the number of mutations
-      exceeds the limit, the server returns [INVALID_ARGUMENT](http://cloud.go
-      ogle.com/spanner/docs/reference/rest/v1/Code#ENUM_VALUES.INVALID_ARGUMEN
-      T).
+      system [limit](https://cloud.google.com/spanner/quotas#limits_for_creati
+      ng_reading_updating_and_deleting_data). If the number of mutations
+      exceeds the limit, the server returns [INVALID_ARGUMENT](https://cloud.g
+      oogle.com/spanner/docs/reference/rest/v1/Code#ENUM_VALUES.INVALID_ARGUME
+      NT).
   """
 
   mutationCount = _messages.IntegerField(1)

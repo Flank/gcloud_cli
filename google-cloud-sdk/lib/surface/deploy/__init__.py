@@ -23,7 +23,6 @@ from googlecloudsdk.calliope import base
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-@base.Hidden
 class Deploy(base.Group):
   """Create and manage Google Cloud Deploy resources."""
   category = base.CI_CD_CATEGORY

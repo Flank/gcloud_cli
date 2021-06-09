@@ -54,7 +54,7 @@ class Update(base.UpdateCommand):
         required=False, default=None).AddToParser(parser)
     flags.GetAnalysisInstanceSchemaArg(required=False).AddToParser(parser)
     flags.GetMonitoringLogTtlArg(required=False).AddToParser(parser)
-    flags.AddObjectiveConfigGroup(parser, required=False)
+    flags.AddObjectiveConfigGroupForUpdate(parser, required=False)
     labels_util.AddUpdateLabelsFlags(parser)
 
   def _Run(self, args, version):
@@ -71,7 +71,7 @@ class Update(base.UpdateCommand):
             'display_name',
             'emails',
             'prediction_sampling_rate',
-            'drift_thresholds',
+            'feature_thresholds',
             'monitoring_config_from_file',
             'monitoring_frequency',
             'analysis_instance_schema',

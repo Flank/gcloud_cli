@@ -33,8 +33,4 @@ class Describe(base.DescribeCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'servicedirectory'
-  FEATURE_DISPLAY_NAME = 'Service Directory'
-
-  def Run(self, args):
-    return self.RunCommand(args)
+  feature_name = 'servicedirectory'

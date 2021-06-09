@@ -30,6 +30,7 @@ from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.command_lib.run import stages
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
+from googlecloudsdk.core import log
 from googlecloudsdk.core.console import progress_tracker
 
 
@@ -69,7 +70,7 @@ class Deploy(base.Command):
     flags.AddParallelismFlag(parser)
     flags.AddTasksFlag(parser)
     flags.AddMaxRetriesFlag(parser)
-    flags.AddJobAndTaskTimeoutFlags(parser)
+    flags.AddTaskTimeoutFlags(parser)
     flags.AddServiceAccountFlag(parser)
     flags.AddSetEnvVarsFlag(parser)
     flags.AddSetCloudSQLFlag(parser)
@@ -139,4 +140,16 @@ class Deploy(base.Command):
                 job=job.name,
                 operation=('completed'
                            if args.wait_for_completion else 'started running')))
+
+      log.Print(
+          '\nView details about this job by running '
+          '`gcloud{release_track} run jobs describe {job_name}`.'
+          '\nSee logs for this job at: '
+          # TODO(b/180749348): Don't piggyback off of cloud_run_revision
+          'https://console.cloud.google.com/logs/viewer?project={project_id}&resource=cloud_run_revision/service_name/{job_name}'
+          .format(
+              release_track=(' {}'.format(self.ReleaseTrack().prefix)
+                             if self.ReleaseTrack().prefix is not None else ''),
+              project_id=job_ref.Parent().Name(),
+              job_name=job.name))
       return job

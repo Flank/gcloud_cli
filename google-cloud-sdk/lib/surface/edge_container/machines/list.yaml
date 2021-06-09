@@ -1,24 +1,24 @@
 - release_tracks: [ALPHA]
 
   help_text:
-    brief: List Kubernetesedge machines.
+    brief: List Edge Container machines.
     description: |
-      List Kubernetesedge machines.
+      List Edge Container machines.
     examples: |
       To list the machines, run:
 
         $ {command}
 
   request:
-    collection: kubernetesedge.projects.locations.machines
-    api_version: v1alpha1
+    collection: edgecontainer.projects.locations.machines
+    api_version: v1alpha
 
   response:
     id_field: name
 
   arguments:
     resource:
-      help_text: Parent Kubernetesedge location to list all contained Kubernetesedge machines.
+      help_text: Parent Edge Container location to list all contained Edge Container machines.
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:location
 
   output:

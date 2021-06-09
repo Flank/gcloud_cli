@@ -61,6 +61,7 @@ Create.detailed_help = {
     with ID ``test-project'',
     run:
 
-      $ {command} my-policy --project=test-project
+      $ {command} my-policy \
+          --project=test-project
     """,
 }

@@ -1,21 +1,21 @@
 - release_tracks: [ALPHA]
 
   help_text:
-    brief: Create a Kubernetesedge node pool.
+    brief: Create an Edge Container node pool.
     description: |
-      Create a new Kubernetesedge nodePool.
+      Create a new Edge Container nodePool.
     examples: |
       To create a node pool called 'test-nodePool', run:
 
         $ {command} my-nodePool
 
   request:
-    collection: kubernetesedge.projects.locations.clusters.nodePools
-    api_version: v1alpha1
+    collection: edgecontainer.projects.locations.clusters.nodePools
+    api_version: v1alpha
 
   arguments:
     resource:
-      help_text: Kubernetesedge node pool to create.
+      help_text: Edge Container node pool to create.
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:nodePool
 
     params:
@@ -34,4 +34,4 @@
       api_field: nodePool.labels
 
   async:
-    collection: kubernetesedge.projects.locations.operations
+    collection: edgecontainer.projects.locations.operations

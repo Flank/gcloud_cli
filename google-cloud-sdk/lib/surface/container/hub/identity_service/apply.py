@@ -49,8 +49,7 @@ class Apply(base.UpdateCommand):
     --config=/path/to/identity-service.yaml
   """
 
-  FEATURE_NAME = 'identityservice'
-  FEATURE_DISPLAY_NAME = 'Identity Service'
+  feature_name = 'identityservice'
 
   @classmethod
   def Args(cls, parser):

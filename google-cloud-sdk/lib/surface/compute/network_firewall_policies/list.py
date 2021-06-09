@@ -67,6 +67,7 @@ List.detailed_help = {
     To list network firewall policies under project
     ``my-project'', run:
 
-      $ {command} --project=my-project
+      $ {command}
+          --project=my-project
     """,
 }

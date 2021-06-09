@@ -121,14 +121,19 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
       download_stream.seek(start_byte)
       provider = self._source_resource.storage_url.scheme
       # TODO(b/162264437): Support all of download_object's parameters.
-      api_factory.get_api(provider).download_object(
-          self._source_resource,
-          download_stream,
-          digesters=self._digesters,
-          download_strategy=download_strategy,
-          progress_callback=progress_callback,
-          start_byte=start_byte,
-          end_byte=end_byte)
+      if self._source_resource.size != 0:
+        api_factory.get_api(provider).download_object(
+            self._source_resource,
+            download_stream,
+            digesters=self._digesters,
+            download_strategy=download_strategy,
+            progress_callback=progress_callback,
+            start_byte=start_byte,
+            end_byte=end_byte)
+      else:
+        # Trying to download a zero-sized file. Call progress_callback to
+        # ensure that the file count gets updated.
+        progress_callback(0)
 
     # CRC32C validated in FinalizeSlicedDownloadTask.
     if hash_util.HashAlgorithm.MD5 in self._digesters:

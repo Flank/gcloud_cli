@@ -75,18 +75,15 @@ class AnalyzeMove(base.Command):
           """\
       To analyze the impacts of moving a project to a different organization, run:
 
-          $ gcloud asset analyze-move --project=YOUR_PROJECT_ID \
-              --destination-organization=ORGANIZATION_ID
+          $ gcloud asset analyze-move --project=YOUR_PROJECT_ID --destination-organization=ORGANIZATION_ID
 
       To analyze the impacts of moving a project to a different folder, run:
 
-          $ gcloud asset analyze-move --project=YOUR_PROJECT_ID \
-              --destination-folder=FOLDER_ID
+          $ gcloud asset analyze-move --project=YOUR_PROJECT_ID --destination-folder=FOLDER_ID
 
       To analyze only the blockers of moving a project to a different folder, run:
 
-          $ gcloud asset analyze-move --project=YOUR_PROJECT_ID \
-              --destination-folder=FOLDER_ID --blockers-only=true
+          $ gcloud asset analyze-move --project=YOUR_PROJECT_ID --destination-folder=FOLDER_ID --blockers-only=true
       """
   }
 

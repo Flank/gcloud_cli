@@ -26,6 +26,7 @@ from googlecloudsdk.command_lib.alloydb import flags
 from googlecloudsdk.core import properties
 
 
+@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Failover(base.Command):
   """Triggers an AlloyDB cluster to failover within a given project."""

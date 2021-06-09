@@ -24,9 +24,10 @@ from googlecloudsdk.api_lib.vmware.nodetypes import NodeTypesClient
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.vmware import flags
 
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
-  """List supported VMware Engine nodes."""
+  """List supported VMware Engine nodes types."""
 
   @staticmethod
   def Args(parser):

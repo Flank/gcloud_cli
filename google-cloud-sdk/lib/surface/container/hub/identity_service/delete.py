@@ -42,8 +42,7 @@ class Delete(base.UpdateCommand):
     $ {command} --membership=CLUSTER_NAME
   """
 
-  FEATURE_NAME = 'identityservice'
-  FEATURE_DISPLAY_NAME = 'Identity Service'
+  feature_name = 'identityservice'
 
   @classmethod
   def Args(cls, parser):

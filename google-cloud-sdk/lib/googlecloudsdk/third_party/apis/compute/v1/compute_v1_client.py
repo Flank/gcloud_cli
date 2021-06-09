@@ -1905,7 +1905,7 @@ Example request body:
     )
 
     def List(self, request, global_params=None):
-      r"""Lists all the policies that have been configured for the specified project.
+      r"""Lists all the policies that have been configured for the specified folder or organization.
 
       Args:
         request: (ComputeFirewallPoliciesListRequest) input message
@@ -9455,7 +9455,7 @@ If the group is part of a backend service that has enabled connection draining, 
           }
 
     def AggregatedList(self, request, global_params=None):
-      r"""Retrieves an aggregated list of commitments.
+      r"""Retrieves an aggregated list of commitments by region.
 
       Args:
         request: (ComputeRegionCommitmentsAggregatedListRequest) input message

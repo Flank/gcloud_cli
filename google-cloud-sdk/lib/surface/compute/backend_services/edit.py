@@ -26,6 +26,7 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import property_selector
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.command_lib.compute import exceptions
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.backend_services import backend_services_utils
 from googlecloudsdk.command_lib.compute.backend_services import flags
@@ -44,23 +45,19 @@ class InvalidResourceError(calliope_exceptions.ToolException):
 
 
 class Edit(base.Command):
-  """Modify backend services.
+  """Modify a backend service.
 
-    *{command}* can be used to modify a backend service. The backend
-  service resource is fetched from the server and presented in a text
-  editor. After the file is saved and closed, this command will
-  update the resource. Only fields that can be modified are
-  displayed in the editor.
+    *{command}* modifies a backend service of a Google Cloud load balancer or
+    Traffic Director. The backend service resource is fetched from the server
+    and presented in a text editor that displays the configurable fields.
 
-  Backends are named by their associated instances groups, and one
-  of the ``--group'' or ``--instance-group'' flags is required to
-  identify the backend that you are modifying.  You cannot "change"
-  the instance group associated with a backend, but you can accomplish
-  something similar with ``backend-services remove-backend'' and
-  ``backend-services add-backend''.
+    The specific editor is defined by the ``EDITOR'' environment variable.
 
-  The editor used to modify the resource is chosen by inspecting
-  the ``EDITOR'' environment variable.
+    The name of each backend corresponds to the name of an instance group,
+    zonal NEG, serverless NEG, or internet NEG.
+
+    To add, remove, or swap backends, use the `gcloud compute backend-services
+    remove-backend` and `gcloud compute backend-services add-backend` commands.
   """
 
   DEFAULT_FORMAT = 'yaml'
@@ -187,7 +184,7 @@ class Edit(base.Command):
       try:
         file_contents = edit.OnlineEdit(file_contents)
       except edit.NoSaveException:
-        raise calliope_exceptions.ToolException('Edit aborted by user.')
+        raise exceptions.AbortedError('Edit aborted by user.')
       try:
         resource_list = self._ProcessEditedResource(holder, backend_service_ref,
                                                     file_contents,
@@ -210,7 +207,7 @@ class Edit(base.Command):
         if not console_io.PromptContinue(
             message=message,
             prompt_string='Would you like to edit the resource again?'):
-          raise calliope_exceptions.ToolException('Edit aborted by user.')
+          raise exceptions.AbortedError('Edit aborted by user.')
     return resource_list
 
   def GetExampleResource(self, client):

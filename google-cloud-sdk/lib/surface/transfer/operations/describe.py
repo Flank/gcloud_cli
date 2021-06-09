@@ -38,12 +38,11 @@ class Describe(base.ListCommand):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        'operation_name',
-        help='The name of the operation you want to describe.')
+        'name', help='The name of the operation you want to describe.')
 
   def Display(self, args, resources):
     del args  # Unsued.
     resource_printer.Print(resources, 'json')
 
   def Run(self, args):
-    return operations_util.api_get(args.operation_name)
+    return operations_util.api_get(args.name)

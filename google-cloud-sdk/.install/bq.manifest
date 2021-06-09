@@ -9,6 +9,7 @@ platform/bq/bq.py
 platform/bq/bq_auth_flags.py
 platform/bq/bq_flags.py
 platform/bq/bq_utils.py
+platform/bq/credential_loader.py
 platform/bq/discovery/httpswwwgoogleapiscom.bigquery.v2.rest.json
 platform/bq/discovery_next/bigquery.json
 platform/bq/discovery_next/iam-policy.json

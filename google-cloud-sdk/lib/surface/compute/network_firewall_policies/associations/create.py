@@ -80,6 +80,9 @@ Create.detailed_help = {
     To associate a network firewall policy with name ``my-policy''
     to network ``my-network'' with an association named ``my-association'', run:
 
-      $ {command} --firewall-policy=my-policy --network=my-network --name=my-association
+      $ {command}
+          --firewall-policy=my-policy
+          --network=my-network
+          --name=my-association
     """,
 }

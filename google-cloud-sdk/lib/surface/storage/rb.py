@@ -48,10 +48,6 @@ class Rb(base.Command):
       Delete two buckets:
 
         $ *{command}* rb gs://my-bucket gs://my-other-bucket
-
-      Delete all buckets beginning with "my" and continue on errors:
-
-        $ *{command}* rb --force gs://my*
       """,
   }
 

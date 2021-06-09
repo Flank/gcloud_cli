@@ -28,6 +28,7 @@ from googlecloudsdk.command_lib.alloydb import instance_helper
 from googlecloudsdk.core import properties
 
 
+@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Create(base.CreateCommand):
   """Creates a new AlloyDB instance within a given cluster."""

@@ -23,6 +23,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.aws import clusters
 from googlecloudsdk.command_lib.container.aws import flags as aws_flags
 from googlecloudsdk.command_lib.container.aws import resource_args
+from googlecloudsdk.command_lib.container.gkemulticloud import constants
 from googlecloudsdk.command_lib.container.gkemulticloud import endpoint_util
 from googlecloudsdk.command_lib.container.gkemulticloud import flags
 from googlecloudsdk.core import log
@@ -43,7 +44,8 @@ class Create(base.CreateCommand):
     flags.AddRootVolumeSize(parser)
     flags.AddMainVolumeSize(parser)
     flags.AddValidateOnly(parser, 'cluster to create')
-    flags.AddTags(parser)
+    flags.AddTags(
+        parser, 'cluster')
 
     aws_flags.AddAwsRegion(parser)
     aws_flags.AddServicesLbSubnetId(parser)
@@ -67,6 +69,8 @@ class Create(base.CreateCommand):
     with endpoint_util.GkemulticloudEndpointOverride(cluster_ref.locationsId,
                                                      release_track):
       cluster_client = clusters.Client(track=release_track)
+      args.root_volume_size = flags.GetRootVolumeSize(args)
+      args.main_volume_size = flags.GetMainVolumeSize(args)
       op = cluster_client.Create(cluster_ref, args)
       op_ref = resource_args.GetOperationResource(op)
 
@@ -79,9 +83,11 @@ class Create(base.CreateCommand):
       if not async_:
         waiter.WaitFor(
             waiter.CloudOperationPollerNoResources(
-                cluster_client.client.projects_locations_operations), op_ref,
+                cluster_client.client.projects_locations_operations),
+            op_ref,
             'Creating cluster {} in AWS region {}'.format(
-                cluster_ref.awsClustersId, args.aws_region))
+                cluster_ref.awsClustersId, args.aws_region),
+            wait_ceiling_ms=constants.MAX_LRO_POLL_INTERVAL_MS)
 
       log.CreatedResource(cluster_ref)
       return cluster_client.Get(cluster_ref)

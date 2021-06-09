@@ -37,7 +37,7 @@ class Monitor(base.Command):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        'operation_name', help='The name of the operation you want to monitor.')
+        'name', help='The name of the operation you want to monitor.')
 
   def Run(self, args):
-    operations_util.display_monitoring_view(args.operation_name)
+    operations_util.display_monitoring_view(args.name)

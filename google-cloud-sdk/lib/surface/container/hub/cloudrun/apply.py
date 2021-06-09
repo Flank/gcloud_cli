@@ -30,7 +30,7 @@ CONFIG_YAML_FLAG = '--config'
 
 
 class Apply(base.CreateCommand):
-  r"""Deploy or update the the CloudRun feature.
+  r"""Deploy or update the CloudRun feature.
 
   Deploy or update a user-specified config file of the CloudRun custom resource.
   The config file should be a YAML file.
@@ -43,9 +43,7 @@ class Apply(base.CreateCommand):
     --config=/path/to/cloud-run-cr.yaml
   """
 
-  FEATURE_NAME = 'appdevexperience'
-  FEATURE_DISPLAY_NAME = 'CloudRun'
-  FEATURE_API = 'appdevelopmentexperience.googleapis.com'
+  feature_name = 'appdevexperience'
 
   @classmethod
   def Args(cls, parser):

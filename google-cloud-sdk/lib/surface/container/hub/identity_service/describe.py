@@ -26,7 +26,7 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
 
-class Describe(gcloud_base.ListCommand):
+class Describe(base.FeatureCommand, gcloud_base.ListCommand):
   r"""Prints the status of all clusters with Identity Service installed.
 
   Prints the status of the Identity Service Feature resource in Hub.
@@ -39,8 +39,7 @@ class Describe(gcloud_base.ListCommand):
 
   """
 
-  FEATURE_NAME = 'identityservice'
-  FEATURE_DISPLAY_NAME = 'Identity Service'
+  feature_name = 'identityservice'
 
   @classmethod
   def Args(cls, parser):
@@ -52,16 +51,16 @@ class Describe(gcloud_base.ListCommand):
       project = args.project or properties.VALUES.core.project.GetOrFail()
       memberships = base.ListMemberships(project)
       name = 'projects/{0}/locations/global/features/{1}'.format(
-          project, self.FEATURE_NAME)
+          project, self.feature_name)
       response = base.GetFeature(name)
     except apitools_exceptions.HttpUnauthorizedError as e:
       raise exceptions.Error(
           'Not authorized to see Feature {} status from project [{}]. '
-          'Underlying error: {}'.format(self.FEATURE_DISPLAY_NAME, project, e))
+          'Underlying error: {}'.format(self.feature.display_name, project, e))
     except apitools_exceptions.HttpNotFoundError as e:
       raise exceptions.Error(
           '{} Feature for project [{}] is not enabled'.format(
-              self.FEATURE_DISPLAY_NAME, project))
+              self.feature.display_name, project))
     if not memberships:
       log.status.Print('No Memberships available in Hub.')
       return {}

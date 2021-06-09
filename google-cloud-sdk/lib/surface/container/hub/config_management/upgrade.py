@@ -45,10 +45,8 @@ class Upgrade(base.UpdateCommand):
     $ {command} --membership=CLUSTER_NAME \
   """
 
-  FEATURE_NAME = 'configmanagement'
-  FEATURE_DISPLAY_NAME = 'Config Management'
-  LATEST_VERSION = '1.7.1'
-  FEATURE_API = 'anthosconfigmanagement.googleapis.com'
+  feature_name = 'configmanagement'
+  LATEST_VERSION = '1.7.2'
 
   @classmethod
   def Args(cls, parser):
@@ -70,8 +68,8 @@ class Upgrade(base.UpdateCommand):
       return
     console_io.PromptContinue(
         'You are about to upgrade the {} Feature for membership {} from version "{}" to version '
-        '"{}".'.format(self.FEATURE_DISPLAY_NAME, membership,
-                       cluster_v, self.LATEST_VERSION),
+        '"{}".'.format(self.feature.display_name, membership, cluster_v,
+                       self.LATEST_VERSION),
         throw_if_unattended=True,
         cancel_on_no=True)
 
@@ -93,19 +91,19 @@ class Upgrade(base.UpdateCommand):
     if declared_v == self.LATEST_VERSION:
       log.status.Print(
           'Membership {} already has the latest version of the {} Feature declared ({}).'
-          .format(membership, self.FEATURE_DISPLAY_NAME, self.LATEST_VERSION))
+          .format(membership, self.feature.display_name, self.LATEST_VERSION))
       return False
     if cluster_v == self.LATEST_VERSION:
       log.status.Print(
           'Membership {} already has the latest version of the {} Feature installed ({}).'
-          .format(membership, self.FEATURE_DISPLAY_NAME, self.LATEST_VERSION))
+          .format(membership, self.feature.display_name, self.LATEST_VERSION))
       return True
 
     if cluster_v > self.LATEST_VERSION:
       raise exceptions.Error(
           'Membership {} has a version of the {} Feature installed ({}) that is '
           'not supported by this command.'.format(membership,
-                                                  self.FEATURE_DISPLAY_NAME,
+                                                  self.feature.display_name,
                                                   cluster_v))
 
     return True
@@ -121,17 +119,17 @@ class Upgrade(base.UpdateCommand):
     """
     try:
       name = 'projects/{0}/locations/global/features/{1}'.format(
-          project, self.FEATURE_NAME)
+          project, self.feature_name)
       response = base.GetFeature(name)
     except apitools_exceptions.HttpUnauthorizedError as e:
       raise exceptions.Error(
           'You are not authorized to see the status of {} '
           'Feature from project [{}]. Underlying error: {}'.format(
-              self.FEATURE_DISPLAY_NAME, project, e))
+              self.feature.display_name, project, e))
     except apitools_exceptions.HttpNotFoundError as e:
       raise exceptions.Error(
           '{} Feature for project [{}] is not enabled'.format(
-              self.FEATURE_DISPLAY_NAME, project))
+              self.feature.display_name, project))
 
     return response
 

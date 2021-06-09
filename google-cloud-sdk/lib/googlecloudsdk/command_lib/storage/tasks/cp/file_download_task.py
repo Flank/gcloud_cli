@@ -23,12 +23,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
+import os
+
 from googlecloudsdk.api_lib.storage import api_factory
 from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import hash_util
 from googlecloudsdk.command_lib.storage import tracker_file_util
 from googlecloudsdk.command_lib.storage.tasks import task
+from googlecloudsdk.command_lib.storage.tasks import task_executor
 from googlecloudsdk.command_lib.storage.tasks.cp import copy_component_util
 from googlecloudsdk.command_lib.storage.tasks.cp import file_part_download_task
 from googlecloudsdk.command_lib.storage.tasks.cp import finalize_sliced_download_task
@@ -36,6 +40,9 @@ from googlecloudsdk.command_lib.util import crc32c
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import scaled_integer
+
+
+TEMPORARY_FILE_SUFFIX = '_.gstmp'
 
 
 _NO_HASH_CHECK_ERROR = """
@@ -110,7 +117,8 @@ def _should_perform_sliced_download(resource):
   api_capabilities = api_factory.get_capabilities(resource.storage_url.scheme)
   return (resource.size and threshold != 0 and resource.size > threshold and
           component_size and
-          cloud_api.Capability.SLICED_DOWNLOAD in api_capabilities)
+          cloud_api.Capability.SLICED_DOWNLOAD in api_capabilities and
+          task_executor.should_use_parallelism())
 
 
 class FileDownloadTask(task.Task):
@@ -130,8 +138,16 @@ class FileDownloadTask(task.Task):
     super(FileDownloadTask, self).__init__()
     self._source_resource = source_resource
     self._destination_resource = destination_resource
+    self._temporary_destination_resource = (
+        self._get_temporary_destination_resource())
+
     self.parallel_processing_key = (
         self._destination_resource.storage_url.url_string)
+
+  def _get_temporary_destination_resource(self):
+    temporary_resource = copy.deepcopy(self._destination_resource)
+    temporary_resource.storage_url.object_name += TEMPORARY_FILE_SUFFIX
+    return temporary_resource
 
   def _get_sliced_download_tasks(self):
     """Creates all tasks necessary for a sliced download."""
@@ -150,7 +166,7 @@ class FileDownloadTask(task.Task):
       download_component_task_list.append(
           file_part_download_task.FilePartDownloadTask(
               self._source_resource,
-              self._destination_resource,
+              self._temporary_destination_resource,
               offset=offset,
               length=length,
               component_number=i,
@@ -159,22 +175,33 @@ class FileDownloadTask(task.Task):
 
     finalize_sliced_download_task_list = [
         finalize_sliced_download_task.FinalizeSlicedDownloadTask(
-            self._source_resource, self._destination_resource)
+            self._source_resource, self._temporary_destination_resource,
+            self._destination_resource)
     ]
 
     return (download_component_task_list, finalize_sliced_download_task_list)
 
   def execute(self, task_status_queue=None):
     """Creates appropriate download tasks."""
+
+    # We need to call os.remove here for two reasons:
+    # 1. It saves on disk space during a transfer.
+    # 2. Os.rename fails if a file exists at the destination. Avoiding this by
+    # removing files after a download makes us susceptible to a race condition
+    # between two running instances of gcloud storage. See the following PR for
+    # more information: https://github.com/GoogleCloudPlatform/gsutil/pull/1202.
+    if self._destination_resource.storage_url.exists():
+      os.remove(self._destination_resource.storage_url.object_name)
+
     if _should_perform_sliced_download(self._source_resource):
-      copy_component_util.create_file_if_needed(self._source_resource,
-                                                self._destination_resource)
+      copy_component_util.create_file_if_needed(
+          self._source_resource, self._temporary_destination_resource)
       download_component_task_list, finalize_sliced_download_task_list = self._get_sliced_download_tasks(
       )
 
       tracker_file_util.read_or_create_download_tracker_file(
           self._source_resource,
-          self._destination_resource.storage_url,
+          self._temporary_destination_resource.storage_url,
           total_components=len(download_component_task_list),
       )
       log.debug('Launching sliced download with {} components.'.format(
@@ -198,8 +225,14 @@ class FileDownloadTask(task.Task):
 
       file_part_download_task.FilePartDownloadTask(
           self._source_resource,
-          self._destination_resource,
+          self._temporary_destination_resource,
           offset=0,
           length=self._source_resource.size,
           strategy=strategy,
           digesters=digesters).execute(task_status_queue=task_status_queue)
+
+      temporary_url = self._temporary_destination_resource.storage_url
+      if os.path.exists(temporary_url.object_name):
+        os.rename(
+            temporary_url.object_name,
+            self._destination_resource.storage_url.object_name)

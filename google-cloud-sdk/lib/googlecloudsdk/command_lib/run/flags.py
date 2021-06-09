@@ -587,9 +587,9 @@ def AddPlatformArg(parser, managed_only=False, anthos_only=False):
       '--platform',
       choices=choices,
       action=actions.StoreProperty(properties.VALUES.run.platform),
+      default=platforms.PLATFORM_MANAGED,
       help='Target platform for running commands. '
-      'Alternatively, set the property [run/platform]. '
-      'If not specified, the user will be prompted to choose a platform.')
+      'Alternatively, set the property [run/platform]. ')
 
 
 def AddKubeconfigFlags(parser):
@@ -887,16 +887,8 @@ def AddWaitForCompletionFlag(parser):
       'If not set, polling completes when the job has started.')
 
 
-def AddJobAndTaskTimeoutFlags(parser):
+def AddTaskTimeoutFlags(parser):
   """Add job flags for job and task deadline."""
-  parser.add_argument(
-      '--job-timeout',
-      type=arg_parsers.Duration(lower_bound='1s'),
-      help='Set the maximum time (deadline) the job can run for. If the job '
-      'does not complete within this time, it will be killed. It is specified '
-      'as a duration; for example, "10m5s" is ten minutes, and five seconds. '
-      'If you don\'t specify a unit, seconds is assumed. For example, "10" is '
-      '10 seconds.')
   parser.add_argument(
       '--task-timeout',
       type=arg_parsers.Duration(lower_bound='1s'),
@@ -1346,9 +1338,6 @@ def GetJobConfigurationChanges(args):
     changes.append(config_changes.SpecChange('completions', args.tasks))
   if FlagIsExplicitlySet(args, 'max_retries'):
     changes.append(config_changes.JobMaxRetriesChange(args.max_retries))
-  if FlagIsExplicitlySet(args, 'job_timeout'):
-    changes.append(
-        config_changes.SpecChange('activeDeadlineSeconds', args.job_timeout))
   if FlagIsExplicitlySet(args, 'task_timeout'):
     changes.append(config_changes.JobInstanceDeadlineChange(args.task_timeout))
 
@@ -1836,7 +1825,7 @@ def VerifyKubernetesFlags(args, release_track, product):
                 platforms.PLATFORM_GKE]))
 
 
-def GetAndValidatePlatform(args, release_track, product, allow_empty=False):
+def GetAndValidatePlatform(args, release_track, product):
   """Returns the platform to run on and validates specified flags.
 
   A given command may support multiple platforms, but not every flag is
@@ -1848,24 +1837,17 @@ def GetAndValidatePlatform(args, release_track, product, allow_empty=False):
     release_track: base.ReleaseTrack, calliope release track.
     product: Product, which product the command was executed for (e.g. Run or
       Events).
-    allow_empty: bool, if True, allows the platform property to be unset and
-      will not prompt.
 
   Raises:
     ArgumentError if an unknown platform type is found.
   """
-  platform = platforms.GetPlatform(prompt_if_unset=not allow_empty)
+  platform = platforms.GetPlatform()
   if platform == platforms.PLATFORM_MANAGED:
     VerifyManagedFlags(args, release_track, product)
   elif platform == platforms.PLATFORM_GKE:
     VerifyGKEFlags(args, release_track, product)
   elif platform == platforms.PLATFORM_KUBERNETES:
     VerifyKubernetesFlags(args, release_track, product)
-  elif allow_empty and platform is None:
-    # No platform is allowed for commands that only support a single platform.
-    # It's assumed that only valid flags exist for these commands, so verifying
-    # supported flags are set is not necessary
-    return platform
   if platform not in platforms.PLATFORMS:
     raise serverless_exceptions.ArgumentError(
         'Invalid target platform specified: [{}].\n'

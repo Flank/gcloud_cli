@@ -67,3 +67,7 @@
               help_text: |
                 Type of inline schema.
               required: true
+
+  response:
+    modify_response_hooks:
+    - googlecloudsdk.command_lib.pubsub.util:OutputMessageValidated

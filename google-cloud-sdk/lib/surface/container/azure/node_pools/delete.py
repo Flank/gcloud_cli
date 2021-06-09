@@ -24,6 +24,7 @@ from googlecloudsdk.api_lib.container.azure import util as azure_api_util
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.azure import resource_args
+from googlecloudsdk.command_lib.container.gkemulticloud import constants
 from googlecloudsdk.command_lib.container.gkemulticloud import endpoint_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
@@ -65,7 +66,9 @@ class Delete(base.DeleteCommand):
       if not async_:
         waiter.WaitFor(
             waiter.CloudOperationPollerNoResources(
-                api_client.client.projects_locations_operations), op_ref,
-            'Deleting node pool {}'.format(nodepool_ref.azureNodePoolsId))
+                api_client.client.projects_locations_operations),
+            op_ref,
+            'Deleting node pool {}'.format(nodepool_ref.azureNodePoolsId),
+            wait_ceiling_ms=constants.MAX_LRO_POLL_INTERVAL_MS)
 
       log.DeletedResource(nodepool_ref, kind='Azure Node Pool')

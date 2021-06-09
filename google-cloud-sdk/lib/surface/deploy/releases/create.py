@@ -59,6 +59,7 @@ def _CommonArgs(parser):
   flags.AddImagesGroup(parser)
   flags.AddIgnoreFileFlag(parser)
   flags.AddToTargetFlag(parser)
+  flags.AddDescription(parser, 'Description of the release.')
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -78,7 +79,8 @@ class Create(base.CreateCommand):
     # Create the release create request.
     release_config = client.CreateReleaseConfig(
         args.source, args.gcs_source_staging_dir, args.ignore_file,
-        args.gcs_render_dir, args.images, args.build_artifacts)
+        args.gcs_render_dir, args.images, args.build_artifacts,
+        args.description)
     operation = client.Create(release_ref, release_config)
     operation_ref = resources.REGISTRY.ParseRelativeName(
         operation.name, collection='clouddeploy.projects.locations.operations')

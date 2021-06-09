@@ -38,15 +38,14 @@ class Pause(base.Command):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        'operation_name',
+        'name',
         help='The name of the paused transfer operation you want to cancel.')
 
   def Run(self, args):
     client = apis.GetClientInstance('storagetransfer', 'v1')
     messages = apis.GetMessagesModule('storagetransfer', 'v1')
 
-    formatted_operation_name = name_util.add_operation_prefix(
-        args.operation_name)
+    formatted_name = name_util.add_operation_prefix(args.name)
     client.transferOperations.Pause(
         messages.StoragetransferTransferOperationsPauseRequest(
-            name=formatted_operation_name))
+            name=formatted_name))

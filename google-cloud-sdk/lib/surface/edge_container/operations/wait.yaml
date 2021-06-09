@@ -12,8 +12,8 @@
         $ {command} projects/my-project/locations/us-east1/operations/123
 
   request:
-    collection: kubernetesedge.projects.locations.operations
-    api_version: v1alpha1
+    collection: edgecontainer.projects.locations.operations
+    api_version: v1alpha
 
   arguments:
     resource:
@@ -21,7 +21,7 @@
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:operation
 
   async:
-    collection: kubernetesedge.projects.locations.operations
+    collection: edgecontainer.projects.locations.operations
     result_attribute: response
 
   output:

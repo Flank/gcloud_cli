@@ -1653,9 +1653,12 @@ lib/third_party/google/oauth2/_client.py
 lib/third_party/google/oauth2/_client_async.py
 lib/third_party/google/oauth2/_credentials_async.py
 lib/third_party/google/oauth2/_id_token_async.py
+lib/third_party/google/oauth2/_reauth_async.py
 lib/third_party/google/oauth2/_service_account_async.py
+lib/third_party/google/oauth2/challenges.py
 lib/third_party/google/oauth2/credentials.py
 lib/third_party/google/oauth2/id_token.py
+lib/third_party/google/oauth2/reauth.py
 lib/third_party/google/oauth2/service_account.py
 lib/third_party/google/oauth2/sts.py
 lib/third_party/google/oauth2/utils.py

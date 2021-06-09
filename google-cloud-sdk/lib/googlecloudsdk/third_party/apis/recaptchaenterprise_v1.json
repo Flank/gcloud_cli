@@ -274,6 +274,7 @@
               "Default unspecified reason.",
               "Indicates a chargeback for fraud was issued for the transaction associated with the assessment.",
               "Indicates the transaction associated with the assessment is suspected of being fraudulent based on the payment method, billing details, shipping address or other transaction information.",
+              "Indicates that the user was served a 2FA challenge. Sufficiently old assessments with this reason that have not been overwritten with PASSED_TWO_FACTOR will be treated as an abandoned 2FA flow, equivalent to FAILED_TWO_FACTOR.",
               "Indicates that the user passed a 2FA challenge.",
               "Indicates that the user failed a 2FA challenge.",
               "Indicates the user provided the correct password.",
@@ -283,6 +284,7 @@
               "REASON_UNSPECIFIED",
               "CHARGEBACK",
               "PAYMENT_HEURISTICS",
+              "INITIATED_TWO_FACTOR",
               "PASSED_TWO_FACTOR",
               "FAILED_TWO_FACTOR",
               "CORRECT_PASSWORD",
@@ -737,7 +739,7 @@
                   "type": "string"
                 },
                 "updateMask": {
-                  "description": "Optional. The mask to control which field of the key get updated. If the mask is not present, all fields will be updated.",
+                  "description": "Optional. The mask to control which fields of the key get updated. If the mask is not present, all fields will be updated.",
                   "location": "query",
                   "type": "string",
                   "format": "google-fieldmask"
@@ -808,7 +810,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Migrates an existing key from reCAPTCHA to reCAPTCHA Enterprise. Once a key is migrated, it can be used from either product. SiteVerify requests will be billed as CreateAssessment calls. You must be authenticated as one of the current owners of the reCAPTCHA Site Key, and your user must have the reCAPTCHA Enterprise Admin IAM role in the destination project."
+              "description": "Migrates an existing key from reCAPTCHA to reCAPTCHA Enterprise. Once a key is migrated, it can be used from either product. SiteVerify requests are billed as CreateAssessment calls. You must be authenticated as one of the current owners of the reCAPTCHA Site Key, and your user must have the reCAPTCHA Enterprise Admin IAM role in the destination project."
             },
             "getMetrics": {
               "id": "recaptchaenterprise.projects.keys.getMetrics",

@@ -37,6 +37,4 @@ class Disable(base.DisableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'appdevexperience'
-  FEATURE_DISPLAY_NAME = 'CloudRun'
-  FEATURE_API = 'appdevelopmentexperience.googleapis.com'
+  feature_name = 'appdevexperience'

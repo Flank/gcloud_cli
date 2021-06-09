@@ -69,7 +69,7 @@ class Update(base.UpdateCommand):
         required=False)
     cls.NAT_SUBNETWORK_ARG.AddArgument(parser)
 
-    flags.AddConnectionPreference(parser)
+    flags.AddConnectionPreference(parser, is_update=True)
     flags.AddEnableProxyProtocolForUpdate(parser)
     flags.AddConsumerRejectList(parser)
     flags.AddConsumerAcceptList(parser)

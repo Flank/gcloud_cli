@@ -23,6 +23,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.aws import flags as aws_flags
 from googlecloudsdk.command_lib.container.aws import node_pools
 from googlecloudsdk.command_lib.container.aws import resource_args
+from googlecloudsdk.command_lib.container.gkemulticloud import constants
 from googlecloudsdk.command_lib.container.gkemulticloud import endpoint_util
 from googlecloudsdk.command_lib.container.gkemulticloud import flags
 from googlecloudsdk.core import log
@@ -42,6 +43,7 @@ class Create(base.CreateCommand):
     flags.AddMaxPodsPerNode(parser)
     flags.AddRootVolumeSize(parser)
     flags.AddValidateOnly(parser, 'node pool to create')
+    flags.AddTags(parser, 'node pool')
 
     aws_flags.AddInstanceType(parser)
     aws_flags.AddKeyPairName(parser)
@@ -59,6 +61,8 @@ class Create(base.CreateCommand):
     with endpoint_util.GkemulticloudEndpointOverride(node_pool_ref.locationsId,
                                                      release_track):
       node_pool_client = node_pools.NodePoolsClient(track=release_track)
+      args.root_volume_size = flags.GetRootVolumeSize(args)
+      args.main_volume_size = flags.GetMainVolumeSize(args)
       op = node_pool_client.Create(node_pool_ref, args)
       op_ref = resource_args.GetOperationResource(op)
 
@@ -71,8 +75,10 @@ class Create(base.CreateCommand):
       if not async_:
         waiter.WaitFor(
             waiter.CloudOperationPollerNoResources(
-                node_pool_client.client.projects_locations_operations), op_ref,
-            'Creating node pool {}'.format(node_pool_ref.awsNodePoolsId))
+                node_pool_client.client.projects_locations_operations),
+            op_ref,
+            'Creating node pool {}'.format(node_pool_ref.awsNodePoolsId),
+            wait_ceiling_ms=constants.MAX_LRO_POLL_INTERVAL_MS)
 
       log.CreatedResource(node_pool_ref)
       return node_pool_client.Get(node_pool_ref)

@@ -60,7 +60,7 @@ class Create(base.CreateCommand):
         To create a template that permits a requestor to specify extensions by
         OIDs, and subjects (but not SANs), with default x509 exensions:
 
-          $ {command} mtls-only-extensions --copy-subject --no-copy-sans --predefined-values-file mtls_cert_exts.yaml --copy-extensions-by-oids 1.3.6.1.5.5.7.3.2,1.3.6.1.5.5.7.3.1
+          $ {command} mtls-only-extensions --copy-subject --no-copy-sans --predefined-values-file mtls_cert_exts.yaml --copy-extensions-by-oid 1.3.6.1.5.5.7.3.2,1.3.6.1.5.5.7.3.1
        """,
   }
 
@@ -82,6 +82,8 @@ class Create(base.CreateCommand):
     messages = privateca_base.GetMessagesModule('v1')
 
     cert_template_ref = args.CONCEPTS.certificate_template.Parse()
+
+    flags_v1.ValidateIdentityConstraints(args)
 
     new_cert_template = messages.CertificateTemplate(
         predefinedValues=flags_v1.ParsePredefinedValues(args),

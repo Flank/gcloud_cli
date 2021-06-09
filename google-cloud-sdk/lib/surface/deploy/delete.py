@@ -46,9 +46,8 @@ def _CommonArgs(parser):
   """
   flags.AddConfigFile(parser)
   flags.AddForce(
-      parser,
-      'If true, the delivery pipeline with sub-resources will be deleted '
-      'and its sub-resources will also be deleted')
+      parser, 'If true, the delivery pipeline and '
+      'its sub-resources (releases and rollouts) are deleted.')
   resource_args.AddLocationResourceArg(parser)
 
 

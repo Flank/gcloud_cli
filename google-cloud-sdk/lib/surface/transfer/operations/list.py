@@ -78,14 +78,14 @@ class List(base.ListCommand):
         '--operation-statuses',
         type=arg_parsers.ArgList(),
         metavar='OPERATION_STATUSES',
-        help='Allows you to list only transfer operations with the statuses you'
+        help='List only transfer operations with the statuses you'
         " specify. Options include 'in-progress', 'paused', 'success',"
         "'failed', 'aborted'. Separate multiple statuses with commas (e.g.,"
         ' --operation-statuses=failed,aborted).')
     parser.add_argument(
         '--expand-table',
         action='store_true',
-        help='Includes additional table columns (operation name, start time,'
+        help='Include additional table columns (operation name, start time,'
         ' status, data copied, status, has errors, job name) in command'
         ' output. Tip: increase the size of your terminal before running the'
         ' command.')

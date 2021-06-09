@@ -33,6 +33,4 @@ class Disable(base.DisableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'identityservice'
-  FEATURE_DISPLAY_NAME = 'Identity Service'
-  FEATURE_API = 'anthosidentityservice.googleapis.com'
+  feature_name = 'identityservice'

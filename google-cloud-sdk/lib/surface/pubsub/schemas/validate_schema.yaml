@@ -45,3 +45,7 @@
       required: true
       help_text: |
         Type of the schema.
+
+  response:
+    modify_response_hooks:
+    - googlecloudsdk.command_lib.pubsub.util:OutputSchemaValidated

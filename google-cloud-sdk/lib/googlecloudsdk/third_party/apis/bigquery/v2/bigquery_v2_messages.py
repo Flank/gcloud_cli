@@ -1179,6 +1179,25 @@ class ExternalDataConfiguration(_messages.Message):
     connectionId: [Optional, Trusted Tester] Connection for external data
       source.
     csvOptions: Additional properties to set if sourceFormat is set to CSV.
+    decimalTargetTypes: [Optional] Defines the list of possible SQL data types
+      to which the source decimal values are converted. This list and the
+      precision and the scale parameters of the decimal field determine the
+      target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is
+      picked if it is in the specified list and if it supports the precision
+      and the scale. STRING supports all precision and scale values. If none
+      of the listed types supports the precision and the scale, the type
+      supporting the widest range in the specified list is picked, and if a
+      value exceeds the supported range when reading the data, an error will
+      be thrown. Example: Suppose the value of this field is ["NUMERIC",
+      "BIGNUMERIC"]. If (precision,scale) is: (38,9) -> NUMERIC; (39,9) ->
+      BIGNUMERIC (NUMERIC cannot hold 30 integer digits); (38,10) ->
+      BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); (76,38) ->
+      BIGNUMERIC; (77,38) -> BIGNUMERIC (error if value exeeds supported
+      range). This field cannot contain duplicate types. The order of the
+      types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"]
+      is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes
+      precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC
+      and ["NUMERIC"] for the other file formats.
     googleSheetsOptions: [Optional] Additional options if sourceFormat is set
       to GOOGLE_SHEETS.
     hivePartitioningOptions: [Optional] Options to configure hive partitioning
@@ -1223,14 +1242,15 @@ class ExternalDataConfiguration(_messages.Message):
   compression = _messages.StringField(3)
   connectionId = _messages.StringField(4)
   csvOptions = _messages.MessageField('CsvOptions', 5)
-  googleSheetsOptions = _messages.MessageField('GoogleSheetsOptions', 6)
-  hivePartitioningOptions = _messages.MessageField('HivePartitioningOptions', 7)
-  ignoreUnknownValues = _messages.BooleanField(8)
-  maxBadRecords = _messages.IntegerField(9, variant=_messages.Variant.INT32)
-  parquetOptions = _messages.MessageField('ParquetOptions', 10)
-  schema = _messages.MessageField('TableSchema', 11)
-  sourceFormat = _messages.StringField(12)
-  sourceUris = _messages.StringField(13, repeated=True)
+  decimalTargetTypes = _messages.StringField(6, repeated=True)
+  googleSheetsOptions = _messages.MessageField('GoogleSheetsOptions', 7)
+  hivePartitioningOptions = _messages.MessageField('HivePartitioningOptions', 8)
+  ignoreUnknownValues = _messages.BooleanField(9)
+  maxBadRecords = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  parquetOptions = _messages.MessageField('ParquetOptions', 11)
+  schema = _messages.MessageField('TableSchema', 12)
+  sourceFormat = _messages.StringField(13)
+  sourceUris = _messages.StringField(14, repeated=True)
 
 
 class GetQueryResultsResponse(_messages.Message):
@@ -1533,26 +1553,25 @@ class JobConfigurationLoad(_messages.Message):
       returned in the job result. The default value is CREATE_IF_NEEDED.
       Creation, truncation and append actions occur as one atomic update upon
       job completion.
-    decimalTargetTypes: Defines the list of possible SQL data types to which
-      the source decimal values are converted. This list and the precision and
-      the scale parameters of the decimal field determine the target type. In
-      the order of NUMERIC, BIGNUMERIC ([Preview](/products/#product-launch-
-      stages)), and STRING, a type is picked if it is in the specified list
-      and if it supports the precision and the scale. STRING supports all
-      precision and scale values. If none of the listed types supports the
-      precision and the scale, the type supporting the widest range in the
-      specified list is picked, and if a value exceeds the supported range
-      when reading the data, an error will be thrown. Example: Suppose the
-      value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale)
-      is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30
-      integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10
-      fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC
-      (error if value exeeds supported range). This field cannot contain
-      duplicate types. The order of the types in this field is ignored. For
-      example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC",
-      "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC.
-      Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other
-      file formats.
+    decimalTargetTypes: [Optional] Defines the list of possible SQL data types
+      to which the source decimal values are converted. This list and the
+      precision and the scale parameters of the decimal field determine the
+      target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is
+      picked if it is in the specified list and if it supports the precision
+      and the scale. STRING supports all precision and scale values. If none
+      of the listed types supports the precision and the scale, the type
+      supporting the widest range in the specified list is picked, and if a
+      value exceeds the supported range when reading the data, an error will
+      be thrown. Example: Suppose the value of this field is ["NUMERIC",
+      "BIGNUMERIC"]. If (precision,scale) is: (38,9) -> NUMERIC; (39,9) ->
+      BIGNUMERIC (NUMERIC cannot hold 30 integer digits); (38,10) ->
+      BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); (76,38) ->
+      BIGNUMERIC; (77,38) -> BIGNUMERIC (error if value exeeds supported
+      range). This field cannot contain duplicate types. The order of the
+      types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"]
+      is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes
+      precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC
+      and ["NUMERIC"] for the other file formats.
     destinationEncryptionConfiguration: Custom encryption configuration (e.g.,
       Cloud KMS keys).
     destinationTable: [Required] The destination table to load the data into.
@@ -1998,8 +2017,8 @@ class JobStatistics(_messages.Message):
     totalBytesProcessed: [Output-only] [Deprecated] Use the bytes processed in
       the query statistics instead.
     totalSlotMs: [Output-only] Slot-milliseconds for the job.
-    transactionInfoTemplate: [Output-only] [Alpha] Information of the multi-
-      statement transaction if this job is part of one.
+    transactionInfo: [Output-only] [Alpha] Information of the multi-statement
+      transaction if this job is part of one.
   """
 
   class ReservationUsageValueListEntry(_messages.Message):
@@ -2032,7 +2051,7 @@ class JobStatistics(_messages.Message):
   startTime = _messages.IntegerField(15)
   totalBytesProcessed = _messages.IntegerField(16)
   totalSlotMs = _messages.IntegerField(17)
-  transactionInfoTemplate = _messages.MessageField('TransactionInfo', 18)
+  transactionInfo = _messages.MessageField('TransactionInfo', 18)
 
 
 class JobStatistics2(_messages.Message):
@@ -2067,6 +2086,8 @@ class JobStatistics2(_messages.Message):
       access policy. Present only for CREATE/DROP ROW ACCESS POLICY queries.
     ddlTargetTable: [Output-only] The DDL target table. Present only for
       CREATE/DROP TABLE/VIEW and DROP ALL ROW ACCESS POLICIES queries.
+    dmlStats: [Output-only] Detailed statistics for DML statements Present
+      only for DML statements INSERT, UPDATE, DELETE or TRUNCATE.
     estimatedBytesProcessed: [Output-only] The original estimate of bytes
       processed for the job.
     modelTraining: [Output-only, Beta] Information about create model query
@@ -2142,24 +2163,25 @@ class JobStatistics2(_messages.Message):
   ddlTargetRoutine = _messages.MessageField('RoutineReference', 7)
   ddlTargetRowAccessPolicy = _messages.MessageField('RowAccessPolicyReference', 8)
   ddlTargetTable = _messages.MessageField('TableReference', 9)
-  estimatedBytesProcessed = _messages.IntegerField(10)
-  modelTraining = _messages.MessageField('BigQueryModelTraining', 11)
-  modelTrainingCurrentIteration = _messages.IntegerField(12, variant=_messages.Variant.INT32)
-  modelTrainingExpectedTotalIteration = _messages.IntegerField(13)
-  numDmlAffectedRows = _messages.IntegerField(14)
-  queryPlan = _messages.MessageField('ExplainQueryStage', 15, repeated=True)
-  referencedRoutines = _messages.MessageField('RoutineReference', 16, repeated=True)
-  referencedTables = _messages.MessageField('TableReference', 17, repeated=True)
-  reservationUsage = _messages.MessageField('ReservationUsageValueListEntry', 18, repeated=True)
-  schema = _messages.MessageField('TableSchema', 19)
-  statementType = _messages.StringField(20)
-  timeline = _messages.MessageField('QueryTimelineSample', 21, repeated=True)
-  totalBytesBilled = _messages.IntegerField(22)
-  totalBytesProcessed = _messages.IntegerField(23)
-  totalBytesProcessedAccuracy = _messages.StringField(24)
-  totalPartitionsProcessed = _messages.IntegerField(25)
-  totalSlotMs = _messages.IntegerField(26)
-  undeclaredQueryParameters = _messages.MessageField('QueryParameter', 27, repeated=True)
+  dmlStats = _messages.MessageField('extra_types.JsonValue', 10)
+  estimatedBytesProcessed = _messages.IntegerField(11)
+  modelTraining = _messages.MessageField('BigQueryModelTraining', 12)
+  modelTrainingCurrentIteration = _messages.IntegerField(13, variant=_messages.Variant.INT32)
+  modelTrainingExpectedTotalIteration = _messages.IntegerField(14)
+  numDmlAffectedRows = _messages.IntegerField(15)
+  queryPlan = _messages.MessageField('ExplainQueryStage', 16, repeated=True)
+  referencedRoutines = _messages.MessageField('RoutineReference', 17, repeated=True)
+  referencedTables = _messages.MessageField('TableReference', 18, repeated=True)
+  reservationUsage = _messages.MessageField('ReservationUsageValueListEntry', 19, repeated=True)
+  schema = _messages.MessageField('TableSchema', 20)
+  statementType = _messages.StringField(21)
+  timeline = _messages.MessageField('QueryTimelineSample', 22, repeated=True)
+  totalBytesBilled = _messages.IntegerField(23)
+  totalBytesProcessed = _messages.IntegerField(24)
+  totalBytesProcessedAccuracy = _messages.StringField(25)
+  totalPartitionsProcessed = _messages.IntegerField(26)
+  totalSlotMs = _messages.IntegerField(27)
+  undeclaredQueryParameters = _messages.MessageField('QueryParameter', 28, repeated=True)
 
 
 class JobStatistics3(_messages.Message):
@@ -2623,6 +2645,8 @@ class QueryResponse(_messages.Message):
 
   Fields:
     cacheHit: Whether the query result was fetched from the query cache.
+    dmlStats: [Output-only] Detailed statistics for DML statements Present
+      only for DML statements INSERT, UPDATE, DELETE or TRUNCATE.
     errors: [Output-only] The first errors or warnings encountered during the
       running of the job. The final message includes the number of errors that
       caused the process to stop. Errors here do not necessarily mean that the
@@ -2656,17 +2680,18 @@ class QueryResponse(_messages.Message):
   """
 
   cacheHit = _messages.BooleanField(1)
-  errors = _messages.MessageField('ErrorProto', 2, repeated=True)
-  jobComplete = _messages.BooleanField(3)
-  jobReference = _messages.MessageField('JobReference', 4)
-  kind = _messages.StringField(5, default='bigquery#queryResponse')
-  numDmlAffectedRows = _messages.IntegerField(6)
-  pageToken = _messages.StringField(7)
-  rows = _messages.MessageField('TableRow', 8, repeated=True)
-  schema = _messages.MessageField('TableSchema', 9)
-  sessionInfoTemplate = _messages.MessageField('SessionInfo', 10)
-  totalBytesProcessed = _messages.IntegerField(11)
-  totalRows = _messages.IntegerField(12, variant=_messages.Variant.UINT64)
+  dmlStats = _messages.MessageField('extra_types.JsonValue', 2)
+  errors = _messages.MessageField('ErrorProto', 3, repeated=True)
+  jobComplete = _messages.BooleanField(4)
+  jobReference = _messages.MessageField('JobReference', 5)
+  kind = _messages.StringField(6, default='bigquery#queryResponse')
+  numDmlAffectedRows = _messages.IntegerField(7)
+  pageToken = _messages.StringField(8)
+  rows = _messages.MessageField('TableRow', 9, repeated=True)
+  schema = _messages.MessageField('TableSchema', 10)
+  sessionInfoTemplate = _messages.MessageField('SessionInfo', 11)
+  totalBytesProcessed = _messages.IntegerField(12)
+  totalRows = _messages.IntegerField(13, variant=_messages.Variant.UINT64)
 
 
 class QueryTimelineSample(_messages.Message):
@@ -2822,8 +2847,9 @@ class SnapshotDefinition(_messages.Message):
 
   Fields:
     baseTableReference: [Required] Reference describing the ID of the table
-      that is snapshotted.
+      that was snapshot.
     snapshotTime: [Required] The time at which the base table was snapshot.
+      This value is reported in the JSON response using RFC3339 format.
   """
 
   baseTableReference = _messages.MessageField('TableReference', 1)
@@ -3420,6 +3446,10 @@ class ViewDefinition(_messages.Message):
   Fields:
     query: [Required] A query that BigQuery executes when the view is
       referenced.
+    useExplicitColumnNames: True if the column names are explicitly specified.
+      For example by using the 'CREATE VIEW v(c1, c2) AS ...' syntax. Can only
+      be set using BigQuery's standard SQL:
+      https://cloud.google.com/bigquery/sql-reference/
     useLegacySql: Specifies whether to use BigQuery's legacy SQL for this
       view. The default value is true. If set to false, the view will use
       BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-
@@ -3430,7 +3460,8 @@ class ViewDefinition(_messages.Message):
   """
 
   query = _messages.StringField(1)
-  useLegacySql = _messages.BooleanField(2)
-  userDefinedFunctionResources = _messages.MessageField('UserDefinedFunctionResource', 3, repeated=True)
+  useExplicitColumnNames = _messages.BooleanField(2)
+  useLegacySql = _messages.BooleanField(3)
+  userDefinedFunctionResources = _messages.MessageField('UserDefinedFunctionResource', 4, repeated=True)
 
 

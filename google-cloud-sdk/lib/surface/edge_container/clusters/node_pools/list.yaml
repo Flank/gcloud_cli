@@ -1,24 +1,24 @@
 - release_tracks: [ALPHA]
 
   help_text:
-    brief: List Kubernetesedge nodePools.
+    brief: List Edge Container nodePools.
     description: |
-      List Kubernetesedge nodePools.
+      List Edge Container nodePools.
     examples: |
       To list the nodePools, run:
 
         $ {command}
 
   request:
-    collection: kubernetesedge.projects.locations.clusters.nodePools
-    api_version: v1alpha1
+    collection: edgecontainer.projects.locations.clusters.nodePools
+    api_version: v1alpha
 
   response:
     id_field: name
 
   arguments:
     resource:
-      help_text: Parent Kubernetesedge location to list all contained Kubernetesedge nodePools.
+      help_text: Parent Edge Container location to list all contained Edge Container nodePools.
       spec: !REF googlecloudsdk.command_lib.edge_container.resources:cluster
 
   output:

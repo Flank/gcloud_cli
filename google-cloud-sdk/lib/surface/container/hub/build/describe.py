@@ -1,0 +1,101 @@
+# -*- coding: utf-8 -*- #
+# Copyright 2021 Google LLC. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""The command to describe the configuration and status of Cloud Build clusters."""
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
+import os
+from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as gbase
+from googlecloudsdk.command_lib.container.hub.build import utils
+from googlecloudsdk.command_lib.container.hub.features import base
+
+DETAILED_HELP = {
+    'EXAMPLES':
+        """\
+    Describe the configuration and status of members with Cloud Build installed:
+
+      $ {command}
+
+      NAME              STATUS  DESCRIPTION                     SECURITY POLICY  VERSION
+      managed-member-a  SUCCESS Created controller for cluster  NON_PRIVILEGED   0.1.0
+      managed-member-b  SUCCESS Created controller for cluster  PRIVILEGED       0.1.0
+      managed-member-c  FAILED  Unable to connect to cluster    PRIVILEGED       0.1.0
+
+    View the status for the member named `managed-member-a`:
+
+      $ {command} --filter="NAME:managed-member-a"
+
+    Use a regular expression to list the configuration and status of multiple members:
+
+      $ {command} --filter="NAME ~ managed-member.*"
+
+    List all members with security policy `PRIVILEGED`:
+
+      $ {command} --filter="SECURITYPOLICY:PRIVILEGED"
+
+    List all the members with security policy `NON_PRIVILEGED` and Cloud Build version `0.1.0`:
+
+      $ {command} --filter="SECURITYPOLICY:NON_PRIVILEGED AND VERSION:0.1.0"
+  """,
+}
+
+
+@gbase.Hidden
+class Describe(base.DescribeCommand, gbase.ListCommand):
+  """Describe the configuration and status of members with Cloud Build installed."""
+  detailed_help = DETAILED_HELP
+
+  feature_name = 'cloudbuild'
+
+  @staticmethod
+  def Args(parser):
+    parser.display_info.AddFormat("""
+    table(
+            NAME:label=NAME:sort=1,
+            STATUS:label=STATUS,
+            DESCRIPTION:label=DESCRIPTION,
+            SECURITYPOLICY:label="SECURITY POLICY",
+            VERSION:label=VERSION
+      )
+    """)
+
+  def Run(self, args):
+    feature = super(Describe, self).Run(args)
+    messages = core_apis.GetMessagesModule('gkehub', 'v1alpha1')
+
+    cluster_status = []
+    feature_spec_memberships = utils.GetFeatureSpecMemberships(
+        feature, messages)
+    feature_state_memberships = utils.GetFeatureStateMemberships(feature)
+
+    for membership, config in feature_spec_memberships.items():
+      dict_entry = {
+          'NAME': os.path.basename(membership),
+          'SECURITYPOLICY': config.securityPolicy,
+          'VERSION': config.version
+      }
+      if membership in feature_state_memberships:
+        details = feature_state_memberships[membership]
+        dict_entry.update({
+            'DESCRIPTION': details.value.description,
+            'STATUS': details.value.code
+        })
+
+      cluster_status.append(dict_entry)
+
+    return cluster_status

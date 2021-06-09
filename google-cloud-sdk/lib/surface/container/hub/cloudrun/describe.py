@@ -31,8 +31,4 @@ class Describe(base.DescribeCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'appdevexperience'
-  FEATURE_DISPLAY_NAME = 'CloudRun'
-
-  def Run(self, args):
-    return self.RunCommand(args)
+  feature_name = 'appdevexperience'

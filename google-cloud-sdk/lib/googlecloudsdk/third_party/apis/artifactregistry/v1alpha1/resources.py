@@ -17,19 +17,37 @@
 import enum
 
 
-BASE_URL = 'https://genomics.googleapis.com/v1/'
-DOCS_URL = 'https://cloud.google.com/genomics'
+BASE_URL = 'https://artifactregistry.googleapis.com/v1alpha1/'
+DOCS_URL = 'https://cloud.google.com/artifacts/docs/'
 
 
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
-  OPERATIONS = (
-      'operations',
+  PROJECTS = (
+      'projects',
+      'projects/{projectsId}',
+      {},
+      ['projectsId'],
+      True
+  )
+  PROJECTS_LOCATIONS = (
+      'projects.locations',
       '{+name}',
       {
           '':
-              'operations/{operationsId}',
+              'projects/{projectsId}/locations/{locationsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_OPERATIONS = (
+      'projects.locations.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/operations/'
+              '{operationsId}',
       },
       ['name'],
       True

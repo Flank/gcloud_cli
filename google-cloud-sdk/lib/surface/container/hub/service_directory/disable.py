@@ -33,6 +33,4 @@ class Disable(base.DisableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'servicedirectory'
-  FEATURE_DISPLAY_NAME = 'Service Directory'
-  FEATURE_API = 'servicedirectory.googleapis.com'
+  feature_name = 'servicedirectory'

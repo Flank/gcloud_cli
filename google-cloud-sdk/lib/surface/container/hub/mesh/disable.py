@@ -33,5 +33,4 @@ class Disable(base.DisableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'servicemesh'
-  FEATURE_DISPLAY_NAME = 'Service Mesh'
+  feature_name = 'servicemesh'

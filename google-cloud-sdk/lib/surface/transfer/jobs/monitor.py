@@ -38,10 +38,10 @@ class Monitor(base.Command):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        'job_name',
+        'name',
         help='The name of the job you want to monitor'
         " (you'll see details for the job's latest operation).")
 
   def Run(self, args):
-    operation_name = jobs_util.block_until_operation_created(args.job_name)
+    operation_name = jobs_util.block_until_operation_created(args.name)
     operations_util.display_monitoring_view(operation_name)

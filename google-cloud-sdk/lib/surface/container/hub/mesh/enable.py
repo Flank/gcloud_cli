@@ -33,9 +33,7 @@ class Enable(base.EnableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'servicemesh'
-  FEATURE_DISPLAY_NAME = 'Service Mesh'
-  FEATURE_API = 'meshconfig.googleapis.com'
+  feature_name = 'servicemesh'
 
   def Run(self, args):
     return self.RunCommand(args, servicemeshFeatureSpec=(

@@ -39,11 +39,11 @@ class Describe(base.ListCommand):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        'job_name', help='The name of the job you want to describe.')
+        'name', help='The name of the job you want to describe.')
 
   def Display(self, args, resources):
     del args  # Unsued.
     resource_printer.Print(resources, 'json')
 
   def Run(self, args):
-    return jobs_util.api_get(args.job_name)
+    return jobs_util.api_get(args.name)

@@ -52,10 +52,7 @@ class Jobs(base.Group):
     return context
 
   def _CheckPlatform(self):
-    platform = platforms.GetPlatform(prompt_if_unset=False)
-    if platform is None:
-      # Set the platform property because some methods later on need it.
-      properties.VALUES.run.platform.Set(platforms.PLATFORM_MANAGED)
-    elif platform != platforms.PLATFORM_MANAGED:
+    platform = platforms.GetPlatform()
+    if platform != platforms.PLATFORM_MANAGED:
       raise exceptions.PlatformError(
           'This command group is only supported for fully managed Cloud Run.')

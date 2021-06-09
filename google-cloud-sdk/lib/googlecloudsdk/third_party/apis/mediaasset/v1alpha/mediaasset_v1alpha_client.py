@@ -307,7 +307,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.assetTypes.assets.annotationSets.annotations.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['updateMask'],
+        query_params=['oldUpdateMask', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='annotation',
         request_type_name='MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsAnnotationsPatchRequest',
@@ -452,7 +452,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.assetTypes.assets.annotationSets.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['updateMask'],
+        query_params=['oldUpdateMask', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='annotationSet',
         request_type_name='MediaassetProjectsLocationsAssetTypesAssetsAnnotationSetsPatchRequest',
@@ -750,87 +750,6 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
-    def LroCreate(self, request, global_params=None):
-      r"""Creates a new asset in a given project and location.
-
-      Args:
-        request: (MediaassetProjectsLocationsAssetTypesAssetsLroCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('LroCreate')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    LroCreate.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1alpha/projects/{projectsId}/locations/{locationsId}/assetTypes/{assetTypesId}/assets:lroCreate',
-        http_method='POST',
-        method_id='mediaasset.projects.locations.assetTypes.assets.lroCreate',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=['assetId'],
-        relative_path='v1alpha/{+parent}/assets:lroCreate',
-        request_field='asset',
-        request_type_name='MediaassetProjectsLocationsAssetTypesAssetsLroCreateRequest',
-        response_type_name='Operation',
-        supports_download=False,
-    )
-
-    def LroDelete(self, request, global_params=None):
-      r"""Deletes a single asset.
-
-      Args:
-        request: (MediaassetProjectsLocationsAssetTypesAssetsLroDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('LroDelete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    LroDelete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1alpha/projects/{projectsId}/locations/{locationsId}/assetTypes/{assetTypesId}/assets/{assetsId}:lroDelete',
-        http_method='POST',
-        method_id='mediaasset.projects.locations.assetTypes.assets.lroDelete',
-        ordered_params=['name'],
-        path_params=['name'],
-        query_params=['etag', 'requestId'],
-        relative_path='v1alpha/{+name}:lroDelete',
-        request_field='',
-        request_type_name='MediaassetProjectsLocationsAssetTypesAssetsLroDeleteRequest',
-        response_type_name='Operation',
-        supports_download=False,
-    )
-
-    def LroUpdate(self, request, global_params=None):
-      r"""Updates the parameters of a single asset.
-
-      Args:
-        request: (MediaassetProjectsLocationsAssetTypesAssetsLroUpdateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('LroUpdate')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    LroUpdate.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1alpha/projects/{projectsId}/locations/{locationsId}/assetTypes/{assetTypesId}/assets/{assetsId}:lroUpdate',
-        http_method='POST',
-        method_id='mediaasset.projects.locations.assetTypes.assets.lroUpdate',
-        ordered_params=['name'],
-        path_params=['name'],
-        query_params=['requestId', 'updateMask'],
-        relative_path='v1alpha/{+name}:lroUpdate',
-        request_field='asset',
-        request_type_name='MediaassetProjectsLocationsAssetTypesAssetsLroUpdateRequest',
-        response_type_name='Operation',
-        supports_download=False,
-    )
-
     def Patch(self, request, global_params=None):
       r"""Updates the parameters of a single asset.
 
@@ -850,7 +769,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.assetTypes.assets.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['requestId', 'updateMask'],
+        query_params=['oldUpdateMask', 'requestId', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='asset',
         request_type_name='MediaassetProjectsLocationsAssetTypesAssetsPatchRequest',
@@ -1049,7 +968,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.assetTypes.rules.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['updateMask'],
+        query_params=['oldUpdateMask', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='rule',
         request_type_name='MediaassetProjectsLocationsAssetTypesRulesPatchRequest',
@@ -1221,7 +1140,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.assetTypes.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['requestId', 'updateMask'],
+        query_params=['oldUpdateMask', 'requestId', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='assetType',
         request_type_name='MediaassetProjectsLocationsAssetTypesPatchRequest',
@@ -1447,7 +1366,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.complexTypes.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['requestId', 'updateMask'],
+        query_params=['oldUpdateMask', 'requestId', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='complexType',
         request_type_name='MediaassetProjectsLocationsComplexTypesPatchRequest',
@@ -1791,7 +1710,7 @@ class MediaassetV1alpha(base_api.BaseApiClient):
         method_id='mediaasset.projects.locations.transformers.patch',
         ordered_params=['name'],
         path_params=['name'],
-        query_params=['requestId', 'updateMask'],
+        query_params=['oldUpdateMask', 'requestId', 'updateMask'],
         relative_path='v1alpha/{+name}',
         request_field='transformer',
         request_type_name='MediaassetProjectsLocationsTransformersPatchRequest',

@@ -74,7 +74,7 @@ class List(base.ListCommand):
         '--job-statuses',
         type=arg_parsers.ArgList(),
         metavar='JOB_STATUSES',
-        help='Allows you to list only jobs with the statuses you specify.'
+        help='List only jobs with the statuses you specify.'
         " Options include 'enabled', 'disabled', 'deleted' (case"
         ' insensitive). Separate multiple statuses with commas (e.g.,'
         ' --job-statuses=enabled,deleted). If not specified, all jobs will'
@@ -82,7 +82,7 @@ class List(base.ListCommand):
     parser.add_argument(
         '--expand-table',
         action='store_true',
-        help='Includes additional table columns (job name, source, destination,'
+        help='Include additional table columns (job name, source, destination,'
         ' frequency, lastest operation name, job status) in command output.'
         ' Tip: increase the size of your terminal before running the command.')
 

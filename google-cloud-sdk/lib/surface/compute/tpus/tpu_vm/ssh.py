@@ -20,18 +20,14 @@ from __future__ import unicode_literals
 
 import argparse
 import os.path
-import sys
 import threading
-import time
 
-from apitools.base.py import encoding_helper
-from apitools.base.py.exceptions import HttpConflictError
-from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute import ssh_utils
+from googlecloudsdk.command_lib.compute.tpus.tpu_vm import ssh as tpu_ssh_utils
 from googlecloudsdk.command_lib.compute.tpus.tpu_vm import util as tpu_utils
 from googlecloudsdk.command_lib.util.ssh import ssh
 from googlecloudsdk.core import log
@@ -67,35 +63,6 @@ def AddCommandArgGroup(parser):
       The logs will be written in files named {WORKER_ID}.log. For example:
       "2.log".
       """)
-
-
-def AddWorkerArg(parser):
-  parser.add_argument(
-      '--worker',
-      default='0',
-      help="""\
-          TPU worker to connect to. The supported value is a single 0-based
-          index of the worker in the case of a TPU Pod. When also using the
-          `--command` flag, it additionally supports a comma-separated list
-          (e.g. '1,4,6'), range (e.g. '1-3'), or special keyword ``all" to
-          run the command concurrently on each of the specified workers.
-
-          Note that when targeting multiple workers, you should run 'ssh-add'
-          with your private key prior to executing the gcloud command. Default:
-          'ssh-add ~/.ssh/google_compute_engine'.
-          """)
-
-
-def AddInternalIPArg(parser):
-  parser.add_argument(
-      '--internal-ip',
-      action='store_true',
-      help="""\
-          Connect to TPU VMs using their internal IP addresses rather than their
-          external IP addresses. Use this to connect from a Google Compute
-          Engine VM to a TPU VM on the same VPC network, or between two peered
-          VPC networks.
-          """)
 
 
 def AddSSHArgs(parser):
@@ -142,43 +109,11 @@ def AddSSHArgs(parser):
       """)
 
 
-def _AttemptSSHWithRetries(worker, ssh_cmd, env, output_file, multiple_workers):
-  """Attempts to connect to a worker using SSH."""
-  max_attempts = 10
-  sleep_interval = 5
-  # Since SSH keys may have recently been set in the instance's metadata by
-  # the UpateNode call, it can take some time before those are propagated
-  # correctly and the SSH command's authorization is successful. Therefore,
-  # we wrap this in a retry loop. No exponential back-off is needed here, as
-  # we're not looking to throttle.
-  for i in range(max_attempts):
-    try:
-      log.status.Print('SSH: Attempting to connect to worker {}...'
-                       .format(worker))
-      return_code = ssh_cmd.Run(env, force_connect=True,
-                                explicit_output_file=output_file,
-                                explicit_error_file=output_file)
-      if return_code:
-        # This is the return code of the remote command.  Problems with SSH
-        # itself will result in ssh.CommandError being raised above.
-        if multiple_workers:
-          log.status.Print('##### Command execution on worker {} failed '
-                           'with return code {}. Continuing.'
-                           ''.format(worker, return_code))
-        sys.exit(return_code)
-    except ssh.CommandError as e:
-      if i == max_attempts - 1:
-        raise e
-      if multiple_workers:
-        log.status.Print('Failed to execute command on multiple workers. '
-                         'This may have happened if you have not added '
-                         'your SSH key to your ssh-agent using "ssh-add '
-                         '~/.ssh/google_compute_engine".')
-      log.status.Print(
-          'Retrying: SSH command error: {}'.format(six.text_type(e)))
-      time.sleep(sleep_interval)
-      continue
-    break
+def SSHRunCmd(env, cmd, output_file_writer):
+  """Returns a function to run."""
+  return cmd.Run(
+      env, force_connect=True, explicit_output_file=output_file_writer,
+      explicit_error_file=output_file_writer)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -194,26 +129,9 @@ class Ssh(base.Command):
     """
     ssh_utils.BaseSSHCLIHelper.Args(parser)
     AddSSHArgs(parser)
-    AddWorkerArg(parser)
+    tpu_ssh_utils.AddTPUSSHArgs(parser)
     AddCommandArgGroup(parser)
-    AddInternalIPArg(parser)
     flags.AddZoneFlag(parser, resource_type='tpu', operation_type='ssh')
-
-  def _GetProject(self, full_name):
-    """Returns the project name for a Cloud TPU VM instance."""
-    return os.path.basename(
-        os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(full_name)))))
-
-  def _ParseHostKeySuffixes(self, guest_attributes_response):
-    """Returns the host key suffixes."""
-    host_key_suffixes = []
-    for guest_attributes in guest_attributes_response.guestAttributes:
-      for item in guest_attributes.queryValue.items:
-        if item.key == 'ssh-ed25519':
-          host_key_suffixes.append(item.value[-6:])
-          break
-    return host_key_suffixes
 
   def Run(self, args):
     user, tpu_name = ssh_utils.GetUserAndInstance(args.user_tpu)
@@ -245,8 +163,8 @@ class Ssh(base.Command):
           'this node, please see '
           'https://cloud.google.com/tpu/docs/creating-deleting-tpus.')
 
-    worker_ips = tpu_utils.ParseWorkerFlag(args.worker, node.networkEndpoints,
-                                           args.internal_ip)
+    worker_ips = tpu_ssh_utils.ParseWorkerFlag(
+        args.worker, node.networkEndpoints, args.internal_ip)
 
     if len(worker_ips) > 1 and not args.command:
       raise exceptions.InvalidArgumentException(
@@ -254,52 +172,32 @@ class Ssh(base.Command):
           'flag.')
 
     guest_attributes_response = tpu.GetGuestAttributes(tpu_name, args.zone)
-    host_key_suffixes = self._ParseHostKeySuffixes(guest_attributes_response)
+    host_key_suffixes = tpu_ssh_utils.ParseHostKeySuffixes(
+        guest_attributes_response)
 
     # Generate the public key.
     ssh_helper = ssh_utils.BaseSSHCLIHelper()
     ssh_helper.Run(args)
     public_key = ssh_helper.keys.GetPublicKey().ToEntry()
 
-    node_dict = encoding_helper.MessageToDict(node)
+    project = tpu_utils.GetProject(self.ReleaseTrack(), ssh_helper)
 
     if not args.plain:
-      holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-      project_name = properties.VALUES.core.project.GetOrFail()
-      project = ssh_helper.GetProject(holder.client, project_name)
       # If there is an '@' symbol in the user_host arg, the user is requesting
       # to connect as a specific user. This may get overridden by OS Login.
       username_requested = '@' in args.user_tpu
       _, expiration_micros = ssh_utils.GetSSHKeyExpirationFromArgs(args)
-      instance_enable_oslogin = False
-      # Check if OS Login is enabled at the instance level.
-      if 'metadata' in node_dict and 'enable-oslogin' in node_dict['metadata']:
-        instance_enable_oslogin = (
-            node_dict['metadata']['enable-oslogin'].upper() == 'TRUE')
       user, _ = ssh.CheckForOsloginAndGetUser(
           None, project, user, public_key, expiration_micros,
           self.ReleaseTrack(), username_requested=username_requested,
-          instance_enable_oslogin=instance_enable_oslogin)
+          instance_enable_oslogin=tpu_ssh_utils.TpuHasOsLoginEnabled(node))
 
     # Format the key correctly.
     public_key = '{1}:{0} {1}'.format(public_key, user)
 
-    # Ensure that the public key exists in the instance's metadata.
-    ssh_keys = ''
-    if 'metadata' in node_dict and 'ssh-keys' in node_dict['metadata']:
-      ssh_keys = node_dict['metadata']['ssh-keys']
-    # Verify if the key exists in the node's metadata. If not, we'll have to
-    # append it by calling UpdateNode.
-    if public_key not in ssh_keys:
-      ssh_keys += '\n' + public_key
-      node_for_update = tpu.messages.Node(
-          metadata=tpu.UpdateMetadataKey(
-              metadata=node.metadata, key='ssh-keys', value=ssh_keys))
-      try:
-        tpu.UpdateNode(tpu_name, args.zone, node_for_update, 'metadata')
-      except HttpConflictError:
-        # Do not fail the SSH if there is already an UpdateNode call in flight.
-        pass
+    if not args.plain and not args.dry_run:
+      tpu_ssh_utils.AddSSHKeyIfNeeded(
+          project, tpu, node, tpu_name, args.zone, public_key)
 
     command_list = args.command.split(' ') if args.command else None
 
@@ -317,11 +215,9 @@ class Ssh(base.Command):
       options = None
       if not args.plain:
         identity_file = ssh_helper.keys.key_file
-        instance_id = 'tpu.{}-{}'.format(node.id, worker)
-        if len(host_key_suffixes) > worker:
-          instance_id += '-{}'.format(host_key_suffixes[worker])
-        options = ssh_helper.GetConfig(instance_id,
-                                       args.strict_host_key_checking, None)
+        options = ssh_helper.GetConfig(
+            tpu_ssh_utils.GetInstanceID(node.id, worker, host_key_suffixes),
+            args.strict_host_key_checking, None)
 
       remote = ssh.Remote(ips.ip_address, user)
       extra_flags = ssh.ParseAndSubstituteSSHFlags(
@@ -342,13 +238,14 @@ class Ssh(base.Command):
       if len(worker_ips) > 1:
         # Run the command on multiple workers concurrently.
         ssh_threads.append(
-            threading.Thread(target=_AttemptSSHWithRetries,
-                             args=(worker, cmd, ssh_helper.env,
-                                   output_file_writer, True)))
+            threading.Thread(target=tpu_ssh_utils.AttemptRunWithRetries,
+                             args=('SSH', worker, cmd, ssh_helper.env,
+                                   output_file_writer, True, SSHRunCmd)))
         ssh_threads[-1].start()
       else:
         # Run on a single worker.
-        _AttemptSSHWithRetries(worker, cmd, ssh_helper.env, output_file_writer,
-                               False)
+        tpu_ssh_utils.AttemptRunWithRetries(
+            'SSH', worker, cmd, ssh_helper.env, output_file_writer, False,
+            SSHRunCmd)
 
 

@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.artifacts import flags
 from googlecloudsdk.command_lib.artifacts.print_settings import settings_util
-from googlecloudsdk.core import log
 
 
+@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
                     base.ReleaseTrack.GA)
 class Pypi(base.Command):
@@ -70,5 +70,4 @@ class Pypi(base.Command):
       A pypi settings snippet.
     """
 
-    log.status.Print("Note: Language package support is in Alpha.\n")
     return {"pypi": settings_util.GetPypiSettingsSnippet(args)}

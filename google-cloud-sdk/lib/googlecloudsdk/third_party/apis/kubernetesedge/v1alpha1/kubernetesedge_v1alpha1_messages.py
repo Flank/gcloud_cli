@@ -972,9 +972,9 @@ class Machine(_messages.Message):
       sters/{cluster_id}/nodePools/{pool_id}/{node}, Or empty if the machine
       is not assigned to assume the role of a node.
     labels: Labels associated with this resource.
-    location: The Google Edge Cloud location of this machine.
     name: Required. The resource name of the machine.
     updateTime: Output only. The time when the node pool was last updated.
+    zone: The Google Edge Cloud zone of this machine.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -1004,9 +1004,9 @@ class Machine(_messages.Message):
   createTime = _messages.StringField(1)
   hostedNode = _messages.StringField(2)
   labels = _messages.MessageField('LabelsValue', 3)
-  location = _messages.StringField(4)
-  name = _messages.StringField(5)
-  updateTime = _messages.StringField(6)
+  name = _messages.StringField(4)
+  updateTime = _messages.StringField(5)
+  zone = _messages.StringField(6)
 
 
 class NodePool(_messages.Message):
@@ -1021,12 +1021,8 @@ class NodePool(_messages.Message):
     labels: Labels associated with this resource.
     name: Required. The resource name of the node pool.
     nodeCount: Required. The number of nodes in the pool.
-    site: Canonical resource name of the site responsible for provisioning
-      machines to assume the role of nodes in this node pool e.g.
-      projects/{project}/locations/{location}/sites/{site_id}. When a node
-      pool is created, the site will be notified, and the site is thereafter
-      responsible for ensuring that machines exist to assume the role of the
-      node (or reporting that provisioning is not possible).
+    site: Name of the Google Edge Cloud zone where this node pool will be
+      created.
     updateTime: Output only. The time when the node pool was last updated.
   """
 

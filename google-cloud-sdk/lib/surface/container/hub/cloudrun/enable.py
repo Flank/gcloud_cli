@@ -33,9 +33,7 @@ class Enable(base.EnableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'appdevexperience'
-  FEATURE_DISPLAY_NAME = 'CloudRun'
-  FEATURE_API = 'appdevelopmentexperience.googleapis.com'
+  feature_name = 'appdevexperience'
 
   @classmethod
   def Args(cls, parser):

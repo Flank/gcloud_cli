@@ -22,6 +22,7 @@ from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import operations
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
+from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -45,6 +46,8 @@ class Create(base.Command):
         group,
         message="Parent of the TagKey in the form of organizations/{org_id}.")
     arguments.AddDescriptionArgToParser(parser)
+    arguments.AddPurposeArgToParser(parser)
+    arguments.AddPurposeDataArgToParser(parser)
     arguments.AddAsyncArgToParser(parser)
 
   def Run(self, args):
@@ -55,8 +58,25 @@ class Create(base.Command):
     tag_parent = args.parent
     description = args.description
 
+    purpose = None
+    purpose_data = None
+    if args.IsSpecified("purpose"):
+      purpose = messages.TagKey.PurposeValueValuesEnum(args.purpose)
+    if args.IsSpecified("purpose_data"):
+      if not purpose:
+        raise tag_utils.InvalidInputError("Purpose parameter not set")
+
+      additional_properties = [
+          messages.TagKey.PurposeDataValue.AdditionalProperty(
+              key=key, value=value) for key, value in args.purpose_data.items()
+      ]
+      purpose_data = messages.TagKey.PurposeDataValue(
+          additionalProperties=additional_properties)
+
     tag_key = messages.TagKey(
-        shortName=short_name, parent=tag_parent, description=description)
+        shortName=short_name, parent=tag_parent, description=description,
+        purpose=purpose, purposeData=purpose_data)
+
     create_req = messages.CloudresourcemanagerTagKeysCreateRequest(
         tagKey=tag_key)
     op = service.Create(create_req)

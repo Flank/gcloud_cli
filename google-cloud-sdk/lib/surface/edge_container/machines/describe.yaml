@@ -9,8 +9,8 @@ help_text:
       $ {command} my-machine --name=my-name
 
 request:
-  collection: kubernetesedge.projects.locations.machines
-  api_version: v1alpha1
+  collection: edgecontainer.projects.locations.machines
+  api_version: v1alpha
 
 arguments:
   resource:

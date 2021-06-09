@@ -65,6 +65,7 @@ Update.detailed_help = {
     To update a network firewall policy with name ``my-policy'', to change the
     description to ``New description'', run:
 
-      $ {command} my-policy --description='New description'
+      $ {command} my-policy \
+          --description='New description'
     """,
 }

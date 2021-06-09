@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2020 Google LLC. All Rights Reserved.
+# Copyright 2021 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,23 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implements the command to import packages into a repository."""
+"""Implements the command to upload apt packages to a repository."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import transfer
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
-from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.artifacts import flags
 from googlecloudsdk.core import resources
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class Import(base.Command):
-  """Import one or more packages into an artifact repository."""
+class Upload(base.Command):
+  """Upload an apt package to an artifact repository."""
 
   api_version = 'v1alpha1'
 
@@ -44,12 +44,11 @@ class Import(base.Command):
     base.ASYNC_FLAG.AddToParser(parser)
 
     parser.add_argument(
-        '--gcs-source',
-        metavar='GCS_SOURCE',
+        '--source',
+        metavar='SOURCE',
         required=True,
-        type=arg_parsers.ArgList(),
         help="""\
-            The Google Cloud Storage location of a package to import.""")
+            The path of a package to upload.""")
 
   def Run(self, args):
     """Run package import command."""
@@ -57,20 +56,24 @@ class Import(base.Command):
     betaclient = apis.GetClientInstance('artifactregistry', 'v1beta2')
     messages = client.MESSAGES_MODULE
 
+    client.additional_http_headers['X-Goog-Upload-Protocol'] = 'multipart'
+
     repo_ref = args.CONCEPTS.repository.Parse()
-    gcs_source = messages.GoogleDevtoolsArtifactregistryV1alpha1GcsSource(
-        uris=args.gcs_source)
-    import_request = (
-        messages.GoogleDevtoolsArtifactregistryV1alpha1ImportArtifactsRequest(
-            gcsSource=gcs_source))
 
-    request = (
-        messages.ArtifactregistryProjectsLocationsRepositoriesImportRequest(
-            googleDevtoolsArtifactregistryV1alpha1ImportArtifactsRequest=import_request,
-            parent=repo_ref.RelativeName()))
+    upload_req = messages.GoogleDevtoolsArtifactregistryV1alpha1UploadAptArtifactRequest
+    upload_request = upload_req()
 
-    op = client.projects_locations_repositories.Import(request)
+    request = messages.ArtifactregistryProjectsLocationsRepositoriesAptartifactsUploadRequest(
+        googleDevtoolsArtifactregistryV1alpha1UploadAptArtifactRequest=upload_request,
+        parent=repo_ref.RelativeName())
 
+    upload = transfer.Upload.FromFile(
+        args.source, mime_type='application/vnd.debian.binary-package')
+
+    op_obj = client.projects_locations_repositories_aptartifacts.Upload(
+        request, upload=upload)
+
+    op = op_obj.operation
     op_ref = resources.REGISTRY.ParseRelativeName(
         op.name, collection='artifactregistry.projects.locations.operations')
 
@@ -80,27 +83,19 @@ class Import(base.Command):
       result = waiter.WaitFor(
           waiter.CloudOperationPollerNoResources(
               betaclient.projects_locations_operations),
-          op_ref, 'Importing package(s)')
+          op_ref, 'Uploading package')
 
       return result
 
 
-Import.detailed_help = {
-    'brief': 'Import one or more packages into an artifact repository.',
+Upload.detailed_help = {
+    'brief': 'Upload an Apt package to an artifact repository.',
     'DESCRIPTION': """
-      *{command}* imports packages from Google Cloud Storage into the specified
-      artifact repository.
+      *{command}* uploads an Apt package to the specified artifact repository.
       """,
     'EXAMPLES': """
-      To import the package `my-package.deb` from Google Cloud Storage into
-      `my-repo`, run:
+      To upload the package `my-package.deb` to `my-repo`, run:
 
-        $ {0} my-repo --location=us-central1 --gcs-source={1}
-
-      To import the packages `my-package.deb` and `other-package.deb` into
-      `my-repo`, run:
-
-        $ {0} my-repo --location=us-central1 --gcs-source={1},{2}
-    """.format('{command}', 'gs://my-bucket/path/to/my-package.deb',
-               'gs://my-bucket/path/to/other-package.deb')
+        $ {0} my-repo --location=us-central1 --source={1}
+    """.format('{command}', 'my-package.deb')
 }

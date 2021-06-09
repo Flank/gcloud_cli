@@ -25,7 +25,7 @@ from googlecloudsdk.command_lib.compute.network_firewall_policies import flags
 
 
 class Delete(base.CreateCommand):
-  """Delete a new association between a firewall policy and an network or folder resource.
+  r"""Delete a new association between a firewall policy and an network or folder resource.
 
   *{command}* is used to delete network firewall policy associations. An
   network firewall policy is a set of rules that controls access to various
@@ -60,6 +60,8 @@ Delete.detailed_help = {
     To delete an association from a network firewall policy with NAME
     ``my-policy'' and association name ``my-association'', run:
 
-      $ {command} --firewall-policy=my-policy --name=my-association
+      $ {command}
+          --firewall-policy=my-policy
+          --name=my-association
     """,
 }

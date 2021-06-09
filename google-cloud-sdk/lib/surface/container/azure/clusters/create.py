@@ -25,6 +25,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container.azure import resource_args
 from googlecloudsdk.command_lib.container.azure import util as command_util
+from googlecloudsdk.command_lib.container.gkemulticloud import constants
 from googlecloudsdk.command_lib.container.gkemulticloud import endpoint_util
 from googlecloudsdk.command_lib.container.gkemulticloud import flags
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
@@ -86,9 +87,9 @@ class Create(base.CreateCommand):
     flags.AddSubnetID(parser, "the cluster control plane")
     flags.AddVMSize(parser)
     flags.AddSSHPublicKey(parser)
-    flags.AddRootVolumeSize(parser, required=True)
-    flags.AddMainVolumeSize(parser, required=True)
-    flags.AddTags(parser)
+    flags.AddRootVolumeSize(parser)
+    flags.AddMainVolumeSize(parser)
+    flags.AddTags(parser, "cluster")
     flags.AddValidateOnly(parser, "creation of the cluster")
     base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddFormat(command_util.CLUSTERS_FORMAT)
@@ -152,9 +153,11 @@ class Create(base.CreateCommand):
       if not async_:
         waiter.WaitFor(
             waiter.CloudOperationPollerNoResources(
-                cluster_client.client.projects_locations_operations), op_ref,
+                cluster_client.client.projects_locations_operations),
+            op_ref,
             "Creating cluster {} in Azure region {}".format(
-                cluster_ref.azureClustersId, azure_region))
+                cluster_ref.azureClustersId, azure_region),
+            wait_ceiling_ms=constants.MAX_LRO_POLL_INTERVAL_MS)
 
       log.CreatedResource(cluster_ref)
       return cluster_client.Get(cluster_ref)

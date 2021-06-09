@@ -48,10 +48,32 @@ class Create(base.CreateCommand):
     $ {command} --project=example --region=us-central1
     --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
     --endpoint=123 --prediction-sampling-rate=0.2
-    --drift-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
+    --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
 
-  To create a model deployment monitoring job with different drift detection for
-  different deployed models or with skew detection, run:
+  To create a model deployment monitoring job with skew detection for all the
+  deployed models under the endpoint ``123'', with training dataset from Google
+  Cloud Storage, run:
+
+    $ {command} --project=example --region=us-central1
+    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
+    --endpoint=123 --prediction-sampling-rate=0.2
+    --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
+    --target-field=price --data-format=csv
+    --gcs-uris=gs://test-bucket/dataset.csv
+
+  To create a model deployment monitoring job with skew detection for all the
+  deployed models under the endpoint ``123'', with training dataset from Vertex
+  AI dataset ``456'', run:
+
+    $ {command} --project=example --region=us-central1
+    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
+    --endpoint=123 --prediction-sampling-rate=0.2
+    --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
+    --target-field=price --dataset=456
+
+  To create a model deployment monitoring job with different drift detection or
+  skew detection for
+  different deployed models, run:
 
     $ {command} --project=example --region=us-central1
     --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
@@ -77,7 +99,7 @@ class Create(base.CreateCommand):
     flags.GetAnalysisInstanceSchemaArg(required=False).AddToParser(parser)
     flags.GetSamplingPredictRequestArg(required=False).AddToParser(parser)
     flags.GetMonitoringLogTtlArg(required=False).AddToParser(parser)
-    flags.AddObjectiveConfigGroup(parser, required=False)
+    flags.AddObjectiveConfigGroupForCreate(parser, required=False)
     labels_util.AddCreateLabelsFlags(parser)
 
   def Run(self, args):

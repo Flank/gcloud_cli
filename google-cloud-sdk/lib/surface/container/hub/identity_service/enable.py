@@ -33,9 +33,7 @@ class Enable(base.EnableCommand):
     $ {command}
   """
 
-  FEATURE_NAME = 'identityservice'
-  FEATURE_DISPLAY_NAME = 'Identity Service'
-  FEATURE_API = 'anthosidentityservice.googleapis.com'
+  feature_name = 'identityservice'
 
   @classmethod
   def Args(cls, parser):

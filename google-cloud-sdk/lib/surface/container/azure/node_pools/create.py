@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.azure import resource_args
 from googlecloudsdk.command_lib.container.azure import util as command_util
+from googlecloudsdk.command_lib.container.gkemulticloud import constants
 from googlecloudsdk.command_lib.container.gkemulticloud import endpoint_util
 from googlecloudsdk.command_lib.container.gkemulticloud import flags
 from googlecloudsdk.core import log
@@ -43,7 +44,8 @@ class Create(base.CreateCommand):
     flags.AddSubnetID(parser, 'the node pool')
     flags.AddVMSize(parser)
     flags.AddSSHPublicKey(parser)
-    flags.AddTags(parser)
+    flags.AddRootVolumeSize(parser)
+    flags.AddTags(parser, 'node pool')
     flags.AddValidateOnly(parser, 'creation of the node pool')
     base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddFormat(command_util.NODE_POOL_FORMAT)
@@ -56,6 +58,7 @@ class Create(base.CreateCommand):
     subnet_id = flags.GetSubnetID(args)
     vm_size = flags.GetVMSize(args)
     ssh_key = flags.GetSSHPublicKey(args)
+    root_volume_size = flags.GetRootVolumeSize(args)
     tags = flags.GetTags(args)
     validate_only = flags.GetValidateOnly(args)
 
@@ -78,6 +81,7 @@ class Create(base.CreateCommand):
           subnet_id=subnet_id,
           vm_size=vm_size,
           ssh_public_key=ssh_key,
+          root_volume_size=root_volume_size,
           tags=tags,
           validate_only=validate_only,
           min_nodes=min_nodes,
@@ -92,8 +96,10 @@ class Create(base.CreateCommand):
       if not async_:
         waiter.WaitFor(
             waiter.CloudOperationPollerNoResources(
-                api_client.client.projects_locations_operations), op_ref,
-            'Creating node pool {}'.format(nodepool_ref.azureNodePoolsId))
+                api_client.client.projects_locations_operations),
+            op_ref,
+            'Creating node pool {}'.format(nodepool_ref.azureNodePoolsId),
+            wait_ceiling_ms=constants.MAX_LRO_POLL_INTERVAL_MS)
 
       log.CreatedResource(nodepool_ref)
       return api_client.Get(nodepool_ref)
