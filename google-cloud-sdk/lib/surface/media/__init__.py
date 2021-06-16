@@ -24,3 +24,8 @@ from googlecloudsdk.calliope import base
 class Mediaservices(base.Group):
   """Manage Cloud Media Services."""
   category = base.SOLUTIONS_CATEGORY
+
+  def Filter(self, context, args):
+    # TODO(b/190536821):  Determine if command group works with project number
+    base.RequireProjectID(args)
+    del context, args

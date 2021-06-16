@@ -58,4 +58,4 @@ class Disable(base.DisableCommand):
           throw_if_unattended=True,
           cancel_on_no=True)
 
-    super(Disable, self).Run(args)
+    self.Disable(args.force)

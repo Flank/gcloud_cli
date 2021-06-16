@@ -65,5 +65,4 @@ class Apply(base.UpdateCommand):
     region_ref = args.CONCEPTS.region.Parse()
     region = region_ref.AsDict()['locationsId']
 
-    resource_dict = deploy_client.ParseDeployConfig(loaded_yaml, region)
-    deploy_client.CreateResources(resource_dict)
+    deploy_client.CreateResources(loaded_yaml, region)

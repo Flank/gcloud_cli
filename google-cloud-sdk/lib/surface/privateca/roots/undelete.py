@@ -39,7 +39,7 @@ class Undelete(base.SilentCommand):
 
     To undelete a root CA:
 
-        $ {command} prod-root --location=us-west1 --pool my-pool
+        $ {command} prod-root --location=us-west1 --pool=my-pool
   """
 
   @staticmethod

@@ -1,4 +1,4 @@
-- release_tracks: [ALPHA]
+- release_tracks: [ALPHA, GA]
 
   help_text:
     brief: Import an EdgeCacheOrigin.
@@ -16,7 +16,10 @@
 
   request:
     collection: networkservices.projects.locations.edgeCacheOrigins
-    api_version: v1alpha1
+    ALPHA:
+      api_version: v1alpha1
+    GA:
+      api_version: v1
 
   async:
     collection: networkservices.projects.locations.operations
@@ -31,5 +34,8 @@
     create_if_not_exists: true
     create_request:
       collection: networkservices.projects.locations.edgeCacheOrigins
-      api_version: v1alpha1
+      ALPHA:
+        api_version: v1alpha1
+      GA:
+        api_version: v1
       method: create

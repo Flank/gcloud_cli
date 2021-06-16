@@ -41,7 +41,7 @@ class Create(base.CreateCommand):
           """\
         To update a template named "dns-restricted" with new default x509 extensions:
 
-          $ {command} dns-restricted --predefined-values-file x509_parameters.yaml
+          $ {command} dns-restricted --predefined-values-file=x509_parameters.yaml
 
         To update a template named "dns-restricted" to allow requestors to specify subject:
 
@@ -50,12 +50,12 @@ class Create(base.CreateCommand):
         To update a template named "dns-restricted" with allowed extension
         'base-key-usage' to allow requestors to specify additional x509 extension 'extended-key-usage':
 
-          $ {command} dns-restricted --copy-known-extensions base-key-usage, extended-key-usage
+          $ {command} dns-restricted --copy-known-extensions=base-key-usage, extended-key-usage
 
         To update a template named "mtls-restricted" with allowed OID
         '1.1' to allow requestors to specify alternative OIDS '2.2,3.3':
 
-          $ {command} mtls-restricted --copy-extensions-by-oid 2.2,3.3
+          $ {command} mtls-restricted --copy-extensions-by-oid=2.2,3.3
        """,
   }
 

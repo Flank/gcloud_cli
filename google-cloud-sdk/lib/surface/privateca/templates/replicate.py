@@ -57,12 +57,12 @@ class Replicate(base.SilentCommand):
 
       To replicate a certificate template to 'us-west1' and 'us-east1', run:
 
-        $ {command} my-template --target-locations us-west1,us-east1
+        $ {command} my-template --target-locations=us-west1,us-east1
 
       To overwrite existing templates with the same resource ID in the target
       locations, use the --overwrite flag:
 
-        $ {command} my-template --target-locations us-west1,us-east1 --overwrite
+        $ {command} my-template --target-locations=us-west1,us-east1 --overwrite
 
       To continue replicating templates in other locations in the event of a
       failure in one or more locations, use the --continue-on-error flag:

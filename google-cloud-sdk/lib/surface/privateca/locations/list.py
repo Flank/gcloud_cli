@@ -32,6 +32,13 @@ class ListBeta(base.ListCommand):
           """\
           Returns supported locations where resources can be managed through
           the Private CA preview API.""",
+      'EXAMPLES':
+          """\
+          To list the locations available for the Private CA preview API:
+
+          $ {command}
+
+          """,
   }
 
   @staticmethod
@@ -56,6 +63,13 @@ class List(base.ListCommand):
           """\
           Returns supported locations where resources can be managed through
           the Private CA GA API.""",
+      'EXAMPLES':
+          """\
+          To list the locations available for the Private CA GA API:
+
+          $ {command}
+
+          """,
   }
 
   @staticmethod

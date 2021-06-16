@@ -1,13 +1,20 @@
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 help_text:
   brief: |
     Import endpoint policy.
   description: |
     Import an endpoint policy.
+  examples: |
+      To import an endpoint policy named 'my-endpoint-policy' from a YAML file, run:
+
+        $ {command} my-endpoint-policy --source=my-endpoint-policy.yaml --location=global
 
 request:
   collection: networkservices.projects.locations.endpointPolicies
-  api_version: v1alpha1
+  ALPHA:
+    api_version: v1alpha1
+  BETA:
+    api_version: v1beta1
 
 arguments:
   resource:
@@ -23,5 +30,8 @@ import:
   create_if_not_exists: true
   create_request:
     collection: networkservices.projects.locations.endpointPolicies
-    api_version: v1alpha1
+    ALPHA:
+      api_version: v1alpha1
+    BETA:
+      api_version: v1beta1
     method: create

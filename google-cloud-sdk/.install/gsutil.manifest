@@ -13,7 +13,6 @@ platform/gsutil/gslib/__init__.py
 platform/gsutil/gslib/__main__.py
 platform/gsutil/gslib/addlhelp/__init__.py
 platform/gsutil/gslib/addlhelp/acls.py
-platform/gsutil/gslib/addlhelp/anon.py
 platform/gsutil/gslib/addlhelp/command_opts.py
 platform/gsutil/gslib/addlhelp/crc32c.py
 platform/gsutil/gslib/addlhelp/creds.py
@@ -24,7 +23,6 @@ platform/gsutil/gslib/addlhelp/metadata.py
 platform/gsutil/gslib/addlhelp/naming.py
 platform/gsutil/gslib/addlhelp/prod.py
 platform/gsutil/gslib/addlhelp/security.py
-platform/gsutil/gslib/addlhelp/subdirs.py
 platform/gsutil/gslib/addlhelp/support.py
 platform/gsutil/gslib/addlhelp/versions.py
 platform/gsutil/gslib/addlhelp/wildcards.py

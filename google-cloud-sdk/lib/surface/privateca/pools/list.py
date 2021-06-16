@@ -30,7 +30,19 @@ from googlecloudsdk.core import properties
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
-  """List CA pools within a project."""
+  """List CA pools within a project.
+
+  ## EXAMPLES
+
+  To list the CA Pools within a project:
+
+  $ {command}
+
+
+  To list the CA Pools within a project and region 'us-central1':
+
+  $ {command} --location="us-central1"
+  """
 
   @staticmethod
   def Args(parser):

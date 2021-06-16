@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.GA)
 @base.Hidden
 class EdgeCache(base.Group):
   """Manage Edge Cache resources."""
@@ -48,3 +48,8 @@ class EdgeCache(base.Group):
             $ {command} keysets describe my-keyset
           """
   }
+
+  def Filter(self, context, args):
+    # TODO(b/190537939):  Determine if command group works with project number
+    base.RequireProjectID(args)
+    del context, args

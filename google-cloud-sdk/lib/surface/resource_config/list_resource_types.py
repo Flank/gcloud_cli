@@ -42,7 +42,7 @@ _DETAILED_HELP = {
 
       $ {command} --output-format=yaml
 
-    To list all exportable resource typesin project `my-project` in json format, run:
+    To list all exportable resource types in project `my-project` in json format, run:
 
       $ {command} --output-format=json --project=my-project
     """

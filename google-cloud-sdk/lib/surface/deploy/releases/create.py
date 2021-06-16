@@ -55,7 +55,6 @@ def _CommonArgs(parser):
   resource_args.AddReleaseResourceArg(parser, positional=True, required=True)
   flags.AddSourceFlag(parser)
   flags.AddGcsSourceStagingDirFlag(parser)
-  flags.AddGcsRenderDirFlag(parser)
   flags.AddImagesGroup(parser)
   flags.AddIgnoreFileFlag(parser)
   flags.AddToTargetFlag(parser)
@@ -77,10 +76,11 @@ class Create(base.CreateCommand):
     release_ref = args.CONCEPTS.release.Parse()
     client = release.ReleaseClient()
     # Create the release create request.
-    release_config = client.CreateReleaseConfig(
-        args.source, args.gcs_source_staging_dir, args.ignore_file,
-        args.gcs_render_dir, args.images, args.build_artifacts,
-        args.description)
+    release_config = client.CreateReleaseConfig(args.source,
+                                                args.gcs_source_staging_dir,
+                                                args.ignore_file, args.images,
+                                                args.build_artifacts,
+                                                args.description)
     operation = client.Create(release_ref, release_config)
     operation_ref = resources.REGISTRY.ParseRelativeName(
         operation.name, collection='clouddeploy.projects.locations.operations')

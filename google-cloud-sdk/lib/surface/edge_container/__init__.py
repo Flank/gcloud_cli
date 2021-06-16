@@ -26,3 +26,8 @@ from googlecloudsdk.calliope import base
 class EdgeContainer(base.Group):
   """Manage Edge Container resources."""
   category = base.COMPUTE_CATEGORY
+
+  def Filter(self, context, args):
+    # TODO(b/190533575):  Determine if command group works with project number
+    base.RequireProjectID(args)
+    del context, args

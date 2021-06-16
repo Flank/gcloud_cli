@@ -23,6 +23,7 @@ import textwrap
 
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.container.hub.config_management import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
@@ -46,7 +47,6 @@ class Upgrade(base.UpdateCommand):
   """
 
   feature_name = 'configmanagement'
-  LATEST_VERSION = '1.7.2'
 
   @classmethod
   def Args(cls, parser):
@@ -69,7 +69,7 @@ class Upgrade(base.UpdateCommand):
     console_io.PromptContinue(
         'You are about to upgrade the {} Feature for membership {} from version "{}" to version '
         '"{}".'.format(self.feature.display_name, membership, cluster_v,
-                       self.LATEST_VERSION),
+                       utils.LATEST_VERSION),
         throw_if_unattended=True,
         cancel_on_no=True)
 
@@ -77,7 +77,7 @@ class Upgrade(base.UpdateCommand):
     msg = client.MESSAGES_MODULE
     mem_config = _parse_membership(feature_data,
                                    membership) or msg.MembershipConfig()
-    mem_config.version = self.LATEST_VERSION
+    mem_config.version = utils.LATEST_VERSION
     applied_config = msg.ConfigManagementFeatureSpec.MembershipConfigsValue.AdditionalProperty(
         key=membership, value=mem_config)
     m_configs = msg.ConfigManagementFeatureSpec.MembershipConfigsValue(
@@ -88,18 +88,18 @@ class Upgrade(base.UpdateCommand):
             membershipConfigs=m_configs))
 
   def _validate_versions(self, membership, declared_v, cluster_v):
-    if declared_v == self.LATEST_VERSION:
+    if declared_v == utils.LATEST_VERSION:
       log.status.Print(
           'Membership {} already has the latest version of the {} Feature declared ({}).'
-          .format(membership, self.feature.display_name, self.LATEST_VERSION))
+          .format(membership, self.feature.display_name, utils.LATEST_VERSION))
       return False
-    if cluster_v == self.LATEST_VERSION:
+    if cluster_v == utils.LATEST_VERSION:
       log.status.Print(
           'Membership {} already has the latest version of the {} Feature installed ({}).'
-          .format(membership, self.feature.display_name, self.LATEST_VERSION))
+          .format(membership, self.feature.display_name, utils.LATEST_VERSION))
       return True
 
-    if cluster_v > self.LATEST_VERSION:
+    if cluster_v > utils.LATEST_VERSION:
       raise exceptions.Error(
           'Membership {} has a version of the {} Feature installed ({}) that is '
           'not supported by this command.'.format(membership,

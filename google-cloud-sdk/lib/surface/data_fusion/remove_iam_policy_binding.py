@@ -26,7 +26,7 @@ from googlecloudsdk.command_lib.iam import iam_util
 
 
 class RemoveIamPolicyBinding(base.Command):
-  r"""Removes an IAM policy bindng to a Cloud Data Fusion instance.
+  r"""Removes an IAM policy binding to a Cloud Data Fusion instance.
 
   ## EXAMPLES
 

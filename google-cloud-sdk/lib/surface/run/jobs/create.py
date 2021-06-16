@@ -76,6 +76,7 @@ class Deploy(base.Command):
     flags.AddSetCloudSQLFlag(parser)
     flags.AddVpcConnectorArg(parser)
     flags.AddEgressSettingsFlag(parser)
+    flags.AddSetSecretsFlag(parser)
     flags.AddMemoryFlag(parser)
     flags.AddCpuFlag(parser, managed_only=True)
     flags.AddCommandFlag(parser)

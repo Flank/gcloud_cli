@@ -68,5 +68,4 @@ class Delete(base.UpdateCommand):
     region_ref = args.CONCEPTS.region.Parse()
     region = region_ref.AsDict()['locationsId']
 
-    resource_dict = deploy_client.ParseDeployConfig(loaded_yaml, region)
-    deploy_client.DeleteResources(resource_dict, args.force)
+    deploy_client.DeleteResources(loaded_yaml, region, args.force)

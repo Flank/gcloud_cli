@@ -24,6 +24,11 @@ from googlecloudsdk.calliope import base
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class ResourceConfig(base.Group):
-  """Commands for declarative resource configuration management."""
+  """Commands for declarative management of Google Cloud Platform resources."""
 
   category = base.DECLARATIVE_CONFIGURATION_CATEGORY
+
+  def Filter(self, context, args):
+    # TODO(b/190542262):  Determine if command group works with project number
+    base.RequireProjectID(args)
+    del context, args

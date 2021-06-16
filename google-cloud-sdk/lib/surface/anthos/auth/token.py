@@ -31,6 +31,16 @@ class Token(base.BinaryBackedCommand):
     flags.GetTypeFlag().AddToParser(parser)
     flags.GetAwsStsRegionFlag().AddToParser(parser)
     flags.GetTokenClusterFlag().AddToParser(parser)
+    flags.GetIdTokenFlag().AddToParser(parser)
+    flags.GetAccessTokenFlag().AddToParser(parser)
+    flags.GetAccessTokenExpiryFlag().AddToParser(parser)
+    flags.GetRefreshTokenFlag().AddToParser(parser)
+    flags.GetClientIdFlag().AddToParser(parser)
+    flags.GetClientSecretFlag().AddToParser(parser)
+    flags.GetIdpCertificateAuthorityDataFlag().AddToParser(parser)
+    flags.GetIdpIssuerUrlFlag().AddToParser(parser)
+    flags.GetKubeconfigPathFlag().AddToParser(parser)
+    flags.GetTokenUserFlag().AddToParser(parser)
 
   def Run(self, args):
     command_executor = anthoscli_backend.AnthosAuthWrapper()
@@ -41,5 +51,15 @@ class Token(base.BinaryBackedCommand):
         token_type=args.type,
         cluster=args.cluster,
         aws_sts_region=args.aws_sts_region,
+        id_token=args.id_token,
+        access_token=args.access_token,
+        access_token_expiry=args.access_token_expiry,
+        refresh_token=args.refresh_token,
+        client_id=args.client_id,
+        client_secret=args.client_secret,
+        idp_certificate_authority_data=args.idp_certificate_authority_data,
+        idp_issuer_url=args.idp_issuer_url,
+        kubeconfig_path=args.kubeconfig_path,
+        user=args.user,
         env=anthoscli_backend.GetEnvArgsForCommand())
     return self._DefaultOperationResponseHandler(response)

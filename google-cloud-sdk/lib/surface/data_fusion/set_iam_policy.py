@@ -40,7 +40,7 @@ def SetIamPolicyFromFile(instance_ref,
 
 
 class SetIamPolicy(base.Command):
-  r"""Sets the IAM policy a Cloud Data Fusion instance.
+  r"""Sets the IAM policy for a Cloud Data Fusion instance.
 
   ## EXAMPLES
 

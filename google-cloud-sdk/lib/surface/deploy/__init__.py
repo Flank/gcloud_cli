@@ -26,3 +26,8 @@ from googlecloudsdk.calliope import base
 class Deploy(base.Group):
   """Create and manage Google Cloud Deploy resources."""
   category = base.CI_CD_CATEGORY
+
+  def Filter(self, context, args):
+    # TODO(b/190530892):  Determine if command group works with project number
+    base.RequireProjectID(args)
+    del context, args

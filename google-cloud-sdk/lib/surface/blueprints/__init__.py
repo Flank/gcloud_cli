@@ -29,3 +29,8 @@ class Blueprints(base.Group):
   """Manage Blueprints Controller deployments and revisions."""
 
   category = base.MANAGEMENT_TOOLS_CATEGORY
+
+  def Filter(self, context, args):
+    # TODO(b/190526433):  Determine if command group works with project number
+    base.RequireProjectID(args)
+    del context, args

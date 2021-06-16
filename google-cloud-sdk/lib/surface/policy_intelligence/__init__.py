@@ -30,3 +30,5 @@ class PolicyIntelligence(base.Group):
   def Filter(self, context, args):
     """Enables User-Project override for this surface."""
     base.EnableUserProjectQuota()
+    # TODO(b/190538573):  Determine if command group works with project number
+    base.RequireProjectID(args)
