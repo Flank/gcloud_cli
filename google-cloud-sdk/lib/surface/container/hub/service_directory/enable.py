@@ -34,8 +34,3 @@ class Enable(base.EnableCommand):
   """
 
   feature_name = 'servicedirectory'
-
-  def Run(self, args):
-    self.RunCommand(
-        args,
-        servicedirectoryFeatureSpec=(base.CreateServiceDirectoryFeatureSpec()))

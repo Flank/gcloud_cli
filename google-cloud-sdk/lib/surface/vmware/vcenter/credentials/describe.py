@@ -41,16 +41,19 @@ class Describe(base.DescribeCommand):
 Describe.detailed_help = {
     'DESCRIPTION':
         """
-          Describe vCenter credentials
+          Retrieve VMware vCenter sign-in credentials associated with a VMware Engine private cloud.
         """,
     'EXAMPLES':
         """
-          To describe a vCenter credentials in
-          private cloud ``my-privatecloud'' with project ``my-project'',
-          zone ``us-west2-a'', run:
+          To get sign-in credentials for vCenter in private cloud ``my-privatecloud'', run:
+
+
+            $ {command} --privatecloud=my-privatecloud --location=us-west2-a --project=my-project
+
+          Or:
 
             $ {command} --privatecloud=my-privatecloud
-                                   --location=us-west2-a
-                                   --project=my-project
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
     """,
 }

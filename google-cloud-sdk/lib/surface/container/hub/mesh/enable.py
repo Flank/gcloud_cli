@@ -34,7 +34,3 @@ class Enable(base.EnableCommand):
   """
 
   feature_name = 'servicemesh'
-
-  def Run(self, args):
-    return self.RunCommand(args, servicemeshFeatureSpec=(
-        base.CreateServiceMeshFeatureSpec()))

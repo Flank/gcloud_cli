@@ -18,14 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import textwrap
-
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 from googlecloudsdk.core import exceptions
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 
 
@@ -49,9 +45,7 @@ class Update(base.UpdateCommand):
     parser.add_argument(
         '--membership',
         type=str,
-        help=textwrap.dedent("""\
-            The name of the Membership to update.
-            """),
+        help='The name of the Membership to update.',
         required=True,
     )
     parser.add_argument(
@@ -59,40 +53,32 @@ class Update(base.UpdateCommand):
         type=str,
         default='NON_PRIVILEGED',
         choices=['NON_PRIVILEGED', 'PRIVILEGED'],
-        help=textwrap.dedent("""\
-            Privilege options for build steps.
-            """),
+        help='Privilege options for build steps.',
         required=True,
     )
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
-    feature = utils.GetFeature(self.feature_name, self.feature.display_name,
-                               project)
-    membership = utils.GetMembership(args.membership, project)
-
-    messages = core_apis.GetMessagesModule('gkehub', 'v1alpha1')
+    feature = self.GetFeature(v1alpha1=True)
+    membership = args.membership
+    utils.VerifyMembership(membership)
 
     feature_spec_memberships = utils.GetFeatureSpecMemberships(
-        feature, messages)
+        feature, self.v1alpha1_messages)
     if membership not in feature_spec_memberships:
       raise exceptions.Error(
           'No Cloud Build hybrid worker pool installation was registered for this membership.'
       )
 
-    mem_config = feature_spec_memberships[membership]
-    securitypolicy = utils.ParseSecuritypolicy(args.security_policy, messages)
-    warn_securitypolicy_update(messages, securitypolicy,
-                               mem_config.securityPolicy, membership)
-    mem_config.securityPolicy = securitypolicy
-    applied_config = messages.CloudBuildFeatureSpec.MembershipConfigsValue.AdditionalProperty(
-        key=membership, value=mem_config)
-    m_configs = messages.CloudBuildFeatureSpec.MembershipConfigsValue(
-        additionalProperties=[applied_config])
-    self.RunCommand(
-        'cloudbuild_feature_spec.membership_configs',
-        cloudbuildFeatureSpec=messages.CloudBuildFeatureSpec(
-            membershipConfigs=m_configs))
+    spec = feature_spec_memberships[membership]
+    securitypolicy = utils.ParseSecuritypolicy(args.security_policy,
+                                               self.v1alpha1_messages)
+    warn_securitypolicy_update(self.v1alpha1_messages, securitypolicy,
+                               spec.securityPolicy, membership)
+    spec.securityPolicy = securitypolicy
+    f = utils.MembershipSpecPatch(self.v1alpha1_messages, membership, spec)
+    self.Update(['cloudbuild_feature_spec.membership_configs'],
+                f,
+                v1alpha1=True)
 
 
 def warn_securitypolicy_update(messages, securitypolicy_requested,

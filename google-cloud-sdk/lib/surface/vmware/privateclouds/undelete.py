@@ -26,15 +26,22 @@ from googlecloudsdk.core import log
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          Cancel deletion a VMware Engine private cloud.
+          Unmark a VMware Engine private cloud that was previously marked for deletion by `gcloud vmware privateclouds delete`.
+
         """,
     'EXAMPLES':
         """
-          To cancel deletion a private cloud called ``my-privatecloud'' in
-          ``my-project'' with zone ``us-west2-a'', run:
+          To unmark a private cloud called ``my-privatecloud'' for deletion, run:
 
-            $ {command} my-privatecloud --location=us-west2-a
-                                        --project=my-project
+
+            $ {command} my-privatecloud --location=us-west2-a --project=my-project
+
+          Or:
+
+            $ {command} my-privatecloud
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
+
     """,
 }
 

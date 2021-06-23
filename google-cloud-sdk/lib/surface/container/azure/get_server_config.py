@@ -31,19 +31,19 @@ class GetServerConfig(base.Command):
 
   @staticmethod
   def Args(parser):
-    resource_args.AddRegionResourceArg(parser, 'to get server configuration')
+    resource_args.AddLocationResourceArg(parser, 'to get server configuration')
 
   def Run(self, args):
     """Run get-server-config command."""
     release_track = self.ReleaseTrack()
-    region_ref = args.CONCEPTS.region.Parse()
+    location_ref = args.CONCEPTS.location.Parse()
 
-    with endpoint_util.GkemulticloudEndpointOverride(region_ref.locationsId,
+    with endpoint_util.GkemulticloudEndpointOverride(location_ref.locationsId,
                                                      release_track):
       client = api_util.GetClientInstance(release_track=release_track)
       messages = api_util.GetMessagesModule(release_track=release_track)
       log.status.Print('Fetching server config for {location}'.format(
-          location=region_ref.locationsId))
+          location=location_ref.locationsId))
       req = messages.GkemulticloudProjectsLocationsGetAzureServerConfigRequest(
-          name='{}/azureServerConfig'.format(region_ref.RelativeName()))
+          name='{}/azureServerConfig'.format(location_ref.RelativeName()))
       return client.projects_locations.GetAzureServerConfig(req)

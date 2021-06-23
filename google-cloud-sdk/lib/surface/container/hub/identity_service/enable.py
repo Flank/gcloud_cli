@@ -34,11 +34,3 @@ class Enable(base.EnableCommand):
   """
 
   feature_name = 'identityservice'
-
-  @classmethod
-  def Args(cls, parser):
-    pass
-
-  def Run(self, args):
-    return self.RunCommand(args, identityserviceFeatureSpec=(
-        base.CreateIdentityServiceFeatureSpec()))

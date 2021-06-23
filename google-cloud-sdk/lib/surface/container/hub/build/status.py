@@ -38,7 +38,7 @@ class Status(base.DescribeCommand):
   feature_name = 'cloudbuild'
 
   def Run(self, args):
-    feature = super(Status, self).Run(args)
+    feature = self.GetFeature(v1alpha1=True)
 
     feature_status = []
     if feature is None or feature.featureState is None:

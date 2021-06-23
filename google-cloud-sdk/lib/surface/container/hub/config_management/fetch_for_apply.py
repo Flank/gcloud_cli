@@ -18,28 +18,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import textwrap
-
-from googlecloudsdk.calliope import base as gcloud_base
+from googlecloudsdk.api_lib.container.hub import util
+from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.config_management import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
-from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
 
 
-MEMBERSHIP_FLAG = '--membership'
-
-
-class Fetch(base.FeatureCommand, gcloud_base.DescribeCommand):
+@gbase.ReleaseTracks(gbase.ReleaseTrack.ALPHA)
+class Fetch(base.DescribeCommand):
   """Prints the Config Management configuration applied to the given membership.
 
   The output is in the format that is used by the apply subcommand. The fields
   that have not been configured will be shown with default values.
 
-  ## Examples
+  ## EXAMPLES
 
   To fetch the applied Config Management configuration, run:
 
@@ -52,18 +48,14 @@ class Fetch(base.FeatureCommand, gcloud_base.DescribeCommand):
   @classmethod
   def Args(cls, parser):
     parser.add_argument(
-        MEMBERSHIP_FLAG,
+        '--membership',
         type=str,
-        help=textwrap.dedent("""\
-            The Membership name provided during registration.
-            """),
+        help='The Membership name provided during registration.',
     )
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
-
     # Get Hub memberships (cluster registered with Hub) from GCP Project.
-    memberships = base.ListMemberships(project)
+    memberships = base.ListMemberships()
     if not memberships:
       raise exceptions.Error('No Memberships available in Hub.')
     # User should choose an existing membership if not provide one
@@ -79,23 +71,15 @@ class Fetch(base.FeatureCommand, gcloud_base.DescribeCommand):
         raise exceptions.Error(
             'Membership {} is not in Hub.'.format(membership))
 
-    response = utils.try_get_configmanagement(project)
-    if response.configmanagementFeatureSpec is None:
-      raise exceptions.Error('Please wait for Feature {} to be ready'.format(
-          self.feature.display_name))
-    if response.configmanagementFeatureSpec.membershipConfigs is None:
-      spec_details = []
-    else:
-      spec_details = response.configmanagementFeatureSpec.membershipConfigs.additionalProperties
+    f = self.GetFeature()
+    membership_spec = None
+    for full_name, spec in self.hubclient.ToPyDict(f.membershipSpecs).items():
+      if util.MembershipShortname(full_name) == membership and spec is not None:
+        membership_spec = spec.configmanagement
 
-    membership_specs = [
-        spec.value for spec in spec_details if spec.key == membership
-    ]
-    if not membership_specs:
+    if membership_spec is None:
       log.status.Print('Membership {} not initialized'.format(membership))
-      membership_spec = None
-    else:
-      membership_spec = membership_specs[0]
+
     # load the config template and merge with config has been applied to the
     # feature spec
     template = yaml.load(utils.APPLY_SPEC_VERSION_1)
@@ -112,7 +96,7 @@ def merge_config_sync(spec, config):
   ConfigSync has nested object structs need to be flatten.
 
   Args:
-    spec: the MembershipConfig object set in feature spec
+    spec: the ConfigManagementMembershipSpec message
     config: the dict loaded from full config template
   """
   if not spec or not spec.configSync:
@@ -143,4 +127,3 @@ def merge_non_cs_components(spec, config):
       if hasattr(getattr(spec, components), field) and getattr(
           getattr(spec, components), field) is not None:
         c[field] = getattr(getattr(spec, components), field)
-

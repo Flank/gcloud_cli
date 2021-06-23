@@ -29,11 +29,15 @@ DETAILED_HELP = {
         """,
     'EXAMPLES':
         """
-          To descripe a private cloud called ``my-privatecloud'' in
-          ``my-project'' with zone ``us-west2-a'', run:
+          To get a description of a private cloud called ``my-privatecloud'' in project ``my-project'' and zone ``us-west2-a'', run:
 
-            $ {command} my-privatecloud --location=us-west2-a
-                                        --project=my-project
+            $ {command} my-privatecloud --location=us-west2-a --project=my-project
+
+          Or:
+
+            $ {command} my-privatecloud
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
     """,
 }
 

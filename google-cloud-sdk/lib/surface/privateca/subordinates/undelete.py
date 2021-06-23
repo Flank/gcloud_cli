@@ -71,7 +71,7 @@ class Undelete(base.SilentCommand):
             .UndeleteCertificateAuthorityRequest(
                 requestId=request_utils.GenerateRequestId())))
 
-    operations.Await(operation, 'Undeleting Subordinate CA')
+    operations.Await(operation, 'Undeleting Subordinate CA', api_version='v1')
 
     log.status.Print('Undeleted Subordinate CA [{}].'.format(
         ca_ref.RelativeName()))

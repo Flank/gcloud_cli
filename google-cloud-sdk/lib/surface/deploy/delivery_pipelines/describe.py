@@ -20,15 +20,14 @@ from __future__ import unicode_literals
 
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.clouddeploy import delivery_pipeline
-from googlecloudsdk.api_lib.clouddeploy import target
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.deploy import describe
 from googlecloudsdk.command_lib.deploy import resource_args
 from googlecloudsdk.command_lib.deploy import target_util
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import resources
 
 _DETAILED_HELP = {
     'DESCRIPTION':
@@ -94,28 +93,19 @@ class Describe(base.DescribeCommand):
     targets = []
     # output the deployment status of the targets in the pipeline.
     for stage in pipeline.serialPipeline.stages:
-      target_ref = resources.REGISTRY.Parse(
-          None,
-          collection='clouddeploy.projects.locations.deliveryPipelines.targets',
-          params={
-              'projectsId': properties.VALUES.core.project.GetOrFail(),
-              'locationsId': region,
-              'deliveryPipelinesId': pipeline_ref.Name(),
-              'targetsId': stage.targetId
-          })
       try:
-        deploy_target = target.TargetsClient().Get(target_ref.RelativeName())
-      except apitools_exceptions.HttpError as error:
-        log.debug('Failed to get target {}: {}'.format(
-            target_ref.RelativeName(), error))
-        log.status.Print('Unable to get target {}'.format(
-            target_ref.RelativeName()))
+        target_ref, deploy_target = target_util.GetTargetReferenceInUnknownCollection(
+            stage.targetId, properties.VALUES.core.project.GetOrFail(), region,
+            pipeline_ref.Name())
+      except core_exceptions.Error as error:
+        log.debug('Failed to get target {}: {}'.format(stage.targetId, error))
+        log.status.Print('Unable to get target {}'.format(stage.targetId))
         continue
       detail = {'Target': target_ref.Name()}
       releases, current_rollout = target_util.GetReleasesAndCurrentRollout(
-          target_ref)
+          target_ref, pipeline_ref.Name())
       detail = describe.SetCurrentReleaseAndRollout(current_rollout, detail)
-      if deploy_target.approvalRequired:
+      if deploy_target.requireApproval:
         detail = describe.ListPendingApprovals(releases, target_ref, detail)
       targets.append(detail)
 

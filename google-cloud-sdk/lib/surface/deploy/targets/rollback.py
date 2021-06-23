@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.clouddeploy import release
-from googlecloudsdk.api_lib.clouddeploy import target
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.deploy import flags
@@ -62,15 +61,15 @@ class Rollback(base.CreateCommand):
     resource_args.AddTargetResourceArg(parser, positional=True)
     flags.AddRelease(parser, 'Name of the release to rollback to.')
     flags.AddRolloutID(parser)
+    flags.AddDeliveryPipeline(parser)
 
   def Run(self, args):
     target_ref = args.CONCEPTS.target.Parse()
-    try:
-      target_obj = target.TargetsClient().Get(target_ref.RelativeName())
-    except apitools_exceptions.HttpError as error:
-      raise exceptions.HttpException(error)
+    # Check if target exists
+    target_util.GetTarget(target_ref)
 
-    release_ref = _GetRollbackRelease(args.release, target_ref)
+    release_ref = _GetRollbackRelease(args.release, args.delivery_pipeline,
+                                      target_ref)
     try:
       release_obj = release.ReleaseClient().Get(release_ref.RelativeName())
     except apitools_exceptions.HttpError as error:
@@ -86,22 +85,23 @@ class Rollback(base.CreateCommand):
                          args.rollout_id)
 
 
-def _GetRollbackRelease(release_arg, target_ref):
+def _GetRollbackRelease(release_id, pipeline_id, target_ref):
   """Gets the release that will be used by promote API to create the rollback rollout."""
-  if release_arg:
+  if release_id:
     ref_dict = target_ref.AsDict()
     return resources.REGISTRY.Parse(
-        release_arg,
+        release_id,
         collection='clouddeploy.projects.locations.deliveryPipelines.releases',
         params={
             'projectsId': ref_dict['projectsId'],
             'locationsId': ref_dict['locationsId'],
-            'deliveryPipelinesId': ref_dict['deliveryPipelinesId'],
-            'releasesId': release_arg
+            'deliveryPipelinesId': pipeline_id,
+            'releasesId': release_id
         })
   else:
     try:
-      _, prior_rollout = target_util.GetReleasesAndCurrentRollout(target_ref, 1)
+      _, prior_rollout = target_util.GetReleasesAndCurrentRollout(
+          target_ref, pipeline_id, 1)
     except core_exceptions.Error:
       raise core_exceptions.Error(
           'unable to rollback target {}. Target has less than 2 rollouts.'

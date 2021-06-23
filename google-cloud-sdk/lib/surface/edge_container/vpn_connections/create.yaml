@@ -36,6 +36,12 @@
       api_field: vpnConnection.natGatewayIp
       help_text: |
         The NAT gateway IP for the gateway floating IPs. Do not specify this if no NAT is used.
+    - arg_name: high-availability
+      api_field: vpnConnection.enableHighAvailability
+      type: bool
+      help_text: |
+        Enables high availability on cluster side. This creates an additional VPN endpoint in
+        cluster. Multiple Nodes/NodePools are required to enable this feature.
 
     labels:
       api_field: vpnConnection.labels

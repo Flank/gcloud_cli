@@ -25,29 +25,26 @@ from googlecloudsdk.command_lib.vmware import flags
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          Describe operation
+          Describe a VMware Engine operation. An operation contains information about the status of a previous request.
         """,
     'EXAMPLES':
         """
-          To get a description of private cloud related operation
-          ``operation-1620372841887-5c1b873a4f837-589a2b50-51e0613c''
-          in location ``us-west1-a''
-          region, run:
+          To get details about an operation on a private cloud with the operation ID ``operation-111-222-333-444'', run:
 
-            $ {command} operation-1620372841887-5c1b873a4f837-589a2b50-51e0613c --location=us-central1 --project=my-project
+            $ {command} operation-111-222-333-444 --location=us-central1 --project=my-project
 
           Or:
 
-            $ {command} operation-1620372841887-5c1b873a4f837-589a2b50-51e0613c --location=us-central1
+            $ {command} operation-111-222-333-444 --location=us-central1
 
-          In the second example, the project and region are taken from gcloud properties core/project and compute/zone.
+          In the second example, the location is taken from gcloud property compute/zone.
     """,
 }
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Describe(base.DescribeCommand):
-  """Describe VMware Engine operation."""
+  """Describe Google Cloud VMware Engine operation."""
 
   @staticmethod
   def Args(parser):

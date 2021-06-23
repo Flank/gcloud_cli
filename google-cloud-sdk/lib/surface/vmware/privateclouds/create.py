@@ -29,24 +29,20 @@ from googlecloudsdk.core import log
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          Create a VMware Engine private cloud.
+          Create a VMware Engine private cloud. Private cloud creation is considered finished when the private cloud is in READY state. Check the progress of a private cloud using `gcloud alpha vmware privateclouds list`.
         """,
     'EXAMPLES':
         """
-          To create a private cloud called ``my-privatecloud'' in project
-          ``my-project'' with zone ``us-west2-a'', cluster id ``cluster-for-account-department''
-          node type ``standard-72'' node count ``3'' cpu cores per node ``36'' in vpc network ``default-vpc''
-          , run:
+          To create a private cloud in the ``us-west2-a'' zone using ``standard-72'' nodes that connects to the ``default-vpc'' VPC network of another project, run:
 
-            $ {command} my-privatecloud --location=us-west2-a
-                                        --project=my-project
-                                        --cluster=cluster-for-account-department
-                                        --node-type=standard-72
-                                        --node-count=3
-                                        --node-custom-virtual-cpu-count=36
-                                        --network-cidr=192.168.0.0/20
-                                        --network=default-vpc
-                                        --network-project=network-project
+
+          $ {command} my-privatecloud --location=us-west2-a --project=my-project --cluster=my-management-cluster --node-type=standard-72 --node-count=3 --management-range=192.168.0.0/20 --network=default-vpc --network-project=another-project
+
+          Or:
+
+          $ {command} my-privatecloud --cluster=my-management-cluster--node-type=standard-72 --node-count=3 --management-range=192.168.0.0/20 --network=default-vpc --network-project=another-project
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
     """,
 }
 
@@ -71,26 +67,25 @@ class Create(base.CreateCommand):
         required=True,
         type=int,
         help="""\
-        Nodes count for management cluster
+        Node type to use for management cluster nodes. To get a list of available node types, run `gcloud alpha vmware nodetypes list`.
         """)
     parser.add_argument(
-        '--network-cidr',
+        '--management-range',
         required=True,
         help="""\
-        Management subnet CIDR
-        For example, `--network-cidr=192.0.1.1/29`.
+         IP address range in the private cloud to use for management appliances, in CIDR format. Use an IP address range that meets the [VMware Engine networking requirements](https://cloud.google.com/vmware-engine/docs/quickstart-networking-requirements).
         """)
     parser.add_argument(
         '--network',
         required=True,
         help="""\
-        VPC network
+        Network ID of the Google Cloud VPC network to connect with your private cloud.
         """)
     parser.add_argument(
         '--network-project',
         required=False,
         help="""\
-        VPC network project
+         Project ID or project name of the VPC network. Use this flag when the VPC network is in another project.
         """)
     labels_util.AddCreateLabelsFlags(parser)
 
@@ -99,7 +94,7 @@ class Create(base.CreateCommand):
     client = PrivateCloudsClient()
     operation = client.Create(privatecloud, args.labels, args.description,
                               args.cluster, args.node_type, args.node_count,
-                              args.network_cidr, args.network,
+                              args.management_range, args.network,
                               args.network_project)
     log.CreatedResource(operation.name, kind='private cloud', is_async=True)
 

@@ -58,12 +58,12 @@ class Delete(base.DeleteCommand):
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
     project_ref = client.resource_parser.Create(
-        'alloydbadmin.projects.locations.clusters.instances',
+        'alloydb.projects.locations.clusters.instances',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region,
         clustersId=args.cluster,
         instancesId=args.instance)
-    req = alloydb_messages.AlloydbadminProjectsLocationsClustersInstancesDeleteRequest(
+    req = alloydb_messages.AlloydbProjectsLocationsClustersInstancesDeleteRequest(
         name=project_ref.RelativeName())
     op = alloydb_client.projects_locations_clusters_instances.Delete(req)
     if not args.async_:

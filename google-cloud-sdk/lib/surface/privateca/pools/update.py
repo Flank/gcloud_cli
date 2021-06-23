@@ -76,4 +76,4 @@ class Update(base.UpdateCommand):
             updateMask=','.join(update_mask),
             requestId=request_utils.GenerateRequestId()))
 
-    return operations.Await(operation, 'Updating CA pool.')
+    return operations.Await(operation, 'Updating CA pool.', api_version='v1')

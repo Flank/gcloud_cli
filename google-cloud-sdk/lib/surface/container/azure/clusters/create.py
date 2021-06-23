@@ -52,9 +52,9 @@ class Create(base.CreateCommand):
                 resource_args.GetAzureClientResourceSpec(),
                 "Azure client to use for cluster creation.",
                 required=True,
-                flag_name_overrides={"region": ""})
+                flag_name_overrides={"location": ""})
         ],
-        command_level_fallthroughs={"--client.region": ["cluster.region"]})
+        command_level_fallthroughs={"--client.location": ["cluster.location"]})
     arg_parser.AddToParser(parser)
 
     parser.add_argument(
@@ -73,16 +73,8 @@ class Create(base.CreateCommand):
         required=True,
         help=("ID of the Azure Virtual Network "
               "to associate with the cluster."))
-    parser.add_argument(
-        "--cluster-ipv4-cidr",
-        required=True,
-        help=("IP address range for the pods in this cluster in CIDR "
-              "notation (e.g. 10.0.0.0/8). Can be any RFC 1918 IP range."))
-    parser.add_argument(
-        "--service-ipv4-cidr",
-        required=True,
-        help=("IP address range for the services IPs in CIDR notation "
-              "(e.g. 10.0.0.0/8). Can be any RFC 1918 IP range."))
+    flags.AddPodAddressCidrBlocks(parser)
+    flags.AddServiceAddressCidrBlocks(parser)
     flags.AddClusterVersion(parser)
     flags.AddSubnetID(parser, "the cluster control plane")
     flags.AddVMSize(parser)
@@ -110,8 +102,8 @@ class Create(base.CreateCommand):
 
     resource_group_id = args.resource_group_id
     vnet_id = args.vnet_id
-    cluster_ipv4_cidr = args.cluster_ipv4_cidr
-    service_ipv4_cidr = args.service_ipv4_cidr
+    pod_address_cidr_blocks = args.pod_address_cidr_blocks
+    service_address_cidr_blocks = args. service_address_cidr_blocks
     cluster_version = flags.GetClusterVersion(args)
     subnet_id = flags.GetSubnetID(args)
     vm_size = flags.GetVMSize(args)
@@ -132,8 +124,8 @@ class Create(base.CreateCommand):
           azure_region=azure_region,
           resource_group_id=resource_group_id,
           vnet_id=vnet_id,
-          cluster_ipv4_cidr=cluster_ipv4_cidr,
-          service_ipv4_cidr=service_ipv4_cidr,
+          pod_address_cidr_blocks=pod_address_cidr_blocks,
+          service_address_cidr_blocks=service_address_cidr_blocks,
           cluster_version=cluster_version,
           subnet_id=subnet_id,
           vm_size=vm_size,

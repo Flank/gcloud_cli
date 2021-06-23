@@ -26,15 +26,19 @@ from googlecloudsdk.core import log
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          Delete a VMware Engine private cloud.
+          Marks a VMware Engine private cloud for deletion. The resource is deleted 3 hours after being marked for deletion. This process can be reversed by using `gcloud vmware privateclouds undelete`.
         """,
     'EXAMPLES':
         """
-          To delete a private cloud called ``my-privatecloud'' in
-          ``my-project'' with zone ``us-west2-a'', run:
+          To mark a private cloud called ``my-privatecloud'' for deletion, run:
 
-            $ {command} my-privatecloud --location=us-west2-a
-                                        --project=my-project
+            $ {command} my-privatecloud --location=us-west2-a --project=my-project
+
+          Or:
+
+            $ {command} my-privatecloud
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
     """,
 }
 

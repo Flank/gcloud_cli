@@ -27,11 +27,11 @@ from googlecloudsdk.command_lib.vmware import flags
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          List VMware Engine operations in location.
+          List VMware Engine operations in a location.
         """,
     'EXAMPLES':
         """
-          To list VMware Engine operations in the location ``us-west2-a'', run:
+          To list VMware Engine operations in a location ``us-west2-a'', run:
 
             $ {command} --location=us-west2-a
 
@@ -39,15 +39,14 @@ DETAILED_HELP = {
 
             $ {command}
 
-          In the second example, the location is taken from gcloud properties
-          compute/zone.
+          In the second example, the location is taken from gcloud property compute/zone.
     """,
 }
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
-  """List VMware Engine operations."""
+  """List Google Cloud VMware Engine operations."""
 
   @staticmethod
   def Args(parser):

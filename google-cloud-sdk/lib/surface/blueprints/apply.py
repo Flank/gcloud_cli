@@ -61,7 +61,9 @@ class CreateAlpha(base.CreateCommand):
     flags.AddAsyncFlag(parser)
     flags.AddSourceFlag(parser)
     flags.AddIgnoreFileFlag(parser)
-    resource_args.AddDeploymentResourceArg(parser)
+    resource_args.AddDeploymentResourceArg(
+        parser,
+        'the deployment to create or update.')
 
   def Run(self, args):
     """This is what gets called when the user runs this command.

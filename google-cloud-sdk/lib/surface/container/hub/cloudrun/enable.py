@@ -34,12 +34,3 @@ class Enable(base.EnableCommand):
   """
 
   feature_name = 'appdevexperience'
-
-  @classmethod
-  def Args(cls, parser):
-    pass
-
-  def Run(self, args):
-    self.RunCommand(
-        args,
-        appdevexperienceFeatureSpec=(base.CreateAppDevExperienceFeatureSpec()))

@@ -74,13 +74,13 @@ class List(base.ListCommand):
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
     project_ref = client.resource_parser.Create(
-        'alloydbadmin.projects.locations',
+        'alloydb.projects.locations',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region)
 
     result = list_pager.YieldFromList(
         alloydb_client.projects_locations_clusters,
-        alloydb_messages.AlloydbadminProjectsLocationsClustersListRequest(
+        alloydb_messages.AlloydbProjectsLocationsClustersListRequest(
             parent=project_ref.RelativeName()),
         field='clusters',
         limit=args.limit,

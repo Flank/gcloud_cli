@@ -23,9 +23,10 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.vmware import flags
 from googlecloudsdk.core import log
 
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Reset(base.UpdateCommand):
-  """Reset VMware Engine vCenter credentials."""
+  """Reset VMware vCenter sign-in credentials associated with a VMware Engine private cloud."""
 
   @staticmethod
   def Args(parser):
@@ -43,17 +44,21 @@ class Reset(base.UpdateCommand):
 Reset.detailed_help = {
     'DESCRIPTION':
         """
-          Reset vCenter credentials
+          Reset VMware vCenter sign-in credentials associated with a VMware Engine private cloud.
         """,
     'EXAMPLES':
         """
-          To reset vCenter credentials description in
-          private cloud ``my-privatecloud'' with project ``my-project'',
-          zone ``us-west2-a'', run:
+          To reset sign-in credentials for vCenter in private cloud ``my-privatecloud'', run:
+
+
+            $ {command} --privatecloud=my-privatecloud --location=us-west2-a --project=my-project
+
+          Or:
 
             $ {command} --privatecloud=my-privatecloud
-                                   --location=us-west2-a
-                                   --project=my-project
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
+
     """,
 }
 

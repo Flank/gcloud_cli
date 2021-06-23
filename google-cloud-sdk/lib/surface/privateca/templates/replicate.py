@@ -187,8 +187,10 @@ class Replicate(base.SilentCommand):
         operation = self._CreateOrUpdateTemplate(template_ref.projectsId,
                                                  location, template_ref.Name(),
                                                  template, args.overwrite)
-        operations.Await(operation,
-                         'Replicating template to [{}]'.format(location))
+        operations.Await(
+            operation,
+            'Replicating template to [{}]'.format(location),
+            api_version='v1')
         success_count += 1
       except ReplicationError as e:
         if args.continue_on_error:

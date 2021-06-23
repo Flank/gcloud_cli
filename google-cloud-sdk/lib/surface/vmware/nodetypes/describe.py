@@ -25,11 +25,11 @@ from googlecloudsdk.command_lib.vmware import flags
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          Describe VMware Engine node type
+          Display data associated with a VMware Engine node type, such as its compute, storage, and memory.
         """,
     'EXAMPLES':
         """
-          To describe node type ``standard-72'' in location ``us-west1-a'', project ``my-project''  run:
+          To describe node type ``standard-72'' in location ``us-west1-a'', run:
 
             $ {command} standard-72 --location=us-central1 --project=my-project
 
@@ -44,7 +44,7 @@ DETAILED_HELP = {
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Describe(base.DescribeCommand):
-  """Describe VMware Engine operation."""
+  """Display data associated with a VMware Engine node type."""
 
   @staticmethod
   def Args(parser):

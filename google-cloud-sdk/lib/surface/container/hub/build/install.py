@@ -19,12 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import textwrap
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 from googlecloudsdk.core import exceptions
-from googlecloudsdk.core import properties
 
 
 @gbase.Hidden
@@ -85,33 +83,31 @@ class Install(base.UpdateCommand):
     )
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
-    feature = utils.GetFeature(self.feature_name, self.feature.display_name,
-                               project)
-    membership = utils.GetMembership(args.membership, project)
+    feature = self.GetFeature(v1alpha1=True)
+    membership = args.membership
+    utils.VerifyMembership(membership)
 
     version = self._parse_version(args.version)
-    messages = core_apis.GetMessagesModule('gkehub', 'v1alpha1')
 
     feature_spec_memberships = utils.GetFeatureSpecMemberships(
-        feature, messages)
+        feature, self.v1alpha1_messages)
     # TODO(b/189313110): Move check to CLH/API
     if membership in feature_spec_memberships:
       raise exceptions.Error(
           'Cloud Build hybrid worker pool installation on the member already exists.'
       )
 
-    securitypolicy = utils.ParseSecuritypolicy(args.security_policy, messages)
-    applied_config = messages.CloudBuildFeatureSpec.MembershipConfigsValue.AdditionalProperty(
-        key=membership,
-        value=messages.CloudBuildMembershipConfig(
-            securityPolicy=securitypolicy, version=version))
-    m_configs = messages.CloudBuildFeatureSpec.MembershipConfigsValue(
-        additionalProperties=[applied_config])
-    self.RunCommand(
-        'cloudbuild_feature_spec.membership_configs',
-        cloudbuildFeatureSpec=messages.CloudBuildFeatureSpec(
-            membershipConfigs=m_configs))
+    securitypolicy = utils.ParseSecuritypolicy(args.security_policy,
+                                               self.v1alpha1_messages)
+    spec = self.v1alpha1_messages.CloudBuildMembershipConfig(
+        securityPolicy=securitypolicy,
+        version=version,
+    )
+    feature = utils.MembershipSpecPatch(self.v1alpha1_messages, membership,
+                                        spec)
+    self.Update(['cloudbuild_feature_spec.membership_configs'],
+                feature,
+                v1alpha1=True)
 
   def _parse_version(self, version):
     if version is None:

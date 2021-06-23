@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import waiter
+from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.aws import clusters
 from googlecloudsdk.command_lib.container.aws import flags as aws_flags
@@ -37,10 +38,18 @@ class Create(base.CreateCommand):
   def Args(parser):
     """Register flags for this command."""
     resource_args.AddAwsClusterResourceArg(parser, 'to create')
-    flags.AddClusterIpv4Cidr(parser)
-    flags.AddServiceIpv4Cidr(parser)
+
+    parser.add_argument(
+        '--subnet-ids',
+        required=True,
+        type=arg_parsers.ArgList(),
+        metavar='SUBNET_ID',
+        help='Subnet ID of an existing VNET to use for the cluster control plane.'
+    )
+
+    flags.AddPodAddressCidrBlocks(parser)
+    flags.AddServiceAddressCidrBlocks(parser)
     flags.AddClusterVersion(parser)
-    flags.AddSubnetId(parser)
     flags.AddRootVolumeSize(parser)
     flags.AddMainVolumeSize(parser)
     flags.AddValidateOnly(parser, 'cluster to create')
@@ -48,11 +57,11 @@ class Create(base.CreateCommand):
         parser, 'cluster')
 
     aws_flags.AddAwsRegion(parser)
-    aws_flags.AddServicesLbSubnetId(parser)
+    aws_flags.AddServiceLoadBalancerSubnetIDs(parser)
     aws_flags.AddIamInstanceProfile(parser)
     aws_flags.AddInstanceType(parser)
-    aws_flags.AddKeyPairName(parser)
-    aws_flags.AddDatabaseEncryptionKey(parser)
+    aws_flags.AddSshEC2KeyPair(parser)
+    aws_flags.AddDatabaseEncryptionKmsKeyArn(parser)
     aws_flags.AddRoleArn(parser)
     aws_flags.AddRoleSessionName(parser)
     aws_flags.AddVpcId(parser)

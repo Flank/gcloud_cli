@@ -66,7 +66,7 @@ class Approve(base.CreateCommand):
       raise exceptions.HttpException(error)
 
     prompt = 'Approving rollout {} from {} to target {}.\n\n'.format(
-        rollout_ref.Name(), release_ref.Name(), rollout_obj.target)
+        rollout_ref.Name(), release_ref.Name(), rollout_obj.targetId)
     release_util.PrintDiff(release_ref, release_obj, prompt=prompt)
 
     console_io.PromptContinue(cancel_on_no=True)

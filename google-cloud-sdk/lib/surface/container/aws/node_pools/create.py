@@ -37,16 +37,15 @@ class Create(base.CreateCommand):
   def Args(parser):
     resource_args.AddAwsNodePoolResourceArg(parser, 'to create')
     flags.AddNodeVersion(parser)
-    flags.AddSubnetId(parser)
+    flags.AddSubnetID(parser, 'the node pool')
     flags.AddAutoscaling(parser)
-    flags.AddNumberOfNodes(parser)
     flags.AddMaxPodsPerNode(parser)
     flags.AddRootVolumeSize(parser)
     flags.AddValidateOnly(parser, 'node pool to create')
     flags.AddTags(parser, 'node pool')
 
     aws_flags.AddInstanceType(parser)
-    aws_flags.AddKeyPairName(parser)
+    aws_flags.AddSshEC2KeyPair(parser)
     aws_flags.AddIamInstanceProfile(parser)
 
     base.ASYNC_FLAG.AddToParser(parser)

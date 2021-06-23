@@ -67,7 +67,8 @@ class Delete(base.DeleteCommand):
             name=template_name,
             requestId=request_utils.GenerateRequestId()))
 
-    operations.Await(operation, 'Deleting Certificate Template')
+    operations.Await(
+        operation, 'Deleting Certificate Template', api_version='v1')
 
     log.status.Print(
         'Deleted Certificate Template [{}].'.format(template_name))

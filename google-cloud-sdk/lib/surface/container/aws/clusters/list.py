@@ -30,14 +30,14 @@ class Describe(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    resource_args.AddRegionResourceArg(parser, 'to list')
+    resource_args.AddLocationResourceArg(parser, 'to list')
     parser.display_info.AddFormat(clusters.CLUSTERS_FORMAT)
 
   def Run(self, args):
     """Run the list command."""
-    region_ref = args.CONCEPTS.region.Parse()
+    location_ref = args.CONCEPTS.location.Parse()
 
-    with endpoint_util.GkemulticloudEndpointOverride(region_ref.locationsId,
+    with endpoint_util.GkemulticloudEndpointOverride(location_ref.locationsId,
                                                      self.ReleaseTrack()):
       cluster_client = clusters.Client(track=self.ReleaseTrack())
-      return cluster_client.List(region_ref)
+      return cluster_client.List(location_ref)

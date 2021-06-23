@@ -27,7 +27,7 @@ from googlecloudsdk.command_lib.vmware import flags
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
-  """List supported Google VMware Engine locations."""
+  """List Google Cloud VMware Engine locations."""
 
   @staticmethod
   def Args(parser):
@@ -48,7 +48,7 @@ class List(base.ListCommand):
 List.detailed_help = {
     'DESCRIPTION':
         """
-          List supported Google Cloud VMware Engine locations.
+          List supported VMware Engine locations.
         """,
     'EXAMPLES':
         """

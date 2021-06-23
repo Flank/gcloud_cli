@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.deploy import describe
+from googlecloudsdk.command_lib.deploy import flags
 from googlecloudsdk.command_lib.deploy import resource_args
 
 _DETAILED_HELP = {
@@ -43,6 +44,7 @@ def _CommonArgs(parser):
       capture some information, but behaves like an ArgumentParser.
   """
   resource_args.AddTargetResourceArg(parser, positional=True)
+  flags.AddDeliveryPipeline(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -78,4 +80,4 @@ class Describe(base.DescribeCommand):
     """This is what gets called when the user runs this command."""
     target_ref = args.CONCEPTS.target.Parse()
 
-    return describe.DescribeTarget(target_ref)
+    return describe.DescribeTarget(target_ref, args.delivery_pipeline)

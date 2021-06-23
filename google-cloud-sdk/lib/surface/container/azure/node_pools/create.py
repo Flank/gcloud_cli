@@ -40,13 +40,13 @@ class Create(base.CreateCommand):
 
     flags.AddNodeVersion(parser)
     flags.AddAutoscaling(parser)
-    flags.AddNumberOfNodes(parser)
     flags.AddSubnetID(parser, 'the node pool')
     flags.AddVMSize(parser)
     flags.AddSSHPublicKey(parser)
     flags.AddRootVolumeSize(parser)
     flags.AddTags(parser, 'node pool')
     flags.AddValidateOnly(parser, 'creation of the node pool')
+    flags.AddMaxPodsPerNode(parser)
     base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddFormat(command_util.NODE_POOL_FORMAT)
 
@@ -61,13 +61,8 @@ class Create(base.CreateCommand):
     root_volume_size = flags.GetRootVolumeSize(args)
     tags = flags.GetTags(args)
     validate_only = flags.GetValidateOnly(args)
-
-    min_nodes, max_nodes = None, None
-    flags.CheckNumberOfNodesAndAutoscaling(args)
-    if flags.GetAutoscalingEnabled(args):
-      min_nodes, max_nodes = flags.GetAutoscalingParams(args)
-    else:
-      min_nodes = max_nodes = flags.GetNumberOfNodes(args)
+    max_pods_per_node = flags.GetMaxPodsPerNode(args)
+    min_nodes, max_nodes = flags.GetAutoscalingParams(args)
 
     async_ = args.async_
 
@@ -85,7 +80,8 @@ class Create(base.CreateCommand):
           tags=tags,
           validate_only=validate_only,
           min_nodes=min_nodes,
-          max_nodes=max_nodes)
+          max_nodes=max_nodes,
+          max_pods_per_node=max_pods_per_node)
 
       op_ref = resource_args.GetOperationResource(op)
 

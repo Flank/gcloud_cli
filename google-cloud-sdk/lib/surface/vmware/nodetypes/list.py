@@ -27,7 +27,7 @@ from googlecloudsdk.command_lib.vmware import flags
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
-  """List supported VMware Engine nodes types."""
+  """List supported Google Cloud VMware Engine node types."""
 
   @staticmethod
   def Args(parser):
@@ -55,8 +55,14 @@ List.detailed_help = {
         """,
     'EXAMPLES':
         """
-          To List VMware Engine node types:
+          To list VMware Engine node types, run:
+
+            $ {command} --location=us-central1 --project=my-project
+
+          Or:
 
             $ {command}
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
     """,
 }

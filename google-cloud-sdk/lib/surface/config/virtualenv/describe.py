@@ -42,8 +42,9 @@ class Module(object):
     self.module_version = module_version
 
 
+@base.Hidden
 class Describe(base.Command):
-  """Describe virtual env."""
+  """Describe a virtualenv environment."""
 
   def Run(self, args):
     ve_dir = config.Paths().virtualenv_dir

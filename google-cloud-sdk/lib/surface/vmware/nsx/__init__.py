@@ -24,6 +24,6 @@ from googlecloudsdk.calliope import base
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Nsx(base.Group):
-  """Manage NSX in Google Cloud VMware Engine."""
+  """Manage NSX using Google Cloud VMware Engine."""
 
   category = base.COMPUTE_CATEGORY

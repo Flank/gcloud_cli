@@ -32,14 +32,14 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    resource_args.AddRegionResourceArg(parser, 'to list Azure clusters')
+    resource_args.AddLocationResourceArg(parser, 'to list Azure clusters')
     parser.display_info.AddFormat(command_util.CLUSTERS_FORMAT)
 
   def Run(self, args):
     """Run the list command."""
-    region_ref = args.CONCEPTS.region.Parse()
-    with endpoint_util.GkemulticloudEndpointOverride(region_ref.locationsId,
+    location_ref = args.CONCEPTS.location.Parse()
+    with endpoint_util.GkemulticloudEndpointOverride(location_ref.locationsId,
                                                      self.ReleaseTrack()):
       api_client = azure_api_util.ClustersClient(track=self.ReleaseTrack())
       return api_client.List(
-          region_ref, page_size=args.page_size, limit=args.limit)
+          location_ref, page_size=args.page_size, limit=args.limit)

@@ -19,7 +19,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
@@ -75,12 +74,11 @@ class Describe(base.DescribeCommand, gbase.ListCommand):
     """)
 
   def Run(self, args):
-    feature = super(Describe, self).Run(args)
-    messages = core_apis.GetMessagesModule('gkehub', 'v1alpha1')
+    feature = self.GetFeature(v1alpha1=True)
 
     cluster_status = []
     feature_spec_memberships = utils.GetFeatureSpecMemberships(
-        feature, messages)
+        feature, self.v1alpha1_messages)
     feature_state_memberships = utils.GetFeatureStateMemberships(feature)
 
     for membership, config in feature_spec_memberships.items():
@@ -92,8 +90,8 @@ class Describe(base.DescribeCommand, gbase.ListCommand):
       if membership in feature_state_memberships:
         details = feature_state_memberships[membership]
         dict_entry.update({
-            'DESCRIPTION': details.value.description,
-            'STATUS': details.value.code
+            'DESCRIPTION': details.description,
+            'STATUS': details.code
         })
 
       cluster_status.append(dict_entry)

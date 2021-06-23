@@ -99,8 +99,8 @@ class Create(base.CreateCommand):
             certificateTemplate=new_cert_template,
             requestId=request_utils.GenerateRequestId()))
 
-    cert_template_response = operations.Await(operation,
-                                              'Creating Certificate Template.')
+    cert_template_response = operations.Await(
+        operation, 'Creating Certificate Template.', api_version='v1')
     cert_template = operations.GetMessageFromResponse(
         cert_template_response, messages.CertificateTemplate)
 

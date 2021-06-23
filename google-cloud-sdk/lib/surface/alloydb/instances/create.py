@@ -71,7 +71,7 @@ class Create(base.CreateCommand):
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
     project_ref = client.resource_parser.Create(
-        'alloydbadmin.projects.locations.clusters',
+        'alloydb.projects.locations.clusters',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region,
         clustersId=args.cluster)

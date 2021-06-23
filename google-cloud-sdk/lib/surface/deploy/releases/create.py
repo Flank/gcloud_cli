@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.clouddeploy import release
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.deploy import flags
 from googlecloudsdk.command_lib.deploy import promote_util
+from googlecloudsdk.command_lib.deploy import release_util
 from googlecloudsdk.command_lib.deploy import resource_args
 from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
@@ -32,16 +33,16 @@ _DETAILED_HELP = {
         '{description}',
     'EXAMPLES':
         """ \
-      To create a release with source located at storage URL `gs://bucket/object.zip`
-      and the first rollout in the first target of the promotion sequence:
+    To create a release with source located at storage URL `gs://bucket/object.zip`
+    and the first rollout in the first target of the promotion sequence:
 
-         $ {command} my-release --source=`gs://bucket/object.zip` --delivery-pipeline=my-pipeline --region=us-central1
+       $ {command} my-release --source=`gs://bucket/object.zip` --delivery-pipeline=my-pipeline --region=us-central1
 
-      To create a release with source located at current directory
-      and deploy a rollout to target prod :
+    To create a release with source located at current directory
+    and deploy a rollout to target prod :
 
-        $ {command} my-release --delivery-pipeline=my-pipeline --region=us-central1 --to-target=prod
-      """,
+      $ {command} my-release --delivery-pipeline=my-pipeline --region=us-central1 --to-target=prod
+    """,
 }
 
 
@@ -76,11 +77,9 @@ class Create(base.CreateCommand):
     release_ref = args.CONCEPTS.release.Parse()
     client = release.ReleaseClient()
     # Create the release create request.
-    release_config = client.CreateReleaseConfig(args.source,
-                                                args.gcs_source_staging_dir,
-                                                args.ignore_file, args.images,
-                                                args.build_artifacts,
-                                                args.description)
+    release_config = release_util.CreateReleaseConfig(
+        args.source, args.gcs_source_staging_dir, args.ignore_file, args.images,
+        args.build_artifacts, args.description)
     operation = client.Create(release_ref, release_config)
     operation_ref = resources.REGISTRY.ParseRelativeName(
         operation.name, collection='clouddeploy.projects.locations.operations')

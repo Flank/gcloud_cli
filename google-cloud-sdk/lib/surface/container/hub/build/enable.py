@@ -36,7 +36,3 @@ class Enable(base.EnableCommand):
   """
 
   feature_name = 'cloudbuild'
-
-  def Run(self, args):
-    return self.RunCommand(
-        args, cloudbuildFeatureSpec=(base.CreateCloudBuildFeatureSpec()))

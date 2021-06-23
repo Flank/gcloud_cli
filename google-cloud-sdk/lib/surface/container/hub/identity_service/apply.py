@@ -19,21 +19,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import sys
-import textwrap
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.anthos.common import file_parsers
 from googlecloudsdk.command_lib.container.hub.features import base
-from googlecloudsdk.command_lib.container.hub.identity_service import utils
-from googlecloudsdk.command_lib.projects import util as project_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
-
-
-MEMBERSHIP_FLAG = '--membership'
-CONFIG_YAML_FLAG = '--config'
-membership = None
 
 
 class Apply(base.UpdateCommand):
@@ -54,29 +44,24 @@ class Apply(base.UpdateCommand):
   @classmethod
   def Args(cls, parser):
     parser.add_argument(
-        MEMBERSHIP_FLAG,
+        '--membership',
         type=str,
-        help=textwrap.dedent("""\
-            The Membership name provided during registration.
-            """),
+        help='The Membership name provided during registration.',
     )
     parser.add_argument(
-        CONFIG_YAML_FLAG,
+        '--config',
         type=str,
-        help=textwrap.dedent("""\
-            The path to the identity-service.yaml config file.
-            """),
+        help='The path to the identity-service.yaml config file.',
         required=True)
 
   def Run(self, args):
     # Get Hub memberships (cluster registered with Hub) from GCP Project.
-    project_id = args.project or properties.VALUES.core.project.GetOrFail()
-    memberships = base.ListMemberships(project_id)
+    memberships = base.ListMemberships()
     if not memberships:
       raise exceptions.Error('No Memberships available in Hub.')
 
     # Acquire membership.
-    global membership
+    membership = None
     # Prompt user for an existing hub membership if none is provided.
     if not args.membership:
       index = 0
@@ -86,8 +71,7 @@ class Apply(base.UpdateCommand):
             message='Please specify a membership to apply {}:\n'.format(
                 args.config))
       membership = memberships[index]
-      sys.stderr.write('Selecting membership [{}].\n'
-                       .format(membership))
+      sys.stderr.write('Selecting membership [{}].\n'.format(membership))
     else:
       membership = args.membership
       if membership not in memberships:
@@ -96,28 +80,25 @@ class Apply(base.UpdateCommand):
 
     # Load config YAML file.
     loaded_config = file_parsers.YamlConfigFile(
-        file_path=args.config,
-        item_type=file_parsers.LoginConfigObject)
+        file_path=args.config, item_type=file_parsers.LoginConfigObject)
 
     # Create new identity service feature spec.
-    client = core_apis.GetClientInstance('gkehub', 'v1alpha1')
-    msg = client.MESSAGES_MODULE
-    member_config = _parse_config(loaded_config, msg)
+    member_config = _parse_config(loaded_config, self.v1alpha1_messages)
 
-    project_number = project_util.GetProjectNumber(project_id)
     # UpdateFeature uses the patch method to update member_configs map, hence
     # there's no need to get the existing feature spec.
-    applied_config = msg.IdentityServiceFeatureSpec.MemberConfigsValue.AdditionalProperty(
-        key=utils.full_membership_name(project_number, membership),
-        value=member_config)
-    m_configs = msg.IdentityServiceFeatureSpec.MemberConfigsValue(
-        additionalProperties=[applied_config])
+    full_name = self.MembershipResourceName(membership, use_number=True)
+    configs = self.hubclient.ToProtoMap(
+        self.v1alpha1_messages.IdentityServiceFeatureSpec.MemberConfigsValue,
+        {full_name: member_config})
+    spec = self.v1alpha1_messages.IdentityServiceFeatureSpec(
+        memberConfigs=configs)
+    f = self.v1alpha1_messages.Feature(identityserviceFeatureSpec=spec)
 
     # Execute update to apply new identity service feature spec to membership.
-    self.RunCommand(
-        'identityservice_feature_spec.member_configs',
-        identityserviceFeatureSpec=msg.IdentityServiceFeatureSpec(
-            memberConfigs=m_configs))
+    self.Update(['identityservice_feature_spec.member_configs'],
+                f,
+                v1alpha1=True)
 
 
 def _parse_config(loaded_config, msg):
@@ -128,6 +109,7 @@ def _parse_config(loaded_config, msg):
       yaml file given by the user. YamlConfigFile is from
       googlecloudsdk.command_lib.anthos.common.file_parsers.
     msg: The empty proto message class for gkehub version v1alpha1
+
   Returns:
     member_config: The MemberConfig configuration containing the AuthMethods for
       the IdentityServiceFeatureSpec.
@@ -170,8 +152,7 @@ def _validate_clientconfig_meta(clientconfig):
       clientconfig['apiVersion'] != 'authentication.gke.io/v2alpha1'):
     raise exceptions.Error(
         'Only support "apiVersion: authentication.gke.io/v2alpha1"')
-  if ('kind' not in clientconfig or
-      clientconfig['kind'] != 'ClientConfig'):
+  if ('kind' not in clientconfig or clientconfig['kind'] != 'ClientConfig'):
     raise exceptions.Error('Only support "kind: ClientConfig"')
   if 'spec' not in clientconfig:
     raise exceptions.Error('Missing required field .spec')
@@ -181,10 +162,11 @@ def _provision_oidc_config(auth_method, msg):
   """Provision FeatureSpec OIDCConfig from the parsed oidc ClientConfig CRD yaml file.
 
   Args:
-    auth_method: YamlConfigFile, The data loaded from the ClientConfig CRD
-      yaml file given by the user. YamlConfigFile is from
+    auth_method: YamlConfigFile, The data loaded from the ClientConfig CRD yaml
+      file given by the user. YamlConfigFile is from
       googlecloudsdk.command_lib.anthos.common.file_parsers.
     msg: The empty proto message class for gkehub version v1alpha1
+
   Returns:
     member_config: The MemberConfig configuration containing the AuthMethods for
       the IdentityServiceFeatureSpec.

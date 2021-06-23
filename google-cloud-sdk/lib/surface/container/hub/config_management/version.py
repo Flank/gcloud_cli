@@ -18,12 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import os
-from apitools.base.py import exceptions as apitools_exceptions
+from googlecloudsdk.api_lib.container.hub import util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.hub.features import base as feature_base
-from googlecloudsdk.core import exceptions
-from googlecloudsdk.core import properties
 
 NA = 'NA'
 
@@ -37,7 +34,14 @@ class ConfigmanagementFeatureState(object):
 
 
 class Version(feature_base.FeatureCommand, base.ListCommand):
-  """Print the version of all clusters with Config Management enabled."""
+  """Print the version of all clusters with Config Management enabled.
+
+  ## EXAMPLES
+
+  To print the version of all clusters with Config Management enabled, run:
+
+    $ {command}
+  """
 
   feature_name = 'configmanagement'
 
@@ -47,46 +51,23 @@ class Version(feature_base.FeatureCommand, base.ListCommand):
         'table(name:label=Name:sort=1,version:label=Version)')
 
   def Run(self, args):
-    try:
-      project_id = properties.VALUES.core.project.GetOrFail()
-      memberships = feature_base.ListMemberships(project_id)
-      name = 'projects/{0}/locations/global/features/{1}'.format(
-          project_id, self.feature_name)
-      response = feature_base.GetFeature(name)
-    except apitools_exceptions.HttpUnauthorizedError as e:
-      raise exceptions.Error(
-          'You are not authorized to see the status of {} '
-          'Feature from project [{}]. Underlying error: {}'.format(
-              self.feature.display_name, project_id, e))
-    except apitools_exceptions.HttpNotFoundError as e:
-      raise exceptions.Error(
-          '{} Feature for project [{}] is not enabled'.format(
-              self.feature.display_name, project_id))
-    if not memberships:
-      return None
+    memberships = feature_base.ListMemberships()
+    f = self.GetFeature()
 
     acm_status = []
-    feature_state_memberships = parse_feature_state_memberships(response)
+    feature_state_memberships = feature_state_memberships = {
+        util.MembershipShortname(m): s
+        for m, s in self.hubclient.ToPyDict(f.membershipStates).items()
+    }
     for name in memberships:
       cluster = ConfigmanagementFeatureState(name)
       if name not in feature_state_memberships:
         acm_status.append(cluster)
         continue
       md = feature_state_memberships[name]
-      fs = md.value.configmanagementFeatureState
-      if fs and fs.membershipConfig and fs.membershipConfig.version:
-        cluster.version = fs.membershipConfig.version
+      fs = md.configmanagement
+      if fs and fs.membershipSpec and fs.membershipSpec.version:
+        cluster.version = fs.membershipSpec.version
       acm_status.append(cluster)
 
     return acm_status
-
-
-def parse_feature_state_memberships(response):
-  if response.featureState is None or response.featureState.detailsByMembership is None:
-    feature_state_membership_details = []
-  else:
-    feature_state_membership_details = response.featureState.detailsByMembership.additionalProperties
-  return {
-      os.path.basename(membership_detail.key): membership_detail
-      for membership_detail in feature_state_membership_details
-  }

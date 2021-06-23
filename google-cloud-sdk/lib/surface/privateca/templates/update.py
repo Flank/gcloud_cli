@@ -174,8 +174,8 @@ class Create(base.CreateCommand):
             updateMask=','.join(update_mask),
             requestId=request_utils.GenerateRequestId()))
 
-    cert_template_response = operations.Await(operation,
-                                              'Updating Certificate Template.')
+    cert_template_response = operations.Await(
+        operation, 'Updating Certificate Template.', api_version='v1')
     cert_template = operations.GetMessageFromResponse(
         cert_template_response, messages.CertificateTemplate)
 

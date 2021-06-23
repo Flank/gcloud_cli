@@ -24,6 +24,6 @@ from googlecloudsdk.calliope import base
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Operations(base.Group):
-  """List operations in Google Cloud VMware Engine."""
+  """List and describe operations in Google Cloud VMware Engine."""
 
   category = base.COMPUTE_CATEGORY

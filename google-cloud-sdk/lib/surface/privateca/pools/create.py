@@ -83,8 +83,9 @@ class Create(base.CreateCommand):
             parent=ca_pool_ref.Parent().RelativeName(),
             requestId=request_utils.GenerateRequestId()))
 
-    ca_pool_response = operations.Await(operation, 'Creating CA Pool.')
-    ca_pool = operations.GetMessageFromResponse(
-        ca_pool_response, messages.CaPool)
+    ca_pool_response = operations.Await(
+        operation, 'Creating CA Pool.', api_version='v1')
+    ca_pool = operations.GetMessageFromResponse(ca_pool_response,
+                                                messages.CaPool)
 
     log.status.Print('Created CA Pool [{}].'.format(ca_pool.name))

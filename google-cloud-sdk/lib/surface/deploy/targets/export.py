@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Exports a Gcloud Deploy delivery pipeline resource."""
+"""Exports a Gcloud Deploy target resource."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -20,13 +20,12 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from apitools.base.py import exceptions as apitools_exceptions
-from googlecloudsdk.api_lib.clouddeploy import target
 from googlecloudsdk.calliope import base
-from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.deploy import export_util
+from googlecloudsdk.command_lib.deploy import flags
 from googlecloudsdk.command_lib.deploy import manifest_util
 from googlecloudsdk.command_lib.deploy import resource_args
+from googlecloudsdk.command_lib.deploy import target_util
 from googlecloudsdk.command_lib.export import util as core_export_util
 
 _DETAILED_HELP = {
@@ -35,9 +34,9 @@ _DETAILED_HELP = {
     'EXAMPLES':
         textwrap.dedent("""\
 
-      To return the .yaml definition of the target 'test-target' for delivery pipeline 'test-pipeline' in region 'us-central1', run:
+      To return the .yaml definition of the target 'test-target' in region 'us-central1', run:
 
-        $ {command} test-target --delivery-pipeline=test-pipeline --region=us-central1
+        $ {command} test-target --region=us-central1
 
       """)
 }
@@ -55,6 +54,7 @@ class Export(base.ExportCommand):
   def Args(parser):
     resource_args.AddTargetResourceArg(parser, positional=True)
     core_export_util.AddExportFlags(parser)
+    flags.AddDeliveryPipeline(parser, False)
 
   def Run(self, args):
     """Entry point of the export command.
@@ -64,12 +64,14 @@ class Export(base.ExportCommand):
         arguments specified in the .Args() method.
     """
     target_ref = args.CONCEPTS.target.Parse()
-    try:
-      target_obj = target.TargetsClient().Get(target_ref.RelativeName())
-    except apitools_exceptions.HttpError as error:
-      raise exceptions.HttpException(error)
+    target_dict = target_ref.AsDict()
+    final_ref = target_util.TargetReference(target_ref.Name(),
+                                            target_dict['projectsId'],
+                                            target_dict['locationsId'],
+                                            args.delivery_pipeline)
+    target_obj = target_util.GetTarget(final_ref)
 
-    manifest = manifest_util.ProtoToManifest(target_obj, target_ref,
+    manifest = manifest_util.ProtoToManifest(target_obj, final_ref,
                                              manifest_util.TARGET_KIND_V1BETA1,
                                              manifest_util.TARGET_FIELDS)
 

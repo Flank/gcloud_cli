@@ -22,9 +22,10 @@ from googlecloudsdk.api_lib.vmware.privateclouds import PrivateCloudsClient
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.vmware import flags
 
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Describe(base.DescribeCommand):
-  """Describe VMware Engine NSX credentials."""
+  """Retrieve VMware NSX sign-in credentials associated with a VMware Engine private cloud."""
 
   @staticmethod
   def Args(parser):
@@ -40,16 +41,18 @@ class Describe(base.DescribeCommand):
 Describe.detailed_help = {
     'DESCRIPTION':
         """
-          Describe NSX credentials
+          Retrieve VMware NSX sign-in credentials associated with a VMware Engine private cloud.
         """,
     'EXAMPLES':
         """
-          To get a NSX credentials description in
-          private cloud ``my-privatecloud'' with project ``my-project'',
-          zone ``us-west2-a'', run:
+          To get sign-in credentials for NSX in private cloud ``my-privatecloud'', run:
+
+            $ {command} --privatecloud=my-privatecloud --location=us-west2-a --project=my-project
+
+          Or:
 
             $ {command} --privatecloud=my-privatecloud
-                                   --location=us-west2-a
-                                   --project=my-project
+
+          In the second example, the project and location are taken from gcloud properties core/project and compute/zone.
     """,
 }

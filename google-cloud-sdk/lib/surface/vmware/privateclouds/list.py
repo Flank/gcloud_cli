@@ -39,8 +39,7 @@ DETAILED_HELP = {
 
             $ {command}
 
-          In the second example, the region is taken from gcloud properties
-          compute/zone.
+          In the second example, the location is taken from gcloud properties compute/zone.
     """,
 }
 

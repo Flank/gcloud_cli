@@ -19,13 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import sys
-import textwrap
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.container.hub.features import base
-from googlecloudsdk.command_lib.container.hub.identity_service import utils
-from googlecloudsdk.command_lib.projects import util as project_util
 from googlecloudsdk.core import exceptions
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 
 
@@ -44,20 +39,17 @@ class Delete(base.UpdateCommand):
 
   feature_name = 'identityservice'
 
-  @classmethod
-  def Args(cls, parser):
+  @staticmethod
+  def Args(parser):
     parser.add_argument(
         '--membership',
         type=str,
-        help=textwrap.dedent("""\
-            Membership name provided during registration.
-            """),
+        help=('Membership name provided during registration.'),
     )
 
   def Run(self, args):
     # Get Hub memberships (cluster registered with Hub) from GCP Project.
-    project_id = args.project or properties.VALUES.core.project.GetOrFail()
-    memberships = base.ListMemberships(project_id)
+    memberships = base.ListMemberships()
     if not memberships:
       raise exceptions.Error('No Memberships available in Hub.')
 
@@ -69,32 +61,20 @@ class Delete(base.UpdateCommand):
       if len(memberships) > 1:
         index = console_io.PromptChoice(
             options=memberships,
-            message=
-            'Please specify a membership to delete Identity Service {}:\n')
+            message='Please specify a membership to delete Identity Service {}:\n'
+        )
       membership = memberships[index]
-      sys.stderr.write('Selecting membership [{}].\n'
-                       .format(membership))
+      sys.stderr.write('Selecting membership [{}].\n'.format(membership))
     else:
       membership = args.membership
       if membership not in memberships:
         raise exceptions.Error(
             'Membership {} is not in Hub.'.format(membership))
 
-    # Create new identity service feature spec.
-    client = core_apis.GetClientInstance('gkehub', 'v1alpha1')
-    msg = client.MESSAGES_MODULE
+    # Setup a patch to set the MembershipSpec to the empty proto ("delete").
+    membership_key = self.MembershipResourceName(membership, use_number=True)
+    specs = {membership_key: self.messages.MembershipFeatureSpec()}
+    patch = self.messages.Feature(
+        membershipSpecs=self.hubclient.ToMembershipSpecs(specs))
 
-    project_number = project_util.GetProjectNumber(project_id)
-    # UpdateFeature uses the patch method to update member_configs map, hence
-    # there's no need to get the existing feature spec.
-    applied_config = msg.IdentityServiceFeatureSpec.MemberConfigsValue.AdditionalProperty(
-        key=utils.full_membership_name(project_number, membership),
-        value=msg.MemberConfig())
-    m_configs = msg.IdentityServiceFeatureSpec.MemberConfigsValue(
-        additionalProperties=[applied_config])
-
-    # Execute update to delete identity service feature spec for membership.
-    self.RunCommand(
-        'identityservice_feature_spec.member_configs',
-        identityserviceFeatureSpec=msg.IdentityServiceFeatureSpec(
-            memberConfigs=m_configs))
+    self.Update(['membership_specs'], patch)

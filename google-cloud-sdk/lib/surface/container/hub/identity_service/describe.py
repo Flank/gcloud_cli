@@ -18,12 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.calliope import base as gcloud_base
 from googlecloudsdk.command_lib.container.hub.features import base
-from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
-from googlecloudsdk.core import properties
 
 
 class Describe(base.FeatureCommand, gcloud_base.ListCommand):
@@ -47,20 +44,8 @@ class Describe(base.FeatureCommand, gcloud_base.ListCommand):
 
   def Run(self, args):
     # Get Hub memberships (cluster registered with Hub) from GCP Project.
-    try:
-      project = args.project or properties.VALUES.core.project.GetOrFail()
-      memberships = base.ListMemberships(project)
-      name = 'projects/{0}/locations/global/features/{1}'.format(
-          project, self.feature_name)
-      response = base.GetFeature(name)
-    except apitools_exceptions.HttpUnauthorizedError as e:
-      raise exceptions.Error(
-          'Not authorized to see Feature {} status from project [{}]. '
-          'Underlying error: {}'.format(self.feature.display_name, project, e))
-    except apitools_exceptions.HttpNotFoundError as e:
-      raise exceptions.Error(
-          '{} Feature for project [{}] is not enabled'.format(
-              self.feature.display_name, project))
+    memberships = base.ListMemberships()
+    response = self.GetFeature(v1alpha1=True)
     if not memberships:
       log.status.Print('No Memberships available in Hub.')
       return {}

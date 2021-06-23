@@ -18,11 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as gbase
-from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
-from googlecloudsdk.core import properties
 
 
 @gbase.Hidden
@@ -47,14 +44,9 @@ class List(base.FeatureCommand, gbase.ListCommand):
     """)
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
-    feature = utils.GetFeature(self.feature_name, self.feature.display_name,
-                               project)
-
-    messages = core_apis.GetMessagesModule('gkehub', 'v1alpha1')
-
+    feature = self.GetFeature(v1alpha1=True)
     feature_spec_memberships = _parse_feature_spec_memberships(
-        feature, messages)
+        feature, self.v1alpha1_messages)
 
     cluster_list = []
     for membership in feature_spec_memberships:

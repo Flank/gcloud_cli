@@ -18,51 +18,41 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import os
-import textwrap
-
-from apitools.base.py import exceptions as apitools_exceptions
-from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.api_lib.container.hub import util
 from googlecloudsdk.command_lib.container.hub.config_management import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
-
-MEMBERSHIP_FLAG = '--membership'
 
 
 class Upgrade(base.UpdateCommand):
-  r"""Upgrade the version of the Config Management Feature.
+  """Upgrade the version of the Config Management Feature.
 
   Upgrade a specified membership to the latest version of the Config Management
   Feature.
 
-  ## Examples
+  ## EXAMPLES
 
-  Upgrade a membership named CLUSTER_NAME:
+  To upgrade a membership named CLUSTER_NAME, run:
 
-    $ {command} --membership=CLUSTER_NAME \
+    $ {command} --membership=CLUSTER_NAME
   """
 
   feature_name = 'configmanagement'
 
-  @classmethod
-  def Args(cls, parser):
+  @staticmethod
+  def Args(parser):
     parser.add_argument(
-        MEMBERSHIP_FLAG,
+        '--membership',
         type=str,
-        help=textwrap.dedent("""\
-            The Membership name provided during registration.
-            """),
+        help='The Membership name provided during registration.',
     )
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
-    feature_data = self._get_feature(project)
-    membership = _get_or_prompt_membership(args, project)
-    declared_v, cluster_v = _parse_versions(feature_data, membership)
+    f = self.GetFeature()
+    membership = _get_or_prompt_membership(args.membership)
+    declared_v, cluster_v = utils.versions_for_member(f, membership)
 
     if not self._validate_versions(membership, declared_v, cluster_v):
       return
@@ -73,19 +63,19 @@ class Upgrade(base.UpdateCommand):
         throw_if_unattended=True,
         cancel_on_no=True)
 
-    client = core_apis.GetClientInstance('gkehub', 'v1alpha1')
-    msg = client.MESSAGES_MODULE
-    mem_config = _parse_membership(feature_data,
-                                   membership) or msg.MembershipConfig()
-    mem_config.version = utils.LATEST_VERSION
-    applied_config = msg.ConfigManagementFeatureSpec.MembershipConfigsValue.AdditionalProperty(
-        key=membership, value=mem_config)
-    m_configs = msg.ConfigManagementFeatureSpec.MembershipConfigsValue(
-        additionalProperties=[applied_config])
-    self.RunCommand(
-        'configmanagement_feature_spec.membership_configs',
-        configmanagementFeatureSpec=msg.ConfigManagementFeatureSpec(
-            membershipConfigs=m_configs))
+    patch = self.messages.MembershipFeatureSpec()
+    # If there's an existing spec, copy it to leave the other fields intact.
+    for full_name, spec in self.hubclient.ToPyDict(f.membershipSpecs).items():
+      if util.MembershipShortname(full_name) == membership and spec is not None:
+        patch = spec
+    if patch.configmanagement is None:
+      patch.configmanagement = self.messages.ConfigManagementMembershipSpec()
+    patch.configmanagement.version = utils.LATEST_VERSION
+
+    f = self.messages.Feature(
+        membershipSpecs=self.hubclient.ToMembershipSpecs(
+            {self.MembershipResourceName(membership): patch}))
+    self.Update(['membershipSpecs'], f)
 
   def _validate_versions(self, membership, declared_v, cluster_v):
     if declared_v == utils.LATEST_VERSION:
@@ -105,92 +95,28 @@ class Upgrade(base.UpdateCommand):
           'not supported by this command.'.format(membership,
                                                   self.feature.display_name,
                                                   cluster_v))
-
     return True
 
-  def _get_feature(self, project):
-    """Fetch the Config Management Feature.
 
-    Args:
-      project: project id
-
-    Returns:
-      configManagementFeature
-    """
-    try:
-      name = 'projects/{0}/locations/global/features/{1}'.format(
-          project, self.feature_name)
-      response = base.GetFeature(name)
-    except apitools_exceptions.HttpUnauthorizedError as e:
-      raise exceptions.Error(
-          'You are not authorized to see the status of {} '
-          'Feature from project [{}]. Underlying error: {}'.format(
-              self.feature.display_name, project, e))
-    except apitools_exceptions.HttpNotFoundError as e:
-      raise exceptions.Error(
-          '{} Feature for project [{}] is not enabled'.format(
-              self.feature.display_name, project))
-
-    return response
-
-
-def _parse_versions(response, membership):
-  """Extract the declared version and cluster version.
-
-  Args:
-    response: A response from fetching the Config Management Feature
-    membership: membership name
-
-  Returns:
-    A tuple of the form (declared version, cluster version).
-  """
-  declared_version = ''
-  mem_config = _parse_membership(response, membership)
-  if mem_config and mem_config.version:
-    declared_version = mem_config.version
-
-  cluster_version = ''
-  if response.featureState.detailsByMembership:
-    membership_details = response.featureState.detailsByMembership.additionalProperties
-    for m in membership_details:
-      if os.path.basename(m.key) == membership:
-        fs = m.value.configmanagementFeatureState
-        if fs and fs.membershipConfig and fs.membershipConfig.version:
-          cluster_version = fs.membershipConfig.version
-
-  return declared_version, cluster_version
-
-
-def _get_or_prompt_membership(args, project):
+def _get_or_prompt_membership(membership):
   """Retrieve the membership name from args or user prompt choice.
 
   Args:
-    args: command line args
-    project: project id
+    membership: The default membership, if any.
+
   Returns:
-    membership: A membership name
+    membership: A final membership name
   Raises: Error, if specified membership could not be found
   """
-  memberships = base.ListMemberships(project)
+  memberships = base.ListMemberships()
   if not memberships:
     raise exceptions.Error('No Memberships available in Hub.')
   # User should choose an existing membership if this arg wasn't provided
-  if not args.membership:
+  if not membership:
     index = console_io.PromptChoice(
         options=memberships,
         message='Please specify a membership to upgrade:\n')
     membership = memberships[index]
-  else:
-    membership = args.membership
-    if membership not in memberships:
-      raise exceptions.Error('Membership {} is not in Hub.'.format(membership))
+  elif membership not in memberships:
+    raise exceptions.Error('Membership {} is not in Hub.'.format(membership))
   return membership
-
-
-def _parse_membership(response, membership):
-  if response.configmanagementFeatureSpec is None or response.configmanagementFeatureSpec.membershipConfigs is None:
-    return None
-
-  for details in response.configmanagementFeatureSpec.membershipConfigs.additionalProperties:
-    if details.key == membership:
-      return details.value

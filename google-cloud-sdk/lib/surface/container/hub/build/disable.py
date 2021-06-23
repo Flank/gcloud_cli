@@ -18,11 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 
 
@@ -42,13 +40,10 @@ class Disable(base.DisableCommand):
   feature_name = 'cloudbuild'
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
-    feature = utils.GetFeature(self.feature_name, self.feature.display_name,
-                               project)
+    feature = self.GetFeature(v1alpha1=True)
 
-    messages = core_apis.GetMessagesModule('gkehub', 'v1alpha1')
-
-    cloudbuild_members = utils.GetFeatureSpecMemberships(feature, messages)
+    cloudbuild_members = utils.GetFeatureSpecMemberships(
+        feature, self.v1alpha1_messages)
     if cloudbuild_members:
       console_io.PromptContinue(
           'The following members still have Cloud Build hybrid worker pools installed:\n\n{}'
