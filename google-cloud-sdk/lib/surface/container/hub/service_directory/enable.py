@@ -26,9 +26,9 @@ class Enable(base.EnableCommand):
 
   Enables the Service Directory Feature in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Enable the Service Directory Feature:
+  To enable the Service Directory Feature, run:
 
     $ {command}
   """

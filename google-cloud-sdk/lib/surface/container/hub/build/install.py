@@ -24,29 +24,28 @@ from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 from googlecloudsdk.core import exceptions
 
+# Pull out the example text so the example command can be one line without the
+# py linter complaining. The docgen tool properly breaks it into multiple lines.
+EXAMPLES = """\
+    To install Cloud Build hybrid worker pools on a membership named
+    MEMBERSHIP-ID with a default security policy of NON_PRIVILEGED and the
+    latest version of Cloud Build, run:
+
+      $ {command} --membership=[MEMBERSHIP-ID]
+
+    To install Cloud Build hybrid worker pools on a membership named
+    MEMBERSHIP-ID with a specified security policy [SECURITY_POLICY]
+    and version [X.Y.Z], run:
+
+      $ {command} --membership=[MEMBERSHIP-ID] --security-policy=[SECURITY_POLICY] --version=[X.Y.Z]
+"""
+
 
 @gbase.Hidden
 class Install(base.UpdateCommand):
-  r"""Install Cloud Build on the specified member.
+  """Install Cloud Build on the specified member."""
 
-  ### Examples
-
-  Install Cloud Build hybrid worker pools on a member named MEMBERSHIP-ID.
-  If the desired security policy or version is omitted, the member will be
-  configured as
-  NON_PRIVILEGED with the latest version of Cloud Build.
-
-    $ {command} --membership=[MEMBERSHIP-ID]
-
-  Install Cloud Build hybrid worker pools on a member named MEMBERSHIP-ID.
-  The installation configuration will have security policy [SECURITY_POLICY]
-  and version [X.Y.Z].
-
-    $ {command} --membership=[MEMBERSHIP-ID]
-    --security-policy=[SECURITY_POLICY] \
-    --version=[X.Y.Z]
-
-  """
+  detailed_help = {'EXAMPLES': EXAMPLES}
 
   feature_name = 'cloudbuild'
   LATEST_VERSION = '0.1.0'

@@ -30,9 +30,9 @@ class Disable(base.DisableCommand):
 
   Disables the Cloud Build Hybrid Feature in the Hub.
 
-  ### Examples
+  ## EXAMPLES
 
-  Disable the Cloud Build Hybrid Feature:
+  To disable the Cloud Build Hybrid Feature, run:
 
     $ {command}
   """

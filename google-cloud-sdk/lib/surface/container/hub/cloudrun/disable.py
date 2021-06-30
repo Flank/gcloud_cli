@@ -26,13 +26,9 @@ class Disable(base.DisableCommand):
 
   This command disables the CloudRun feature in Anthos clusters.
 
-  ## Examples
+  ## EXAMPLES
 
-  Disable the CloudRun feature:
-
-  ## Examples
-
-  Disable CloudRun Feature:
+  To disable the CloudRun Feature, run:
 
     $ {command}
   """

@@ -84,7 +84,7 @@ class Deploy(base.Command):
     flags.AddClientNameAndVersionFlags(parser)
     flags.AddBinAuthzPolicyFlags(parser, with_clear=False)
     flags.AddBinAuthzBreakglassFlag(parser)
-    flags.AddCmekKeyFlag(parser)
+    flags.AddCmekKeyFlag(parser, with_clear=False)
 
     polling_group = parser.add_mutually_exclusive_group()
     flags.AddAsyncFlag(polling_group)

@@ -26,31 +26,32 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 
-CONFIG_YAML_FLAG = '--config'
+# Pull out the example text so the example command can be one line without the
+# py linter complaining. The docgen tool properly breaks it into multiple lines.
+EXAMPLES = """\
+    To apply the CloudRun YAML file, run:
+
+      $ {command} --kubeconfig=/path/to/kubeconfig  --config=/path/to/cloud-run-cr.yaml
+"""
 
 
 class Apply(base.CreateCommand):
-  r"""Deploy or update the CloudRun feature.
+  """Deploy or update the CloudRun feature.
 
   Deploy or update a user-specified config file of the CloudRun custom resource.
   The config file should be a YAML file.
-
-  ## Examples
-
-  Apply the CloudRun YAML file:
-
-    $ {command} --kubeconfig=user-kubeconfig \
-    --config=/path/to/cloud-run-cr.yaml
   """
+
+  detailed_help = {'EXAMPLES': EXAMPLES}
 
   feature_name = 'appdevexperience'
 
-  @classmethod
-  def Args(cls, parser):
+  @staticmethod
+  def Args(parser):
     hub_util.AddClusterConnectionCommonArgs(parser)
 
     parser.add_argument(
-        CONFIG_YAML_FLAG,
+        '--config',
         type=str,
         help='The path to CloudRun custom resource config file.',
         required=False)

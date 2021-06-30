@@ -28,9 +28,9 @@ class Status(base.DescribeCommand):
 
   Displays the status of the Cloud Build Feature in the Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Status of the Cloud Build Feature:
+  To get the status of the Cloud Build Feature, run:
 
     $ {command}
   """

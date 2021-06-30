@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.clouddeploy import client_util
 from googlecloudsdk.api_lib.clouddeploy import release
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.deploy import deploy_util
 from googlecloudsdk.command_lib.deploy import flags
 from googlecloudsdk.command_lib.deploy import promote_util
 from googlecloudsdk.command_lib.deploy import release_util
@@ -44,6 +45,7 @@ _DETAILED_HELP = {
       $ {command} my-release --delivery-pipeline=my-pipeline --region=us-central1 --to-target=prod
     """,
 }
+_RELEASE = 'release'
 
 
 def _CommonArgs(parser):
@@ -60,6 +62,8 @@ def _CommonArgs(parser):
   flags.AddIgnoreFileFlag(parser)
   flags.AddToTargetFlag(parser)
   flags.AddDescription(parser, 'Description of the release.')
+  flags.AddAnnotationsFlag(parser, _RELEASE)
+  flags.AddLabelsFlag(parser, _RELEASE)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -80,6 +84,9 @@ class Create(base.CreateCommand):
     release_config = release_util.CreateReleaseConfig(
         args.source, args.gcs_source_staging_dir, args.ignore_file, args.images,
         args.build_artifacts, args.description)
+    deploy_util.SetMetadata(client.messages, release_config,
+                            deploy_util.ResourceType.RELEASE, args.annotations,
+                            args.labels)
     operation = client.Create(release_ref, release_config)
     operation_ref = resources.REGISTRY.ParseRelativeName(
         operation.name, collection='clouddeploy.projects.locations.operations')

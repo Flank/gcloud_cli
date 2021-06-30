@@ -25,19 +25,23 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 
+# Pull out the example text so the example command can be one line without the
+# py linter complaining. The docgen tool properly breaks it into multiple lines.
+EXAMPLES = """\
+    To apply an Identity Service configuration for a membership, run:
+
+    $ {command} --membership=CLUSTER_NAME --config=/path/to/identity-service.yaml
+"""
+
 
 class Apply(base.UpdateCommand):
-  r"""Update an Identity Service Feature Spec.
+  """Update an Identity Service Feature Spec.
 
-  Command applies IdentityService CR from user-specified config yaml file.
-
-  ## Examples
-
-  Apply IdentityService yaml file:
-
-    $ {command} --membership=CLUSTER_NAME \
-    --config=/path/to/identity-service.yaml
+  This command applies the IdentityService CR from a user-specified config YAML
+  file.
   """
+
+  detailed_help = {'EXAMPLES': EXAMPLES}
 
   feature_name = 'identityservice'
 

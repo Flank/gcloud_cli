@@ -26,9 +26,9 @@ class Disable(base.DisableCommand):
 
   Disable the Service Mesh Feature in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Disable Service Mesh Feature:
+  To disable the Service Mesh Feature, run:
 
     $ {command}
   """

@@ -30,7 +30,7 @@ class Delete(base.UpdateCommand):
   Removes the Identity Service Feature Spec for the given
   membership.
 
-  ## Examples
+  ## EXAMPLES
 
   To delete an Identity Service configuration for a membership, run:
 

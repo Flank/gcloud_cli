@@ -24,9 +24,10 @@ from googlecloudsdk.command_lib.container.hub.features import base
 class Describe(base.DescribeCommand):
   """Describe the status of the CloudRun feature.
 
-  This command describes the status of the CloudRun feature in Anthos clusters.
+  ## EXAMPLES
 
-  ## Examples
+  To get the detailed current status of the CloudRun Feature in Anthos clusters,
+  run:
 
     $ {command}
   """

@@ -36,7 +36,8 @@ default(
 """
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 class Subscribe(base.Command):
   """Stream messages from a Pub/Sub Lite subscription."""
 

@@ -26,9 +26,9 @@ class Enable(base.EnableCommand):
 
   This command enables the Identity Service Feature in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Enable Identity Service Feature:
+  To enable the Identity Service Feature, run:
 
     $ {command}
   """

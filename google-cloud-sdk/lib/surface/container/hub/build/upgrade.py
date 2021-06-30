@@ -28,12 +28,13 @@ from googlecloudsdk.core import exceptions
 
 @gbase.Hidden
 class Upgrade(base.UpdateCommand):
-  r"""Upgrades the Cloud Build installation on the specified member.
+  """Upgrades the Cloud Build installation on the specified member.
 
-  ### Examples
+  Upgrade defaults to the latest version if the --version flag is omitted
 
-  Upgrades the Cloud Build version on a member named [MEMBERSHIP-ID].
-  Defaults to the latest version if the --version flag is omitted
+  ## EXAMPLES
+
+  To upgrade the Cloud Build version on a membership named [MEMBERSHIP-ID], run:
 
     $ {command} --membership=[MEMBERSHIP-ID] --version=[X.Y.Z]
 

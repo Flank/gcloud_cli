@@ -40,7 +40,8 @@ class Update(base.Command):
     log.status.Print('Updating modules...')
     update_modules = [
         '{}/bin/pip3'.format(ve_dir), 'install', '--log',
-        '{}/update_module.log'.format(ve_dir), '-q'
+        '{}/update_module.log'.format(ve_dir), '-q',
+        '--disable-pip-version-check'
     ]
     update_modules.extend(util.MODULES)
     ec = execution_utils.Exec(update_modules, no_exit=True)

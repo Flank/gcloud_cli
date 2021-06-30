@@ -26,9 +26,9 @@ class Enable(base.EnableCommand):
 
   Enable the Service Mesh Feature in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Enable Service Mesh Feature:
+  To enable the Service Mesh Feature, run:
 
     $ {command}
   """

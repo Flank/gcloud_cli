@@ -26,9 +26,9 @@ class Describe(base.DescribeCommand):
 
   Describe the status of Service Mesh Feature resource in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Describe Service Mesh Feature:
+  To describe the Service Mesh Feature, run:
 
     $ {command}
   """

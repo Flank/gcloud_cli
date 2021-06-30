@@ -34,7 +34,7 @@
 
   output:
     ALPHA:
-      # TODO(zuhaochen): Finalize the columns and formats with UX.
+      # TODO(b/191807690): Finalize the columns and formats with UX.
       format: |
         table(
            name.basename():label=NAME,

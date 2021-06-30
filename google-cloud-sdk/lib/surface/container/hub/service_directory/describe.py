@@ -24,11 +24,12 @@ from googlecloudsdk.command_lib.container.hub.features import base
 class Describe(base.DescribeCommand):
   """Describe the status of the Service Directory Feature resource.
 
-  Describes the status of the Service Directory Feature resource in Hub.
+  This command gets the detailed status of the Service Directory Feature
+  resource in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Describe Service Directory Feature:
+  To describe the Service Directory Feature, run:
 
     $ {command}
   """

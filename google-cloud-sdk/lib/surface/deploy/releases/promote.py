@@ -40,6 +40,7 @@ _DETAILED_HELP = {
 
 """,
 }
+_ROLLOUT = 'rollout'
 
 
 def _CommonArgs(parser):
@@ -52,6 +53,8 @@ def _CommonArgs(parser):
   resource_args.AddReleaseResourceArg(parser)
   flags.AddToTarget(parser)
   flags.AddRolloutID(parser)
+  flags.AddAnnotationsFlag(parser, _ROLLOUT)
+  flags.AddLabelsFlag(parser, _ROLLOUT)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -89,4 +92,4 @@ class Promote(base.CreateCommand):
         cancel_on_no=True)
 
     promote_util.Promote(release_ref, release_obj, to_target_id,
-                         args.rollout_id)
+                         args.rollout_id, args.annotations, args.labels)

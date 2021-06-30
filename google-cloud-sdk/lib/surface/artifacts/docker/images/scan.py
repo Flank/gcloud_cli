@@ -25,6 +25,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.artifacts import flags
 from googlecloudsdk.command_lib.artifacts import ondemandscanning_util as ods_util
 from googlecloudsdk.command_lib.util.anthos import binary_operations
+from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
@@ -95,6 +96,7 @@ class ScanBeta(base.Command):
     flags.GetRemoteFlag().AddToParser(parser)
     flags.GetOnDemandScanningFakeExtractionFlag().AddToParser(parser)
     flags.GetOnDemandScanningLocationFlag().AddToParser(parser)
+    flags.GetAdditionalPackageTypesFlag().AddToParser(parser)
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
@@ -160,6 +162,7 @@ class ScanBeta(base.Command):
           remote=args.remote,
           fake_extraction=args.fake_extraction,
           rpm_parser_path=ods_util.RpmParserPath(),
+          additional_package_types=args.additional_package_types,
       )
       if operation_result.exit_code:
         # Filter out any log messages on std err and only include any actual
@@ -173,26 +176,27 @@ class ScanBeta(base.Command):
         if not extraction_error:
           if operation_result.exit_code < 0:
             extraction_error = EXTRACTION_KILLED_ERROR_TEMPLATE.format(
-                exit_code=operation_result.exit_code,
-            )
+                exit_code=operation_result.exit_code,)
           else:
             extraction_error = UNKNOWN_EXTRACTION_ERROR_TEMPLATE.format(
-                exit_code=operation_result.exit_code,
-            )
-        tracker.FailStage(
-            'extract', ods_util.ExtractionFailedError(extraction_error))
+                exit_code=operation_result.exit_code,)
+        tracker.FailStage('extract',
+                          ods_util.ExtractionFailedError(extraction_error))
         return
 
       # Parse stdout for the JSON-ified PackageData protos.
       pkgs = []
       for pkg in json.loads(operation_result.stdout):
-        pkgs += [
-            messages.PackageData(
-                package=pkg['package'],
-                version=pkg['version'],
-                cpeUri=pkg['cpe_uri'],
-            )
-        ]
+        pkg_data = messages.PackageData(
+            package=pkg['package'],
+            version=pkg['version'],
+            cpeUri=pkg['cpe_uri'],
+        )
+        if 'package_type' in pkg:
+          pkg_data.packageType = arg_utils.ChoiceToEnum(
+              pkg['package_type'],
+              messages.PackageData.PackageTypeValueValuesEnum)
+        pkgs += [pkg_data]
       tracker.CompleteStage('extract')
 
       # Stage 2) Make the RPC to the On-Demand Scanning API.
@@ -263,8 +267,8 @@ class Command(binary_operations.BinaryBackedOperation):
     super(Command, self).__init__(binary='local-extract', **kwargs)
 
   def _ParseArgsForCommand(self, resource_uri, remote, fake_extraction,
-                           rpm_parser_path, **kwargs):
-    return [
+                           rpm_parser_path, additional_package_types, **kwargs):
+    args = [
         '--resource_uri=' + resource_uri,
         '--remote=' + six.text_type(remote),
         '--provide_fake_results=' + six.text_type(fake_extraction),
@@ -275,5 +279,10 @@ class Command(binary_operations.BinaryBackedOperation):
         # versions of the command can invoke old versions of the binary.
         '--undefok=' + ','.join([
             'rpm_parser_path',
+            'additional_package_types',
         ]),
     ]
+    if additional_package_types:
+      args.append('--additional_package_types=' +
+                  six.text_type(','.join(additional_package_types)))
+    return args

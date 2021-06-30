@@ -24,11 +24,11 @@ from googlecloudsdk.core import log
 
 
 class Describe(base.FeatureCommand, gcloud_base.ListCommand):
-  r"""Prints the status of all clusters with Identity Service installed.
+  """Prints the status of all clusters with Identity Service installed.
 
   Prints the status of the Identity Service Feature resource in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
   To describe the status of the Identity Service configuration, run:
 

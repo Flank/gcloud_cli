@@ -26,11 +26,11 @@ from googlecloudsdk.core import log
 
 @gbase.Hidden
 class Uninstall(base.UpdateCommand):
-  r"""Uninstall Cloud Build from the specified member.
+  """Uninstall Cloud Build from the specified member.
 
-  ### Examples
+  ## EXAMPLES
 
-  Uninstall Cloud Build from a member named MEMBERSHIP-ID:
+  To uninstall Cloud Build from a membership named MEMBERSHIP-ID, run:
 
     $ {command} --membership=[MEMBERSHIP-ID]
   """

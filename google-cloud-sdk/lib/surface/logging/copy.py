@@ -36,7 +36,7 @@ class Copy(base.Command):
     parser.add_argument(
         '--location', required=True, help='Location of the bucket.')
     parser.add_argument(
-        '--log_filter',
+        '--log-filter',
         required=False,
         help=('A filter specifying which log entries to copy. '
               'The filter must be no more than 20k characters. '

@@ -26,9 +26,9 @@ class Disable(base.DisableCommand):
 
   Disables the Service Directory Feature in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Disable the Service Directory Feature:
+  To disable the Service Directory Feature, run:
 
     $ {command}
   """

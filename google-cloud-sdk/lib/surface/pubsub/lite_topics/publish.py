@@ -25,7 +25,8 @@ from googlecloudsdk.command_lib.pubsub import lite_util
 from googlecloudsdk.command_lib.util.args import resource_args
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 class Publish(base.Command):
   """Publish Pub/Sub Lite messages."""
 

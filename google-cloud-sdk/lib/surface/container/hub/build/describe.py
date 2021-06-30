@@ -23,41 +23,44 @@ from googlecloudsdk.calliope import base as gbase
 from googlecloudsdk.command_lib.container.hub.build import utils
 from googlecloudsdk.command_lib.container.hub.features import base
 
-DETAILED_HELP = {
-    'EXAMPLES':
-        """\
-    Describe the configuration and status of members with Cloud Build installed:
+# Pull out the example text so the example command can be one line without the
+# py linter complaining. The docgen tool properly breaks it into multiple lines.
+EXAMPLES = """\
+    To describe the configuration and status of members with Cloud Build installed, run:
 
       $ {command}
+
+    Example output:
 
       NAME              STATUS  DESCRIPTION                     SECURITY POLICY  VERSION
       managed-member-a  SUCCESS Created controller for cluster  NON_PRIVILEGED   0.1.0
       managed-member-b  SUCCESS Created controller for cluster  PRIVILEGED       0.1.0
       managed-member-c  FAILED  Unable to connect to cluster    PRIVILEGED       0.1.0
 
-    View the status for the member named `managed-member-a`:
+    To view the status for a membership named `managed-member-a`, run:
 
       $ {command} --filter="NAME:managed-member-a"
 
-    Use a regular expression to list the configuration and status of multiple members:
+    To use a regular expression to list the configuration and status of multiple
+    memberships, run:
 
       $ {command} --filter="NAME ~ managed-member.*"
 
-    List all members with security policy `PRIVILEGED`:
+    To list all members with security policy `PRIVILEGED`, run:
 
       $ {command} --filter="SECURITYPOLICY:PRIVILEGED"
 
-    List all the members with security policy `NON_PRIVILEGED` and Cloud Build version `0.1.0`:
+    To list all the members with security policy `NON_PRIVILEGED` and Cloud
+    Build version `0.1.0`, run:
 
       $ {command} --filter="SECURITYPOLICY:NON_PRIVILEGED AND VERSION:0.1.0"
-  """,
-}
+"""
 
 
 @gbase.Hidden
 class Describe(base.DescribeCommand, gbase.ListCommand):
   """Describe the configuration and status of members with Cloud Build installed."""
-  detailed_help = DETAILED_HELP
+  detailed_help = {'EXAMPLES': EXAMPLES}
 
   feature_name = 'cloudbuild'
 

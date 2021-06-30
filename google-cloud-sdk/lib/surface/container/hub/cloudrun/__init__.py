@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-# TODO(b/179683259): Remove hidden flag for launch.
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CloudRun(base.Group):
   """Manage the CloudRun feature."""

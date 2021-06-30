@@ -26,9 +26,9 @@ class Enable(base.EnableCommand):
 
   This command enables the CloudRun feature in Anthos clusters.
 
-  ## Examples
+  ## EXAMPLES
 
-  Enable the CloudRun feature:
+  To enable the CloudRun Feature, run:
 
     $ {command}
   """

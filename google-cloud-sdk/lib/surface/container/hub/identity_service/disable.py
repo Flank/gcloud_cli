@@ -26,9 +26,9 @@ class Disable(base.DisableCommand):
 
   This command disables the Identity Service Feature in Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Disable Identity Service Feature:
+  To disable the Identity Service Feature, run:
 
     $ {command}
   """

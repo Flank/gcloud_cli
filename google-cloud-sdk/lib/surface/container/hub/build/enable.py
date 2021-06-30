@@ -28,9 +28,9 @@ class Enable(base.EnableCommand):
 
   Enables the Cloud Build Hybrid Feature in the Hub.
 
-  ## Examples
+  ## EXAMPLES
 
-  Enable the Cloud Build Hybrid Feature:
+  To enable the Cloud Build Hybrid Feature, run:
 
     $ {command}
   """

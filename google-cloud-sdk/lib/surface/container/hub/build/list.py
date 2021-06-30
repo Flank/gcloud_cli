@@ -26,9 +26,9 @@ from googlecloudsdk.command_lib.container.hub.features import base
 class List(base.FeatureCommand, gbase.ListCommand):
   """Lists all members with Cloud Build installed.
 
-  Lists all members with Cloud Build installed.
+  ## EXAMPLES
 
-  ## Examples
+  To list all members with Cloud Build installed, run:
 
     $ {command}
   """

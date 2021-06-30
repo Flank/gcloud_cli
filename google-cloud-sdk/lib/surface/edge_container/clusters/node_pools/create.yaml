@@ -25,11 +25,11 @@
       required: true
       help_text: |
         Default nodeCount used by this node pool.
-    - arg_name: site
-      api_field: nodePool.site
+    - arg_name: node-location
+      api_field: nodePool.nodeLocation
       required: true
       help_text: |
-        Default site used by this node pool.
+        Google Edge Cloud zone where nodes in this node pool will be created.
     labels:
       api_field: nodePool.labels
 

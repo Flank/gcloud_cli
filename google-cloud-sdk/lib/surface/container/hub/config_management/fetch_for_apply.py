@@ -112,7 +112,7 @@ def merge_config_sync(spec, config):
     cs['syncWait'] = git.syncWaitSecs
   for field in [
       'policyDir', 'httpsProxy', 'secretType', 'syncBranch', 'syncRepo',
-      'syncRev'
+      'syncRev', 'gcpServiceAccountEmail'
   ]:
     if hasattr(git, field) and getattr(git, field) is not None:
       cs[field] = getattr(git, field)

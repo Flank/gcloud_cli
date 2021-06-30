@@ -2,9 +2,9 @@
 
   help_text:
     brief: |
-      Update a managed Microsoft Active Directory domain peering.
+      Update a Managed Microsoft Active Directory domain peering.
     description: |
-      Update a managed Microsoft Active Directory (AD) domain peering.
+      Update a Managed Microsoft Active Directory (AD) domain peering.
 
       This command can fail for the following reasons:
         * The active account does not have permission to access the given

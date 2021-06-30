@@ -78,7 +78,8 @@ class Create(base.Command):
       log.status.Print('Installing modules...')
       install_modules = [
           '{}/bin/pip3'.format(ve_dir), 'install', '--log',
-          '{}/install_module.log'.format(ve_dir), '-q'
+          '{}/install_module.log'.format(ve_dir), '-q',
+          '--disable-pip-version-check'
       ]
       install_modules.extend(util.MODULES)
       ec = execution_utils.Exec(install_modules, no_exit=True)

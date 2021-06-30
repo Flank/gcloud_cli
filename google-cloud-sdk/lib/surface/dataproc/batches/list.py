@@ -33,22 +33,35 @@ class List(base.ListCommand):
 
     List batch jobs in a project. Page-size sets the maximum number of jobs
     returned per page, and Page-token retrieves subsequent results.
-    Use an optional filter to constrain the batch jobs returned.
 
   ## EXAMPLES
 
   List batch jobs in the "us-central1" region:
 
     $ {command} --region="us-central1"
-
-  List batch jobs in the "europe-west1" region with "ERROR" state:
-
-    $ {command} --region="europe-west1" --filter="status.state=ERROR"
   """
 
   @staticmethod
   def Args(parser):
     base.URI_FLAG.RemoveFromParser(parser)
+    # TODO(b/191296541): Use built-in filter arg after it is supported by
+    # backend.
+    # Filter is not supported yet.
+    base.FILTER_FLAG.RemoveFromParser(parser)
+    # Temporary add a dummy hidden implementation so that no parsing logic need
+    # to be changed.
+    parser.add_argument(
+        '--filter',
+        hidden=True,
+        metavar='EXPRESSION',
+        require_coverage_in_tests=False,
+        help="""\
+        Apply a Boolean filter _EXPRESSION_ to each resource item to be listed.
+        If the expression evaluates `True`, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters. This
+        flag interacts with other flags that are applied in this order: *--flatten*,
+        *--sort-by*, *--filter*, *--limit*.""")
+
     flags.AddRegionFlag(parser)
     parser.display_info.AddFormat("""
           table(

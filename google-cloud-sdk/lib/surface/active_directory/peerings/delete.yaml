@@ -2,9 +2,9 @@
 
   help_text:
     brief: |
-      Delete a managed Microsoft Active Directory domain peering.
+      Delete a Managed Microsoft Active Directory domain peering.
     description: |
-      Delete a managed Microsoft Active Directory (AD) domain peering.
+      Delete a Managed Microsoft Active Directory (AD) domain peering.
 
       This command can fail for the following reasons:
         * The active account does not have permission to access the given

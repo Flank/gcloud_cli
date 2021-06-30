@@ -27,11 +27,12 @@ from googlecloudsdk.core.console import console_io
 
 @gbase.Hidden
 class Update(base.UpdateCommand):
-  r"""Update the Cloud Build configuration on the specified member.
+  """Update the Cloud Build configuration on the specified member.
 
-  ### Examples
+  ## EXAMPLES
 
-  Update the security policy configuration on a member named [MEMBERSHIP-ID].
+  To update the security policy configuration on a membership named
+  [MEMBERSHIP-ID], run:
 
     $ {command} --membership=[MEMBERSHIP-ID]
     --security-policy=[SECURITYPOLICY]
