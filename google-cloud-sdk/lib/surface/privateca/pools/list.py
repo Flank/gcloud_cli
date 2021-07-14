@@ -39,9 +39,9 @@ class List(base.ListCommand):
   $ {command}
 
 
-  To list the CA Pools within a project and region 'us-central1':
+  To list the CA Pools within a project and region 'us-west1':
 
-  $ {command} --location="us-central1"
+  $ {command} --location=us-west1
   """
 
   @staticmethod

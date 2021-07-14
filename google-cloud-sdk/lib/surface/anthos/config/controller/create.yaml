@@ -1,5 +1,4 @@
 - release_tracks: [ALPHA]
-  hidden: true
   help_text:
     brief: Create Anthos Config Controller instances
     description: Create an Anthos Config Controller instance.

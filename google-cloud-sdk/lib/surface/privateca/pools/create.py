@@ -37,20 +37,20 @@ class Create(base.CreateCommand):
 
   To create a CA pool in the dev ops tier:
 
-      $ {command} my-pool \
-        --tier=devops
+      $ {command} my-pool --location=us-west1 \
+          --tier=devops
 
   To create a CA pool and restrict what it can issue:
 
-      $ {command} my-pool \
-        --issuance-policy=policy.yaml
+      $ {command} my-pool --location=us-west1 \
+          --issuance-policy=policy.yaml
 
   To create a CA pool that doesn't publicly publish CA certificates and CRLs:
 
-      $ {command} my-pool \
-        --issuance-policy=policy.yaml \
-        --no-publish-ca-cert \
-        --no-publish-crl
+      $ {command} my-pool --location=us-west1 \
+          --issuance-policy=policy.yaml \
+          --no-publish-ca-cert \
+          --no-publish-crl
   """
 
   @staticmethod

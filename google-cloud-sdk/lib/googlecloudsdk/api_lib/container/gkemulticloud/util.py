@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Utilities Cloud GKE Multi-cloud for AWS API."""
+"""Utilities Cloud GKE Multi-cloud API."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -21,27 +21,24 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 
-MODULE_NAME = 'gkemulticloud'
-
-_RELEASE_TRACK_TO_API_VERSION = {
+_VERSION_MAP = {
     base.ReleaseTrack.ALPHA: 'v1',
     base.ReleaseTrack.BETA: 'v1',
     base.ReleaseTrack.GA: 'v1',
 }
 
+MODULE_NAME = 'gkemulticloud'
+
 
 def GetApiVersionForTrack(release_track=base.ReleaseTrack.GA):
-  """Returns the API version for a release track."""
-  return _RELEASE_TRACK_TO_API_VERSION.get(release_track)
+  return _VERSION_MAP.get(release_track)
 
 
 def GetMessagesModule(release_track=base.ReleaseTrack.GA):
-  """Returns the API messages module for a release track."""
-  api_version = _RELEASE_TRACK_TO_API_VERSION.get(release_track)
+  api_version = _VERSION_MAP.get(release_track)
   return apis.GetMessagesModule(MODULE_NAME, api_version)
 
 
 def GetClientInstance(release_track=base.ReleaseTrack.GA):
-  """Returns the API client for a release track."""
-  api_version = _RELEASE_TRACK_TO_API_VERSION.get(release_track)
+  api_version = _VERSION_MAP.get(release_track)
   return apis.GetClientInstance(MODULE_NAME, api_version)

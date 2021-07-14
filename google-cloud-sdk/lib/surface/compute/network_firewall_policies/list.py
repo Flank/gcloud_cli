@@ -35,7 +35,6 @@ class List(base.ListCommand):
 
   @classmethod
   def Args(cls, parser):
-    flags.AddArgsListNetworkFirewallPolicy(parser)
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
     lister.AddBaseListerArgs(parser)
     parser.display_info.AddCacheUpdater(flags.NetworkFirewallPoliciesCompleter)

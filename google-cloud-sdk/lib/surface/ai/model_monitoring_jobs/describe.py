@@ -24,18 +24,19 @@ from googlecloudsdk.command_lib.ai import constants
 from googlecloudsdk.command_lib.ai import endpoint_util
 from googlecloudsdk.command_lib.ai import flags
 
+DETAILED_HELP = {
+    'EXAMPLES':
+        """
+    Describe a model deployment monitoring job `123` of project `example` in region `us-central1`, run:
+
+      $ {command} 123 --project=example --region=us-central1
+    """,
+}
+
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
-  """Get detailed model deployment monitoring job information about the given job id.
-
-  ## EXAMPLES
-
-  Describe a model deployment monitoring job `123` of project `example` in
-  region `us-central1`, run:
-
-    $ {command} 123 --project=example --region=us-central1
-  """
+  """Get detailed model deployment monitoring job information about the given job id."""
 
   @staticmethod
   def Args(parser):
@@ -50,3 +51,6 @@ class Describe(base.DescribeCommand):
 
   def Run(self, args):
     return self._Run(args, constants.BETA_VERSION)
+
+
+Describe.detailed_help = DETAILED_HELP

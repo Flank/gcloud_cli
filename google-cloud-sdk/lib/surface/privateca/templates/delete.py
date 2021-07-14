@@ -35,11 +35,11 @@ class Delete(base.DeleteCommand):
 
     To delete a certificate template:
 
-      $ {command} my-template --location='us-west1'
+      $ {command} my-template --location=us-west1
 
     To delete a certificate template while skipping the confirmation input:
 
-      $ {command} my-template --location='us-west1' --quiet
+      $ {command} my-template --location=us-west1 --quiet
   """
 
   @staticmethod

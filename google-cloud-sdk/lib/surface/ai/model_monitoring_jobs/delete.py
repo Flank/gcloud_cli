@@ -28,18 +28,19 @@ from googlecloudsdk.command_lib.ai import model_monitoring_jobs_util
 from googlecloudsdk.command_lib.ai import operations_util
 from googlecloudsdk.core.console import console_io
 
+DETAILED_HELP = {
+    'EXAMPLES':
+        """
+    To delete a model deployment monitoring job `123` of project `example` in region `us-central1`, run:
+
+      $ {command} 123 --project=example --region=us-central1
+    """,
+}
+
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Delete(base.DeleteCommand):
-  """Delete an existing Vertex AI model deployment monitoring job.
-
-  ## EXAMPLES
-
-  To delete a model deployment monitoring job `123` of project `example` in
-  region `us-central1`, run:
-
-    $ {command} 123 --project=example --region=us-central1
-  """
+  """Delete an existing Vertex AI model deployment monitoring job."""
 
   @staticmethod
   def Args(parser):
@@ -65,3 +66,6 @@ class Delete(base.DeleteCommand):
 
   def Run(self, args):
     return self._Run(args, constants.BETA_VERSION)
+
+
+Delete.detailed_help = DETAILED_HELP

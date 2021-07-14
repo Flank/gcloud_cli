@@ -45,7 +45,7 @@ class Describe(base.FeatureCommand, gcloud_base.ListCommand):
   def Run(self, args):
     # Get Hub memberships (cluster registered with Hub) from GCP Project.
     memberships = base.ListMemberships()
-    response = self.GetFeature(v1alpha1=True)
+    response = self.GetFeature()
     if not memberships:
       log.status.Print('No Memberships available in Hub.')
       return {}

@@ -33,7 +33,7 @@ class Create(base.CreateCommand):
 
   ## EXAMPLES
 
-  To create a restore 'my-restore' in location 'us-central1', run:
+  To create a restore ``my-restore'' in location ``us-central1'', run:
 
     $ {command} my-restore --project=my-project --location=us-central1
 

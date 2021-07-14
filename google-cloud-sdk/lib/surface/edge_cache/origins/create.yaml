@@ -11,6 +11,8 @@
 
   request:
     collection: networkservices.projects.locations.edgeCacheOrigins
+    modify_request_hooks:
+    - googlecloudsdk.command_lib.edge_cache.util:SetFailoverOriginRelativeName
     ALPHA:
       api_version: v1alpha1
     GA:

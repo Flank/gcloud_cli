@@ -26,12 +26,16 @@ from googlecloudsdk.core.updater import installers
 _PROGRESS_CALLBACK_THRESHOLD = 16777216  # 16 MiB in bytes.
 
 
-class FilePart:
-  """Implements a subset of the io.IOBase API for part of a stream.
+class UploadStream:
+  """Implements a subset of the io.IOBase API, adding functionality for uploads.
 
-  This class behaves as a contiguous subset of a given stream (e.g., this object
-  will behave as though the desired part of the stream was written to a file,
-  and the second file was opened).
+  When data is read from a stream, this class
+  1. Updates hash digesters.
+  2. Executes a progress callbacks if a byte threshold is passed.
+
+  If offset and length are specified, This class behaves as a contiguous subset
+  of the underlying stream (i.e., this object will behave as though the desired
+  part of the stream was written to a file, and the second file was opened).
 
   This is helpful for composite uploads since even when total_size is specified,
   apitools.transfer.Upload looks at the size of the source file to ensure
@@ -47,14 +51,14 @@ class FilePart:
     """Initializes a FilePart instance.
 
     Args:
-      stream (io.IOBase): The entire stream that we only want part of.
-      offset (int): The position (in bytes) in the original file that
-        corresponds to the first byte of the FilePart.
-      length: The total number of bytes in the FilePart.
+      stream (io.IOBase): The underlying stream wrapped by this class.
+      offset (int): The position (in bytes) in the original stream that
+        corresponds to the first byte of the UploadStream.
+      length: The total number of bytes in the UploadStream.
       digesters (dict[util.HashAlgorithm, hashlib hash object]): Values are
         updated with with data as it's read.
-      progress_callback (func<int>): Accepts processed bytes and submits
-        progress info for aggregation.
+      progress_callback (func<int>): Accepts an amount of processed bytes and
+        submits progress information for aggregation.
     """
     self._stream = stream
     self._length = length

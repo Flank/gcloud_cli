@@ -97,6 +97,7 @@ class ScanBeta(base.Command):
     flags.GetOnDemandScanningFakeExtractionFlag().AddToParser(parser)
     flags.GetOnDemandScanningLocationFlag().AddToParser(parser)
     flags.GetAdditionalPackageTypesFlag().AddToParser(parser)
+    flags.GetExperimentalPackageTypesFlag().AddToParser(parser)
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
@@ -161,8 +162,8 @@ class ScanBeta(base.Command):
           resource_uri=args.RESOURCE_URI,
           remote=args.remote,
           fake_extraction=args.fake_extraction,
-          rpm_parser_path=ods_util.RpmParserPath(),
           additional_package_types=args.additional_package_types,
+          experimental_package_types=args.experimental_package_types,
       )
       if operation_result.exit_code:
         # Filter out any log messages on std err and only include any actual
@@ -267,22 +268,29 @@ class Command(binary_operations.BinaryBackedOperation):
     super(Command, self).__init__(binary='local-extract', **kwargs)
 
   def _ParseArgsForCommand(self, resource_uri, remote, fake_extraction,
-                           rpm_parser_path, additional_package_types, **kwargs):
+                           additional_package_types, experimental_package_types,
+                           **kwargs):
     args = [
         '--resource_uri=' + resource_uri,
         '--remote=' + six.text_type(remote),
         '--provide_fake_results=' + six.text_type(fake_extraction),
-        '--rpm_parser_path=' + rpm_parser_path,
         # Due to backwards compatibility issues between the gcloud command and
         # the local-extract binary, provide a list of all flags to --undefok
         # which were introduced after the first launch. In this way, new
         # versions of the command can invoke old versions of the binary.
         '--undefok=' + ','.join([
-            'rpm_parser_path',
             'additional_package_types',
         ]),
     ]
+
+    package_types = []
     if additional_package_types:
+      package_types += additional_package_types
+    if experimental_package_types:
+      package_types += experimental_package_types
+
+    if package_types:
       args.append('--additional_package_types=' +
-                  six.text_type(','.join(additional_package_types)))
+                  six.text_type(','.join(package_types)))
+
     return args

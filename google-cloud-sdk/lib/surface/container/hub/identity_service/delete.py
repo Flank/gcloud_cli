@@ -72,7 +72,7 @@ class Delete(base.UpdateCommand):
             'Membership {} is not in Hub.'.format(membership))
 
     # Setup a patch to set the MembershipSpec to the empty proto ("delete").
-    membership_key = self.MembershipResourceName(membership, use_number=True)
+    membership_key = self.MembershipResourceName(membership)
     specs = {membership_key: self.messages.MembershipFeatureSpec()}
     patch = self.messages.Feature(
         membershipSpecs=self.hubclient.ToMembershipSpecs(specs))

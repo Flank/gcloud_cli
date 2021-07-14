@@ -28,62 +28,37 @@ from googlecloudsdk.command_lib.ai import validation
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
+DETAILED_HELP = {
+    'EXAMPLES':
+        """
+    To create a model deployment monitoring job under project ``example'' in region ``us-central1'' for endpoint ``123'', run:
+
+      $ {command} --project=example --region=us-central1 --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com --endpoint=123 --prediction-sampling-rate=0.2
+
+    To create a model deployment monitoring job with drift detection for all the deployed models under the endpoint ``123'', run:
+
+      $ {command} --project=example --region=us-central1 --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com --endpoint=123 --prediction-sampling-rate=0.2 --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
+
+    To create a model deployment monitoring job with skew detection for all the deployed models under the endpoint ``123'', with training dataset from Google Cloud Storage, run:
+
+      $ {command} --project=example --region=us-central1 --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com --endpoint=123 --prediction-sampling-rate=0.2 --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3 --target-field=price --data-format=csv --gcs-uris=gs://test-bucket/dataset.csv
+
+    To create a model deployment monitoring job with skew detection for all the deployed models under the endpoint ``123'', with training dataset from Vertex AI dataset ``456'', run:
+
+      $ {command} --project=example --region=us-central1 --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com --endpoint=123 --prediction-sampling-rate=0.2 --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3 --target-field=price --dataset=456
+
+    To create a model deployment monitoring job with different drift detection or skew detection for different deployed models, run:
+
+      $ {command} --project=example --region=us-central1 --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com --endpoint=123 --prediction-sampling-rate=0.2 --monitoring-config-from-file=your_objective_config.yaml
+
+    After creating the monitoring job, be sure to send some predict requests. We will use that to generate some metadata for analysis purpose, like predict and analysis instance schema.
+    """,
+}
+
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
-  """Create a new Vertex AI model monitoring job.
-
-  ## EXAMPLES
-
-  To create a model deployment monitoring job under project ``example'' in
-  region ``us-central1'' for endpoint ``123'', run:
-
-    $ {command} --project=example --region=us-central1
-    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
-    --endpoint=123 --prediction-sampling-rate=0.2
-
-  To create a model deployment monitoring job with drift detection for all the
-  deployed models under the endpoint ``123'', run:
-
-    $ {command} --project=example --region=us-central1
-    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
-    --endpoint=123 --prediction-sampling-rate=0.2
-    --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
-
-  To create a model deployment monitoring job with skew detection for all the
-  deployed models under the endpoint ``123'', with training dataset from Google
-  Cloud Storage, run:
-
-    $ {command} --project=example --region=us-central1
-    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
-    --endpoint=123 --prediction-sampling-rate=0.2
-    --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
-    --target-field=price --data-format=csv
-    --gcs-uris=gs://test-bucket/dataset.csv
-
-  To create a model deployment monitoring job with skew detection for all the
-  deployed models under the endpoint ``123'', with training dataset from Vertex
-  AI dataset ``456'', run:
-
-    $ {command} --project=example --region=us-central1
-    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
-    --endpoint=123 --prediction-sampling-rate=0.2
-    --feature-thresholds=feat1=0.1,feat2=0.2,feat3=0.2,feat4=0.3
-    --target-field=price --dataset=456
-
-  To create a model deployment monitoring job with different drift detection or
-  skew detection for
-  different deployed models, run:
-
-    $ {command} --project=example --region=us-central1
-    --display-name=my_monitoring_job --emails=a@gmail.com,b@gmail.com
-    --endpoint=123 --prediction-sampling-rate=0.2
-    --monitoring-config-from-file=your_objective_config.yaml
-
-  After creating the monitoring job, be sure to send some predict requests.
-  We will use that to generate some metadata for analysis purpose, like predict
-  and analysis instance schema.
-  """
+  """Create a new Vertex AI model monitoring job."""
 
   @staticmethod
   def Args(parser):
@@ -115,3 +90,6 @@ class Create(base.CreateCommand):
               id=model_monitoring_jobs_util.ParseJobName(response.name),
               state=response.state))
       return response
+
+
+Create.detailed_help = DETAILED_HELP

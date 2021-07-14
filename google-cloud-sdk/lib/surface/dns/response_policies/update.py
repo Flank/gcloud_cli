@@ -30,6 +30,7 @@ from googlecloudsdk.core import log
 def _AddArgsCommon(parser):
   flags.GetResponsePolicyDescriptionArg().AddToParser(parser)
   flags.GetResponsePolicyNetworksArg().AddToParser(parser)
+  flags.GetResponsePolicyGkeClustersArg().AddToParser(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -74,7 +75,8 @@ class UpdateBeta(base.UpdateCommand):
     response_policy_ref = args.CONCEPTS.response_policies.Parse()
     to_update = self._FetchResponsePolicy(response_policy_ref, api_version)
 
-    if not (args.IsSpecified('networks') or args.IsSpecified('description')):
+    if not (args.IsSpecified('networks') or args.IsSpecified('description') or
+            args.IsSpecified('gkeclusters')):
       log.status.Print('Nothing to update.')
       return to_update
 
@@ -83,6 +85,13 @@ class UpdateBeta(base.UpdateCommand):
         args.networks = []
       to_update.networks = command_util.ParseResponsePolicyNetworks(
           args.networks, response_policy_ref.project, api_version)
+
+    if args.IsSpecified('gkeclusters'):
+      gkeclusters = args.gkeclusters
+      to_update.gkeClusters = [
+          messages.ResponsePolicyGKECluster(gkeClusterName=name)
+          for name in gkeclusters
+      ]
 
     if args.IsSpecified('description'):
       to_update.description = args.description

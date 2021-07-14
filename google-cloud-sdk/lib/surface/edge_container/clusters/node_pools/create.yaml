@@ -30,6 +30,12 @@
       required: true
       help_text: |
         Google Edge Cloud zone where nodes in this node pool will be created.
+    - arg_name: machine-filter
+      api_field: nodePool.machineFilter
+      help_text: |
+        Only machines matching this filter will be allowed to join the node
+        pool. The filtering language accepts strings like "name=<name>", and is
+        documented in more detail at https://google.aip.dev/160.
     labels:
       api_field: nodePool.labels
 

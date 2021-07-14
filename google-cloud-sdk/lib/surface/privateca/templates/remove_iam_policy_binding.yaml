@@ -14,7 +14,7 @@
       'test-user@gmail.com' on the certificate template 'my-template' with the location 'us-west1', run:
 
         $ {command} my-template \
-          --location='us-west1' \
+          --location=us-west1 \
           --member='user:test-user@gmail.com' \
           --role='roles/privateca.templateUser'
 

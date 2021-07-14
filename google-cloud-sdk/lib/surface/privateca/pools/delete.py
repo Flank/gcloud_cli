@@ -39,12 +39,11 @@ class Delete(base.DeleteCommand):
 
     To delete a CA pool:
 
-      $ {command} my-pool --location='us-west1'
+      $ {command} my-pool --location=us-west1
 
     To delete a CA pool while skipping the confirmation input:
 
-      $ {command} my-pool --location='us-west1' --quiet
-
+      $ {command} my-pool --location=us-west1 --quiet
   """
 
   @staticmethod

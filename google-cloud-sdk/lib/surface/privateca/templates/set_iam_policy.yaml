@@ -12,7 +12,7 @@
       'policy.json' and set it for the certificate template 'my-template' with the location
       'us-west1':
 
-        $ {command} my-template policy.json --location=us-west1
+        $ {command} my-template --location=us-west1 policy.json
 
   request:
     collection: privateca.projects.locations.certificateTemplates

@@ -30,7 +30,8 @@ from googlecloudsdk.core import log
 
 def _AddArgsCommon(parser):
   flags.GetResponsePolicyDescriptionArg(required=True).AddToParser(parser)
-  flags.GetResponsePolicyNetworksArg(required=True).AddToParser(parser)
+  flags.GetResponsePolicyNetworksArg().AddToParser(parser)
+  flags.GetResponsePolicyGkeClustersArg().AddToParser(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -69,18 +70,25 @@ class CreateBeta(base.UpdateCommand):
     response_policy = messages.ResponsePolicy(
         responsePolicyName=response_policy_name)
 
-    if args.IsSpecified('networks'):
+    if args.IsSpecified('networks') or args.IsSpecified('gkeclusters'):
       if args.networks == ['']:
         args.networks = []
       response_policy.networks = command_util.ParseResponsePolicyNetworks(
           args.networks, response_policy_ref.project, api_version)
 
+      if args.IsSpecified('gkeclusters'):
+        gkeclusters = args.gkeclusters
+        response_policy.gkeClusters = [
+            messages.ResponsePolicyGKECluster(gkeClusterName=name)
+            for name in gkeclusters
+        ]
+
     else:
-      raise exceptions.RequiredArgumentException('--networks', ("""
-           A list of networks must be
-           provided.'
+      raise exceptions.RequiredArgumentException(
+          '--networks,--gkeclusters',
+          ("""A list of networks or GKE clusters must be provided.'
          NOTE: You can provide an empty value ("") for response policies that
-          have NO network binding.
+          have NO network or GKE clusters binding.
           """))
 
     if args.IsSpecified('description'):

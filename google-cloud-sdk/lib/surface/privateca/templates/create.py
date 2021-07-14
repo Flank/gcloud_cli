@@ -50,17 +50,17 @@ class Create(base.CreateCommand):
         but permits custom subjects/SANs and defines the default x509
         extensions, run:
 
-          $ {command} restricted-template --copy-subject --copy-sans --predefined-values-file=x509_parameters.yaml
+          $ {command} restricted-template --location=us-west1 --copy-subject --copy-sans --predefined-values-file=x509_parameters.yaml
 
         To create a template that allows requesters to specify only DNS names
         from requesters, use a custom CEL expression with a SAN only restriction:
 
-          $ {command} dns-only-template --description="Restricts certificates to DNS SANs." --no-copy-subject --copy-sans --identity-cel-expression="subject_alt_names.all(san, san.type == DNS)"
+          $ {command} dns-only-template --location=us-west1 --description="Restricts certificates to DNS SANs." --no-copy-subject --copy-sans --identity-cel-expression="subject_alt_names.all(san, san.type == DNS)"
 
         To create a template that permits a requestor to specify extensions by
         OIDs, and subjects (but not SANs), with default x509 exensions:
 
-          $ {command} mtls-only-extensions --copy-subject --no-copy-sans --predefined-values-file=mtls_cert_exts.yaml --copy-extensions-by-oid=1.3.6.1.5.5.7.3.2,1.3.6.1.5.5.7.3.1
+          $ {command} mtls-only-extensions --location=us-west1 --copy-subject --no-copy-sans --predefined-values-file=mtls_cert_exts.yaml --copy-extensions-by-oid=1.3.6.1.5.5.7.3.2,1.3.6.1.5.5.7.3.1
        """,
   }
 

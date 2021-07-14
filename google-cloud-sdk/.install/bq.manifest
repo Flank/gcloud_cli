@@ -20,6 +20,7 @@ platform/bq/third_party/absl/__init__.py
 platform/bq/third_party/absl/_collections_abc.py
 platform/bq/third_party/absl/_enum_module.py
 platform/bq/third_party/absl/app.py
+platform/bq/third_party/absl/app.pyi
 platform/bq/third_party/absl/command_name.py
 platform/bq/third_party/absl/flags/__init__.py
 platform/bq/third_party/absl/flags/__init__.pyi
@@ -34,6 +35,7 @@ platform/bq/third_party/absl/flags/_flagvalues.py
 platform/bq/third_party/absl/flags/_flagvalues.pyi
 platform/bq/third_party/absl/flags/_helpers.py
 platform/bq/third_party/absl/flags/_validators.py
+platform/bq/third_party/absl/flags/_validators_classes.py
 platform/bq/third_party/absl/flags/argparse_flags.py
 platform/bq/third_party/absl/logging/__init__.py
 platform/bq/third_party/absl/logging/converter.py
@@ -98,15 +100,19 @@ platform/bq/third_party/googleapiclient/schema.py
 platform/bq/third_party/httplib2/LICENSE
 platform/bq/third_party/httplib2/__init__.py
 platform/bq/third_party/httplib2/python2/__init__.py
+platform/bq/third_party/httplib2/python2/auth.py
 platform/bq/third_party/httplib2/python2/ca_certs_locater.py
 platform/bq/third_party/httplib2/python2/cacerts.txt
 platform/bq/third_party/httplib2/python2/certs.py
+platform/bq/third_party/httplib2/python2/error.py
 platform/bq/third_party/httplib2/python2/iri2uri.py
 platform/bq/third_party/httplib2/python2/socks.py
 platform/bq/third_party/httplib2/python3/__init__.py
+platform/bq/third_party/httplib2/python3/auth.py
 platform/bq/third_party/httplib2/python3/ca_certs_locater.py
 platform/bq/third_party/httplib2/python3/cacerts.txt
 platform/bq/third_party/httplib2/python3/certs.py
+platform/bq/third_party/httplib2/python3/error.py
 platform/bq/third_party/httplib2/python3/iri2uri.py
 platform/bq/third_party/httplib2/python3/socks.py
 platform/bq/third_party/inflection/LICENSE
@@ -201,6 +207,8 @@ platform/bq/third_party/pyasn1_modules/rfc5652.py
 platform/bq/third_party/pyasn1_modules/rfc6402.py
 platform/bq/third_party/pyglib/__init__.py
 platform/bq/third_party/pyglib/appcommands.py
+platform/bq/third_party/pyparsing/LICENSE
+platform/bq/third_party/pyparsing/__init__.py
 platform/bq/third_party/pyu2f/LICENSE
 platform/bq/third_party/pyu2f/__init__.py
 platform/bq/third_party/pyu2f/apdu.py

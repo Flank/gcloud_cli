@@ -38,9 +38,6 @@ class Delete(base.DeleteCommand):
     cls.FIREWALL_POLICY_ARG = flags.NetworkFirewallPolicyArgument(
         required=True, operation='delete')
     cls.FIREWALL_POLICY_ARG.AddArgument(parser, operation_type='delete')
-    parser.add_argument(
-        '--project',
-        help=('Project in which network firewall policies is to be deleted'))
     parser.display_info.AddCacheUpdater(flags.NetworkFirewallPoliciesCompleter)
 
   def Run(self, args):

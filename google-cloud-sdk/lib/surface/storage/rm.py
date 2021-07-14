@@ -20,8 +20,10 @@ from __future__ import unicode_literals
 
 import multiprocessing
 
+from googlecloudsdk.api_lib.storage import request_config_factory
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import errors
+from googlecloudsdk.command_lib.storage import flags
 from googlecloudsdk.command_lib.storage import name_expansion
 from googlecloudsdk.command_lib.storage import plurality_checkable_iterator
 from googlecloudsdk.command_lib.storage import stdin_iterator
@@ -32,7 +34,7 @@ from googlecloudsdk.core import log
 
 
 class Rm(base.Command):
-  """Deletes Cloud Storage objects and buckets."""
+  """Delete Cloud Storage objects and buckets."""
 
   detailed_help = {
       'DESCRIPTION':
@@ -106,6 +108,8 @@ class Rm(base.Command):
         action='store_true',
         help='Deletes all versions of an object.')
 
+    flags.add_precondition_flags(parser)
+
   def Run(self, args):
     if args.stdin:
       if args.urls:
@@ -125,12 +129,14 @@ class Rm(base.Command):
         include_buckets=args.recursive,
         recursion_requested=args.recursive)
 
+    user_request_args = request_config_factory.get_user_request_args_from_command_args(
+        args)
     task_status_queue = multiprocessing.Queue()
-
     task_iterator_factory = (
         delete_task_iterator_factory.DeleteTaskIteratorFactory(
             name_expansion_iterator,
-            task_status_queue=task_status_queue))
+            task_status_queue=task_status_queue,
+            user_request_args=user_request_args))
 
     log.status.Print('Removing objects:')
     task_executor.execute_tasks(

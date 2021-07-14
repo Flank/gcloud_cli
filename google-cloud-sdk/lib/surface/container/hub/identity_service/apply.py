@@ -87,22 +87,20 @@ class Apply(base.UpdateCommand):
         file_path=args.config, item_type=file_parsers.LoginConfigObject)
 
     # Create new identity service feature spec.
-    member_config = _parse_config(loaded_config, self.v1alpha1_messages)
+    member_config = _parse_config(loaded_config, self.messages)
 
     # UpdateFeature uses the patch method to update member_configs map, hence
     # there's no need to get the existing feature spec.
-    full_name = self.MembershipResourceName(membership, use_number=True)
-    configs = self.hubclient.ToProtoMap(
-        self.v1alpha1_messages.IdentityServiceFeatureSpec.MemberConfigsValue,
-        {full_name: member_config})
-    spec = self.v1alpha1_messages.IdentityServiceFeatureSpec(
-        memberConfigs=configs)
-    f = self.v1alpha1_messages.Feature(identityserviceFeatureSpec=spec)
+    full_name = self.MembershipResourceName(membership)
+    specs = {
+        full_name:
+            self.messages.MembershipFeatureSpec(identityservice=member_config)
+    }
+    feature = self.messages.Feature(
+        membershipSpecs=self.hubclient.ToMembershipSpecs(specs))
 
     # Execute update to apply new identity service feature spec to membership.
-    self.Update(['identityservice_feature_spec.member_configs'],
-                f,
-                v1alpha1=True)
+    self.Update(['membership_specs'], feature)
 
 
 def _parse_config(loaded_config, msg):
@@ -112,7 +110,7 @@ def _parse_config(loaded_config, msg):
     loaded_config: YamlConfigFile, The data loaded from the ClientConfig CRD
       yaml file given by the user. YamlConfigFile is from
       googlecloudsdk.command_lib.anthos.common.file_parsers.
-    msg: The empty proto message class for gkehub version v1alpha1
+    msg: The gkehub messages package.
 
   Returns:
     member_config: The MemberConfig configuration containing the AuthMethods for
@@ -127,7 +125,7 @@ def _parse_config(loaded_config, msg):
   auth_providers = clientconfig.GetAuthProviders(name_only=False)
 
   # Create empy MemberConfig and populate it with Auth_Provider configurations.
-  member_config = msg.MemberConfig()
+  member_config = msg.IdentityServiceMembershipSpec()
   # The config must contain an OIDC auth_method.
   oidc = False
   for auth_provider in auth_providers:
@@ -169,13 +167,13 @@ def _provision_oidc_config(auth_method, msg):
     auth_method: YamlConfigFile, The data loaded from the ClientConfig CRD yaml
       file given by the user. YamlConfigFile is from
       googlecloudsdk.command_lib.anthos.common.file_parsers.
-    msg: The empty proto message class for gkehub version v1alpha1
+    msg: The gkehub messages package.
 
   Returns:
     member_config: The MemberConfig configuration containing the AuthMethods for
       the IdentityServiceFeatureSpec.
   """
-  auth_method_proto = msg.AuthMethod()
+  auth_method_proto = msg.IdentityServiceAuthMethod()
   auth_method_proto.name = auth_method['name']
   oidc_config = auth_method['oidc']
 
@@ -183,7 +181,7 @@ def _provision_oidc_config(auth_method, msg):
   if 'issuerURI' not in oidc_config or 'clientID' not in oidc_config:
     raise exceptions.Error(
         'input config file OIDC Config must contain issuerURI and clientID.')
-  auth_method_proto.oidcConfig = msg.OidcConfig()
+  auth_method_proto.oidcConfig = msg.IdentityServiceOidcConfig()
   auth_method_proto.oidcConfig.issuerUri = oidc_config['issuerURI']
   auth_method_proto.oidcConfig.clientId = oidc_config['clientID']
 

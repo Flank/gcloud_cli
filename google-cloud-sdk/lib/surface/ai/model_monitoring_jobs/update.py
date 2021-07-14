@@ -28,19 +28,19 @@ from googlecloudsdk.command_lib.ai import validation
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
+DETAILED_HELP = {
+    'EXAMPLES':
+        """
+    To update display name of model deployment monitoring job `123` under project `example` in region `us-central1`, run:
+
+      $ {command} 123 --display-name=new-name --project=example --region=us-central1
+    """,
+}
+
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class Update(base.UpdateCommand):
-  """Update an Vertex AI model deployment monitoring job.
-
-  ## EXAMPLES
-
-  To update display name of model deployment monitoring job `123` under project
-  `example` in
-  region `us-central1`, run:
-
-    $ {command} --display-name=new-name --project=example --region=us-central1
-  """
+  """Update an Vertex AI model deployment monitoring job."""
 
   @staticmethod
   def Args(parser):
@@ -91,3 +91,6 @@ class Update(base.UpdateCommand):
 
   def Run(self, args):
     return self._Run(args, constants.BETA_VERSION)
+
+
+Update.detailed_help = DETAILED_HELP

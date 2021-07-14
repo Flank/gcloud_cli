@@ -23,6 +23,8 @@
       table(
         displayName:label=NAME,
         state:label=STATE,
-        source.scope("connectionProfiles"),
-        destination.scope("connectionProfiles")
+        sourceConfig.sourceConnectionProfileName:label=SOURCE,
+        destinationConfig.destinationConnectionProfileName:label=DESTINATION,
+        createTime,
+        updateTime
       )

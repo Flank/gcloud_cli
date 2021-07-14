@@ -26,18 +26,19 @@ from googlecloudsdk.command_lib.ai import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 
+DETAILED_HELP = {
+    'EXAMPLES':
+        """
+    To resume a model deployment monitoring job `123` of project `example` in region `us-central1`, run:
+
+      $ {command} 123 --project=example --region=us-central1
+    """,
+}
+
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Resume(base.SilentCommand):
-  """Resume a paused Vertex AI model deployment monitoring job.
-
-  ## EXAMPLES
-
-  To resume a model deployment monitoring job `123` of project `example` in
-  region `us-central1`, run:
-
-    $ {command} 123 --project=example --region=us-central1
-  """
+  """Resume a paused Vertex AI model deployment monitoring job."""
 
   @staticmethod
   def Args(parser):
@@ -62,3 +63,6 @@ class Resume(base.SilentCommand):
 
   def Run(self, args):
     return self._Run(args, constants.BETA_VERSION)
+
+
+Resume.detailed_help = DETAILED_HELP

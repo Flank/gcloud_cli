@@ -35,8 +35,8 @@ class GetCaCerts(base.Command):
 
     To get the root CA certs for all active CAs in the CA pool:
 
-      $ {command} my-pool --output-file='ca-certificates.pem' \
-        --location='us-west1'
+      $ {command} my-pool --output-file=ca-certificates.pem \
+          --location=us-west1
   """
 
   @staticmethod
