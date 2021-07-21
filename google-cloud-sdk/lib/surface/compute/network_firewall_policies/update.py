@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.network_firewall_policies import client
+from googlecloudsdk.api_lib.compute.network_firewall_policies import region_client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.network_firewall_policies import flags
 
@@ -42,30 +43,40 @@ class Update(base.UpdateCommand):
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-
     ref = self.NETWORK_FIREWALL_POLICY_ARG.ResolveAsResource(
         args, holder.resources)
+
     network_firewall_policy = client.NetworkFirewallPolicy(
-        ref=ref, compute_client=holder.client)
+        ref, compute_client=holder.client)
+    if args.IsSpecified('region'):
+      network_firewall_policy = region_client.RegionNetworkFirewallPolicy(
+          ref, compute_client=holder.client)
 
     existing_firewall_policy = network_firewall_policy.Describe(
         only_generate_request=False)[0]
     firewall_policy = holder.client.messages.FirewallPolicy(
         description=args.description,
         fingerprint=existing_firewall_policy.fingerprint)
-
     return network_firewall_policy.Update(
-        firewall_policy=firewall_policy,
-        only_generate_request=False)
+        firewall_policy=firewall_policy, only_generate_request=False)
 
 
 Update.detailed_help = {
     'EXAMPLES':
         """\
-    To update a network firewall policy with name ``my-policy'', to change the
-    description to ``New description'', run:
+    To update a global network firewall policy with name ``my-policy'',
+    to change the description to ``New description'', run:
 
       $ {command} my-policy \
-          --description='New description'
+          --description='New description' \
+          --global
+
+    To update a regional network firewall policy with name ``my-policy'',
+    in region ``my-region'',
+    to change the description to ``New description'', run:
+
+      $ {command} my-policy \
+          --description='New description' \
+          --region=my-region
     """,
 }

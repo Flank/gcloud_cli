@@ -55,13 +55,13 @@ class Describe(base.DescribeCommand):
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
-    project_ref = client.resource_parser.Create(
+    instance_ref = client.resource_parser.Create(
         'alloydb.projects.locations.clusters.instances',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region,
         clustersId=args.cluster,
         instancesId=args.instance)
     req = alloydb_messages.AlloydbProjectsLocationsClustersInstancesGetRequest(
-        name=project_ref.RelativeName())
+        name=instance_ref.RelativeName())
     op = alloydb_client.projects_locations_clusters_instances.Get(req)
     return op

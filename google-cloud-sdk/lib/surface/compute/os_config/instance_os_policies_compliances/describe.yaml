@@ -44,7 +44,7 @@
         detailedState,
         detailedStateReason,
         instance,
-        lastComplianceCheckTime.date('%Y-%m-%dT%H:%M:%S'),
+        lastComplianceCheckTime.date("%Y-%m-%dT%H:%M:%SZ"),
         lastComplianceRunId,
         name,
         osPolicyCompliances,

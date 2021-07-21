@@ -47,6 +47,7 @@ class Create(base.CreateCommand):
     aws_flags.AddInstanceType(parser)
     aws_flags.AddSshEC2KeyPair(parser)
     aws_flags.AddIamInstanceProfile(parser)
+    aws_flags.AddSecurityGroupIds(parser, 'nodes')
 
     base.ASYNC_FLAG.AddToParser(parser)
 

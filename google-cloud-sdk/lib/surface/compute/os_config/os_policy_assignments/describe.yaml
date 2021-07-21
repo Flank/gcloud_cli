@@ -28,7 +28,7 @@
         instanceFilter,
         name,
         osPolicies,
-        revisionCreateTime.date('%Y-%m-%dT%H:%M:%S'),
+        revisionCreateTime.date("%Y-%m-%dT%H:%M:%SZ"),
         revisionId,
         rollout,
         rolloutState,

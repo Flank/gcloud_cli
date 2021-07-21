@@ -86,7 +86,7 @@ class List(base.ListCommand):
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
-    project_ref = client.resource_parser.Create(
+    cluster_ref = client.resource_parser.Create(
         'alloydb.projects.locations.clusters',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region,
@@ -96,7 +96,7 @@ class List(base.ListCommand):
         alloydb_client.projects_locations_clusters_instances,
         alloydb_messages
         .AlloydbProjectsLocationsClustersInstancesListRequest(
-            parent=project_ref.RelativeName()),
+            parent=cluster_ref.RelativeName()),
         field='instances',
         limit=args.limit,
         batch_size=args.page_size,

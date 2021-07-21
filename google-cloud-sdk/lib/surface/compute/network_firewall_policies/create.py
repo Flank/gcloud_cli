@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.network_firewall_policies import client
+from googlecloudsdk.api_lib.compute.network_firewall_policies import region_client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.network_firewall_policies import flags
 
@@ -47,6 +48,9 @@ class Create(base.CreateCommand):
 
     network_firewall_policy = client.NetworkFirewallPolicy(
         ref, compute_client=holder.client)
+    if args.IsSpecified('region'):
+      network_firewall_policy = region_client.RegionNetworkFirewallPolicy(
+          ref, compute_client=holder.client)
 
     firewall_policy = holder.client.messages.FirewallPolicy(
         description=args.description, name=ref.Name())
@@ -54,14 +58,22 @@ class Create(base.CreateCommand):
     return network_firewall_policy.Create(
         firewall_policy=firewall_policy, only_generate_request=False)
 
+
 Create.detailed_help = {
     'EXAMPLES':
         """\
-    To create a network firewall policy named ``my-policy" under project
-    with ID ``test-project'',
-    run:
+    To create a global network firewall policy named ``my-policy" under project
+    with ID ``test-project'', run:
 
       $ {command} my-policy \
-          --project=test-project
+          --project=test-project \
+          --global
+
+    To create a regional network firewall policy named ``my-region-policy" under project
+    with ID ``test-project'', in region ``my-region'', run:
+
+      $ {command} my-region-policy \
+          --project=test-project \
+          --region=my-region
     """,
 }

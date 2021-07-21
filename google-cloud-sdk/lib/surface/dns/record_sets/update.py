@@ -26,8 +26,9 @@ from googlecloudsdk.command_lib.dns import flags
 from googlecloudsdk.core import properties
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
-  """Update a record-set in a managed-zone.
+  """Updates a record-set in a managed-zone.
 
   This command updates a record-set contained within the specified
   managed-zone.
@@ -77,3 +78,31 @@ class Update(base.UpdateCommand):
             resourceRecordSet=resource_record_set))
 
     return result
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+class UpdateBeta(Update):
+  """Updates a record-set in a managed-zone.
+
+  This command updates a record-set contained within the specified
+  managed-zone.
+
+  ## EXAMPLES
+
+  To update a record-set with dnsName foo.bar.com., record type A to have rrdata
+  [1.2.3.4, 9.8.7.6] and ttl 60 in my_zone, run:
+
+    $ {command} foo.bar.com. --rrdatas=1.2.3.4,9.8.7.6 --type=A --ttl=60
+       --zone=my_zone
+
+  """
+
+  @classmethod
+  def Args(cls, parser):
+    flags.GetZoneArg().AddToParser(parser)
+    flags.GetResourceRecordSetsNameArg().AddToParser(parser)
+    flags.GetResourceRecordSetsTypeArg(True).AddToParser(parser)
+    flags.GetResourceRecordSetsTtlArg(False).AddToParser(parser)
+    flags.GetResourceRecordSetsRrdatasArgGroup().AddToParser(parser)
+    parser.display_info.AddCacheUpdater(None)
+    parser.display_info.AddFormat(flags.RESOURCERECORDSETS_FORMAT)

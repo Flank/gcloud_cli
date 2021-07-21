@@ -42,26 +42,34 @@ _DETAILED_HELP = {
 
     $ {command} --activity-type=serviceAccountKeyLastAuthentication --project=project-id
 
-    To query serviceAccountLastAuthentication activities of a project, run:
+    To query serviceAccountLastAuthentication activities of a project with no limit, run:
 
-    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id
+    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id --limit=unlimited
 
     To query serviceAccountLastAuthentication with filtering on certain service account, run:
 
-    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id --query-filter='activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-id@project-id.iam.gserviceaccount.com"' --limit=unlimited
+    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id --query-filter='activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-name@project-id.iam.gserviceaccount.com"'
+
+    To query serviceAccountLastAuthentication with filtering on multiple service accounts, run:
+
+    $ {command} --activity-type=serviceAccountLastAuthentication --project=project-id --query-filter='activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-name-1@project-id.iam.gserviceaccount.com" OR activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-name-2@project-id.iam.gserviceaccount.com" OR activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-name-3@project-id.iam.gserviceaccount.com"'
         """
 }
 
+_API_VERSION_V1BETA1 = 'v1beta1'
+_API_VERSION_V1 = 'v1'
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 @base.Hidden
-class QueryActivityBeta(base.Command):
+class QueryActivityGA(base.Command):
   """Query activities on cloud resource."""
 
   detailed_help = _DETAILED_HELP
 
   @staticmethod
   def Args(parser):
+    """Parses arguments for the commands."""
     parser.add_argument(
         '--activity-type',
         required=True,
@@ -81,7 +89,7 @@ class QueryActivityBeta(base.Command):
         '--query-filter',
         type=str,
         default='',
-        help='Filter on activities. e.g. activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-id@project-id.iam.gserviceaccount.com"'
+        help='Filter on activities, separated by "OR" if multiple filters are specified. At most 10 filter restrictions are supported in the query-filter. e.g. --query-filter=\'activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-name-1@project-id.iam.gserviceaccount.com" OR activities.full_resource_name="//iam.googleapis.com/projects/project-id/serviceAccounts/service-account-name-2@project-id.iam.gserviceaccount.com"\''
     )
     parser.add_argument(
         '--limit',
@@ -97,7 +105,8 @@ class QueryActivityBeta(base.Command):
     )
 
   def Run(self, args):
-    policy_analyzer_client, messages = policy_analyzer.GetClientAndMessages()
+    policy_analyzer_client, messages = policy_analyzer.GetClientAndMessages(
+        self.ReleaseTrack())
     query_activity_parent = 'projects/{0}/locations/global/activityTypes/{1}'.format(
         args.project, args.activity_type)
     query_activity_request = messages.PolicyanalyzerProjectsLocationsActivityTypesActivitiesQueryRequest(

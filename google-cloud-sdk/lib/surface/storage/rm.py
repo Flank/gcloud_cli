@@ -34,50 +34,50 @@ from googlecloudsdk.core import log
 
 
 class Rm(base.Command):
-  """Delete Cloud Storage objects and buckets."""
+  """Delete objects and buckets."""
 
   detailed_help = {
       'DESCRIPTION':
           """
-      The rm command deletes objects and buckets.
+      Delete objects and buckets.
       """,
       'EXAMPLES':
           """
 
-      Delete a Google Cloud Storage object named "my-object":
+      The following command deletes a Cloud Storage object named "my-object"
+      from the bucket "my-bucket":
 
-        $ *{command}* rm gs://my-bucket/my-object
+        $ {command} gs://my-bucket/my-object
 
-      Delete all objects of cloud directory "my-dir" but not subdirectories:
+      The following command deletes all objects directly within the directory
+      "my-dir" but no objects within subdirectories:
 
-        $ *{command}* rm gs://my-bucket/my-dir/*
+        $ {command} gs://my-bucket/my-dir/*
 
-      Delete all objects and subdirectories of cloud directory "my-dir":
+      The following command deletes all objects and subdirectories within the
+      directory "my-dir":
 
-        $ *{command}* rm gs://my-bucket/my-dir/**
+        $ {command} gs://my-bucket/my-dir/**
 
-      Delete all versions of all objects and subdirectories of cloud directory
-      "my-dir":
+      Note that for buckets that contain
+      [versioned objects](https://cloud.google.com/storage/docs/object-versioning),
+      the above command only affects live versions. Use the `--recursive` flag
+      instead to delete all versions.
 
-        $ *{command}* rm -r gs://my-bucket/my-dir/
+      The following command deletes all versions of all resources in
+      "my-bucket" and then deletes the bucket.
 
-      Delete all versions of all resources in "my-bucket" and then delete the
-      bucket.
+        $ {command} --recursive gs://my-bucket/
 
-        $ *{command}* rm -r gs://my-bucket/
+      The following command deletes all text files in the top-level of
+      "my-bucket", but not text files in subdirectories:
 
-      Delete live version of all resources in "my-bucket" without deleting
-      the bucket.
+        $ {command} -recursive gs://my-bucket/*.txt
 
-        $ *{command}* rm gs://my-bucket/**
+      The following command deletes one wildcard expression per line passed
+      in by stdin:
 
-      Delete all text files in "my-bucket":
-
-        $ *{command}* rm -r gs://my-bucket/*.txt
-
-      Delete one wildcard expression per line passed in by stdin:
-
-        $ some_program | *{command}* rm -I
+        $ some_program | {command} -I
       """,
   }
 
@@ -86,27 +86,29 @@ class Rm(base.Command):
     parser.add_argument(
         'urls',
         nargs='*',
-        help='Specifies the URLs of the resources to delete.')
+        help='The URLs of the resources to delete.')
     parser.add_argument(
         '--stdin',
         '-I',
         action='store_true',
-        help='Reads the list of resources to remove from stdin.')
+        help='Read the list of resources to remove from stdin.')
     parser.add_argument(
         '--recursive',
         '-R',
         '-r',
         action='store_true',
-        help=('Deletes bucket or directory contents to be removed'
-              ' recursively. Will delete matching bucket URLs (like'
-              ' gs://bucket) after deleting objects and directories. This'
-              ' option implies the -a option. If you want to delete only live'
-              ' object versions, use the \'**\' wildcard instead.'))
+        help=('Recursively delete the contents of buckets or directories that'
+              ' match the path expression. If the path is set to a bucket, like'
+              ' ``gs://bucket\'\', the bucket is also deleted. This option'
+              ' implies the `--all-versions` option. If you want to delete only'
+              ' live object versions, use the ``**\'\' wildcard instead.'))
     parser.add_argument(
         '--all-versions',
         '-a',
         action='store_true',
-        help='Deletes all versions of an object.')
+        help='Delete all'
+        ' [versions](https://cloud.google.com/storage/docs/object-versioning)'
+        ' of an object.')
 
     flags.add_precondition_flags(parser)
 

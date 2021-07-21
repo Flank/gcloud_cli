@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Deletes a new AlloyDB instance."""
+"""Deletes an AlloyDB instance."""
 
 
 from __future__ import absolute_import
@@ -30,7 +30,7 @@ from googlecloudsdk.core import properties
 @base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Delete(base.DeleteCommand):
-  """Deletes a new AlloyDB instance within a given cluster."""
+  """Deletes an AlloyDB instance within a given cluster."""
 
   @staticmethod
   def Args(parser):
@@ -57,14 +57,14 @@ class Delete(base.DeleteCommand):
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
-    project_ref = client.resource_parser.Create(
+    instance_ref = client.resource_parser.Create(
         'alloydb.projects.locations.clusters.instances',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region,
         clustersId=args.cluster,
         instancesId=args.instance)
     req = alloydb_messages.AlloydbProjectsLocationsClustersInstancesDeleteRequest(
-        name=project_ref.RelativeName())
+        name=instance_ref.RelativeName())
     op = alloydb_client.projects_locations_clusters_instances.Delete(req)
     if not args.async_:
       instance_operations.Await(op, 'Deleting instance', False)

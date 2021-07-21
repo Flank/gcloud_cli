@@ -35,7 +35,8 @@ class Create(base.CreateCommand):
 
   detailed_help = {
       'DESCRIPTION':
-          """Create a certificate template that enforces policy restrictions on
+          """\
+          Create a certificate template that enforces policy restrictions on
           certificate requestors. Using a certificate template, you can define
           restrictions on the kinds of Subjects/SANs and x509 extensions allowed
           from certificate requestors as well as a default set of x509
@@ -43,6 +44,8 @@ class Create(base.CreateCommand):
           template. These templates can be binded to IAM identities such that
           certain groups of requestors must use particular templates, allowing
           for fine-grained policy enforcements based on identity.
+
+          For more information and examples, see https://cloud.google.com/certificate-authority-service/docs/creating-certificate-template.
           """,
       'EXAMPLES':
           """\

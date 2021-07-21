@@ -1,4 +1,4 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [ALPHA, BETA, GA]
   help_text:
     brief: |
       Restore a Dataproc Metastore service.
@@ -25,6 +25,10 @@
       api_version: v1beta
       modify_request_hooks:
       - googlecloudsdk.command_lib.metastore.services.backups.util:UpdateBackupV1Beta
+    GA:
+      api_version: v1
+      modify_request_hooks:
+      - googlecloudsdk.command_lib.metastore.services.backups.util:UpdateBackupV1
     collection: metastore.projects.locations.services
     method: restore
 

@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.privateca import base as privateca_base
 from googlecloudsdk.api_lib.privateca import request_utils
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.privateca import pem_utils
 from googlecloudsdk.command_lib.privateca import resource_args
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files
@@ -63,7 +64,7 @@ class GetCaCerts(base.Command):
     root_certs = [
         chain.certificates[-1] for chain in fetch_ca_certs_response.caCerts
     ]
-    return '\n'.join(root_certs)
+    return ''.join(pem_utils.PemChainForOutput(root_certs))
 
   def Run(self, args):
     ca_pool_ref = args.CONCEPTS.ca_pool.Parse()

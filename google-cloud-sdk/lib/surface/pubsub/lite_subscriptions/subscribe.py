@@ -31,7 +31,7 @@ default(
   data,
   message_id,
   ordering_key,
-  attributes.list(separator='\n')
+  attributes
 )
 """
 

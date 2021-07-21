@@ -70,13 +70,13 @@ class Create(base.CreateCommand):
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
-    project_ref = client.resource_parser.Create(
+    cluster_ref = client.resource_parser.Create(
         'alloydb.projects.locations.clusters',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region,
         clustersId=args.cluster)
-    req = instance_helper.ConstructRequestFromArgs(
-        client, alloydb_messages, project_ref, args)
+    req = instance_helper.ConstructCreateRequestFromArgs(
+        client, alloydb_messages, cluster_ref, args)
     op = alloydb_client.projects_locations_clusters_instances.Create(req)
     if not args.async_:
       instance_operations.Await(op, 'Creating instance')

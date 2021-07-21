@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.network_firewall_policies import client
+from googlecloudsdk.api_lib.compute.network_firewall_policies import region_client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.network_firewall_policies import flags
 
@@ -44,9 +45,12 @@ class Describe(base.DescribeCommand):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     ref = self.NETWORK_FIREWALL_POLICY_ARG.ResolveAsResource(
         args, holder.resources)
+
     network_firewall_policy = client.NetworkFirewallPolicy(
-        ref=ref,
-        compute_client=holder.client)
+        ref, compute_client=holder.client)
+    if args.IsSpecified('region'):
+      network_firewall_policy = region_client.RegionNetworkFirewallPolicy(
+          ref, compute_client=holder.client)
 
     return network_firewall_policy.Describe(only_generate_request=False)
 
@@ -54,8 +58,13 @@ class Describe(base.DescribeCommand):
 Describe.detailed_help = {
     'EXAMPLES':
         """\
-    To describe a network firewall policy with name ``my-policy'', run:
+    To describe a global network firewall policy with name ``my-policy'', run:
 
-      $ {command} my-policy
+      $ {command} my-policy --global
+
+    To describe a regional network firewall policy with name ``my-policy'',
+    in region ``my-region'', run:
+
+      $ {command} my-policy --region=my-region
     """,
 }

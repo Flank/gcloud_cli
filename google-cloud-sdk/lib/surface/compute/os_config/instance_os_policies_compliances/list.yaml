@@ -30,6 +30,6 @@
          instance:label=INSTANCE_NAME,
          state,
          detailed_state,
-         last_compliance_check_time.date("%Y-%m-%dT%H:%M:%S"),
+         last_compliance_check_time.date("%Y-%m-%dT%H:%M:%SZ"),
          last_compliance_run_id
        )

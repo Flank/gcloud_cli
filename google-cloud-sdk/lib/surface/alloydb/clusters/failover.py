@@ -57,12 +57,12 @@ class Failover(base.Command):
     client = api_util.AlloyDBClient(api_util.API_VERSION_DEFAULT)
     alloydb_client = client.alloydb_client
     alloydb_messages = client.alloydb_messages
-    project_ref = client.resource_parser.Create(
+    cluster_ref = client.resource_parser.Create(
         'alloydb.projects.locations.clusters',
         projectsId=properties.VALUES.core.project.GetOrFail,
         locationsId=args.region, clustersId=args.cluster)
     req = alloydb_messages.AlloydbProjectsLocationsClustersFailoverRequest(
-        name=project_ref.RelativeName())
+        name=cluster_ref.RelativeName())
     op = alloydb_client.projects_locations_clusters.Failover(req)
     if not args.async_:
       cluster_operations.Await(op, 'Triggering failover', False)

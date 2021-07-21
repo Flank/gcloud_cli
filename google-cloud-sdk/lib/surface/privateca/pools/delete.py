@@ -68,9 +68,8 @@ class Delete(base.DeleteCommand):
             name=ca_pool_ref.RelativeName(),
             requestId=request_utils.GenerateRequestId()))
 
-    ca_response = operations.Await(
+    operations.Await(
         operation, 'Deleting the CA pool', api_version='v1')
-    operations.GetMessageFromResponse(ca_response, messages.CaPool)
 
     log.status.Print('Deleted the CA pool [{}].'.format(
         ca_pool_ref.RelativeName()))

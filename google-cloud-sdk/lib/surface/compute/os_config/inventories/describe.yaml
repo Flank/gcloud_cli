@@ -104,5 +104,5 @@
           "table[box,title='Package Updates Available (Quick Fix Engineering)']
             (caption:sort=1,description,hot_fix_id,install_time)",
         system_information:format="default
-          (architecture,hostname,kernelRelease,kernelVersion,longName,osconfigAgentVersion,shortName,updateTime.date('%Y-%m-%dT%H:%M:%S'),version)"
+          (architecture,hostname,kernelRelease,kernelVersion,longName,osconfigAgentVersion,shortName,updateTime.date('%Y-%m-%dT%H:%M:%SZ'),version)"
       )
