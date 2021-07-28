@@ -70,7 +70,6 @@ class Delete(base.Command):
     if args.async_:
       return op
 
-    return operations.WaitForOperation(
+    return operations.WaitForDeleteOperation(
         op,
-        'Waiting for TagKey [{}] to be deleted'.format(tag_key),
-        service=service)
+        'Waiting for TagKey [{}] to be deleted'.format(tag_key))

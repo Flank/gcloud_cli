@@ -1379,6 +1379,7 @@ lib/third_party/google/auth/crypt/_python_rsa.py
 lib/third_party/google/auth/crypt/base.py
 lib/third_party/google/auth/crypt/es256.py
 lib/third_party/google/auth/crypt/rsa.py
+lib/third_party/google/auth/downscoped.py
 lib/third_party/google/auth/environment_vars.py
 lib/third_party/google/auth/exceptions.py
 lib/third_party/google/auth/external_account.py

@@ -72,8 +72,8 @@ class Delete(base.Command):
   def Run(self, args):
     location = args.location if args.IsSpecified("location") else None
 
-    resource_name = tag_utils.GetCanonicalResourceName(
-        args.parent, location, base.ReleaseTrack.GA)
+    resource_name = tag_utils.GetCanonicalResourceName(args.parent, location,
+                                                       base.ReleaseTrack.GA)
 
     if args.tag_value.find("tagValues/") == 0:
       tag_value = args.tag_value
@@ -95,11 +95,10 @@ class Delete(base.Command):
         if args.async_ or op.done:
           return op
         else:
-          return operations.WaitForOperation(
+          return operations.WaitForDeleteOperation(
               op,
               "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
-              "deleted with [{}]".format(args.parent, args.tag_value, op.name),
-              service=service)
+              "deleted with [{}]".format(args.parent, args.tag_value, op.name))
     except HttpBadRequestError:
       if args.parent.find(PROJECTS_PREFIX) != 0:
         raise
@@ -117,8 +116,7 @@ class Delete(base.Command):
         if args.async_ or op.done:
           return op
         else:
-          return operations.WaitForOperation(
+          return operations.WaitForDeleteOperation(
               op,
               "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
-              "deleted with [{}]".format(args.parent, tag_value, op.name),
-              service=service)
+              "deleted with [{}]".format(args.parent, tag_value, op.name))
