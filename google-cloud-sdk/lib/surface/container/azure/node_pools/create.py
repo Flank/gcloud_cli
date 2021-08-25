@@ -29,9 +29,20 @@ from googlecloudsdk.command_lib.container.gkemulticloud import flags
 from googlecloudsdk.core import log
 
 
+# Command needs to be in one line for the docgen tool to format properly.
+_EXAMPLES = """
+To create a node pool named ``my-node-pool'' in a cluster named ``my-cluster''
+managed in location ``us-west1'', run:
+
+$ {command} my-node-pool --cluster=my-cluster --location=us-west1 --node-version=NODE_VERSION --ssh-public-key=SSH_PUBLIC_KEY --subnet-id=SUBNET_ID
+"""
+
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Create(base.CreateCommand):
   """Create a node pool in an Azure cluster."""
+
+  detailed_help = {'EXAMPLES': _EXAMPLES}
 
   @staticmethod
   def Args(parser):
@@ -49,6 +60,7 @@ class Create(base.CreateCommand):
     flags.AddMaxPodsPerNode(parser)
     flags.AddNodeLabels(parser)
     flags.AddNodeTaints(parser)
+    flags.AddAzureAvailabilityZone(parser)
     base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddFormat(command_util.NODE_POOL_FORMAT)
 
@@ -63,6 +75,7 @@ class Create(base.CreateCommand):
     tags = flags.GetTags(args)
     validate_only = flags.GetValidateOnly(args)
     max_pods_per_node = flags.GetMaxPodsPerNode(args)
+    azure_availability_zone = flags.GetAzureAvailabilityZone(args)
     min_nodes, max_nodes = flags.GetAutoscalingParams(args)
     taints = flags.GetNodeTaints(args)
     labels = flags.GetNodeLabels(args)
@@ -88,7 +101,8 @@ class Create(base.CreateCommand):
           max_nodes=max_nodes,
           max_pods_per_node=max_pods_per_node,
           taints=taints,
-          labels=labels)
+          labels=labels,
+          azure_availability_zone=azure_availability_zone)
 
       if validate_only:
         args.format = 'disable'

@@ -104,10 +104,10 @@
     "oauth2": {
       "scopes": {
         "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud Platform data"
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
         },
         "https://www.googleapis.com/auth/cloud-platform.read-only": {
-          "description": "View your data across Google Cloud Platform services"
+          "description": "View your data across Google Cloud services and see the email address of your Google Account"
         },
         "https://www.googleapis.com/auth/logging.admin": {
           "description": "Administrate log data for your projects"
@@ -319,58 +319,12 @@
           "type": "string"
         },
         "type": {
-          "description": "Required. The field data type.",
-          "type": "string",
-          "enumDescriptions": [
-            "Illegal value",
-            "UTF8 characters",
-            "64-bit signed",
-            "64-bit IEEE floating point",
-            "Aggregate type",
-            "Binary data",
-            "2-valued",
-            "64-bit signed usec since UTC epoch",
-            "Civil date - Year, Month, Day",
-            "Civil time - Hour, Minute, Second, Microseconds",
-            "Combination of civil date and civil time",
-            "Geography object",
-            "Numeric value",
-            "BigNumeric value",
-            "JSON value"
-          ],
-          "enum": [
-            "UNKNOWN_TYPE",
-            "STRING",
-            "INTEGER",
-            "FLOAT",
-            "RECORD",
-            "BYTES",
-            "BOOLEAN",
-            "TIMESTAMP",
-            "DATE",
-            "TIME",
-            "DATETIME",
-            "GEOGRAPHY",
-            "NUMERIC",
-            "BIGNUMERIC",
-            "JSON"
-          ]
+          "description": "Required. The field data type. Possible values include: STRING INTEGER (or INT64) FLOAT (or FLOAT64) BOOLEAN (or BOOL) TIMESTAMP RECORD (or STRUCT)Use of RECORD\/STRUT indicates that the field contains a nested schema.",
+          "type": "string"
         },
         "mode": {
           "description": "Optional. The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.",
-          "type": "string",
-          "enumDescriptions": [
-            "Illegal value",
-            "",
-            "",
-            ""
-          ],
-          "enum": [
-            "UNKNOWN_MODE",
-            "NULLABLE",
-            "REQUIRED",
-            "REPEATED"
-          ]
+          "type": "string"
         },
         "fields": {
           "description": "Optional. Describes the nested schema fields if the type property is set to RECORD.",
@@ -646,8 +600,7 @@
           "type": "string"
         },
         "schema": {
-          "description": "Output only. Describes the schema of the logs stored in the bucket that are accessible via this view.This field is only populated for views in analytics-enabled buckets.",
-          "readOnly": true,
+          "description": "Describes the schema of the logs stored in the bucket that are accessible via this view.This field is only populated for views in analytics-enabled buckets.",
           "$ref": "TableSchema"
         }
       }
@@ -5459,6 +5412,12 @@
           "response": {
             "$ref": "QueryResults"
           },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/cloud-platform.read-only",
+            "https://www.googleapis.com/auth/logging.admin",
+            "https://www.googleapis.com/auth/logging.read"
+          ],
           "description": "Runs a SQL query synchronously and returns query results if the query completes within a specified timeout. The results from a previous query can also be fetched by specifying a result reference."
         },
         "copy": {

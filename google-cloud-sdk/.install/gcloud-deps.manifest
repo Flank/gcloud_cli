@@ -3924,6 +3924,7 @@ lib/third_party/sqlparse/utils.py
 lib/third_party/uritemplate/LICENSE
 lib/third_party/uritemplate/__init__.py
 lib/third_party/uritemplate/api.py
+lib/third_party/uritemplate/orderedset.py
 lib/third_party/uritemplate/template.py
 lib/third_party/uritemplate/variable.py
 lib/third_party/urllib3/LICENSE

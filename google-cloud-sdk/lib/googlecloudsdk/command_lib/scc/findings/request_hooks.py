@@ -67,7 +67,7 @@ def ListFindingsSecurityMarksReqHook(ref, args, req):
   _ValidateMutexOnFindingAndSourceAndOrganization(args)
   finding_name = _GetFindingNameForParent(args)
   req.parent = GetSourceParentFromResourceName(finding_name)
-  req.filter = "name=\"" + finding_name + "\""
+  req.filter = "name : \"" + _GetFindingIdFromName(finding_name) + "\""
   return req
 
 
@@ -86,6 +86,14 @@ def GroupFindingsReqHook(ref, args, req):
   if resource_pattern.match(parent):
     args.source = parent
   req.parent = _GetSourceNameForParent(args)
+  return req
+
+
+def SetMuteReqHook(ref, args, req):
+  """"Sets a finding's mute state."""
+  del ref
+  parent = _ValidateAndGetParent(args)
+  req.name = parent + "/sources/" + args.source + "/findings/" + args.findingId
   return req
 
 
@@ -187,6 +195,50 @@ def _GetFindingIdFromName(finding_name):
         "organizations/[0-9]+/sources/[0-9-]+/findings/[a-zA-Z0-9]+.")
   list_finding_components = finding_name.split("/")
   return list_finding_components[len(list_finding_components) - 1]
+
+
+def _ValidateAndGetParent(args):
+  """Validates parent."""
+  if args.organization is not None:  # Validates organization.
+    if "/" in args.organization:
+      pattern = re.compile("^organizations/[0-9]{1,19}$")
+      if not pattern.match(args.organization):
+        raise InvalidSCCInputError(
+            "When providing a full resource path, it must include the pattern "
+            "'^organizations/[0-9]{1,19}$'.")
+      else:
+        return args.organization
+    else:
+      pattern = re.compile("^[0-9]{1,19}$")
+      if not pattern.match(args.organization):
+        raise InvalidSCCInputError(
+            "Organization does not match the pattern '^[0-9]{1,19}$'.")
+      else:
+        return "organizations/" + args.organization
+
+  if args.folder is not None:  # Validates folder.
+    if "/" in args.folder:
+      pattern = re.compile("^folders/.*$")
+      if not pattern.match(args.folder):
+        raise InvalidSCCInputError(
+            "When providing a full resource path, it must include the pattern "
+            "'^folders/.*$'.")
+      else:
+        return args.folder
+    else:
+      return "folders/" + args.folder
+
+  if args.project is not None:  # Validates project.
+    if "/" in args.project:
+      pattern = re.compile("^projects/.*$")
+      if not pattern.match(args.project):
+        raise InvalidSCCInputError(
+            "When providing a full resource path, it must include the pattern "
+            "'^projects/.*$'.")
+      else:
+        return args.project
+    else:
+      return "projects/" + args.project
 
 
 def _ValidateMutexOnSourceAndOrganization(args):

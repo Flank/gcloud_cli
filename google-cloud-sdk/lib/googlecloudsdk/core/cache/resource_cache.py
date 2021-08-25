@@ -323,9 +323,10 @@ class Updater(BaseUpdater):
       return table.Select(row_template)
     except exceptions.CacheTableExpired:
       rows = self.Update(parameter_info, aggregations)
-      table.DeleteRows()
-      table.AddRows(rows)
-      table.Validate()
+      if rows is not None:
+        table.DeleteRows()
+        table.AddRows(rows)
+        table.Validate()
       return table.Select(row_template, ignore_expiration=True)
 
   def Select(self, row_template, parameter_info=None):
@@ -531,13 +532,6 @@ class ResourceCache(PERSISTENT_CACHE_IMPLEMENTATION.Cache):
     files.MakeDir(os.path.join(*path))
     path.append('resource.cache')
     return os.path.join(*path)
-
-
-def DeleteDeprecatedCache():
-  """Silently deletes the deprecated resource completion cache if it exists."""
-  cache_dir = config.Paths().completion_cache_dir
-  if os.path.isdir(cache_dir):
-    files.RmTree(cache_dir)
 
 
 def Delete(name=None):

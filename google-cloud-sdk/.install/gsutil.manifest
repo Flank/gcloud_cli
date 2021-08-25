@@ -2102,6 +2102,7 @@ platform/gsutil/third_party/pyu2f/.gitignore
 platform/gsutil/third_party/pyu2f/.travis.yml
 platform/gsutil/third_party/pyu2f/CONTRIBUTING.md
 platform/gsutil/third_party/pyu2f/LICENSE
+platform/gsutil/third_party/pyu2f/MANIFEST.in
 platform/gsutil/third_party/pyu2f/README.md
 platform/gsutil/third_party/pyu2f/pyu2f/__init__.py
 platform/gsutil/third_party/pyu2f/pyu2f/apdu.py
@@ -2134,6 +2135,7 @@ platform/gsutil/third_party/pyu2f/pyu2f/tests/model_test.py
 platform/gsutil/third_party/pyu2f/pyu2f/tests/u2f_test.py
 platform/gsutil/third_party/pyu2f/pyu2f/tests/util_test.py
 platform/gsutil/third_party/pyu2f/pyu2f/u2f.py
+platform/gsutil/third_party/pyu2f/setup.cfg
 platform/gsutil/third_party/pyu2f/setup.py
 platform/gsutil/third_party/pyu2f/tox.ini
 platform/gsutil/third_party/retry-decorator/.gitignore

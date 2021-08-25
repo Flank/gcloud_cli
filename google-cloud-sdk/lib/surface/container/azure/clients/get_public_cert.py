@@ -26,9 +26,23 @@ from googlecloudsdk.command_lib.container.gkemulticloud import flags
 from googlecloudsdk.core import log
 
 
+_EXAMPLES = """
+To get the public certificate of an Azure client named ``my-client'' in
+location ``us-west1'', run:
+
+$ {command} my-client --location=us-west1
+
+To store the certificate in a file named ``client.crt'', run:
+
+$ {command} my-client --location=us-west1 --output-file=client.crt
+"""
+
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class GetPublicCert(base.DescribeCommand):
   """Get the public certificate of an Azure client."""
+
+  detailed_help = {"EXAMPLES": _EXAMPLES}
 
   @staticmethod
   def Args(parser):
@@ -37,11 +51,11 @@ class GetPublicCert(base.DescribeCommand):
     flags.AddOutputFile(parser, "to store PEM")
 
   def Run(self, args):
-    """Run the get-public-cert command."""
-    client_ref = args.CONCEPTS.client.Parse()
-
-    with endpoint_util.GkemulticloudEndpointOverride(client_ref.locationsId,
-                                                     self.ReleaseTrack()):
+    """Runs the get-public-cert command."""
+    with endpoint_util.GkemulticloudEndpointOverride(
+        resource_args.ParseAzureClientResourceArg(args).locationsId,
+        self.ReleaseTrack()):
+      client_ref = resource_args.ParseAzureClientResourceArg(args)
       api_client = azure_api_util.ClientsClient(track=self.ReleaseTrack())
       client = api_client.Get(client_ref)
       log.WriteToFileOrStdout(

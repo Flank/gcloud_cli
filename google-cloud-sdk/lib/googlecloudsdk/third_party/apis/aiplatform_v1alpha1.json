@@ -104,10 +104,10 @@
     "oauth2": {
       "scopes": {
         "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud Platform data"
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
         },
         "https://www.googleapis.com/auth/cloud-platform.read-only": {
-          "description": "View your data across Google Cloud Platform services"
+          "description": "View your data across Google Cloud services and see the email address of your Google Account"
         }
       }
     }
@@ -2100,7 +2100,7 @@
           "$ref": "GoogleCloudAiplatformV1alpha1StudySpecMedianAutomatedStoppingSpec"
         },
         "convexStopConfig": {
-          "description": "The automated early stopping using convex stopping rule.",
+          "description": "Deprecated, use convex_automated_stopping_spec instead. The automated early stopping using convex stopping rule.",
           "$ref": "GoogleCloudAiplatformV1alpha1StudySpecConvexStopConfig"
         },
         "metrics": {
@@ -5403,6 +5403,44 @@
         }
       }
     },
+    "GoogleCloudAiplatformV1alpha1RawPredictRequest": {
+      "id": "GoogleCloudAiplatformV1alpha1RawPredictRequest",
+      "description": "Request message for PredictionService.RawPredict.",
+      "type": "object",
+      "properties": {
+        "httpBody": {
+          "description": "The prediction input that supports HTTP headers and arbitrary data payload. A DeployedModel may have an upper limit on the number of instances it supports per request, and when it is exceeded the prediction call errors in case of AutoML Models, or, in case of customer created Models, the behaviour is as documented by that Model. The schema of any single instance may be specified via Endpoint's DeployedModels' Model's PredictSchemata's instance_schema_uri.",
+          "$ref": "GoogleApiHttpBody"
+        }
+      }
+    },
+    "GoogleApiHttpBody": {
+      "id": "GoogleApiHttpBody",
+      "description": "Message that represents an arbitrary HTTP body. It should only be used for payload formats that can't be represented as JSON, such as raw binary or an HTML page. This message can be used both in streaming and non-streaming API methods in the request as well as the response. It can be used as a top-level request field, which is convenient if one wants to extract parameters from either the URL or HTTP template into the request fields and also want access to the raw HTTP body. Example: message GetResourceRequest { \/\/ A unique request id. string request_id = 1; \/\/ The raw HTTP body is bound to this field. google.api.HttpBody http_body = 2; } service ResourceService { rpc GetResource(GetResourceRequest) returns (google.api.HttpBody); rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty); } Example with streaming methods: service CaldavService { rpc GetCalendar(stream google.api.HttpBody) returns (stream google.api.HttpBody); rpc UpdateCalendar(stream google.api.HttpBody) returns (stream google.api.HttpBody); } Use of this type only changes how the request and response bodies are handled, all other features will continue to work unchanged.",
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "description": "The HTTP Content-Type header value specifying the content type of the body.",
+          "type": "string"
+        },
+        "data": {
+          "description": "The HTTP request\/response body as raw binary.",
+          "type": "string",
+          "format": "byte"
+        },
+        "extensions": {
+          "description": "Application specific response metadata. Must be set in the first response for streaming APIs.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object. Contains field @type with type URL."
+            }
+          }
+        }
+      }
+    },
     "GoogleCloudAiplatformV1alpha1ExplainRequest": {
       "id": "GoogleCloudAiplatformV1alpha1ExplainRequest",
       "description": "Request message for PredictionService.Explain.",
@@ -5978,11 +6016,29 @@
         }
       }
     },
+    "GoogleCloudAiplatformV1alpha1WriteTensorboardExperimentDataRequest": {
+      "id": "GoogleCloudAiplatformV1alpha1WriteTensorboardExperimentDataRequest",
+      "description": "Request message for TensorboardService.WriteTensorboardExperimentData.",
+      "type": "object",
+      "properties": {
+        "writeRunDataRequests": {
+          "description": "Required. Requests containing per-run TensorboardTimeSeries data to write.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudAiplatformV1alpha1WriteTensorboardRunDataRequest"
+          }
+        }
+      }
+    },
     "GoogleCloudAiplatformV1alpha1WriteTensorboardRunDataRequest": {
       "id": "GoogleCloudAiplatformV1alpha1WriteTensorboardRunDataRequest",
       "description": "Request message for TensorboardService.WriteTensorboardRunData.",
       "type": "object",
       "properties": {
+        "tensorboardRun": {
+          "description": "Required. The resource name of the TensorboardRun to write data to. Format: `projects\/{project}\/locations\/{location}\/tensorboards\/{tensorboard}\/experiments\/{experiment}\/runs\/{run}`",
+          "type": "string"
+        },
         "timeSeriesData": {
           "description": "Required. The TensorboardTimeSeries data to write. Values with in a time series are indexed by their step value. Repeated writes to the same step will overwrite the existing value for that step. The upper limit of data points per write request is 5000.",
           "type": "array",
@@ -5990,6 +6046,13 @@
             "$ref": "GoogleCloudAiplatformV1alpha1TimeSeriesData"
           }
         }
+      }
+    },
+    "GoogleCloudAiplatformV1alpha1WriteTensorboardExperimentDataResponse": {
+      "id": "GoogleCloudAiplatformV1alpha1WriteTensorboardExperimentDataResponse",
+      "description": "Response message for TensorboardService.WriteTensorboardExperimentData.",
+      "type": "object",
+      "properties": {
       }
     },
     "GoogleCloudAiplatformV1alpha1WriteTensorboardRunDataResponse": {
@@ -6396,11 +6459,6 @@
         "disabled": {
           "description": "The monitoring schedule for snapshot analysis. For EntityType-level config: unset \/ disabled = true indicates disabled by default for Features under it; otherwise by default enable snapshot analysis monitoring with monitoring_interval for Features under it. Feature-level config: disabled = true indicates disabled regardless of the EntityType-level config; unset monitoring_interval indicates going with EntityType-level config; otherwise run snapshot analysis monitoring with monitoring_interval regardless of the EntityType-level config. Explicitly Disable the snapshot analysis based monitoring.",
           "type": "boolean"
-        },
-        "monitoringInterval": {
-          "description": "Will be deprecated by [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days] soon. Configuration of the snapshot analysis based monitoring pipeline running interval. The value is rolled up to full day.",
-          "type": "string",
-          "format": "google-duration"
         },
         "monitoringIntervalDays": {
           "description": "Configuration of the snapshot analysis based monitoring pipeline running interval. The value indicates number of days. If both FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days and FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval are set when creating\/updating EntityTypes\/Features, FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days will be used.",
@@ -8549,6 +8607,10 @@
           "description": "The Cloud Storage\/BigQuery URI of the destination as specified in the request.",
           "type": "string"
         },
+        "destination": {
+          "description": "A proto representation of the destination, for easier UI parsing.",
+          "$ref": "GoogleCloudAiplatformUiFeatureValueDestination"
+        },
         "requestedEntityTypeCount": {
           "description": "The total number of Entity types in the request.",
           "type": "string",
@@ -8558,6 +8620,69 @@
           "description": "The total number of Feature in the request.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "GoogleCloudAiplatformUiFeatureValueDestination": {
+      "id": "GoogleCloudAiplatformUiFeatureValueDestination",
+      "description": "A destination location for Feature values and format.",
+      "type": "object",
+      "properties": {
+        "bigqueryDestination": {
+          "description": "Output in BigQuery format. BigQueryDestination.output_uri in FeatureValueDestination.bigquery_destination must refer to a table.",
+          "$ref": "GoogleCloudAiplatformUiBigQueryDestination"
+        },
+        "tfrecordDestination": {
+          "description": "Output in TFRecord format. Below are the mapping from Feature value type in Featurestore to Feature value type in TFRecord: Value type in Featurestore | Value type in TFRecord DOUBLE, DOUBLE_ARRAY | FLOAT_LIST INT64, INT64_ARRAY | INT64_LIST STRING, STRING_ARRAY, BYTES | BYTES_LIST true -> byte_string(\"true\"), false -> byte_string(\"false\") BOOL, BOOL_ARRAY (true, false) | BYTES_LIST",
+          "$ref": "GoogleCloudAiplatformUiTFRecordDestination"
+        },
+        "csvDestination": {
+          "description": "Output in CSV format. Array Feature value types are not allowed in CSV format.",
+          "$ref": "GoogleCloudAiplatformUiCsvDestination"
+        }
+      }
+    },
+    "GoogleCloudAiplatformUiBigQueryDestination": {
+      "id": "GoogleCloudAiplatformUiBigQueryDestination",
+      "description": "The BigQuery location for the output content.",
+      "type": "object",
+      "properties": {
+        "outputUri": {
+          "description": "Required. BigQuery URI to a project or table, up to 2000 characters long. When only the project is specified, the Dataset and Table is created. When the full table reference is specified, the Dataset must exist and table must not exist. Accepted forms: * BigQuery path. For example: `bq:\/\/projectId` or `bq:\/\/projectId.bqDatasetId` or `bq:\/\/projectId.bqDatasetId.bqTableId`.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudAiplatformUiTFRecordDestination": {
+      "id": "GoogleCloudAiplatformUiTFRecordDestination",
+      "description": "The storage details for TFRecord output content.",
+      "type": "object",
+      "properties": {
+        "gcsDestination": {
+          "description": "Required. Google Cloud Storage location.",
+          "$ref": "GoogleCloudAiplatformUiGcsDestination"
+        }
+      }
+    },
+    "GoogleCloudAiplatformUiGcsDestination": {
+      "id": "GoogleCloudAiplatformUiGcsDestination",
+      "description": "The Google Cloud Storage location where the output is to be written to.",
+      "type": "object",
+      "properties": {
+        "outputUriPrefix": {
+          "description": "Required. Google Cloud Storage URI to output directory. If the uri doesn't end with '\/', a '\/' will be automatically appended. The directory is created if it doesn't exist.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudAiplatformUiCsvDestination": {
+      "id": "GoogleCloudAiplatformUiCsvDestination",
+      "description": "The storage details for CSV output content.",
+      "type": "object",
+      "properties": {
+        "gcsDestination": {
+          "description": "Required. Google Cloud Storage location.",
+          "$ref": "GoogleCloudAiplatformUiGcsDestination"
         }
       }
     },
@@ -8882,7 +9007,7 @@
           "type": "boolean"
         },
         "monitoringInterval": {
-          "description": "Will be deprecated by [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days] soon. Configuration of the snapshot analysis based monitoring pipeline running interval. The value is rolled up to full day.",
+          "description": "Configuration of the snapshot analysis based monitoring pipeline running interval. The value is rolled up to full day.",
           "type": "string",
           "format": "google-duration"
         },
@@ -10082,28 +10207,6 @@
             "JSONL",
             "BIGQUERY"
           ]
-        }
-      }
-    },
-    "GoogleCloudAiplatformUiGcsDestination": {
-      "id": "GoogleCloudAiplatformUiGcsDestination",
-      "description": "The Google Cloud Storage location where the output is to be written to.",
-      "type": "object",
-      "properties": {
-        "outputUriPrefix": {
-          "description": "Required. Google Cloud Storage URI to output directory. If the uri doesn't end with '\/', a '\/' will be automatically appended. The directory is created if it doesn't exist.",
-          "type": "string"
-        }
-      }
-    },
-    "GoogleCloudAiplatformUiBigQueryDestination": {
-      "id": "GoogleCloudAiplatformUiBigQueryDestination",
-      "description": "The BigQuery location for the output content.",
-      "type": "object",
-      "properties": {
-        "outputUri": {
-          "description": "Required. BigQuery URI to a project or table, up to 2000 characters long. When only the project is specified, the Dataset and Table is created. When the full table reference is specified, the Dataset must exist and table must not exist. Accepted forms: * BigQuery path. For example: `bq:\/\/projectId` or `bq:\/\/projectId.bqDatasetId` or `bq:\/\/projectId.bqDatasetId.bqTableId`.",
-          "type": "string"
         }
       }
     },
@@ -13353,7 +13456,7 @@
           "type": "boolean"
         },
         "monitoringInterval": {
-          "description": "Will be deprecated by [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days] soon. Configuration of the snapshot analysis based monitoring pipeline running interval. The value is rolled up to full day.",
+          "description": "Configuration of the snapshot analysis based monitoring pipeline running interval. The value is rolled up to full day.",
           "type": "string",
           "format": "google-duration"
         },
@@ -15652,7 +15755,7 @@
       "type": "object",
       "properties": {
         "destinationBigqueryUri": {
-          "description": "URI of desired destination BigQuery table. Expected format: bq:\/\/:: If not specified, then results are exported to the following auto-created BigQuery table: :export_evaluated_examples__.evaluated_examples",
+          "description": "URI of desired destination BigQuery table. Expected format: `bq:\/\/{project_id}:{dataset_id}:{table}` If not specified, then results are exported to the following auto-created BigQuery table: `{project_id}:export_evaluated_examples_{model_name}_{yyyy_MM_dd'T'HH_mm_ss_SSS'Z'}.evaluated_examples`",
           "type": "string"
         },
         "overrideExistingTable": {
@@ -16522,7 +16625,7 @@
           "$ref": "GoogleCloudAiplatformV1beta1StudySpecMedianAutomatedStoppingSpec"
         },
         "convexStopConfig": {
-          "description": "The automated early stopping using convex stopping rule.",
+          "description": "Deprecated, use convex_automated_stopping_spec instead. The automated early stopping using convex stopping rule.",
           "$ref": "GoogleCloudAiplatformV1beta1StudySpecConvexStopConfig"
         },
         "metrics": {
@@ -19719,7 +19822,7 @@
       "type": "object",
       "properties": {
         "destinationBigqueryUri": {
-          "description": "URI of desired destination BigQuery table. Expected format: bq:\/\/:: If not specified, then results are exported to the following auto-created BigQuery table: :export_evaluated_examples__.evaluated_examples",
+          "description": "URI of desired destination BigQuery table. Expected format: `bq:\/\/{project_id}:{dataset_id}:{table}` If not specified, then results are exported to the following auto-created BigQuery table: `{project_id}:export_evaluated_examples_{model_name}_{yyyy_MM_dd'T'HH_mm_ss_SSS'Z'}.evaluated_examples`",
           "type": "string"
         },
         "overrideExistingTable": {
@@ -20601,6 +20704,14 @@
       "description": "Represents specification of a Study.",
       "type": "object",
       "properties": {
+        "decayCurveStoppingSpec": {
+          "description": "The automated early stopping spec using decay curve rule.",
+          "$ref": "GoogleCloudAiplatformV1StudySpecDecayCurveAutomatedStoppingSpec"
+        },
+        "medianAutomatedStoppingSpec": {
+          "description": "The automated early stopping spec using median rule.",
+          "$ref": "GoogleCloudAiplatformV1StudySpecMedianAutomatedStoppingSpec"
+        },
         "metrics": {
           "description": "Required. Metric specs for the Study.",
           "type": "array",
@@ -20656,6 +20767,28 @@
             "LAST_MEASUREMENT",
             "BEST_MEASUREMENT"
           ]
+        }
+      }
+    },
+    "GoogleCloudAiplatformV1StudySpecDecayCurveAutomatedStoppingSpec": {
+      "id": "GoogleCloudAiplatformV1StudySpecDecayCurveAutomatedStoppingSpec",
+      "description": "The decay curve automated stopping rule builds a Gaussian Process Regressor to predict the final objective value of a Trial based on the already completed Trials and the intermediate measurements of the current Trial. Early stopping is requested for the current Trial if there is very low probability to exceed the optimal value found so far.",
+      "type": "object",
+      "properties": {
+        "useElapsedDuration": {
+          "description": "True if Measurement.elapsed_duration is used as the x-axis of each Trials Decay Curve. Otherwise, Measurement.step_count will be used as the x-axis.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GoogleCloudAiplatformV1StudySpecMedianAutomatedStoppingSpec": {
+      "id": "GoogleCloudAiplatformV1StudySpecMedianAutomatedStoppingSpec",
+      "description": "The median automated stopping rule stops a pending Trial if the Trial's best objective_value is strictly below the median 'performance' of all completed Trials reported up to the Trial's last measurement. Currently, 'performance' refers to the running average of the objective values reported by the Trial in each measurement.",
+      "type": "object",
+      "properties": {
+        "useElapsedDuration": {
+          "description": "True if median automated stopping rule applies on Measurement.elapsed_duration. It means that elapsed_duration field of latest measurement of current Trial is used to compute median objective value for each completed Trials.",
+          "type": "boolean"
         }
       }
     },
@@ -23668,6 +23801,34 @@
                   ],
                   "description": "Perform an online prediction."
                 },
+                "rawPredict": {
+                  "id": "aiplatform.projects.locations.endpoints.rawPredict",
+                  "path": "v1alpha1/{+endpoint}:rawPredict",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/endpoints/{endpointsId}:rawPredict",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "endpoint": {
+                      "description": "Required. The name of the Endpoint requested to serve the prediction. Format: `projects\/{project}\/locations\/{location}\/endpoints\/{endpoint}`",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/endpoints\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "endpoint"
+                  ],
+                  "request": {
+                    "$ref": "GoogleCloudAiplatformV1alpha1RawPredictRequest"
+                  },
+                  "response": {
+                    "$ref": "GoogleApiHttpBody"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Perform an online prediction with arbitrary http payload."
+                },
                 "explain": {
                   "id": "aiplatform.projects.locations.endpoints.explain",
                   "path": "v1alpha1/{+endpoint}:explain",
@@ -26143,7 +26304,7 @@
                       "type": "string"
                     },
                     "force": {
-                      "description": "If set to true, any child resources of this MetadataStore will be deleted. (Otherwise, the request will fail with a FAILED_PRECONDITION error if the MetadataStore has any child resources.)",
+                      "description": "Deprecated: Field is no longer supported.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -26157,7 +26318,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Deletes a single MetadataStore."
+                  "description": "Deletes a single MetadataStore and all its child resources (i.e. all Artifacts, Executions, Contexts)."
                 }
               }
               ,
@@ -26277,13 +26438,13 @@
                           "type": "string"
                         },
                         "updateMask": {
-                          "description": "Required. A FieldMask indicating which fields should be updated.",
+                          "description": "Required. A FieldMask indicating which fields should be updated. Functionality of this field is not yet supported.",
                           "location": "query",
                           "type": "string",
                           "format": "google-fieldmask"
                         },
                         "allowMissing": {
-                          "description": "If set to true, and the Artifact is not found, a new Artifact will be created. In this situation, `update_mask` is ignored.",
+                          "description": "If set to true, and the Artifact is not found, a new Artifact will be created.",
                           "location": "query",
                           "type": "boolean"
                         }
@@ -26419,13 +26580,13 @@
                           "type": "string"
                         },
                         "updateMask": {
-                          "description": "Required. A FieldMask indicating which fields should be updated.",
+                          "description": "Required. A FieldMask indicating which fields should be updated. Functionality of this field is not yet supported.",
                           "location": "query",
                           "type": "string",
                           "format": "google-fieldmask"
                         },
                         "allowMissing": {
-                          "description": "If set to true, and the Context is not found, a new Context will be created. In this situation, `update_mask` is ignored.",
+                          "description": "If set to true, and the Context is not found, a new Context will be created.",
                           "location": "query",
                           "type": "boolean"
                         }
@@ -26642,13 +26803,13 @@
                           "type": "string"
                         },
                         "updateMask": {
-                          "description": "Required. A FieldMask indicating which fields should be updated.",
+                          "description": "Required. A FieldMask indicating which fields should be updated. Functionality of this field is not yet supported.",
                           "location": "query",
                           "type": "string",
                           "format": "google-fieldmask"
                         },
                         "allowMissing": {
-                          "description": "If set to true, and the Execution is not found, a new Execution will be created. In this situation, `update_mask` is ignored.",
+                          "description": "If set to true, and the Execution is not found, a new Execution will be created.",
                           "location": "query",
                           "type": "boolean"
                         }
@@ -28618,7 +28779,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The resource name of the Location to list Tensorboards. Format: 'projects\/{project}\/locations\/{location}'",
+                      "description": "Required. The resource name of the Location to list Tensorboards. Format: `projects\/{project}\/locations\/{location}`",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -29015,6 +29176,34 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
                       "description": "Deletes a TensorboardExperiment."
+                    },
+                    "write": {
+                      "id": "aiplatform.projects.locations.tensorboards.experiments.write",
+                      "path": "v1alpha1/{+tensorboardExperiment}:write",
+                      "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/tensorboards/{tensorboardsId}/experiments/{experimentsId}:write",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "tensorboardExperiment": {
+                          "description": "Required. The resource name of the TensorboardExperiment to write data to. Format: `projects\/{project}\/locations\/{location}\/tensorboards\/{tensorboard}\/experiments\/{experiment}`",
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/tensorboards\/[^\/]+\/experiments\/[^\/]+$",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "tensorboardExperiment"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudAiplatformV1alpha1WriteTensorboardExperimentDataRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudAiplatformV1alpha1WriteTensorboardExperimentDataResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Write time series data points of multiple TensorboardTimeSeries in multiple TensorboardRun's. If any data fail to be ingested, an error will be returned."
                     }
                   }
                   ,

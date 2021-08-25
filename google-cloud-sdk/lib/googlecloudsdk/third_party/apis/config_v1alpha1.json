@@ -575,6 +575,86 @@
         }
       }
     },
+    "Preview": {
+      "id": "Preview",
+      "description": "Preview message contains preview results.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Output only. Resource name of the preview. Format: `projects\/{project}\/locations\/{location}\/previews\/{preview}`",
+          "readOnly": true,
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. Time the preview was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "applyInput": {
+          "description": "Input parameters for preview of apply operation.",
+          "$ref": "ApplyInput"
+        },
+        "deleteInput": {
+          "description": "Input parameters for preview of delete operation.",
+          "$ref": "DeleteInput"
+        },
+        "previewResults": {
+          "description": "Output only. Locations of outputs from preview operation.",
+          "readOnly": true,
+          "$ref": "PreviewResults"
+        }
+      }
+    },
+    "ApplyInput": {
+      "id": "ApplyInput",
+      "description": "Input parameters for preview of apply operation.",
+      "type": "object",
+      "properties": {
+        "blueprint": {
+          "description": "Required. Blueprint to preview.",
+          "$ref": "Blueprint"
+        },
+        "deployment": {
+          "description": "Deployment to dry-run modification to during preview. For preview of new deployment this could be left empty. For preview modifications to existing deployment this must match an existing deployment, otherwise this will be considered as a new deployment. Format: `projects\/{project}\/locations\/{location}\/deployments\/{deployment}`",
+          "type": "string"
+        }
+      }
+    },
+    "DeleteInput": {
+      "id": "DeleteInput",
+      "description": "Input parameters for preview of delete operation.",
+      "type": "object",
+      "properties": {
+        "deployment": {
+          "description": "Required. Name of existing deployment to preview its deletion. Format: `projects\/{project}\/locations\/{location}\/deployments\/{deployment}`",
+          "type": "string"
+        }
+      }
+    },
+    "PreviewResults": {
+      "id": "PreviewResults",
+      "description": "Locations of outputs from config preview.",
+      "type": "object",
+      "properties": {
+        "content": {
+          "description": "Location of generated preview data in Google Cloud Storage. Format: `gs:\/\/{bucket}\/{object}`",
+          "type": "string"
+        },
+        "logs": {
+          "description": "Location of logs in Google Cloud Storage. Format: `gs:\/\/{bucket}\/{object}`",
+          "type": "string"
+        },
+        "artifacts": {
+          "description": "Location of kpt artifacts in Google Cloud Storage. Format: `gs:\/\/{bucket}\/{object}`",
+          "type": "string"
+        },
+        "build": {
+          "description": "Name of the corresponding Cloud Build run. Format: `projects\/{project}\/locations\/{location}\/builds\/{build}` See https:\/\/cloud.google.com\/build\/docs\/api\/reference\/rest\/v1\/projects.builds\/get#query-parameters for how to get build details.",
+          "type": "string"
+        }
+      }
+    },
     "ListLocationsResponse": {
       "id": "ListLocationsResponse",
       "description": "The response message for Locations.ListLocations.",
@@ -645,7 +725,7 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members` to a single `role`. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https:\/\/cloud.google.com\/iam\/help\/conditions\/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles\/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles\/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles\/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles\/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= - version: 3 For a description of IAM and its features, see the [IAM documentation](https:\/\/cloud.google.com\/iam\/docs\/).",
+      "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members` to a single `role`. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https:\/\/cloud.google.com\/iam\/help\/conditions\/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles\/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles\/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles\/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles\/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https:\/\/cloud.google.com\/iam\/docs\/).",
       "type": "object",
       "properties": {
         "version": {
@@ -1421,6 +1501,43 @@
                       "description": "Gets details of a single Deployment."
                     }
                   }
+                }
+              }
+            },
+            "previews": {
+              "methods": {
+                "create": {
+                  "id": "config.projects.locations.previews.create",
+                  "path": "v1alpha1/{+parent}/previews",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/previews",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The parent in whose context the Preview is created. The parent value is in the format: 'projects\/{project_id}\/locations\/{location}'.",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "request": {
+                    "$ref": "Preview"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Creates a new Preview in a given project and location."
                 }
               }
             }

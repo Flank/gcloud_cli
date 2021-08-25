@@ -179,8 +179,7 @@ def _SecretsDiffer(project1, secret1, project2, secret2):
     True if the two secrets differ, False otherwise.
   """
   return (secret1 != secret2 or
-          (project1 != project2 and
-           project1.isnumeric() == project2.isnumeric() and
+          (project1 != project2 and project1.isdigit() == project2.isdigit() and
            project1 != _DEFAULT_PROJECT_IDENTIFIER and
            project2 != _DEFAULT_PROJECT_IDENTIFIER))
 
@@ -302,6 +301,10 @@ def ConfigureFlags(parser):
       the environment variable `SECRET_ENV_VAR` as you would normally do in the
       function's programming language.
 
+      We recommend using a `numeric` version for secret environment variables
+      as any updates to the secret value are not reflected until new clones
+      start.
+
       To mount the secret within a volume use `/secret_path=SECRET_VALUE_REF` or
       `/mount_path:/secret_file_path=SECRET_VALUE_REF`. To use the value of the
       secret, read the file at `/secret_path` as you would normally do in the
@@ -312,7 +315,10 @@ def ConfigureFlags(parser):
       `latest` version of the secret `SECRET_FOO` available in a file
       `secret_foo` under the directory `/etc/secrets`. `/etc/secrets` will be
       considered as the `mount path` and will `not` be available for any other
-      volume.""")
+      volume.
+
+      We recommend referencing the `latest` version when using secret volumes so
+      that the secret's value changes are reflected immediately.""")
 
   update_remove_flag_group = flag_group.add_argument_group(help="""
       Only `--update-secrets` and `--remove-secrets` can be used together. If

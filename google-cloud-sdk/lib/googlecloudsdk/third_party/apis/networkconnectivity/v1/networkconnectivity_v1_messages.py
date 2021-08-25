@@ -487,12 +487,9 @@ class LinkedInterconnectAttachments(_messages.Message):
 
   Fields:
     siteToSiteDataTransfer: A value that controls whether site-to-site data
-      transfer is enabled for these resources. If true, routes are propagated
-      between the spoke associated with these resources and other spokes in
-      the hub that have data transfer enabled. If false, the spoke associated
-      with these resources provides connectivity only between the external
-      site and Google Cloud. In regions where data transfer is unsupported,
-      you cannot set this field to true.
+      transfer is enabled for these resources. This field is set to false by
+      default, but you must set it to true. Note that data transfer is
+      available only in supported locations.
     uris: The URIs of linked interconnect attachment resources
   """
 
@@ -508,12 +505,9 @@ class LinkedRouterApplianceInstances(_messages.Message):
   Fields:
     instances: The list of router appliance instances.
     siteToSiteDataTransfer: A value that controls whether site-to-site data
-      transfer is enabled for these resources. If true, routes are propagated
-      between the spoke associated with these resources and other spokes in
-      the hub that have data transfer enabled. If false, the spoke associated
-      with these resources provides connectivity only between the external
-      site and Google Cloud. In regions where data transfer is unsupported,
-      you cannot set this field to true.
+      transfer is enabled for these resources. This field is set to false by
+      default, but you must set it to true. Note that data transfer is
+      available only in supported locations.
   """
 
   instances = _messages.MessageField('RouterApplianceInstance', 1, repeated=True)
@@ -528,12 +522,9 @@ class LinkedVpnTunnels(_messages.Message):
 
   Fields:
     siteToSiteDataTransfer: A value that controls whether site-to-site data
-      transfer is enabled for these resources. If true, routes are propagated
-      between the spoke associated with these resources and other spokes in
-      the hub that have data transfer enabled. If false, the spoke associated
-      with these resources provides connectivity only between the external
-      site and Google Cloud. In regions where data transfer is unsupported,
-      you cannot set this field to true.
+      transfer is enabled for these resources. This field is set to false by
+      default, but you must set it to true. Note that data transfer is
+      available only in supported locations.
     uris: The URIs of linked VPN tunnel resources.
   """
 
@@ -1209,7 +1200,7 @@ class Policy(_messages.Message):
   roles/resourcemanager.organizationAdmin - members: - user:eve@example.com
   role: roles/resourcemanager.organizationViewer condition: title: expirable
   access description: Does not grant access after Sep 2020 expression:
-  request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= -
+  request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA=
   version: 3 For a description of IAM and its features, see the [IAM
   documentation](https://cloud.google.com/iam/docs/).
 

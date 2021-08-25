@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2020 Google LLC. All Rights Reserved.
+# Copyright 2021 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,27 +12,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Utilities for AI Platform hyperparameter tuning jobs commands."""
+"""List event types available to Google Cloud Functions v1."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
-from googlecloudsdk.core import resources
+from googlecloudsdk.api_lib.functions.v1 import triggers
 
 
-def ParseJobName(name):
-  return resources.REGISTRY.Parse(
-      name,
-      collection='aiplatform.projects.locations.hyperparameterTuningJobs').Name(
-      )
+def Run(args):
+  """Lists GCF v1 available event_types.
 
+  Args:
+    args: an argparse namespace. All the arguments that were provided to this
+      command invocation.
 
-def OutputCommandVersion(release_track):
-  if release_track == base.ReleaseTrack.GA:
-    return ''
-  elif release_track == base.ReleaseTrack.BETA:
-    return ' beta'
-  else:
-    return ' alpha'
+  Yields:
+    events: List[v1.TriggerEvent], The list of v1 supported event types.
+  """
+  del args
+
+  for provider in triggers.TRIGGER_PROVIDER_REGISTRY.providers:
+    for event in provider.events:
+      yield event

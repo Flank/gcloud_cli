@@ -25,7 +25,7 @@ from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import traffic
 
 
-ENDPOINT_VISIBILITY = 'serving.knative.dev/visibility'
+ENDPOINT_VISIBILITY = 'networking.knative.dev/visibility'
 CLUSTER_LOCAL = 'cluster-local'
 
 INGRESS_ANNOTATION = 'run.googleapis.com/ingress'
@@ -45,7 +45,7 @@ class Service(k8s_object.KubernetesObject):
   KIND = 'Service'
   # Field names that are present in Cloud Run messages, but should not be
   # initialized because they are here for legacy reasons.
-  FIELD_BLACKLIST = ['manual', 'release', 'runLatest', 'pinned', 'container']
+  EXCLUDED_FIELDS = ['manual', 'release', 'runLatest', 'pinned', 'container']
 
   @classmethod
   def New(cls, client, namespace):

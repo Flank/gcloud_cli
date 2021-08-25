@@ -911,9 +911,10 @@ class DocumentationRule(_messages.Message):
   Fields:
     deprecationDescription: Deprecation description of the selected
       element(s). It can be provided if an element is marked as `deprecated`.
-    description: The description is the comment in front of the selected proto
-      element, such as a message, a method, a 'service' definition, or a
-      field.
+    description: Description of the selected proto element (e.g. a message, a
+      method, a 'service' definition, or a field). Defaults to leading &
+      trailing comments taken from the proto source definition of the proto
+      element.
     selector: The selector is a comma-separated list of patterns for any
       element such as a method, a field, an enum value. Each pattern is a
       qualified name of the element which may end in "*", indicating a
@@ -2663,7 +2664,7 @@ class Policy(_messages.Message):
   roles/resourcemanager.organizationAdmin - members: - user:eve@example.com
   role: roles/resourcemanager.organizationViewer condition: title: expirable
   access description: Does not grant access after Sep 2020 expression:
-  request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= -
+  request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA=
   version: 3 For a description of IAM and its features, see the [IAM
   documentation](https://cloud.google.com/iam/docs/).
 

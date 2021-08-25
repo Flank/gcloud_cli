@@ -104,7 +104,7 @@
     "oauth2": {
       "scopes": {
         "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud Platform data"
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
         },
         "https://www.googleapis.com/auth/service.management": {
           "description": "Manage your Google API service configuration"
@@ -796,7 +796,7 @@
           "type": "string"
         },
         "dnsSuffix": {
-          "description": "The DNS domain name suffix e.g. `example.com.`.",
+          "description": "The DNS domain name suffix e.g. `example.com.`. Cloud DNS requires that a DNS suffix ends with a trailing dot.",
           "type": "string"
         }
       }
@@ -1385,7 +1385,7 @@
           "type": "string"
         },
         "description": {
-          "description": "The description is the comment in front of the selected proto element, such as a message, a method, a 'service' definition, or a field.",
+          "description": "Description of the selected proto element (e.g. a message, a method, a 'service' definition, or a field). Defaults to leading & trailing comments taken from the proto source definition of the proto element.",
           "type": "string"
         },
         "deprecationDescription": {

@@ -349,12 +349,17 @@ class CreateDatabaseMetadata(_messages.Message):
 class CreateDatabaseRequest(_messages.Message):
   r"""The request for CreateDatabase.
 
+  Enums:
+    DatabaseDialectValueValuesEnum: Optional. The dialect of the Cloud Spanner
+      Database.
+
   Fields:
     createStatement: Required. A `CREATE DATABASE` statement, which specifies
       the ID of the new database. The database ID must conform to the regular
       expression `a-z*[a-z0-9]` and be between 2 and 30 characters in length.
       If the database ID is a reserved word or if it contains a hyphen, the
       database ID must be enclosed in backticks (`` ` ``).
+    databaseDialect: Optional. The dialect of the Cloud Spanner Database.
     encryptionConfig: Optional. The encryption configuration for the database.
       If this field is not specified, Cloud Spanner will encrypt/decrypt all
       data at rest using Google default encryption.
@@ -364,9 +369,23 @@ class CreateDatabaseRequest(_messages.Message):
       if there is an error in any statement, the database is not created.
   """
 
+  class DatabaseDialectValueValuesEnum(_messages.Enum):
+    r"""Optional. The dialect of the Cloud Spanner Database.
+
+    Values:
+      DATABASE_DIALECT_UNSPECIFIED: Default value. This value will create a
+        database with the GOOGLE_STANDARD_SQL dialect.
+      GOOGLE_STANDARD_SQL: Google standard SQL.
+      POSTGRESQL: PostgreSQL supported SQL.
+    """
+    DATABASE_DIALECT_UNSPECIFIED = 0
+    GOOGLE_STANDARD_SQL = 1
+    POSTGRESQL = 2
+
   createStatement = _messages.StringField(1)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 2)
-  extraStatements = _messages.StringField(3, repeated=True)
+  databaseDialect = _messages.EnumField('DatabaseDialectValueValuesEnum', 2)
+  encryptionConfig = _messages.MessageField('EncryptionConfig', 3)
+  extraStatements = _messages.StringField(4, repeated=True)
 
 
 class CreateInstanceMetadata(_messages.Message):
@@ -417,11 +436,14 @@ class Database(_messages.Message):
   r"""A Cloud Spanner database.
 
   Enums:
+    DatabaseDialectValueValuesEnum: Output only. The dialect of the Cloud
+      Spanner Database.
     StateValueValuesEnum: Output only. The current database state.
 
   Fields:
     createTime: Output only. If exists, the time at which the database
       creation started.
+    databaseDialect: Output only. The dialect of the Cloud Spanner Database.
     defaultLeader: Output only. The read-write region which contains the
       database's leader replicas. This is the same as the value of
       default_leader database option set using DatabaseAdmin.CreateDatabase or
@@ -456,6 +478,19 @@ class Database(_messages.Message):
       UpdateDatabaseDdl. Defaults to 1 hour, if not set.
   """
 
+  class DatabaseDialectValueValuesEnum(_messages.Enum):
+    r"""Output only. The dialect of the Cloud Spanner Database.
+
+    Values:
+      DATABASE_DIALECT_UNSPECIFIED: Default value. This value will create a
+        database with the GOOGLE_STANDARD_SQL dialect.
+      GOOGLE_STANDARD_SQL: Google standard SQL.
+      POSTGRESQL: PostgreSQL supported SQL.
+    """
+    DATABASE_DIALECT_UNSPECIFIED = 0
+    GOOGLE_STANDARD_SQL = 1
+    POSTGRESQL = 2
+
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current database state.
 
@@ -477,14 +512,15 @@ class Database(_messages.Message):
     READY_OPTIMIZING = 3
 
   createTime = _messages.StringField(1)
-  defaultLeader = _messages.StringField(2)
-  earliestVersionTime = _messages.StringField(3)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 4)
-  encryptionInfo = _messages.MessageField('EncryptionInfo', 5, repeated=True)
-  name = _messages.StringField(6)
-  restoreInfo = _messages.MessageField('RestoreInfo', 7)
-  state = _messages.EnumField('StateValueValuesEnum', 8)
-  versionRetentionPeriod = _messages.StringField(9)
+  databaseDialect = _messages.EnumField('DatabaseDialectValueValuesEnum', 2)
+  defaultLeader = _messages.StringField(3)
+  earliestVersionTime = _messages.StringField(4)
+  encryptionConfig = _messages.MessageField('EncryptionConfig', 5)
+  encryptionInfo = _messages.MessageField('EncryptionInfo', 6, repeated=True)
+  name = _messages.StringField(7)
+  restoreInfo = _messages.MessageField('RestoreInfo', 8)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
+  versionRetentionPeriod = _messages.StringField(10)
 
 
 class Delete(_messages.Message):
@@ -2222,7 +2258,7 @@ class Policy(_messages.Message):
   roles/resourcemanager.organizationAdmin - members: - user:eve@example.com
   role: roles/resourcemanager.organizationViewer condition: title: expirable
   access description: Does not grant access after Sep 2020 expression:
-  request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= -
+  request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA=
   version: 3 For a description of IAM and its features, see the [IAM
   documentation](https://cloud.google.com/iam/docs/).
 
@@ -4466,6 +4502,13 @@ class Type(_messages.Message):
 
   Enums:
     CodeValueValuesEnum: Required. The TypeCode for this type.
+    TypeAnnotationValueValuesEnum: The TypeAnnotationCode that disambiguates
+      SQL type that Spanner will use to represent values of this type during
+      query processing. This is necessary for some type codes because a single
+      TypeCode can be mapped to different SQL types depending on the SQL
+      dialect. type_annotation typically is not needed to process the content
+      of a value (it doesn't affect serialization) and clients can ignore it
+      on the read path.
 
   Fields:
     arrayElementType: If code == ARRAY, then `array_element_type` is the type
@@ -4473,6 +4516,13 @@ class Type(_messages.Message):
     code: Required. The TypeCode for this type.
     structType: If code == STRUCT, then `struct_type` provides type
       information for the struct's fields.
+    typeAnnotation: The TypeAnnotationCode that disambiguates SQL type that
+      Spanner will use to represent values of this type during query
+      processing. This is necessary for some type codes because a single
+      TypeCode can be mapped to different SQL types depending on the SQL
+      dialect. type_annotation typically is not needed to process the content
+      of a value (it doesn't affect serialization) and clients can ignore it
+      on the read path.
   """
 
   class CodeValueValuesEnum(_messages.Enum):
@@ -4524,9 +4574,34 @@ class Type(_messages.Message):
     NUMERIC = 10
     JSON = 11
 
+  class TypeAnnotationValueValuesEnum(_messages.Enum):
+    r"""The TypeAnnotationCode that disambiguates SQL type that Spanner will
+    use to represent values of this type during query processing. This is
+    necessary for some type codes because a single TypeCode can be mapped to
+    different SQL types depending on the SQL dialect. type_annotation
+    typically is not needed to process the content of a value (it doesn't
+    affect serialization) and clients can ignore it on the read path.
+
+    Values:
+      TYPE_ANNOTATION_CODE_UNSPECIFIED: Not specified.
+      INT32: 32-bit signed integer type. This annotation can be used by a
+        client interacting with PostgreSQL-enabled Spanner database to specify
+        that a value should be treated using the semantics of the INTEGER
+        type.
+      PG_NUMERIC: PostgreSQL compatible NUMERIC type. This annotation needs to
+        be applied to Type instances having NUMERIC type code to specify that
+        values of this type should be treated as PostgreSQL NUMERIC values.
+        Currently this annotation is always needed for NUMERIC when a client
+        interacts with PostgreSQL-enabled Spanner databases.
+    """
+    TYPE_ANNOTATION_CODE_UNSPECIFIED = 0
+    INT32 = 1
+    PG_NUMERIC = 2
+
   arrayElementType = _messages.MessageField('Type', 1)
   code = _messages.EnumField('CodeValueValuesEnum', 2)
   structType = _messages.MessageField('StructType', 3)
+  typeAnnotation = _messages.EnumField('TypeAnnotationValueValuesEnum', 4)
 
 
 class UpdateDatabaseDdlMetadata(_messages.Message):

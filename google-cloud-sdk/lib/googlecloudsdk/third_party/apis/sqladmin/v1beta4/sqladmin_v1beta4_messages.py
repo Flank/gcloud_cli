@@ -329,6 +329,8 @@ class ConnectSettings(_messages.Message):
       **SQLSERVER_2017_EXPRESS**, or **SQLSERVER_2017_WEB**.
     ipAddresses: The assigned IP addresses for the instance.
     kind: This is always `sql#connectSettings`.
+    region: The cloud region for the instance. e.g. **us-central1**, **europe-
+      west1**. The region cannot be changed after instance creation.
     serverCaCert: SSL configuration.
   """
 
@@ -408,7 +410,8 @@ class ConnectSettings(_messages.Message):
   databaseVersion = _messages.EnumField('DatabaseVersionValueValuesEnum', 2)
   ipAddresses = _messages.MessageField('IpMapping', 3, repeated=True)
   kind = _messages.StringField(4)
-  serverCaCert = _messages.MessageField('SslCert', 5)
+  region = _messages.StringField(5)
+  serverCaCert = _messages.MessageField('SslCert', 6)
 
 
 class Database(_messages.Message):
@@ -1487,7 +1490,8 @@ class IpConfiguration(_messages.Message):
       set, the instance ip will be created in the allocated range. The range
       name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035).
       Specifically, the name must be 1-63 characters long and match the
-      regular expression [a-z]([-a-z0-9]*[a-z0-9])?. Reserved for future use.
+      regular expression `[a-z]([-a-z0-9]*[a-z0-9])?.` Reserved for future
+      use.
     authorizedNetworks: The list of external networks that are allowed to
       connect to the instance using the IP. In 'CIDR' notation, also known as
       'slash' notation (for example: *192.168.100.0/24*).
@@ -1666,7 +1670,13 @@ class MySqlReplicaConfiguration(_messages.Message):
 
 
 class MySqlSyncConfig(_messages.Message):
-  r"""MySQL-specific external server sync settings."""
+  r"""MySQL-specific external server sync settings.
+
+  Fields:
+    initialSyncFlags: Flags to use for the initial dump.
+  """
+
+  initialSyncFlags = _messages.MessageField('SyncFlags', 1, repeated=True)
 
 
 class OnPremisesConfiguration(_messages.Message):
@@ -2600,6 +2610,20 @@ class SqlInstancesImportRequest(_messages.Message):
   project = _messages.StringField(3, required=True)
 
 
+class SqlInstancesInsertRequest(_messages.Message):
+  r"""A SqlInstancesInsertRequest object.
+
+  Fields:
+    databaseInstance: A DatabaseInstance resource to be passed as the request
+      body.
+    project: Project ID of the project to which the newly created Cloud SQL
+      instances should belong.
+  """
+
+  databaseInstance = _messages.MessageField('DatabaseInstance', 1)
+  project = _messages.StringField(2, required=True)
+
+
 class SqlInstancesListRequest(_messages.Message):
   r"""A SqlInstancesListRequest object.
 
@@ -3301,6 +3325,20 @@ class StandardQueryParameters(_messages.Message):
   trace = _messages.StringField(10)
   uploadType = _messages.StringField(11)
   upload_protocol = _messages.StringField(12)
+
+
+class SyncFlags(_messages.Message):
+  r"""Initial sync flags for certain Cloud SQL APIs. Currently used for the
+  MySQL external server initial dump.
+
+  Fields:
+    name: The name of the flag.
+    value: The value of the flag. This field must be omitted if the flag
+      doesn't take a value.
+  """
+
+  name = _messages.StringField(1)
+  value = _messages.StringField(2)
 
 
 class Tier(_messages.Message):

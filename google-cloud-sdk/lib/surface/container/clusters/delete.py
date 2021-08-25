@@ -36,16 +36,18 @@ class Delete(base.DeleteCommand):
 
   When you delete a cluster, the following resources are deleted:
 
-  - The master resources
+  - The control plane resources
   - All of the node instances in the cluster
   - Any Pods that are running on those instances
   - Any firewalls and routes created by Kubernetes Engine at the time of cluster
     creation
   - Data stored in host hostPath and emptyDir volumes
 
-  The following resources are not deleted:
+  GKE will attempt to delete the following resources. Deletion of these
+  resources is not always guaranteed:
 
   - External load balancers created by the cluster
+  - Internal load balancers created by the cluster
   - Persistent disk volumes
   """
 

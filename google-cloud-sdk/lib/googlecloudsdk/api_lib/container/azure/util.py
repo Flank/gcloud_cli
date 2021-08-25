@@ -145,6 +145,12 @@ class ClustersClient(_AzureClientBase):
 
     return self._service.Create(req)
 
+  def GenerateAccessToken(self, cluster_ref):
+    """Generates an access token for an Azure cluster."""
+    req = self._service.GetRequestType('GenerateAzureAccessToken')(
+        azureCluster=cluster_ref.RelativeName())
+    return self._service.GenerateAzureAccessToken(req)
+
   def GetKubeConfig(self, cluster_ref):
     req = self._service.GetRequestType('GetAzureClusterAdminKubeconfig')(
         azureCluster=cluster_ref.RelativeName())
@@ -250,7 +256,8 @@ class NodePoolsClient(_AzureClientBase):
              max_nodes=None,
              max_pods_per_node=None,
              taints=None,
-             labels=None):
+             labels=None,
+             azure_availability_zone=None):
     """Create a new Azure Node Pool."""
     req = self._service.GetRequestType('Create')(
         azureNodePoolId=nodepool_ref.azureNodePoolsId,
@@ -263,6 +270,7 @@ class NodePoolsClient(_AzureClientBase):
         name=nodepool_ref.azureNodePoolsId,
         subnetId=subnet_id,
         version=node_version)
+    nodepool.azureAvailabilityZone = azure_availability_zone
 
     nodepool.autoscaling = type(nodepool).autoscaling.type(
         maxNodeCount=max_nodes, minNodeCount=min_nodes)

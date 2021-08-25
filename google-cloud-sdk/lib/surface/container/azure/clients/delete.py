@@ -23,25 +23,34 @@ from googlecloudsdk.api_lib.container import util as gke_util
 from googlecloudsdk.api_lib.container.azure import util as azure_api_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.azure import resource_args
+from googlecloudsdk.command_lib.container.gkemulticloud import constants
 from googlecloudsdk.command_lib.container.gkemulticloud import endpoint_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
+
+_EXAMPLES = """
+To delete an Azure client named ``my-client'' in location ``us-west1'', run:
+
+$ {command} my-client --location=us-west1
+"""
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Delete(base.DeleteCommand):
   """Delete an Azure client."""
 
+  detailed_help = {'EXAMPLES': _EXAMPLES}
+
   @staticmethod
   def Args(parser):
     resource_args.AddAzureClientResourceArg(parser, 'to delete')
 
   def Run(self, args):
-    """Run the delete command."""
-    client_ref = args.CONCEPTS.client.Parse()
-
-    with endpoint_util.GkemulticloudEndpointOverride(client_ref.locationsId,
-                                                     self.ReleaseTrack()):
+    """Runs the delete command."""
+    with endpoint_util.GkemulticloudEndpointOverride(
+        resource_args.ParseAzureClientResourceArg(args).locationsId,
+        self.ReleaseTrack()):
+      client_ref = resource_args.ParseAzureClientResourceArg(args)
       api_client = azure_api_util.ClientsClient(track=self.ReleaseTrack())
       api_client.Delete(client_ref, validate_only=True)
 
@@ -56,4 +65,4 @@ class Delete(base.DeleteCommand):
           cancel_on_no=True)
 
       api_client.Delete(client_ref)
-      log.DeletedResource(client_ref, kind='Azure Client')
+      log.DeletedResource(client_ref, kind=constants.AZURE_CLIENT_KIND)

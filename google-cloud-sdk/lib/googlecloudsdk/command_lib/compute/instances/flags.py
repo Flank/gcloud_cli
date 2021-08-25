@@ -1545,6 +1545,34 @@ def AddPreemptibleVmArgs(parser):
       """)
 
 
+def AddProvisioningModelVmArgs(parser):
+  """Set arguments for specifing provisioning model for instances."""
+  parser.add_argument(
+      '--provisioning-model',
+      choices={
+          'SPOT': (
+              'Spot VM instances are preemptible VM instances without '
+              'a 24-hour limit. They typically cost much less than '
+              'a default VM, but have no guaranteed runtime.')
+      },
+      type=arg_utils.ChoiceToEnumName,
+      help="""\
+      Specifies provisioning model, which determines price, obtainability,
+      and runtime for the VM instance.
+      """)
+
+
+def AddHostErrorTimeoutSecondsArgs(parser):
+  parser.add_argument(
+      '--host-error-timeout-seconds',
+      type=arg_parsers.Duration(lower_bound='90s', upper_bound='300s'),
+      help="""
+      The timeout in seconds for host error detection. The value must be
+      set with 30 second increments, with a range of 90 to 330 seconds.
+      If unset, the default behavior of the host error recovery is used.
+    """)
+
+
 def AddNetworkArgs(parser):
   """Set arguments for choosing the network/subnetwork."""
   parser.add_argument(

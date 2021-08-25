@@ -1143,6 +1143,22 @@ class AiplatformProjectsLocationsEndpointsPredictRequest(_messages.Message):
   googleCloudAiplatformV1beta1PredictRequest = _messages.MessageField('GoogleCloudAiplatformV1beta1PredictRequest', 2)
 
 
+class AiplatformProjectsLocationsEndpointsRawPredictRequest(_messages.Message):
+  r"""A AiplatformProjectsLocationsEndpointsRawPredictRequest object.
+
+  Fields:
+    endpoint: Required. The name of the Endpoint requested to serve the
+      prediction. Format:
+      `projects/{project}/locations/{location}/endpoints/{endpoint}`
+    googleCloudAiplatformV1beta1RawPredictRequest: A
+      GoogleCloudAiplatformV1beta1RawPredictRequest resource to be passed as
+      the request body.
+  """
+
+  endpoint = _messages.StringField(1, required=True)
+  googleCloudAiplatformV1beta1RawPredictRequest = _messages.MessageField('GoogleCloudAiplatformV1beta1RawPredictRequest', 2)
+
+
 class AiplatformProjectsLocationsEndpointsUndeployModelRequest(_messages.Message):
   r"""A AiplatformProjectsLocationsEndpointsUndeployModelRequest object.
 
@@ -1827,6 +1843,25 @@ class AiplatformProjectsLocationsFeaturestoresPatchRequest(_messages.Message):
   updateMask = _messages.StringField(3)
 
 
+class AiplatformProjectsLocationsFeaturestoresQueryFeatureValuesRequest(_messages.Message):
+  r"""A AiplatformProjectsLocationsFeaturestoresQueryFeatureValuesRequest
+  object.
+
+  Fields:
+    featurestoresId: A string attribute.
+    googleCloudAiplatformV1beta1QueryFeatureValuesRequest: A
+      GoogleCloudAiplatformV1beta1QueryFeatureValuesRequest resource to be
+      passed as the request body.
+    locationsId: A string attribute.
+    projectsId: A string attribute.
+  """
+
+  featurestoresId = _messages.StringField(1, required=True)
+  googleCloudAiplatformV1beta1QueryFeatureValuesRequest = _messages.MessageField('GoogleCloudAiplatformV1beta1QueryFeatureValuesRequest', 2)
+  locationsId = _messages.StringField(3, required=True)
+  projectsId = _messages.StringField(4, required=True)
+
+
 class AiplatformProjectsLocationsFeaturestoresSearchFeaturesRequest(_messages.Message):
   r"""A AiplatformProjectsLocationsFeaturestoresSearchFeaturesRequest object.
 
@@ -2487,13 +2522,13 @@ class AiplatformProjectsLocationsMetadataStoresArtifactsPatchRequest(_messages.M
 
   Fields:
     allowMissing: If set to true, and the Artifact is not found, a new
-      Artifact will be created. In this situation, `update_mask` is ignored.
+      Artifact will be created.
     googleCloudAiplatformV1beta1Artifact: A
       GoogleCloudAiplatformV1beta1Artifact resource to be passed as the
       request body.
     name: Output only. The resource name of the Artifact.
     updateMask: Required. A FieldMask indicating which fields should be
-      updated.
+      updated. Functionality of this field is not yet supported.
   """
 
   allowMissing = _messages.BooleanField(1)
@@ -2687,12 +2722,12 @@ class AiplatformProjectsLocationsMetadataStoresContextsPatchRequest(_messages.Me
 
   Fields:
     allowMissing: If set to true, and the Context is not found, a new Context
-      will be created. In this situation, `update_mask` is ignored.
+      will be created.
     googleCloudAiplatformV1beta1Context: A GoogleCloudAiplatformV1beta1Context
       resource to be passed as the request body.
     name: Output only. The resource name of the Context.
     updateMask: Required. A FieldMask indicating which fields should be
-      updated.
+      updated. Functionality of this field is not yet supported.
   """
 
   allowMissing = _messages.BooleanField(1)
@@ -2762,9 +2797,7 @@ class AiplatformProjectsLocationsMetadataStoresDeleteRequest(_messages.Message):
   r"""A AiplatformProjectsLocationsMetadataStoresDeleteRequest object.
 
   Fields:
-    force: If set to true, any child resources of this MetadataStore will be
-      deleted. (Otherwise, the request will fail with a FAILED_PRECONDITION
-      error if the MetadataStore has any child resources.)
+    force: Deprecated: Field is no longer supported.
     name: Required. The resource name of the MetadataStore to delete. Format:
       projects/{project}/locations/{location}/metadataStores/{metadatastore}
   """
@@ -2892,13 +2925,13 @@ class AiplatformProjectsLocationsMetadataStoresExecutionsPatchRequest(_messages.
 
   Fields:
     allowMissing: If set to true, and the Execution is not found, a new
-      Execution will be created. In this situation, `update_mask` is ignored.
+      Execution will be created.
     googleCloudAiplatformV1beta1Execution: A
       GoogleCloudAiplatformV1beta1Execution resource to be passed as the
       request body.
     name: Output only. The resource name of the Execution.
     updateMask: Required. A FieldMask indicating which fields should be
-      updated.
+      updated. Functionality of this field is not yet supported.
   """
 
   allowMissing = _messages.BooleanField(1)
@@ -4905,21 +4938,20 @@ class AiplatformProjectsLocationsTensorboardsExperimentsRunsTimeSeriesReadReques
   tensorboardTimeSeries = _messages.StringField(3, required=True)
 
 
-class AiplatformProjectsLocationsTensorboardsExperimentsRunsWriteRequest(_messages.Message):
-  r"""A AiplatformProjectsLocationsTensorboardsExperimentsRunsWriteRequest
-  object.
+class AiplatformProjectsLocationsTensorboardsExperimentsWriteRequest(_messages.Message):
+  r"""A AiplatformProjectsLocationsTensorboardsExperimentsWriteRequest object.
 
   Fields:
-    googleCloudAiplatformV1beta1WriteTensorboardRunDataRequest: A
-      GoogleCloudAiplatformV1beta1WriteTensorboardRunDataRequest resource to
-      be passed as the request body.
-    tensorboardRun: Required. The resource name of the TensorboardRun to write
-      data to. Format: `projects/{project}/locations/{location}/tensorboards/{
-      tensorboard}/experiments/{experiment}/runs/{run}`
+    googleCloudAiplatformV1beta1WriteTensorboardExperimentDataRequest: A
+      GoogleCloudAiplatformV1beta1WriteTensorboardExperimentDataRequest
+      resource to be passed as the request body.
+    tensorboardExperiment: Required. The resource name of the
+      TensorboardExperiment to write data to. Format: `projects/{project}/loca
+      tions/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
   """
 
-  googleCloudAiplatformV1beta1WriteTensorboardRunDataRequest = _messages.MessageField('GoogleCloudAiplatformV1beta1WriteTensorboardRunDataRequest', 1)
-  tensorboardRun = _messages.StringField(2, required=True)
+  googleCloudAiplatformV1beta1WriteTensorboardExperimentDataRequest = _messages.MessageField('GoogleCloudAiplatformV1beta1WriteTensorboardExperimentDataRequest', 1)
+  tensorboardExperiment = _messages.StringField(2, required=True)
 
 
 class AiplatformProjectsLocationsTensorboardsGetRequest(_messages.Message):
@@ -4949,7 +4981,7 @@ class AiplatformProjectsLocationsTensorboardsListRequest(_messages.Message):
       TensorboardService.ListTensorboards must match the call that provided
       the page token.
     parent: Required. The resource name of the Location to list Tensorboards.
-      Format: 'projects/{project}/locations/{location}'
+      Format: `projects/{project}/locations/{location}`
     readMask: Mask specifying which fields to read.
   """
 
@@ -5189,6 +5221,67 @@ class AiplatformProjectsLocationsTrainingPipelinesOperationsWaitRequest(_message
 
   name = _messages.StringField(1, required=True)
   timeout = _messages.StringField(2)
+
+
+class GoogleApiHttpBody(_messages.Message):
+  r"""Message that represents an arbitrary HTTP body. It should only be used
+  for payload formats that can't be represented as JSON, such as raw binary or
+  an HTML page. This message can be used both in streaming and non-streaming
+  API methods in the request as well as the response. It can be used as a top-
+  level request field, which is convenient if one wants to extract parameters
+  from either the URL or HTTP template into the request fields and also want
+  access to the raw HTTP body. Example: message GetResourceRequest { // A
+  unique request id. string request_id = 1; // The raw HTTP body is bound to
+  this field. google.api.HttpBody http_body = 2; } service ResourceService {
+  rpc GetResource(GetResourceRequest) returns (google.api.HttpBody); rpc
+  UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty); }
+  Example with streaming methods: service CaldavService { rpc
+  GetCalendar(stream google.api.HttpBody) returns (stream
+  google.api.HttpBody); rpc UpdateCalendar(stream google.api.HttpBody) returns
+  (stream google.api.HttpBody); } Use of this type only changes how the
+  request and response bodies are handled, all other features will continue to
+  work unchanged.
+
+  Messages:
+    ExtensionsValueListEntry: A ExtensionsValueListEntry object.
+
+  Fields:
+    contentType: The HTTP Content-Type header value specifying the content
+      type of the body.
+    data: The HTTP request/response body as raw binary.
+    extensions: Application specific response metadata. Must be set in the
+      first response for streaming APIs.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ExtensionsValueListEntry(_messages.Message):
+    r"""A ExtensionsValueListEntry object.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        ExtensionsValueListEntry object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ExtensionsValueListEntry object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  contentType = _messages.StringField(1)
+  data = _messages.BytesField(2)
+  extensions = _messages.MessageField('ExtensionsValueListEntry', 3, repeated=True)
 
 
 class GoogleCloudAiplatformInternalAnnotationSpecStats(_messages.Message):
@@ -6580,10 +6673,6 @@ class GoogleCloudAiplatformInternalFeaturestoreMonitoringConfigSnapshotAnalysis(
       level config; otherwise run snapshot analysis monitoring with
       monitoring_interval regardless of the EntityType-level config.
       Explicitly Disable the snapshot analysis based monitoring.
-    monitoringInterval: Will be deprecated by
-      [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-      soon. Configuration of the snapshot analysis based monitoring pipeline
-      running interval. The value is rolled up to full day.
     monitoringIntervalDays: Configuration of the snapshot analysis based
       monitoring pipeline running interval. The value indicates number of
       days. If both
@@ -6595,8 +6684,7 @@ class GoogleCloudAiplatformInternalFeaturestoreMonitoringConfigSnapshotAnalysis(
   """
 
   disabled = _messages.BooleanField(1)
-  monitoringInterval = _messages.StringField(2)
-  monitoringIntervalDays = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  monitoringIntervalDays = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class GoogleCloudAiplatformInternalGcsSource(_messages.Message):
@@ -7500,6 +7588,8 @@ class GoogleCloudAiplatformUiBatchReadFeatureValuesOperationMetadata(_messages.M
   r"""Details of operations that batch reads Feature values.
 
   Fields:
+    destination: A proto representation of the destination, for easier UI
+      parsing.
     destinationUri: The Cloud Storage/BigQuery URI of the destination as
       specified in the request.
     genericMetadata: Operation metadata for Featurestore batch read Features
@@ -7510,11 +7600,12 @@ class GoogleCloudAiplatformUiBatchReadFeatureValuesOperationMetadata(_messages.M
     requestedFeatureCount: The total number of Feature in the request.
   """
 
-  destinationUri = _messages.StringField(1)
-  genericMetadata = _messages.MessageField('GoogleCloudAiplatformUiGenericOperationMetadata', 2)
-  instanceUri = _messages.StringField(3)
-  requestedEntityTypeCount = _messages.IntegerField(4)
-  requestedFeatureCount = _messages.IntegerField(5)
+  destination = _messages.MessageField('GoogleCloudAiplatformUiFeatureValueDestination', 1)
+  destinationUri = _messages.StringField(2)
+  genericMetadata = _messages.MessageField('GoogleCloudAiplatformUiGenericOperationMetadata', 3)
+  instanceUri = _messages.StringField(4)
+  requestedEntityTypeCount = _messages.IntegerField(5)
+  requestedFeatureCount = _messages.IntegerField(6)
 
 
 class GoogleCloudAiplatformUiBatchReadFeatureValuesResponse(_messages.Message):
@@ -7746,6 +7837,16 @@ class GoogleCloudAiplatformUiCreateTensorboardOperationMetadata(_messages.Messag
   """
 
   genericMetadata = _messages.MessageField('GoogleCloudAiplatformUiGenericOperationMetadata', 1)
+
+
+class GoogleCloudAiplatformUiCsvDestination(_messages.Message):
+  r"""The storage details for CSV output content.
+
+  Fields:
+    gcsDestination: Required. Google Cloud Storage location.
+  """
+
+  gcsDestination = _messages.MessageField('GoogleCloudAiplatformUiGcsDestination', 1)
 
 
 class GoogleCloudAiplatformUiDataLabelingJobRef(_messages.Message):
@@ -8783,6 +8884,28 @@ class GoogleCloudAiplatformUiFeatureStatsAnomaly(_messages.Message):
   startTime = _messages.StringField(7)
 
 
+class GoogleCloudAiplatformUiFeatureValueDestination(_messages.Message):
+  r"""A destination location for Feature values and format.
+
+  Fields:
+    bigqueryDestination: Output in BigQuery format.
+      BigQueryDestination.output_uri in
+      FeatureValueDestination.bigquery_destination must refer to a table.
+    csvDestination: Output in CSV format. Array Feature value types are not
+      allowed in CSV format.
+    tfrecordDestination: Output in TFRecord format. Below are the mapping from
+      Feature value type in Featurestore to Feature value type in TFRecord:
+      Value type in Featurestore | Value type in TFRecord DOUBLE, DOUBLE_ARRAY
+      | FLOAT_LIST INT64, INT64_ARRAY | INT64_LIST STRING, STRING_ARRAY, BYTES
+      | BYTES_LIST true -> byte_string("true"), false -> byte_string("false")
+      BOOL, BOOL_ARRAY (true, false) | BYTES_LIST
+  """
+
+  bigqueryDestination = _messages.MessageField('GoogleCloudAiplatformUiBigQueryDestination', 1)
+  csvDestination = _messages.MessageField('GoogleCloudAiplatformUiCsvDestination', 2)
+  tfrecordDestination = _messages.MessageField('GoogleCloudAiplatformUiTFRecordDestination', 3)
+
+
 class GoogleCloudAiplatformUiFeaturestoreMonitoringConfig(_messages.Message):
   r"""Configuration of how features in Featurestore are monitored.
 
@@ -8810,10 +8933,9 @@ class GoogleCloudAiplatformUiFeaturestoreMonitoringConfigSnapshotAnalysis(_messa
       level config; otherwise run snapshot analysis monitoring with
       monitoring_interval regardless of the EntityType-level config.
       Explicitly Disable the snapshot analysis based monitoring.
-    monitoringInterval: Will be deprecated by
-      [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-      soon. Configuration of the snapshot analysis based monitoring pipeline
-      running interval. The value is rolled up to full day.
+    monitoringInterval: Configuration of the snapshot analysis based
+      monitoring pipeline running interval. The value is rolled up to full
+      day.
     monitoringIntervalDays: Configuration of the snapshot analysis based
       monitoring pipeline running interval. The value indicates number of
       days. If both
@@ -10488,6 +10610,16 @@ class GoogleCloudAiplatformUiSuggestTrialsResponse(_messages.Message):
   startTime = _messages.StringField(2)
   studyState = _messages.EnumField('StudyStateValueValuesEnum', 3)
   trials = _messages.MessageField('GoogleCloudAiplatformUiTrial', 4, repeated=True)
+
+
+class GoogleCloudAiplatformUiTFRecordDestination(_messages.Message):
+  r"""The storage details for TFRecord output content.
+
+  Fields:
+    gcsDestination: Required. Google Cloud Storage location.
+  """
+
+  gcsDestination = _messages.MessageField('GoogleCloudAiplatformUiGcsDestination', 1)
 
 
 class GoogleCloudAiplatformUiTextStats(_messages.Message):
@@ -14593,9 +14725,10 @@ class GoogleCloudAiplatformV1SchemaTrainingjobDefinitionExportEvaluatedDataItems
 
   Fields:
     destinationBigqueryUri: URI of desired destination BigQuery table.
-      Expected format: bq://:: If not specified, then results are exported to
-      the following auto-created BigQuery table:
-      :export_evaluated_examples__.evaluated_examples
+      Expected format: `bq://{project_id}:{dataset_id}:{table}` If not
+      specified, then results are exported to the following auto-created
+      BigQuery table: `{project_id}:export_evaluated_examples_{model_name}_{yy
+      yy_MM_dd'T'HH_mm_ss_SSS'Z'}.evaluated_examples`
     overrideExistingTable: If true and an export destination is specified,
       then the contents of the destination are overwritten. Otherwise, if the
       export destination already exists, then the export operation fails.
@@ -14854,8 +14987,12 @@ class GoogleCloudAiplatformV1StudySpec(_messages.Message):
 
   Fields:
     algorithm: The search algorithm specified for the Study.
+    decayCurveStoppingSpec: The automated early stopping spec using decay
+      curve rule.
     measurementSelectionType: Describe which measurement selection type will
       be used
+    medianAutomatedStoppingSpec: The automated early stopping spec using
+      median rule.
     metrics: Required. Metric specs for the Study.
     observationNoise: The observation noise level of the study. Currently only
       supported by the Vizier service. Not supported by HyperparamterTuningJob
@@ -14911,10 +15048,45 @@ class GoogleCloudAiplatformV1StudySpec(_messages.Message):
     HIGH = 2
 
   algorithm = _messages.EnumField('AlgorithmValueValuesEnum', 1)
-  measurementSelectionType = _messages.EnumField('MeasurementSelectionTypeValueValuesEnum', 2)
-  metrics = _messages.MessageField('GoogleCloudAiplatformV1StudySpecMetricSpec', 3, repeated=True)
-  observationNoise = _messages.EnumField('ObservationNoiseValueValuesEnum', 4)
-  parameters = _messages.MessageField('GoogleCloudAiplatformV1StudySpecParameterSpec', 5, repeated=True)
+  decayCurveStoppingSpec = _messages.MessageField('GoogleCloudAiplatformV1StudySpecDecayCurveAutomatedStoppingSpec', 2)
+  measurementSelectionType = _messages.EnumField('MeasurementSelectionTypeValueValuesEnum', 3)
+  medianAutomatedStoppingSpec = _messages.MessageField('GoogleCloudAiplatformV1StudySpecMedianAutomatedStoppingSpec', 4)
+  metrics = _messages.MessageField('GoogleCloudAiplatformV1StudySpecMetricSpec', 5, repeated=True)
+  observationNoise = _messages.EnumField('ObservationNoiseValueValuesEnum', 6)
+  parameters = _messages.MessageField('GoogleCloudAiplatformV1StudySpecParameterSpec', 7, repeated=True)
+
+
+class GoogleCloudAiplatformV1StudySpecDecayCurveAutomatedStoppingSpec(_messages.Message):
+  r"""The decay curve automated stopping rule builds a Gaussian Process
+  Regressor to predict the final objective value of a Trial based on the
+  already completed Trials and the intermediate measurements of the current
+  Trial. Early stopping is requested for the current Trial if there is very
+  low probability to exceed the optimal value found so far.
+
+  Fields:
+    useElapsedDuration: True if Measurement.elapsed_duration is used as the
+      x-axis of each Trials Decay Curve. Otherwise, Measurement.step_count
+      will be used as the x-axis.
+  """
+
+  useElapsedDuration = _messages.BooleanField(1)
+
+
+class GoogleCloudAiplatformV1StudySpecMedianAutomatedStoppingSpec(_messages.Message):
+  r"""The median automated stopping rule stops a pending Trial if the Trial's
+  best objective_value is strictly below the median 'performance' of all
+  completed Trials reported up to the Trial's last measurement. Currently,
+  'performance' refers to the running average of the objective values reported
+  by the Trial in each measurement.
+
+  Fields:
+    useElapsedDuration: True if median automated stopping rule applies on
+      Measurement.elapsed_duration. It means that elapsed_duration field of
+      latest measurement of current Trial is used to compute median objective
+      value for each completed Trials.
+  """
+
+  useElapsedDuration = _messages.BooleanField(1)
 
 
 class GoogleCloudAiplatformV1StudySpecMetricSpec(_messages.Message):
@@ -17396,7 +17568,8 @@ class GoogleCloudAiplatformV1beta1Artifact(_messages.Message):
       characters, underscores and dashes. International characters are
       allowed. No more than 64 user labels can be associated with one Artifact
       (System labels are excluded).
-    MetadataValue: Properties of the Artifact.
+    MetadataValue: Properties of the Artifact. The size of this field should
+      not exceed 200KB.
 
   Fields:
     createTime: Output only. Timestamp when this Artifact was created.
@@ -17411,7 +17584,8 @@ class GoogleCloudAiplatformV1beta1Artifact(_messages.Message):
       underscores and dashes. International characters are allowed. No more
       than 64 user labels can be associated with one Artifact (System labels
       are excluded).
-    metadata: Properties of the Artifact.
+    metadata: Properties of the Artifact. The size of this field should not
+      exceed 200KB.
     name: Output only. The resource name of the Artifact.
     schemaTitle: The title of the schema describing the metadata. Schema title
       and version is expected to be registered in earlier Create Schema calls.
@@ -17479,7 +17653,8 @@ class GoogleCloudAiplatformV1beta1Artifact(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
-    r"""Properties of the Artifact.
+    r"""Properties of the Artifact. The size of this field should not exceed
+    200KB.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -18255,7 +18430,8 @@ class GoogleCloudAiplatformV1beta1Context(_messages.Message):
       characters, underscores and dashes. International characters are
       allowed. No more than 64 user labels can be associated with one Context
       (System labels are excluded).
-    MetadataValue: Properties of the Context.
+    MetadataValue: Properties of the Context. The size of this field should
+      not exceed 200KB.
 
   Fields:
     createTime: Output only. Timestamp when this Context was created.
@@ -18270,7 +18446,8 @@ class GoogleCloudAiplatformV1beta1Context(_messages.Message):
       underscores and dashes. International characters are allowed. No more
       than 64 user labels can be associated with one Context (System labels
       are excluded).
-    metadata: Properties of the Context.
+    metadata: Properties of the Context. The size of this field should not
+      exceed 200KB.
     name: Output only. The resource name of the Context.
     parentContexts: Output only. A list of resource names of Contexts that are
       parents of this Context. A Context may have at most 10 parent_contexts.
@@ -18315,7 +18492,8 @@ class GoogleCloudAiplatformV1beta1Context(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
-    r"""Properties of the Context.
+    r"""Properties of the Context. The size of this field should not exceed
+    200KB.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -19820,7 +19998,8 @@ class GoogleCloudAiplatformV1beta1Execution(_messages.Message):
       characters, underscores and dashes. International characters are
       allowed. No more than 64 user labels can be associated with one
       Execution (System labels are excluded).
-    MetadataValue: Properties of the Execution.
+    MetadataValue: Properties of the Execution. The size of this field should
+      not exceed 200KB.
 
   Fields:
     createTime: Output only. Timestamp when this Execution was created.
@@ -19835,7 +20014,8 @@ class GoogleCloudAiplatformV1beta1Execution(_messages.Message):
       underscores and dashes. International characters are allowed. No more
       than 64 user labels can be associated with one Execution (System labels
       are excluded).
-    metadata: Properties of the Execution.
+    metadata: Properties of the Execution. The size of this field should not
+      exceed 200KB.
     name: Output only. The resource name of the Execution.
     schemaTitle: The title of the schema describing the metadata. Schema title
       and version is expected to be registered in earlier Create Schema calls.
@@ -19906,7 +20086,8 @@ class GoogleCloudAiplatformV1beta1Execution(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
-    r"""Properties of the Execution.
+    r"""Properties of the Execution. The size of this field should not exceed
+    200KB.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -21171,10 +21352,9 @@ class GoogleCloudAiplatformV1beta1FeaturestoreMonitoringConfigSnapshotAnalysis(_
       level config; otherwise run snapshot analysis monitoring with
       monitoring_interval regardless of the EntityType-level config.
       Explicitly Disable the snapshot analysis based monitoring.
-    monitoringInterval: Will be deprecated by
-      [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-      soon. Configuration of the snapshot analysis based monitoring pipeline
-      running interval. The value is rolled up to full day.
+    monitoringInterval: Configuration of the snapshot analysis based
+      monitoring pipeline running interval. The value is rolled up to full
+      day.
     monitoringIntervalDays: Configuration of the snapshot analysis based
       monitoring pipeline running interval. The value indicates number of
       days. If both
@@ -24623,6 +24803,92 @@ class GoogleCloudAiplatformV1beta1PythonPackageSpec(_messages.Message):
   pythonModule = _messages.StringField(4)
 
 
+class GoogleCloudAiplatformV1beta1QueryFeatureValuesRequest(_messages.Message):
+  r"""Request message for FeaturestoreService.QueryFeatureValues.
+
+  Fields:
+    bigqueryReadInstances: Similar to csv_read_instances, but from BigQuery
+      source.
+    csvReadInstances: Each read instance consists of exactly one read
+      timestamp and one or more entity IDs identifying entities of the
+      corresponding EntityTypes whose Features are requested. Each output
+      instance contains Feature values of requested entities concatenated
+      together as of the read time. An example read instance may be
+      `foo_entity_id, bar_entity_id, 2020-01-01T10:00:00.123Z`. An example
+      output instance may be `foo_entity_id, bar_entity_id,
+      2020-01-01T10:00:00.123Z, foo_entity_feature1_value,
+      bar_entity_feature2_value`. Timestamp in each read instance must be
+      millisecond-aligned. `csv_read_instances` are read instances stored in a
+      plain-text CSV file. The header should be: [ENTITY_TYPE_ID1],
+      [ENTITY_TYPE_ID2], ..., timestamp The columns can be in any order.
+      Values in the timestamp column must use the RFC 3339 format, e.g.
+      `2012-07-30T10:43:17.123Z`.
+    destination: Required. Specifies output location and format.
+    entityTypeSpecs: Required. Specifies EntityType grouping Features to read
+      values of and settings. Each EntityType referenced in
+      [QueryFeatureValuesRequest.entity_type_specs] must have a column
+      specifying entity IDs in tha EntityType in
+      QueryFeatureValuesRequest.request .
+    passThroughFields: When not empty, the specified fields in the
+      *_read_instances source will be joined as-is in the output, in addition
+      to those fields from the Featurestore Entity. For BigQuery source, the
+      type of the pass-through values will be automatically inferred. For CSV
+      source, the pass-through values will be passed as opaque bytes.
+  """
+
+  bigqueryReadInstances = _messages.MessageField('GoogleCloudAiplatformV1beta1BigQuerySource', 1)
+  csvReadInstances = _messages.MessageField('GoogleCloudAiplatformV1beta1CsvSource', 2)
+  destination = _messages.MessageField('GoogleCloudAiplatformV1beta1FeatureValueDestination', 3)
+  entityTypeSpecs = _messages.MessageField('GoogleCloudAiplatformV1beta1QueryFeatureValuesRequestEntityTypeSpec', 4, repeated=True)
+  passThroughFields = _messages.MessageField('GoogleCloudAiplatformV1beta1QueryFeatureValuesRequestPassThroughField', 5, repeated=True)
+
+
+class GoogleCloudAiplatformV1beta1QueryFeatureValuesRequestEntityTypeSpec(_messages.Message):
+  r"""Selects Features of an EntityType to read values of and specifies read
+  settings.
+
+  Fields:
+    entityType: Required. The resource name (EntityType) from which to query
+      Feature values. Format: `projects/{project}/locations/{location}/feature
+      stores/{featurestore}/entityTypes/{entity_type}`
+    featureSelector: Required. Selectors choosing which Feature values to read
+      from the EntityType.
+    settings: The setting for each Feature in the query output.
+  """
+
+  entityType = _messages.StringField(1)
+  featureSelector = _messages.MessageField('GoogleCloudAiplatformV1beta1FeatureSelector', 2)
+  settings = _messages.MessageField('GoogleCloudAiplatformV1beta1DestinationFeatureSetting', 3, repeated=True)
+
+
+class GoogleCloudAiplatformV1beta1QueryFeatureValuesRequestPassThroughField(_messages.Message):
+  r"""Describe pass-through fields in read_instance source.
+
+  Fields:
+    fieldName: Required. The name of the field in the CSV header or the name
+      of the column in BigQuery table. The naming restriction is the same as
+      Feature.name.
+  """
+
+  fieldName = _messages.StringField(1)
+
+
+class GoogleCloudAiplatformV1beta1RawPredictRequest(_messages.Message):
+  r"""Request message for PredictionService.RawPredict.
+
+  Fields:
+    httpBody: The prediction input that supports HTTP headers and arbitrary
+      data payload. A DeployedModel may have an upper limit on the number of
+      instances it supports per request, and when it is exceeded the
+      prediction call errors in case of AutoML Models, or, in case of customer
+      created Models, the behaviour is as documented by that Model. The schema
+      of any single instance may be specified via Endpoint's DeployedModels'
+      Model's PredictSchemata's instance_schema_uri.
+  """
+
+  httpBody = _messages.MessageField('GoogleApiHttpBody', 1)
+
+
 class GoogleCloudAiplatformV1beta1ReadFeatureValuesRequest(_messages.Message):
   r"""Request message for FeaturestoreOnlineServingService.ReadFeatureValues.
 
@@ -27046,9 +27312,10 @@ class GoogleCloudAiplatformV1beta1SchemaTrainingjobDefinitionExportEvaluatedData
 
   Fields:
     destinationBigqueryUri: URI of desired destination BigQuery table.
-      Expected format: bq://:: If not specified, then results are exported to
-      the following auto-created BigQuery table:
-      :export_evaluated_examples__.evaluated_examples
+      Expected format: `bq://{project_id}:{dataset_id}:{table}` If not
+      specified, then results are exported to the following auto-created
+      BigQuery table: `{project_id}:export_evaluated_examples_{model_name}_{yy
+      yy_MM_dd'T'HH_mm_ss_SSS'Z'}.evaluated_examples`
     overrideExistingTable: If true and an export destination is specified,
       then the contents of the destination are overwritten. Otherwise, if the
       export destination already exists, then the export operation fails.
@@ -27518,7 +27785,8 @@ class GoogleCloudAiplatformV1beta1StudySpec(_messages.Message):
 
   Fields:
     algorithm: The search algorithm specified for the Study.
-    convexStopConfig: The automated early stopping using convex stopping rule.
+    convexStopConfig: Deprecated, use convex_automated_stopping_spec instead.
+      The automated early stopping using convex stopping rule.
     decayCurveStoppingSpec: The automated early stopping spec using decay
       curve rule.
     measurementSelectionType: Describe which measurement selection type will
@@ -28959,17 +29227,38 @@ class GoogleCloudAiplatformV1beta1WorkerPoolSpec(_messages.Message):
   replicaCount = _messages.IntegerField(5)
 
 
+class GoogleCloudAiplatformV1beta1WriteTensorboardExperimentDataRequest(_messages.Message):
+  r"""Request message for TensorboardService.WriteTensorboardExperimentData.
+
+  Fields:
+    writeRunDataRequests: Required. Requests containing per-run
+      TensorboardTimeSeries data to write.
+  """
+
+  writeRunDataRequests = _messages.MessageField('GoogleCloudAiplatformV1beta1WriteTensorboardRunDataRequest', 1, repeated=True)
+
+
+class GoogleCloudAiplatformV1beta1WriteTensorboardExperimentDataResponse(_messages.Message):
+  r"""Response message for TensorboardService.WriteTensorboardExperimentData.
+  """
+
+
+
 class GoogleCloudAiplatformV1beta1WriteTensorboardRunDataRequest(_messages.Message):
   r"""Request message for TensorboardService.WriteTensorboardRunData.
 
   Fields:
+    tensorboardRun: Required. The resource name of the TensorboardRun to write
+      data to. Format: `projects/{project}/locations/{location}/tensorboards/{
+      tensorboard}/experiments/{experiment}/runs/{run}`
     timeSeriesData: Required. The TensorboardTimeSeries data to write. Values
       with in a time series are indexed by their step value. Repeated writes
       to the same step will overwrite the existing value for that step. The
       upper limit of data points per write request is 5000.
   """
 
-  timeSeriesData = _messages.MessageField('GoogleCloudAiplatformV1beta1TimeSeriesData', 1, repeated=True)
+  tensorboardRun = _messages.StringField(1)
+  timeSeriesData = _messages.MessageField('GoogleCloudAiplatformV1beta1TimeSeriesData', 2, repeated=True)
 
 
 class GoogleCloudAiplatformV1beta1WriteTensorboardRunDataResponse(_messages.Message):

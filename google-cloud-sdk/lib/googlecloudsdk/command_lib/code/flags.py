@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util.args import map_util
 from googlecloudsdk.core import exceptions
 import six
@@ -77,15 +78,6 @@ class BuilderFlags(MutuallyExclusiveGroupDef):
         '--dockerfile',
         default='Dockerfile',
         help='Dockerfile for the service image.')
-
-  def AddAppengine(self):
-    self._AddFlag(
-        '--appengine',
-        action='store_true',
-        default=False,
-        help='Build with a Cloud Native Computing Foundation Buildpack builder '
-        'selected from gcr.io/gae-runtimes/buildpacks, according to the App '
-        'Engine runtime specified in app.yaml.')
 
   def AddBuilder(self):
     self._AddFlag(
@@ -200,7 +192,6 @@ class CommonFlags(FlagDefs):
         'service_config',
         metavar='SERVICE_CONFIG',
         nargs='?',
-        type=arg_parsers.YAMLFileContents(),
         help=(
             'service.yaml filename override. Defaults to the first file '
             'matching ```*service.dev.yaml``` then ```*service.yaml```, if any '
@@ -231,7 +222,13 @@ class CommonFlags(FlagDefs):
   def BuildersGroup(self):
     return self._GetGroup(BuilderFlags)
 
-  def AddBetaFlags(self):
+  def AddAlphaAndBetaFlags(self, release_track):
+    self._AddBetaFlags()
+
+    if release_track == base.ReleaseTrack.ALPHA:
+      self._AddAlphaFlags()
+
+  def _AddBetaFlags(self):
     """Set up flags that are for alpha and beta tracks."""
     self.BuildersGroup().AddDockerfile()
     self.AddSource()
@@ -240,7 +237,7 @@ class CommonFlags(FlagDefs):
     self.CredentialsGroup().AddApplicationDefaultCredential()
     self.AddReadinessProbe()
 
-  def AddAlphaFlags(self):
+  def _AddAlphaFlags(self):
     """Set up flags that are for alpha track only."""
     self.AddServiceYamlPositionalArg()
     self.AddCloudsqlInstances()
@@ -248,7 +245,6 @@ class CommonFlags(FlagDefs):
     self.AddImage()
     self.AddMemory()
     self.AddCpu()
-    self.BuildersGroup().AddAppengine()
     self.BuildersGroup().AddBuilder()
     self.EnvVarsGroup().AddEnvVars()
     self.EnvVarsGroup().AddEnvVarsFile()

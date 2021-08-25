@@ -639,7 +639,7 @@ class IPAllocationPolicy(_messages.Message):
       `use_ip_aliases` is true. Set to blank to have GKE choose a range with
       the default size. Set to /netmask (e.g. `/14`) to have GKE choose a
       range with a specific netmask. Set to a
-      [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+      [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
       notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
       `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific
       range to use. Specify `cluster_secondary_range_name` or
@@ -657,7 +657,7 @@ class IPAllocationPolicy(_messages.Message):
       `use_ip_aliases` is true. Set to blank to have GKE choose a range with
       the default size. Set to /netmask (e.g. `/14`) to have GKE choose a
       range with a specific netmask. Set to a
-      [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+      [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
       notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
       `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific
       range to use. Specify `services_secondary_range_name` or
@@ -780,6 +780,11 @@ class NodeConfig(_messages.Message):
       is 20GB. If unspecified, defaults to 100GB. Cannot be updated. This
       field is supported for Cloud Composer environments in versions
       composer-1.*.*-airflow-*.*.*.
+    enableIpMasqAgent: Optional. Deploys 'ip-masq-agent' daemon set in the GKE
+      cluster and defines nonMasqueradeCIDRs equals to pod IP range so IP
+      masquerading is used for all destination addresses, except between pods
+      traffic. See: https://cloud.google.com/kubernetes-engine/docs/how-to/ip-
+      masquerade-agent
     ipAllocationPolicy: Optional. The IPAllocationPolicy fields for the GKE
       cluster.
     location: Optional. The Compute Engine [zone](/compute/docs/regions-zones)
@@ -857,15 +862,16 @@ class NodeConfig(_messages.Message):
   """
 
   diskSizeGb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 2)
-  location = _messages.StringField(3)
-  machineType = _messages.StringField(4)
-  maxPodsPerNode = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  network = _messages.StringField(6)
-  oauthScopes = _messages.StringField(7, repeated=True)
-  serviceAccount = _messages.StringField(8)
-  subnetwork = _messages.StringField(9)
-  tags = _messages.StringField(10, repeated=True)
+  enableIpMasqAgent = _messages.BooleanField(2)
+  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 3)
+  location = _messages.StringField(4)
+  machineType = _messages.StringField(5)
+  maxPodsPerNode = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  network = _messages.StringField(7)
+  oauthScopes = _messages.StringField(8, repeated=True)
+  serviceAccount = _messages.StringField(9)
+  subnetwork = _messages.StringField(10)
+  tags = _messages.StringField(11, repeated=True)
 
 
 class Operation(_messages.Message):
@@ -1080,6 +1086,10 @@ class PrivateEnvironmentConfig(_messages.Message):
       environment is created. If this field is set to true,
       `IPAllocationPolicy.use_ip_aliases` must be set to true for Cloud
       Composer environments in versions composer-1.*.*-airflow-*.*.*.
+    enablePrivatelyUsedPublicIps: Optional. When enabled, IPs from public
+      (non-RFC1918) ranges can be used for
+      `IPAllocationPolicy.cluster_ipv4_cidr_block` and
+      `IPAllocationPolicy.service_ipv4_cidr_block`.
     privateClusterConfig: Optional. Configuration for the private GKE cluster
       for a Private IP Cloud Composer environment.
     webServerIpv4CidrBlock: Optional. The CIDR block from which IP range for
@@ -1096,9 +1106,10 @@ class PrivateEnvironmentConfig(_messages.Message):
   cloudComposerNetworkIpv4ReservedRange = _messages.StringField(2)
   cloudSqlIpv4CidrBlock = _messages.StringField(3)
   enablePrivateEnvironment = _messages.BooleanField(4)
-  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 5)
-  webServerIpv4CidrBlock = _messages.StringField(6)
-  webServerIpv4ReservedRange = _messages.StringField(7)
+  enablePrivatelyUsedPublicIps = _messages.BooleanField(5)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 6)
+  webServerIpv4CidrBlock = _messages.StringField(7)
+  webServerIpv4ReservedRange = _messages.StringField(8)
 
 
 class RestartWebServerRequest(_messages.Message):
