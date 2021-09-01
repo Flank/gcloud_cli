@@ -418,6 +418,8 @@ lib/googlecloudsdk/api_lib/domains/operations.py
 lib/googlecloudsdk/api_lib/domains/registrations.py
 lib/googlecloudsdk/api_lib/edge/__init__.py
 lib/googlecloudsdk/api_lib/edge/util.py
+lib/googlecloudsdk/api_lib/edgecontainer/__init__.py
+lib/googlecloudsdk/api_lib/edgecontainer/util.py
 lib/googlecloudsdk/api_lib/edgeml/__init__.py
 lib/googlecloudsdk/api_lib/edgeml/edgeml.py
 lib/googlecloudsdk/api_lib/edgeml/operations.py
@@ -1274,6 +1276,7 @@ lib/googlecloudsdk/command_lib/container/gkemulticloud/__init__.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/constants.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/endpoint_util.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/flags.py
+lib/googlecloudsdk/command_lib/container/gkemulticloud/kubeconfig.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/operations.py
 lib/googlecloudsdk/command_lib/container/hub/__init__.py
 lib/googlecloudsdk/command_lib/container/hub/agent_util.py
@@ -1445,6 +1448,7 @@ lib/googlecloudsdk/command_lib/edge_cache/flags.yaml
 lib/googlecloudsdk/command_lib/edge_cache/resources.yaml
 lib/googlecloudsdk/command_lib/edge_cache/util.py
 lib/googlecloudsdk/command_lib/edge_container/__init__.py
+lib/googlecloudsdk/command_lib/edge_container/admin_users.py
 lib/googlecloudsdk/command_lib/edge_container/hub.py
 lib/googlecloudsdk/command_lib/edge_container/locations.py
 lib/googlecloudsdk/command_lib/edge_container/resources.yaml
@@ -1718,6 +1722,7 @@ lib/googlecloudsdk/command_lib/meta/__init__.py
 lib/googlecloudsdk/command_lib/meta/apis/__init__.py
 lib/googlecloudsdk/command_lib/meta/apis/flags.py
 lib/googlecloudsdk/command_lib/meta/cache_util.py
+lib/googlecloudsdk/command_lib/meta/command_templates/config_export_template.tpl
 lib/googlecloudsdk/command_lib/meta/command_templates/create_template.tpl
 lib/googlecloudsdk/command_lib/meta/command_templates/delete_template.tpl
 lib/googlecloudsdk/command_lib/meta/command_templates/describe_template.tpl
@@ -1727,9 +1732,12 @@ lib/googlecloudsdk/command_lib/meta/command_templates/set_iam_policy_template.tp
 lib/googlecloudsdk/command_lib/meta/debug.py
 lib/googlecloudsdk/command_lib/meta/generate_cli_trees.py
 lib/googlecloudsdk/command_lib/meta/generate_command.py
+lib/googlecloudsdk/command_lib/meta/generate_config_command.py
 lib/googlecloudsdk/command_lib/meta/help_util.py
 lib/googlecloudsdk/command_lib/meta/list_cli_trees.py
 lib/googlecloudsdk/command_lib/meta/regen.py
+lib/googlecloudsdk/command_lib/meta/surface_spec_templates/config_export_template.tpl
+lib/googlecloudsdk/command_lib/meta/test_templates/config_export_template.tpl
 lib/googlecloudsdk/command_lib/meta/test_templates/scenario_unit_test_template.tpl
 lib/googlecloudsdk/command_lib/metastore/__init__.py
 lib/googlecloudsdk/command_lib/metastore/delete_util.py
@@ -2123,10 +2131,12 @@ lib/googlecloudsdk/command_lib/util/resource_map/declarative/__init__.py
 lib/googlecloudsdk/command_lib/util/resource_map/declarative/declarative_map.py
 lib/googlecloudsdk/command_lib/util/resource_map/declarative/declarative_map.yaml
 lib/googlecloudsdk/command_lib/util/resource_map/declarative/declarative_map_schema.yaml
+lib/googlecloudsdk/command_lib/util/resource_map/declarative/declarative_map_update_util.py
 lib/googlecloudsdk/command_lib/util/resource_map/declarative/resource_name_translator.py
 lib/googlecloudsdk/command_lib/util/resource_map/resource_map.py
 lib/googlecloudsdk/command_lib/util/resource_map/resource_map.yaml
 lib/googlecloudsdk/command_lib/util/resource_map/resource_map_schema.yaml
+lib/googlecloudsdk/command_lib/util/resource_map/resource_map_update_util.py
 lib/googlecloudsdk/command_lib/util/ssh/__init__.py
 lib/googlecloudsdk/command_lib/util/ssh/containers.py
 lib/googlecloudsdk/command_lib/util/ssh/ip.py
@@ -2190,8 +2200,10 @@ lib/googlecloudsdk/core/credentials/gce_cache.py
 lib/googlecloudsdk/core/credentials/gce_read.py
 lib/googlecloudsdk/core/credentials/google_auth_credentials.py
 lib/googlecloudsdk/core/credentials/http.py
+lib/googlecloudsdk/core/credentials/introspect.py
 lib/googlecloudsdk/core/credentials/oauth2_landing.html
 lib/googlecloudsdk/core/credentials/oauth2_landing_error.html
+lib/googlecloudsdk/core/credentials/p12_service_account.py
 lib/googlecloudsdk/core/credentials/requests.py
 lib/googlecloudsdk/core/credentials/store.py
 lib/googlecloudsdk/core/credentials/transport.py
@@ -2614,6 +2626,13 @@ lib/googlecloudsdk/schemas/compute/v1/UrlMapTestHeader.yaml
 lib/googlecloudsdk/schemas/compute/v1/UrlRewrite.yaml
 lib/googlecloudsdk/schemas/compute/v1/WeightedBackendService.yaml
 lib/googlecloudsdk/schemas/gkebackup/v1alpha1/SubstitutionRules.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/CertificateProviderInstance.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/GoogleCloudNetworksecurityV1CertificateProvider.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/GoogleCloudNetworksecurityV1GrpcEndpoint.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/LabelsValue.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/MTLSPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/ServerTlsPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/ValidationCA.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/AuthorizationPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/CertificateProvider.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/CertificateProviderInstance.yaml
@@ -3023,8 +3042,13 @@ lib/googlecloudsdk/third_party/apis/cloudfunctions/v2alpha/__init__.py
 lib/googlecloudsdk/third_party/apis/cloudfunctions/v2alpha/cloudfunctions_v2alpha_client.py
 lib/googlecloudsdk/third_party/apis/cloudfunctions/v2alpha/cloudfunctions_v2alpha_messages.py
 lib/googlecloudsdk/third_party/apis/cloudfunctions/v2alpha/resources.py
+lib/googlecloudsdk/third_party/apis/cloudfunctions/v2beta/__init__.py
+lib/googlecloudsdk/third_party/apis/cloudfunctions/v2beta/cloudfunctions_v2beta_client.py
+lib/googlecloudsdk/third_party/apis/cloudfunctions/v2beta/cloudfunctions_v2beta_messages.py
+lib/googlecloudsdk/third_party/apis/cloudfunctions/v2beta/resources.py
 lib/googlecloudsdk/third_party/apis/cloudfunctions_v1.json
 lib/googlecloudsdk/third_party/apis/cloudfunctions_v2alpha.json
+lib/googlecloudsdk/third_party/apis/cloudfunctions_v2beta.json
 lib/googlecloudsdk/third_party/apis/cloudidentity/__init__.py
 lib/googlecloudsdk/third_party/apis/cloudidentity/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/cloudidentity/v1/cloudidentity_v1_client.py
@@ -3462,10 +3486,15 @@ lib/googlecloudsdk/third_party/apis/genomics_v1.json
 lib/googlecloudsdk/third_party/apis/genomics_v1alpha2.json
 lib/googlecloudsdk/third_party/apis/genomics_v2alpha1.json
 lib/googlecloudsdk/third_party/apis/gkebackup/__init__.py
+lib/googlecloudsdk/third_party/apis/gkebackup/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/gkebackup/v1/gkebackup_v1_client.py
+lib/googlecloudsdk/third_party/apis/gkebackup/v1/gkebackup_v1_messages.py
+lib/googlecloudsdk/third_party/apis/gkebackup/v1/resources.py
 lib/googlecloudsdk/third_party/apis/gkebackup/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/gkebackup/v1alpha1/gkebackup_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/gkebackup/v1alpha1/gkebackup_v1alpha1_messages.py
 lib/googlecloudsdk/third_party/apis/gkebackup/v1alpha1/resources.py
+lib/googlecloudsdk/third_party/apis/gkebackup_v1.json
 lib/googlecloudsdk/third_party/apis/gkebackup_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/gkehub/__init__.py
 lib/googlecloudsdk/third_party/apis/gkehub/v1/__init__.py
@@ -5912,6 +5941,7 @@ lib/surface/container/aws/clusters/__init__.py
 lib/surface/container/aws/clusters/create.py
 lib/surface/container/aws/clusters/delete.py
 lib/surface/container/aws/clusters/describe.py
+lib/surface/container/aws/clusters/get_credentials.py
 lib/surface/container/aws/clusters/get_kubeconfig.py
 lib/surface/container/aws/clusters/list.py
 lib/surface/container/aws/clusters/print_access_token.py
@@ -5936,6 +5966,7 @@ lib/surface/container/azure/clusters/__init__.py
 lib/surface/container/azure/clusters/create.py
 lib/surface/container/azure/clusters/delete.py
 lib/surface/container/azure/clusters/describe.py
+lib/surface/container/azure/clusters/get_credentials.py
 lib/surface/container/azure/clusters/get_kubeconfig.py
 lib/surface/container/azure/clusters/list.py
 lib/surface/container/azure/clusters/print_access_token.py
@@ -7461,6 +7492,7 @@ lib/surface/meta/cli_trees/update.py
 lib/surface/meta/debug.py
 lib/surface/meta/gcloud_command_vocabulary.txt
 lib/surface/meta/generate_command.py
+lib/surface/meta/generate_config_commands.py
 lib/surface/meta/generate_help_docs.py
 lib/surface/meta/lint.py
 lib/surface/meta/list_commands.py
@@ -7468,6 +7500,8 @@ lib/surface/meta/list_files_for_upload.py
 lib/surface/meta/list_from_json.py
 lib/surface/meta/list_gcloud.py
 lib/surface/meta/render_markdown.py
+lib/surface/meta/resource_maps/__init__.py
+lib/surface/meta/resource_maps/update_resource_map.py
 lib/surface/meta/resources/__init__.py
 lib/surface/meta/resources/generate.py
 lib/surface/meta/resources/parse.py
@@ -8386,6 +8420,11 @@ lib/surface/storage/buckets/create.py
 lib/surface/storage/buckets/delete.py
 lib/surface/storage/buckets/describe.py
 lib/surface/storage/buckets/list.yaml
+lib/surface/storage/buckets/notifications/__init__.py
+lib/surface/storage/buckets/notifications/create.py
+lib/surface/storage/buckets/notifications/delete.py
+lib/surface/storage/buckets/notifications/describe.py
+lib/surface/storage/buckets/notifications/list.py
 lib/surface/storage/buckets/update.py
 lib/surface/storage/cat.py
 lib/surface/storage/copy.py
@@ -8408,6 +8447,7 @@ lib/surface/storage/objects/rewrite.py
 lib/surface/storage/objects/update.py
 lib/surface/storage/rm.py
 lib/surface/storage/rsync.py
+lib/surface/storage/service_agent.py
 lib/surface/storage/sign_url.py
 lib/surface/survey.py
 lib/surface/tasks/__init__.py
@@ -8583,8 +8623,6 @@ lib/surface/workspace_add_ons/deployments/list.yaml
 lib/surface/workspace_add_ons/deployments/replace.yaml
 lib/surface/workspace_add_ons/deployments/uninstall.yaml
 lib/surface/workspace_add_ons/get_authorization.yaml
-lib/tools/__init__.py
-lib/tools/regen_gapic_deps/README.md
 path.bash.inc
 path.fish.inc
 path.zsh.inc
