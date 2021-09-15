@@ -378,13 +378,16 @@ class _BaseInstances(object):
     if _IsBetaOrNewer(release_track):
       settings.userLabels = labels_util.ParseCreateArgs(
           args, sql_messages.Settings.UserLabelsValue)
-
-    # ALPHA args.
-    if _IsAlpha(release_track):
       if args.allocated_ip_range_name:
         if not settings.ipConfiguration:
           settings.ipConfiguration = sql_messages.IpConfiguration()
         settings.ipConfiguration.allocatedIpRange = args.allocated_ip_range_name
+
+    # ALPHA args.
+    if _IsAlpha(release_track):
+      if args.audit_bucket_path is not None:
+        settings.sqlServerAuditConfig = (
+            reducers.SqlServerAuditConfig(sql_messages, args.audit_bucket_path))
 
     return settings
 
@@ -488,6 +491,12 @@ class _BaseInstances(object):
                                         instance.settings.userLabels)
       if labels_update.needs_update:
         settings.userLabels = labels_update.labels
+
+    # ALPHA args.
+    if _IsAlpha(release_track):
+      if args.audit_bucket_path is not None:
+        settings.sqlServerAuditConfig = (
+            reducers.SqlServerAuditConfig(sql_messages, args.audit_bucket_path))
 
     return settings
 

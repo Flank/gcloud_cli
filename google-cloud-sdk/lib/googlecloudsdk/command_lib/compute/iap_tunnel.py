@@ -37,6 +37,7 @@ from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import http_proxy
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import transport
 from googlecloudsdk.core.credentials import creds
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import files
@@ -44,6 +45,9 @@ from googlecloudsdk.core.util import platforms
 import portpicker
 import six
 from six.moves import queue
+
+
+READ_FROM_STDIN_TIMEOUT_SECS = 3
 
 
 class LocalPortUnavailableError(exceptions.Error):
@@ -355,7 +359,6 @@ class _StdinSocket(object):
 
       new_thread = threading.Thread(target=
                                     self._ReadFromStdinAndEnqueueMessageUnix)
-      new_thread.daemon = True
       new_thread.start()
 
   def send(self, data):  # pylint: disable=invalid-name
@@ -430,6 +433,8 @@ class _StdinSocket(object):
       raise socket.error(errno.EIO, 'stdin ReadFile failed')
     return buf.raw[:number_of_bytes_read.value]
 
+  # TODO(b/198682299): This method is not needed anymore, we should refactor
+  # it out.
   def _ReadFromStdinAndEnqueueMessageUnix(self):
     """Reads data from stdin on Unix, blocking on the first byte.
 
@@ -439,9 +444,13 @@ class _StdinSocket(object):
 
     try:
       while not self._stdin_closed:
-        # On Unix, the way to quickly read bytes without unnecessary blocking
-        # is to make stdin non-blocking. To ensure at least 1 byte is
-        # received, we read the first byte blocking.
+
+        # We have a timeout here because of b/197960494
+        stdin_ready = select.select([sys.stdin], (), (),
+                                    READ_FROM_STDIN_TIMEOUT_SECS)
+        if not stdin_ready[0]:
+          continue
+
         if six.PY2:
           first_byte = sys.stdin.read(1)
         else:
@@ -451,6 +460,8 @@ class _StdinSocket(object):
         if first_byte == b'':  # pylint: disable=g-explicit-bool-comparison
           raise _StdinSocket._EOFError
 
+        # On Unix, the way to quickly read bytes without unnecessary blocking
+        # is to make stdin non-blocking.
         complete_msg = first_byte + self._ReadUnixNonBlocking(self._bufsize - 1)
         msg = self._StdinSocketMessage(self._DataMessageType, complete_msg)
         self._message_queue.put(msg)
@@ -582,13 +593,14 @@ class _BaseIapTunnelHelper(object):
     self._ip = ip
     self._port = port
 
-  def _InitiateWebSocketConnection(self, local_conn, get_access_token_callback):
+  def _InitiateWebSocketConnection(self, local_conn, get_access_token_callback,
+                                   user_agent):
     tunnel_target = self._GetTunnelTargetInfo()
     new_websocket = iap_tunnel_websocket.IapTunnelWebSocket(
         tunnel_target, get_access_token_callback,
         functools.partial(_SendLocalDataCallback, local_conn),
         functools.partial(_CloseLocalConnectionCallback, local_conn),
-        ignore_certs=self._ignore_certs)
+        user_agent, ignore_certs=self._ignore_certs)
     new_websocket.InitiateConnection()
     return new_websocket
 
@@ -607,21 +619,22 @@ class _BaseIapTunnelHelper(object):
                                      network=self._network,
                                      ip=self._ip)
 
-  def _RunReceiveLocalData(self, conn, socket_address):
+  def _RunReceiveLocalData(self, conn, socket_address, user_agent):
     """Receive data from provided local connection and send over WebSocket.
 
     Args:
       conn: A socket or _StdinSocket representing the local connection.
       socket_address: A verbose loggable string describing where conn is
         connected to.
+      user_agent: The user_agent of this connection
     """
-
     websocket_conn = None
     try:
       websocket_conn = self._InitiateWebSocketConnection(
           conn,
           functools.partial(_GetAccessTokenCallback,
-                            store.LoadIfEnabled(use_google_auth=True)))
+                            store.LoadIfEnabled(use_google_auth=True)),
+          user_agent)
       while not self._shutdown:
         data = conn.recv(utils.SUBPROTOCOL_MAX_DATA_FRAME_SIZE)
         if not data:
@@ -693,10 +706,12 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
 
   def _TestConnection(self):
     log.status.Print('Testing if tunnel connection works.')
+    user_agent = transport.MakeUserAgentString()
     websocket_conn = self._InitiateWebSocketConnection(
         None,
         functools.partial(_GetAccessTokenCallback,
-                          store.LoadIfEnabled(use_google_auth=True)))
+                          store.LoadIfEnabled(use_google_auth=True)),
+        user_agent)
     websocket_conn.Close()
 
   def _AcceptNewConnection(self):
@@ -767,7 +782,8 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
 
   def _HandleNewConnection(self, conn, socket_address):
     try:
-      self._RunReceiveLocalData(conn, repr(socket_address))
+      user_agent = transport.MakeUserAgentString()
+      self._RunReceiveLocalData(conn, repr(socket_address), user_agent)
     except EnvironmentError as e:
       log.info('Socket error [%s] while receiving from client.',
                six.text_type(e))
@@ -782,6 +798,12 @@ class IapTunnelStdinHelper(_BaseIapTunnelHelper):
     """Executes the tunneling of data."""
     try:
       with execution_utils.RaisesKeyboardInterrupt():
-        self._RunReceiveLocalData(_StdinSocket(), 'stdin')
+
+        # Fetching user agent before we start the read loop, because the agent
+        # fetch will call sys.stdin.isatty, which is blocking if there is a read
+        # waiting for data in the stdin. This only affects MacOs + python 2.7.
+        user_agent = transport.MakeUserAgentString()
+
+        self._RunReceiveLocalData(_StdinSocket(), 'stdin', user_agent)
     except KeyboardInterrupt:
       log.info('Keyboard interrupt received.')

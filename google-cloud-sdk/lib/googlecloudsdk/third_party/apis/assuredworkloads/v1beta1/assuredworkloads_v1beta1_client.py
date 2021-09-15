@@ -146,7 +146,7 @@ class AssuredworkloadsV1beta1(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error.
+      r"""Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error. In addition to assuredworkloads.workload.delete permission, the user should also have orgpolicy.policy.set permission on the deleted folder to remove Assured Workloads OrgPolicies.
 
       Args:
         request: (AssuredworkloadsOrganizationsLocationsWorkloadsDeleteRequest) input message
@@ -250,6 +250,33 @@ class AssuredworkloadsV1beta1(base_api.BaseApiClient):
         request_field='googleCloudAssuredworkloadsV1beta1Workload',
         request_type_name='AssuredworkloadsOrganizationsLocationsWorkloadsPatchRequest',
         response_type_name='GoogleCloudAssuredworkloadsV1beta1Workload',
+        supports_download=False,
+    )
+
+    def RestrictAllowedServices(self, request, global_params=None):
+      r"""Restrict the list of services allowed in the Workload environment. The current list of allowed services can be found at https://cloud.google.com/assured-workloads/docs/supported-products In addition to assuredworkloads.workload.create permission, the user should also have orgpolicy.policy.set permission on the folder resource to use this functionality.
+
+      Args:
+        request: (AssuredworkloadsOrganizationsLocationsWorkloadsRestrictAllowedServicesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAssuredworkloadsV1beta1RestrictAllowedServicesResponse) The response message.
+      """
+      config = self.GetMethodConfig('RestrictAllowedServices')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    RestrictAllowedServices.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/workloads/{workloadsId}:restrictAllowedServices',
+        http_method='POST',
+        method_id='assuredworkloads.organizations.locations.workloads.restrictAllowedServices',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}:restrictAllowedServices',
+        request_field='googleCloudAssuredworkloadsV1beta1RestrictAllowedServicesRequest',
+        request_type_name='AssuredworkloadsOrganizationsLocationsWorkloadsRestrictAllowedServicesRequest',
+        response_type_name='GoogleCloudAssuredworkloadsV1beta1RestrictAllowedServicesResponse',
         supports_download=False,
     )
 

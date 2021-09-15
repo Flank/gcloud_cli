@@ -288,6 +288,7 @@ def ParseUpdateOptionsBase(args, locations):
       disable_database_encryption=args.disable_database_encryption,
       enable_vertical_pod_autoscaling=args.enable_vertical_pod_autoscaling,
       enable_autoprovisioning=args.enable_autoprovisioning,
+      enable_mesh_certificates=args.enable_mesh_certificates,
       autoprovisioning_config_file=args.autoprovisioning_config_file,
       autoprovisioning_service_account=args.autoprovisioning_service_account,
       autoprovisioning_scopes=args.autoprovisioning_scopes,
@@ -317,6 +318,18 @@ def ParseUpdateOptionsBase(args, locations):
     if pdcsi_disabled:
       console_io.PromptContinue(
           message='If the GCE Persistent Disk CSI Driver is disabled, then any '
+          'pods currently using PersistentVolumes owned by the driver '
+          'will fail to terminate. Any new pods that try to use those '
+          'PersistentVolumes will also fail to start.',
+          cancel_on_no=True)
+
+  if (args.disable_addons and
+      api_adapter.GCPFILESTORECSIDRIVER in args.disable_addons):
+    filestorecsi_disabled = args.disable_addons[
+        api_adapter.GCPFILESTORECSIDRIVER]
+    if filestorecsi_disabled:
+      console_io.PromptContinue(
+          message='If the GCP Filestore CSI Driver is disabled, then any '
           'pods currently using PersistentVolumes owned by the driver '
           'will fail to terminate. Any new pods that try to use those '
           'PersistentVolumes will also fail to start.',

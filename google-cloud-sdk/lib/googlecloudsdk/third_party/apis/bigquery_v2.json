@@ -4,7 +4,7 @@
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20210820",
+ "revision": "20210903",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -93,6 +93,16 @@
   }
  },
  "schemas": {
+  "AvroOptions": {
+   "id": "AvroOptions",
+   "type": "object",
+   "properties": {
+    "useAvroLogicalTypes": {
+     "type": "boolean",
+     "description": "[Optional] If set to true will enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER)."
+    }
+   }
+  },
   "BiEngineReason": {
    "id": "BiEngineReason",
    "type": "object",
@@ -436,6 +446,10 @@
     "datasetReference": {
      "$ref": "DatasetReference",
      "description": "[Required] A reference that identifies the dataset."
+    },
+    "defaultCollation": {
+     "type": "string",
+     "description": "[Output-only] The default collation of the dataset."
     },
     "defaultEncryptionConfiguration": {
      "$ref": "EncryptionConfiguration"
@@ -860,6 +874,10 @@
     "autodetect": {
      "type": "boolean",
      "description": "Try to detect schema and format options automatically. Any option specified explicitly will be honored."
+    },
+    "avroOptions": {
+     "$ref": "AvroOptions",
+     "description": "Additional properties to set if sourceFormat is set to Avro."
     },
     "bigtableOptions": {
      "$ref": "BigtableOptions",
@@ -2538,6 +2556,10 @@
      "type": "string",
      "description": "[Output-only] The time when this table was created, in milliseconds since the epoch.",
      "format": "int64"
+    },
+    "defaultCollation": {
+     "type": "string",
+     "description": "[Output-only] The default collation of the table."
     },
     "description": {
      "type": "string",

@@ -15,6 +15,18 @@ from apitools.base.py import extra_types
 package = 'bigquery'
 
 
+class AvroOptions(_messages.Message):
+  r"""A AvroOptions object.
+
+  Fields:
+    useAvroLogicalTypes: [Optional] If set to true will enable interpreting
+      logical types into their corresponding types (ie. TIMESTAMP), instead of
+      only using their raw types (ie. INTEGER).
+  """
+
+  useAvroLogicalTypes = _messages.BooleanField(1)
+
+
 class BiEngineReason(_messages.Message):
   r"""A BiEngineReason object.
 
@@ -757,6 +769,7 @@ class Dataset(_messages.Message):
     creationTime: [Output-only] The time when this dataset was created, in
       milliseconds since the epoch.
     datasetReference: [Required] A reference that identifies the dataset.
+    defaultCollation: [Output-only] The default collation of the dataset.
     defaultEncryptionConfiguration: A EncryptionConfiguration attribute.
     defaultPartitionExpirationMs: [Optional] The default partition expiration
       for all partitioned tables in the dataset, in milliseconds. Once this
@@ -890,20 +903,21 @@ class Dataset(_messages.Message):
   access = _messages.MessageField('AccessValueListEntry', 1, repeated=True)
   creationTime = _messages.IntegerField(2)
   datasetReference = _messages.MessageField('DatasetReference', 3)
-  defaultEncryptionConfiguration = _messages.MessageField('EncryptionConfiguration', 4)
-  defaultPartitionExpirationMs = _messages.IntegerField(5)
-  defaultTableExpirationMs = _messages.IntegerField(6)
-  description = _messages.StringField(7)
-  etag = _messages.StringField(8)
-  friendlyName = _messages.StringField(9)
-  id = _messages.StringField(10)
-  isCaseInsensitive = _messages.BooleanField(11)
-  kind = _messages.StringField(12, default='bigquery#dataset')
-  labels = _messages.MessageField('LabelsValue', 13)
-  lastModifiedTime = _messages.IntegerField(14)
-  location = _messages.StringField(15)
-  satisfiesPZS = _messages.BooleanField(16)
-  selfLink = _messages.StringField(17)
+  defaultCollation = _messages.StringField(4)
+  defaultEncryptionConfiguration = _messages.MessageField('EncryptionConfiguration', 5)
+  defaultPartitionExpirationMs = _messages.IntegerField(6)
+  defaultTableExpirationMs = _messages.IntegerField(7)
+  description = _messages.StringField(8)
+  etag = _messages.StringField(9)
+  friendlyName = _messages.StringField(10)
+  id = _messages.StringField(11)
+  isCaseInsensitive = _messages.BooleanField(12)
+  kind = _messages.StringField(13, default='bigquery#dataset')
+  labels = _messages.MessageField('LabelsValue', 14)
+  lastModifiedTime = _messages.IntegerField(15)
+  location = _messages.StringField(16)
+  satisfiesPZS = _messages.BooleanField(17)
+  selfLink = _messages.StringField(18)
 
 
 class DatasetAccessEntry(_messages.Message):
@@ -1223,6 +1237,7 @@ class ExternalDataConfiguration(_messages.Message):
   Fields:
     autodetect: Try to detect schema and format options automatically. Any
       option specified explicitly will be honored.
+    avroOptions: Additional properties to set if sourceFormat is set to Avro.
     bigtableOptions: [Optional] Additional options if sourceFormat is set to
       BIGTABLE.
     compression: [Optional] The compression type of the data source. Possible
@@ -1291,19 +1306,20 @@ class ExternalDataConfiguration(_messages.Message):
   """
 
   autodetect = _messages.BooleanField(1)
-  bigtableOptions = _messages.MessageField('BigtableOptions', 2)
-  compression = _messages.StringField(3)
-  connectionId = _messages.StringField(4)
-  csvOptions = _messages.MessageField('CsvOptions', 5)
-  decimalTargetTypes = _messages.StringField(6, repeated=True)
-  googleSheetsOptions = _messages.MessageField('GoogleSheetsOptions', 7)
-  hivePartitioningOptions = _messages.MessageField('HivePartitioningOptions', 8)
-  ignoreUnknownValues = _messages.BooleanField(9)
-  maxBadRecords = _messages.IntegerField(10, variant=_messages.Variant.INT32)
-  parquetOptions = _messages.MessageField('ParquetOptions', 11)
-  schema = _messages.MessageField('TableSchema', 12)
-  sourceFormat = _messages.StringField(13)
-  sourceUris = _messages.StringField(14, repeated=True)
+  avroOptions = _messages.MessageField('AvroOptions', 2)
+  bigtableOptions = _messages.MessageField('BigtableOptions', 3)
+  compression = _messages.StringField(4)
+  connectionId = _messages.StringField(5)
+  csvOptions = _messages.MessageField('CsvOptions', 6)
+  decimalTargetTypes = _messages.StringField(7, repeated=True)
+  googleSheetsOptions = _messages.MessageField('GoogleSheetsOptions', 8)
+  hivePartitioningOptions = _messages.MessageField('HivePartitioningOptions', 9)
+  ignoreUnknownValues = _messages.BooleanField(10)
+  maxBadRecords = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  parquetOptions = _messages.MessageField('ParquetOptions', 12)
+  schema = _messages.MessageField('TableSchema', 13)
+  sourceFormat = _messages.StringField(14)
+  sourceUris = _messages.StringField(15, repeated=True)
 
 
 class GetQueryResultsResponse(_messages.Message):
@@ -2986,6 +3002,7 @@ class Table(_messages.Message):
       and subsequently clustered.
     creationTime: [Output-only] The time when this table was created, in
       milliseconds since the epoch.
+    defaultCollation: [Output-only] The default collation of the table.
     description: [Optional] A user-friendly description of this table.
     encryptionConfiguration: Custom encryption configuration (e.g., Cloud KMS
       keys).
@@ -3087,33 +3104,34 @@ class Table(_messages.Message):
 
   clustering = _messages.MessageField('Clustering', 1)
   creationTime = _messages.IntegerField(2)
-  description = _messages.StringField(3)
-  encryptionConfiguration = _messages.MessageField('EncryptionConfiguration', 4)
-  etag = _messages.StringField(5)
-  expirationTime = _messages.IntegerField(6)
-  externalDataConfiguration = _messages.MessageField('ExternalDataConfiguration', 7)
-  friendlyName = _messages.StringField(8)
-  id = _messages.StringField(9)
-  kind = _messages.StringField(10, default='bigquery#table')
-  labels = _messages.MessageField('LabelsValue', 11)
-  lastModifiedTime = _messages.IntegerField(12, variant=_messages.Variant.UINT64)
-  location = _messages.StringField(13)
-  materializedView = _messages.MessageField('MaterializedViewDefinition', 14)
-  model = _messages.MessageField('ModelDefinition', 15)
-  numBytes = _messages.IntegerField(16)
-  numLongTermBytes = _messages.IntegerField(17)
-  numPhysicalBytes = _messages.IntegerField(18)
-  numRows = _messages.IntegerField(19, variant=_messages.Variant.UINT64)
-  rangePartitioning = _messages.MessageField('RangePartitioning', 20)
-  requirePartitionFilter = _messages.BooleanField(21, default=False)
-  schema = _messages.MessageField('TableSchema', 22)
-  selfLink = _messages.StringField(23)
-  snapshotDefinition = _messages.MessageField('SnapshotDefinition', 24)
-  streamingBuffer = _messages.MessageField('Streamingbuffer', 25)
-  tableReference = _messages.MessageField('TableReference', 26)
-  timePartitioning = _messages.MessageField('TimePartitioning', 27)
-  type = _messages.StringField(28)
-  view = _messages.MessageField('ViewDefinition', 29)
+  defaultCollation = _messages.StringField(3)
+  description = _messages.StringField(4)
+  encryptionConfiguration = _messages.MessageField('EncryptionConfiguration', 5)
+  etag = _messages.StringField(6)
+  expirationTime = _messages.IntegerField(7)
+  externalDataConfiguration = _messages.MessageField('ExternalDataConfiguration', 8)
+  friendlyName = _messages.StringField(9)
+  id = _messages.StringField(10)
+  kind = _messages.StringField(11, default='bigquery#table')
+  labels = _messages.MessageField('LabelsValue', 12)
+  lastModifiedTime = _messages.IntegerField(13, variant=_messages.Variant.UINT64)
+  location = _messages.StringField(14)
+  materializedView = _messages.MessageField('MaterializedViewDefinition', 15)
+  model = _messages.MessageField('ModelDefinition', 16)
+  numBytes = _messages.IntegerField(17)
+  numLongTermBytes = _messages.IntegerField(18)
+  numPhysicalBytes = _messages.IntegerField(19)
+  numRows = _messages.IntegerField(20, variant=_messages.Variant.UINT64)
+  rangePartitioning = _messages.MessageField('RangePartitioning', 21)
+  requirePartitionFilter = _messages.BooleanField(22, default=False)
+  schema = _messages.MessageField('TableSchema', 23)
+  selfLink = _messages.StringField(24)
+  snapshotDefinition = _messages.MessageField('SnapshotDefinition', 25)
+  streamingBuffer = _messages.MessageField('Streamingbuffer', 26)
+  tableReference = _messages.MessageField('TableReference', 27)
+  timePartitioning = _messages.MessageField('TimePartitioning', 28)
+  type = _messages.StringField(29)
+  view = _messages.MessageField('ViewDefinition', 30)
 
 
 class TableCell(_messages.Message):

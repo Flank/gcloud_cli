@@ -392,6 +392,26 @@ class ApigeeOrganizationsApisKeyvaluemapsDeleteRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
+class ApigeeOrganizationsApisKeyvaluemapsEntriesListRequest(_messages.Message):
+  r"""A ApigeeOrganizationsApisKeyvaluemapsEntriesListRequest object.
+
+  Fields:
+    pageSize: Optional. Maximum number of key value entries to return. If
+      unspecified, at most 100 entries will be returned.
+    pageToken: Optional. Page token, a KeyValueEntry returned from a previous
+      call, that we can use to retrieve the next page.
+    parent: Required. The scope as indicated by the URI in which to list key
+      value maps. Must be one of the form
+      `organizations/{organization}/apis/{api}/keyvaluemaps/{keyvaluemap}`. `o
+      rganizations/{organization}/environments/{environment}/keyvaluemaps/{key
+      valuemap}` `organizations/{organization}/keyvaluemaps/{keyvaluemap}`.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
 class ApigeeOrganizationsApisListRequest(_messages.Message):
   r"""A ApigeeOrganizationsApisListRequest object.
 
@@ -2043,6 +2063,26 @@ class ApigeeOrganizationsEnvironmentsKeyvaluemapsDeleteRequest(_messages.Message
   name = _messages.StringField(1, required=True)
 
 
+class ApigeeOrganizationsEnvironmentsKeyvaluemapsEntriesListRequest(_messages.Message):
+  r"""A ApigeeOrganizationsEnvironmentsKeyvaluemapsEntriesListRequest object.
+
+  Fields:
+    pageSize: Optional. Maximum number of key value entries to return. If
+      unspecified, at most 100 entries will be returned.
+    pageToken: Optional. Page token, a KeyValueEntry returned from a previous
+      call, that we can use to retrieve the next page.
+    parent: Required. The scope as indicated by the URI in which to list key
+      value maps. Must be one of the form
+      `organizations/{organization}/apis/{api}/keyvaluemaps/{keyvaluemap}`. `o
+      rganizations/{organization}/environments/{environment}/keyvaluemaps/{key
+      valuemap}` `organizations/{organization}/keyvaluemaps/{keyvaluemap}`.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
 class ApigeeOrganizationsEnvironmentsOptimizedStatsGetRequest(_messages.Message):
   r"""A ApigeeOrganizationsEnvironmentsOptimizedStatsGetRequest object.
 
@@ -3245,6 +3285,26 @@ class ApigeeOrganizationsKeyvaluemapsDeleteRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class ApigeeOrganizationsKeyvaluemapsEntriesListRequest(_messages.Message):
+  r"""A ApigeeOrganizationsKeyvaluemapsEntriesListRequest object.
+
+  Fields:
+    pageSize: Optional. Maximum number of key value entries to return. If
+      unspecified, at most 100 entries will be returned.
+    pageToken: Optional. Page token, a KeyValueEntry returned from a previous
+      call, that we can use to retrieve the next page.
+    parent: Required. The scope as indicated by the URI in which to list key
+      value maps. Must be one of the form
+      `organizations/{organization}/apis/{api}/keyvaluemaps/{keyvaluemap}`. `o
+      rganizations/{organization}/environments/{environment}/keyvaluemaps/{key
+      valuemap}` `organizations/{organization}/keyvaluemaps/{keyvaluemap}`.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class ApigeeOrganizationsListRequest(_messages.Message):
@@ -5898,6 +5958,9 @@ class GoogleCloudApigeeV1Instance(_messages.Message):
       `SLASH_20` and defaults to `SLASH_16`. Evaluation organizations support
       only `SLASH_23`.
     port: Output only. Port number of the exposed Apigee endpoint.
+    runtimeVersion: Output only. Version of the runtime system running in the
+      instance. The runtime system is the set of components that serve the API
+      Proxy traffic in your Environments.
     state: Output only. State of the instance. Values other than `ACTIVE`
       means the resource is not ready to use.
   """
@@ -5956,7 +6019,8 @@ class GoogleCloudApigeeV1Instance(_messages.Message):
   nodeConfig = _messages.MessageField('GoogleCloudApigeeV1NodeConfig', 11)
   peeringCidrRange = _messages.EnumField('PeeringCidrRangeValueValuesEnum', 12)
   port = _messages.StringField(13)
-  state = _messages.EnumField('StateValueValuesEnum', 14)
+  runtimeVersion = _messages.StringField(14)
+  state = _messages.EnumField('StateValueValuesEnum', 15)
 
 
 class GoogleCloudApigeeV1InstanceAttachment(_messages.Message):
@@ -6057,16 +6121,34 @@ class GoogleCloudApigeeV1KeyAliasReference(_messages.Message):
   reference = _messages.StringField(2)
 
 
+class GoogleCloudApigeeV1KeyValueEntry(_messages.Message):
+  r"""Key value map pair, where the value represents the data associated with
+  the corresponding key.
+
+  Fields:
+    name: The name points to the resource URI which helps in identifying the
+      scope of the key value map entries.
+    value: Required. The data or the payload that is being retrieved and
+      associated with the unique key.
+  """
+
+  name = _messages.StringField(1)
+  value = _messages.StringField(2)
+
+
 class GoogleCloudApigeeV1KeyValueMap(_messages.Message):
   r"""A collection of key, value string pairs
 
   Fields:
     encrypted: Optional. If `true` entry values will be encrypted.
     name: Required. The id of the key value map.
+    resourceName: Output only. name refers to the resource URI on which the
+      key value map is based on.
   """
 
   encrypted = _messages.BooleanField(1)
   name = _messages.StringField(2)
+  resourceName = _messages.StringField(3)
 
 
 class GoogleCloudApigeeV1Keystore(_messages.Message):
@@ -6334,6 +6416,20 @@ class GoogleCloudApigeeV1ListInstancesResponse(_messages.Message):
   """
 
   instances = _messages.MessageField('GoogleCloudApigeeV1Instance', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class GoogleCloudApigeeV1ListKeyValueEntriesResponse(_messages.Message):
+  r"""The request structure for listing Key value map keys and its
+  corrresponding values.
+
+  Fields:
+    keyValueEntries: One or more Key value map key and its value.
+    nextPageToken: A token that can be sent as `next_page_token` to retrieve
+      the next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  keyValueEntries = _messages.MessageField('GoogleCloudApigeeV1KeyValueEntry', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
 
 
@@ -8279,6 +8375,8 @@ class GoogleCloudApigeeV1TargetServerConfig(_messages.Message):
     ProtocolValueValuesEnum: The protocol used by this target server.
 
   Fields:
+    enabled: Whether the target server is enabled. An empty/omitted value for
+      this field should be interpreted as true.
     host: Host name of the target server.
     name: Target server revision name in the following format: `organizations/
       {org}/environments/{env}/targetservers/{targetserver}/revisions/{rev}`
@@ -8300,11 +8398,12 @@ class GoogleCloudApigeeV1TargetServerConfig(_messages.Message):
     HTTP = 1
     GRPC = 2
 
-  host = _messages.StringField(1)
-  name = _messages.StringField(2)
-  port = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  protocol = _messages.EnumField('ProtocolValueValuesEnum', 4)
-  tlsInfo = _messages.MessageField('GoogleCloudApigeeV1TlsInfoConfig', 5)
+  enabled = _messages.BooleanField(1)
+  host = _messages.StringField(2)
+  name = _messages.StringField(3)
+  port = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  protocol = _messages.EnumField('ProtocolValueValuesEnum', 5)
+  tlsInfo = _messages.MessageField('GoogleCloudApigeeV1TlsInfoConfig', 6)
 
 
 class GoogleCloudApigeeV1TestDatastoreResponse(_messages.Message):

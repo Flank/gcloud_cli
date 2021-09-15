@@ -32,6 +32,7 @@ from googlecloudsdk.api_lib.functions.v2 import util as api_util
 from googlecloudsdk.api_lib.run import global_methods
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.functions import flags
 from googlecloudsdk.command_lib.functions import labels_util
 from googlecloudsdk.command_lib.run import connection_context
@@ -91,8 +92,6 @@ _SIGNATURE_TYPE_ENV_VAR_COLLISION_ERROR_MESSAGE = (
 
 _LEGACY_V1_FLAGS = [
     ('security_level', '--security-level'),
-    ('trigger_event', '--trigger-event'),
-    ('trigger_resource', '--trigger-resource'),
 ]
 _LEGACY_V1_FLAG_ERROR = '`%s` is only supported in Cloud Functions V1.'
 
@@ -119,11 +118,6 @@ _ZIP_MIME_TYPE = 'application/zip'
 
 _DEPLOYMENT_TOOL_LABEL = 'deployment-tool'
 _DEPLOYMENT_TOOL_VALUE = 'cli-gcloud'
-
-
-def _IsHttpTriggered(args):
-  return args.IsSpecified('trigger_http') or not (
-      args.trigger_topic or args.trigger_bucket or args.trigger_event_filters)
 
 
 def _GcloudIgnoreCreationPredicate(directory):
@@ -379,29 +373,34 @@ def _GetServiceConfig(args, messages, existing_function):
           ])), service_updated_fields
 
 
-def _GetEventTrigger(args, messages):
-  """Constructs an EventTrigger message from the command-line arguments.
+def _GetEventTrigger(args, messages, existing_function):
+  """Gets an EventTrigger message from the command-line arguments.
 
   Args:
     args: argparse.Namespace, arguments that this command was invoked with
     messages: messages module, the GCFv2 message stubs
+    existing_function: cloudfunctions_v2alpha_messages.Function | None
 
   Returns:
     event_trigger: cloudfunctions_v2alpha_messages.EventTrigger, used to request
       events sent from another service
     updated_fields_set: frozenset, set of update mask fields
   """
-  if _IsHttpTriggered(args):
-    return None, frozenset()
+  if args.trigger_http:
+    return None, frozenset(['event_trigger'] if existing_function else [])
 
   event_filters = []
   event_type = None
   pubsub_topic = None
+  service_account_email = args.trigger_service_account or args.service_account
+
+  if args.trigger_event or args.trigger_resource:
+    return _GetEventTriggerForEventType(args,
+                                        messages), frozenset(['event_trigger'])
 
   if args.trigger_topic:
     event_type = _EVENT_TYPE_PUBSUB_MESSAGE_PUBLISHED
-    pubsub_topic = 'projects/{}/topics/{}'.format(
-        properties.VALUES.core.project.GetOrFail(), args.trigger_topic)
+    pubsub_topic = _BuildFullPubsubTopic(args.trigger_topic)
   elif args.trigger_bucket:
     bucket = args.trigger_bucket[5:].rstrip('/')  # strip 'gs://' and final '/'
     event_type = _EVENT_TYPE_STORAGE_OBJECT_FINALIZED
@@ -414,17 +413,74 @@ def _GetEventTrigger(args, messages):
         if attr != 'type'
     ]
   else:
-    # Not expected given the implementation of _IsHttpTriggered
-    raise NotImplementedError('unknown trigger type')
+    if existing_function:
+      return existing_function.eventTrigger, frozenset()
+
+    raise calliope_exceptions.OneOfArgumentsRequiredException([
+        '--trigger-topic', '--trigger-bucket', '--trigger-http',
+        '--trigger-event', '--trigger-event-filters'
+    ], 'You must specify a trigger when deploying a new function.')
 
   event_trigger = messages.EventTrigger(
       eventFilters=event_filters,
       eventType=event_type,
       pubsubTopic=pubsub_topic,
-      serviceAccountEmail=args.trigger_service_account or args.service_account,
+      serviceAccountEmail=service_account_email,
       triggerRegion=args.trigger_location)
 
   return event_trigger, frozenset(['event_trigger'])
+
+
+def _GetEventTriggerForEventType(args, messages):
+  """Constructs an EventTrigger message from the command-line arguments.
+
+  Args:
+    args: argparse.Namespace, arguments that this command was invoked with
+    messages: messages module, the GCFv2 message stubs
+
+  Returns:
+    event_trigger: cloudfunctions_v2alpha_messages.EventTrigger, used to request
+      events sent from another service
+  """
+  trigger_event = args.trigger_event
+  trigger_resource = args.trigger_resource
+  service_account_email = args.trigger_service_account or args.service_account
+
+  # TODO(b/195973812): add gcf v1 type conversion
+  if trigger_event == 'google.cloud.pubsub.topic.v1.messagePublished':
+    pubsub_topic = trigger_resource
+    return messages.EventTrigger(
+        eventType=_EVENT_TYPE_PUBSUB_MESSAGE_PUBLISHED,
+        pubsubTopic=_BuildFullPubsubTopic(pubsub_topic),
+        serviceAccountEmail=service_account_email,
+        triggerRegion=args.trigger_location)
+
+  elif trigger_event in [
+      'google.cloud.storage.object.v1.archived',
+      'google.cloud.storage.object.v1.deleted',
+      'google.cloud.storage.object.v1.finalized',
+      'google.cloud.storage.object.v1.metadataUpdated',
+  ]:
+    # name without prefix gs://
+    bucket_name = storage_util.BucketReference.FromUrl(
+        trigger_resource).bucket
+    return messages.EventTrigger(
+        eventType=trigger_event,
+        eventFilters=[
+            messages.EventFilter(attribute='bucket', value=bucket_name)
+        ],
+        serviceAccountEmail=service_account_email,
+        triggerRegion=args.trigger_location)
+
+  else:
+    raise exceptions.InvalidArgumentException(
+        '--trigger-event',
+        'Unsupported event type: {} specified.'.format(trigger_event))
+
+
+def _BuildFullPubsubTopic(pubsub_topic):
+  return 'projects/{}/topics/{}'.format(
+      properties.VALUES.core.project.GetOrFail(), pubsub_topic)
 
 
 def _GetSignatureType(args, event_trigger):
@@ -659,9 +715,6 @@ def _SetInvokerPermissions(args, function, is_new_function):
       function.serviceConfig.service,
       _CLOUD_RUN_SERVICE_COLLECTION_ONE_PLATFORM)
 
-  if not _IsHttpTriggered(args):
-    return
-
   # This condition will be truthy if the user provided either
   # `--allow-unauthenticated` or `--no-allow-unauthenticated`. In other
   # words, it is only falsey when neither of those two flags is provided.
@@ -798,7 +851,9 @@ def Run(args, release_track):
   existing_function = _GetFunction(client, messages, function_ref)
   is_new_function = existing_function is None
 
-  event_trigger, trigger_updated_fields = _GetEventTrigger(args, messages)
+  event_trigger, trigger_updated_fields = _GetEventTrigger(
+      args, messages, existing_function)
+
   build_config, build_updated_fields = _GetBuildConfig(args, client, messages,
                                                        function_ref.locationsId,
                                                        function_ref.Name(),
@@ -831,7 +886,8 @@ def Run(args, release_track):
       messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
           name=function_ref.RelativeName()))
 
-  _SetInvokerPermissions(args, function, is_new_function)
+  if event_trigger is None:
+    _SetInvokerPermissions(args, function, is_new_function)
 
   log.status.Print(
       'You can view your function in the Cloud Console here: ' +

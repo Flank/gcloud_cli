@@ -125,6 +125,24 @@ class AssuredworkloadsOrganizationsLocationsWorkloadsPatchRequest(_messages.Mess
   updateMask = _messages.StringField(3)
 
 
+class AssuredworkloadsOrganizationsLocationsWorkloadsRestrictAllowedServicesRequest(_messages.Message):
+  r"""A AssuredworkloadsOrganizationsLocationsWorkloadsRestrictAllowedServices
+  Request object.
+
+  Fields:
+    googleCloudAssuredworkloadsV1beta1RestrictAllowedServicesRequest: A
+      GoogleCloudAssuredworkloadsV1beta1RestrictAllowedServicesRequest
+      resource to be passed as the request body.
+    name: Required. The resource name of the Workload. This is the workloads's
+      relative path in the API, formatted as "organizations/{organization_id}/
+      locations/{location_id}/workloads/{workload_id}". For example,
+      "organizations/123/locations/us-east1/workloads/assured-workload-1".
+  """
+
+  googleCloudAssuredworkloadsV1beta1RestrictAllowedServicesRequest = _messages.MessageField('GoogleCloudAssuredworkloadsV1beta1RestrictAllowedServicesRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Message):
   r"""Operation metadata to give request details of CreateWorkload.
 
@@ -156,6 +174,8 @@ class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Mes
       HITRUST: Health Information Trust Alliance controls
       EU_REGIONS_AND_SUPPORT: Assured Workloads For EU Regions and Support
         controls
+      CA_REGIONS_AND_SUPPORT: Assured Workloads For Canada Regions and Support
+        controls
     """
     COMPLIANCE_REGIME_UNSPECIFIED = 0
     IL4 = 1
@@ -166,6 +186,7 @@ class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Mes
     HIPAA = 6
     HITRUST = 7
     EU_REGIONS_AND_SUPPORT = 8
+    CA_REGIONS_AND_SUPPORT = 9
 
   complianceRegime = _messages.EnumField('ComplianceRegimeValueValuesEnum', 1)
   createTime = _messages.StringField(2)
@@ -238,6 +259,8 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
       HITRUST: Health Information Trust Alliance controls
       EU_REGIONS_AND_SUPPORT: Assured Workloads For EU Regions and Support
         controls
+      CA_REGIONS_AND_SUPPORT: Assured Workloads For Canada Regions and Support
+        controls
     """
     COMPLIANCE_REGIME_UNSPECIFIED = 0
     IL4 = 1
@@ -248,6 +271,7 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
     HIPAA = 6
     HITRUST = 7
     EU_REGIONS_AND_SUPPORT = 8
+    CA_REGIONS_AND_SUPPORT = 9
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -435,6 +459,42 @@ class GoogleCloudAssuredworkloadsV1beta1ListWorkloadsResponse(_messages.Message)
 
   nextPageToken = _messages.StringField(1)
   workloads = _messages.MessageField('GoogleCloudAssuredworkloadsV1beta1Workload', 2, repeated=True)
+
+
+class GoogleCloudAssuredworkloadsV1beta1RestrictAllowedServicesRequest(_messages.Message):
+  r"""Request for restricting list of available services in Workload
+  environment.
+
+  Enums:
+    RestrictionTypeValueValuesEnum: Required. The type of restriction for
+      using gcp services in the Workload environment.
+
+  Fields:
+    restrictionType: Required. The type of restriction for using gcp services
+      in the Workload environment.
+  """
+
+  class RestrictionTypeValueValuesEnum(_messages.Enum):
+    r"""Required. The type of restriction for using gcp services in the
+    Workload environment.
+
+    Values:
+      RESTRICTION_TYPE_UNSPECIFIED: Unknown restriction type.
+      ALLOW_ALL_GCP_SERVICES: Allow the use all services. This effectively
+        remove all restrictions placed on the Folder.
+      ALLOW_COMPLIANT_SERVICES: Based on Workload's compliance regime, allowed
+        list changes. See - https://cloud.google.com/assured-
+        workloads/docs/supported-products for the list of allowed services.
+    """
+    RESTRICTION_TYPE_UNSPECIFIED = 0
+    ALLOW_ALL_GCP_SERVICES = 1
+    ALLOW_COMPLIANT_SERVICES = 2
+
+  restrictionType = _messages.EnumField('RestrictionTypeValueValuesEnum', 1)
+
+
+class GoogleCloudAssuredworkloadsV1beta1RestrictAllowedServicesResponse(_messages.Message):
+  r"""Response for restricting the list of allowed services."""
 
 
 class GoogleCloudAssuredworkloadsV1beta1Workload(_messages.Message):

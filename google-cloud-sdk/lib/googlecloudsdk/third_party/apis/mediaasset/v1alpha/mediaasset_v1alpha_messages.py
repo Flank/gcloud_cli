@@ -805,6 +805,32 @@ class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
 
 
+class Catalog(_messages.Message):
+  r"""A catalog specifies a search index for a collection of assets.
+
+  Fields:
+    createTime: Output only. The creation time of the catalog.
+    name: The resource name of the catalog, in the following form:
+      `projects/{project}/locations/{location}/catalogs/{catalog}`.
+    updateTime: Output only. The last-modified time of the catalog.
+  """
+
+  createTime = _messages.StringField(1)
+  name = _messages.StringField(2)
+  updateTime = _messages.StringField(3)
+
+
+class CatalogConfig(_messages.Message):
+  r"""Configures the catalog of assets.
+
+  Fields:
+    catalog: Required. Reference to a catalog to populate with assets:
+      `projects/{project}/locations/{location}/catalogs/{name}`.
+  """
+
+  catalog = _messages.StringField(1)
+
+
 class ComplexFieldAllowedValues(_messages.Message):
   r"""A ComplexFieldAllowedValues object.
 
@@ -1778,6 +1804,21 @@ class ListAssetsResponse(_messages.Message):
   unreachable = _messages.StringField(3, repeated=True)
 
 
+class ListCatalogsResponse(_messages.Message):
+  r"""Response message for CatalogsService.ListCatalogs.
+
+  Fields:
+    catalogs: The list of catalogs.
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results in the list.
+    unreachable: Locations that could not be reached.
+  """
+
+  catalogs = _messages.MessageField('Catalog', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+  unreachable = _messages.StringField(3, repeated=True)
+
+
 class ListComplexTypesResponse(_messages.Message):
   r"""Response message for ComplexTypesService.ListComplexTypes.
 
@@ -2681,6 +2722,86 @@ class MediaassetProjectsLocationsAssetTypesTestIamPermissionsRequest(_messages.M
   resource = _messages.StringField(2, required=True)
 
 
+class MediaassetProjectsLocationsCatalogsCreateRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsCatalogsCreateRequest object.
+
+  Fields:
+    catalog: A Catalog resource to be passed as the request body.
+    catalogId: The ID of the catalog resource to be created.
+    parent: Required. The parent resource name, in the following form:
+      `projects/{project}/locations/{location}`.
+  """
+
+  catalog = _messages.MessageField('Catalog', 1)
+  catalogId = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class MediaassetProjectsLocationsCatalogsDeleteRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsCatalogsDeleteRequest object.
+
+  Fields:
+    name: Required. The name of the catalog to delete, in the following form:
+      `projects/{project}/locations/{location}/catalogs/{catalog}`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MediaassetProjectsLocationsCatalogsGetRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsCatalogsGetRequest object.
+
+  Fields:
+    name: Required. The name of the catalog to retrieve, in the following
+      form: `projects/{project}/locations/{location}/catalogs/{catalog}`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MediaassetProjectsLocationsCatalogsListRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsCatalogsListRequest object.
+
+  Fields:
+    filter: The filter to apply to list results.
+    orderBy: Specifies the ordering of results following syntax at
+      https://cloud.google.com/apis/design/design_patterns#sorting_order.
+    pageSize: The maximum number of items to return. If unspecified, server
+      will pick an appropriate default. Server may return fewer items than
+      requested. A caller should only rely on response's next_page_token to
+      determine if there are more realms left to be queried.
+    pageToken: The next_page_token value returned from a previous List
+      request, if any.
+    parent: Required. The parent resource name, in the following form:
+      `projects/{project}/locations/{location}`.
+  """
+
+  filter = _messages.StringField(1)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
+
+
+class MediaassetProjectsLocationsCatalogsPatchRequest(_messages.Message):
+  r"""A MediaassetProjectsLocationsCatalogsPatchRequest object.
+
+  Fields:
+    catalog: A Catalog resource to be passed as the request body.
+    name: The resource name of the catalog, in the following form:
+      `projects/{project}/locations/{location}/catalogs/{catalog}`.
+    updateMask: Field mask is used to specify the fields to be overwritten in
+      the Catalog resource by the update. The fields specified in the
+      update_mask are relative to the resource, not the full request. A field
+      will be overwritten if it is in the mask. If the user does not provide a
+      mask then all fields will be overwritten.
+  """
+
+  catalog = _messages.MessageField('Catalog', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
 class MediaassetProjectsLocationsComplexTypesCreateRequest(_messages.Message):
   r"""A MediaassetProjectsLocationsComplexTypesCreateRequest object.
 
@@ -3498,13 +3619,14 @@ class PubSubDestination(_messages.Message):
 
 class Rule(_messages.Message):
   r"""A rule resource is associated with an AssetType and manages the workflow
-  pipelines of a collection of Assets under that AssetType.
+  pipelines of a collection of Assets under that AssetType. NEXT_ID: 10
 
   Messages:
     LabelsValue: The labels associated with this resource. Each label is a
       key-value pair.
 
   Fields:
+    catalog: Configures how to catalog assets.
     createTime: Output only. The creation time of the rule.
     derivedAsset: Configures the associated AssetType to manage the derived
       assets for its Assets.
@@ -3548,13 +3670,14 @@ class Rule(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  createTime = _messages.StringField(1)
-  derivedAsset = _messages.MessageField('DerivedAssetConfig', 2)
-  labels = _messages.MessageField('LabelsValue', 3)
-  name = _messages.StringField(4)
-  notification = _messages.MessageField('NotificationConfig', 5)
-  transformation = _messages.MessageField('TransformationConfig', 6)
-  updateTime = _messages.StringField(7)
+  catalog = _messages.MessageField('CatalogConfig', 1)
+  createTime = _messages.StringField(2)
+  derivedAsset = _messages.MessageField('DerivedAssetConfig', 3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  name = _messages.StringField(5)
+  notification = _messages.MessageField('NotificationConfig', 6)
+  transformation = _messages.MessageField('TransformationConfig', 7)
+  updateTime = _messages.StringField(8)
 
 
 class SortOrderConfig(_messages.Message):

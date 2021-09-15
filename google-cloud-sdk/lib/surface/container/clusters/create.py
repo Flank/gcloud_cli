@@ -270,6 +270,7 @@ def ParseCreateOptionsBase(args, is_autopilot, get_default, location,
       enable_master_authorized_networks=\
         get_default('enable_master_authorized_networks'),
       enable_master_global_access=get_default('enable_master_global_access'),
+      enable_mesh_certificates=get_default('enable_mesh_certificates'),
       enable_network_policy=get_default('enable_network_policy'),
       enable_private_nodes=get_default('enable_private_nodes'),
       enable_private_endpoint=get_default('enable_private_endpoint'),
@@ -499,6 +500,8 @@ flags_to_add = {
             flags.AddMaxPodsPerNodeFlag,
         'maxunavailable':
             flags.AddMaxUnavailableUpgradeFlag,
+        'meshcertificates':
+            flags.AddMeshCertificatesFlags,
         'metadata':
             flags.AddMetadataFlags,
         'mincpu':
@@ -663,6 +666,8 @@ flags_to_add = {
             flags.AddMaxPodsPerNodeFlag,
         'maxunavailable':
             (lambda p: flags.AddMaxUnavailableUpgradeFlag(p, is_create=True)),
+        'meshcertificates':
+            flags.AddMeshCertificatesFlags,
         'metadata':
             flags.AddMetadataFlags,
         'mincpu':
@@ -700,6 +705,8 @@ flags_to_add = {
             flags.AddShieldedInstanceFlags,
         'shieldednodes':
             flags.AddEnableShieldedNodesFlags,
+        'spot':
+            flags.AddSpotFlag,
         'stackdriver':
             flags.AddEnableStackdriverKubernetesFlag,
         'surgeupgrade': (lambda p: flags.AddSurgeUpgradeFlag(p, default=1)),
@@ -846,6 +853,8 @@ flags_to_add = {
             flags.AddMasterAuthorizedNetworksFlags,
         'mastersignals':
             AddMasterSignalsFlag,
+        'meshcertificates':
+            flags.AddMeshCertificatesFlags,
         'metadata':
             flags.AddMetadataFlags,
         'mincpu':
@@ -885,6 +894,8 @@ flags_to_add = {
             flags.AddShieldedInstanceFlags,
         'shieldednodes':
             flags.AddEnableShieldedNodesFlags,
+        'spot':
+            flags.AddSpotFlag,
         'stackdriver':
             flags.AddEnableStackdriverKubernetesFlag,
         'securityprofile':
@@ -1139,6 +1150,7 @@ class CreateBeta(Create):
         get_default('cross_connect_subnetworks')
     ops.enable_service_externalips = get_default('enable_service_externalips')
     ops.enable_managed_prometheus = get_default('enable_managed_prometheus')
+    ops.spot = get_default('spot')
     return ops
 
 
@@ -1220,4 +1232,5 @@ class CreateAlpha(Create):
         get_default('cross_connect_subnetworks')
     ops.enable_service_externalips = get_default('enable_service_externalips')
     ops.enable_managed_prometheus = get_default('enable_managed_prometheus')
+    ops.spot = get_default('spot')
     return ops

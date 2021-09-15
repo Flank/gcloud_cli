@@ -312,6 +312,10 @@
           "description": "Configuration for issuance of mTLS keys and certificates to Kubernetes pods.",
           "$ref": "WorkloadCertificates"
         },
+        "meshCertificates": {
+          "description": "Configuration for issuance of mTLS keys and certificates to Kubernetes pods.",
+          "$ref": "MeshCertificates"
+        },
         "workloadAltsConfig": {
           "description": "Configuration for direct-path (via ALTS) with workload identity.",
           "$ref": "WorkloadALTSConfig"
@@ -1323,12 +1327,12 @@
           "type": "boolean"
         },
         "minNodeCount": {
-          "description": "Minimum number of nodes in the NodePool. Must be >= 1 and <= max_node_count.",
+          "description": "Minimum number of nodes for one location in the NodePool. Must be >= 1 and <= max_node_count.",
           "type": "integer",
           "format": "int32"
         },
         "maxNodeCount": {
-          "description": "Maximum number of nodes in the NodePool. Must be >= min_node_count. There has to be enough quota to scale up the cluster.",
+          "description": "Maximum number of nodes for one location in the NodePool. Must be >= min_node_count. There has to be enough quota to scale up the cluster.",
           "type": "integer",
           "format": "int32"
         },
@@ -2374,6 +2378,17 @@
         }
       }
     },
+    "MeshCertificates": {
+      "id": "MeshCertificates",
+      "description": "Configuration for issuance of mTLS keys and certificates to Kubernetes pods.",
+      "type": "object",
+      "properties": {
+        "enableCertificates": {
+          "description": "enable_certificates controls issuance of workload mTLS certificates. If set, the GKE Workload Identity Certificates controller and node agent will be deployed in the cluster, which can then be configured by creating a WorkloadCertificateConfig Custom Resource. Requires Workload Identity (workload_pool must be non-empty).",
+          "type": "boolean"
+        }
+      }
+    },
     "WorkloadALTSConfig": {
       "id": "WorkloadALTSConfig",
       "description": "Configuration for direct-path (via ALTS) with workload identity.",
@@ -3198,6 +3213,10 @@
         "desiredWorkloadCertificates": {
           "description": "Configuration for issuance of mTLS keys and certificates to Kubernetes pods.",
           "$ref": "WorkloadCertificates"
+        },
+        "desiredMeshCertificates": {
+          "description": "Configuration for issuance of mTLS keys and certificates to Kubernetes pods.",
+          "$ref": "MeshCertificates"
         },
         "desiredWorkloadAltsConfig": {
           "description": "Configuration for direct-path (via ALTS) with workload identity.",
